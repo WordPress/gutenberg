@@ -49,14 +49,14 @@ function render_block_core_countdown( $attributes, $content, $block ) {
 		$end_time_ts  = strtotime( $end_time_gmt . ' +0000' );
 
 		/**
-         * Filters the absolute end time (Unix timestamp) for the countdown.
-         *
-         * @since 23.4.0
-         * @param int      $end_time_ts The calculated Unix timestamp of the end time.
-         * @param array    $attributes  The block attributes.
-         * @param WP_Block $block       The block instance.
-         */
-        $end_time_ts = (int) apply_filters( 'core_countdown_end_time_ts', $end_time_ts, $attributes, $block );
+		 * Filters the absolute end time (Unix timestamp) for the countdown.
+		 *
+		 * @since 23.4.0
+		 * @param int      $end_time_ts The calculated Unix timestamp of the end time.
+		 * @param array    $attributes  The block attributes.
+		 * @param WP_Block $block       The block instance.
+		 */
+		$end_time_ts = (int) apply_filters( 'core_countdown_end_time_ts', $end_time_ts, $attributes, $block );
 
 		$remaining_time   = $end_time_ts - $current_time;
 		$is_expired       = 0 >= $remaining_time;
@@ -64,15 +64,15 @@ function render_block_core_countdown( $attributes, $content, $block ) {
 	}
 
 	/**
-     * Filters whether the countdown is considered expired.
-     *
-     * @since 23.4.0
-     *
-     * @param bool     $is_expired Whether the countdown has reached 0.
-     * @param array    $attributes The block attributes.
-     * @param WP_Block $block      The block instance.
-     */
-    $is_expired = apply_filters( 'core_countdown_is_expired', $is_expired, $attributes, $block );
+	 * Filters whether the countdown is considered expired.
+	 *
+	 * @since 23.4.0
+	 *
+	 * @param bool     $is_expired Whether the countdown has reached 0.
+	 * @param array    $attributes The block attributes.
+	 * @param WP_Block $block      The block instance.
+	 */
+	$is_expired = apply_filters( 'core_countdown_is_expired', $is_expired, $attributes, $block );
 
 	if ( ! $is_evergreen ) {
 		$naturally_expired = 0 >= $remaining_time;
@@ -93,6 +93,7 @@ function render_block_core_countdown( $attributes, $content, $block ) {
 	if ( $is_expired && 'redirect' === $action_on_end && $is_frontend_request ) {
 		$valid_url = wp_http_validate_url( $action_value );
 		if ( $valid_url ) {
+			// phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			wp_redirect( $valid_url );
 			exit;
 		}

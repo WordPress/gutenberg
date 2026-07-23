@@ -678,6 +678,12 @@
 		"parent": "core-blocks-theme"
 	},
 	{
+		"title": "Countdown",
+		"slug": "core-block-countdown",
+		"markdown_source": "../packages/block-library/src/countdown/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
 		"title": "Cover",
 		"slug": "core-block-cover",
 		"markdown_source": "../packages/block-library/src/cover/README.md",

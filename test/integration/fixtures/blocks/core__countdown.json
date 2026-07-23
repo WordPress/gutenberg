@@ -7,10 +7,15 @@
 			"showHours": true,
 			"showMinutes": true,
 			"showSeconds": true,
-			"actionOnEnd": "hide",
+			"actionOnEnd": "none",
 			"actionValue": "",
 			"bgColor": "#ffffff",
-			"borderColor": "#000000"
+			"borderColor": "#000000",
+			"innerBlocksBehavior": "revealOnEnd",
+			"isEvergreen": false,
+			"evergreenDays": 0,
+			"evergreenHours": 0,
+			"evergreenMinutes": 15
 		},
 		"innerBlocks": []
 	}
