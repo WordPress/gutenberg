@@ -93,6 +93,78 @@ describe( 'DataForm component', () => {
 			expect( fieldsSelector.author.edit() ).toBeInTheDocument();
 		} );
 
+		it( 'should use the field header as the text control label', () => {
+			const fieldsWithHeader = fields.map( ( field ) =>
+				field.id === 'title'
+					? {
+							...field,
+							header: <span>Title with icon</span>,
+					  }
+					: field
+			);
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithHeader }
+					form={ form }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Title with icon' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should use the field header as the number control label', () => {
+			const fieldsWithHeader = fields.map( ( field ) =>
+				field.id === 'order'
+					? {
+							...field,
+							header: <span>Order with icon</span>,
+					  }
+					: field
+			);
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithHeader }
+					form={ form }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Order with icon' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should use the field header as the select control label', () => {
+			const fieldsWithHeader = fields.map( ( field ) =>
+				field.id === 'author'
+					? {
+							...field,
+							header: <span>Author with icon</span>,
+					  }
+					: field
+			);
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithHeader }
+					form={ form }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Author with icon' } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should render custom Edit component', () => {
 			const fieldsWithCustomEditComponent = fields.map( ( field ) => {
 				if ( field.id === 'title' ) {

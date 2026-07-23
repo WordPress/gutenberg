@@ -31,3 +31,20 @@
 	/* Override the default margin on a h2 element. */
 	margin: 0 !important;
 }
+
+.block-editor-block-fields__field-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $grid-unit-05;
+	width: 100%;
+}
+
+.block-editor-block-fields__bindings-indicator {
+	display: inline-flex;
+	color: $gray-600;
+
+	&.is-bound {
+		color: var(--wp-block-synced-color);
+	}
+}

@@ -22,7 +22,7 @@ export default function Radio< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, description, getValue, setValue, isValid } = field;
+	const { header, description, getValue, setValue, isValid } = field;
 	const disabled = field.isDisabled( { item: data, field } );
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
@@ -45,7 +45,7 @@ export default function Radio< Item >( {
 			required={ !! field.isValid?.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			help={ description }
 			onChange={ onChangeControl }
 			options={ elements }
