@@ -22,7 +22,9 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	} ) => (
 		<div
 			data-testid={ `block-controls-${
-				__experimentalShareWithChildBlocks ? 'parent' : group
+				__experimentalShareWithChildBlocks
+					? 'shared-with-child-blocks'
+					: group
 			}` }
 		>
 			{ children }
@@ -149,7 +151,7 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
-	it( 'renders the add track control for child blocks', () => {
+	it( 'shares the add track control with selected track blocks', () => {
 		render(
 			<PlaylistEdit
 				attributes={ defaultAttributes }
@@ -160,10 +162,12 @@ describe( 'PlaylistEdit', () => {
 			/>
 		);
 
-		const childControls = screen.getByTestId( 'block-controls-parent' );
+		const sharedControls = screen.getByTestId(
+			'block-controls-shared-with-child-blocks'
+		);
 
 		expect(
-			within( childControls ).getByRole( 'button', {
+			within( sharedControls ).getByRole( 'button', {
 				name: 'Add track',
 			} )
 		).toBeInTheDocument();
