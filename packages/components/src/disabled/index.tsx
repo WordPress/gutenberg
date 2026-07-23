@@ -1,8 +1,15 @@
-import { disabledStyles } from './styles/disabled-styles';
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import { useCx } from '../utils';
 import Context from './context';
+import styles from './style.module.scss';
 
 const { Consumer, Provider } = Context;
 
@@ -54,8 +61,6 @@ function Disabled( {
 	isDisabled = true,
 	...props
 }: WordPressComponentProps< DisabledProps, 'div' > ) {
-	const cx = useCx();
-
 	return (
 		<Provider value={ isDisabled }>
 			<div
@@ -63,7 +68,11 @@ function Disabled( {
 				inert={ isDisabled ? 'true' : undefined }
 				className={
 					isDisabled
-						? cx( disabledStyles, className, 'components-disabled' )
+						? clsx(
+								styles.disabled,
+								className,
+								'components-disabled'
+						  )
 						: undefined
 				}
 				{ ...props }

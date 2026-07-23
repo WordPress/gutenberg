@@ -1,14 +1,9 @@
-/**
- * External dependencies
- */
-import { css } from '@emotion/react';
-
-export const disabledStyles = css`
+.disabled {
 	position: relative;
 	pointer-events: none;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -20,4 +15,4 @@ export const disabledStyles = css`
 	* {
 		pointer-events: none;
 	}
-`;
+}
