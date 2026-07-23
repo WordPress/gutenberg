@@ -4,58 +4,37 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
- * WordPress dependencies
- */
-import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
-import RevisionsSlider from '../revisions-slider';
+import { RevisionsSlider } from '../revisions-slider';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
-	jest.fn()
-);
+const noop = () => {};
 
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: ( object ) => ( {
-		...object,
-		registerPrivateActions: jest.fn(),
-		registerPrivateSelectors: jest.fn(),
-	} ),
-} ) );
+function getRevisionsSlider( revisions ) {
+	return (
+		<RevisionsSlider
+			revisions={ revisions }
+			perPage={ 100 }
+			currentRevisionId={ 2 }
+			revisionKey="id"
+			revisionPage={ 1 }
+			totalRevisions={ 2 }
+			setCurrentRevisionId={ noop }
+			setRevisionPage={ noop }
+		/>
+	);
+}
 
 describe( 'RevisionsSlider', () => {
-	let revisions;
-
-	beforeEach( () => {
-		revisions = undefined;
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				getCurrentPostType: () => 'post',
-				getCurrentRevisionId: () => 2,
-				getRevisionPage: () => 1,
-				getPageRevisions: () => revisions,
-				getRevisionsPerPage: () => 100,
-				getCurrentPostRevisionsCount: () => 2,
-				getEntityConfig: () => ( { revisionKey: 'id' } ),
-			} ) )
-		);
-		useDispatch.mockReturnValue( {
-			setCurrentRevisionId: jest.fn(),
-			setRevisionPage: jest.fn(),
-		} );
-	} );
-
 	it( 'focuses the slider when revisions load without user interaction', () => {
-		const { rerender } = render( <RevisionsSlider /> );
+		const { rerender } = render( getRevisionsSlider() );
 
-		revisions = [
-			{ id: 2, date: '2026-07-14T12:00:00' },
-			{ id: 1, date: '2026-07-14T11:00:00' },
-		];
-		rerender( <RevisionsSlider /> );
+		rerender(
+			getRevisionsSlider( [
+				{ id: 2, date: '2026-07-14T12:00:00' },
+				{ id: 1, date: '2026-07-14T11:00:00' },
+			] )
+		);
 
 		expect(
 			screen.getByRole( 'slider', { name: 'Revision' } )
@@ -66,21 +45,20 @@ describe( 'RevisionsSlider', () => {
 		const { rerender } = render(
 			<>
 				<button>Options</button>
-				<RevisionsSlider />
+				{ getRevisionsSlider() }
 			</>
 		);
 		const optionsButton = screen.getByRole( 'button', { name: 'Options' } );
 
 		fireEvent.pointerDown( optionsButton );
 		expect( document.body ).toHaveFocus();
-		revisions = [
-			{ id: 2, date: '2026-07-14T12:00:00' },
-			{ id: 1, date: '2026-07-14T11:00:00' },
-		];
 		rerender(
 			<>
 				<button>Options</button>
-				<RevisionsSlider />
+				{ getRevisionsSlider( [
+					{ id: 2, date: '2026-07-14T12:00:00' },
+					{ id: 1, date: '2026-07-14T11:00:00' },
+				] ) }
 			</>
 		);
 

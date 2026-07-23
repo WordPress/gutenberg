@@ -18,19 +18,12 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Slider component for navigating revisions with pagination.
+ * Connects the revisions slider to the editor store.
  *
- * @return {React.JSX.Element} The revisions slider component.
+ * @return {React.JSX.Element} The connected revisions slider.
  */
-function RevisionsSlider() {
-	const {
-		revisions: rawRevisions,
-		perPage,
-		currentRevisionId,
-		revisionKey,
-		revisionPage,
-		totalRevisions,
-	} = useSelect( ( select ) => {
+export default function ConnectedRevisionsSlider() {
+	const revisionData = useSelect( ( select ) => {
 		const {
 			getCurrentRevisionId,
 			getRevisionPage,
@@ -47,24 +40,55 @@ function RevisionsSlider() {
 			'postType',
 			postType
 		);
-		const _revisionKey = entityConfig?.revisionKey || 'id';
-		const _revisionPage = getRevisionPage();
+		const revisionKey = entityConfig?.revisionKey || 'id';
+		const revisionPage = getRevisionPage();
 
 		return {
-			revisions: getPageRevisions( _revisionPage ),
+			revisions: getPageRevisions( revisionPage ),
 			perPage: getRevisionsPerPage(),
 			currentRevisionId: getCurrentRevisionId(),
-			revisionKey: _revisionKey,
-			revisionPage: _revisionPage,
+			revisionKey,
+			revisionPage,
 			totalRevisions:
 				select( editorStore ).getCurrentPostRevisionsCount(),
 		};
 	}, [] );
 
-	const { setCurrentRevisionId, setRevisionPage } = unlock(
-		useDispatch( editorStore )
-	);
+	const revisionActions = unlock( useDispatch( editorStore ) );
 
+	return (
+		<RevisionsSlider
+			{ ...revisionData }
+			setCurrentRevisionId={ revisionActions.setCurrentRevisionId }
+			setRevisionPage={ revisionActions.setRevisionPage }
+		/>
+	);
+}
+
+/**
+ * Slider component for navigating revisions with pagination.
+ *
+ * @param {Object}          props                      Component props.
+ * @param {Array|undefined} props.revisions            Revisions on the current page.
+ * @param {number}          props.perPage              Revisions per page.
+ * @param {number|string}   props.currentRevisionId    Selected revision ID.
+ * @param {string}          props.revisionKey          Revision identifier key.
+ * @param {number}          props.revisionPage         Current page.
+ * @param {number}          props.totalRevisions       Total number of revisions.
+ * @param {Function}        props.setCurrentRevisionId Selects a revision.
+ * @param {Function}        props.setRevisionPage      Selects a page.
+ * @return {React.JSX.Element} The revisions slider component.
+ */
+export function RevisionsSlider( {
+	revisions: rawRevisions,
+	perPage,
+	currentRevisionId,
+	revisionKey,
+	revisionPage,
+	totalRevisions,
+	setCurrentRevisionId,
+	setRevisionPage,
+} ) {
 	const setFocusOnMountRef = useFocusOnMount( true );
 	const initialActiveElementRef = useRef();
 	const didInteractWhileLoadingRef = useRef( false );
@@ -247,5 +271,3 @@ function RevisionsSlider() {
 		</Stack>
 	);
 }
-
-export default RevisionsSlider;

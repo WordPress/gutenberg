@@ -94,40 +94,58 @@ export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
 }
 
 /**
+ * Connects the revision code diff to the editor store.
+ *
+ * @return {React.JSX.Element} The connected revision code diff.
+ */
+export default function ConnectedRevisionsCodeDiff() {
+	const revisionDiff = useSelect( ( select ) => {
+		const editorSelectors = select( editorStore );
+		const {
+			getCurrentRevision,
+			getPreviousRevision,
+			getRevisionPage,
+			getRevisionsPerPage,
+			isShowingRevisionDiff,
+		} = unlock( editorSelectors );
+		const _previousRevision = getPreviousRevision();
+		const _showDiff = isShowingRevisionDiff();
+		const totalPages =
+			Math.ceil(
+				editorSelectors.getCurrentPostRevisionsCount() /
+					getRevisionsPerPage()
+			) || 1;
+
+		return {
+			revision: getCurrentRevision(),
+			previousRevision: _previousRevision,
+			showDiff: _showDiff,
+			isPreviousRevisionLoading:
+				_showDiff &&
+				_previousRevision === null &&
+				getRevisionPage() < totalPages,
+		};
+	}, [] );
+
+	return <RevisionsCodeDiff { ...revisionDiff } />;
+}
+
+/**
  * Shows the selected revision's raw block markup as a read-only diff.
  *
+ * @param {Object}      props                           Component props.
+ * @param {Object}      props.revision                  Selected revision.
+ * @param {Object|null} props.previousRevision          Previous revision.
+ * @param {boolean}     props.showDiff                  Whether to show changes.
+ * @param {boolean}     props.isPreviousRevisionLoading Whether the previous revision is loading.
  * @return {React.JSX.Element} The revision code diff.
  */
-export default function RevisionsCodeDiff() {
-	const { revision, previousRevision, showDiff, isPreviousRevisionLoading } =
-		useSelect( ( select ) => {
-			const editorSelectors = select( editorStore );
-			const {
-				getCurrentRevision,
-				getPreviousRevision,
-				getRevisionPage,
-				getRevisionsPerPage,
-				isShowingRevisionDiff,
-			} = unlock( editorSelectors );
-			const _previousRevision = getPreviousRevision();
-			const _showDiff = isShowingRevisionDiff();
-			const totalPages =
-				Math.ceil(
-					editorSelectors.getCurrentPostRevisionsCount() /
-						getRevisionsPerPage()
-				) || 1;
-
-			return {
-				revision: getCurrentRevision(),
-				previousRevision: _previousRevision,
-				showDiff: _showDiff,
-				isPreviousRevisionLoading:
-					_showDiff &&
-					_previousRevision === null &&
-					getRevisionPage() < totalPages,
-			};
-		}, [] );
-
+export function RevisionsCodeDiff( {
+	revision,
+	previousRevision,
+	showDiff,
+	isPreviousRevisionLoading,
+} ) {
 	const rows = useMemo( () => {
 		if ( ! revision || isPreviousRevisionLoading ) {
 			return [];

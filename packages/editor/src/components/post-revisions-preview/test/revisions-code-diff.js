@@ -2,61 +2,31 @@
  * External dependencies
  */
 import { render, screen, within } from '@testing-library/react';
-import { diffLines } from 'diff';
-
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import RevisionsCodeDiff, { getCodeDiffRows } from '../revisions-code-diff';
+import { RevisionsCodeDiff, getCodeDiffRows } from '../revisions-code-diff';
 
-jest.mock( 'diff', () => {
-	const actual = jest.requireActual( 'diff' );
-	return {
-		...actual,
-		diffLines: jest.fn( actual.diffLines ),
-	};
-} );
-
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: ( object ) => ( {
-		...object,
-		registerPrivateActions: jest.fn(),
-		registerPrivateSelectors: jest.fn(),
-	} ),
-} ) );
-
-function mockRevisions( {
+function renderCodeDiff( {
 	currentContent = '',
 	previousContent = '',
 	previousRevision,
 	showDiff = true,
-	revisionPage = 1,
-	totalRevisions = 2,
-	revisionsPerPage = 100,
+	isPreviousRevisionLoading = false,
 } = {} ) {
 	const resolvedPreviousRevision =
 		previousRevision === undefined
 			? { content: { raw: previousContent } }
 			: previousRevision;
 
-	useSelect.mockImplementation( ( mapSelect ) =>
-		mapSelect( () => ( {
-			getCurrentRevision: () => ( {
-				content: { raw: currentContent },
-			} ),
-			getPreviousRevision: () => resolvedPreviousRevision,
-			getRevisionPage: () => revisionPage,
-			getRevisionsPerPage: () => revisionsPerPage,
-			getCurrentPostRevisionsCount: () => totalRevisions,
-			isShowingRevisionDiff: () => showDiff,
-		} ) )
+	return render(
+		<RevisionsCodeDiff
+			revision={ { content: { raw: currentContent } } }
+			previousRevision={ resolvedPreviousRevision }
+			showDiff={ showDiff }
+			isPreviousRevisionLoading={ isPreviousRevisionLoading }
+		/>
 	);
 }
 
@@ -120,55 +90,54 @@ describe( 'getCodeDiffRows', () => {
 	} );
 
 	it( 'uses a coarse diff when line diffing exceeds its limits', () => {
-		diffLines.mockReturnValueOnce( undefined );
+		const previousLines = Array.from(
+			{ length: 501 },
+			( _, index ) => `Before ${ index }`
+		);
+		const currentLines = Array.from(
+			{ length: 501 },
+			( _, index ) => `After ${ index }`
+		);
+		const rows = getCodeDiffRows(
+			previousLines.join( '\n' ),
+			currentLines.join( '\n' ),
+			true
+		);
 
-		expect( getCodeDiffRows( 'Before\nOld', 'After\nNew', true ) ).toEqual(
-			[
-				{
-					value: 'Before',
-					status: 'removed',
-					previousLineNumber: 1,
-					currentLineNumber: null,
-				},
-				{
-					value: 'Old',
-					status: 'removed',
-					previousLineNumber: 2,
-					currentLineNumber: null,
-				},
-				{
-					value: 'After',
-					status: 'added',
-					previousLineNumber: null,
-					currentLineNumber: 1,
-				},
-				{
-					value: 'New',
-					status: 'added',
-					previousLineNumber: null,
-					currentLineNumber: 2,
-				},
-			]
-		);
-		expect( diffLines ).toHaveBeenLastCalledWith(
-			'Before\nOld',
-			'After\nNew',
-			{
-				maxEditLength: 1000,
-				timeout: 100,
-			}
-		);
+		expect( rows ).toHaveLength( 1002 );
+		expect( rows[ 0 ] ).toEqual( {
+			value: 'Before 0',
+			status: 'removed',
+			previousLineNumber: 1,
+			currentLineNumber: null,
+		} );
+		expect( rows[ 500 ] ).toEqual( {
+			value: 'Before 500',
+			status: 'removed',
+			previousLineNumber: 501,
+			currentLineNumber: null,
+		} );
+		expect( rows[ 501 ] ).toEqual( {
+			value: 'After 0',
+			status: 'added',
+			previousLineNumber: null,
+			currentLineNumber: 1,
+		} );
+		expect( rows[ 1001 ] ).toEqual( {
+			value: 'After 500',
+			status: 'added',
+			previousLineNumber: null,
+			currentLineNumber: 501,
+		} );
 	} );
 } );
 
 describe( 'RevisionsCodeDiff', () => {
 	it( 'shows added and removed markup in the code diff', () => {
-		mockRevisions( {
+		renderCodeDiff( {
 			previousContent: '<!-- wp:paragraph -->\n<p>Before</p>',
 			currentContent: '<!-- wp:paragraph -->\n<p>After</p>',
 		} );
-
-		render( <RevisionsCodeDiff /> );
 
 		expect(
 			screen.getByRole( 'region', { name: 'Code changes' } )
@@ -182,13 +151,11 @@ describe( 'RevisionsCodeDiff', () => {
 	} );
 
 	it( 'shows only the selected revision when changes are hidden', () => {
-		mockRevisions( {
+		renderCodeDiff( {
 			previousContent: '<p>Before</p>',
 			currentContent: '<p>After</p>',
 			showDiff: false,
 		} );
-
-		render( <RevisionsCodeDiff /> );
 
 		expect(
 			screen.getByRole( 'region', { name: 'Revision code' } )
@@ -207,15 +174,12 @@ describe( 'RevisionsCodeDiff', () => {
 		expect( screen.queryByText( 'Unchanged' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'waits for the previous revision at a page boundary', () => {
-		mockRevisions( {
+	it( 'waits while the previous revision is loading', () => {
+		renderCodeDiff( {
 			currentContent: '<p>Current</p>',
 			previousRevision: null,
-			revisionPage: 1,
-			totalRevisions: 101,
+			isPreviousRevisionLoading: true,
 		} );
-
-		render( <RevisionsCodeDiff /> );
 
 		expect( screen.getByRole( 'presentation' ) ).toHaveClass(
 			'components-spinner'
@@ -224,14 +188,10 @@ describe( 'RevisionsCodeDiff', () => {
 	} );
 
 	it( 'compares the oldest revision against empty content', () => {
-		mockRevisions( {
+		renderCodeDiff( {
 			currentContent: '<p>Oldest</p>',
 			previousRevision: null,
-			revisionPage: 2,
-			totalRevisions: 101,
 		} );
-
-		render( <RevisionsCodeDiff /> );
 
 		expect(
 			screen.getByRole( 'row', { name: /Added.*<p>Oldest<\/p>/ } )
@@ -239,12 +199,10 @@ describe( 'RevisionsCodeDiff', () => {
 	} );
 
 	it( 'preserves blank source lines without inserting text', () => {
-		mockRevisions( {
+		renderCodeDiff( {
 			currentContent: 'First\n\nLast',
 			showDiff: false,
 		} );
-
-		render( <RevisionsCodeDiff /> );
 
 		expect(
 			screen.getByText( '', {
