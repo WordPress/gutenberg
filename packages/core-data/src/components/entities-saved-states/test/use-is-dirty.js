@@ -42,15 +42,6 @@ jest.mock( '@wordpress/data', () => {
 	};
 } );
 
-jest.mock( '@wordpress/core-data', () => {
-	return {
-		store: {
-			__experimentalGetDirtyEntityRecords: jest.fn(),
-			getEntityRecordEdits: jest.fn(),
-		},
-	};
-} );
-
 describe( 'useIsDirty', () => {
 	it( 'should calculate dirtyEntityRecords', () => {
 		const { result } = renderHook( () => useIsDirty() );
