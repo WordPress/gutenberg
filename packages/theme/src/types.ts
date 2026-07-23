@@ -16,7 +16,7 @@ export interface ThemeProviderSettings {
 		 * error.
 		 *
 		 * When omitted, inherits from the parent `ThemeProvider`. If there is
-		 * no parent, the prebuilt default applies.
+		 * no parent value, the prebuilt default applies.
 		 */
 		primary?: string;
 		/**
@@ -28,7 +28,7 @@ export interface ThemeProviderSettings {
 		 * error.
 		 *
 		 * When omitted, inherits from the parent `ThemeProvider`. If there is
-		 * no parent, the prebuilt default applies.
+		 * no parent value, the prebuilt default applies.
 		 */
 		background?: string;
 	};
@@ -42,7 +42,7 @@ export interface ThemeProviderSettings {
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
 		 * When omitted, inherits from the parent `ThemeProvider`. If there is
-		 * no parent, the prebuilt default applies (`pointer`).
+		 * no parent value, the prebuilt default applies (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
@@ -56,7 +56,7 @@ export interface ThemeProviderSettings {
 	 * size.
 	 *
 	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
-	 * parent, the prebuilt default applies (`subtle`).
+	 * parent value, the prebuilt default applies (`subtle`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
 }
