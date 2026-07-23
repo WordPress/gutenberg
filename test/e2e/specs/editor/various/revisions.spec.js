@@ -766,3 +766,66 @@ test.describe( 'Post revisions shareable URLs', () => {
 			.toBe( null );
 	} );
 } );
+
+test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
+	test.beforeEach( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-post-revisions'
+		);
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-post-revisions'
+		);
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should render an autosave that is absent from the revisions collection', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Autosave URL Test',
+				content:
+					'<!-- wp:paragraph --><p>Saved content</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		const autosave = await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }/autosaves`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Autosaved content</p><!-- /wp:paragraph -->',
+			},
+		} );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }/revisions`,
+		} );
+		expect( revisions ).toHaveLength( 0 );
+
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ autosave.id }`
+		);
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toHaveText( 'Autosaved content' );
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( String( autosave.id ) );
+	} );
+} );

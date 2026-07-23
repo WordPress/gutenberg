@@ -728,7 +728,6 @@ export const openRevision =
 				.resolveSelect( coreStore )
 				.getRevision( 'postType', postType, postId, revisionId, {
 					context: 'edit',
-					_fields: revisionKey,
 				} );
 			if ( select.getCurrentRevisionId() !== revisionId ) {
 				return;
