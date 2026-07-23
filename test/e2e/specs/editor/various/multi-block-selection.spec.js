@@ -1588,6 +1588,73 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			} );
 		} );
 
+		test( 'should partially select text from list item to list item', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'first item text' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'second item text' },
+					},
+				],
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			// Click within the text, not the (full row width) center.
+			await editor.canvas
+				.getByText( 'first item text', { exact: true } )
+				.click( { position: { x: 40, y: 8 } } );
+			await editor.canvas
+				.getByText( 'second item text', { exact: true } )
+				.click( {
+					modifiers: [ 'Shift' ],
+					position: { x: 60, y: 8 },
+				} );
+
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							blocks: sel.getSelectedBlockClientIds().length,
+							startKey: sel.getSelectionStart().attributeKey,
+							endKey: sel.getSelectionEnd().attributeKey,
+							isFullySelected: sel.__unstableIsFullySelected(),
+						};
+					} )
+				)
+				.toEqual( {
+					blocks: 2,
+					startKey: 'content',
+					endKey: 'content',
+					isFullySelected: false,
+				} );
+
+			// The native selection reaches from within the first item to
+			// within the second: it must contain the end of the first
+			// item's text and the start of the second's.
+			await expect
+				.poll( () =>
+					page
+						.frame( { name: 'editor-canvas' } )
+						.evaluate( () =>
+							document
+								.getSelection()
+								.toString()
+								.replace( /\s+/g, ' ' )
+						)
+				)
+				.toMatch( /text s/ );
+		} );
+
 		test( 'should multi-select blocks without text selection', async ( {
 			editor,
 			multiBlockSelectionUtils,
