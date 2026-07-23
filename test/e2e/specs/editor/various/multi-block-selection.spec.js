@@ -1609,6 +1609,81 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 					{ name: 'core/spacer' },
 				] );
 		} );
+
+		test( 'should not scroll the canvas when the selection spans a scrolled page', async ( {
+			editor,
+			page,
+			browserName,
+		} ) => {
+			test.fixme(
+				browserName === 'webkit',
+				'WebKit still scrolls through a different route: transient single selections during the gesture trigger the selected block scroll into view behavior. See #80608.'
+			);
+			await editor.insertBlock( { name: 'core/spacer' } );
+			for ( let i = 0; i < 30; i++ ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: `${ i }` },
+				} );
+			}
+
+			const frame = page.frame( { name: 'editor-canvas' } );
+
+			// Select the spacer at the top of the document.
+			await frame.evaluate( () => {
+				document.documentElement.scrollTop = 0;
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Spacer' } )
+				.click();
+
+			// Scroll to the bottom of the document, and resolve after the
+			// scroll event settles so the watcher below only sees
+			// scrolling caused by the selection.
+			const before = await frame.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						document.addEventListener(
+							'scroll',
+							() =>
+								window.requestAnimationFrame( () =>
+									resolve(
+										document.documentElement.scrollTop
+									)
+								),
+							{ once: true }
+						);
+						document.documentElement.scrollTop =
+							document.documentElement.scrollHeight;
+					} )
+			);
+			expect( before ).toBeGreaterThan( 0 );
+
+			// Record every scroll movement for a second. The page may
+			// scroll up and back down again, so the position cannot be
+			// asserted after the fact.
+			const scrollWatcher = frame.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						const positions = [];
+						document.addEventListener( 'scroll', () => {
+							positions.push(
+								document.documentElement.scrollTop
+							);
+						} );
+						setTimeout( () => resolve( positions ), 1000 );
+					} )
+			);
+
+			// Extend the selection to a paragraph at the bottom. Focus
+			// moves to the editable wrapper, which must not scroll the
+			// page back to the top of the document.
+			await editor.canvas
+				.getByText( '28', { exact: true } )
+				.click( { modifiers: [ 'Shift' ] } );
+
+			expect( await scrollWatcher ).toEqual( [] );
+		} );
 	} );
 
 	test( 'should select by dragging into separator', async ( {
