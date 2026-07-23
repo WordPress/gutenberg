@@ -116,9 +116,13 @@ function useContextHeadingLevel( blockName ) {
  * as a block property is tracked in
  * https://github.com/WordPress/gutenberg/issues/80438.
  *
- * The link-bearing heading blocks get no `link` layer: their inner-link control
- * reads the `inheritedValue.elements.link` passthrough, so folding `link` in
- * would bleed link color into the heading's own text.
+ * Only blocks that *are* a link fold the `link` layer (e.g. Read More, Login/out
+ * and the pagination links render `<a>` as their whole selves). Blocks that
+ * merely *contain* a link — the heading family, Paragraph, Group, and the
+ * hybrid blocks with a Link colour control (Post Author Name, Post Date, …) —
+ * get no `link` layer: their inner-link control reads the
+ * `inheritedValue.elements.link` passthrough instead, so folding `link` in would
+ * bleed link color into the block's own text.
  *
  * @param {string}  blockName    Block name.
  * @param {?number} headingLevel Resolved heading level, from `getHeadingLevel`.
@@ -142,6 +146,25 @@ function getElementLayers( blockName, headingLevel ) {
 			return headingLevel
 				? [ 'heading', `h${ headingLevel }` ]
 				: [ 'heading' ];
+		// Whole-block link blocks: the entire block renders as an `<a>`, so the
+		// root `styles.elements.link` layer paints it, mirroring how `button`
+		// paints Button. For the blocks whose `color.text` support is disabled
+		// this is inert at the (hidden) text control while their typography
+		// controls now reflect the link element; Read More (`color.text: true`)
+		// surfaces the inherited link color at its Text control.
+		case 'core/read-more':
+		case 'core/loginout':
+		case 'core/post-navigation-link':
+		case 'core/query-pagination-next':
+		case 'core/query-pagination-previous':
+		case 'core/query-pagination-numbers':
+		case 'core/comments-pagination-next':
+		case 'core/comments-pagination-previous':
+		case 'core/comments-pagination-numbers':
+		case 'core/comment-edit-link':
+		case 'core/comment-reply-link':
+		case 'core/post-comments-link':
+			return [ 'link' ];
 		default:
 			return [];
 	}
