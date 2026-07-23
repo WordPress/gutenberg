@@ -17,30 +17,24 @@ const registries = new WeakMap();
 /**
  * Fires the callbacks of every subscribed element that owns the event.
  *
- * An element owns the event when it contains the target (the event happened
- * inside it) or `ownsSelection` is true (it owns the selection through a focused
- * editing host, e.g. the block editor canvas wrapper). That can only hold for
- * an ancestor of the target, an ancestor of the selection anchor, or the
- * focused element, so only those chains are walked, rather than testing every
- * subscriber. The check is the same one an element-bound listener would make;
- * it is only asked of the nodes that could pass it.
+ * These are editing and selection events, so the element that owns the event is
+ * the one that owns the selection: it contains the selection anchor, or it is
+ * the focused element (when the selection sits elsewhere). `ownsSelection` can
+ * only be true for an ancestor of the anchor or the focused element, so only
+ * those two chains are walked, rather than testing every subscriber.
  *
  * @param {WeakMap}  elements      Subscribed elements mapped to their callbacks.
  * @param {Document} ownerDocument Document the listener is attached to.
  * @param {Event}    event         The event to dispatch.
  */
 function dispatch( elements, ownerDocument, event ) {
-	const { activeElement } = ownerDocument;
 	const anchorNode = ownerDocument.defaultView?.getSelection()?.anchorNode;
 	const fired = new Set();
 
-	for ( const start of [ event.target, anchorNode, activeElement ] ) {
+	for ( const start of [ anchorNode, ownerDocument.activeElement ] ) {
 		for ( let node = start; node; node = node.parentNode ) {
 			const callbacks = elements.get( node );
-			if ( ! callbacks || fired.has( node ) ) {
-				continue;
-			}
-			if ( node.contains( event.target ) || ownsSelection( node ) ) {
+			if ( callbacks && ! fired.has( node ) && ownsSelection( node ) ) {
 				fired.add( node );
 				for ( const callback of callbacks ) {
 					callback( event );
@@ -51,11 +45,11 @@ function dispatch( elements, ownerDocument, event ) {
 }
 
 /**
- * Subscribes a callback for events owned by the given editable element:
- * events targeting the element or its descendants, and events targeting a
- * focused editing host (e.g. an editable block editor canvas wrapper) while
- * the element contains the selection. In the latter case events target the
- * host, never the element, so an element-bound listener would not fire.
+ * Subscribes a callback for editing and selection events the given editable
+ * element owns, meaning it owns the document selection. This covers the case
+ * where a focused editing host (e.g. an editable block editor canvas wrapper)
+ * owns the selection: the event targets the host, never the element, so an
+ * element-bound listener would not fire.
  *
  * @param {HTMLElement} element   The editable element.
  * @param {string}      eventType DOM event name.
