@@ -33,9 +33,11 @@
 }
 
 .block-editor-block-fields__field-header {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: $grid-unit-05;
+	width: 100%;
 }
 
 .block-editor-block-fields__bindings-indicator {
