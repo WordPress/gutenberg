@@ -1,4 +1,4 @@
 interface:
     display_name: 'Gutenberg Release Knowledge'
     short_description: 'Turn release discussions into durable guidance'
-    default_prompt: 'Use $gutenberg-release-knowledge to analyze a specified Gutenberg release and prepare a focused draft documentation PR.'
+    default_prompt: 'Use $gutenberg-release-knowledge to analyze a specified Gutenberg release and prepare a focused documentation PR ready for review.'

@@ -1,6 +1,6 @@
 ---
 name: gutenberg-release-knowledge
-description: Analyze the pull requests and discussions shipped in an explicitly named Gutenberg release, extract durable architectural and compatibility guidance, verify it against current code and documentation, and prepare a small draft pull request. Use for historical release-learning pilots, release knowledge reviews, documentation-gap analysis, and deciding whether release evidence justifies updates to docs, AGENTS.md, or Copilot instructions.
+description: Analyze the pull requests and discussions shipped in an explicitly named Gutenberg release, extract durable architectural and compatibility guidance, verify it against current code and documentation, and prepare a small pull request ready for review. Use for historical release-learning pilots, release knowledge reviews, documentation-gap analysis, and deciding whether release evidence justifies updates to docs, AGENTS.md, or Copilot instructions.
 ---
 
 # Gutenberg Release Knowledge
@@ -11,7 +11,7 @@ Turn one named Gutenberg release into a traceable, human-reviewed documentation 
 
 - Require an explicit Gutenberg release number such as `23.6`.
 - Reject release candidates and other prereleases; accept only a published stable release.
-- Ask where the draft PR should live if the user has not specified the repository, base branch, and fork.
+- Ask where the PR should live if the user has not specified the repository, base branch, and fork.
 - Keep collection deterministic and analysis interpretive.
 - Treat “no useful durable guidance found” as a valid result.
 - Read [references/people.md](references/people.md) completely before weighing contributors. Prefer the live `gutenberg-core` team list when access permits; use the snapshot as fallback.
@@ -94,7 +94,7 @@ Before proposing text:
 - Do not add instruction-file text for a release status, a single implementation choice, unresolved design preference, or guidance already expressed adequately in canonical docs.
 - Do not force an instruction-file change to make the result appear more substantial.
 
-## Prepare the draft PR
+## Prepare the PR
 
 Keep the change small and reviewable. Prefer one coherent topic over a release-wide grab bag.
 
@@ -114,20 +114,20 @@ Use a concise PR description:
 This is a release-learning proposal, not a settled conclusion. Please challenge the evidence, scope, wording, or destination. Closing this PR is a useful outcome if the guidance is not durable or correct. Discussion here will be used to improve this skill.
 ```
 
-Include direct evidence links without turning the PR body into the full analysis report. Open the PR as a draft, never merge it, and keep it in the user-specified fork when requested.
+Include direct evidence links without turning the PR body into the full analysis report. Open the PR ready for review, never merge it, and keep it in the user-specified fork when requested.
 
-Before opening the draft:
+Before opening the PR:
 
 1. Query the target repository's current labels. Select the smallest set of existing labels that describes the proposed change, using labels from the source PRs as evidence when they still fit. Never create a label just for the generated PR.
 2. Tag with `@handle` the people whose substantive discussion, review, or authored rationale directly informed the proposal alongside the corresponding evidence links in the PR body.
 3. Request reviews only from those named evidence participants. Exclude bots, reaction-only participants, passive requested reviewers, broad props lists, and people whose comments did not inform the proposal. Use the trust weighting above to keep the list focused when several people support the same point.
-4. Apply the selected labels and request the evidence-linked reviewers after opening the draft.
+4. Apply the selected labels and request the evidence-linked reviewers after opening the PR.
 5. Verify the labels and review requests on the opened PR. If repository permissions or collaborator rules prevent either action, keep the relevant people tagged in the PR body and report the intended labels or reviewers with the exact limitation.
 
 ## Validate and report
 
 - Run formatting or lint checks scoped to changed files when possible.
 - Distinguish new failures from pre-existing warnings.
-- Confirm the pushed branch and draft status.
+- Confirm the pushed branch and ready-for-review status.
 - Summarize the selected guidance, unresolved dissent, omitted candidates, changed destinations, and validation result.
 - Explicitly say why no `AGENTS.md` or Copilot instruction change was made when that is the outcome.
