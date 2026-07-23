@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	blockNoteUtils: async ( { page, editor }, use ) => {
-		await use( new BlockNoteUtils( { page, editor } ) );
+	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
+		await use( new BlockNoteUtils( { page, editor, pageUtils } ) );
 	},
 } );
 
@@ -141,12 +141,10 @@ test.describe( 'Block Notes', () => {
 			comment: 'test comment before edit',
 		} );
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
-		const editTextbox = page
+		await page
 			.getByRole( 'textbox', { name: 'Note' } )
-			.first();
-		await editTextbox.click();
-		await page.keyboard.press( 'ControlOrMeta+a' );
-		await page.keyboard.type( 'Test comment after edit.' );
+			.first()
+			.fill( 'Test comment after edit.' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Update', exact: true } )
@@ -983,12 +981,10 @@ test.describe( 'Block Notes', () => {
 
 			// Test focus on action button when note is updated.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
-			const editTextbox = page
+			await page
 				.getByRole( 'textbox', { name: 'Note' } )
-				.first();
-			await editTextbox.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
-			await page.keyboard.type( 'Test comment after edit.' );
+				.first()
+				.fill( 'Test comment after edit.' );
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Update' } )
@@ -1288,6 +1284,7 @@ test.describe( 'Block Notes', () => {
 			editor,
 			page,
 			requestUtils,
+			blockNoteUtils,
 		} ) => {
 			const me = await requestUtils.rest( {
 				path: '/wp/v2/users/me',
@@ -1308,7 +1305,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 
@@ -1365,6 +1362,7 @@ test.describe( 'Block Notes', () => {
 			editor,
 			page,
 			pageUtils,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1375,7 +1373,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1407,6 +1405,7 @@ test.describe( 'Block Notes', () => {
 		test( 'falls back to a block-level note when its inline marker is removed', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1417,7 +1416,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1443,7 +1442,7 @@ test.describe( 'Block Notes', () => {
 			// block-level note, mirroring how a removed block orphans (rather
 			// than deletes) its note.
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 			await page.keyboard.press( 'Delete' );
 
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
@@ -1466,7 +1465,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1498,6 +1497,7 @@ test.describe( 'Block Notes', () => {
 		test( 'removes the inline marker when the note is resolved', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1508,7 +1508,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1536,6 +1536,7 @@ test.describe( 'Block Notes', () => {
 		test( 'anchors the marker to only the selected text', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1547,18 +1548,9 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Select just the word "brave" (offsets 6-11) so the inline note
-			// wraps a sub-range rather than the whole block. Collapse a
-			// select-all to the start with ArrowLeft (cross-platform; `Home`
-			// does not move the caret on macOS), then walk into the word.
+			// wraps a sub-range rather than the whole block.
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
-			await page.keyboard.press( 'ArrowLeft' );
-			for ( let i = 0; i < 6; i++ ) {
-				await page.keyboard.press( 'ArrowRight' );
-			}
-			for ( let i = 0; i < 5; i++ ) {
-				await page.keyboard.press( 'Shift+ArrowRight' );
-			}
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1580,6 +1572,7 @@ test.describe( 'Block Notes', () => {
 		test( 'boosts the marker opacity when its note is selected', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1590,7 +1583,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
+			await blockNoteUtils.selectBlockText();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
@@ -1634,6 +1627,7 @@ test.describe( 'Block Notes', () => {
 		test( 'clicking between inline markers selects the matching note', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1644,27 +1638,16 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			// Two inline notes on the same paragraph. Collapse a select-all to
-			// the start with ArrowLeft (cross-platform; `Home` does not move the
-			// caret on macOS), then walk to each word and extend the selection.
+			// Two inline notes on the same paragraph, each wrapping one word.
+			// addNote waits for the thread, so the second note isn't created
+			// until the first has settled the (now floating) sidebar.
 			async function addInlineNote( { skip, length, content } ) {
 				await paragraph.click();
-				await page.keyboard.press( 'ControlOrMeta+a' );
-				await page.keyboard.press( 'ArrowLeft' );
-				for ( let i = 0; i < skip; i++ ) {
-					await page.keyboard.press( 'ArrowRight' );
-				}
-				for ( let i = 0; i < length; i++ ) {
-					await page.keyboard.press( 'Shift+ArrowRight' );
-				}
-				await editor.clickBlockOptionsMenuItem( 'Add note' );
-				await page
-					.getByRole( 'textbox', { name: 'New note', exact: true } )
-					.fill( content );
-				await page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Add note', exact: true } )
-					.click();
+				await blockNoteUtils.selectBlockText( {
+					start: skip,
+					length,
+				} );
+				await blockNoteUtils.addNote( content );
 			}
 
 			// "Alpha" (offsets 0-5) and "charlie" (offsets 12-19). Wrap the
@@ -1743,7 +1726,7 @@ test.describe( 'Block Notes', () => {
 					3
 				) + 'The final anchor';
 
-			async function selectTrailingWord( { editor, page } ) {
+			async function selectTrailingWord( { editor, blockNoteUtils } ) {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: { content: LONG_TEXT },
@@ -1753,14 +1736,12 @@ test.describe( 'Block Notes', () => {
 					name: 'Block: Paragraph',
 				} );
 
-				// Select the trailing word "anchor": collapse a select-all to
-				// the end, then extend the selection back over the word.
+				// Select the trailing word "anchor".
 				await paragraph.click();
-				await page.keyboard.press( 'ControlOrMeta+a' );
-				await page.keyboard.press( 'ArrowRight' );
-				for ( let i = 0; i < 'anchor'.length; i++ ) {
-					await page.keyboard.press( 'Shift+ArrowLeft' );
-				}
+				await blockNoteUtils.selectBlockText( {
+					length: 'anchor'.length,
+					fromEnd: true,
+				} );
 
 				return paragraph;
 			}
@@ -1768,8 +1749,12 @@ test.describe( 'Block Notes', () => {
 			test( 'aligns the floating thread with its inline marker', async ( {
 				editor,
 				page,
+				blockNoteUtils,
 			} ) => {
-				const paragraph = await selectTrailingWord( { editor, page } );
+				const paragraph = await selectTrailingWord( {
+					editor,
+					blockNoteUtils,
+				} );
 
 				await editor.clickBlockOptionsMenuItem( 'Add note' );
 				await page
@@ -1809,8 +1794,12 @@ test.describe( 'Block Notes', () => {
 			test( 'aligns the pending new-note form with the text selection', async ( {
 				editor,
 				page,
+				blockNoteUtils,
 			} ) => {
-				const paragraph = await selectTrailingWord( { editor, page } );
+				const paragraph = await selectTrailingWord( {
+					editor,
+					blockNoteUtils,
+				} );
 
 				await editor.clickBlockOptionsMenuItem( 'Add note' );
 				// The pending form floats next to the canvas while composing;
@@ -2120,10 +2109,49 @@ class BlockNoteUtils {
 	#page;
 	/** @type {import('@wordpress/e2e-test-utils-playwright').Editor} */
 	#editor;
+	/** @type {import('@wordpress/e2e-test-utils-playwright').PageUtils} */
+	#pageUtils;
 
-	constructor( { page, editor } ) {
+	constructor( { page, editor, pageUtils } ) {
 		this.#page = page;
 		this.#editor = editor;
+		this.#pageUtils = pageUtils;
+	}
+
+	/**
+	 * Selects text inside the focused block, replacing the noisy select-all +
+	 * arrow-key dance the inline-note tests use to anchor a marker. The caller
+	 * still focuses the block (e.g. by clicking it) first.
+	 *
+	 * @param {Object}  [range]         Range to select. Omit to select the whole block.
+	 * @param {number}  [range.start]   Characters to skip from the block start.
+	 * @param {number}  [range.length]  Characters to select. Omit to select all.
+	 * @param {boolean} [range.fromEnd] Anchor `length` at the block end instead of `start`.
+	 */
+	async selectBlockText( { start = 0, length, fromEnd = false } = {} ) {
+		// The first `primary+a` selects the block's text.
+		await this.#pageUtils.pressKeys( 'primary+a' );
+		if ( length === undefined ) {
+			return;
+		}
+
+		// ArrowLeft/Right collapse the select-all to an edge (cross-platform;
+		// `Home`/`End` don't move the caret on macOS) to anchor from there.
+		if ( fromEnd ) {
+			await this.#pageUtils.pressKeys( 'ArrowRight' );
+			await this.#pageUtils.pressKeys( 'Shift+ArrowLeft', {
+				times: length,
+			} );
+			return;
+		}
+
+		await this.#pageUtils.pressKeys( 'ArrowLeft' );
+		if ( start > 0 ) {
+			await this.#pageUtils.pressKeys( 'ArrowRight', { times: start } );
+		}
+		await this.#pageUtils.pressKeys( 'Shift+ArrowRight', {
+			times: length,
+		} );
 	}
 
 	async openBlockNoteSidebar() {
