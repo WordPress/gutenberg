@@ -42,9 +42,9 @@
 	}
 }
 
-// The override indicator: a small, focus-reachable button hosting the filled
-// diamond SVG and the "Overrides inherited styles" tooltip. It carries no
-// action — reset lives in the ToolsPanel options menu.
+// The override indicator: a small, focus-reachable infotip trigger (a native
+// `<button>` from `Popover.Trigger`) hosting the filled diamond SVG. It carries
+// no action — reset lives in the ToolsPanel options menu.
 .global-styles-inheritance-indicator {
 	display: inline-flex !important;
 	align-items: center;
@@ -53,20 +53,21 @@
 	position: relative;
 	margin-inline-start: 6px;
 
-	// Override the default IconButton chrome so the trigger appears as a tight
+	// Strip the native `<button>` chrome so the trigger appears as a tight
 	// inline control that never shifts the sibling label text.
 	min-width: $grid-unit-20 !important;
 	width: $grid-unit-20 !important;
 	height: $grid-unit-20 !important;
 	padding: 0 !important;
+	border: none !important;
 	border-radius: 50% !important;
 	background: transparent !important;
 	box-shadow: none !important;
+	appearance: none;
 	overflow: hidden;
 
-	// `<Button>` does not preserve text-transform overrides from its parent
-	// label. Belt-and-braces: ensure the trigger never inherits an uppercase
-	// transform from a label that happens to use one.
+	// Belt-and-braces: ensure the trigger never inherits an uppercase transform
+	// from a label that happens to use one.
 	text-transform: none;
 	letter-spacing: normal;
 

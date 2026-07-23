@@ -7,12 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Button,
 	Rect,
 	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { Tooltip } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- The infotip pattern (an info trigger that reveals arbitrary content, accessible to touch and screen readers) requires the @wordpress/ui Popover per the design-system Tooltip usage guidelines.
+import { Popover, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -113,18 +113,16 @@ function Diamond() {
  * (the standard controls) and the custom controls (color, shadow, duotone,
  * background image) that render it in their own slot.
  *
- * It is a real, enabled `Button` — the trigger the `@wordpress/ui` `Tooltip` is
- * built for, so the "Overrides inherited styles" explanation is reliably
- * reachable by hover *and* keyboard focus (a non-focusable element does not
- * surface it reliably; see
- * [#80506](https://github.com/WordPress/gutenberg/pull/80506)).
+ * The diamond is an **infotip**, not a tooltip: its whole purpose is to reveal
+ * the "Overrides inherited styles" explanation, so it uses `@wordpress/ui`
+ * `Popover` with an `openOnHover` trigger rather than `Tooltip`. That makes the
+ * content reachable by hover, keyboard focus, *and* tap — a tooltip would be
+ * unavailable to touch and screen-reader users. See the infotip guidance in the
+ * `@wordpress/ui` Tooltip usage guidelines.
  *
- * The button does **nothing but host the tooltip**: it carries no reset and no
- * hover shape-change. Per the review feedback, a control that combines the
- * tooltip with another action is risky because hover/tap-morph behaviours are
- * unavailable to touch users; keeping it purely an indicator means tapping it
- * only opens the tooltip. Resetting is done through the `ToolsPanel` options
- * menu each control already exposes via `onDeselect`.
+ * The indicator carries no reset action; clearing a local override relies on the
+ * panel's existing reset options (e.g. the `ToolsPanel` options menu via
+ * `onDeselect`).
  *
  * @param {Object} props
  * @param {string} [props.className] Optional className for slot positioning
@@ -134,34 +132,29 @@ function Diamond() {
  */
 export function InheritanceOverrideIndicator( { className } ) {
 	return (
-		<Tooltip.Root>
-			<Tooltip.Trigger
-				render={
-					// Intentionally small (16×16) control; exempt from the
-					// 40px default-size enforcement rule.
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-					<Button
-						__next40pxDefaultSize={ false }
-						aria-label={ OVERRIDE_INDICATOR_LABEL }
-						className={ clsx(
-							'global-styles-inheritance-indicator',
-							className
-						) }
-						onClick={ ( event ) => {
-							// The button exists only to host the tooltip, so a
-							// click does nothing. Prevent it from reaching any
-							// wrapping `<label htmlFor>` association (which would
-							// otherwise focus/activate the control).
-							event.preventDefault();
-							event.stopPropagation();
-						} }
-					>
-						<Diamond />
-					</Button>
-				}
-			/>
-			<Tooltip.Popup>{ OVERRIDE_INDICATOR_LABEL }</Tooltip.Popup>
-		</Tooltip.Root>
+		<Popover.Root>
+			<Popover.Trigger
+				openOnHover
+				delay={ 200 }
+				closeDelay={ 200 }
+				aria-label={ OVERRIDE_INDICATOR_LABEL }
+				className={ clsx(
+					'global-styles-inheritance-indicator',
+					className
+				) }
+			>
+				<Diamond />
+			</Popover.Trigger>
+			<Popover.Popup className="global-styles-inheritance-indicator__infotip">
+				<Popover.Arrow />
+				<VisuallyHidden render={ <Popover.Title /> }>
+					{ OVERRIDE_INDICATOR_LABEL }
+				</VisuallyHidden>
+				<Popover.Description>
+					{ OVERRIDE_INDICATOR_LABEL }
+				</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
 	);
 }
 
