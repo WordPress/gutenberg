@@ -247,7 +247,7 @@ export default function useSelectionObserver() {
 				// text selection has been clicked.
 				if ( isClickShift ) {
 					const selectedClientId = getBlockSelectionStart();
-					const clickedClientId = getBlockClientId( event.target );
+					const clickedClientId = getClickedBlockClientId( event );
 					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
 					// We need to check if there was already a selection with a non-selectable focusNode.
 					const focusNodeIsNonSelectable =
@@ -475,6 +475,20 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
+			// Returns the block client ID under the pointer of the given
+			// mouse event. `event.target` is not reliable for this:
+			// browsers may retarget the event (WebKit can dispatch the
+			// mouseup of a shift+click on the block the selection started
+			// from instead of the clicked block).
+			function getClickedBlockClientId( event ) {
+				return getBlockClientId(
+					ownerDocument.elementFromPoint(
+						event.clientX,
+						event.clientY
+					) ?? event.target
+				);
+			}
+
 			// Returns the caret position at the given point, like the
 			// standard `caretPositionFromPoint`, with a fallback to the
 			// WebKit-only `caretRangeFromPoint`.
@@ -499,7 +513,7 @@ export default function useSelectionObserver() {
 				// before the selection is recorded.
 				if ( event.shiftKey ) {
 					const selection = defaultView.getSelection();
-					const clickedClientId = getBlockClientId( event.target );
+					const clickedClientId = getClickedBlockClientId( event );
 					if (
 						selection.anchorNode &&
 						clickedClientId &&
