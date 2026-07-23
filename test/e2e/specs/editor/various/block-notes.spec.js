@@ -1922,6 +1922,81 @@ test.describe( 'Block Notes', () => {
 			expect( await readTint( paragraph, rgb ) ).toBe( 'tint' );
 		} );
 
+		test( 'overlays a non-text block with the tint and an all-around rule at rest', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			// A group's wrapper is not a rich-text editable, so it takes the
+			// overlay path: a background behind a non-text block is hidden by
+			// the block's own content (e.g. an image), so the tint is painted
+			// above the block instead, with the rule drawn all the way around.
+			await editor.insertBlock( {
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inside the group.' },
+					},
+				],
+			} );
+			await blockNoteUtils.addNote( 'Whole group note' );
+
+			const group = editor.canvas.getByRole( 'document', {
+				name: 'Block: Group',
+			} );
+
+			// Move focus to the title so the freshly added note is deselected:
+			// the marking has to be legible at rest.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			const readOverlay = () =>
+				group.evaluate( ( el ) => {
+					const style = window.getComputedStyle( el, '::after' );
+					return {
+						background: style.backgroundColor,
+						shadow: style.boxShadow,
+						pointerEvents: style.pointerEvents,
+					};
+				} );
+
+			// Same tint classification as readTint, applied to the overlay:
+			// the author color at the single allowed alpha (≈ 0x40).
+			await expect
+				.poll( async () => {
+					const { background } = await readOverlay();
+					const m = background.match(
+						/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+					);
+					if ( ! m ) {
+						return background;
+					}
+					const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
+					return Number( m[ 1 ] ) === rgb.r &&
+						Number( m[ 2 ] ) === rgb.g &&
+						Number( m[ 3 ] ) === rgb.b &&
+						alpha > 0.2 &&
+						alpha < 0.35
+						? 'tint'
+						: background;
+				} )
+				.toBe( 'tint' );
+
+			// The all-around rule is inset so it cannot reflow the canvas; the
+			// overlay must ignore pointer events or it would swallow every
+			// click on the block.
+			const { shadow, pointerEvents } = await readOverlay();
+			expect( shadow ).toContain( 'inset' );
+			expect( pointerEvents ).toBe( 'none' );
+		} );
+
 		test( 'clears the tint when the block-level note is deleted', async ( {
 			editor,
 			page,
