@@ -1523,9 +1523,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			// must extend to the clicked position, like it does within a
 			// single block, resulting in a partial selection of both
 			// blocks.
-			await editor.canvas
-				.locator( '[data-type="core/verse"]' )
-				.click();
+			await editor.canvas.locator( '[data-type="core/verse"]' ).click();
 			await editor.canvas
 				.locator( '[data-type="core/paragraph"]' )
 				.click( { modifiers: [ 'Shift' ] } );
