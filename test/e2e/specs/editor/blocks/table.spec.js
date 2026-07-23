@@ -208,19 +208,19 @@ test.describe( 'Table', () => {
 		// Click to the next cell and add some text. Align left.
 		await cells.nth( 1 ).click();
 		await page.keyboard.type( 'To the left' );
-		await editor.clickBlockToolbarButton( 'Change column alignment' );
+		await editor.clickBlockToolbarButton( 'Align column content' );
 		await page.click( 'role=menuitemradio[name="Align column left"i]' );
 
 		// Click the next cell and add some text. Align center.
 		await cells.nth( 2 ).click();
 		await page.keyboard.type( 'Centered' );
-		await editor.clickBlockToolbarButton( 'Change column alignment' );
+		await editor.clickBlockToolbarButton( 'Align column content' );
 		await page.click( 'role=menuitemradio[name="Align column center"i]' );
 
 		// Tab to the next cell and add some text. Align right.
 		await cells.nth( 3 ).click();
 		await page.keyboard.type( 'Right aligned' );
-		await editor.clickBlockToolbarButton( 'Change column alignment' );
+		await editor.clickBlockToolbarButton( 'Align column content' );
 		await page.click( 'role=menuitemradio[name="Align column right"i]' );
 
 		// Expect the post to have the correct alignment classes inside the table.

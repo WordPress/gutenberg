@@ -11,6 +11,7 @@ import {
 	createWaveformContainer,
 	getWaveformColors,
 	getWaveformGradientStops,
+	initWaveformPlayer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
 	setupPlayButtonArtwork,
@@ -677,6 +678,68 @@ describe( 'Waveform utilities', () => {
 					'--wp--playlist--play-button-artwork'
 				)
 			).toBe( '' );
+		} );
+	} );
+
+	describe( 'initWaveformPlayer', () => {
+		let jsdomStubs;
+
+		beforeEach( () => {
+			// The WaveformPlayer library defers loading the audio source
+			// (and canvas work jsdom cannot perform) to a
+			// requestAnimationFrame callback. Fake timers keep that callback
+			// from running so the test only exercises the synchronous
+			// construction path, where the crossOrigin behavior is decided
+			// before any request is made.
+			jest.useFakeTimers();
+
+			// jsdom does not implement canvas rendering or media playback;
+			// stub them out so the library's construction and destroy paths
+			// do not emit "Not implemented" console errors.
+			jsdomStubs = [
+				jest
+					.spyOn( window.HTMLCanvasElement.prototype, 'getContext' )
+					.mockReturnValue( null ),
+				jest
+					.spyOn( window.HTMLMediaElement.prototype, 'pause' )
+					.mockImplementation( () => {} ),
+				jest
+					.spyOn( window.HTMLMediaElement.prototype, 'load' )
+					.mockImplementation( () => {} ),
+			];
+		} );
+
+		afterEach( () => {
+			jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
+			jest.useRealTimers();
+			document.body.innerHTML = '';
+		} );
+
+		it( 'does not set the crossOrigin attribute on the audio element', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+
+			const player = initWaveformPlayer( element, {
+				src: 'https://cdn.example.com/track.mp3',
+				title: 'Test track',
+				labels: { seek: 'Seek' },
+			} );
+
+			/*
+			 * crossOrigin forces a CORS request and breaks playback of tracks
+			 * served without CORS headers (e.g. media offloaded to a CDN).
+			 * waveform-player < 1.23.0 hardcoded crossOrigin="anonymous";
+			 * 1.23.0 leaves it unset by default. Guard against a regression
+			 * (e.g. a dependency downgrade or a default flip upstream).
+			 * See https://core.trac.wordpress.org/ticket/65673.
+			 */
+			expect( player.instance.audio ).not.toBeNull();
+			expect( player.instance.audio.crossOrigin ).toBeNull();
+			expect( player.instance.audio ).not.toHaveAttribute(
+				'crossorigin'
+			);
+
+			player.destroy();
 		} );
 	} );
 
