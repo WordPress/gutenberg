@@ -96,9 +96,9 @@ const Template = ( {
 	selectedSlug,
 	...props
 }: React.ComponentProps< typeof GradientPicker > ) => {
-	const [ gradient, setGradient ] = useState< ( typeof props )[ 'value' ] >(
-		value ?? null
-	);
+	const [ gradient, setGradient ] = useState<
+		React.ComponentProps< typeof GradientPicker >[ 'value' ]
+	>( value ?? null );
 	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
 	return (
 		<GradientPicker
