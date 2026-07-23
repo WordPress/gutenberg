@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Include extracted styles (e.g. the `style.css` cache group output) in the version hash of the entry point's asset file, so that style-only changes produce a new version ([#80601](https://github.com/WordPress/gutenberg/pull/80601)).
+
 ## 6.51.0 (2026-07-14)
 
 ### Bug Fixes

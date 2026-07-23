@@ -83,4 +83,10 @@ export type AutocompletePopupProps = ComponentProps<
 export type AutocompleteRootProps< Value = unknown > =
 	_Autocomplete.Root.Props< Value >;
 
+export type AutocompleteRowProps = ComponentProps<
+	typeof _Autocomplete.Row
+> & {
+	children?: React.ReactNode;
+};
+
 export type AutocompleteValueProps = _Autocomplete.Value.Props;
