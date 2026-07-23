@@ -688,6 +688,7 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @phpstan-param array{
 	 *     overlay_css_classes: list<string>,
+	 *     ...
 	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
@@ -719,6 +720,7 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @phpstan-param array{
 	 *     overlay_inline_styles: string,
+	 *     ...
 	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
