@@ -306,6 +306,12 @@ class Gutenberg_View_Config_Data {
 	 * stops inheriting core's future additions to it — but it's useful when a
 	 * contributor needs to pin a list to an exact set of members.
 	 *
+	 * The shape rule applies here too: a patch value whose shape does not match
+	 * the current value — an associative array where a list lives, or a
+	 * non-empty list where an associative value lives — is rejected with a
+	 * notice and leaves the current value unchanged. An empty array is exempt,
+	 * so replacing a list with an empty list still clears it.
+	 *
 	 * A patch that declares an unsupported schema version is rejected and does
 	 * not change anything.
 	 *
@@ -507,6 +513,18 @@ class Gutenberg_View_Config_Data {
 
 		// Numerical indexed arrays are expected to be lists (sequential integer keys starting at 0).
 		if ( array_is_list( $incoming ) ) {
+			// A non-empty list only lands where a list (or nothing) lives, under
+			// merge() and replace() alike. An empty array is shape-ambiguous and
+			// exempt, so replace() with an empty list can still clear a list.
+			if ( array() !== $incoming && is_array( $current ) && ! array_is_list( $current ) && array() !== $current ) {
+				_doing_it_wrong(
+					__METHOD__,
+					esc_html__( 'A view configuration patch value must match the shape of the value it patches: a list merges into a list, and an associative array into an associative array.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return $current;
+			}
+
 			// replace() takes an incoming list as-is; merge() merges it by member identity.
 			if ( $replace_lists ) {
 				// As-is except for nulls: a list swapped in wholesale has no
@@ -518,15 +536,6 @@ class Gutenberg_View_Config_Data {
 			// An empty list has no members to merge, and an empty array is
 			// shape-ambiguous, so merging one is a no-op rather than a reset.
 			if ( array() === $incoming ) {
-				return $current;
-			}
-
-			if ( is_array( $current ) && ! array_is_list( $current ) && array() !== $current ) {
-				_doing_it_wrong(
-					__METHOD__,
-					esc_html__( 'A view configuration patch value must match the shape of the value it patches: a list merges into a list, and an associative array into an associative array.', 'gutenberg' ),
-					'7.1.0'
-				);
 				return $current;
 			}
 

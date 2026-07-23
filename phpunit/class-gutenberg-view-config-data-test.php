@@ -1876,6 +1876,64 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * replace() rejects a non-empty list patch value where an associative value
+	 * lives, the same rule merge() enforces: a list in the patch replaces the
+	 * current list wholesale, but it cannot land where a map lives. The current
+	 * map survives untouched instead of being discarded.
+	 *
+	 * @covers ::replace
+	 */
+	public function test_replace_rejects_list_patch_over_an_associative_value() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge_properties' );
+
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'sort' => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+			)
+		);
+		$before = self::read_config( $data );
+
+		$data->replace(
+			array(
+				'default_view' => array(
+					'sort' => array( 'title', 'asc' ),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * An empty array is exempt from the shape guard, so replace() with an
+	 * empty list stays the documented way to clear a list.
+	 *
+	 * @covers ::replace
+	 */
+	public function test_replace_empty_list_still_clears_a_list() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All items',
+					),
+				),
+			)
+		);
+
+		$data->replace( array( 'view_list' => array() ), 1 );
+
+		$this->assertSame( array( 'view_list' => array() ), self::read_config( $data ) );
+	}
+
 
 	/**
 	 * merge() treats a scalar list member as its own identity: an incoming
