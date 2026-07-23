@@ -113,7 +113,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		try {
 			$this->assertFalse( wp_is_collaboration_enabled() );
 			$wp_rest_server = new WP_REST_Server();
-			do_action( 'rest_api_init' );
+			gutenberg_register_collaboration_rest_routes();
 
 			$routes = rest_get_server()->get_routes();
 			$this->assertArrayNotHasKey( '/wp-sync/v1/updates', $routes );
