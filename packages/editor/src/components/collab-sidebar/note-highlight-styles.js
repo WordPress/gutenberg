@@ -1,13 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { useStyleOverride } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import {
+	store as blockEditorStore,
+	useStyleOverride,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { getAvatarBorderColor, getNoteMarkerSelector } from './utils';
+import {
+	findNoteInBlock,
+	getAvatarBorderColor,
+	getNoteMarkerSelector,
+	pickPrimaryNote,
+} from './utils';
 
 /*
  * Hex alpha suffix for the tint painted behind the marker's text. One low value
@@ -70,6 +78,48 @@ function underline( color, thickness ) {
 // background in every browser). The `core/note` anchor marker serializes as a
 // `<mark>` and would otherwise inherit the yellow default in the editor canvas.
 const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
+
+/**
+ * Derive the block-level highlights from the note threads: a thread marks its
+ * whole block when no in-content `core/note` marker carries its id (an inline
+ * note's marker is its anchor, so markerless means block-level). A block can
+ * hold several; one color has to win, so the primary thread (the same one the
+ * avatar indicator surfaces) decides.
+ *
+ * Pure helper: block attributes are read through the passed selector so it can
+ * be unit-tested without a store.
+ *
+ * @param {Array}    threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
+ * @param {Function} getBlockAttributes Block-editor selector.
+ * @return {Array} Block-level notes (each with `clientId`, `id` and `author`).
+ */
+export function getBlockLevelHighlights( threads, getBlockAttributes ) {
+	const threadsByBlock = new Map();
+	for ( const thread of threads ?? [] ) {
+		if ( ! thread?.id || ! thread?.blockClientId ) {
+			continue;
+		}
+		const attributes = getBlockAttributes( thread.blockClientId );
+		if ( findNoteInBlock( attributes, thread.id ) ) {
+			continue;
+		}
+		const blockThreads = threadsByBlock.get( thread.blockClientId ) ?? [];
+		blockThreads.push( thread );
+		threadsByBlock.set( thread.blockClientId, blockThreads );
+	}
+	const highlights = [];
+	for ( const [ clientId, blockThreads ] of threadsByBlock ) {
+		const primary = pickPrimaryNote( blockThreads );
+		if ( primary ) {
+			highlights.push( {
+				clientId,
+				id: primary.id,
+				author: primary.author,
+			} );
+		}
+	}
+	return highlights;
+}
 
 /**
  * Build the CSS rule set that tints each inline-note marker with its author's
@@ -176,26 +226,32 @@ export function buildBlockHighlightCss( blockHighlights ) {
  *
  * Inline markers are underlined and block-level notes ruled along their bottom
  * edge at rest, so annotated content is legible without interaction. Markers
- * thicken their underline on `:hover`, `:focus-within` and when the matching
- * thread is selected; block-level tints stay flat and let the block's own
- * outline carry those states.
+ * thicken their
+ * underline on `:hover`, `:focus-within` and when the matching thread is
+ * selected; block-level tints stay flat and let the block's own outline carry
+ * those states.
  *
  * @param {Object}      props
- * @param {Array}       props.threads           Unresolved note threads.
- * @param {Array}       [props.blockHighlights] Unresolved block-level notes to tint whole.
- * @param {string|null} [props.selectedId]      ID of the currently selected note.
+ * @param {Array}       props.threads      Unresolved note threads.
+ * @param {string|null} [props.selectedId] ID of the currently selected note.
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
-export function NoteHighlightStyles( {
-	threads,
-	blockHighlights,
-	selectedId,
-} ) {
-	const css = useMemo(
-		() =>
-			buildHighlightCss( threads, selectedId ) +
-			buildBlockHighlightCss( blockHighlights ),
-		[ threads, blockHighlights, selectedId ]
+export function NoteHighlightStyles( { threads, selectedId } ) {
+	// Which threads are block-level depends on block attributes (a thread is
+	// inline iff its marker exists in the block), so the CSS is derived in
+	// `useSelect` to track attribute edits. It returns the finished string:
+	// strict-equality on a primitive keeps re-renders to actual changes.
+	const css = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			return (
+				buildHighlightCss( threads, selectedId ) +
+				buildBlockHighlightCss(
+					getBlockLevelHighlights( threads, getBlockAttributes )
+				)
+			);
+		},
+		[ threads, selectedId ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;

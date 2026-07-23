@@ -1,17 +1,28 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
+import { select } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
 	buildBlockHighlightCss,
 	buildHighlightCss,
+	getBlockLevelHighlights,
 } from '../note-highlight-styles';
 import { getAvatarBorderColor } from '../utils';
 
+const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
+
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
-		expect( buildHighlightCss( [] ) ).toContain(
-			'mark.wp-note{background-color:transparent;color:inherit;}'
-		);
+		expect( buildHighlightCss( [] ) ).toContain( MARK_RESET );
 	} );
 
 	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
@@ -148,11 +159,107 @@ describe( 'buildHighlightCss', () => {
 	} );
 
 	it( 'returns just the reset when no threads are provided', () => {
-		expect( buildHighlightCss() ).toBe(
-			'mark.wp-note{background-color:transparent;color:inherit;}'
+		expect( buildHighlightCss() ).toBe( MARK_RESET );
+		expect( buildHighlightCss( null ) ).toBe( MARK_RESET );
+	} );
+} );
+
+describe( 'getBlockLevelHighlights', () => {
+	const FORMAT_NAME = 'core/note';
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	// Marker detection parses the block's rich-text HTML, which needs the
+	// `core/note` format registered — same setup as the `findNoteRange` tests.
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'span',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	// A thread is inline iff a `core/note` marker with its id exists in the
+	// block; these attributes hold a marker for note 7 only.
+	const attributesByClientId = {
+		'block-inline': {
+			content: 'a <span class="wp-note" data-id="7">b</span> c',
+		},
+		'block-plain': { content: 'no markers here' },
+	};
+	const getBlockAttributes = ( clientId ) =>
+		attributesByClientId[ clientId ] ?? {};
+
+	it( 'returns markerless threads as block-level highlights', () => {
+		const highlights = getBlockLevelHighlights(
+			[ { id: 9, author: 2, blockClientId: 'block-plain' } ],
+			getBlockAttributes
 		);
-		expect( buildHighlightCss( null ) ).toBe(
-			'mark.wp-note{background-color:transparent;color:inherit;}'
+		expect( highlights ).toEqual( [
+			{ clientId: 'block-plain', id: 9, author: 2 },
+		] );
+	} );
+
+	it( 'skips threads whose marker exists in their block (inline notes)', () => {
+		const highlights = getBlockLevelHighlights(
+			[ { id: 7, author: 1, blockClientId: 'block-inline' } ],
+			getBlockAttributes
+		);
+		expect( highlights ).toEqual( [] );
+	} );
+
+	it( 'collapses several block-level threads on one block to the primary', () => {
+		// `pickPrimaryNote` prefers the first unresolved thread, so the first
+		// listed thread wins and only one highlight is emitted for the block.
+		const highlights = getBlockLevelHighlights(
+			[
+				{
+					id: 9,
+					author: 2,
+					status: 'hold',
+					blockClientId: 'block-plain',
+				},
+				{
+					id: 11,
+					author: 4,
+					status: 'hold',
+					blockClientId: 'block-plain',
+				},
+			],
+			getBlockAttributes
+		);
+		expect( highlights ).toEqual( [
+			{ clientId: 'block-plain', id: 9, author: 2 },
+		] );
+	} );
+
+	it( 'skips threads without an id or block', () => {
+		const highlights = getBlockLevelHighlights(
+			[
+				{ author: 2, blockClientId: 'block-plain' },
+				{ id: 9, author: 2, blockClientId: null },
+			],
+			getBlockAttributes
+		);
+		expect( highlights ).toEqual( [] );
+	} );
+
+	it( 'returns an empty list for empty input', () => {
+		expect( getBlockLevelHighlights( [], getBlockAttributes ) ).toEqual(
+			[]
+		);
+		expect( getBlockLevelHighlights( null, getBlockAttributes ) ).toEqual(
+			[]
 		);
 	} );
 } );

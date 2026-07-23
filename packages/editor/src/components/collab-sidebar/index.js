@@ -68,8 +68,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes, blockHighlights } =
-		useNoteThreads( postId );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -163,7 +162,6 @@ function NotesSidebar( { postId } ) {
 		<>
 			<NoteHighlightStyles
 				threads={ unresolvedNotes }
-				blockHighlights={ blockHighlights }
 				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (

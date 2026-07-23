@@ -31,13 +31,11 @@ import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
 import {
 	applyNoteFormat,
-	BLOCK_LEVEL_NOTE_START,
 	calculateNotePositions,
 	findNoteInBlock,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	pickPrimaryNote,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
@@ -68,9 +66,9 @@ export function useNoteThreads( postId ) {
 	}, [] );
 
 	// Process notes to build the tree structure.
-	const { notes, unresolvedNotes, blockHighlights } = useMemo( () => {
+	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
-			return { notes: [], unresolvedNotes: [], blockHighlights: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
 		/*
@@ -118,7 +116,7 @@ export function useNoteThreads( postId ) {
 		}
 
 		if ( rootThreads.length === 0 ) {
-			return { notes: [], unresolvedNotes: [], blockHighlights: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
 		// Order within a block: block-level notes (no inline anchor) come
@@ -128,7 +126,6 @@ export function useNoteThreads( postId ) {
 		// already iterated in document order above.
 		const unresolved = [];
 		const resolved = [];
-		const highlights = [];
 		for ( const [ clientId, noteIds ] of Object.entries(
 			blocksWithNotes
 		) ) {
@@ -158,28 +155,6 @@ export function useNoteThreads( postId ) {
 					resolved.push( thread );
 				}
 			}
-
-			/*
-			 * Unresolved notes with no inline marker anchor the whole block, so
-			 * the block itself is tinted in the author's color. A block can
-			 * hold several; one color has to win, so the primary thread (the
-			 * same one the avatar indicator surfaces) decides.
-			 */
-			const blockLevelThreads = orderedThreads
-				.filter(
-					( { thread, start } ) =>
-						start === BLOCK_LEVEL_NOTE_START &&
-						thread.status === 'hold'
-				)
-				.map( ( { thread } ) => thread );
-			const primary = pickPrimaryNote( blockLevelThreads );
-			if ( primary ) {
-				highlights.push( {
-					clientId,
-					id: primary.id,
-					author: primary.author,
-				} );
-			}
 		}
 
 		// Orphans: root threads without a linked block. They stay with the
@@ -192,14 +167,12 @@ export function useNoteThreads( postId ) {
 		return {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
-			blockHighlights: highlights,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return {
 		notes,
 		unresolvedNotes,
-		blockHighlights,
 	};
 }
 
