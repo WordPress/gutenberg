@@ -173,10 +173,10 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 				background: '#1e1e1e',
 				primary: '#3858e9',
 			},
-			// WP Classic
+			// WP Fresh
 			{
-				background: '#1d2327',
-				primary: '#2271b1',
+				background: '#25292b',
+				primary: '#3858e9',
 			},
 			// WP Light
 			{
