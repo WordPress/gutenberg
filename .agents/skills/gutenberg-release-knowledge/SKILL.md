@@ -107,6 +107,10 @@ Use a concise PR description:
 ## Why?
 
 <The gap and the release evidence that exposed it.>
+
+## Discussion
+
+This is a release-learning proposal, not a settled conclusion. Please challenge the evidence, scope, wording, or destination. Closing this PR is a useful outcome if the guidance is not durable or correct. Discussion here will be used to improve this skill.
 ```
 
 Include direct evidence links without turning the PR body into the full analysis report. Open the PR as a draft, never merge it, and keep it in the user-specified fork when requested.
@@ -114,9 +118,10 @@ Include direct evidence links without turning the PR body into the full analysis
 Before opening the draft:
 
 1. Query the target repository's current labels. Select the smallest set of existing labels that describes the proposed change, using labels from the source PRs as evidence when they still fit. Never create a label just for the generated PR.
-2. Name the people whose substantive discussion, review, or authored rationale directly informed the proposal alongside the corresponding evidence links in the PR body.
+2. Tag with `@handle` the people whose substantive discussion, review, or authored rationale directly informed the proposal alongside the corresponding evidence links in the PR body.
 3. Request reviews only from those named evidence participants. Exclude bots, reaction-only participants, passive requested reviewers, broad props lists, and people whose comments did not inform the proposal. Use the trust weighting above to keep the list focused when several people support the same point.
-4. Apply the selected labels and request the evidence-linked reviewers after opening the draft. If the fork or repository permissions prevent either action, report the intended labels or reviewers and the exact limitation.
+4. Apply the selected labels and request the evidence-linked reviewers after opening the draft.
+5. Verify the labels and review requests on the opened PR. If repository permissions or collaborator rules prevent either action, keep the relevant people tagged in the PR body and report the intended labels or reviewers with the exact limitation.
 
 ## Validate and report
 
