@@ -22,11 +22,12 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$label_attr = $attributes['label'] ?? null;
 	$text       = is_string( $label_attr ) && '' !== $label_attr ? trim( $label_attr ) : '';
 
-	$service     = $attributes['service'] ?? 'Icon';
-	$url         = $attributes['url'] ?? false;
-	$text        = $text ? $text : block_core_social_link_get_name( $service );
-	$rel         = $attributes['rel'] ?? '';
-	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
+	$service_attr = $attributes['service'] ?? null;
+	$service      = is_string( $service_attr ) ? $service_attr : 'Icon';
+	$url          = $attributes['url'] ?? false;
+	$text         = $text ? $text : block_core_social_link_get_name( $service );
+	$rel          = $attributes['rel'] ?? '';
+	$show_labels  = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
