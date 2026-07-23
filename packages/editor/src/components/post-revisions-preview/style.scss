@@ -106,7 +106,6 @@ $revision-code-diff-marker-width: 3ch;
 	max-width: $revision-code-diff-line-number-width;
 	border-right: $border-width solid $gray-200;
 	background: $gray-100;
-	font-variant-numeric: tabular-nums;
 
 	&.is-previous + &.is-current {
 		left: $revision-code-diff-line-number-width;

@@ -17,11 +17,6 @@ import { useFocusOnMount, useRefEffect } from '@wordpress/compose';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-/**
- * Connects the revisions slider to the editor store.
- *
- * @return {React.JSX.Element} The connected revisions slider.
- */
 export default function ConnectedRevisionsSlider() {
 	const revisionData = useSelect( ( select ) => {
 		const {

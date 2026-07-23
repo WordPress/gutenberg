@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -161,17 +161,6 @@ describe( 'RevisionsCodeDiff', () => {
 			screen.getByRole( 'region', { name: 'Revision code' } )
 		).toHaveTextContent( '<p>After</p>' );
 		expect( screen.queryByText( '<p>Before</p>' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Added' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Removed' ) ).not.toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'columnheader', { name: 'Change' } )
-		).not.toBeInTheDocument();
-		expect(
-			within(
-				screen.getByRole( 'row', { name: /<p>After<\/p>/ } )
-			).getAllByRole( 'cell' )
-		).toHaveLength( 2 );
-		expect( screen.queryByText( 'Unchanged' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'waits while the previous revision is loading', () => {

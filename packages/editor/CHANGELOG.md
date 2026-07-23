@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   Add a read-only code diff to the revisions screen.
+-   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
 ### Bug Fixes
 

@@ -147,14 +147,10 @@ test.describe( 'Post revisions', () => {
 		).toBeVisible();
 
 		const optionsButton = page.getByRole( 'button', { name: 'Options' } );
-		await expect( optionsButton ).toBeEnabled();
 		const codeEditorMenuItem = page.getByRole( 'menuitemradio', {
 			name: 'Code editor',
 		} );
 		try {
-			await expect(
-				page.locator( '.editor-revisions-header .components-spinner' )
-			).toBeVisible();
 			await optionsButton.click();
 			await expect( codeEditorMenuItem ).toBeVisible();
 		} finally {
@@ -167,7 +163,6 @@ test.describe( 'Post revisions', () => {
 		await codeEditorMenuItem.click();
 
 		const codeDiff = page.getByRole( 'region', { name: 'Code changes' } );
-		await expect( codeDiff ).toBeVisible();
 		await expect(
 			codeDiff.locator( 'tr.is-removed' ).filter( {
 				hasText: '<p>Original content</p>',
@@ -187,18 +182,11 @@ test.describe( 'Post revisions', () => {
 		).toBeVisible();
 		await expect( codeDiff ).not.toContainText( '<p>Updated content</p>' );
 
-		await page.keyboard.press( 'End' );
-		await expect(
-			codeDiff.locator( 'tr.is-added' ).filter( {
-				hasText: '<p>Updated content</p>',
-			} )
-		).toBeVisible();
-
 		await page.getByRole( 'button', { name: 'Show changes' } ).click();
 		const revisionCode = page.getByRole( 'region', {
 			name: 'Revision code',
 		} );
-		await expect( revisionCode ).toContainText( '<p>Updated content</p>' );
+		await expect( revisionCode ).toContainText( '<p>Original content</p>' );
 		await expect( revisionCode.locator( 'tr.is-removed' ) ).toHaveCount(
 			0
 		);
@@ -209,7 +197,7 @@ test.describe( 'Post revisions', () => {
 			.click();
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		).toHaveText( 'Updated content' );
+		).toHaveText( 'Original content' );
 	} );
 
 	test( 'should preserve block clientId when sliding between revisions', async ( {

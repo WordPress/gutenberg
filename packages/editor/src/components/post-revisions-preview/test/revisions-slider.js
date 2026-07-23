@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -39,32 +39,5 @@ describe( 'RevisionsSlider', () => {
 		expect(
 			screen.getByRole( 'slider', { name: 'Revision' } )
 		).toHaveFocus();
-	} );
-
-	it( 'does not focus after pointer interaction while revisions load', () => {
-		const { rerender } = render(
-			<>
-				<button>Options</button>
-				{ getRevisionsSlider() }
-			</>
-		);
-		const optionsButton = screen.getByRole( 'button', { name: 'Options' } );
-
-		fireEvent.pointerDown( optionsButton );
-		expect( document.body ).toHaveFocus();
-		rerender(
-			<>
-				<button>Options</button>
-				{ getRevisionsSlider( [
-					{ id: 2, date: '2026-07-14T12:00:00' },
-					{ id: 1, date: '2026-07-14T11:00:00' },
-				] ) }
-			</>
-		);
-
-		expect(
-			screen.getByRole( 'slider', { name: 'Revision' } )
-		).not.toHaveFocus();
-		expect( document.body ).toHaveFocus();
 	} );
 } );

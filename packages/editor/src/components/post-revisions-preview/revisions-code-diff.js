@@ -93,11 +93,6 @@ export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
 	} );
 }
 
-/**
- * Connects the revision code diff to the editor store.
- *
- * @return {React.JSX.Element} The connected revision code diff.
- */
 export default function ConnectedRevisionsCodeDiff() {
 	const revisionDiff = useSelect( ( select ) => {
 		const editorSelectors = select( editorStore );
