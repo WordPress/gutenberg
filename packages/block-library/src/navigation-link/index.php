@@ -151,7 +151,7 @@ function block_core_navigation_link_render_submenu_icon() {
  */
 function block_core_navigation_link_maybe_urldecode( $url ) {
 	if ( ! is_string( $url ) ) {
-		return $url;
+		return '';
 	}
 
 	$is_url_encoded = false;
