@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
+
 ### Internal
 
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).

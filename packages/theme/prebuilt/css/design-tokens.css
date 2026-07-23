@@ -298,21 +298,21 @@
 	/* Extended animations like complex or multi-step transitions */
 	--wpds-motion-duration-xl: 400ms;
 	/* Nearly imperceptible easing for hover, color, and background transitions */
-	--wpds-motion-easing-subtle: cubic-bezier( 0.15, 0, 0.15, 1 );
+	--wpds-motion-easing-subtle: cubic-bezier(0.15, 0, 0.15, 1);
 	/* General-purpose easing for on-screen movement like resizing, morphing, and layout shifts */
-	--wpds-motion-easing-balanced: cubic-bezier( 0.4, 0, 0.2, 1 );
+	--wpds-motion-easing-balanced: cubic-bezier(0.4, 0, 0.2, 1);
 	/* Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers */
-	--wpds-motion-easing-expressive: cubic-bezier( 0.25, 0, 0, 1 );
+	--wpds-motion-easing-expressive: cubic-bezier(0.25, 0, 0, 1);
 	/* Headings font family */
-	--wpds-typography-font-family-heading: -apple-system, system-ui, 'Segoe UI',
-		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
+	--wpds-typography-font-family-heading: -apple-system, system-ui, "Segoe UI",
+		"Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue",
 		sans-serif;
 	/* Body font family */
-	--wpds-typography-font-family-body: -apple-system, system-ui, 'Segoe UI',
-		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
+	--wpds-typography-font-family-body: -apple-system, system-ui, "Segoe UI",
+		"Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue",
 		sans-serif;
 	/* Monospace font family */
-	--wpds-typography-font-family-mono: 'Menlo', 'Consolas', monaco, monospace;
+	--wpds-typography-font-family-mono: "Menlo", "Consolas", monaco, monospace;
 	/* Extra small font size */
 	--wpds-typography-font-size-xs: 11px;
 	/* Small font size */
@@ -343,15 +343,15 @@
 	--wpds-typography-font-weight-emphasis: 600;
 }
 
-@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
 	:root {
 		/* Border width for focus ring */
 		--wpds-border-width-focus: 1.5px;
 	}
 }
 
-[data-wpds-corner-radius='none'],
-:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='none'] ) {
+[data-wpds-corner-radius="none"],
+:root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"]) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 0px;
 	/* Standalone buttons, inputs, and compact controls. */
@@ -364,10 +364,8 @@
 	--wpds-border-radius-xl: 0px;
 }
 
-[data-wpds-corner-radius='subtle'],
-:root:has(
-		[data-wpds-root-provider='true'][data-wpds-corner-radius='subtle']
-	) {
+[data-wpds-corner-radius="subtle"],
+:root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"]) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 1px;
 	/* Standalone buttons, inputs, and compact controls. */
@@ -380,9 +378,9 @@
 	--wpds-border-radius-xl: 12px;
 }
 
-[data-wpds-corner-radius='moderate'],
+[data-wpds-corner-radius="moderate"],
 :root:has(
-		[data-wpds-root-provider='true'][data-wpds-corner-radius='moderate']
+		[data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"]
 	) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 6px;
@@ -396,9 +394,9 @@
 	--wpds-border-radius-xl: 20px;
 }
 
-[data-wpds-corner-radius='pronounced'],
+[data-wpds-corner-radius="pronounced"],
 :root:has(
-		[data-wpds-root-provider='true'][data-wpds-corner-radius='pronounced']
+		[data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"]
 	) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 18px;

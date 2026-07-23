@@ -26,7 +26,9 @@ import {
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
+	getNoteMarkerSelector,
 } from '../utils';
+import { noteFormat } from '../format';
 
 function makeRect( top ) {
 	return { top };
@@ -545,6 +547,35 @@ describe( 'calculateNotePositions', () => {
 		// 1 (upward):    184 - 200 - 50 - 20 = -86 → 114
 		expect( positions ).toEqual( { 1: 114, 2: 184, 3: 254 } );
 	} );
+
+	it( 'never displaces a thread above its own anchor when the pending note sorts out of order', () => {
+		/*
+		 * The pending "new" note is spliced in after its block's existing
+		 * threads, but it anchors to the live selection, which can sit above
+		 * a marker that precedes it in the list. Ordering by measured top
+		 * keeps the sweep's assumption true; without it note 1 is pushed to
+		 * 164 - 136px above the marker it points at.
+		 */
+		const threads = [ { id: 1 }, { id: 'new' } ];
+		const blockRects = {
+			1: makeRect( 300 ),
+			new: makeRect( 250 ),
+		};
+		const heights = { 1: 50, new: 80 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 'new',
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// new (anchor):   250 - 16 = 234
+		// 1 (downward):   (234 + 80) - 300 + 20 = 34 → 334
+		expect( positions ).toEqual( { 1: 334, new: 234 } );
+		expect( positions[ 1 ] ).toBeGreaterThan( blockRects[ 1 ].top - 50 );
+	} );
 } );
 
 describe( 'findNoteRange', () => {
@@ -996,5 +1027,36 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'getNoteMarkerSelector', () => {
+	it( 'targets the note marker by id', () => {
+		expect( getNoteMarkerSelector( 12 ) ).toBe(
+			'mark.wp-note[data-id="12"]'
+		);
+		expect( getNoteMarkerSelector( '12' ) ).toBe(
+			'mark.wp-note[data-id="12"]'
+		);
+	} );
+
+	it( 'escapes quotes and backslashes', () => {
+		expect( getNoteMarkerSelector( '1"2\\3' ) ).toBe(
+			'mark.wp-note[data-id="1\\"2\\\\3"]'
+		);
+	} );
+} );
+
+describe( 'getNoteMarkerSelector / noteFormat', () => {
+	it( 'matches the shape the note format actually serializes', () => {
+		// The selector is hand-written rather than derived, so lock it to the
+		// format definition: a change to tagName/className/data-id there must
+		// fail here rather than silently degrade every thread to block-top
+		// alignment via getAnchorRects' fallback.
+		const marker = document.createElement( noteFormat.tagName );
+		marker.className = noteFormat.className;
+		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
+
+		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
 	} );
 } );

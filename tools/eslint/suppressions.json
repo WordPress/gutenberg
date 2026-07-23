@@ -137,11 +137,6 @@
 			"count": 3
 		}
 	},
-	"packages/block-editor/src/components/global-styles/filters-panel.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -339,11 +334,6 @@
 		}
 	},
 	"packages/block-library/src/image/image.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/math/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -711,11 +701,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/form-token-field/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/grid/hook.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -804,11 +789,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/search-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -847,16 +827,6 @@
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/toggle-group-control/toggle-group-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {

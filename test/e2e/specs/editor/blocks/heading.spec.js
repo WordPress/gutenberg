@@ -148,6 +148,26 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'should not remove an empty heading on backspace when removal is locked', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { lock: { remove: true, move: false } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		await page.keyboard.press( 'Backspace' );
+
+		// The locked heading cannot be removed, so it should still be there.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/heading' } ] );
+	} );
+
 	test( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async ( {
 		editor,
 		page,
