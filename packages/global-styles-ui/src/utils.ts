@@ -1,9 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	GlobalStylesSettings,
+} from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * State definition with value and label.
@@ -52,15 +65,24 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 };
 
 /**
- * Get the valid states for a given block or element.
+ * Responsive breakpoint states available for all blocks.
+ * These map to CSS media queries wrapping the block's styles.
+ */
+export const RESPONSIVE_STATES: StateDefinition[] = [
+	{ value: '@tablet', label: __( 'Tablet' ) },
+	{ value: '@mobile', label: __( 'Mobile' ) },
+];
+
+/**
+ * Get the valid pseudo states for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid state definitions, or empty array if none
+ * @return Array of valid pseudo state definitions, or empty array if none
  */
-export function getValidStates( name: string ): StateDefinition[] {
-	// Check if it's a block
+export function getValidPseudoStates( name: string ): StateDefinition[] {
+	// Check if it's a block (contains a slash, e.g. 'core/button').
 	if ( VALID_BLOCK_STATES[ name ] ) {
-		return VALID_BLOCK_STATES[ name ];
+		return VALID_BLOCK_STATES[ name ] ?? [];
 	}
 
 	// Check if it's an element
@@ -69,6 +91,24 @@ export function getValidStates( name: string ): StateDefinition[] {
 	}
 
 	return [];
+}
+
+/**
+ * Get the valid viewport state definitions.
+ *
+ * @param viewportSettings
+ * @return Array of valid viewport state definitions.
+ */
+export function getValidViewportStates(
+	viewportSettings?: GlobalStylesSettings[ 'viewport' ]
+): StateDefinition[] {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return RESPONSIVE_STATES.filter(
+		( state ) =>
+			( state.value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+			( state.value !== '@mobile' || breakpoints.mobile !== undefined )
+	);
 }
 
 /**

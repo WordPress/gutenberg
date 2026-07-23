@@ -14,6 +14,10 @@ import { uploadMedia } from '@wordpress/media-utils';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	addFiles as trackStart,
+	advance as trackAdvance,
+} from '../../components/upload-progress-snackbar/tracker';
 
 const noop = () => {};
 
@@ -30,6 +34,10 @@ const noop = () => {};
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  * @param {Function} $0.onSuccess         Function called after the final representation of the file is available.
  * @param {boolean}  $0.multiple          Whether to allow multiple files to be uploaded.
+ * @param {boolean}  $0.isTransportOnly   Whether the caller owns the upload lifecycle UX (progress tracking and
+ *                                        save locking) and uses this function only as its server transport. Set
+ *                                        by the `@wordpress/upload-media` queue, which counts its own items for
+ *                                        the progress snackbar and locks saving via `useUploadSaveLock`.
  */
 export default function mediaUpload( {
 	additionalData = {},
@@ -40,6 +48,7 @@ export default function mediaUpload( {
 	onFileChange,
 	onSuccess,
 	multiple = true,
+	isTransportOnly = false,
 } ) {
 	const { receiveEntityRecords } = dispatch( coreDataStore );
 	const { getCurrentPost, getEditorSettings } = select( editorStore );
@@ -52,7 +61,6 @@ export default function mediaUpload( {
 
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	const lockKey = `image-upload-${ uuid() }`;
-	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 	const currentPost = getCurrentPost();
@@ -61,44 +69,43 @@ export default function mediaUpload( {
 		typeof currentPost?.id === 'number'
 			? currentPost.id
 			: currentPost?.wp_id;
-	const setSaveLock = () => {
-		if ( window.__clientSideMediaProcessing ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
-		lockPostSaving( lockKey );
-		lockPostAutosaving( lockKey );
-		imageIsUploading = true;
-	};
-
-	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
-		if ( window.__clientSideMediaProcessing ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
-		imageIsUploading = false;
 	};
+
+	// Lock saving immediately when the upload starts. Skipped for transport
+	// calls from the `@wordpress/upload-media` queue, whose items already
+	// lock saving via useUploadSaveLock in the editor provider.
+	if ( ! isTransportOnly ) {
+		lockPostSaving( lockKey );
+		lockPostAutosaving( lockKey );
+	}
+
+	const postData = currentPostId ? { post: currentPostId } : {};
+
+	// Track this batch for the upload progress snackbar. Skipped for
+	// transport calls from the `@wordpress/upload-media` queue — its items
+	// are already counted by the snackbar, so registering them here would
+	// double-count them (see gutenberg#80369).
+	if ( ! isTransportOnly ) {
+		const trackingFiles = Array.from( filesList ).map(
+			( f ) => f?.name || ''
+		);
+		trackStart( trackingFiles );
+	}
+	let lastCompletedCount = 0;
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange: ( file ) => {
-			// When client-side media processing is enabled, save locking
-			// is handled by useUploadSaveLock in the editor provider.
-			if ( ! window.__clientSideMediaProcessing ) {
-				if ( ! imageIsUploading ) {
-					setSaveLock();
-				} else {
-					clearSaveLock();
-				}
-			}
-			onFileChange?.( file );
+		onFileChange: ( files ) => {
+			onFileChange?.( files );
 
 			// Files are initially received by `onFileChange` as a blob.
-			// After that the function is called a second time with the file as an entity.
+			// After that the function is called again with the file as an entity.
 			// For core-data, we only care about receiving/invalidating entities.
-			const entityFiles = file.filter( ( _file ) => _file?.id );
+			const entityFiles = files.filter( ( _file ) => _file?.id );
 			if ( entityFiles?.length ) {
 				const invalidateCache = true;
 				receiveEntityRecords(
@@ -109,6 +116,20 @@ export default function mediaUpload( {
 					invalidateCache
 				);
 			}
+
+			// Unlock saving once all files have been uploaded (all have IDs).
+			if ( ! isTransportOnly && entityFiles.length === files.length ) {
+				clearSaveLock();
+			}
+
+			// Advance the snackbar tracker for newly-completed files.
+			if ( ! isTransportOnly ) {
+				const completedCount = entityFiles.length;
+				if ( completedCount > lastCompletedCount ) {
+					trackAdvance( completedCount - lastCompletedCount );
+					lastCompletedCount = completedCount;
+				}
+			}
 		},
 		onSuccess,
 		additionalData: {
@@ -117,8 +138,10 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			if ( ! window.__clientSideMediaProcessing ) {
+			if ( ! isTransportOnly ) {
 				clearSaveLock();
+				// Failed files still count as "done" for the snackbar.
+				trackAdvance( 1 );
 			}
 			onError( message );
 		},

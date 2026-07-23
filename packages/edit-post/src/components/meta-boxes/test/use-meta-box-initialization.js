@@ -35,15 +35,22 @@ const initializeMetaBoxes = jest.fn( () => ( {
 	type: 'META_BOXES_INITIALIZED',
 } ) );
 
+const updateEditorSettings = jest.fn( () => ( {
+	type: 'UPDATE_EDITOR_SETTINGS',
+} ) );
+
 function createMockStores( {
 	isEditorReady = true,
 	isCollaborationEnabled = true,
 	metaBoxes = [],
-	rtcCompatibleIds = [],
 } = {} ) {
 	return {
 		'core/editor': {
 			...storeConfig,
+			actions: {
+				...storeConfig.actions,
+				updateEditorSettings,
+			},
 			selectors: {
 				__unstableIsEditorReady: jest.fn( () => isEditorReady ),
 				isCollaborationEnabledForCurrentPost: jest.fn(
@@ -66,7 +73,6 @@ function createMockStores( {
 			},
 			selectors: {
 				getAllMetaBoxes: jest.fn( () => metaBoxes ),
-				getRtcCompatibleMetaBoxIds: jest.fn( () => rtcCompatibleIds ),
 				hasMetaBoxes: jest.fn( () => metaBoxes.length > 0 ),
 				getActiveMetaBoxLocations: jest.fn( () =>
 					metaBoxes.length > 0 ? [ 'normal' ] : []
@@ -93,6 +99,7 @@ describe( 'useMetaBoxInitialization', () => {
 	afterEach( () => {
 		setCollaborationSupported.mockClear();
 		initializeMetaBoxes.mockClear();
+		updateEditorSettings.mockClear();
 	} );
 
 	it( 'disables collaboration when metaboxes are present', () => {
@@ -113,10 +120,17 @@ describe( 'useMetaBoxInitialization', () => {
 	it( 'does not disable collaboration when all metaboxes are rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{ id: 'my-metabox', title: 'My Meta Box' },
-				{ id: 'another-metabox', title: 'Another' },
+				{
+					id: 'my-metabox',
+					title: 'My Meta Box',
+					__rtc_compatible: true,
+				},
+				{
+					id: 'another-metabox',
+					title: 'Another',
+					__rtc_compatible: true,
+				},
 			],
-			rtcCompatibleIds: [ 'my-metabox', 'another-metabox' ],
 		} );
 		const registry = createRegistry( mockStores );
 
@@ -129,10 +143,13 @@ describe( 'useMetaBoxInitialization', () => {
 	it( 'disables collaboration when some metaboxes lack rtcCompatible', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
-				{ id: 'compatible-metabox', title: 'Compatible' },
+				{
+					id: 'compatible-metabox',
+					title: 'Compatible',
+					__rtc_compatible: true,
+				},
 				{ id: 'incompatible-metabox', title: 'Incompatible' },
 			],
-			rtcCompatibleIds: [ 'compatible-metabox' ],
 		} );
 		const registry = createRegistry( mockStores );
 
@@ -143,8 +160,13 @@ describe( 'useMetaBoxInitialization', () => {
 
 	it( 'does not disable collaboration when the only metabox is rtcCompatible', () => {
 		const mockStores = createMockStores( {
-			metaBoxes: [ { id: 'compatible-metabox', title: 'Compatible' } ],
-			rtcCompatibleIds: [ 'compatible-metabox' ],
+			metaBoxes: [
+				{
+					id: 'compatible-metabox',
+					title: 'Compatible',
+					__rtc_compatible: true,
+				},
+			],
 		} );
 		const registry = createRegistry( mockStores );
 
@@ -174,5 +196,27 @@ describe( 'useMetaBoxInitialization', () => {
 		renderHook( registry );
 
 		expect( setCollaborationSupported ).not.toHaveBeenCalled();
+	} );
+
+	it( 'disables visual revisions when metaboxes are present', () => {
+		const mockStores = createMockStores( {
+			metaBoxes: [ { id: 'my-metabox', title: 'My Meta Box' } ],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( updateEditorSettings ).toHaveBeenCalledWith( {
+			disableVisualRevisions: true,
+		} );
+	} );
+
+	it( 'does not disable visual revisions when there are no metaboxes', () => {
+		const mockStores = createMockStores( { metaBoxes: [] } );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( updateEditorSettings ).not.toHaveBeenCalled();
 	} );
 } );

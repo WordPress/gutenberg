@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -11,6 +12,9 @@ import { useSelect } from '@wordpress/data';
  */
 import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default function useSpace( clientId ) {
 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
@@ -55,10 +59,14 @@ export default function useSpace( clientId ) {
 				}
 			}
 
-			element.addEventListener( 'keydown', onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', onKeyDown );
-			};
+			// Capture phase so we run before writing-flow's ancestor-bubble
+			// keydown handlers that gate on `event.defaultPrevented`.
+			return subscribeOwnedListener(
+				element,
+				'keydown',
+				onKeyDown,
+				true
+			);
 		},
 		[ clientId, indentListItem ]
 	);

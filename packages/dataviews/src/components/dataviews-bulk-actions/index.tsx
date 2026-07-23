@@ -59,34 +59,35 @@ function ActionWithModal< Item >( {
 	);
 }
 
+export function hasAPossibleBulkAction< Item >(
+	actions: Action< Item >[],
+	item: Item
+) {
+	return actions.some(
+		( action ) =>
+			action.supportsBulk &&
+			( ! action.isEligible || action.isEligible( item ) )
+	);
+}
+
 export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
-	return useMemo( () => {
-		return actions.some( ( action ) => {
-			return (
-				action.supportsBulk &&
-				( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ actions, item ] );
+	return useMemo(
+		() => hasAPossibleBulkAction( actions, item ),
+		[ actions, item ]
+	);
 }
 
 export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
+	return useMemo(
+		() => data.some( ( item ) => hasAPossibleBulkAction( actions, item ) ),
+		[ actions, data ]
+	);
 }
 
 interface BulkSelectionCheckboxProps< Item > {

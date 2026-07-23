@@ -9,14 +9,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
+import { getResolutionStatus } from './utils';
 import { unlock } from '../lock-unlock';
 import { getNormalizedCommaSeparable } from '../utils';
 
-interface EntityRecordsResolution< RecordType > {
+export interface EntityRecordsResolution< RecordType > {
 	/** The requested entity records */
 	records: RecordType[] | null;
 
@@ -24,6 +24,11 @@ interface EntityRecordsResolution< RecordType > {
 	 * Is the record still being resolved?
 	 */
 	isResolving: boolean;
+
+	/**
+	 * Has the resolution started?
+	 */
+	hasStarted: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -108,38 +113,41 @@ export default function useEntityRecords< RecordType >(
 	// if the values remain the same.
 	const queryAsString = addQueryArgs( '', queryArgs );
 
-	const { data: records, ...rest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return {
-					// Avoiding returning a new reference on every execution.
-					data: EMPTY_ARRAY,
-				};
-			}
-			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
-		},
-		[ kind, name, queryAsString, options.enabled ]
-	);
-
-	const { totalItems, totalPages } = useSelect(
+	const { records, totalItems, totalPages, ...rest } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
+					// Avoiding returning a new reference on every execution.
+					records: EMPTY_ARRAY,
 					totalItems: null,
 					totalPages: null,
+					...getResolutionStatus(),
 				};
 			}
+
+			const storeSelectors = select( coreStore );
+			const resolutionStatus = storeSelectors.getResolutionState(
+				'getEntityRecords',
+				[ kind, name, queryArgs ]
+			)?.status;
+
 			return {
-				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+				records: storeSelectors.getEntityRecords(
+					kind,
+					name,
+					queryArgs
+				) as RecordType[] | null,
+				totalItems: storeSelectors.getEntityRecordsTotalItems(
 					kind,
 					name,
 					queryArgs
 				),
-				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+				totalPages: storeSelectors.getEntityRecordsTotalPages(
 					kind,
 					name,
 					queryArgs
 				),
+				...getResolutionStatus( resolutionStatus ),
 			};
 		},
 		[ kind, name, queryAsString, options.enabled ]

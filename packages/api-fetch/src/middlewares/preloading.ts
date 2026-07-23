@@ -8,6 +8,9 @@ import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
  */
 import type { APIFetchMiddleware } from '../types';
 
+export const ENABLE_MULTI_USE = Symbol( 'preloadingEnableMultiUse' );
+export const CLEAR = Symbol( 'preloadingClear' );
+
 /**
  * @param preloadedData
  * @return Preloading middleware.
@@ -15,14 +18,20 @@ import type { APIFetchMiddleware } from '../types';
 function createPreloadingMiddleware(
 	preloadedData: Record< string, any >
 ): APIFetchMiddleware {
-	const cache = Object.fromEntries(
+	const { OPTIONS = {}, ...GET } = Object.fromEntries(
 		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
 			normalizePath( path ),
 			data,
 		] )
-	);
+	) as Record< string, any > & { OPTIONS?: Record< string, any > };
 
-	return ( options, next ) => {
+	// Preload entries that haven't been served yet.
+	const unusedGet = new Set< string >( Object.keys( GET ) );
+	const unusedOptions = new Set< string >( Object.keys( OPTIONS ) );
+
+	let multiUse = false;
+
+	const middleware: APIFetchMiddleware = ( options, next ) => {
 		const { parse = true } = options;
 		let rawPath = options.path;
 		if ( ! rawPath && options.url ) {
@@ -42,28 +51,55 @@ function createPreloadingMiddleware(
 		const method = options.method || 'GET';
 		const path = normalizePath( rawPath );
 
-		if ( 'GET' === method && cache[ path ] ) {
-			const cacheData = cache[ path ];
-
-			// Unsetting the cache key ensures that the data is only used a single time.
-			delete cache[ path ];
-
-			return prepareResponse( cacheData, !! parse );
-		} else if (
-			'OPTIONS' === method &&
-			cache[ method ] &&
-			cache[ method ][ path ]
-		) {
-			const cacheData = cache[ method ][ path ];
-
-			// Unsetting the cache key ensures that the data is only used a single time.
-			delete cache[ method ][ path ];
-
-			return prepareResponse( cacheData, !! parse );
+		if ( 'GET' === method && GET[ path ] ) {
+			const data = GET[ path ];
+			if ( ! multiUse ) {
+				delete GET[ path ];
+			}
+			unusedGet.delete( path );
+			return prepareResponse( data, !! parse );
+		} else if ( 'OPTIONS' === method && OPTIONS[ path ] ) {
+			const data = OPTIONS[ path ];
+			if ( ! multiUse ) {
+				delete OPTIONS[ path ];
+			}
+			unusedOptions.delete( path );
+			return prepareResponse( data, !! parse );
 		}
 
 		return next( options );
 	};
+
+	( middleware as any )[ ENABLE_MULTI_USE ] = () => {
+		multiUse = true;
+	};
+
+	( middleware as any )[ CLEAR ] = (): void => {
+		const tags = [
+			...Array.from( unusedGet, ( p ) => `GET ${ p }` ),
+			...Array.from( unusedOptions, ( p ) => `OPTIONS ${ p }` ),
+		];
+		if ( tags.length ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'[api-fetch][preload] Some preloads were never consumed:',
+				tags
+			);
+		} else {
+			// eslint-disable-next-line no-console
+			console.log( '[api-fetch][preload] All preloads consumed.' );
+		}
+		unusedGet.clear();
+		unusedOptions.clear();
+		for ( const key of Object.keys( GET ) ) {
+			delete GET[ key ];
+		}
+		for ( const key of Object.keys( OPTIONS ) ) {
+			delete OPTIONS[ key ];
+		}
+	};
+
+	return middleware;
 }
 
 /**

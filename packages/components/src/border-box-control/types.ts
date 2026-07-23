@@ -22,7 +22,10 @@ export type BorderSide = keyof Borders;
 
 export type BorderBoxControlProps = ColorProps &
 	LabelProps &
-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+	Pick<
+		BorderControlProps,
+		'enableStyle' | '__next40pxDefaultSize' | 'size'
+	> & {
 		/**
 		 * A callback function invoked when any border value is changed. The value
 		 * received may be a "flat" border object, one that has properties defining
@@ -45,15 +48,9 @@ export type BorderBoxControlProps = ColorProps &
 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
 		 */
 		value: AnyBorder;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
 	};
 
-export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
+export type LinkedButtonProps = {
 	/**
 	 * This prop allows the `LinkedButton` to reflect whether the parent
 	 * `BorderBoxControl` is currently displaying "linked" or "unlinked"
@@ -68,7 +65,7 @@ export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
 	onClick: () => void;
 };
 
-export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
+export type VisualizerProps = {
 	/**
 	 * An object representing the current border configuration. It contains
 	 * properties for each side, with each side an object reflecting the border
@@ -78,7 +75,7 @@ export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
 };
 
 export type SplitControlsProps = ColorProps &
-	Pick< BorderBoxControlProps, 'enableStyle' | 'size' > & {
+	Pick< BorderBoxControlProps, 'enableStyle' > & {
 		/**
 		 * A callback that is invoked whenever an individual side's border has
 		 * changed.

@@ -2,14 +2,9 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import {
-	Spinner,
-	Navigator,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,75 +12,23 @@ import {
 import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
-import { fetchGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import GuidelineActionsSection from './components/guideline-actions-section';
-import RevisionHistory from './components/revision-history';
-
-const GUIDELINE_ITEMS = [
-	{
-		title: __( 'Site' ),
-		description: __(
-			"Describe your site's purpose, goals, and primary audience."
-		),
-
-		slug: 'site',
-	},
-	{
-		title: __( 'Copy' ),
-		description: __(
-			'Set your writing standards for tone, voice, style, and formatting.'
-		),
-
-		slug: 'copy',
-	},
-	{
-		title: __( 'Images' ),
-		description: __(
-			'Outline your style, dimensions, formats, mood and aesthetic preferences.'
-		),
-
-		slug: 'images',
-	},
-	{
-		title: __( 'Blocks' ),
-		description: __(
-			'Create tailored guidelines for specific block types.'
-		),
-		slug: 'blocks',
-	},
-	{
-		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines.' ),
-		slug: 'additional',
-	},
-];
-
-const KNOWN_VIEWS = [ 'revision-history' ];
-
-function getInitialNavigatorPath() {
-	if ( window?.location?.href ) {
-		const url = new URL( window.location.href );
-		const view = url.searchParams.get( 'view' ) ?? '';
-		if ( KNOWN_VIEWS.includes( view ) ) {
-			return `/${ view }`;
-		}
-	}
-
-	return '/';
-}
+import { useGuidelineData, scopeSlug, BLOCKS_SCOPE } from './data';
 
 function GuidelinesPage() {
-	const [ loading, setLoading ] = useState( true );
-	const [ error, setError ] = useState< string | null >( null );
+	const { scopes, contentBlocks, bySlug, query, isLoading } =
+		useGuidelineData();
 
+	// Only show the spinner on the first load. Later refetches (e.g. after a
+	// save re-resolves the collection) must not unmount the sections, or the
+	// accordions would collapse and lose any in-progress edits.
+	const [ hasLoaded, setHasLoaded ] = useState( false );
 	useEffect( () => {
-		// Populate the store with the guidelines.
-		fetchGuidelines()
-			.then( () => setError( null ) )
-			.catch( ( e: Error ) => setError( e.message ) )
-			.finally( () => setLoading( false ) );
-	}, [] );
+		if ( ! isLoading ) {
+			setHasLoaded( true );
+		}
+	}, [ isLoading ] );
 
 	return (
 		<Page
@@ -94,95 +37,68 @@ function GuidelinesPage() {
 				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 			) }
 		>
-			{ error && (
-				<div className="guidelines__content">
-					<Notice status="error" isDismissible={ false }>
-						<strong>
-							{ sprintf(
-								/* translators: %s: Error message. */
-								__( 'Error loading guidelines: %s' ),
-								error
-							) }
-						</strong>
-						<p className="guidelines__error-description">
-							{ __(
-								'Please try again. If the problem persists, contact support.'
-							) }
-						</p>
-					</Notice>
-				</div>
-			) }
-			{ loading ? (
+			{ ! hasLoaded ? (
 				<div className="guidelines__loading">
 					<Spinner />
 				</div>
 			) : (
-				! error && (
-					<Navigator initialPath={ getInitialNavigatorPath() }>
-						<Navigator.Screen path="/">
-							<VStack className="guidelines__content">
-								{ /*
-								 * Disable reason: The `list` ARIA role is redundant but
-								 * Safari+VoiceOver won't announce the list otherwise.
-								 */
-								/* eslint-disable jsx-a11y/no-redundant-roles */ }
-								<ul role="list" className="guidelines__list">
-									{ GUIDELINE_ITEMS.map( ( item ) => {
-										const contentId = `guidelines-${ item.slug }`;
-										const headingId = `guidelines-${ item.slug }-heading`;
-										const descriptionId = `guidelines-${ item.slug }-description`;
-
-										return (
-											<li
-												key={ item.slug }
-												className="guidelines__list-item"
-											>
-												<div className="guidelines__accordion-item">
-													<GuidelineAccordion
-														title={ item.title }
-														description={
-															item.description
-														}
-														contentId={ contentId }
-														headingId={ headingId }
-														descriptionId={
-															descriptionId
-														}
-													>
-														{ item.slug ===
-														'blocks' ? (
-															<BlockGuidelines />
-														) : (
-															<GuidelineAccordionForm
-																slug={
-																	item.slug
-																}
-																contentId={
-																	contentId
-																}
-																headingId={
-																	headingId
-																}
-																descriptionId={
-																	descriptionId
-																}
-															/>
-														) }
-													</GuidelineAccordion>
-												</div>
-											</li>
-										);
-									} ) }
-								</ul>
-								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								<GuidelineActionsSection />
-							</VStack>
-						</Navigator.Screen>
-						<Navigator.Screen path="/revision-history">
-							<RevisionHistory />
-						</Navigator.Screen>
-					</Navigator>
-				)
+				<VStack className="guidelines__content">
+					{ /*
+					 * Disable reason: The `list` ARIA role is redundant but
+					 * Safari+VoiceOver won't announce the list otherwise.
+					 */
+					/* eslint-disable jsx-a11y/no-redundant-roles */ }
+					<ul role="list" className="guidelines__list">
+						{ /*
+						 * Scopes come sorted by order from the registry. The
+						 * Blocks scope is rendered specially — its per-block rows
+						 * instead of a single textarea. Removing it from the
+						 * server registry drops the whole section here.
+						 */ }
+						{ scopes.map( ( scope ) => (
+							<li
+								key={ scope.slug }
+								className="guidelines__list-item"
+								data-slug={ scope.slug }
+							>
+								<GuidelineAccordion
+									title={ scope.title }
+									description={ scope.description }
+								>
+									{ scope.slug === BLOCKS_SCOPE ? (
+										<BlockGuidelines
+											contentBlocks={ contentBlocks }
+											bySlug={ bySlug }
+											query={ query }
+										/>
+									) : (
+										<GuidelineAccordionForm
+											scope={ scope }
+											existingId={
+												bySlug[
+													scopeSlug( scope.slug )
+												]?.id
+											}
+											content={
+												bySlug[
+													scopeSlug( scope.slug )
+												]?.content ?? ''
+											}
+											query={ query }
+										/>
+									) }
+								</GuidelineAccordion>
+							</li>
+						) ) }
+					</ul>
+					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+					<GuidelineActionsSection
+						scopes={ scopes }
+						contentBlocks={ contentBlocks }
+						bySlug={ bySlug }
+						query={ query }
+					/>
+				</VStack>
 			) }
 		</Page>
 	);

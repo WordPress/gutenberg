@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import {
+	insert,
+	toHTMLString,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 
 /**
@@ -13,6 +17,9 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../../../utils/selection';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export function findSelection( blocks ) {
 	let i = blocks.length;
@@ -154,10 +161,22 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'input', onInput );
-	element.addEventListener( 'compositionend', onInput );
+	// Capture phase so these run before ancestor (writing flow) bubble
+	// handlers, matching the timing of the previous raw element listeners.
+	const unsubscribeInput = subscribeOwnedListener(
+		element,
+		'input',
+		onInput,
+		true
+	);
+	const unsubscribeCompositionEnd = subscribeOwnedListener(
+		element,
+		'compositionend',
+		onInput,
+		true
+	);
 	return () => {
-		element.removeEventListener( 'input', onInput );
-		element.removeEventListener( 'compositionend', onInput );
+		unsubscribeInput();
+		unsubscribeCompositionEnd();
 	};
 };

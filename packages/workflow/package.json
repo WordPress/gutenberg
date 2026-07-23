@@ -40,9 +40,8 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": {
 		".": "./build-module/index.mjs"
 	},
@@ -50,6 +49,7 @@
 		"@wordpress/abilities": "file:../abilities",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
+		"@wordpress/core-abilities": "file:../core-abilities",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
@@ -60,8 +60,8 @@
 		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,25 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
-import { insertObject, useAnchor } from '@wordpress/rich-text';
+import { __ } from '@wordpress/i18n';
+import { useState, useEffect, useRef } from '@wordpress/element';
+import {
+	insert,
+	insertObject,
+	slice,
+	getTextContent,
+	useAnchor,
+} from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
-	TextControl,
-	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { ValidatedTextControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -35,6 +38,7 @@ function InlineUI( {
 		activeAttributes?.[ 'data-latex' ] || ''
 	);
 	const [ error, setError ] = useState( null );
+	const formRef = useRef();
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -43,25 +47,18 @@ function InlineUI( {
 
 	// Update the math object in real-time as the user types
 	const handleLatexChange = ( newLatex ) => {
-		let mathML = '';
-
 		setLatex( newLatex );
 
-		if ( newLatex ) {
+		let mathML = '';
+		if ( newLatex && latexToMathML ) {
 			try {
 				mathML = latexToMathML( newLatex, { displayMode: false } );
 				setError( null );
 			} catch ( err ) {
 				setError( err.message );
-				speak(
-					sprintf(
-						/* translators: %s: error message returned when parsing LaTeX. */
-						__( 'Error parsing mathematical expression: %s' ),
-						err.message
-					)
-				);
-				return;
 			}
+		} else {
+			setError( null );
 		}
 
 		const newReplacements = value.replacements.slice();
@@ -85,37 +82,29 @@ function InlineUI( {
 			offset={ 8 }
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
+			// Surface any parsing error before focus leaves the popover.
+			// An invalid field is refocused, keeping the popover open.
+			onFocusOutside={ () => formRef.current?.reportValidity() }
 			className="block-editor-format-toolbar__math-popover"
 		>
-			<div style={ { minWidth: '300px', padding: '4px' } }>
-				<VStack spacing={ 1 }>
-					<TextControl
-						__next40pxDefaultSize
-						hideLabelFromVision
-						label={ __( 'LaTeX math syntax' ) }
-						value={ latex }
-						onChange={ handleLatexChange }
-						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
-						autoComplete="off"
-						className="block-editor-format-toolbar__math-input"
-					/>
-					{ error && (
-						<>
-							<Badge
-								intent="error"
-								className="wp-block-math__error"
-							>
-								{ sprintf(
-									/* translators: %s: error message returned when parsing LaTeX. */
-									__( 'Error: %s' ),
-									error
-								) }
-							</Badge>
-							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
-						</>
-					) }
-				</VStack>
-			</div>
+			<form
+				ref={ formRef }
+				style={ { minWidth: '300px', padding: '4px' } }
+				onSubmit={ ( event ) => event.preventDefault() }
+			>
+				<ValidatedTextControl
+					hideLabelFromVision
+					label={ __( 'LaTeX math syntax' ) }
+					value={ latex }
+					customValidity={
+						error ? { type: 'invalid', message: error } : undefined
+					}
+					onChange={ handleLatexChange }
+					placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+					autoComplete="off"
+					className="block-editor-format-toolbar__math-input"
+				/>
+			</form>
 		</Popover>
 	);
 }
@@ -135,23 +124,51 @@ function Edit( {
 			setLatexToMathML( () => module.default );
 		} );
 	}, [] );
+
+	function onClick() {
+		let newValue;
+
+		if ( isObjectActive ) {
+			// Revert the active math object to its LaTeX source so clicking
+			// the button toggles back to the exact text it was created from.
+			// Keep the restored text selected so it can be edited or
+			// re-marked right away.
+			const latex = activeObjectAttributes?.[ 'data-latex' ] || '';
+			newValue = insert( value, latex );
+			newValue.start = newValue.end - latex.length;
+		} else {
+			// If there's a selection, seed the format with it so you can type
+			// LaTeX inline and then mark it as math.
+			const selectedText = getTextContent( slice( value ) );
+			let innerHTML = '';
+			if ( selectedText && latexToMathML ) {
+				try {
+					innerHTML = latexToMathML( selectedText, {
+						displayMode: false,
+					} );
+				} catch {
+					// Leave unrendered; the popover opens with the text
+					// prefilled so the expression can be corrected.
+				}
+			}
+			newValue = insertObject( value, {
+				type: name,
+				attributes: { 'data-latex': selectedText },
+				innerHTML,
+			} );
+			newValue.start = newValue.end - 1;
+		}
+
+		onChange( newValue );
+		onFocus();
+	}
+
 	return (
 		<>
 			<RichTextToolbarButton
 				icon={ icon }
 				title={ title }
-				onClick={ () => {
-					const newValue = insertObject( value, {
-						type: name,
-						attributes: {
-							'data-latex': '',
-						},
-						innerHTML: '',
-					} );
-					newValue.start = newValue.end - 1;
-					onChange( newValue );
-					onFocus();
-				} }
+				onClick={ onClick }
 				isActive={ isObjectActive }
 			/>
 			{ isObjectActive && (

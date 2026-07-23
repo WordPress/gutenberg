@@ -604,7 +604,7 @@ test.describe( 'Links', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener">Gutenberg</a>',
+						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener">Gutenberg</a>',
 				},
 			},
 		] );
@@ -871,7 +871,7 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener nofollow">Gutenberg</a>`,
+					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener nofollow">Gutenberg</a>`,
 				},
 			},
 		] );
@@ -969,12 +969,16 @@ test.describe( 'Links', () => {
 
 			await richTextLink.click();
 
-			// Check focus remains in the RichText.
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			).toBeFocused();
+			// Check the selection remains in the RichText.
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			// Type to modify the link text.
 			await page.keyboard.type( ' is awesome' );

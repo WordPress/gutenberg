@@ -95,6 +95,7 @@ export function PageAttributesParent() {
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
 				query.orderby = 'relevance';
+				query.search_columns = [ 'post_title' ];
 			}
 
 			const parentPost = pageId
@@ -194,7 +195,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }

@@ -543,6 +543,11 @@ describe( 'DataViews Picker', () => {
 				screen.getByRole( 'menuitemradio', { name: 'Table' } )
 			).toBeInTheDocument();
 
+			// The Activity layout is opt-in and must not appear by default.
+			expect(
+				screen.queryByRole( 'menuitemradio', { name: 'Activity' } )
+			).not.toBeInTheDocument();
+
 			// The grid layout is active by default.
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Grid' } )

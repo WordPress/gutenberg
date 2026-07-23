@@ -12,61 +12,105 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	VisuallyHidden,
-	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { ActionItem } from '@wordpress/interface';
+import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import PostPreviewButton from '../post-preview-button';
+import { PostPreviewMenuItem } from '../post-preview-button';
+import { sidebars } from '../sidebar/constants';
+import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {
 		deviceType,
 		homeUrl,
+		hasMobileViewport,
+		hasTabletViewport,
 		isTemplate,
 		isViewable,
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		isResponsiveEditing,
+		hasBlockSelection,
+		activeComplementaryArea,
 	} = useSelect( ( select ) => {
 		const {
-			getDeviceType,
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getRenderingMode,
-		} = select( editorStore );
+			getDeviceType,
+		} = unlock( select( editorStore ) );
+		const {
+			isResponsiveEditing: _isResponsiveEditing,
+			getBlockSelectionStart,
+			getSettings,
+		} = unlock( select( blockEditorStore ) );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
+		const viewportBreakpoints = getViewportBreakpoints(
+			getSettings().__experimentalFeatures?.viewport
+		);
 		return {
 			deviceType: getDeviceType(),
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
+			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			isResponsiveEditing: _isResponsiveEditing(),
+			hasBlockSelection: !! getBlockSelectionStart(),
+			activeComplementaryArea:
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
 		useDispatch( editorStore )
 	);
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
+		unlock( useDispatch( blockEditorStore ) );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
 		resetZoomLevel();
+	};
+
+	const handleResponsiveEditingChange = () => {
+		const newIsResponsiveEditing = ! isResponsiveEditing;
+		setResponsiveEditing( newIsResponsiveEditing );
+		setStyleStateViewport(
+			newIsResponsiveEditing
+				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				: 'default'
+		);
+		// Only auto-open the block inspector when enabling responsive styles
+		// for a selected block and no complementary area is already open.
+		if (
+			newIsResponsiveEditing &&
+			hasBlockSelection &&
+			! activeComplementaryArea
+		) {
+			enableComplementaryArea( 'core', sidebars.block );
+		}
 	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -107,24 +151,42 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			value: 'Desktop',
 			label: __( 'Desktop' ),
 			icon: desktop,
+			info: isResponsiveEditing
+				? __( 'Style all viewports.' )
+				: __( 'Preview desktop viewport.' ),
 		},
-		{
-			value: 'Tablet',
-			label: __( 'Tablet' ),
-			icon: tablet,
-		},
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-		},
+		...( hasTabletViewport
+			? [
+					{
+						value: 'Tablet',
+						label: __( 'Tablet' ),
+						icon: tablet,
+						info: isResponsiveEditing
+							? __( 'Style tablet only.' )
+							: __( 'Preview tablet viewport.' ),
+					},
+			  ]
+			: [] ),
+		...( hasMobileViewport
+			? [
+					{
+						value: 'Mobile',
+						label: __( 'Mobile' ),
+						icon: mobile,
+						info: isResponsiveEditing
+							? __( 'Style mobile only.' )
+							: __( 'Preview mobile viewport.' ),
+					},
+			  ]
+			: [] ),
 	];
 
 	return (
 		<DropdownMenu
 			className={ clsx(
 				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`,
+				{ 'is-responsive-editing': isResponsiveEditing }
 			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
@@ -142,6 +204,19 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							icon={ isResponsiveEditing ? check : undefined }
+							isSelected={ isResponsiveEditing }
+							role="menuitemcheckbox"
+							onClick={ handleResponsiveEditingChange }
+							info={ __(
+								'Style changes apply only to the selected viewport.'
+							) }
+						>
+							{ __( 'Responsive styles' ) }
+						</MenuItem>
+					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
 							<MenuItem
@@ -151,7 +226,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								onClick={ onClose }
 							>
 								{ __( 'View site' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )
@@ -181,17 +256,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					) }
 					{ isViewable && (
 						<MenuGroup>
-							<PostPreviewButton
-								className="editor-preview-dropdown__button-external"
-								role="menuitem"
+							<PostPreviewMenuItem
 								forceIsAutosaveable={ forceIsAutosaveable }
-								aria-label={ __( 'Preview in new tab' ) }
-								textContent={
-									<>
-										{ __( 'Preview in new tab' ) }
-										<Icon icon={ external } />
-									</>
-								}
 								onPreview={ onClose }
 							/>
 						</MenuGroup>

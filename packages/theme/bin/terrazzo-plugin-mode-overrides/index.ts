@@ -1,7 +1,5 @@
-/**
- * External dependencies
- */
 import { basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Plugin } from '@terrazzo/parser';
 
 type DTCGPrimitiveValue =
@@ -198,7 +196,7 @@ export default function pluginModeOverrides(): Plugin {
 						sourceDir
 					);
 					outputFile(
-						outFileUrl.href,
+						fileURLToPath( outFileUrl ),
 						JSON.stringify( output, null, '\t' )
 					);
 				}

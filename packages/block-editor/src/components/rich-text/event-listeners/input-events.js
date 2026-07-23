@@ -1,3 +1,16 @@
+/**
+ * WordPress dependencies
+ */
+
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+
 export default ( props ) => ( element ) => {
 	const { inputEvents } = props.current;
 	function onInput( event ) {
@@ -6,8 +19,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'input', onInput );
-	return () => {
-		element.removeEventListener( 'input', onInput );
-	};
+	return subscribeOwnedListener( element, 'input', onInput );
 };

@@ -98,7 +98,7 @@ The following configurable variables are used with the template files. Template 
 -   `namespace` (default: `'create-block'`) – the internal namespace for the block name.
 -   `title` (no default) – a display title for your block.
 -   `description` (no default) – a short description for your block.
--   `dashicon` (no default) – an icon property thats makes it easier to identify a block ([available values](https://developer.wordpress.org/resource/dashicons/)).
+-   `dashicon` (no default) – an icon property that makes it easier to identify a block ([available values](https://developer.wordpress.org/resource/dashicons/)).
 -   `category` (default: `'widgets'`) – blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
 -   `textdomain` (defaults to the `slug` value) – the text domain used to make strings translatable ([more info](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#text-domains)).
 -   `attributes` (no default) – block attributes ([more details](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/)).

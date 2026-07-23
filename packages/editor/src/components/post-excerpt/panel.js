@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Dropdown,
 	Button,
 	__experimentalVStack as VStack,
@@ -12,7 +12,10 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -23,7 +26,9 @@ import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
 import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
-import { getTemplateInfo } from '../../utils/get-template-info';
+import { unlock } from '../../lock-unlock';
+
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 /**
  * Module Constants
@@ -185,9 +190,9 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
+		<WCText align="left" numberOfLines={ 4 } truncate={ allowEditing }>
 			{ decodeEntities( excerpt ) }
-		</Text>
+		</WCText>
 	);
 	if ( ! allowEditing ) {
 		return excerptText;

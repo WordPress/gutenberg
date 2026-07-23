@@ -14,7 +14,7 @@ npm install @wordpress/admin-ui --save
 
 ## Setup
 
-This package requires CSS from this package and from multiple dependency packages.
+This package requires CSS from multiple dependency packages.
 
 ### Within WordPress
 
@@ -31,7 +31,6 @@ npm install @wordpress/admin-ui @wordpress/theme @wordpress/components
 ```js
 import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/build-style/style.css';
-import '@wordpress/admin-ui/build-style/style.css';
 ```
 
 RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
@@ -62,6 +61,14 @@ _Parameters_
 
 -   _props_ `BreadcrumbsProps`:
 -   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
+
+### getAdminThemeColors
+
+Reads the active WordPress admin color scheme from the `admin-color-*` body class and returns its primary and background colors. Intended to seed a `ThemeProvider` (`color` prop) so the design system matches the user's chosen admin color scheme.
+
+_Returns_
+
+-   `AdminThemeColors`: The primary and background colors for the active admin color scheme.
 
 ### NavigableRegion
 

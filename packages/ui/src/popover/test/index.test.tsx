@@ -1,7 +1,22 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Component, createRef, useState } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import * as Popover from '../index';
+import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
+
+function collectUncaughtErrors() {
+	const errors: Error[] = [];
+	const handler = ( event: ErrorEvent ) => {
+		event.preventDefault();
+		errors.push( event.error );
+	};
+	window.addEventListener( 'error', handler );
+	return {
+		errors,
+		cleanup: () => window.removeEventListener( 'error', handler ),
+	};
+}
 
 describe( 'Popover', () => {
 	describe( 'forwards ref', () => {
@@ -376,6 +391,35 @@ describe( 'Popover', () => {
 				);
 			} );
 		} );
+
+		it( 'merges user `className` on Popover.Title with the internal one', async () => {
+			// Regression test for the shared `useRender` class-name merge
+			// that also covers Popover.Description and its Dialog/Drawer
+			// counterparts.
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title className="custom-title">
+							Title
+						</Popover.Title>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const heading = await screen.findByRole( 'heading', {
+				name: 'Title',
+			} );
+			// The regression this guards against: `useRender` must still
+			// forward the user-supplied className to the underlying DOM node.
+			// CSS module classes are stubbed in the Jest environment, so we
+			// can only assert the user class end-to-end.
+			expect( heading ).toHaveClass( 'custom-title' );
+		} );
 	} );
 
 	describe( 'variant', () => {
@@ -408,6 +452,8 @@ describe( 'Popover', () => {
 			expect(
 				await screen.findByText( 'Unstyled content' )
 			).toBeVisible();
+			const unstyledPopup = unstyledRef.current;
+			expect( unstyledPopup ).not.toBeNull();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open styled' } )
@@ -416,12 +462,12 @@ describe( 'Popover', () => {
 
 			const styledClasses = Array.from( styledPopup.classList );
 			for ( const cls of styledClasses ) {
-				expect( unstyledRef.current! ).not.toHaveClass( cls );
+				expect( unstyledPopup! ).not.toHaveClass( cls );
 			}
 		} );
 	} );
 
-	describe( 'inline (via container)', () => {
+	describe( 'inline via portal (custom container)', () => {
 		function InlinePopover() {
 			const containerRef = createRef< HTMLSpanElement >();
 			return (
@@ -432,7 +478,11 @@ describe( 'Popover', () => {
 							ref={ containerRef }
 							style={ { display: 'contents' } }
 						/>
-						<Popover.Popup container={ containerRef }>
+						<Popover.Popup
+							portal={
+								<Popover.Portal container={ containerRef } />
+							}
+						>
 							<Popover.Title>Title</Popover.Title>
 							Inline content
 						</Popover.Popup>
@@ -441,7 +491,7 @@ describe( 'Popover', () => {
 			);
 		}
 
-		it( 'should render inside the container when a local ref is used', async () => {
+		it( 'should render inside the portal container when a local ref is used', async () => {
 			const user = userEvent.setup();
 
 			render( <InlinePopover /> );
@@ -482,6 +532,136 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	// Slot is identified by a data attribute, not a user-facing role/text.
+	/* eslint-disable testing-library/no-node-access */
+	describe( 'wp compat overlay slot', () => {
+		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+
+		// Exercises the public opt-in path rather than poking the flag.
+		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+			useEnableWpCompatOverlaySlot();
+			return <>{ children }</>;
+		}
+
+		afterEach( () => {
+			// The hook is one-way at runtime; reset explicitly between tests.
+			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+				.__wpUiCompatOverlaySlotEnabled;
+			document
+				.querySelectorAll( SLOT_SELECTOR )
+				.forEach( ( element ) => element.remove() );
+		} );
+
+		it( 'portals the popup into the slot when the consumer opts in', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<WithSlotEnabled>
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup>
+							<Popover.Title>Title</Popover.Title>
+							Popover content
+						</Popover.Popup>
+					</Popover.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText( 'Popover content' );
+			expect( content ).toBeVisible();
+
+			const slot = document.querySelector( SLOT_SELECTOR );
+			expect( slot ).not.toBeNull();
+			expect( slot ).toContainElement( content );
+		} );
+
+		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+						Popover content
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			expect(
+				await screen.findByText( 'Popover content' )
+			).toBeVisible();
+			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
+		} );
+
+		it( 'lets a caller-supplied portal container override the slot', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<WithSlotEnabled>
+					<Popover.Root>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Popover.Popup
+							portal={
+								<Popover.Portal container={ containerRef } />
+							}
+						>
+							<Popover.Title>Title</Popover.Title>
+							Popover content
+						</Popover.Popup>
+					</Popover.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText( 'Popover content' );
+			expect( content ).toBeVisible();
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				content
+			);
+		} );
+	} );
+	/* eslint-enable testing-library/no-node-access */
+
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup
+						positioner={
+							<Popover.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Popover.Title>Title</Popover.Title>
+						Positioner slot content
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText(
+				'Positioner slot content'
+			);
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( content );
+		} );
+	} );
+
 	describe( 'anchor', () => {
 		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
 			function AnchorTest() {
@@ -493,7 +673,13 @@ describe( 'Popover', () => {
 							Anchor element
 						</div>
 						<Popover.Root defaultOpen>
-							<Popover.Popup anchor={ anchorEl ?? undefined }>
+							<Popover.Popup
+								positioner={
+									<Popover.Positioner
+										anchor={ anchorEl ?? undefined }
+									/>
+								}
+							>
 								<Popover.Title>Title</Popover.Title>
 								Anchored content
 							</Popover.Popup>
@@ -613,84 +799,87 @@ describe( 'Popover', () => {
 	} );
 
 	describe( 'title validation', () => {
+		// Suppress console.error from React act() warnings and jsdom
+		// unhandled-error logging. Validation errors are caught via
+		// collectUncaughtErrors (window 'error' event) instead.
+		let originalConsoleError: typeof console.error;
+
+		beforeEach( () => {
+			// eslint-disable-next-line no-console
+			originalConsoleError = console.error;
+			// eslint-disable-next-line no-console
+			console.error = jest.fn();
+		} );
+
+		afterEach( () => {
+			// eslint-disable-next-line no-console
+			console.error = originalConsoleError;
+		} );
+
 		it( 'should throw when Popover.Title is missing', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
-
-			// Suppress console.error from React error boundary
-			const spy = jest
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<ErrorBoundary onError={ onError }>
-					<Popover.Root>
-						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup>No title here</Popover.Popup>
-					</Popover.Root>
-				</ErrorBoundary>
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>No title here</Popover.Popup>
+				</Popover.Root>
 			);
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			await waitFor( () => {
-				expect( onError ).toHaveBeenCalledWith(
-					expect.objectContaining( {
-						message: expect.stringContaining(
-							'Missing <Popover.Title>'
-						),
-					} )
-				);
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			spy.mockRestore();
+			expect( errors[ 0 ].message ).toBe(
+				'Popover: Missing <Popover.Title>. ' +
+					'For accessibility, every popover requires a title. ' +
+					'If needed, the title can be visually hidden but must not be omitted.'
+			);
+
+			cleanup();
 		} );
 
 		it( 'should throw when Popover.Title is empty', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
-
-			const spy = jest
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<ErrorBoundary onError={ onError }>
-					<Popover.Root>
-						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup>
-							<Popover.Title />
-						</Popover.Popup>
-					</Popover.Root>
-				</ErrorBoundary>
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title />
+					</Popover.Popup>
+				</Popover.Root>
 			);
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			await waitFor( () => {
-				expect( onError ).toHaveBeenCalledWith(
-					expect.objectContaining( {
-						message: expect.stringContaining( 'cannot be empty' ),
-					} )
-				);
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			spy.mockRestore();
+			expect( errors[ 0 ].message ).toBe(
+				'Popover: <Popover.Title> cannot be empty. ' +
+					'Provide meaningful text content for the popover title.'
+			);
+
+			cleanup();
 		} );
 
 		it( 'should not throw when Popover.Title is present', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<ErrorBoundary onError={ onError }>
-					<Popover.Root>
-						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup>
-							<Popover.Title>Valid Title</Popover.Title>
-						</Popover.Popup>
-					</Popover.Root>
-				</ErrorBoundary>
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title>Valid Title</Popover.Title>
+					</Popover.Popup>
+				</Popover.Root>
 			);
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
@@ -699,29 +888,95 @@ describe( 'Popover', () => {
 				expect( screen.getByText( 'Valid Title' ) ).toBeVisible();
 			} );
 
-			expect( onError ).not.toHaveBeenCalled();
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
+			expect( errors ).toHaveLength( 0 );
+
+			cleanup();
+		} );
+
+		it( 'should throw when title is removed after mount', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			const ui = ( showTitle: boolean ) => (
+				<Popover.Root defaultOpen>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						{ showTitle && <Popover.Title>My Title</Popover.Title> }
+						<p>Content</p>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			const { rerender } = render( ui( true ) );
+
+			// Wait for the popover to render.
+			await waitFor( () => {
+				expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
+			} );
+
+			// Let initial validation settle — no errors expected.
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
+			expect( errors ).toHaveLength( 0 );
+
+			// Remove the title via rerender.
+			rerender( ui( false ) );
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Popover: Missing <Popover.Title>. ' +
+					'For accessibility, every popover requires a title. ' +
+					'If needed, the title can be visually hidden but must not be omitted.'
+			);
+
+			cleanup();
+		} );
+
+		it( 'should recover when title is added back', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			const ui = ( showTitle: boolean ) => (
+				<Popover.Root defaultOpen>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						{ showTitle && <Popover.Title>My Title</Popover.Title> }
+						<p>Content</p>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			const { rerender } = render( ui( false ) );
+
+			// Wait for the popover to render.
+			await waitFor( () => {
+				expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
+			} );
+
+			// Initially no title — should error.
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			const errorCountAfterInitial = errors.length;
+
+			// Add the title back via rerender.
+			rerender( ui( true ) );
+
+			// Wait for deferred validation to settle.
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
+
+			// No new errors should have been thrown.
+			expect( errors ).toHaveLength( errorCountAfterInitial );
+
+			cleanup();
 		} );
 	} );
 } );
-
-class ErrorBoundary extends Component<
-	{ children: React.ReactNode; onError: ( error: Error ) => void },
-	{ hasError: boolean }
-> {
-	state = { hasError: false };
-
-	static getDerivedStateFromError() {
-		return { hasError: true };
-	}
-
-	componentDidCatch( error: Error ) {
-		this.props.onError( error );
-	}
-
-	render() {
-		if ( this.state.hasError ) {
-			return null;
-		}
-		return this.props.children;
-	}
-}

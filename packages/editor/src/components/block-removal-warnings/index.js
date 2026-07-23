@@ -95,13 +95,6 @@ export default function BlockRemovalWarnings() {
 		[ currentPostType ]
 	);
 
-	// `BlockRemovalWarnings` is rendered in the editor provider, a shared component
-	// across react native and web. However, `BlockRemovalWarningModal` is web only.
-	// Check it exists before trying to render it.
-	if ( ! BlockRemovalWarningModal ) {
-		return null;
-	}
-
 	if ( ! removalRulesForPostType ) {
 		return null;
 	}

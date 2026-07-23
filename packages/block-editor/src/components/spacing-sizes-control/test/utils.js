@@ -8,12 +8,12 @@ import {
 	getPresetValueFromCustomValue,
 	getSliderValueFromPreset,
 	getSpacingPresetCssVar,
-	getSpacingPresetSlug,
 	hasAxisSupport,
 	hasBalancedSidesSupport,
 	isValueSpacingPreset,
 	VIEWS,
 } from '../utils';
+import { getPresetSlug } from '../../preset-input-control/utils';
 
 describe( 'isValueSpacingPreset', () => {
 	it( 'should return true if value is string in spacing presets var format', () => {
@@ -82,15 +82,26 @@ describe( 'getSpacingPresetCssVar', () => {
 			'var(--wp--preset--spacing--20)'
 		);
 	} );
+	it( 'should return undefined for a malformed non-string value such as an array', () => {
+		// Malformed blockGap data, e.g. `{ top: [ '1rem' ] }`, would otherwise
+		// throw when `.match()` is called on the array.
+		expect( getSpacingPresetCssVar( [ '1rem' ] ) ).toBe( undefined );
+	} );
+	it( 'should return undefined for other non-string values', () => {
+		expect( getSpacingPresetCssVar( { top: '1rem' } ) ).toBe( undefined );
+		expect( getSpacingPresetCssVar( 20 ) ).toBe( undefined );
+	} );
 } );
 
-describe( 'getSpacingPresetSlug', () => {
+describe( 'getPresetSlug', () => {
 	it( 'should return original value if 0 or default', () => {
-		expect( getSpacingPresetSlug( '0' ) ).toBe( '0' );
-		expect( getSpacingPresetSlug( 'default' ) ).toBe( 'default' );
+		expect( getPresetSlug( '0', 'spacing' ) ).toBe( '0' );
+		expect( getPresetSlug( 'default', 'spacing' ) ).toBe( 'default' );
 	} );
 	it( 'should return the int value of the slug portion of a valid preset var', () => {
-		expect( getSpacingPresetSlug( 'var:preset|spacing|20' ) ).toBe( '20' );
+		expect( getPresetSlug( 'var:preset|spacing|20', 'spacing' ) ).toBe(
+			'20'
+		);
 	} );
 } );
 

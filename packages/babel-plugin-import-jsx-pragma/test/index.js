@@ -159,7 +159,10 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 function getTransformedCode( source, options = {} ) {
 	const { code } = transformSync( source, {
 		configFile: false,
-		plugins: [ [ plugin, options ], '@babel/plugin-syntax-jsx' ],
+		plugins: [
+			[ plugin, options ],
+			require.resolve( '@babel/plugin-syntax-jsx' ),
+		],
 	} );
 
 	return code;

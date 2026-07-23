@@ -1,10 +1,43 @@
 /**
+ * External dependencies
+ */
+import type { Page } from '@playwright/test';
+
+/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
 import { SECOND_USER } from './fixtures/collaboration-utils';
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
+const CORE_DATA_PRIVATE_APIS_CONSENT =
+	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
+
+async function waitForCollaborationEnabledForCurrentPost(
+	page: Page,
+	expected: boolean
+) {
+	await page.waitForFunction(
+		( { consent, expectedValue } ) => {
+			const privateApis = ( window as any ).wp.privateApis;
+			const { unlock } =
+				privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			return (
+				unlock(
+					window.wp.data.select( 'core/editor' )
+				).isCollaborationEnabledForCurrentPost() === expectedValue
+			);
+		},
+		{
+			consent: CORE_DATA_PRIVATE_APIS_CONSENT,
+			expectedValue: expected,
+		},
+		{ timeout: 15000 }
+	);
+}
 
 test.describe( 'Collaboration with meta boxes', () => {
 	test.describe( 'incompatible meta boxes', () => {
@@ -24,7 +57,6 @@ test.describe( 'Collaboration with meta boxes', () => {
 			collaborationUtils,
 			requestUtils,
 			admin,
-			editor,
 			page,
 		} ) => {
 			// Create a draft post.
@@ -35,14 +67,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			} );
 
 			// User 1 (admin) opens the post.
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ post.id }&action=edit`
-			);
-			await editor.setPreferences( 'core/edit-post', {
-				welcomeGuide: false,
-				fullscreenMode: false,
-			} );
+			await admin.editPost( post.id );
 
 			// Wait for collaboration runtime and entity record to be ready.
 			await collaborationUtils.waitForEntityReady( page );
@@ -50,14 +75,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			// Wait for meta boxes to initialize and disable collaboration.
 			// collaborationSupported starts as true, then the meta box hook
 			// sets it to false once meta boxes are detected.
-			await page.waitForFunction(
-				() =>
-					window?.wp?.data
-						?.select( 'core/editor' )
-						?.isCollaborationEnabledForCurrentPost?.() === false,
-				undefined,
-				{ timeout: 15000 }
-			);
+			await waitForCollaborationEnabledForCurrentPost( page, false );
 
 			// Set up second browser context for User 2.
 			const secondContext = await admin.browser.newContext( {
@@ -113,6 +131,44 @@ test.describe( 'Collaboration with meta boxes', () => {
 				await secondContext.close();
 			}
 		} );
+
+		test( 'keeps undo available when meta boxes disable collaboration', async ( {
+			collaborationUtils,
+			requestUtils,
+			admin,
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const post = await requestUtils.createPost( {
+				title: 'Meta Box Undo Test',
+				status: 'draft',
+				date_gmt: new Date().toISOString(),
+			} );
+
+			await admin.editPost( post.id );
+			await collaborationUtils.waitForEntityReady( page );
+			await waitForCollaborationEnabledForCurrentPost( page, false );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Undo after meta boxes disable collaboration',
+				},
+			} );
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data.select( 'core' ).hasUndo()
+					)
+				)
+				.toBe( true );
+
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect.poll( () => editor.getBlocks() ).toHaveLength( 0 );
+		} );
 	} );
 
 	test.describe( 'RTC-compatible meta boxes', () => {
@@ -132,7 +188,6 @@ test.describe( 'Collaboration with meta boxes', () => {
 			collaborationUtils,
 			requestUtils,
 			admin,
-			editor,
 			page,
 		} ) => {
 			// Create a draft post.
@@ -143,28 +198,14 @@ test.describe( 'Collaboration with meta boxes', () => {
 			} );
 
 			// User 1 (admin) opens the post.
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ post.id }&action=edit`
-			);
-			await editor.setPreferences( 'core/edit-post', {
-				welcomeGuide: false,
-				fullscreenMode: false,
-			} );
+			await admin.editPost( post.id );
 
 			// Wait for collaboration runtime and entity record to be ready.
 			await collaborationUtils.waitForEntityReady( page );
 
 			// Verify collaboration remains enabled. The RTC-compatible meta
 			// box should not trigger the incompatibility lock-out.
-			await page.waitForFunction(
-				() =>
-					window?.wp?.data
-						?.select( 'core/editor' )
-						?.isCollaborationEnabledForCurrentPost?.() === true,
-				undefined,
-				{ timeout: 15000 }
-			);
+			await waitForCollaborationEnabledForCurrentPost( page, true );
 
 			// Verify a second user can join without seeing the lock modal.
 			const { page: page2 } = await collaborationUtils.joinUser(
@@ -176,7 +217,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			const modal = page2.getByRole( 'dialog', {
 				name: 'This post is already being edited',
 			} );
-			await expect( modal ).not.toBeVisible();
+			await expect( modal ).toBeHidden();
 		} );
 	} );
 } );

@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
+	tags: [ 'manifest' ],
 	component: TextareaControl,
 	title: 'Components/Selection & Input/Common/TextareaControl',
 	id: 'components-textareacontrol',
@@ -32,9 +33,9 @@ const meta: Meta< typeof TextareaControl > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `TextareaControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`TextareaControl`](?path=/docs/design-system-components-form-primitives-textarea--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

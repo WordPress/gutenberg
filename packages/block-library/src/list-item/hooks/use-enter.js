@@ -6,8 +6,8 @@ import {
 	getDefaultBlockName,
 	cloneBlock,
 } from '@wordpress/blocks';
-import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -16,29 +16,33 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import useOutdentListItem from './use-outdent-list-item';
+import { unlock } from '../../lock-unlock';
 
-export default function useEnter( props ) {
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+
+export default function useEnter( clientId ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex, getBlockName } =
-		useSelect( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
+	const {
+		getBlock,
+		getBlockAttributes,
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const outdentListItem = useOutdentListItem();
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;
 			}
-			const { content, clientId } = propsRef.current;
-			if ( content.length ) {
+			const { content } = getBlockAttributes( clientId ) ?? {};
+			if ( content?.length ) {
 				return;
 			}
 			event.preventDefault();
 			const canOutdent =
 				getBlockName(
-					getBlockRootClientId(
-						getBlockRootClientId( propsRef.current.clientId )
-					)
+					getBlockRootClientId( getBlockRootClientId( clientId ) )
 				) === 'core/list-item';
 			if ( canOutdent ) {
 				outdentListItem();
@@ -82,9 +86,8 @@ export default function useEnter( props ) {
 			selectionChange( middle.clientId );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 	}, [] );
 }

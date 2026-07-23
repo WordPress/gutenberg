@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { getSyncManager, hasSyncManager } from './sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -163,6 +167,7 @@ export function receiveEditorAssets( assets ) {
 
 /**
  * Returns an action object used to set whether collaboration is supported.
+ * When set to false, also disconnects all sync entities.
  *
  * @param {boolean} supported Whether collaboration is supported.
  *
@@ -172,6 +177,13 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+		if ( ! supported && hasSyncManager() ) {
+			getSyncManager().unloadAll();
+			dispatch.__unstableNotifySyncUndoManagerChange( {
+				hasUndo: false,
+				hasRedo: false,
+			} );
+		}
 	};
 
 /**
@@ -191,3 +203,174 @@ export function receiveViewConfig( kind, name, config ) {
 		config,
 	};
 }
+
+/**
+ * Returns an action object used to notify core-data that the sync undo manager
+ * state changed outside of the core-data reducer, e.g. The Yjs UndoManager
+ * captured an undo level.
+ *
+ * @param {Object}  state         The sync undo stack state.
+ * @param {boolean} state.hasRedo Whether there are changes to redo.
+ * @param {boolean} state.hasUndo Whether there are changes to undo.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableNotifySyncUndoManagerChange( state ) {
+	return {
+		type: 'SYNC_UNDO_MANAGER_CHANGE',
+		...state,
+	};
+}
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}
+
+/**
+ * Save entity records marked as dirty.
+ *
+ * @param {Object}   options                        Options for the action.
+ * @param {Function} [options.onSave]               Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
+ * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
+ */
+export const saveDirtyEntities =
+	( {
+		onSave,
+		dirtyEntityRecords = [],
+		entitiesToSkip = [],
+		close,
+		successNoticeContent,
+	} = {} ) =>
+	( { registry } ) => {
+		const PUBLISH_ON_SAVE_ENTITIES = [
+			{ kind: 'postType', name: 'wp_navigation' },
+		];
+		const saveNoticeId = 'site-editor-save-success';
+		const homeUrl = registry
+			.select( STORE_NAME )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
+		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! entitiesToSkip.some(
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
+				);
+			}
+		);
+		close?.( entitiesToSave );
+		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					registry
+						.dispatch( STORE_NAME )
+						.editEntityRecord( kind, name, key, {
+							status: 'publish',
+						} );
+				}
+
+				pendingSavedRecords.push(
+					registry
+						.dispatch( STORE_NAME )
+						.saveEditedEntityRecord( kind, name, key )
+				);
+			}
+		} );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				registry
+					.dispatch( STORE_NAME )
+					.__experimentalSaveSpecifiedEntityEdits(
+						'root',
+						'site',
+						undefined,
+						siteItemsToSave
+					)
+			);
+		}
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		Promise.all( pendingSavedRecords )
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
+			} )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					registry
+						.dispatch( noticesStore )
+						.createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					registry
+						.dispatch( noticesStore )
+						.createSuccessNotice(
+							successNoticeContent || __( 'Site updated.' ),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+								actions: [
+									{
+										label: __( 'View site' ),
+										url: homeUrl,
+										openInNewTab: true,
+									},
+								],
+							}
+						);
+				}
+			} )
+			.catch( ( error ) =>
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						`${ __( 'Saving failed.' ) } ${ error }`
+					)
+			);
+	};
