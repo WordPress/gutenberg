@@ -66,8 +66,9 @@ Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may pro
 
 It's a declarative action a widget type exposes.
 Each carries `id`, `label`, `href`, and optional `download` / `openInNewTab`.
+`data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 
-The widget names the intent and a link target; the host renders it as an anchor and owns placement. Only the `link` target exists today, and navigation and downloads are handled by the browser.
+The widget names the intent and a link target; the host renders it as an anchor and owns placement.
 
 ### Field types
 
