@@ -51,7 +51,7 @@ describe( 'buildHighlightCss', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]{background-color:${ color }40;text-decoration-line:underline;text-decoration-color:color-mix(in srgb, ${ color } 30%, currentColor);text-decoration-thickness:1.5px;`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;text-decoration-line:underline;text-decoration-color:color-mix(in srgb, currentColor 30%, ${ color });text-decoration-thickness:1.5px;`
 		);
 	} );
 
@@ -65,14 +65,16 @@ describe( 'buildHighlightCss', () => {
 	/*
 	 * The canvas can be light or dark and the author palette is fixed, so a
 	 * pure-palette stroke would fall under the 3:1 non-text contrast minimum on
-	 * one of them. Anchoring the mix to `currentColor` is what keeps it above
-	 * that floor in both.
+	 * one of them. Mixing 30% of `currentColor` into the author color is the
+	 * least dilution that holds the floor on both canvases.
 	 */
-	it( 'anchors the underline color to currentColor rather than the raw palette', () => {
+	it( 'mixes currentColor into the underline rather than using the raw palette', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ], '7' );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).not.toContain( `text-decoration-color:${ color };` );
-		expect( css ).toContain( 'currentColor)' );
+		expect( css ).toContain(
+			`color-mix(in srgb, currentColor 30%, ${ color })`
+		);
 	} );
 
 	it( 'emphasizes the selected thread by appending a second rule', () => {
@@ -265,23 +267,26 @@ describe( 'getBlockLevelHighlights', () => {
 } );
 
 describe( 'buildBlockHighlightCss', () => {
-	// The selector only matches when the block's own wrapper element is itself
-	// a rich-text editable, which is what scopes the treatment to text blocks.
-	const selectorFor = ( clientId ) =>
+	// The tint-behind-the-text rule only matches when the block's own wrapper
+	// element is itself a rich-text editable, which is what scopes that
+	// treatment to text blocks; every other block gets the overlay rule.
+	const textSelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
+	const overlaySelectorFor = ( clientId ) =>
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable)::after`;
 
-	it( 'tints each block with its author color at the tint alpha (0x40)', () => {
+	it( 'tints each text block with its author color at the tint alpha (0x40)', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
 		expect( css ).toContain(
-			`${ selectorFor(
+			`${ textSelectorFor(
 				'abc-1'
 			) }{background-color:${ getAvatarBorderColor( 1 ) }40;`
 		);
 		expect( css ).toContain(
-			`${ selectorFor(
+			`${ textSelectorFor(
 				'abc-2'
 			) }{background-color:${ getAvatarBorderColor( 3 ) }40;`
 		);
@@ -293,30 +298,49 @@ describe( 'buildBlockHighlightCss', () => {
 	 * inset shadow rather than a border so that adding it cannot reflow the
 	 * canvas.
 	 */
-	it( 'rules the bottom edge of each block at rest', () => {
+	it( 'rules the bottom edge of each text block at rest', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 		] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`box-shadow:inset 0 -1.5px 0 0 color-mix(in srgb, ${ color } 30%, currentColor);`
+			`box-shadow:inset 0 -1.5px 0 0 color-mix(in srgb, currentColor 30%, ${ color });`
 		);
 		expect( css ).not.toContain( 'border' );
 	} );
 
 	/*
-	 * The tint covers a whole paragraph, so deepening it would cost the theme's
-	 * text contrast across all of that, and a wrapped paragraph striped on every
-	 * line would read as formatting where a single bottom edge reads as a
-	 * boundary. Hover and selection are carried by the block outline instead, so
-	 * the CSS here stays one rule per block.
+	 * A background behind a non-text block (an image, a container) is hidden by
+	 * the block's own content, so the same tint and rule are painted onto an
+	 * overlay above it instead - all the way around, since a non-text block has
+	 * no text baseline for a bottom edge to relate to. The overlay must ignore
+	 * pointer events or it would swallow every click on the block.
 	 */
-	it( 'emits exactly one rule per block, with no state or per-line variants', () => {
+	it( 'overlays non-text blocks with the tint and an all-around rule at rest', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).toContain(
+			`${ overlaySelectorFor(
+				'abc-1'
+			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;box-shadow:inset 0 0 0 1.5px color-mix(in srgb, currentColor 30%, ${ color });}`
+		);
+	} );
+
+	/*
+	 * The tint covers a whole block, so deepening it would cost the theme's
+	 * text contrast across all of that, and a wrapped paragraph striped on
+	 * every line would read as formatting where a single bottom edge reads as a
+	 * boundary. Hover and selection are carried by the block outline instead,
+	 * so the CSS here stays flat: one resting rule per treatment and no state
+	 * or per-line variants.
+	 */
+	it( 'emits only resting rules, with no state or per-line variants', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
-		expect( css.match( /\{/g ) ).toHaveLength( 2 );
 		expect( css ).not.toContain( ':hover' );
 		expect( css ).not.toContain( 'text-decoration' );
 		const alphas = [
@@ -324,7 +348,8 @@ describe( 'buildBlockHighlightCss', () => {
 		]
 			.map( ( [ , alpha ] ) => alpha )
 			.filter( Boolean );
-		expect( alphas ).toEqual( [ '40', '40' ] );
+		// One tint per treatment (text + overlay) per block, all at 0x40.
+		expect( alphas ).toEqual( [ '40', '40', '40', '40' ] );
 	} );
 
 	it( 'escapes quotes and backslashes in the client id', () => {
@@ -345,7 +370,7 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'falls back to author 0 when the field is missing', () => {
 		const css = buildBlockHighlightCss( [ { clientId: 'abc-1', id: 7 } ] );
 		expect( css ).toContain(
-			`${ selectorFor(
+			`${ textSelectorFor(
 				'abc-1'
 			) }{background-color:${ getAvatarBorderColor( 0 ) }40;`
 		);

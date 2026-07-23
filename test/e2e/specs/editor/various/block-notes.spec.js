@@ -1690,11 +1690,11 @@ test.describe( 'Block Notes', () => {
 				.toBe( '3px' );
 
 			/*
-			 * The stroke is `color-mix(in srgb, <author color> 30%, currentColor)`:
-			 * mostly the text color so it clears 3:1 on a light or a dark canvas,
-			 * with enough author hue to read as that person's note. Recompute the
-			 * mix here rather than hard-coding it, since `currentColor` comes from
-			 * the theme.
+			 * The stroke is `color-mix(in srgb, currentColor 30%, <author color>)`:
+			 * mostly the author's color so it reads as that person's note, with
+			 * just enough of the text color mixed in to clear 3:1 on a light or a
+			 * dark canvas. Recompute the mix here rather than hard-coding it,
+			 * since `currentColor` comes from the theme.
 			 */
 			/*
 			 * Chrome serializes a resolved `color-mix()` as
@@ -1713,7 +1713,7 @@ test.describe( 'Block Notes', () => {
 			const textRgb = parseRgb( decoration.text );
 			const strokeRgb = parseRgb( decoration.color );
 			[ r, g, b ].forEach( ( channel, i ) => {
-				const expected = 0.3 * channel + 0.7 * textRgb[ i ];
+				const expected = 0.7 * channel + 0.3 * textRgb[ i ];
 				// Tolerance covers the browser's rounding of the mix.
 				expect( Math.abs( strokeRgb[ i ] - expected ) ).toBeLessThan(
 					2

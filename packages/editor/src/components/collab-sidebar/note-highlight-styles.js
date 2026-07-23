@@ -35,20 +35,21 @@ const RULE_THICKNESS = '1.5px';
 const RULE_THICKNESS_EMPHASIZED = '3px';
 
 /**
- * The stroke color for a note's rule: mostly `currentColor` with the author's
- * color mixed in.
+ * The stroke color for a note's rule: the author's color with a share of
+ * `currentColor` mixed in.
  *
  * Pure author color would be the clearest signal, but the canvas can be light
  * or dark and the palette is fixed, so some of the seven colors would land
- * under the 3:1 non-text contrast minimum on one of them. Anchoring to the text
- * color keeps the rule above that floor in both, and 30% is about as much hue
- * as fits underneath it.
+ * under the 3:1 non-text contrast minimum on one of them. Mixing in 30% of the
+ * text color is the least dilution that holds the floor on both: at 70% author
+ * share every palette color clears 3:1 against a white and a near-black
+ * canvas, with orange right at the line (3.0:1 on white).
  *
  * @param {string} color The author's `#RRGGBB` color.
  * @return {string} A CSS color value.
  */
 function ruleColor( color ) {
-	return `color-mix(in srgb, ${ color } 30%, currentColor)`;
+	return `color-mix(in srgb, currentColor 30%, ${ color })`;
 }
 
 /**
@@ -164,32 +165,32 @@ export function buildHighlightCss( threads, selectedId = null ) {
 }
 
 /**
- * Build the CSS rule set that tints a whole text block whose note is attached at
+ * Build the CSS rule set that marks a whole block whose note is attached at
  * the block level. Block-level notes carry no in-content `<mark>` to target, so
  * the block is matched by its client id instead.
  *
- * The selector only matches when the block's own wrapper element *is* a
- * rich-text editable, which is true for text-leaf blocks (paragraph, heading,
- * list item) and false for containers and media. That keeps the treatment
- * scoped to text without any block-type checks: non-text blocks get an overlay
- * of their own in a separate iteration.
+ * Text blocks - those whose own wrapper element *is* a rich-text editable
+ * (paragraph, heading, list item) - get a tint behind the text and a rule along
+ * their bottom edge. The rule is an inset shadow rather than a border so adding
+ * it cannot reflow the canvas, and it sits under the block rather than under
+ * each line: a wrapped paragraph striped on every line would read as
+ * formatting, where a single edge reads as a boundary.
  *
- * The block gets a tint and a rule along its bottom edge, both at rest, so an
- * annotated block is legible as one without clicking anything. The rule is an
- * inset shadow rather than a border so adding it cannot reflow the canvas, and
- * it sits under the block rather than under each line: a wrapped paragraph
- * striped on every line would read as formatting, where a single edge reads as
- * a boundary. (An inline marker's underline hugs its own few words, so it does
- * not have that problem.)
+ * Every other block (media, containers) paints the same treatment onto an
+ * `::after` overlay instead - a tinted veil with the rule drawn all the way
+ * around - because a background behind e.g. an image is hidden by the image
+ * itself. The overlay ignores pointer events, so the block stays editable
+ * through it.
  *
- * The tint is flat, with no hover or selected variant. It covers a whole
- * paragraph rather than a few words, so deepening it would cost the theme's text
- * contrast across all of that. Hovering or selecting the note draws the block's
- * own outline instead, which is what already signals "this block" everywhere
- * else in the editor.
+ * Both are present at rest, with no hover or selected variant, so an annotated
+ * block is legible as one without clicking anything. The tint covers a whole
+ * block rather than a few words, so deepening it on a state would cost the
+ * theme's text contrast across all of that. Hovering or selecting the note
+ * draws the block's own outline instead, which is what already signals "this
+ * block" everywhere else in the editor.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
- * @return {string} A serialized CSS string targeting the blocks' editable elements.
+ * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
 export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
@@ -204,9 +205,16 @@ export function buildBlockHighlightCss( blockHighlights ) {
 			/["\\]/g,
 			'\\$&'
 		);
-		const sel = `[data-block="${ escapedClientId }"].block-editor-rich-text__editable`;
+		const blockSel = `[data-block="${ escapedClientId }"]`;
 		rules.push(
-			`${ sel }{background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 -${ RULE_THICKNESS } 0 0 ${ ruleColor(
+			`${ blockSel }.block-editor-rich-text__editable{background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 -${ RULE_THICKNESS } 0 0 ${ ruleColor(
+				color
+			) };}`
+		);
+		// Block wrappers are position:relative and the overlay sits above the
+		// content, so `inset:0` hugs the block exactly with no reflow.
+		rules.push(
+			`${ blockSel }:not(.block-editor-rich-text__editable)::after{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 0 0 ${ RULE_THICKNESS } ${ ruleColor(
 				color
 			) };}`
 		);
@@ -218,15 +226,15 @@ export function buildBlockHighlightCss( blockHighlights ) {
  * Injects per-note background rules into the editor canvas so inline-note
  * markers carry their author's avatar color. The `core/note` format serializes
  * each marker as `<mark class="wp-note" data-id="{noteId}">`, which we target
- * directly. Notes attached at the block level have no marker, so the whole text
- * block is tinted instead.
+ * directly. Notes attached at the block level have no marker, so the whole
+ * block is marked instead - text blocks by tinting the text, any other block
+ * by a tinted overlay.
  *
  * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
  * `<style>` element rendered in the sidebar would only affect the parent doc.
  *
- * Inline markers are underlined and block-level notes ruled along their bottom
- * edge at rest, so annotated content is legible without interaction. Markers
- * thicken their
+ * Inline markers are underlined and block-level notes ruled at rest, so
+ * annotated content is legible without interaction. Markers thicken their
  * underline on `:hover`, `:focus-within` and when the matching thread is
  * selected; block-level tints stay flat and let the block's own outline carry
  * those states.
