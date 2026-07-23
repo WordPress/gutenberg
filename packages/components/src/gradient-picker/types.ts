@@ -17,10 +17,16 @@ type GradientPickerBaseProps = {
 	 */
 	className?: string;
 	/**
-	 * The function called when a new gradient has been defined. It is passed to
-	 * the `currentGradient` as an argument.
+	 * The function called when a new gradient has been defined. It is passed
+	 * the `currentGradient` as an argument. When a predefined gradient is
+	 * selected, the second argument is its index (or, for multiple-origin
+	 * gradients, the origin index) and the third argument is its slug.
 	 */
-	onChange: ( currentGradient: string | undefined ) => void;
+	onChange: (
+		currentGradient: string | undefined,
+		index?: number,
+		slug?: string
+	) => void;
 	/**
 	 * The current value of the gradient. Pass a css gradient string (See default value for example).
 	 * Optionally pass in a `null` value to specify no gradient is currently selected.
@@ -28,6 +34,19 @@ type GradientPickerBaseProps = {
 	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
 	 */
 	value?: GradientObject[ 'gradient' ] | null;
+	/**
+	 * The slug of the currently selected predefined gradient.
+	 *
+	 * When set to a non-empty string, selection is determined by slug rather
+	 * than by gradient value, which correctly handles palettes where two
+	 * entries share the same gradient. Entries whose slug does not match will
+	 * not appear selected in this mode, even if their gradient value matches
+	 * `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls
+	 * back to matching by gradient value.
+	 */
+	selectedSlug?: string;
 	/**
 	 * Whether the palette should have a clearing button or not.
 	 *
@@ -121,7 +140,8 @@ export type PickerProps< TOriginType extends GradientObject | OriginObject > =
 		clearGradient: () => void;
 		onChange: (
 			currentGradient: string | undefined,
-			index: number
+			index: number,
+			slug?: string
 		) => void;
 		actions?: React.ReactNode;
 		gradients: TOriginType[];

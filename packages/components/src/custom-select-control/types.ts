@@ -89,7 +89,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -121,11 +121,4 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
-	 * @ignore
-	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
 };

@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import plugin from '../no-token-fallback-values.mjs';
+import plugin from '../../../stylelint-plugins/no-token-fallback-values.mjs';
 import { getStylelintResult } from './utils';
 
 const CONFIG = {

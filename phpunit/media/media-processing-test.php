@@ -121,6 +121,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'png_interlaced', $data );
 		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayNotHasKey( 'image_sizes', $data );
+		$this->assertArrayNotHasKey( 'image_strip_meta', $data );
+		$this->assertArrayNotHasKey( 'image_max_bit_depth', $data );
 	}
 
 	/**
@@ -152,6 +154,49 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		// $this->assertArrayNotHasKey( 'png_interlaced', $data );
 		// $this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
+		$this->assertArrayHasKey( 'image_strip_meta', $data );
+		$this->assertTrue( $data['image_strip_meta'] );
+		$this->assertArrayHasKey( 'image_max_bit_depth', $data );
+		$this->assertSame( 16, $data['image_max_bit_depth'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_strip_meta_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'image_strip_meta', '__return_false' );
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertFalse( $data['image_strip_meta'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_max_bit_depth_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter(
+			'image_max_bit_depth',
+			static function ( $max_depth ) {
+				return min( 8, $max_depth );
+			}
+		);
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertSame( 8, $data['image_max_bit_depth'] );
 	}
 
 	/**
@@ -208,8 +253,52 @@ HTML;
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( '<audio crossorigin="anonymous"', $output );
-		$this->assertStringContainsString( '<img crossorigin="anonymous"', $output );
 		$this->assertStringContainsString( '<video crossorigin="anonymous"', $output );
+		$this->assertStringNotContainsString(
+			'crossorigin="anonymous" crossorigin=',
+			$output,
+			'Tags must not receive a duplicate crossorigin attribute when WordPress Core has already added one.'
+		);
+	}
+
+	/**
+	 * Tests that the media template processing adds crossorigin to AUDIO and
+	 * VIDEO tags, skips tags that already have it, and leaves IMG tags
+	 * untouched (adding it breaks previews of media served without CORS
+	 * headers).
+	 *
+	 * @covers ::gutenberg_update_media_template_crossorigin_attributes
+	 */
+	public function test_gutenberg_update_media_template_crossorigin_attributes(): void {
+		$html = <<<HTML
+<script type="text/html" id="tmpl-test-media">
+	<img src="{{ data.url }}" draggable="false" alt="" />
+	<audio controls src="{{ data.url }}"></audio>
+	<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>
+	<video controls src="{{ data.url }}"></video>
+</script>
+<script type="text/javascript">var notATemplate = '<img src="test.jpg" />';</script>
+HTML;
+
+		$actual = gutenberg_update_media_template_crossorigin_attributes( $html );
+
+		$this->assertStringContainsString( '<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>', $actual );
+		$this->assertStringContainsString( '<video crossorigin="anonymous" controls src="{{ data.url }}"></video>', $actual );
+		$this->assertSame(
+			3,
+			substr_count( $actual, 'crossorigin' ),
+			'Only the two AUDIO tags and one VIDEO tag should carry a crossorigin attribute, with no duplicates.'
+		);
+		$this->assertDoesNotMatchRegularExpression(
+			'/<img\b[^>]*\bcrossorigin/i',
+			$actual,
+			'IMG tags must not receive a crossorigin attribute.'
+		);
+		$this->assertStringContainsString(
+			"var notATemplate = '<img src=\"test.jpg\" />';",
+			$actual,
+			'Script tags that are not text/html templates must not be modified.'
+		);
 	}
 
 	/**

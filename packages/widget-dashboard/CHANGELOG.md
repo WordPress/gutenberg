@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### New Features
+
+-   Surface a widget's declared `actions` in the tile chrome as a "More"
+    menu of links ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Enhancements
+
+-   Widget settings: use the `drawerRight` icon for the per-tile settings
+    trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+-   Widget toolbar: when the tile header lacks room for the inline attribute
+    controls, the promoted fields collapse into a dropdown; the settings
+    trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)) ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
+
+### Documentation
+
+-   Prefer a static CSV asset over a `data:` URL in the goal-progress story ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
+-   Add/improve default story and documentation ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
+-   Document how attribute `relevance` maps to surfaces: the prominent
+    surface, the settings surface, and the measured collapse ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Add a Storybook story reproducing the tile header with multiple
+    high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+-   Mark the default runtime module `import()` with `@vite-ignore` alongside
+    `webpackIgnore`, silencing Vite's import-analysis warning ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+## 0.3.0 (2026-07-14)
+
 -   Remove layout-settings editing: the customize-toolbar button, the
     settings drawer, the layout-model switch commands, and the
     `onGridSettingsChange` prop. `gridSettings` is now read-only rendering

@@ -16,17 +16,19 @@ import { getUserLabel } from '../autocompleters/user';
 type MentionableUser = {
 	id: number;
 	name: string;
-	link: string;
 };
 
 /**
  * A user mention completer for notes.
  *
- * Mirrors the editor's `@` user completer but inserts the mention as a link
- * to the user's author page, carrying the mentioned user's ID in a `user-N`
- * class so the mention can be styled as a chip and, in a follow-up, resolved
- * to a notification recipient. A plain `core/link` format handles the anchor,
- * so no dedicated mention format is needed.
+ * Mirrors the editor's `@` user completer but inserts the mention as a
+ * `<span class="wp-note-mention user-N">` chip, carrying the mentioned user's
+ * ID in the `user-N` class so the mention can be styled and, in a follow-up,
+ * resolved to a notification recipient. A mention is deliberately not a link:
+ * a `span` keeps it out of the Link format UI (which would strip the mention
+ * markup on edit), and the `wp-note-mention` class keeps other formats from
+ * claiming the element. RichText preserves the unregistered `span` as-is, so
+ * no dedicated mention format is needed.
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
@@ -40,7 +42,7 @@ const noteMentionCompleter = {
 				const { getUsers } = select( coreStore );
 				return getUsers( {
 					context: 'view',
-					search: encodeURIComponent( filterValue ),
+					search: filterValue,
 				} );
 			},
 			[ filterValue ]
@@ -65,12 +67,9 @@ const noteMentionCompleter = {
 		return {
 			action: 'insert-at-caret' as const,
 			value: (
-				<a
-					className={ `wp-note-mention user-${ user.id }` }
-					href={ user.link }
-				>
+				<span className={ `wp-note-mention user-${ user.id }` }>
 					{ '@' + user.name }
-				</a>
+				</span>
 			),
 		};
 	},

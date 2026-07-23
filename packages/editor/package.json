@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.50.0",
+	"version": "14.51.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -97,6 +97,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",

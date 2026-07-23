@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useObservableValue } from '@wordpress/compose';
 import {
 	useContext,
@@ -9,9 +6,6 @@ import {
 	createPortal,
 } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import SlotFillContext from './context';
 import type { FillComponentProps } from './types';
 import StyleProvider from '../style-provider';
@@ -62,9 +56,9 @@ export default function Fill( { name, children }: FillComponentProps ) {
 			: children;
 
 	// When using a `Fill`, the `children` will be rendered in the document of the
-	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`
-	// to make sure we're referencing the right document/iframe (instead of the
-	// context of the `Fill`'s parent).
+	// `Slot`. Wrap the children in a `StyleProvider` so CSS module styles and
+	// legacy Emotion styles target that document/iframe instead of the document
+	// containing the `Fill`.
 	return createPortal(
 		<StyleProvider document={ portalEl.ownerDocument }>
 			{ wrappedChildren }

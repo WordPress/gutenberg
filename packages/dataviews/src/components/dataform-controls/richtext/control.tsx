@@ -2,21 +2,22 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { FocusEvent, MutableRefObject, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
 import {
-	Popover,
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
-	createPortal,
-	useEffect,
+	useMergeRefs,
+	useRefEffect,
+	__experimentalUseFocusOutside as useFocusOutside,
+} from '@wordpress/compose';
+import {
 	useInsertionEffect,
 	useMemo,
 	useRef,
@@ -209,104 +210,11 @@ export default function RichTextControl( {
 		new Set< ( event: KeyboardEvent ) => void >()
 	);
 
-	/*
-	 * The assembly owns the selection ("active") lifetime, because only it
-	 * can prove that a popover receiving focus belongs to this field: format
-	 * popovers (e.g. the inline link UI opened via Cmd+K) portal into the
-	 * `Popover.Slot` this component renders below inside its own
-	 * `SlotFillProvider`, so "focus is in one of this field's popovers" is
-	 * simply containment in that slot.
-	 */
-	const popoverSlotRef = useRef< HTMLDivElement | null >( null );
-	/*
-	 * Where the `Popover.Slot` portals to: the editable's `ownerDocument`
-	 * body. The slot must not render inline where the field sits — form
-	 * fields routinely live inside scroll containers (`overflow` ancestors
-	 * clip the popovers) and transformed ancestors (which re-root the
-	 * popovers' positioning). Portaling to the body mirrors where popovers
-	 * land by default when no slot is present, while keeping the slot inside
-	 * this field's `SlotFillProvider` (React context crosses portals) so the
-	 * containment-based focus tracking above keeps working.
-	 */
-	const [ popoverContainer, setPopoverContainer ] =
-		useState< HTMLElement | null >( null );
-	const popoverContainerRef = useRefEffect< HTMLElement >( ( element ) => {
-		setPopoverContainer( element.ownerDocument.body );
-	}, [] );
-	// When the editable blurs, defer flipping the selection off so a
-	// portal-rendered popover can claim focus without `FormatEdit` — and
-	// therefore the popover itself — unmounting underneath it.
-	const blurDeselectTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
-	/*
-	 * Once focus moves into one of the field's popovers, the editable has
-	 * already blurred and its `onBlur` will not fire again when focus later
-	 * leaves that popover. Watch document-level `focusout` for the duration
-	 * of the popover excursion so the field still deselects (and tears down
-	 * its format UI) once focus settles outside both the editable and its
-	 * popovers.
-	 */
-	const stopPopoverFocusTrackingRef = useRef< ( () => void ) | undefined >(
-		undefined
-	);
-	useEffect(
-		() => () => {
-			clearTimeout( blurDeselectTimeoutRef.current );
-			stopPopoverFocusTrackingRef.current?.();
-		},
-		[]
-	);
-
-	function isFocusInField( ownerDocument: Document ) {
-		const active = ownerDocument.activeElement;
-		return !! (
-			active &&
-			( anchorRef.current?.contains( active ) ||
-				popoverSlotRef.current?.contains( active ) )
-		);
-	}
-
-	function trackPopoverFocusOut( ownerDocument: Document ) {
-		stopPopoverFocusTrackingRef.current?.();
-
-		function onDocumentFocusOut() {
-			clearTimeout( blurDeselectTimeoutRef.current );
-			blurDeselectTimeoutRef.current = setTimeout( () => {
-				if ( isFocusInField( ownerDocument ) ) {
-					return;
-				}
-				stopPopoverFocusTrackingRef.current?.();
-				setIsSelected( false );
-			}, 0 );
-		}
-
-		ownerDocument.addEventListener( 'focusout', onDocumentFocusOut );
-		stopPopoverFocusTrackingRef.current = () => {
-			ownerDocument.removeEventListener( 'focusout', onDocumentFocusOut );
-			stopPopoverFocusTrackingRef.current = undefined;
-		};
-	}
-
-	function onEditableFocus() {
-		clearTimeout( blurDeselectTimeoutRef.current );
-		// Focus is back in the editable, so its own blur handling takes over
-		// from the popover focus tracking again.
-		stopPopoverFocusTrackingRef.current?.();
-		setIsSelected( true );
-	}
-
-	function onEditableBlur( event: FocusEvent< HTMLElement > ) {
-		clearTimeout( blurDeselectTimeoutRef.current );
-		const { ownerDocument } = event.currentTarget;
-		blurDeselectTimeoutRef.current = setTimeout( () => {
-			// Stay selected while focus is inside one of the popovers this
-			// field's format UI opened.
-			if ( isFocusInField( ownerDocument ) ) {
-				trackPopoverFocusOut( ownerDocument );
-				return;
-			}
-			setIsSelected( false );
-		}, 0 );
-	}
+	// The focus boundary (below) wraps the editable and its format UI. Format
+	// popovers portal out of it in the DOM but still bubble focus events
+	// through the React tree, so `useFocusOutside` deselects only once focus
+	// leaves the field's own UI for good.
+	const focusOutside = useFocusOutside( () => setIsSelected( false ) );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -497,33 +405,18 @@ export default function RichTextControl( {
 	 * returned props (including the rendered popover as `children`). With no
 	 * `completers` it does no work and renders nothing, keeping the control
 	 * zero-cost for consumers that don't opt in.
-	 * The hook anchors its popover to its own internal ref and overrides
-	 * whatever `contentRef` is passed, but the parameter type requires one.
 	 */
-	const unusedContentRef = useRef< HTMLElement >( null );
-	const {
-		ref: autocompleteRef,
-		'aria-activedescendant': autocompleteActiveDescendant,
-		'aria-autocomplete': autocompleteAriaAutocomplete,
-		...autocompleteRest
-	} = useAutocompleteProps( {
-		completers,
-		record: value,
-		onChange: onRichTextChange,
-		// This control's completers insert their completion into the value;
-		// none replace the whole value, so the required `onReplace` is a
-		// no-op here.
-		onReplace: () => {},
-		contentRef: unusedContentRef,
-	} );
-	// Normalize the hook's loosely-typed aria values for the DOM element:
-	// `aria-activedescendant` may be `null` (React wants `undefined`) and
-	// `aria-autocomplete` is only ever `'list'` or `undefined` at runtime.
-	const autocompleteProps = {
-		...autocompleteRest,
-		'aria-activedescendant': autocompleteActiveDescendant ?? undefined,
-		'aria-autocomplete': autocompleteAriaAutocomplete as 'list' | undefined,
-	};
+	const { ref: autocompleteRef, ...autocompleteProps } = useAutocompleteProps(
+		{
+			completers,
+			record: value,
+			onChange: onRichTextChange,
+			// This control's completers insert their completion into the value;
+			// none replace the whole value, so the required `onReplace` is a
+			// no-op here.
+			onReplace: () => {},
+		}
+	);
 
 	// The shell exposes no focus management of its own (form controls leave
 	// that to the surrounding region); focus the field on mount here when the
@@ -539,81 +432,76 @@ export default function RichTextControl( {
 
 	const editableRef = useMergeRefs( [
 		richTextRef,
-		anchorRef as MutableRefObject< HTMLElement | undefined >,
+		anchorRef,
 		eventListenersRef,
 		enterRef,
 		focusOnMountRef,
-		popoverContainerRef,
 		autocompleteRef,
 	] );
 
 	return (
-		/*
-		 * The provider scopes every slot/fill rendered by this field — most
-		 * importantly the format popovers, which land in the `Popover.Slot`
-		 * below. That containment is what the blur handling above checks to
-		 * decide whether focus is still within the field's own UI. A format
-		 * popover using a custom `__unstableSlotName` would portal to the
-		 * body-level fallback container instead and deselect the field;
-		 * `core/link` (and every other core format) uses the default slot.
-		 */
-		<SlotFillProvider>
-			<RichTextControlShell
-				label={ label }
-				id={ id }
-				className={ clsx( 'dataviews-controls__richtext', className ) }
-				// The shell draws this while the element is empty, and the
-				// rich-text hook below renders its own placeholder element
-				// once it takes over the contents; either way the attribute
-				// keeps `aria-placeholder` exposed to assistive technology.
-				placeholder={ placeholder }
-				hideLabelFromVision={ hideLabelFromVision }
-				help={ help }
-				disabled={ disabled }
-				required={ required }
-				markWhenOptional={ markWhenOptional }
-				customValidity={ customValidity }
-				// The shell manages the editable content through the ref; the
-				// plain text only drives its hidden validity delegate.
-				value={ value.text }
-				aria-multiline={ ! disableLineBreaks }
-				{ ...autocompleteProps }
-				ref={ editableRef }
-				onFocus={ onEditableFocus }
-				onBlur={ onEditableBlur }
-			/>
+		// Focus boundary for the field's selection: `onFocus` selects on entry;
+		// the spread `useFocusOutside` handlers deselect once focus leaves.
+		<div
+			{ ...focusOutside }
+			onFocus={ ( event ) => {
+				setIsSelected( true );
+				focusOutside.onFocus( event );
+			} }
+		>
 			{ /*
-			 * The format assembly mounts only while the field is selected —
-			 * the shell is presentational and knows nothing about selection,
-			 * so this module owns both the state and the gating.
+			 * Scopes the format types' `RichText.ToolbarControls.*` fills so
+			 * they can't reach a surrounding block toolbar.
 			 */ }
-			{ isSelected && ! disabled && (
-				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<InputEventContext.Provider value={ inputEvents }>
-						{ /*
-						 * Format types gate both their toolbar buttons and
-						 * their inline UIs (e.g. the link popover opened via
-						 * Cmd+K) on `isVisible`. A standalone field renders no
-						 * `RichText.ToolbarControls` slot, so the
-						 * toolbar-button fills mount into nothing while the
-						 * inline UIs stay functional.
-						 */ }
-						<FormatEdit
-							value={ value }
-							onChange={ onRichTextChange }
-							onFocus={ onFocus }
-							formatTypes={ formatTypes }
-							forwardedRef={ anchorRef }
-							isVisible
-						/>
-					</InputEventContext.Provider>
-				</KeyboardShortcutContext.Provider>
-			) }
-			{ popoverContainer &&
-				createPortal(
-					<Popover.Slot ref={ popoverSlotRef } />,
-					popoverContainer
+			<SlotFillProvider>
+				<RichTextControlShell
+					label={ label }
+					id={ id }
+					className={ clsx(
+						'dataviews-controls__richtext',
+						className
+					) }
+					// The shell draws this while the element is empty, and the
+					// rich-text hook below renders its own placeholder element
+					// once it takes over the contents; either way the attribute
+					// keeps `aria-placeholder` exposed to assistive technology.
+					placeholder={ placeholder }
+					hideLabelFromVision={ hideLabelFromVision }
+					help={ help }
+					disabled={ disabled }
+					required={ required }
+					markWhenOptional={ markWhenOptional }
+					customValidity={ customValidity }
+					// The shell manages the editable content through the ref; the
+					// plain text only drives its hidden validity delegate.
+					value={ value.text }
+					aria-multiline={ ! disableLineBreaks }
+					{ ...autocompleteProps }
+					ref={ editableRef }
+				/>
+				{ /*
+				 * The format assembly mounts only while the field is selected —
+				 * the shell is presentational and knows nothing about selection,
+				 * so this module owns both the state and the gating.
+				 */ }
+				{ isSelected && ! disabled && (
+					<KeyboardShortcutContext.Provider
+						value={ keyboardShortcuts }
+					>
+						<InputEventContext.Provider value={ inputEvents }>
+							{ /* Format types gate their inline UIs on `isVisible`. */ }
+							<FormatEdit
+								value={ value }
+								onChange={ onRichTextChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+								isVisible
+							/>
+						</InputEventContext.Provider>
+					</KeyboardShortcutContext.Provider>
 				) }
-		</SlotFillProvider>
+			</SlotFillProvider>
+		</div>
 	);
 }
