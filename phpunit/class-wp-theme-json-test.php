@@ -938,9 +938,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * References to presets (`var:preset|type|slug`) are converted using the
 	 * same kebab-cased slug as the custom properties generated from the
 	 * presets, so both sides match for slugs that change when kebab-cased.
-	 * Duotone references keep the raw slug, as they are resolved by slug
-	 * lookup in `WP_Duotone` instead of through the generated custom
-	 * properties.
 	 */
 	public function test_get_stylesheet_kebab_cases_preset_reference_slugs() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -1011,9 +1008,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'padding-top: var(--wp--preset--spacing--small-2)',
 			$stylesheet
 		);
-		// Duotone references keep the raw slug.
 		$this->assertStringContainsString(
-			'var(--wp--preset--duotone--blueOrange2)',
+			'var(--wp--preset--duotone--blue-orange-2)',
 			$stylesheet
 		);
 	}

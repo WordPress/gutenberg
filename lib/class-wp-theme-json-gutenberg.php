@@ -5695,12 +5695,8 @@ class WP_Theme_JSON_Gutenberg {
 			 * conversion produces a reference to a custom property that does
 			 * not exist (`--wp--preset--font-family--n27` instead of the
 			 * generated `--wp--preset--font-family--n-27`).
-			 *
-			 * Duotone references keep the raw slug: they are resolved by slug
-			 * lookup in `WP_Duotone`, not through the generated custom
-			 * properties.
 			 */
-			if ( 3 === count( $parts ) && 'preset' === $parts[0] && 'duotone' !== $parts[1] ) {
+			if ( 3 === count( $parts ) && 'preset' === $parts[0] ) {
 				$parts[2] = _wp_to_kebab_case( $parts[2] );
 			}
 
