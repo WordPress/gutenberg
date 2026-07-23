@@ -5,18 +5,21 @@ const path = require( 'path' );
 const { readdir, stat, readFile } = require( 'fs/promises' );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
+const ICON_VIEW_BOX = '0 0 24 24';
 
 /*
- * Validating the icons collection means verifying that each icon defined in
- * the manifest has a corresponding SVG file found in the library/ folder and
- * vice versa.
+ * Validating the icons collection checks that:
+ *
+ * - Each manifest entry has a matching SVG in library/, and vice versa.
+ * - Each SVG uses currentColor so icons inherit text color.
+ * - Each SVG uses viewBox="0 0 24 24".
  */
 async function validateCollection() {
 	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
 
 	try {
 		await stat( manifestPath );
-	} catch ( error ) {
+	} catch {
 		throw new Error(
 			`Could not find icons manifest at '${ manifestPath }'`
 		);
@@ -83,12 +86,26 @@ async function validateCollection() {
 		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
 
 	for ( const file of svgFiles ) {
+		const svgPath = path.join( ICON_LIBRARY_DIR, path.basename( file ) );
+
 		if ( ! manifestPaths.includes( file ) ) {
+			problems.push( `- Missing entry for icon ${ svgPath }` );
+		}
+
+		const svgContent = await readFile( svgPath, 'utf8' );
+		if ( ! svgContent.includes( 'currentColor' ) ) {
 			problems.push(
-				`- Missing entry for icon ${ path.join(
-					ICON_LIBRARY_DIR,
-					path.basename( file )
-				) }`
+				`- Icon ${ svgPath } must set fill="currentColor" or stroke="currentColor" so the icon inherits text color`
+			);
+		}
+
+		if ( ! svgContent.includes( 'viewBox=' ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must set a viewBox attribute instead of width and height attributes`
+			);
+		} else if ( ! svgContent.includes( `viewBox="${ ICON_VIEW_BOX }"` ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must set viewBox="${ ICON_VIEW_BOX }"`
 			);
 		}
 	}

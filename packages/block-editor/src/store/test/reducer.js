@@ -42,6 +42,8 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
+	selectedBlockStyleState,
+	styleStateViewport,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -285,7 +287,7 @@ describe( 'state', () => {
 							'chicken-child': {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -344,7 +346,7 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -387,7 +389,7 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -446,7 +448,7 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -518,7 +520,7 @@ describe( 'state', () => {
 						} )
 					),
 					tree: new Map(),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -613,7 +615,7 @@ describe( 'state', () => {
 							[ newChildBlockId3 ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -689,7 +691,7 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -742,7 +744,7 @@ describe( 'state', () => {
 							[ newChildBlockId ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -764,7 +766,7 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				tree: new Map(),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 				blockEditingModes: new Map(),
 			} );
 		} );
@@ -833,7 +835,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'ribs',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -879,7 +881,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -887,7 +889,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 1 );
 			expect( state.byClientId.get( 'wings' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
@@ -902,7 +904,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -954,7 +956,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -973,7 +975,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -1036,7 +1038,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'chicken',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -1047,7 +1049,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
@@ -1071,7 +1073,7 @@ describe( 'state', () => {
 			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -1097,7 +1099,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 		} );
 
@@ -1602,7 +1604,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'persimmon',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -2196,6 +2198,91 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( true );
 				} );
 
+				it( 'should flag only the next change as not persistent', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+					} );
+
+					const nextState = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( nextState.isPersistentChange ).toBe( false );
+
+					// A subsequent change should revert to persistent.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should flag ignored history for an explicitly marked not persistent change', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+
+					const nextState = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( nextState.isPersistentChange ).toBe( false );
+					expect( nextState.lastBlockChangeHistoryMode ).toBe(
+						'ignore'
+					);
+
+					// A subsequent change should clear the ignored history.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
+					expect(
+						subsequentState.lastBlockChangeHistoryMode
+					).toBeUndefined();
+				} );
+
 				it( 'should retain reference for same state, same persistence', () => {
 					const original = deepFreeze(
 						blocks( undefined, {
@@ -2259,7 +2346,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
 					expect( state.tree.get( 'child' ) ).toBeUndefined();
@@ -2296,9 +2385,7 @@ describe( 'state', () => {
 								'paragraph-id': [],
 							} )
 						),
-						controlledInnerBlocks: {
-							'reusable-id': true,
-						},
+						controlledInnerBlocks: new Set( [ 'reusable-id' ] ),
 						parents: new Map(
 							Object.entries( {
 								'group-id': '',
@@ -2421,9 +2508,9 @@ describe( 'state', () => {
 						clientId: 'chicken',
 						hasControlledInnerBlocks: true,
 					} );
-					expect( withControlled.controlledInnerBlocks.chicken ).toBe(
-						true
-					);
+					expect(
+						withControlled.controlledInnerBlocks.has( 'chicken' )
+					).toBe( true );
 
 					const state = blocks( withControlled, {
 						type: 'RESET_BLOCKS',
@@ -2437,7 +2524,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 				} );
 
 				it( 'should preserve controlledInnerBlocks blocks across RESET_BLOCKS', () => {
@@ -2499,7 +2588,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					expect(
 						getBlocks( { blocks: state }, 'chicken' ).map(
 							( b ) => b.clientId
@@ -2656,7 +2747,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The order and byClientId Maps should be the same
 					// reference because the block has no inner blocks to
 					// remove, so REPLACE_INNER_BLOCKS should be skipped.
@@ -3385,7 +3478,7 @@ describe( 'state', () => {
 
 	describe( 'blockListSettings', () => {
 		it( 'should add new settings', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3395,19 +3488,29 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should return same reference if updated as the same', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3421,7 +3524,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return same reference if updated settings not assigned and id not exists', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3432,14 +3535,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update the settings of a block', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3449,40 +3560,61 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/list' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/list' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove existing settings if updated settings not assigned', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 
 		it( 'should remove the settings of a block when it is replaced', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3490,22 +3622,35 @@ describe( 'state', () => {
 				blocks: [],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3518,29 +3663,42 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove the settings of a block when it is removed', () => {
-			const original = deepFreeze( {
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 	} );
 
@@ -5702,6 +5860,446 @@ describe( 'state', () => {
 					)
 				);
 			} );
+		} );
+
+		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForTemplateParts: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for template parts when disableContentOnlyForTemplateParts is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+		} );
+	} );
+
+	describe( 'selectedBlockStyleState', () => {
+		it( 'defaults to undefined', () => {
+			const state = selectedBlockStyleState( undefined, {} );
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'stores a selected viewport state for a block', () => {
+			const state = selectedBlockStyleState( undefined, {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { viewport: '@mobile' },
+			} );
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					viewport: '@mobile',
+					pseudo: 'default',
+				},
+			} );
+		} );
+
+		it( 'stores a selected pseudo state for a block', () => {
+			const state = selectedBlockStyleState( undefined, {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { pseudo: ':hover' },
+			} );
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					pseudo: ':hover',
+				},
+			} );
+		} );
+
+		it( 'updates only the selected state type for the same block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: '@mobile', pseudo: 'default' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					viewport: '@mobile',
+					pseudo: ':hover',
+				},
+			} );
+		} );
+
+		it( 'replaces the selected state when another block is selected', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: '@mobile', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-2',
+					value: { pseudo: ':focus' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-2',
+				showStateOnCanvas: true,
+				value: {
+					pseudo: ':focus',
+				},
+			} );
+		} );
+
+		it( 'stores explicit defaults when both state types are default', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: '@mobile', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: 'default' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+				},
+			} );
+		} );
+
+		it( 'clears the selected state when clientId is missing', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					value: { pseudo: ':focus' },
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when value is missing', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when the same block is selected', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECT_BLOCK',
+				clientId: 'client-1',
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state when another block is selected', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECT_BLOCK',
+					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes in the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				clientId: 'client-1',
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes in another block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when selection resets to the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'RESET_SELECTION',
+				selectionStart: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state when selection resets to another block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'RESET_SELECTION',
+					selectionStart: { clientId: 'client-2' },
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the selection is cleared', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'CLEAR_SELECTED_BLOCK',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when multiple blocks are selected', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'MULTI_SELECT',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the block is removed', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ 'client-1' ],
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the block is replaced', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':focus' },
+				},
+				{
+					type: 'REPLACE_BLOCKS',
+					clientIds: [ 'client-2' ],
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the block is missing after reset', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{
+							clientId: 'client-2',
+							innerBlocks: [],
+						},
+					],
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when the block exists after reset', () => {
+			const originalState = {
+				clientId: 'client-2',
+				value: { viewport: 'default', pseudo: ':focus' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'client-2',
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'stores whether canvas preview is enabled for the selected state', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: '@mobile', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+					clientId: 'client-1',
+					value: false,
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: false,
+				value: { viewport: '@mobile', pseudo: ':hover' },
+			} );
+		} );
+
+		it( 'keeps canvas preview when updating the selected state for the same block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+					value: { viewport: '@mobile', pseudo: 'default' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: false,
+				value: { viewport: '@mobile', pseudo: ':hover' },
+			} );
+		} );
+	} );
+
+	describe( 'styleStateViewport', () => {
+		it( 'defaults to "default"', () => {
+			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+		} );
+
+		it( 'stores the selected viewport', () => {
+			expect(
+				styleStateViewport( 'default', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+					viewport: '@tablet',
+				} )
+			).toBe( '@tablet' );
+		} );
+
+		it( 'falls back to "default" when no viewport is provided', () => {
+			expect(
+				styleStateViewport( '@tablet', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+				} )
+			).toBe( 'default' );
+		} );
+
+		it( 'ignores unrelated actions', () => {
+			expect(
+				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+			).toBe( '@mobile' );
 		} );
 	} );
 

@@ -2,6 +2,53 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Normalize `keyboard-close`, `offline`, and `wordpress` to use the standard `viewBox="0 0 24 24"`. ([#80273](https://github.com/WordPress/gutenberg/pull/80273))
+
+## 15.2.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Add Playlist icon. ([#80168](https://github.com/WordPress/gutenberg/pull/80168)).
+-   Add new "sites" icon. ([#80094](https://github.com/WordPress/gutenberg/pull/80094)).
+
+## 15.1.0 (2026-07-01)
+
+## 15.0.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Update all icons to render with `currentColor` by default. Consumers that style icons by setting inherited `fill` on a wrapper should set `color` instead, or pass `style={ { color: ... } }` to the icon. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+
+## 14.0.1 (2026-06-16)
+
+## 14.0.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Breaking Changes
+
+-   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
+
+## 13.2.0 (2026-05-27)
+
+## 13.1.0 (2026-05-14)
+
+## 13.0.0 (2026-04-29)
+
+### Breaking Changes
+
+- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+
+## 12.2.0 (2026-04-15)
+
+## 12.1.0 (2026-04-01)
+
 ## 12.0.0 (2026-03-18)
 
 ### Breaking Changes

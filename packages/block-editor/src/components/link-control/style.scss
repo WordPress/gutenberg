@@ -151,7 +151,7 @@ $block-editor-link-control-number-of-actions: 1;
 		width: 100%;
 
 		mark {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			color: inherit;
 			background-color: transparent;
 		}
@@ -227,7 +227,7 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		mark {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			color: inherit;
 			background-color: transparent;
 		}

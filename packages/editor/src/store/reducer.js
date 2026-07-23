@@ -277,19 +277,17 @@ export function renderingMode( state = 'post-only', action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
+ * Reducer for the canvas width.
  *
- * @param {Object} state  Current state.
+ * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
+ * @return {number} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
+export function canvasWidth( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'SET_DEVICE_TYPE':
-			return action.deviceType;
+		case 'SET_CANVAS_WIDTH':
+			return action.width;
 	}
-
 	return state;
 }
 
@@ -419,21 +417,6 @@ export function showStylebook( state = false, action ) {
 }
 
 /**
- * Reducer for the canvas minimum height.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
- */
-export function canvasMinHeight( state = 0, action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_MIN_HEIGHT':
-			return action.minHeight;
-	}
-	return state;
-}
-
-/**
  * Reducer for the revisions preview mode.
  * Stores the current revision ID, or null if not in revisions mode.
  *
@@ -450,12 +433,25 @@ export function revisionId( state = null, action ) {
 }
 
 /**
- * Reducer returning the currently selected note and its options.
+ * Reducer for the current revisions page number.
  *
- * @param {Object} state  Current state.
+ * @param {number} state  Current page number.
  * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
+ * @return {number} Updated state.
  */
+export function revisionPage( state = 1, action ) {
+	switch ( action.type ) {
+		case 'SET_REVISION_PAGE':
+			return action.page;
+		case 'SET_CURRENT_REVISION_ID':
+			if ( ! action.revisionId ) {
+				return 1;
+			}
+			return state;
+	}
+	return state;
+}
+
 /**
  * Reducer for whether the revision diff is shown.
  * Resets to true when entering/exiting revisions mode.
@@ -469,11 +465,19 @@ export function showRevisionDiff( state = true, action ) {
 		case 'SET_SHOW_REVISION_DIFF':
 			return action.showDiff;
 		case 'SET_CURRENT_REVISION_ID':
-			return true; // reset on enter/exit revisions
+			// Reset during the exit.
+			return ! action.revisionId ? true : state;
 	}
 	return state;
 }
 
+/**
+ * Reducer returning the currently selected note and its options.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
 export function selectedNote( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECT_NOTE':
@@ -494,7 +498,7 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
-	deviceType,
+	canvasWidth,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
@@ -503,8 +507,8 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
-	canvasMinHeight,
 	revisionId,
+	revisionPage,
 	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,

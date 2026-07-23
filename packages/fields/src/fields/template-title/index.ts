@@ -12,10 +12,10 @@ import { getItemTitle } from '../../actions/utils';
 import TitleView from '../title/view';
 
 const templateTitleField: Field< Template > = {
+	id: 'title',
 	type: 'text',
 	label: __( 'Template' ),
 	placeholder: __( 'No title' ),
-	id: 'title',
 	getValue: ( { item } ) => getItemTitle( item ),
 	render: TitleView,
 	enableHiding: false,

@@ -2,21 +2,25 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	__experimentalApplicationPasswordConnectorSettings as ApplicationPasswordConnectorSettings,
+	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { __ } from '@wordpress/i18n';
-import { Badge } from '@wordpress/ui';
+import { select } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { Badge, Link } from '@wordpress/ui';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { useConnectorPlugin } from './use-connector-plugin';
+import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
@@ -24,6 +28,8 @@ import {
 	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
+
+const { store: connectorsStore } = unlock( connectorsPrivateApis );
 
 interface ConnectorData {
 	name: string;
@@ -38,20 +44,32 @@ interface ConnectorData {
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
+interface ConnectorScriptModuleData {
+	connectors?: Record< string, ConnectorData >;
+	isFileModDisabled?: boolean;
+}
+
+function getConnectorScriptModuleData(): ConnectorScriptModuleData {
+	try {
+		return JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-options-connectors-wp-admin'
+			)?.textContent ?? '{}'
+		);
+	} catch {
+		return {};
+	}
+}
+
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
 export function getConnectorData(): Record< string, ConnectorData > {
-	try {
-		const parsed = JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? ''
-		);
-		return parsed?.connectors ?? {};
-	} catch {
-		return {};
-	}
+	return getConnectorScriptModuleData().connectors ?? {};
+}
+
+export function getIsFileModDisabled(): boolean {
+	return !! getConnectorScriptModuleData().isFileModDisabled;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
@@ -83,7 +101,7 @@ const ConnectedBadge = () => (
 			padding: '4px 12px',
 			borderRadius: '2px',
 			fontSize: '13px',
-			fontWeight: 500,
+			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
 			whiteSpace: 'nowrap',
 		} }
 	>
@@ -91,7 +109,80 @@ const ConnectedBadge = () => (
 	</span>
 );
 
+const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
+	<Link
+		href={ sprintf(
+			/* translators: %s: plugin slug. */
+			__( 'https://wordpress.org/plugins/%s/' ),
+			slug
+		) }
+		openInNewTab
+	>
+		{ __( 'Learn more' ) }
+	</Link>
+);
+
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
+
+interface ConnectorActionAreaProps {
+	isConnected: boolean;
+	showUnavailableBadge: boolean;
+	pluginSlug?: string;
+	isExpanded: boolean;
+	isBusy: boolean;
+	pluginStatus: PluginStatus;
+	actionButtonRef: {
+		current: HTMLButtonElement | null;
+	};
+	handleButtonClick: () => void;
+	getButtonLabel: () => string;
+}
+
+function ConnectorActionArea( {
+	isConnected,
+	showUnavailableBadge,
+	pluginSlug,
+	isExpanded,
+	isBusy,
+	pluginStatus,
+	actionButtonRef,
+	handleButtonClick,
+	getButtonLabel,
+}: ConnectorActionAreaProps ) {
+	return (
+		<HStack spacing={ 3 } expanded={ false }>
+			{ isConnected && <ConnectedBadge /> }
+			{ showUnavailableBadge &&
+				( pluginSlug ? (
+					<PluginDirectoryLink slug={ pluginSlug } />
+				) : (
+					<UnavailableActionBadge />
+				) ) }
+			{ ! showUnavailableBadge && (
+				<Button
+					ref={ actionButtonRef }
+					variant={
+						isExpanded || isConnected ? 'tertiary' : 'secondary'
+					}
+					size="compact"
+					onClick={ handleButtonClick }
+					disabled={ pluginStatus === 'checking' || isBusy }
+					isBusy={ isBusy }
+					accessibleWhenDisabled
+				>
+					{ getButtonLabel() }
+				</Button>
+			) }
+		</HStack>
+	);
+}
+
+function getPluginSlug( pluginFile?: string ) {
+	const pluginBasename = pluginFile?.replace( /\.php$/, '' );
+	return pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
+}
 
 function ApiKeyConnector( {
 	name,
@@ -104,19 +195,7 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
-	const pluginSlug = pluginFile?.includes( '/' )
-		? pluginFile.split( '/' )[ 0 ]
-		: pluginFile;
-
-	let helpLabel: string | undefined;
-	try {
-		if ( helpUrl ) {
-			helpLabel = new URL( helpUrl ).hostname;
-		}
-	} catch {
-		// Invalid URL — leave helpLabel undefined.
-	}
+	const pluginSlug = getPluginSlug( plugin?.file );
 
 	const {
 		pluginStatus,
@@ -127,6 +206,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		hasResolvedSettings,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
@@ -146,25 +226,8 @@ function ApiKeyConnector( {
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
-	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after async actions complete.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
-
-	const handleActionClick = () => {
-		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
-			pendingFocusRef.current = true;
-		}
-		handleButtonClick();
-	};
 
 	return (
 		<ConnectorItem
@@ -175,59 +238,148 @@ function ApiKeyConnector( {
 			name={ name }
 			description={ description }
 			actionArea={
-				<HStack spacing={ 3 } expanded={ false }>
-					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge && <UnavailableActionBadge /> }
-					{ showActionButton && (
-						<Button
-							ref={ actionButtonRef }
-							variant={
-								isExpanded || isConnected
-									? 'tertiary'
-									: 'secondary'
-							}
-							size="compact"
-							onClick={ handleActionClick }
-							disabled={ pluginStatus === 'checking' || isBusy }
-							isBusy={ isBusy }
-						>
-							{ getButtonLabel() }
-						</Button>
-					) }
-				</HStack>
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
+				/>
 			}
 		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<DefaultConnectorSettings
-					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={
-						isExternallyConfigured
-							? '••••••••••••••••'
-							: currentApiKey
-					}
-					helpUrl={ helpUrl }
-					helpLabel={ helpLabel }
-					readOnly={ isConnected || isExternallyConfigured }
-					keySource={ keySource }
-					onRemove={
-						isExternallyConfigured
-							? undefined
-							: async () => {
-									pendingFocusRef.current = true;
-									try {
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<DefaultConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialValue={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentApiKey
+						}
+						helpUrl={ helpUrl }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
 										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
-							  }
-					}
-					onSave={ async ( apiKey: string ) => {
-						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
-						setIsExpanded( false );
-					} }
+										actionButtonRef.current?.focus();
+								  }
+						}
+						onSave={ async ( apiKey: string ) => {
+							await saveApiKey( apiKey );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
+		</ConnectorItem>
+	);
+}
+
+function ApplicationPasswordConnector( {
+	name,
+	description,
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'application_password'
+			? authentication
+			: undefined;
+	const settingName = auth?.settingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const pluginSlug = getPluginSlug( plugin?.file );
+
+	const {
+		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
+		isExpanded,
+		setIsExpanded,
+		isBusy,
+		isConnected,
+		currentUsername,
+		hasResolvedSettings,
+		keySource,
+		handleButtonClick,
+		getButtonLabel,
+		saveCredentials,
+		removeCredentials,
+	} = useConnectorPlugin( {
+		file: plugin?.file,
+		settingName,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
+		initialIsConnected: auth?.isConnected,
+	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const showUnavailableBadge =
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
+
+	return (
+		<ConnectorItem
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			logo={ logo }
+			name={ name }
+			description={ description }
+			actionArea={
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
 				/>
-			) }
+			}
+		>
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<ApplicationPasswordConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialUsername={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentUsername
+						}
+						helpUrl={ helpUrl }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
+										await removeCredentials();
+										actionButtonRef.current?.focus();
+								  }
+						}
+						onSave={ async ( credentials ) => {
+							await saveCredentials( credentials );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
 		</ConnectorItem>
 	);
 }
@@ -239,6 +391,12 @@ export function registerDefaultConnectors() {
 	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		// Special case: Hide Akismet unless it is already installed.
+		// See https://core.trac.wordpress.org/ticket/65012
+		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
+			continue;
+		}
+
 		const { authentication } = data;
 
 		const connectorName = sanitize( connectorId );
@@ -250,8 +408,20 @@ export function registerDefaultConnectors() {
 			authentication,
 			plugin: data.plugin,
 		};
-		if ( authentication.method === 'api_key' ) {
+
+		// Preserve a render that was already registered for this slug by
+		// another caller. Omitting `render` from `args` leaves the existing
+		// render in place while the server-side metadata still merges on top.
+		const existing = unlock( select( connectorsStore ) ).getConnector(
+			connectorName
+		);
+		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
+		} else if (
+			authentication.method === 'application_password' &&
+			! existing?.render
+		) {
+			args.render = ApplicationPasswordConnector;
 		}
 
 		registerConnector( connectorName, args );

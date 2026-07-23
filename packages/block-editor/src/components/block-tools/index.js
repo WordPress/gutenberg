@@ -58,6 +58,9 @@ function selector( select ) {
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 		viewportModalClientIds: getViewportModalClientIds(),
+		blockVisibilitySetting:
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.blockVisibility?.allowEditing,
 	};
 }
 
@@ -82,6 +85,7 @@ export default function BlockTools( {
 		isZoomOutMode,
 		isDragging,
 		viewportModalClientIds,
+		blockVisibilitySetting,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
@@ -247,6 +251,9 @@ export default function BlockTools( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();

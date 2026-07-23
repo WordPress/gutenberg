@@ -14,18 +14,29 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
-## Stylesheet Dependencies
+## Setup
 
-DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
+This package requires CSS from this package and from multiple dependency packages.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
 
 ```bash
-npm install @wordpress/components @wordpress/theme
+npm install @wordpress/dataviews @wordpress/theme @wordpress/components
 ```
 
-```tsx
-import '@wordpress/components/build-style/style.css';
+```js
 import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/build-style/style.css';
+import '@wordpress/dataviews/build-style/style.css';
 ```
+
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## `DataViews`
 
@@ -1658,7 +1669,7 @@ When the field declares a type, it gets a default sort function:
 }
 ```
 
-The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
+The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
 -   `a`: the first item to compare
 -   `b`: the second item to compare
@@ -1706,7 +1717,7 @@ Fields that define a type come with default validation for the type. For example
 }
 ```
 
-The validation rules can be overriden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
+The validation rules can be overridden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
 
 ```js
 {

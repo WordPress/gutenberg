@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -67,11 +62,7 @@ test.describe( 'Paragraph', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
 			const testImageName = '10x10_e2e_test_image_z9T8jK.png';
-			const testImagePath = path.join(
-				__dirname,
-				'../../../assets',
-				testImageName
-			);
+			const testImagePath = `./assets/${ testImageName }`;
 
 			const { dragOver, drop } =
 				await pageUtils.dragFiles( testImagePath );
@@ -105,7 +96,11 @@ test.describe( 'Paragraph', () => {
 				attributes: { content: 'My Heading' },
 			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await editor.canvas.locator( 'text=My Heading' ).focus();
+			// Select the heading by clicking it. Focusing it programmatically
+			// does not move focus when the empty paragraph is selected and its
+			// editable root wrapper holds focus (a nested editable element
+			// cannot take focus from an editing host ancestor).
+			await editor.canvas.locator( 'text=My Heading' ).click();
 			await editor.showBlockToolbar();
 
 			const dragHandle = page.locator(

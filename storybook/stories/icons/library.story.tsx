@@ -43,7 +43,7 @@ const keywords: Partial< Record< string, string[] > > = {
 	pencil: [ 'edit' ],
 	thumbsDown: [ 'dislike' ],
 	thumbsUp: [ 'like' ],
-	timeToRead: [ 'clock' ],
+	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
 	trash: [ 'delete' ],
 	unseen: [ 'hide' ],
 };
@@ -123,7 +123,6 @@ const LibraryExample = ( {
 			<VStack spacing={ 8 }>
 				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
 					<SearchControl
-						__next40pxDefaultSize
 						label="Icon name"
 						hideLabelFromVision={ false }
 						value={ filter }
@@ -138,7 +137,6 @@ const LibraryExample = ( {
 						onChange={ ( value: string | number | undefined ) =>
 							updateArgs( { size: value } )
 						}
-						__next40pxDefaultSize
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
 							<ToggleGroupControlOption

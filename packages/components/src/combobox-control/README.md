@@ -34,7 +34,6 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -91,7 +90,7 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
 -   Type: `( value: string | null | undefined ) => void`
 -   Required: No
@@ -132,14 +131,6 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
-
-#### __next40pxDefaultSize
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
 
 ## Related components
 

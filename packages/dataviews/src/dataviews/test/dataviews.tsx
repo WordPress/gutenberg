@@ -19,7 +19,7 @@ import {
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 } from '../../constants';
-import type { Action, View } from '../../types';
+import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -38,11 +38,11 @@ const DEFAULT_VIEW = {
 	filters: [],
 };
 
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {},
-	[ LAYOUT_LIST ]: {},
-	[ LAYOUT_ACTIVITY ]: {},
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_TABLE ]: true,
+	[ LAYOUT_GRID ]: true,
+	[ LAYOUT_LIST ]: true,
+	[ LAYOUT_ACTIVITY ]: true,
 };
 
 const fields = [
@@ -402,6 +402,233 @@ describe( 'DataViews component', () => {
 			// Don't keep the modifier pressed down, that's just mean.
 			await user.keyboard( '{/Control}' );
 		} );
+
+		it( 'accepts shift key and click for range selection', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+				/>
+			);
+			const user = userEvent.setup();
+			// Ctrl/Cmd+Click selects the first item and makes it the anchor.
+			await user.keyboard( '{Control>}' );
+			await user.click( screen.getByText( data[ 0 ].title ) );
+			await user.keyboard( '{/Control}' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toBeChecked();
+
+			// Shift+Click selects everything between the anchor and the
+			// clicked item.
+			await user.keyboard( '{Shift>}' );
+			await user.click( screen.getByText( data[ 2 ].title ) );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+
+			await user.keyboard( '{/Shift}' );
+		} );
+
+		it( 'keeps the existing selection when shift-clicking a range', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+				/>
+			);
+			const user = userEvent.setup();
+			// Checkbox clicks select the first and third items; the third
+			// becomes the anchor.
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+			);
+
+			// Shift+Click applies the anchor's state to the range without
+			// touching the selection outside of it: the first item stays
+			// selected.
+			await user.keyboard( '{Shift>}' );
+			await user.click( screen.getByText( data[ 1 ].title ) );
+			await user.keyboard( '{/Shift}' );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+		} );
+
+		it( 'selects the range when shift-clicking a selected item', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+				/>
+			);
+			const user = userEvent.setup();
+			await user.click(
+				screen.getAllByRole( 'checkbox', { name: 'Select all' } )[ 0 ]
+			);
+			// Unchecking the third item makes it the anchor.
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+			);
+
+			// Shift-clicking the selected second item selects the range
+			// between the anchor and it rather than deselecting it.
+			await user.keyboard( '{Shift>}' );
+			await user.click( screen.getByText( data[ 1 ].title ) );
+			await user.keyboard( '{/Shift}' );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+		} );
+
+		it( 'selects the range when shift-clicking after deselecting an item', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+				/>
+			);
+			const user = userEvent.setup();
+			// Selecting and deselecting the first item leaves it as the
+			// anchor with nothing selected.
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+
+			// Shift-clicking the unselected third item selects the whole
+			// range from the anchor.
+			await user.keyboard( '{Shift>}' );
+			await user.click( screen.getByText( data[ 2 ].title ) );
+			await user.keyboard( '{/Shift}' );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+		} );
+
+		it( 'keeps the checkbox in sync when shift-clicking the checkbox itself', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+				/>
+			);
+			const user = userEvent.setup();
+			// The checkbox click selects the third item and makes it the
+			// anchor.
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+			);
+
+			// Shift-clicking the first item's checkbox selects the whole
+			// range, and the clicked checkbox itself must reflect the new
+			// state: cancelling the click would revert the input's native
+			// toggle after React re-renders, leaving it visually unchecked.
+			await user.keyboard( '{Shift>}' );
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+			await user.keyboard( '{/Shift}' );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+		} );
+
+		it( 'swallows modifier clicks on non-selectable items and skips them in ranges', async () => {
+			const onClickItem = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					actions={ [
+						{
+							id: 'delete',
+							label: 'Delete',
+							supportsBulk: true,
+							// The second item is not selectable.
+							isEligible: ( item: Data ) => item.id !== 2,
+							RenderModal: () => <div>Modal Content</div>,
+						},
+					] }
+					isItemClickable={ () => true }
+					onClickItem={ onClickItem }
+				/>
+			);
+			const user = userEvent.setup();
+			// Ctrl/Cmd+Click on a non-selectable item is swallowed: it
+			// neither changes the selection nor activates the item's title.
+			await user.keyboard( '{Control>}' );
+			await user.click( screen.getByText( data[ 1 ].title ) );
+			expect( onClickItem ).not.toHaveBeenCalled();
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			).not.toBeChecked();
+
+			// Selectable items still respond and become the anchor.
+			await user.click( screen.getByText( data[ 0 ].title ) );
+			await user.keyboard( '{/Control}' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toBeChecked();
+
+			// Shift+Click ranges skip the non-selectable item.
+			await user.keyboard( '{Shift>}' );
+			await user.click( screen.getByText( data[ 2 ].title ) );
+			await user.keyboard( '{/Shift}' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+			).toBeChecked();
+			expect( onClickItem ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'in grid view', () => {
@@ -544,6 +771,46 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Control}' );
 		} );
 
+		it( 'accepts shift key and click for range selection', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						type: 'grid',
+						fields: [ 'author' ],
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					// A bulk action is required for the dataview to be multi-selectable.
+					actions={ actions }
+					isItemClickable={ () => false }
+				/>
+			);
+			const user = userEvent.setup();
+			// Ctrl/Cmd+Click selects the first item and makes it the anchor.
+			await user.keyboard( '{Control>}' );
+			await user.click(
+				screen.getByRole( 'gridcell', { name: /Hello World/ } )
+			);
+			await user.keyboard( '{/Control}' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toBeChecked();
+
+			// Shift+Click selects everything between the anchor and the
+			// clicked item.
+			await user.keyboard( '{Shift>}' );
+			await user.click(
+				screen.getByRole( 'gridcell', { name: /Posts/ } )
+			);
+			await user.keyboard( '{/Shift}' );
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
+		} );
+
 		it( 'supports tabbing to selection and actions when title is visible', async () => {
 			render(
 				<DataViewWrapper
@@ -683,6 +950,49 @@ describe( 'DataViews component', () => {
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );
 		} );
+
+		describe.each( [
+			[ 'ungrouped', undefined ],
+			[ 'grouped', { field: 'author', direction: 'asc' as const } ],
+		] )( 'when %s', ( _name, groupBy ) => {
+			const view: View = {
+				type: 'list',
+				groupBy,
+				layout: { density: 'compact' },
+			};
+
+			it( 'should apply the configured density', () => {
+				const { container } = render(
+					<DataViewWrapper view={ view } />
+				);
+				expect(
+					// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+					container.querySelector( '.dataviews-view-list' )
+				).toHaveClass( 'has-compact-density' );
+			} );
+
+			it( 'should become inert while loading and refreshing once the delay elapses', async () => {
+				const { container, rerender } = render(
+					<DataViewWrapper view={ view } />
+				);
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				const list = container.querySelector( '.dataviews-view-list' );
+
+				expect( screen.getByRole( 'grid' ) ).not.toHaveAttribute(
+					'inert'
+				);
+
+				rerender( <DataViewWrapper view={ view } isLoading /> );
+
+				expect( screen.getByRole( 'grid' ) ).toHaveAttribute( 'inert' );
+				// The refreshing state is deliberately delayed, so it is not
+				// applied on the render that starts the load.
+				expect( list ).not.toHaveClass( 'is-refreshing' );
+				await waitFor( () =>
+					expect( list ).toHaveClass( 'is-refreshing' )
+				);
+			} );
+		} );
 	} );
 
 	describe( 'actions on mobile viewport', () => {
@@ -735,6 +1045,73 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );
+		} );
+	} );
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal wrapper that intentionally omits the `defaultLayouts` prop so
+		 * DataViews falls back to its internal DEFAULT_LAYOUTS constant
+		 * ({ table: true, grid: true, list: true }).
+		 */
+		function DataViewWrapperWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				...DEFAULT_VIEW,
+				fields: [ 'title', 'order', 'author' ],
+			} );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, fields );
+			}, [ view ] );
+
+			return (
+				<DataViews
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ fields }
+					onChangeView={ setView }
+					// No `defaultLayouts` prop — falls back to DEFAULT_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders Table, Grid, and List layout options when defaultLayouts is not provided', async () => {
+			render( <DataViewWrapperWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// All three default layouts are available, so the Layout switcher
+			// button (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Table, Grid, and List options must all appear.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).toBeInTheDocument();
+
+			// Table is the default active layout.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).not.toBeChecked();
 		} );
 	} );
 } );

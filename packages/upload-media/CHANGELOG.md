@@ -2,6 +2,81 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
+### Enhancements
+
+-   Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Animated GIF to video conversion is now abandoned after a timeout (default 30 seconds) and skipped entirely for GIFs whose total decoded pixels (width × height × frame count) exceed a budget. In both cases the original GIF upload is kept and no error is surfaced; a `SCRIPT_DEBUG` diagnostic explains the skip. Both knobs are configurable via the `TranscodeGif` operation args ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
+
+### Bug Fixes
+
+-   `cancelItem` no longer awaits the best-effort worker cancellation calls. A busy vips worker is synchronously blocked inside a wasm call and cannot answer the cancellation RPC until every operation already queued in the worker finishes, which for a large animated GIF left cancelled items stuck in the queue - and the parent attachment unfinalized - for minutes ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
+-   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+
+## 0.36.0 (2026-07-14)
+
+### Enhancement
+
+-   Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 0.35.0 (2026-07-01)
+
+## 0.34.0 (2026-06-24)
+
+### Enhancement
+
+-   Add `ErrorCode` enum and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Log upload cancellations and batch completions via a `SCRIPT_DEBUG`-gated `console.debug` diagnostic; top-level cancellations without an `onError` handler are surfaced via `console.error` ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Emit User Timings API entries for upload, sideload, resize, rotate, and transcode operations under a custom "Upload Media" DevTools track when `SCRIPT_DEBUG` is enabled ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+
+### Bug Fix
+
+-   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
+
+## 0.33.1 (2026-06-16)
+
+## 0.33.0 (2026-06-10)
+
+### Enhancement
+
+-   UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline, so gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+-   Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
+### Bug Fix
+
+-   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail. [#78949](https://github.com/WordPress/gutenberg/pull/78949).
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 0.32.0 (2026-05-27)
+
+### Bug Fix
+
+-   Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
+-   Propagate the post-finalize attachment from `mediaFinalize` back to the queue so the block markup picks up the `-scaled` URL. Without this, oversized client-side uploads kept the unscaled original's URL in the block, and `wp_calculate_image_srcset()` could not match the `src` to any entry in `$image_meta['sizes']` — so the front-end `<img>` shipped without `srcset`.
+
+## 0.31.0 (2026-05-14)
+
+## 0.30.0 (2026-04-29)
+
+### Enhancement
+
+-   Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).
+
+## 0.29.0 (2026-04-15)
+
+## 0.28.0 (2026-04-01)
+
 ## 0.27.0 (2026-03-18)
 
 ## 0.26.0 (2026-03-04)

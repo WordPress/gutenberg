@@ -13,7 +13,7 @@ it( 'should export an array', () => {
 } );
 
 it( 'should not contain invalid queries', () => {
-	const result = browserslist( [ 'extends @wordpress/browserslist-config' ] );
+	const result = browserslist( config );
 
 	expect( result ).toBeTruthy();
 } );

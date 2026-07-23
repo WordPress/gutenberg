@@ -21,6 +21,7 @@ import {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	getUltraHdrInfo,
 } from './index';
 
 /**
@@ -33,6 +34,7 @@ const api = {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	getUltraHdrInfo,
 };
 
 expose( api );

@@ -9,6 +9,7 @@ import { getRectangleFromRange } from '@wordpress/dom';
  * Internal dependencies
  */
 import type { WPFormat } from '../register-format-type';
+import { ownsSelection } from '../owns-selection';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -61,6 +62,11 @@ function getFormatElement(
 	}
 
 	const selector = tagName + ( className ? '.' + className : '' );
+
+	// Element#matches will throw SyntaxError on an empty selector
+	if ( ! selector ) {
+		return;
+	}
 
 	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
@@ -151,18 +157,14 @@ function getAnchor(
 		return;
 	}
 
-	const formatElement = getFormatElement(
-		range,
-		editableContentElement,
-		tagName,
-		className
-	);
-
-	if ( formatElement ) {
-		return formatElement;
+	if ( ! tagName && ! className ) {
+		return createVirtualAnchorElement( range, editableContentElement );
 	}
 
-	return createVirtualAnchorElement( range, editableContentElement );
+	return (
+		getFormatElement( range, editableContentElement, tagName, className ) ??
+		createVirtualAnchorElement( range, editableContentElement )
+	);
 }
 
 const DEFAULT_SETTINGS = {
@@ -227,7 +229,7 @@ export function useAnchor( {
 		const { ownerDocument } = editableContentElement;
 
 		if (
-			editableContentElement === ownerDocument.activeElement ||
+			ownsSelection( editableContentElement ) ||
 			// When a link is created, we need to attach the popover to the newly created anchor.
 			( ! wasActive && isActive ) ||
 			// Sometimes we're _removing_ an active anchor, such as the inline color popover.

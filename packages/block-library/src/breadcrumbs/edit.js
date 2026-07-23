@@ -264,7 +264,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
 							value={ separator }
@@ -290,7 +289,7 @@ export default function BreadcrumbEdit( {
 						setAttributes( { showOnHomePage: value } )
 					}
 					help={ __(
-						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
+						'If this Breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
 					) }
 				/>
 				<CheckboxControl

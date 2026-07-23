@@ -84,6 +84,88 @@ export function isYMap< T extends YMapRecord >(
 	return value instanceof Y.Map;
 }
 
+declare const richTextOffsetBrand: unique symbol;
+declare const htmlStringIndexBrand: unique symbol;
+
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asRichTextOffset()
+ */
+export type RichTextOffset = number & {
+	readonly [ richTextOffsetBrand ]: 'RichTextOffset';
+};
+
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asHtmlStringIndex()
+ */
+export type HtmlStringIndex = number & {
+	readonly [ htmlStringIndexBrand ]: 'HtmlStringIndex';
+};
+
+/**
+ * Brand a number as an offset into a RichText’s text content.
+ *
+ * @param offset The rich-text offset to brand.
+ * @return The branded rich-text offset.
+ */
+export function asRichTextOffset( offset: number ): RichTextOffset {
+	return offset as RichTextOffset;
+}
+
+/**
+ * Brand a number as a string index into serialized HTML.
+ *
+ * @param index The HTML string index to brand.
+ * @return The branded HTML string index.
+ */
+export function asHtmlStringIndex( index: number ): HtmlStringIndex {
+	return index as HtmlStringIndex;
+}
+
+/**
+ * Resolve a selection attribute key to a Y.Text value.
+ *
+ * RichText identifiers are normally top-level block attribute keys, but nested
+ * rich-text fields can provide a dot path such as `body.0.cells.0.content`.
+ *
+ * @param attributes   The block attributes map.
+ * @param attributeKey The top-level attribute key or nested attribute path.
+ * @return The matching Y.Text, or null if the path is not a rich-text field.
+ */
+export function getYTextByAttributeKey(
+	attributes: Y.Map< unknown >,
+	attributeKey: string
+): Y.Text | null {
+	const directValue = attributes.get( attributeKey );
+	if ( directValue instanceof Y.Text ) {
+		return directValue;
+	}
+
+	let value: unknown = attributes;
+	for ( const pathPart of attributeKey.split( '.' ) ) {
+		if ( value instanceof Y.Map ) {
+			value = value.get( pathPart );
+		} else if ( value instanceof Y.Array ) {
+			const index = Number.parseInt( pathPart, 10 );
+			if (
+				! Number.isSafeInteger( index ) ||
+				index < 0 ||
+				index.toString() !== pathPart
+			) {
+				return null;
+			}
+			value = value.get( index );
+		} else {
+			return null;
+		}
+	}
+
+	return value instanceof Y.Text ? value : null;
+}
+
 /**
  * Given a block ID and a Y.Doc, find the block in the document.
  *
@@ -141,15 +223,15 @@ function pickMarker( text: string ): string | null {
  */
 export function htmlIndexToRichTextOffset(
 	html: string,
-	htmlIndex: number
-): number {
+	htmlIndex: HtmlStringIndex
+): RichTextOffset {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return htmlIndex;
+		return asRichTextOffset( htmlIndex );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return htmlIndex;
+		return asRichTextOffset( htmlIndex );
 	}
 
 	// Insert marker and let create() do the parsing.
@@ -158,7 +240,7 @@ export function htmlIndexToRichTextOffset(
 	const value = create( { html: withMarker } );
 	const markerPos = value.text.indexOf( marker );
 
-	return markerPos === -1 ? htmlIndex : markerPos;
+	return asRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
 }
 
 /**
@@ -172,15 +254,15 @@ export function htmlIndexToRichTextOffset(
  */
 export function richTextOffsetToHtmlIndex(
 	html: string,
-	richTextOffset: number
-): number {
+	richTextOffset: RichTextOffset
+): HtmlStringIndex {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return richTextOffset;
+		return asHtmlStringIndex( richTextOffset );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return richTextOffset;
+		return asHtmlStringIndex( richTextOffset );
 	}
 
 	const value = create( { html } );
@@ -200,7 +282,9 @@ export function richTextOffsetToHtmlIndex(
 
 	const htmlWithMarker = toHTMLString( { value: withMarker } );
 	const markerIndex = htmlWithMarker.indexOf( marker );
-	return markerIndex === -1 ? richTextOffset : markerIndex;
+	return asHtmlStringIndex(
+		markerIndex === -1 ? richTextOffset : markerIndex
+	);
 }
 
 function findBlockByClientIdInBlocks(

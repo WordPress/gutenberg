@@ -345,6 +345,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"minWidth": {
+							"description": "Allow blocks to define a minimum width value.",
+							"type": "boolean",
+							"default": false
+						},
 						"width": {
 							"description": "Allow blocks to define a width value.",
 							"type": "boolean",
@@ -374,6 +379,11 @@
 						},
 						"backgroundSize": {
 							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
+							"type": "boolean",
+							"default": false
+						},
+						"gradient": {
+							"description": "Allow blocks to define gradient values.",
 							"type": "boolean",
 							"default": false
 						}
@@ -466,6 +476,11 @@
 										"columnCount": {
 											"description": "The column count value.",
 											"type": "number"
+										},
+										"autoFit": {
+											"description": "Whether grid columns stretch to fill the available space (auto-fit) instead of leaving empty tracks (auto-fill).",
+											"type": "boolean",
+											"default": false
 										}
 									}
 								},
@@ -485,7 +500,7 @@
 									"default": true
 								},
 								"allowSizingOnChildren": {
-									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max/Fixed) on all child blocks of the flex block.",
 									"type": "boolean",
 									"default": false
 								},
@@ -697,6 +712,11 @@
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"type": "boolean",
 					"default": false
+				},
+				"editableRoot": {
+					"description": "This property indicates that the block works when an ancestor element (the editor canvas) is the contenteditable editing host, with focus and native selection residing there instead of on the block's own elements. It enables native partial selection across blocks.",
+					"type": "boolean",
+					"default": false
 				}
 			},
 			"additionalProperties": true
@@ -756,6 +776,7 @@
 								"aspectRatio": { "type": "string" },
 								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
+								"minWidth": { "type": "string" },
 								"width": { "type": "string" }
 							}
 						}
@@ -854,6 +875,13 @@
 				"innerBlocks": {
 					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\n\n[ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ]\n\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks.",
 					"type": "array"
+				},
+				"innerContent": {
+					"description": "Static HTML fragments interleaved with inner blocks, where null entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.",
+					"type": "array",
+					"items": {
+						"type": [ "string", "null" ]
+					}
 				}
 			}
 		},
@@ -1028,6 +1056,13 @@
 								"type": "array",
 								"items": {
 									"type": "array"
+								}
+							},
+							"innerContent": {
+								"description": "Static HTML fragments interleaved with inner blocks, where null entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.",
+								"type": "array",
+								"items": {
+									"type": [ "string", "null" ]
 								}
 							},
 							"example": {

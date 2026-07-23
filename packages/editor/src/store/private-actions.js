@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
@@ -16,6 +16,12 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
+import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -120,126 +126,6 @@ export const hideBlockTypes =
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
-	};
-
-/**
- * Save entity records marked as dirty.
- *
- * @param {Object}   options                        Options for the action.
- * @param {Function} [options.onSave]               Callback when saving happens.
- * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
- * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
- * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
- * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
- */
-export const saveDirtyEntities =
-	( {
-		onSave,
-		dirtyEntityRecords = [],
-		entitiesToSkip = [],
-		close,
-		successNoticeContent,
-	} = {} ) =>
-	( { registry } ) => {
-		const PUBLISH_ON_SAVE_ENTITIES = [
-			{ kind: 'postType', name: 'wp_navigation' },
-		];
-		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry
-			.select( coreStore )
-			.getEntityRecord( 'root', '__unstableBase' )?.home;
-		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! entitiesToSkip.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-		close?.( entitiesToSave );
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					registry
-						.dispatch( coreStore )
-						.editEntityRecord( kind, name, key, {
-							status: 'publish',
-						} );
-				}
-
-				pendingSavedRecords.push(
-					registry
-						.dispatch( coreStore )
-						.saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				registry
-					.dispatch( coreStore )
-					.__experimentalSaveSpecifiedEntityEdits(
-						'root',
-						'site',
-						undefined,
-						siteItemsToSave
-					)
-			);
-		}
-		registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkLastChangeAsPersistent();
-		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					registry
-						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					registry
-						.dispatch( noticesStore )
-						.createSuccessNotice(
-							successNoticeContent || __( 'Site updated.' ),
-							{
-								type: 'snackbar',
-								id: saveNoticeId,
-								actions: [
-									{
-										label: __( 'View site' ),
-										url: homeUrl,
-										openInNewTab: true,
-									},
-								],
-							}
-						);
-				}
-			} )
-			.catch( ( error ) =>
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
-					)
-			);
 	};
 
 /**
@@ -576,15 +462,36 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
+ * Set the width of the canvas.
  *
- * @param {number} minHeight
- * @return {Object} Action object.
+ * @param {number} width The width of the canvas in pixels.
  */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		const blockEditorSelect = unlock( registry.select( blockEditorStore ) );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if ( blockEditorSelect.isResponsiveEditing() ) {
+			const viewportSettings =
+				blockEditorSelect.getSettings().__experimentalFeatures
+					?.viewport;
+			const deviceType = getDeviceTypeByCanvasWidth(
+				width,
+				viewportSettings
+			);
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
 	};
 }
 
@@ -601,6 +508,39 @@ export function setCurrentRevisionId( revisionId ) {
 		revisionId,
 	};
 }
+
+/**
+ * Set the current revisions page number and select the newest
+ * revision on that page once it loads.
+ *
+ * @param {number} page The page number.
+ */
+export const setRevisionPage =
+	( page ) =>
+	async ( { dispatch, select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page )
+			);
+
+		registry.batch( () => {
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+			if ( revisions?.length ) {
+				dispatch.setCurrentRevisionId( revisions[ 0 ][ revisionKey ] );
+			}
+		} );
+	};
 
 /**
  * Set whether the revision diff highlighting is shown.
@@ -682,18 +622,20 @@ export const restoreRevision =
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
+		if ( select.didPostSaveRequestFail() ) {
+			return;
+		}
+
+		// The saved post is now newer than any autosave, so the
+		// autosave notice is stale.
+		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n(
-					getDateSettings().formats.datetime,
-					// Template revisions use the template REST API format, which
-					// exposes 'modified' instead of 'date'.
-					revisionKey === 'wp_id' ? revision.modified : revision.date
-				)
+				dateI18n( getDateSettings().formats.datetime, revision.date )
 			),
 			{
 				type: 'snackbar',

@@ -7,21 +7,29 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { Placeholder, SandBox, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -49,7 +57,10 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
+import { getBackgroundEmbedHtml } from '../embed-video-utils';
+import { unlock } from '../../lock-unlock';
+
+const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -118,9 +129,23 @@ function CoverEdit( {
 		postId
 	);
 	const { getSettings } = useSelect( blockEditorStore );
+	const openMediaEditorModal = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
+		[]
+	);
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
+	const registry = useRegistry();
+
+	// Ref to access latest values after async operations (e.g. getMediaColor),
+	// avoiding stale values that could overwrite concurrent remote changes.
+	const propsRef = useRef( { attributes, overlayColor } );
+	useLayoutEffect( () => {
+		propsRef.current = { attributes, overlayColor };
+	} );
+
 	const { media } = useSelect(
 		( select ) => {
 			return {
@@ -155,26 +180,37 @@ function CoverEdit( {
 
 			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
-			let newOverlayColor = overlayColor.color;
-			if ( ! isUserOverlayColor ) {
+			// Read latest values after await to avoid stale closures.
+			const { attributes: currentAttrs, overlayColor: currentOverlay } =
+				propsRef.current;
+
+			let newOverlayColor = currentOverlay.color;
+			if ( ! currentAttrs.isUserOverlayColor ) {
 				newOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
 				setOverlayColor( newOverlayColor );
 			}
 
 			const newIsDark = compositeIsDark(
-				dimRatio,
+				currentAttrs.dimRatio,
 				newOverlayColor,
 				averageBackgroundColor
 			);
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				isDark: newIsDark,
-				isUserOverlayColor: isUserOverlayColor || false,
+				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
 		} )();
 		// Update the block only when the featured image changes.
-	}, [ mediaUrl ] );
+		// The other dependencies are stable references (dispatch actions / setters).
+	}, [
+		mediaUrl,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+		setOverlayColor,
+		useFeaturedImage,
+	] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -191,6 +227,35 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
+	// Create the initial inner paragraph when the block gains a background
+	// and has no content yet.
+	const scaffoldInnerBlocks = () => {
+		const {
+			getBlocks,
+			isBlockSelected,
+			getSelectedBlocksInitialCaretPosition,
+		} = registry.select( blockEditorStore );
+		if ( getBlocks( clientId ).length > 0 ) {
+			return;
+		}
+		// Check for fontSize support before we pass a fontSize attribute to
+		// the innerBlocks.
+		const [ fontSizes ] = unlock(
+			registry.select( blockEditorStore )
+		).getBlockSettings( clientId, 'typography.fontSizes' );
+		const hasFontSizes = fontSizes?.length > 0;
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate(
+				getInnerBlocksTemplate( {
+					fontSize: hasFontSizes ? 'large' : undefined,
+				} )
+			),
+			isBlockSelected( clientId ),
+			getSelectedBlocksInitialCaretPosition()
+		);
+	};
+
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
 		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
@@ -201,12 +266,15 @@ function CoverEdit( {
 			isImage ? newMedia?.url : undefined
 		);
 
-		let newOverlayColor = overlayColor.color;
-		if ( ! isUserOverlayColor ) {
+		// Read latest values to avoid stale closures.
+		const { attributes: currentAttrs, overlayColor: currentOverlay } =
+			propsRef.current;
+
+		let newOverlayColor = currentOverlay.color;
+		if ( ! currentAttrs.isUserOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
@@ -214,7 +282,9 @@ function CoverEdit( {
 		// to avoid resetting to 50 if it has been explicitly set to 100.
 		// See issue #52835 for context.
 		const newDimRatio =
-			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+			currentAttrs.url === undefined && currentAttrs.dimRatio === 100
+				? 50
+				: currentAttrs.dimRatio;
 
 		const newIsDark = compositeIsDark(
 			newDimRatio,
@@ -250,23 +320,29 @@ function CoverEdit( {
 			}
 		}
 
-		setAttributes( {
-			...mediaAttributes,
-			focalPoint: undefined,
-			useFeaturedImage: undefined,
-			dimRatio: newDimRatio,
-			isDark: newIsDark,
-			isUserOverlayColor: isUserOverlayColor || false,
+		registry.batch( () => {
+			setAttributes( {
+				...mediaAttributes,
+				focalPoint: undefined,
+				useFeaturedImage: undefined,
+				dimRatio: newDimRatio,
+				isDark: newIsDark,
+				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
+			} );
+
+			scaffoldInnerBlocks();
 		} );
 	};
 
 	const onClearMedia = () => {
 		let newOverlayColor = overlayColor.color;
-		if ( ! isUserOverlayColor ) {
+
+		// Skip for embeds, which never auto-assign an overlay color; otherwise
+		// the non-persistent flag lands on the media reset itself (unsaveable).
+		if ( ! isUserOverlayColor && overlayColor.color ) {
 			newOverlayColor = DEFAULT_OVERLAY_COLOR;
 			setOverlayColor( undefined );
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
@@ -290,28 +366,43 @@ function CoverEdit( {
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+
+		// Read latest dimRatio after await to avoid stale closure.
+		const { attributes: currentAttrs } = propsRef.current;
+
 		const newIsDark = compositeIsDark(
-			dimRatio,
+			currentAttrs.dimRatio,
 			newOverlayColor,
 			averageBackgroundColor
 		);
 
 		setOverlayColor( newOverlayColor );
-
-		// Make undo revert the next setAttributes and the previous setOverlayColor.
+		// Fold next attribute change into the same undo level as the setOverlayColor above.
 		__unstableMarkNextChangeAsNotPersistent();
 
-		setAttributes( {
-			isUserOverlayColor: true,
-			isDark: newIsDark,
+		registry.batch( () => {
+			setAttributes( {
+				isUserOverlayColor: true,
+				isDark: newIsDark,
+			} );
+
+			// Skip when the color is cleared: that returns the block to its
+			// placeholder, which only renders while there is no content.
+			if ( newOverlayColor ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+
+		// Read latest overlayColor after await to avoid stale closure.
+		const { overlayColor: currentOverlay } = propsRef.current;
+
 		const newIsDark = compositeIsDark(
 			newDimRatio,
-			overlayColor.color,
+			currentOverlay.color,
 			averageBackgroundColor
 		);
 
@@ -365,24 +456,22 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
-	// Compute embedSrc on-the-fly from embed preview for editor display
-	const embedSrc = useMemo( () => {
+	// Compute embed HTML for editor display via SandBox
+	const embedHtml = useMemo( () => {
 		if (
 			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
 			! embedPreview?.html
 		) {
 			return null;
 		}
-
-		// Extract iframe src from embed HTML
-		const iframeSrc = getIframeSrc( embedPreview.html );
-		if ( ! iframeSrc ) {
-			return null;
-		}
-
-		// Modify the src to add background video parameters (provider auto-detected)
-		return getBackgroundVideoSrc( iframeSrc );
+		return getBackgroundEmbedHtml( embedPreview.html );
 	}, [ embedPreview, backgroundType ] );
+
+	// Set while the media editor has pointed the cover at a freshly
+	// generated file the browser hasn't finished loading; cleared by the
+	// background <img> load/error handlers (or immediately after
+	// setAttributes for CSS backgrounds, which never fire load events).
+	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
@@ -437,22 +526,11 @@ function CoverEdit( {
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
-	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes?.length > 0;
-	const innerBlocksTemplate = getInnerBlocksTemplate( {
-		fontSize: hasFontSizes ? 'large' : undefined,
-	} );
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
-			// See: https://github.com/WordPress/gutenberg/pull/45632
-			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
-			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
 			dropZoneElement: ref.current,
@@ -460,6 +538,7 @@ function CoverEdit( {
 	);
 
 	const mediaElement = useRef();
+	const editMediaButtonRef = useRef();
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
@@ -470,6 +549,92 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const openCoverMediaEditorModal = useCallback( () => {
+		if ( ! id || ! openMediaEditorModal ) {
+			return;
+		}
+
+		openMediaEditorModal( {
+			id,
+			onClose: () => {
+				editMediaButtonRef.current?.focus();
+			},
+			onUpdate: async ( { id: newId, url: newUrl } ) => {
+				if ( typeof newId !== 'number' ) {
+					return;
+				}
+
+				if ( newId !== id && newUrl ) {
+					setIsSwappingMedia( true );
+				}
+
+				const nextAttributes = {
+					id: newId,
+					backgroundType: IMAGE_BACKGROUND_TYPE,
+					...( newUrl ? { url: newUrl } : {} ),
+					...( newId !== id
+						? { sizeSlug: DEFAULT_MEDIA_SIZE_SLUG }
+						: {} ),
+				};
+
+				if ( newUrl ) {
+					const averageBackgroundColor =
+						await getMediaColor( newUrl );
+
+					// Read latest values after await to avoid stale closures.
+					const {
+						attributes: currentAttrs,
+						overlayColor: currentOverlay,
+					} = propsRef.current;
+
+					let newOverlayColor = currentOverlay.color;
+					if ( ! currentAttrs.isUserOverlayColor ) {
+						newOverlayColor = averageBackgroundColor;
+						setOverlayColor( newOverlayColor );
+						// Fold next attribute change into the same undo level as the setOverlayColor above.
+						__unstableMarkNextChangeAsNotPersistent();
+					}
+
+					nextAttributes.isDark = compositeIsDark(
+						currentAttrs.dimRatio,
+						newOverlayColor,
+						averageBackgroundColor
+					);
+					nextAttributes.isUserOverlayColor =
+						currentAttrs.isUserOverlayColor || false;
+				}
+
+				setAttributes( nextAttributes );
+
+				// A CSS background (parallax/repeated) renders as a div and
+				// never fires a load event; getMediaColor already fetched
+				// the file, so the swap is done once attributes are set.
+				const {
+					hasParallax: currentHasParallax,
+					isRepeated: currentIsRepeated,
+				} = propsRef.current.attributes;
+				if ( currentHasParallax || currentIsRepeated ) {
+					setIsSwappingMedia( false );
+				}
+			},
+		} );
+	}, [
+		id,
+		openMediaEditorModal,
+		setAttributes,
+		setOverlayColor,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	const showEditMediaButton =
+		hasNonContentControls &&
+		! useFeaturedImage &&
+		isImageBackground &&
+		!! id &&
+		!! url &&
+		! isUploadingMedia &&
+		!! openMediaEditorModal;
+
 	const toggleUseFeaturedImage = async () => {
 		const newUseFeaturedImage = ! useFeaturedImage;
 
@@ -477,37 +642,50 @@ function CoverEdit( {
 			? await getMediaColor( mediaUrl )
 			: DEFAULT_BACKGROUND_COLOR;
 
-		const newOverlayColor = ! isUserOverlayColor
-			? averageBackgroundColor
-			: overlayColor.color;
+		// Read latest values after await to avoid stale closures.
+		const { attributes: currentAttrs, overlayColor: currentOverlay } =
+			propsRef.current;
 
-		if ( ! isUserOverlayColor ) {
+		const newOverlayColor = ! currentAttrs.isUserOverlayColor
+			? averageBackgroundColor
+			: currentOverlay.color;
+
+		if ( ! currentAttrs.isUserOverlayColor ) {
 			if ( newUseFeaturedImage ) {
 				setOverlayColor( newOverlayColor );
 			} else {
 				setOverlayColor( undefined );
 			}
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
-		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newDimRatio =
+			currentAttrs.dimRatio === 100 ? 50 : currentAttrs.dimRatio;
 		const newIsDark = compositeIsDark(
 			newDimRatio,
 			newOverlayColor,
 			averageBackgroundColor
 		);
 
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: newUseFeaturedImage,
-			dimRatio: newDimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-			isDark: newIsDark,
+		registry.batch( () => {
+			setAttributes( {
+				id: undefined,
+				url: undefined,
+				useFeaturedImage: newUseFeaturedImage,
+				dimRatio: newDimRatio,
+				backgroundType: useFeaturedImage
+					? IMAGE_BACKGROUND_TYPE
+					: undefined,
+				isDark: newIsDark,
+			} );
+
+			// Skip when the featured image is disabled: that can return the
+			// block to its placeholder, which only renders while there is no
+			// content.
+			if ( newUseFeaturedImage ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
@@ -521,6 +699,10 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
 			blockEditingMode={ blockEditingMode }
+			onEditMedia={ openCoverMediaEditorModal }
+			editMediaButtonRef={ editMediaButtonRef }
+			showEditMediaButton={ showEditMediaButton }
+			isEditMediaDisabled={ isSwappingMedia }
 		/>
 	);
 
@@ -603,7 +785,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'is-light': ! isDark,
-			'is-transient': isUploadingMedia,
+			'is-transient': isUploadingMedia || isSwappingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-custom-content-position':
@@ -643,6 +825,8 @@ function CoverEdit( {
 							alt={ alt }
 							src={ url }
 							style={ mediaStyle }
+							onLoad={ () => setIsSwappingMedia( false ) }
+							onError={ () => setIsSwappingMedia( false ) }
 						/>
 					) : (
 						<div
@@ -668,21 +852,23 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isEmbedVideoBackground && embedSrc && (
+				{ isEmbedVideoBackground && embedHtml && (
 					<div
 						ref={ mediaElement }
 						className="wp-block-cover__video-background wp-block-cover__embed-background"
 						style={ mediaStyle }
 					>
-						<iframe
-							src={ embedSrc }
+						<SandBox
+							allowSameOrigin
+							html={ embedHtml }
 							title="Background video"
-							frameBorder="0"
-							allow="autoplay; fullscreen"
+							styles={ [
+								'iframe{position:fixed;top:0;left:0;width:100%;height:100%;}',
+							] }
 						/>
 					</div>
 				) }
-				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
 					<Spinner />
 				) }
 
@@ -708,7 +894,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ isUploadingMedia && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons

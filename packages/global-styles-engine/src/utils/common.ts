@@ -19,6 +19,34 @@ import { getValueFromObjectPath } from './object';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
+export function splitSelectorList( selector: string ) {
+	if ( ! selector.includes( ',' ) ) {
+		return [ selector ];
+	}
+
+	const selectors: string[] = [];
+	let currentSelector = '';
+	let parenthesesDepth = 0;
+
+	for ( const char of selector ) {
+		if ( char === '(' ) {
+			parenthesesDepth++;
+		} else if ( char === ')' && parenthesesDepth > 0 ) {
+			parenthesesDepth--;
+		} else if ( char === ',' && parenthesesDepth === 0 ) {
+			selectors.push( currentSelector );
+			currentSelector = '';
+			continue;
+		}
+
+		currentSelector += char;
+	}
+
+	selectors.push( currentSelector );
+
+	return selectors;
+}
+
 export const PRESET_METADATA = [
 	{
 		path: [ 'color', 'palette' ],
@@ -170,8 +198,8 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 		return selector;
 	}
 
-	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
+	const scopes = splitSelectorList( scope );
+	const selectors = splitSelectorList( selector );
 
 	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
@@ -257,7 +285,7 @@ export function appendToSelector( selector: string, toAppend: string ) {
 	if ( ! selector.includes( ',' ) ) {
 		return selector + toAppend;
 	}
-	const selectors = selector.split( ',' );
+	const selectors = splitSelectorList( selector );
 	const newSelectors = selectors.map( ( sel ) => sel + toAppend );
 	return newSelectors.join( ',' );
 }
@@ -289,20 +317,61 @@ export function getBlockStyleVariationSelector(
 		return variationClass;
 	}
 
-	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
-	const addVariationClass = (
-		_match: string,
-		group1: string,
-		group2: string
-	) => {
-		return group1 + group2 + variationClass;
-	};
+	/*
+	 * Append the variation class to each selector's ancestor: the first run
+	 * of characters before any combinator (whitespace) or pseudo-class (`:`).
+	 * `String.prototype.replace` only replaces the first match.
+	 *
+	 * Examples ("custom" variation):
+	 * - `.wp-block`              => `.wp-block.is-style-custom`
+	 * - `.wp-block .inner`       => `.wp-block.is-style-custom .inner`
+	 * - `.wp-block:where(.a .b)` => `.wp-block.is-style-custom:where(.a .b)`
+	 * - `:where(.outer .inner)`  => `:where(.outer.is-style-custom .inner)`
+	 */
+	const ancestorRegex = /[^\s:]+/;
+	const addVariationClass = ( match: string ) => match + variationClass;
 
-	const result = blockSelector
-		.split( ',' )
-		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+	const result = splitSelectorList( blockSelector ).map( ( part ) =>
+		part.replace( ancestorRegex, addVariationClass )
+	);
 
 	return result.join( ',' );
+}
+
+/**
+ * Generates the selector for a block style variation feature selector.
+ *
+ * Feature selectors can target a different element than the block root
+ * selector. Apply the variation class directly to the selector that receives
+ * the declarations instead of deriving it from the block root selector.
+ *
+ * @param variation       Name for the variation.
+ * @param featureSelector CSS selector for the feature.
+ *
+ * @return CSS selector for the block style variation feature.
+ */
+export function getBlockStyleVariationFeatureSelector(
+	variation: string,
+	featureSelector: string
+) {
+	const variationClass = `.is-style-${ variation }`;
+	const selectorParts = splitSelectorList( featureSelector ).map(
+		( selector ) => {
+			const trimmedSelector = selector.trim();
+			const prefix = `${ variationClass } `;
+
+			if ( trimmedSelector.startsWith( prefix ) ) {
+				return trimmedSelector.slice( prefix.length );
+			}
+
+			return trimmedSelector;
+		}
+	);
+
+	return getBlockStyleVariationSelector(
+		variation,
+		selectorParts.join( ',' )
+	);
 }
 
 /**

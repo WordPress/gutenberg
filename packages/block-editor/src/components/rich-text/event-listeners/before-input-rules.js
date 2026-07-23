@@ -1,13 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { insert, isCollapsed } from '@wordpress/rich-text';
+import {
+	insert,
+	isCollapsed,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 /**
  * When typing over a selection, the selection will we wrapped by a matching
@@ -80,13 +87,10 @@ export default ( props ) => ( element ) => {
 		// call few lines above has fully updated the data store state and rerendered
 		// all affected components.
 		window.queueMicrotask( () => {
-			event.target.dispatchEvent( newEvent );
+			element.dispatchEvent( newEvent );
 		} );
 		event.preventDefault();
 	}
 
-	element.addEventListener( 'beforeinput', onInput );
-	return () => {
-		element.removeEventListener( 'beforeinput', onInput );
-	};
+	return subscribeOwnedListener( element, 'beforeinput', onInput, true );
 };

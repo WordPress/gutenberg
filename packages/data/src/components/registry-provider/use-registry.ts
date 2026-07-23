@@ -10,17 +10,17 @@ import { Context } from './context';
 import type { DataRegistry } from '../../types';
 
 /**
- * A custom react hook exposing the registry context for use.
+ * A custom React hook exposing the registry context for use.
  *
  * This exposes the `registry` value provided via the
- * <a href="#RegistryProvider">Registry Provider</a> to a component implementing
+ * <a href="#registryprovider">Registry Provider</a> to a component implementing
  * this hook.
  *
- * It acts similarly to the `useContext` react hook.
+ * It acts similarly to the `useContext` React hook.
  *
  * Note: Generally speaking, `useRegistry` is a low level hook that in most cases
  * won't be needed for implementation. Most interactions with the `@wordpress/data`
- * API can be performed via the `useSelect` hook,  or the `withSelect` and
+ * API can be performed via the `useSelect` hook, or the `withSelect` and
  * `withDispatch` higher order components.
  *
  * @example
@@ -46,7 +46,7 @@ import type { DataRegistry } from '../../types';
  * };
  * ```
  *
- * @return A custom react hook exposing the registry context value.
+ * @return A custom React hook exposing the registry context value.
  */
 export default function useRegistry(): DataRegistry {
 	return useContext( Context );

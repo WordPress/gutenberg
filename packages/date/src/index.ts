@@ -626,7 +626,7 @@ export function humanTimeDiff(
  * @return A moment instance.
  */
 function buildMoment(
-	dateValue?: Moment | Date | string | number,
+	dateValue: Moment | Date | string | number,
 	timezone: string | number = ''
 ) {
 	const dateMoment = momentLib( dateValue );

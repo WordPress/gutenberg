@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import colorTokens from '../../prebuilt/ts/color-tokens';
-import _tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
+import _tokenFallbacks from '../../../prebuilt/js/design-token-fallbacks.mjs';
 import { ThemeProvider } from '../../theme-provider';
 
 const tokenFallbacks: Record< string, string > = _tokenFallbacks;
@@ -72,12 +72,10 @@ export default meta;
 export const Default: StoryObj< typeof Verifier > = {
 	render: ( { adminThemeColor } ) => (
 		<div
-			style={
-				{
-					'--wp-admin-theme-color': adminThemeColor,
-					fontSize: 13,
-				} as React.CSSProperties
-			}
+			style={ {
+				'--wp-admin-theme-color': adminThemeColor,
+				fontSize: 13,
+			} }
 		>
 			<p
 				style={ {
@@ -122,7 +120,7 @@ export const Default: StoryObj< typeof Verifier > = {
 
 const headerStyle: React.CSSProperties = {
 	fontSize: 11,
-	fontWeight: 600,
+	fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
 	color: '#757575',
 	paddingBottom: 4,
 	borderBottom: '1px solid #e0e0e0',

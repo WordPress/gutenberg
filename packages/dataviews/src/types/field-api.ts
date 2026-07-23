@@ -82,8 +82,8 @@ export type Rules< Item > = {
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: number;
-	max?: number;
+	min?: number | string;
+	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -125,8 +125,8 @@ export type NormalizedRules< Item > = {
 	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
-	min?: NormalizedRule< Item, number >;
-	max?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
 	custom?: CustomValidator< Item >;
 };
 
@@ -168,6 +168,41 @@ export type EditConfigDatetime = {
 };
 
 /**
+ * Edit configuration for the rich text control.
+ */
+export type EditConfigRichText = {
+	control: 'richtext';
+	/**
+	 * Additional class name applied to the control.
+	 */
+	className?: string;
+	/**
+	 * Block client ID, when the control is rendered for a specific block.
+	 */
+	clientId?: string;
+	/**
+	 * Format types the control allows. Defaults to all registered formats.
+	 */
+	allowedFormats?: string[];
+	/**
+	 * Disable all formatting, rendering plain text only.
+	 */
+	disableFormats?: boolean;
+	/**
+	 * Disable interactive formats such as links.
+	 */
+	withoutInteractiveFormatting?: boolean;
+	/**
+	 * Preserve white space in the value.
+	 */
+	preserveWhiteSpace?: boolean;
+	/**
+	 * Disable line breaks (Enter key).
+	 */
+	disableLineBreaks?: boolean;
+};
+
+/**
  * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
@@ -182,14 +217,12 @@ export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
 	| EditConfigDatetime
+	| EditConfigRichText
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
 export type Field< Item > = {
 	/**
-	 * Type of the fields.
+	 * Type of the field.
 	 */
 	type?: FieldTypeName;
 
@@ -235,7 +268,12 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * Callback used to validate the field.
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
 
@@ -243,6 +281,18 @@ export type Field< Item > = {
 	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Whether the field is sortable.
@@ -380,6 +430,10 @@ export type NormalizedField< Item > = Omit<
 	filterBy: Required< FilterByConfig > | false;
 	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
 	format:
 		| {}
 		| Required< FormatDate >
@@ -462,6 +516,14 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
+		// Rich text control options.
+		className?: string;
+		clientId?: string;
+		allowedFormats?: string[];
+		disableFormats?: boolean;
+		withoutInteractiveFormatting?: boolean;
+		preserveWhiteSpace?: boolean;
+		disableLineBreaks?: boolean;
 	};
 };
 

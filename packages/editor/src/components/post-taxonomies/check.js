@@ -22,8 +22,7 @@ export default function PostTaxonomiesCheck( { children } ) {
 		const postType = select( editorStore ).getCurrentPostType();
 		const taxonomies = select( coreStore ).getEntityRecords(
 			'root',
-			'taxonomy',
-			{ per_page: -1 }
+			'taxonomy'
 		);
 		return taxonomies?.some( ( taxonomy ) =>
 			taxonomy.types.includes( postType )

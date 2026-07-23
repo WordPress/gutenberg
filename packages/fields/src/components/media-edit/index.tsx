@@ -9,15 +9,13 @@ import clsx from 'clsx';
 import {
 	Button,
 	DropZone,
-	Icon,
+	Icon as WCIcon,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -42,6 +40,8 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -193,9 +193,10 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<Tooltip text={ label } placement="top">
-			{ mediaPickerButton }
-		</Tooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ mediaPickerButton } />
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -291,13 +292,13 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 			/>
 		);
 	} else if ( mimeType.startsWith( 'audio' ) ) {
-		return <Icon icon={ audio } />;
+		return <WCIcon icon={ audio } />;
 	} else if ( mimeType.startsWith( 'video' ) ) {
-		return <Icon icon={ video } />;
+		return <WCIcon icon={ video } />;
 	} else if ( archiveMimeTypes.includes( mimeType ) ) {
-		return <Icon icon={ archive } />;
+		return <WCIcon icon={ archive } />;
 	}
-	return <Icon icon={ file } />;
+	return <WCIcon icon={ file } />;
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
@@ -567,7 +568,7 @@ function CompactMediaEditAttachments( {
  * @param {Item}                 props.data                  - The item being edited.
  * @param {Object}               props.field                 - The field configuration with getValue and setValue methods.
  * @param {Function}             props.onChange              - Callback function when the media selection changes.
- * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Default `['image']`.
+ * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
@@ -838,6 +839,13 @@ export default function MediaEdit< Item >( {
 			setCustomValidity( undefined );
 		}
 	}, [ isTouched, field.isValid, validity ] );
+
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -914,7 +922,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
@@ -937,9 +945,12 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text variant="muted">
+									<WCText
+										variant="muted"
+										className="fields__media-edit-description"
+									>
 										{ field.description }
-									</Text>
+									</WCText>
 								) }
 							</VStack>
 						);
@@ -958,25 +969,23 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<div aria-live="polite">
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							{
-								'is-invalid': customValidity.type === 'invalid',
-								'is-valid': customValidity.type === 'valid',
-							}
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				</div>
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						{
+							'is-invalid': customValidity.type === 'invalid',
+							'is-valid': customValidity.type === 'valid',
+						}
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
 			) }
 		</div>
 	);

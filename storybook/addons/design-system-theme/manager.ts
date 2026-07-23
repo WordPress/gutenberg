@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, Fragment } from 'react';
 import { addons, types, useGlobals } from 'storybook/manager-api';
@@ -11,6 +8,7 @@ import {
 	TooltipMessage,
 	TooltipLinkList,
 } from 'storybook/internal/components';
+import { storyIdMatchesDesignSystemTheme } from '../../decorators/utils/design-system-theme-story-matchers';
 
 interface ThemeOption {
 	id: string;
@@ -31,14 +29,16 @@ const COLOR_OPTIONS: ThemeOption[] = [
 ];
 
 const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
-	{ id: '', title: 'Default' },
+	{ id: 'default', title: 'Default' },
 	{ id: 'pointer', title: 'Pointer' },
 ];
 
-const DENSITY_OPTIONS: ThemeOption[] = [
-	{ id: 'compact', title: 'Compact' },
+const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
 	{ id: '', title: 'Default' },
-	{ id: 'comfortable', title: 'Comfortable' },
+	{ id: 'none', title: 'None' },
+	{ id: 'subtle', title: 'Subtle' },
+	{ id: 'moderate', title: 'Moderate' },
+	{ id: 'pronounced', title: 'Pronounced' },
 ];
 
 function ThemeTooltipMessage( {
@@ -69,11 +69,6 @@ const ThemeTool = () => {
 		Fragment,
 		null,
 		createElement( ThemeTooltipMessage, {
-			title: 'Density',
-			globalName: 'dsDensity',
-			options: DENSITY_OPTIONS,
-		} ),
-		createElement( ThemeTooltipMessage, {
 			title: 'Color',
 			globalName: 'dsColorTheme',
 			options: COLOR_OPTIONS,
@@ -82,6 +77,11 @@ const ThemeTool = () => {
 			title: 'Cursor control',
 			globalName: 'dsCursorControl',
 			options: CURSOR_CONTROL_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Corner radius',
+			globalName: 'dsCornerRadius',
+			options: CORNER_RADIUS_OPTIONS,
 		} )
 	);
 
@@ -106,7 +106,7 @@ addons.register( ADDON_ID, () => {
 		type: types.TOOL,
 		title: 'Design System Theme',
 		match: ( { storyId, viewMode } ) =>
-			!! storyId?.startsWith( 'design-system-components-' ) &&
+			storyIdMatchesDesignSystemTheme( storyId ) &&
 			( [ 'story', 'docs' ] as any[] ).includes( viewMode ),
 		render: ThemeTool,
 	} );

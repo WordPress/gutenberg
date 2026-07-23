@@ -86,6 +86,7 @@ const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.yaml' ) ||
 	hasProjectFile( '.prettierrc.yml' ) ||
 	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( 'prettier.config.mjs' ) ||
 	hasProjectFile( '.prettierrc' ) ||
 	hasPackageProp( 'prettier' );
 
@@ -272,7 +273,7 @@ function getWebpackEntryPoints( buildType ) {
 				// at which point they are completely empty and therefore not valid JSON
 				try {
 					parsedBlockJson = JSON.parse( fileContents );
-				} catch ( error ) {
+				} catch {
 					warn(
 						`Not scanning "${ blockMetadataFile.replace(
 							fromProjectRoot( sep ),
@@ -402,7 +403,7 @@ function getPhpFilePaths( context, props ) {
 		let parsedBlockJson;
 		try {
 			parsedBlockJson = JSON.parse( readFileSync( blockMetadataFile ) );
-		} catch ( error ) {
+		} catch {
 			warn(
 				`Not scanning "${ blockMetadataFile.replace(
 					fromProjectRoot( sep ),

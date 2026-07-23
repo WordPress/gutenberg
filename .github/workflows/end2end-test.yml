@@ -25,6 +25,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -33,7 +34,7 @@ jobs:
                 totalParts: [8]
 
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -55,46 +56,35 @@ jobs:
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-                  SHARD_PART: ${{ matrix.part }}
-                  SHARD_TOTAL: ${{ matrix.totalParts }}
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
-
-            - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-              if: ${{ !cancelled() }}
-              with:
-                  name: failures-artifacts--${{ matrix.part }}
-                  path: artifacts/test-results
-                  if-no-files-found: ignore
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive blob reports (HTML)
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--${{ matrix.part }}
-                  path: blob-report
+                  path: test/e2e/blob-report
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--${{ matrix.part }}
-                  path: flaky-tests
+                  path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
-    merge-artifacts:
-        name: Merge Artifacts
-        if: ${{ !cancelled() }}
-        needs: [e2e-playwright]
+    e2e-playwright-rtc-websocket:
+        name: Playwright - RTC WebSocket
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        outputs:
-            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+            id-token: write
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -102,19 +92,67 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Merge failures artifacts
-              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-              # Don't fail the job if there aren't any artifacts to merge.
-              continue-on-error: true
+            - name: Npm build
+              run: npm run build -- --skip-types
+
+            - name: Install Playwright dependencies
+              run: |
+                  npx playwright install chromium firefox webkit --with-deps
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  # Run against the "slow" profile (a short simulated send
+                  # delay) for better coverage of real-world timing.
+                  RTC_WS_DELAY: 50
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # WebSocket-provider flakes are reported as their own issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'RTC WebSocket'
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:rtc-websocket
+
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
-                  # Retain the merged artifacts in case of a rerun.
-                  pattern: failures-artifacts*
-                  delete-merged: true
+                  name: blob-reports--rtc-websocket
+                  path: test/e2e/blob-report
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--rtc-websocket
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
+    merge-artifacts:
+        name: Merge Artifacts
+        if: ${{ !cancelled() }}
+        needs: [e2e-playwright, e2e-playwright-rtc-websocket]
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        outputs:
+            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+        steps:
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
-              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               continue-on-error: true
               with:
                   name: flaky-tests-report
@@ -122,7 +160,7 @@ jobs:
                   delete-merged: true
 
             - name: Merge blob reports
-              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               continue-on-error: true
               with:
                   name: blob-reports-merged
@@ -141,7 +179,7 @@ jobs:
               continue-on-error: true
 
             - name: Upload merged HTML report
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               continue-on-error: true
               with:
                   name: html-report--attempt-${{ github.run_attempt }}
@@ -160,7 +198,7 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}

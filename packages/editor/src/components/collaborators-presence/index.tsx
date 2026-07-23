@@ -13,8 +13,6 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { createCursorRegistry } from '../collaborators-overlay/cursor-registry';
-
-import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 
 const { useActiveCollaborators } = unlock( privateApis );

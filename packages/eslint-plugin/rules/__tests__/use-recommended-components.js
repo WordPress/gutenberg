@@ -1,17 +1,8 @@
-/* eslint-env jest */
-
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -29,8 +20,28 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
+		"import { Icon } from '@wordpress/ui';",
+		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
-		"import { Badge, Stack } from '@wordpress/ui';",
+		"import { Text } from '@wordpress/ui';",
+		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+
+		// Unlocked private APIs are only checked for denied names.
+		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
+		`
+			import { privateApis } from '@wordpress/components';
+			import { unlock } from '../../lock-unlock';
+
+			function test() {
+				function unlock( value ) {
+					return value;
+				}
+
+				const { Tabs } = unlock( privateApis );
+
+				return Tabs;
+			}
+		`,
 	],
 
 	invalid: [
@@ -73,6 +84,41 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+				},
+			],
+		},
+		{
+			code: "import { Tabs, TabPanel } from '@wordpress/components';",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs } = unlock( privateApis );",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs: WCTabs } = unlock( componentsPrivateApis );",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { Tooltip } from '@wordpress/components';",
+			errors: [
+				{
+					message: 'Use `Tooltip` from `@wordpress/ui` instead.',
 				},
 			],
 		},

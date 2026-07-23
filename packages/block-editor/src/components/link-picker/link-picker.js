@@ -5,9 +5,9 @@ import {
 	BaseControl,
 	Button,
 	Popover,
-	VisuallyHidden,
 	useBaseControlProps,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useState, useId, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

@@ -3,10 +3,6 @@
 @use "@wordpress/base-styles/z-index" as *;
 
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	border: $border-width solid $gray-300;
-	border-radius: $radius-small;
-	// Full width. ToolsPanel lays out children in a grid.
-	grid-column: 1 / -1;
 	position: relative;
 
 	&.is-open {
@@ -82,7 +78,7 @@
 }
 
 .block-editor-global-styles-background-panel__dropdown-toggle {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: transparent;
 	border: none;
 	height: 100%;
@@ -101,12 +97,25 @@
 		transition: opacity 0.1s ease-in-out;
 	}
 
+	&.has-local-override-from-global-styles__reset {
+		position: absolute;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline: 0 $grid-unit;
+		opacity: 1;
+	}
+
 	&.block-editor-global-styles-background-panel__reset {
 		border-radius: $radius-small;
 	}
 
 	.block-editor-global-styles-background-panel__dropdown-toggle:hover + &,
 	&:focus,
+	&:focus-within,
 	&:hover {
 		opacity: 1;
 	}

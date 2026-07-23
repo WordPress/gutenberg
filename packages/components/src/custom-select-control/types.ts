@@ -89,7 +89,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -117,14 +117,8 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
 	 * @ignore
 	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 };

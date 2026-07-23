@@ -47,6 +47,10 @@ Date field for BasePost.
 
 Delete action for Templates, Patterns and Template Parts.
 
+### descriptionField
+
+Description field for templates.
+
 ### discussionField
 
 Discussion field for BasePost with custom render logic.
@@ -79,6 +83,10 @@ Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
 Format field for BasePost.
 
+### lastEditedDateField
+
+Last edited date field for BasePost.
+
 ### MediaEdit
 
 A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
@@ -107,7 +115,7 @@ _Parameters_
 -   _props.data_ `Item`: - The item being edited.
 -   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
 -   _props.onChange_ `Function`: - Callback function when the media selection changes.
--   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Default `['image']`.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
 -   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
 -   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
 -   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
@@ -144,6 +152,14 @@ Password field for BasePost.
 
 Undocumented declaration.
 
+### patternDescriptionField
+
+Description field for patterns.
+
+### patternSyncStatusField
+
+Sync status field for patterns.
+
 ### patternTitleField
 
 Title for the pattern entity.
@@ -160,9 +176,25 @@ Ping status field for BasePost.
 
 Post content information field for BasePost.
 
+### postsPageTitleField
+
+Title field for the posts page (the `page` assigned as `page_for_posts`).
+
+### postsPerPageField
+
+Posts per page field for the `root/site` entity.
+
 ### PostType
 
 Undocumented declaration.
+
+### readOnlyDescriptionField
+
+Read-only description field for theme-provided templates, which can't be edited. Shares the display config with `descriptionField` but renders as read-only and is only visible when a description exists.
+
+_Type_
+
+-   `Field< Template >`
 
 ### renamePost
 
@@ -184,6 +216,10 @@ Restore action for PostWithPermissions.
 
 ScheduledDate Field.
 
+### siteDiscussionField
+
+Discussion field for the `root/site` entity.
+
 ### slugField
 
 Slug field for BasePost.
@@ -192,9 +228,29 @@ Slug field for BasePost.
 
 Status field for BasePost.
 
+### stickyField
+
+Sticky field for BasePost.
+
+### templateAuthorField
+
+Author field for templates.
+
+_Type_
+
+-   `Field< Template >`
+
 ### templateField
 
 Template field for BasePost.
+
+### templatePartAuthorField
+
+Author field for template parts.
+
+_Type_
+
+-   `Field< TemplatePart >`
 
 ### templateTitleField
 

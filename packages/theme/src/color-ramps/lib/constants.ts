@@ -1,16 +1,16 @@
-/**
- * External dependencies
- */
-import { to, OKLCH } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
+import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
 import type { Ramp } from './types';
 
-export const WHITE = to( 'white', OKLCH );
-export const BLACK = to( 'black', OKLCH );
+export const WHITE: PlainColorObject = {
+	space: OKLCH,
+	coords: [ 1, 0, 0 ],
+	alpha: 1,
+};
+export const BLACK: PlainColorObject = {
+	space: OKLCH,
+	coords: [ 0, 0, 0 ],
+	alpha: 1,
+};
 
 // Margin added to target contrasts to counter for algorithm approximations and rounding errors.
 // - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
@@ -79,7 +79,7 @@ export const CONTRAST_COMBINATIONS: {
 
 // Used when generating the DTCG tokens and the static color ramps.
 export const DEFAULT_SEED_COLORS = {
-	bg: '#f8f8f8',
+	background: '#fcfcfc',
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',

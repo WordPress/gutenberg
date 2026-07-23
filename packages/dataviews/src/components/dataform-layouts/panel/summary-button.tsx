@@ -6,10 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, Icon, Tooltip } from '@wordpress/components';
+import { Button, Icon as WCIcon } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { Tooltip } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -33,8 +34,8 @@ export default function SummaryButton< Item >( {
 	validity,
 	touched,
 	disabled,
+	isOpen,
 	onClick,
-	'aria-expanded': ariaExpanded,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -43,8 +44,8 @@ export default function SummaryButton< Item >( {
 	validity?: FieldValidity;
 	touched: boolean;
 	disabled?: boolean;
+	isOpen: boolean;
 	onClick: () => void;
-	'aria-expanded'?: boolean;
 } ) {
 	const { labelPosition, editVisibility } =
 		field.layout as NormalizedPanelLayout;
@@ -80,11 +81,20 @@ export default function SummaryButton< Item >( {
 		  );
 
 	const rowRef = useRef< HTMLDivElement >( null );
+	const editButtonRef = useRef< HTMLButtonElement >( null );
 
-	const handleRowClick = () => {
-		const selection =
-			rowRef.current?.ownerDocument.defaultView?.getSelection();
-		if ( selection && selection.toString().length > 0 ) {
+	const handleRowClick = ( event: React.MouseEvent ) => {
+		// Prevent a drag-to-select from opening the flyout — focus could move
+		// in and lose the selection. Skip the guard for double-clicks (standard
+		// button behavior), an already-open flyout, and the edit button.
+		if (
+			! isOpen &&
+			event.detail < 2 &&
+			! editButtonRef.current?.contains( event.target as Node ) &&
+			rowRef.current?.ownerDocument.defaultView
+				?.getSelection()
+				?.toString()
+		) {
 			return;
 		}
 		onClick();
@@ -111,11 +121,20 @@ export default function SummaryButton< Item >( {
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-label-error-content">
-						<Icon icon={ errorIcon } size={ 16 } />
-					</span>
-				</Tooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<span
+								className="dataforms-layouts-panel__field-label-error-content"
+								role="img"
+								aria-label={ errorMessage }
+							>
+								<WCIcon icon={ errorIcon } size={ 16 } />
+							</span>
+						}
+					/>
+					<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
+				</Tooltip.Root>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -155,12 +174,12 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
+					ref={ editButtonRef }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
-					showTooltip={ false }
 					icon={ pencil }
 					size="small"
-					aria-expanded={ ariaExpanded }
+					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
 					aria-describedby={ `${ controlId }` }
 				/>

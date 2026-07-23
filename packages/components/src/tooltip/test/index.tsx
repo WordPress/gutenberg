@@ -286,7 +286,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'delay', () => {
 		it( 'should respect custom delay prop when showing tooltip', async () => {
-			const ADDITIONAL_DELAY = 100;
+			const ADDITIONAL_DELAY = 500;
 
 			render(
 				<Tooltip
@@ -304,7 +304,8 @@ describe( 'Tooltip', () => {
 			await hover( anchor );
 			expectTooltipToBeHidden();
 
-			// Advance time by default delay
+			// Advance time by default delay, which is still well before the
+			// custom delay even when CI is slow to resolve the hover event.
 			await sleep( TOOLTIP_DELAY );
 
 			// Tooltip hasn't appeared yet

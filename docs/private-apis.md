@@ -96,7 +96,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -122,11 +121,11 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 
@@ -192,6 +191,10 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
@@ -263,7 +266,6 @@ Private exports:
 Private exports:
 - `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
 - `PluginPostExcerpt`
 - `PostCardPanel`
@@ -303,7 +305,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post
