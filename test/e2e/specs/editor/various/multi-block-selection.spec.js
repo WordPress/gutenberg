@@ -1518,6 +1518,29 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 						isFullySelected: sel.__unstableIsFullySelected(),
 					};
 				} );
+			const getNativeSelection = () =>
+				page.frame( { name: 'editor-canvas' } ).evaluate( () => {
+					const selection = document.getSelection();
+					const blockType = ( domNode ) =>
+						domNode &&
+						( domNode.nodeType === domNode.TEXT_NODE
+							? domNode.parentElement
+							: domNode
+						)
+							.closest( '[data-type]' )
+							?.getAttribute( 'data-type' );
+					return {
+						anchorBlock: blockType( selection.anchorNode ),
+						focusBlock: blockType( selection.focusNode ),
+						// The clicked positions vary with rendering, but
+						// any selection between the middle of the verse
+						// and the middle of the paragraph contains the
+						// last verse line whole.
+						includesCrossedText: selection
+							.toString()
+							.includes( 'verse three' ),
+					};
+				} );
 
 			// Down: from the verse into the paragraph. The selection
 			// must extend to the clicked position, like it does within a
@@ -1532,6 +1555,12 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				startKey: 'content',
 				endKey: 'content',
 				isFullySelected: false,
+			} );
+			// The native selection reaches from the click to the click.
+			await expect.poll( getNativeSelection ).toEqual( {
+				anchorBlock: 'core/verse',
+				focusBlock: 'core/paragraph',
+				includesCrossedText: true,
 			} );
 
 			// Deselect: click in the paragraph again.
@@ -1551,6 +1580,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				startKey: 'content',
 				endKey: 'content',
 				isFullySelected: false,
+			} );
+			await expect.poll( getNativeSelection ).toEqual( {
+				anchorBlock: 'core/paragraph',
+				focusBlock: 'core/verse',
+				includesCrossedText: true,
 			} );
 		} );
 
