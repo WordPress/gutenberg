@@ -25,7 +25,7 @@ import { Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { InheritanceResetButton } from './inheritance';
+import { InheritanceOverrideIndicator } from './inheritance';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -202,10 +202,7 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 				</Button>
 				{ hasLocalValue &&
 					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onResetToInherited={ handleReset }
-						/>
+						<InheritanceOverrideIndicator className="block-editor-global-styles__shadow-editor__remove-button" />
 					) : (
 						<Button
 							__next40pxDefaultSize

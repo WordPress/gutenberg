@@ -39,7 +39,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import { InheritanceResetButton } from '../global-styles/inheritance';
+import { InheritanceOverrideIndicator } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -229,18 +229,7 @@ function BackgroundControlsPanel( {
 						/>
 						{ onReset &&
 							( hasLocalOverride ? (
-								<InheritanceResetButton
-									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
+								<InheritanceOverrideIndicator className="block-editor-global-styles-background-panel__reset" />
 							) : (
 								<Button
 									__next40pxDefaultSize
@@ -714,10 +703,10 @@ export default function BackgroundImagePanel( {
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
-	// The blue-dot local-override affordance is part of the inherited-value
-	// treatment. When that treatment is disabled (e.g. in the Global Styles
-	// panel, where the edited value *is* the global style rather than a local
-	// override of it), fall back to the plain reset control.
+	// The override indicator is part of the inherited-value treatment. When that
+	// treatment is disabled (e.g. in the Global Styles panel, where the edited
+	// value *is* the global style rather than a local override of it), fall back
+	// to the plain reset control.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators &&
 		localHasImageValue &&

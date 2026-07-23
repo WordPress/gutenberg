@@ -43,7 +43,7 @@ const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
 /**
  * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
- * renders its linked/unlink toggle button, which the local-override reset dot
+ * renders its linked/unlink toggle button, which the local-override indicator
  * offsets itself against.
  *
  * @param {string[]|undefined} sides            Configurable sides for the control.

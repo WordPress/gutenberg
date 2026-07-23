@@ -8,11 +8,19 @@ import clsx from 'clsx';
  */
 import {
 	Button,
-	Icon as WCIcon,
+	Rect,
+	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { reset as resetIcon } from '@wordpress/icons';
+import { Tooltip } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Accessible name / tooltip for the local-override indicator.
+ *
+ * @type {string}
+ */
+const OVERRIDE_INDICATOR_LABEL = __( 'Overrides inherited styles' );
 
 /**
  * Whether the inspector surfaces inherited Global Styles values.
@@ -25,19 +33,18 @@ export const ENABLE_GLOBAL_STYLES_INHERITANCE = globalThis.IS_GUTENBERG_PLUGIN
 	: false;
 
 /**
- * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
- * so its descendant label picks up the inherited-from-Global-Styles
- * visual treatment.
+ * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>` so it
+ * can mark a local override of an inherited Global Styles value.
  *
- * When `isInherited` is true without a local override, the descendant
- * label text receives the inherited-from-Global-Styles treatment
- * (dotted underline). No dot is shown.
+ * Inheritance is the default, unmarked state: when a control simply inherits
+ * (no local override) it gets no visual treatment at all — the inherited value
+ * shows as an ordinary value via the control's native placeholder.
  *
- * When `hasLocalOverride` is true, a small reset dot is rendered as a
- * sibling of the control exposing a "Reset to inherited value" action.
+ * When `hasLocalOverride` is true, a filled diamond indicator is rendered as a
+ * sibling of the control, hosting an "Overrides inherited styles" tooltip.
  *
- * The two states are mutually exclusive at the source. If both are passed,
- * only the local-override class is returned.
+ * `isInherited` is still accepted (and returned) so panels can keep passing the
+ * resolved at-rest state without changes, but it no longer produces any marker.
  *
  * Returned object shape allows direct spread:
  *
@@ -64,7 +71,6 @@ export function getInheritanceProps(
 ) {
 	const inheritedOnly = !! isInherited && ! hasLocalOverride;
 	const className = clsx( baseClassName, {
-		'is-inherited-from-global-styles': inheritedOnly,
 		'has-local-override-from-global-styles': !! hasLocalOverride,
 	} );
 	return {
@@ -75,82 +81,117 @@ export function getInheritanceProps(
 }
 
 /**
- * Renders the small always-visible reset button shown next to a control
- * that holds a local override of an inherited Global Styles value. Used by
- * `<InheritanceToolsPanelItem>` and the color/gradient controls.
+ * The filled diamond drawn inside the override indicator. Meaning comes from the
+ * shape plus the button's accessible name, not from color.
  *
- * At rest the button shows a blue dot signalling the local override. On
- * hover/focus the dot morphs into the `reset` (dash) icon and the button
- * exposes a "Reset to inherited value" tooltip. Activating it clears the
- * override so the control falls back to its inherited value — the same
- * action the `ToolsPanel` menu performs via `onDeselect`.
- *
- * @param {Object}   props
- * @param {Function} props.onResetToInherited Reset handler.
- * @param {string}   [props.className]        Optional className for the button.
- *
- * @return {Element} The reset button.
+ * @return {Element} The diamond.
  */
-export function InheritanceResetButton( { onResetToInherited, className } ) {
+function Diamond() {
 	return (
-		// Intentionally small (14×14) circular control; exempt from the
-		// 40px default-size enforcement rule.
-		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-		<Button
-			__next40pxDefaultSize={ false }
-			label={ __( 'Reset to inherited value' ) }
-			// The button has children (the dot + reset icon), so the tooltip
-			// is not shown automatically; opt in explicitly.
-			showTooltip
-			className={ clsx(
-				'has-local-override-from-global-styles__reset',
-				className
-			) }
-			onClick={ ( event ) => {
-				// Prevent the click from reaching any wrapping
-				// `<label htmlFor>` association, which would otherwise
-				// focus/activate the inner control.
-				event.preventDefault();
-				event.stopPropagation();
-				onResetToInherited?.();
-			} }
+		<SVG
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
 		>
-			<span
-				aria-hidden="true"
-				className="has-local-override-from-global-styles__dot"
+			<Rect
+				x="7.75736"
+				y="12"
+				width="6"
+				height="6"
+				rx="1"
+				transform="rotate(-45 7.75736 12)"
+				fill="currentColor"
 			/>
-			<WCIcon
-				className="has-local-override-from-global-styles__reset-icon"
-				icon={ resetIcon }
-			/>
-		</Button>
+		</SVG>
 	);
 }
 
 /**
- * A `ToolsPanelItem` that reflects whether its control's value is inherited
- * from Global Styles or locally overridden. The two states are mutually
- * exclusive.
+ * Renders the small filled diamond that marks a control holding a local override
+ * of an inherited Global Styles value. Shared by `<InheritanceToolsPanelItem>`
+ * (the standard controls) and the custom controls (color, shadow, duotone,
+ * background image) that render it in their own slot.
  *
- * - Inherited: the control label receives the inherited-from-Global-Styles
- *   treatment (dotted underline) via the `is-inherited-from-global-styles`
- *   class applied through `getInheritanceProps`. No dot is shown.
- * - Local override: a reset dot is rendered as a plain sibling of the control
- *   at the item's inline-end — never nested in the label — exposing the same
- *   one-click reset the `ToolsPanel` options menu performs via `onDeselect`.
+ * It is a real, enabled `Button` — the trigger the `@wordpress/ui` `Tooltip` is
+ * built for, so the "Overrides inherited styles" explanation is reliably
+ * reachable by hover *and* keyboard focus (a non-focusable element does not
+ * surface it reliably; see
+ * [#80506](https://github.com/WordPress/gutenberg/pull/80506)).
  *
- * Controls that render their own reset control next to a custom toggle (color,
- * background image) pass `showLocalOverrideActionsInLabel={ false }` so the
- * item does not render a second reset dot.
+ * The button does **nothing but host the tooltip**: it carries no reset and no
+ * hover shape-change. Per the review feedback, a control that combines the
+ * tooltip with another action is risky because hover/tap-morph behaviours are
+ * unavailable to touch users; keeping it purely an indicator means tapping it
+ * only opens the tooltip. Resetting is done through the `ToolsPanel` options
+ * menu each control already exposes via `onDeselect`.
+ *
+ * @param {Object} props
+ * @param {string} [props.className] Optional className for slot positioning
+ *                                   (color/shadow/duotone/background controls).
+ *
+ * @return {Element} The override indicator.
+ */
+export function InheritanceOverrideIndicator( { className } ) {
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					// Intentionally small (16×16) control; exempt from the
+					// 40px default-size enforcement rule.
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					<Button
+						__next40pxDefaultSize={ false }
+						aria-label={ OVERRIDE_INDICATOR_LABEL }
+						className={ clsx(
+							'global-styles-inheritance-indicator',
+							className
+						) }
+						onClick={ ( event ) => {
+							// The button exists only to host the tooltip, so a
+							// click does nothing. Prevent it from reaching any
+							// wrapping `<label htmlFor>` association (which would
+							// otherwise focus/activate the control).
+							event.preventDefault();
+							event.stopPropagation();
+						} }
+					>
+						<Diamond />
+					</Button>
+				}
+			/>
+			<Tooltip.Popup>{ OVERRIDE_INDICATOR_LABEL }</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+}
+
+/**
+ * A `ToolsPanelItem` that marks whether its control locally overrides an
+ * inherited Global Styles value.
+ *
+ * - Inherited (the default): no visual treatment — the inherited value shows as
+ *   an ordinary value via the control's native placeholder.
+ * - Local override: a small, **non-interactive** diamond indicator is rendered
+ *   in the label row. It is not a control — it carries no keyboard focus and no
+ *   click action, so it sidesteps the "interactive control in the label row"
+ *   problem (a real 24px target does not fit the 16px label row without
+ *   breaking out). Its meaning reaches assistive tech through an `aria-label`
+ *   and sighted mouse users through a hover tooltip. Resetting the override is
+ *   done through the `ToolsPanel` options menu the item already exposes via
+ *   `onDeselect` — the standard, keyboard-accessible reset path.
+ *
+ * Controls with a bespoke layout (color, background image, shadow, duotone) pass
+ * `showLocalOverrideActionsInLabel={ false }` and render the same
+ * `InheritanceOverrideIndicator` in their own slot instead.
  *
  * @param {Object}                    props
  * @param {?string}                   props.className                         Item className.
- * @param {boolean}                   props.isInherited                       Value is inherited at rest. Accepted so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; the inherited treatment is applied via `className`.
+ * @param {boolean}                   props.isInherited                       Value is inherited at rest. Accepted (and unused) so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; inheritance is the unmarked default and carries no treatment.
  * @param {boolean}                   props.hasLocalOverride                  Local override is set.
  * @param {import('react').ReactNode} props.label                             Control label.
- * @param {?Function}                 props.onDeselect                        Reset handler.
- * @param {boolean}                   [props.showLocalOverrideActionsInLabel] Render the reset dot here (default true).
- * @param {boolean}                   [props.hasInlineEndToggle]              The control renders a 24x24 toggle (linked/unlink, units switch) at its inline-end; offset the reset dot to sit just to its inline-start (default false).
+ * @param {?Function}                 props.onDeselect                        Reset handler wired to the `ToolsPanel` options menu.
+ * @param {boolean}                   [props.showLocalOverrideActionsInLabel] Render the override indicator here (default true).
+ * @param {boolean}                   [props.hasInlineEndToggle]              The control renders a 24x24 toggle (linked/unlink, units switch) at its inline-end; offset the indicator to sit just to its inline-start (default false).
  * @param {import('react').ReactNode} props.children                          The control.
  *
  * @return {Element} The panel item.
@@ -158,9 +199,8 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
 export function InheritanceToolsPanelItem( {
 	className,
 	// Destructured (and unused) so the `getInheritanceProps` spread does not
-	// leak `isInherited` onto the underlying `ToolsPanelItem`. The inherited
-	// treatment is applied purely via `className`
-	// (`is-inherited-from-global-styles`).
+	// leak `isInherited` onto the underlying `ToolsPanelItem`. Inheritance is
+	// the unmarked default state, so this carries no visual treatment.
 	isInherited,
 	hasLocalOverride,
 	label,
@@ -170,8 +210,7 @@ export function InheritanceToolsPanelItem( {
 	children,
 	...rest
 } ) {
-	const showResetAffordance =
-		hasLocalOverride && showLocalOverrideActionsInLabel;
+	const showIndicator = hasLocalOverride && showLocalOverrideActionsInLabel;
 
 	return (
 		<ToolsPanelItem
@@ -181,14 +220,14 @@ export function InheritanceToolsPanelItem( {
 			{ ...rest }
 		>
 			{ children }
-			{ showResetAffordance && (
+			{ showIndicator && (
 				<div
 					className={ clsx( 'global-styles-inheritance-affordance', {
 						'global-styles-inheritance-affordance--offset-toggle':
 							hasInlineEndToggle,
 					} ) }
 				>
-					<InheritanceResetButton onResetToInherited={ onDeselect } />
+					<InheritanceOverrideIndicator />
 				</div>
 			) }
 		</ToolsPanelItem>

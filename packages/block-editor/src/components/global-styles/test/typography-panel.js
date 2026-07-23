@@ -644,10 +644,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 
 		// Both zero values are local overrides, so each control surfaces the
-		// accessible reset-to-inherited affordance.
+		// non-interactive override indicator.
 		expect(
 			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
+				name: /overrides inherited styles/i,
 			} )
 		).toHaveLength( 2 );
 	} );
@@ -970,10 +970,13 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		);
 	} );
 
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', () => {
+	it( 'folds the single-column layout class together with the local-override treatment when indicators are on', () => {
+		// Inheritance is the unmarked default, so an inherited-only control gets
+		// no inheritance class. A local override is the state that still emits a
+		// class, so it is what the layout class must fold with without clobbering.
 		renderPanel( {
 			showInheritanceLabelIndicators: true,
-			value: {},
+			value: { typography: { lineHeight: '2', letterSpacing: '2px' } },
 			inheritedValue,
 		} );
 
@@ -982,11 +985,11 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
 		expect( lineHeightItem ).toHaveClass(
-			'is-inherited-from-global-styles'
+			'has-local-override-from-global-styles'
 		);
 		expect( letterSpacingItem ).toHaveClass( 'single-column' );
 		expect( letterSpacingItem ).toHaveClass(
-			'is-inherited-from-global-styles'
+			'has-local-override-from-global-styles'
 		);
 	} );
 } );

@@ -131,12 +131,12 @@ function renderPanel( props ) {
 	);
 }
 
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
+// A local override surfaces the override indicator button, so assert on that
+// rather than the label's CSS class hook.
 function expectLocalOverride() {
 	expect(
 		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
+			name: /overrides inherited styles/i,
 		} )
 	).toBeInTheDocument();
 }
@@ -510,9 +510,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			} );
 			expect( aspectSelect ).toHaveValue( '1' );
 			// A local override now gets the same local-override flag as
-			// every other control, so the inline reset button can attach.
-			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
+			// every other control, so the override indicator attaches. The
+			// indicator itself is covered by the InheritanceOverrideIndicator
+			// unit tests.
 			expectLocalOverride();
 		} );
 

@@ -28,7 +28,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
+	InheritanceOverrideIndicator,
 	InheritanceToolsPanelItem,
 } from './inheritance';
 
@@ -262,16 +262,7 @@ export default function ColorGradientDropdownItem( {
 							</Button>
 							{ hasValue() &&
 								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
+									<InheritanceOverrideIndicator className="block-editor-panel-color-gradient-settings__reset" />
 								) : (
 									<Button
 										__next40pxDefaultSize

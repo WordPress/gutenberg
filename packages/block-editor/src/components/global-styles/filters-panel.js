@@ -33,7 +33,7 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
+	InheritanceOverrideIndicator,
 	ENABLE_GLOBAL_STYLES_INHERITANCE,
 } from './inheritance';
 
@@ -162,10 +162,7 @@ const renderToggle = ( duotone, resetConfig ) =>
 				</Button>
 				{ hasLocalValue &&
 					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
+						<InheritanceOverrideIndicator className="block-editor-panel-duotone-settings__reset" />
 					) : (
 						<Button
 							size="small"
@@ -241,7 +238,7 @@ export default function FiltersPanel( {
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
-	// Only a local value shadowing an inherited one shows the blue-dot reset.
+	// Only a local value shadowing an inherited one shows the override indicator.
 	const hasDuotoneLocalOverride =
 		showInheritanceLabelIndicators &&
 		hasDuotone() &&
@@ -275,8 +272,8 @@ export default function FiltersPanel( {
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
-					// Toggle renders its own reset dot, so the item must not
-					// add a second.
+					// Toggle renders its own override indicator, so the item
+					// must not add a second.
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
