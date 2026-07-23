@@ -19,7 +19,8 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = $block->context['openInNewTab'] ?? false;
 
-	$text = ! empty( $attributes['label'] ) ? trim( $attributes['label'] ) : '';
+	$label_attr = $attributes['label'] ?? null;
+	$text       = is_string( $label_attr ) && '' !== $label_attr ? trim( $label_attr ) : '';
 
 	$service     = $attributes['service'] ?? 'Icon';
 	$url         = $attributes['url'] ?? false;
