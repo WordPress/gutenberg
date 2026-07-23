@@ -160,10 +160,10 @@ export default function useInput() {
 			) {
 				setContentEditableWrapper( node, false );
 				event.preventDefault();
-				if ( __unstableIsFullySelected() ) {
-					removeBlocks( getSelectedBlockClientIds() );
-				} else if ( __unstableIsSelectionMergeable() ) {
+				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
+				} else if ( __unstableIsFullySelected() ) {
+					removeBlocks( getSelectedBlockClientIds() );
 				} else {
 					__unstableExpandSelection();
 				}

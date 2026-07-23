@@ -1088,7 +1088,42 @@ export function __unstableSelectionHasUnmergeableBlock( state ) {
 }
 
 /**
+ * Compare two block client IDs in document order.
+ *
+ * Returns `true` when `a` appears before `b`, `false` when after, or `null`
+ * when the order can't be determined (unrelated subtrees).
+ *
+ * @param {Object} state Editor state.
+ * @param {string} a     A client ID.
+ * @param {string} b     Another client ID.
+ * @return {?boolean} Whether `a` is before `b`, or null if undeterminable.
+ */
+function isClientIdBefore( state, a, b ) {
+	if ( a === b ) {
+		return false;
+	}
+	const aParent = getBlockRootClientId( state, a );
+	const bParent = getBlockRootClientId( state, b );
+	if ( aParent === bParent ) {
+		const order = getBlockOrder( state, aParent );
+		return order.indexOf( a ) < order.indexOf( b );
+	}
+	// Ancestor comes first in document order.
+	if ( getBlockParents( state, b ).includes( a ) ) {
+		return true;
+	}
+	if ( getBlockParents( state, a ).includes( b ) ) {
+		return false;
+	}
+	return null;
+}
+
+/**
  * Check whether the selection is mergeable.
+ *
+ * Supports sibling partial selections and ancestor/descendant partial
+ * selections (cross-nesting).
+ * opens the delete/merge path when rich-text endpoints exist.
  *
  * @param {Object}  state     Editor state.
  * @param {boolean} isForward Whether to merge forwards.
@@ -1114,40 +1149,31 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		return false;
 	}
 
-	const anchorRootClientId = getBlockRootClientId(
+	const anchorBeforeFocus = isClientIdBefore(
 		state,
-		selectionAnchor.clientId
-	);
-	const focusRootClientId = getBlockRootClientId(
-		state,
+		selectionAnchor.clientId,
 		selectionFocus.clientId
 	);
-
-	// It's not mergeable if the selection doesn't start and end in the same
-	// block list. Maybe in the future it should be allowed.
-	if ( anchorRootClientId !== focusRootClientId ) {
+	if ( anchorBeforeFocus === null ) {
 		return false;
 	}
 
-	const blockOrder = getBlockOrder( state, anchorRootClientId );
-	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+	const selectionStart = anchorBeforeFocus
+		? selectionAnchor
+		: selectionFocus;
+	const selectionEnd = anchorBeforeFocus ? selectionFocus : selectionAnchor;
 
-	// Reassign selection start and end based on order.
-	let selectionStart, selectionEnd;
+	// Nested (ancestor/descendant) merges always land in the ancestor,
+	// matching document order — same as a backward merge of the endpoints.
+	const sameParent =
+		getBlockRootClientId( state, selectionStart.clientId ) ===
+		getBlockRootClientId( state, selectionEnd.clientId );
+	const isForwardMerge = isForward && sameParent;
 
-	if ( anchorIndex > focusIndex ) {
-		selectionStart = selectionFocus;
-		selectionEnd = selectionAnchor;
-	} else {
-		selectionStart = selectionAnchor;
-		selectionEnd = selectionFocus;
-	}
-
-	const targetBlockClientId = isForward
+	const targetBlockClientId = isForwardMerge
 		? selectionEnd.clientId
 		: selectionStart.clientId;
-	const blockToMergeClientId = isForward
+	const blockToMergeClientId = isForwardMerge
 		? selectionStart.clientId
 		: selectionEnd.clientId;
 
