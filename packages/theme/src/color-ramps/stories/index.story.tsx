@@ -173,40 +173,45 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 				background: '#1e1e1e',
 				primary: '#3858e9',
 			},
-			// WP Classic
+			// WP Fresh
 			{
-				background: '#1d2327',
-				primary: '#2271b1',
+				background: '#25292b',
+				primary: '#3858e9',
 			},
 			// WP Light
 			{
-				background: '#e5e5e5',
-				primary: '#d64e07',
+				background: '#eaeeed',
+				primary: '#007cba',
 			},
 			// WP Blue
 			{
-				background: '#096484',
-				primary: '#52accc',
+				background: '#3876a8',
+				primary: '#437aa8',
 			},
 			// WP Coffee
 			{
-				background: '#46403c',
-				primary: '#c7a589',
+				background: '#5b534d',
+				primary: '#916745',
 			},
 			// WP Ectoplasm
 			{
-				background: '#413256',
-				primary: '#a3b745',
+				background: '#4f386e',
+				primary: '#646c3e',
 			},
 			// WP Ocean
 			{
-				background: '#627c83',
-				primary: '#9ebaa0',
+				background: '#5f787f',
+				primary: '#567958',
+			},
+			// WP Midnight
+			{
+				background: '#3d4042',
+				primary: '#cf4339',
 			},
 			// Sunrise
 			{
-				background: '#b43c38',
-				primary: '#dd823b',
+				background: '#cc4541',
+				primary: '#ad631e',
 			},
 		];
 
