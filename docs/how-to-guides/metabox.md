@@ -199,6 +199,30 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 
 WordPress won't show the meta box but a message saying that it isn't compatible with the block editor, including a link to the Classic Editor plugin. By default, `__block_editor_compatible_meta_box` is `true`.
 
+Real-time collaboration is disabled when the editor contains a legacy meta box
+that has not been marked as compatible. This protects against data loss because
+the meta box may edit state that is not synchronized between collaborators.
+After verifying that a meta box does not edit unsynchronized state, plugin
+authors can opt it in through the callback arguments:
+
+```php
+add_meta_box(
+	'my-meta-box',
+	'My Meta Box',
+	'my_meta_box_callback',
+	null,
+	'normal',
+	'high',
+	array(
+		'__rtc_compatible_meta_box' => true,
+	)
+);
+```
+
+Site owners can apply the same flag to a third-party meta box with the
+`filter_block_editor_meta_boxes` filter, but should do so only after checking
+the meta box's behavior.
+
 After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
 ```php
