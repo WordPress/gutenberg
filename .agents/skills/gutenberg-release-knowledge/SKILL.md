@@ -53,6 +53,7 @@ Use titles, changed paths, labels, authors, and diffs to shortlist candidates be
 For every shortlisted PR, read:
 
 - the description and linked design context;
+- any issue explicitly linked from the PR after the PR remains a documentation candidate, including its relevant discussion and resolution;
 - issue comments and review summaries;
 - inline review threads, including resolved threads;
 - changed files and the final merged implementation;
@@ -87,6 +88,7 @@ Before proposing text:
 
 - Update user or contributor documentation for behavior, migration, compatibility, and supported API guidance.
 - Update `AGENTS.md` only for a durable engineering constraint that future feature or bug-fix work should consistently apply.
+- Put a package-specific durable constraint in the affected package's nearest `AGENTS.md`. If that package has no instruction file and the evidence requires package-scoped guidance, create `packages/<package>/AGENTS.md` with only the focused guidance instead of promoting it to the repository root.
 - Update `.github/copilot-instructions.md` only when the same durable constraint is useful to repository-wide coding assistance.
 - Do not add instruction-file text for a release status, a single implementation choice, unresolved design preference, or guidance already expressed adequately in canonical docs.
 - Do not force an instruction-file change to make the result appear more substantial.
