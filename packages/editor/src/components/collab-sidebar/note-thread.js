@@ -63,16 +63,9 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
-	const blurDeselectTimeoutRef = useRef();
 	const markViewedTimeoutRef = useRef();
 
-	useEffect(
-		() => () => {
-			clearTimeout( blurDeselectTimeoutRef.current );
-			clearTimeout( markViewedTimeoutRef.current );
-		},
-		[]
-	);
+	useEffect( () => () => clearTimeout( markViewedTimeoutRef.current ), [] );
 
 	const allReplies = note?.reply || [];
 	const lastReply =
