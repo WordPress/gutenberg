@@ -25,6 +25,8 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
+		viewportOverrides,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
@@ -38,6 +40,14 @@ export default {
 				blockGapValue = getGapCSSValue( blockGapStyleValue?.top );
 			} else if ( typeof blockGapStyleValue === 'string' ) {
 				blockGapValue = getGapCSSValue( blockGapStyleValue );
+			}
+
+			if (
+				! blockGapValue &&
+				globalBlockGapValue &&
+				viewportOverrides === undefined
+			) {
+				blockGapValue = getGapCSSValue( globalBlockGapValue );
 			}
 		}
 

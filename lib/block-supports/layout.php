@@ -479,6 +479,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	$rules_group             = $options['rules_group'] ?? null;
 	$has_block_gap_override  = ! empty( $options['has_block_gap_override'] );
 	$should_output_block_gap = null === $viewport_overrides || $has_block_gap_override;
+
+	$should_apply_fallback_gap = ! empty( $options['apply_fallback_gap'] ) && null === $viewport_overrides;
+	$resolved_fallback_gap     = is_array( $fallback_gap_value )
+		? ( $fallback_gap_value['top'] ?? reset( $fallback_gap_value ) )
+		: $fallback_gap_value;
 	// Viewport styles only store changed fields. If a field is present with null,
 	// the user cleared a value inherited from the default viewport, so check
 	// whether the key exists rather than whether the value is truthy.
@@ -491,6 +496,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $has_block_gap_support && $should_output_block_gap ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = $gap_value['top'] ?? null;
+			}
+			if ( null === $gap_value && $should_apply_fallback_gap ) {
+				$gap_value = $resolved_fallback_gap;
 			}
 			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				// Get spacing CSS variable from preset value if provided.
@@ -643,6 +651,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $has_block_gap_support && $should_output_block_gap ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = $gap_value['top'] ?? null;
+			}
+			if ( null === $gap_value && $should_apply_fallback_gap ) {
+				$gap_value = $resolved_fallback_gap;
 			}
 			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				// Get spacing CSS variable from preset value if provided.
@@ -928,6 +939,30 @@ function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 }
 
 /**
+ * Returns the list of container blocks whose inner block gap should follow the
+ * site-wide block spacing (Global Styles > Layout > Block spacing) instead of a
+ * theme-defined per-block blockGap value.
+ *
+ * These blocks wrap arbitrary inner content and users expect the spacing between
+ * that content to match the rest of the site. See
+ * https://github.com/WordPress/gutenberg/issues/49777.
+ *
+ * @return string[] Array of block names.
+ */
+function gutenberg_blocks_using_site_block_gap() {
+	/**
+	 * Filters the list of blocks whose inner block gap follows the site-wide
+	 * block spacing rather than a theme-defined per-block blockGap value.
+	 *
+	 * @param string[] $block_names Array of block names.
+	 */
+	return apply_filters(
+		'gutenberg_blocks_using_site_block_gap',
+		array( 'core/quote', 'core/details' )
+	);
+}
+
+/**
  * Generates a unique ID based on the structure and values of a given array.
  *
  * This function serializes the array into a JSON string and generates a hash
@@ -1171,7 +1206,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			}
 		}
 
-		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+		$blocks_using_site_block_gap = gutenberg_blocks_using_site_block_gap();
+		if ( in_array( $block_name, $blocks_using_site_block_gap, true ) ) {
+			$global_block_gap_value = $global_styles['spacing']['blockGap'] ?? null;
+		} else {
+			$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+		}
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
@@ -1227,7 +1267,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$gap_value,
 			$should_skip_gap_serialization,
 			$fallback_gap_value,
-			$block_spacing
+			$block_spacing,
+			array( 'apply_fallback_gap' => null !== $global_block_gap_value )
 		);
 
 		// Only add container class and enqueue block support styles if unique styles were generated.

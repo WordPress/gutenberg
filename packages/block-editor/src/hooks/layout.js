@@ -49,6 +49,8 @@ import {
 
 const VARIATION_PREFIX = 'is-style-';
 
+const BLOCKS_USING_SITE_BLOCK_GAP = [ 'core/quote', 'core/details' ];
+
 const layoutBlockSupportKey = 'layout';
 const CHILD_LAYOUT_KEYS = [
 	'selfStretch',
@@ -771,9 +773,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 					}
 
 					const globalBlockGapValue =
-						variationBlockGapValue ??
-						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
-						globalStyles?.spacing?.blockGap;
+						BLOCKS_USING_SITE_BLOCK_GAP.includes( name )
+							? globalStyles?.spacing?.blockGap
+							: variationBlockGapValue ??
+							  globalStyles?.blocks?.[ name ]?.spacing
+									?.blockGap ??
+							  globalStyles?.spacing?.blockGap;
 
 					return {
 						blockGapSupport,
