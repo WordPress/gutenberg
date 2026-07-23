@@ -89,16 +89,9 @@ When you set script translations for a handle WordPress will automatically figur
 
 ### Script modules
 
-Since WordPress 7.0, translations are detected automatically for enqueued script
-modules and their dependencies. Use
-[`wp_set_script_module_translations()`](https://developer.wordpress.org/reference/functions/wp_set_script_module_translations/)
-only when you need to override the default text domain or translation path.
+Since WordPress 7.0, translations are detected automatically for enqueued script modules and their dependencies. Use [`wp_set_script_module_translations()`](https://developer.wordpress.org/reference/functions/wp_set_script_module_translations/) only when you need to override the default text domain or translation path.
 
-The Gutenberg plugin provides automatic detection on earlier supported
-WordPress versions, but it does not polyfill the override function. Script
-module translations also still use the classic `wp-i18n` runtime. Translation
-data for dynamically imported modules may therefore be loaded before those
-modules are needed.
+The Gutenberg plugin provides automatic detection on earlier supported WordPress versions, but it does not polyfill the override function. Script module translations also still use the classic `wp-i18n` runtime. Translation data for dynamically imported modules may therefore be loaded before those modules are needed.
 
 ## Provide your own translations
 
