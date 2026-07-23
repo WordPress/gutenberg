@@ -40,10 +40,12 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 * Registers a new icon.
 	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
-	 *                          (e.g. "my-plugin/arrow-left"). The "core" collection is
-	 *                          reserved for WordPress core icons; third-party code should
-	 *                          register icons under its own collection rather than the
-	 *                          "core" collection.
+	 *                          (e.g. "my-plugin/arrow-left"). The unqualified name must
+	 *                          start and end with a lowercase letter or digit and contain
+	 *                          only lowercase letters, digits, hyphens, and underscores.
+	 *                          The "core" collection is reserved for WordPress core icons;
+	 *                          third-party code should register icons under its own
+	 *                          collection rather than the "core" collection.
 	 * @param array  $args {
 	 *     List of properties for the icon.
 	 *
@@ -65,7 +67,9 @@ if ( ! function_exists( 'wp_unregister_icon' ) ) {
 	 * Unregisters an icon.
 	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
-	 *                          (e.g. "core/arrow-left").
+	 *                          (e.g. "core/arrow-left"). The unqualified name must
+	 *                          start and end with a lowercase letter or digit and contain
+	 *                          only lowercase letters, digits, hyphens, and underscores.
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
 	function wp_unregister_icon( $icon_name ) {
