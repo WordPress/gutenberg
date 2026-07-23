@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useResolvedStyle } from '../inherited-value-context';
+import { BlockContextProvider } from '../../block-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';
 
@@ -46,9 +47,10 @@ jest.mock( '../../../store', () => ( {
 } ) );
 
 // `inherited-value-context.js` imports `store as blocksStore` from
-// `@wordpress/blocks` for `useOwnVariation`. The blocks store's transitive
-// import chain fails under this file's `@wordpress/data` mock (missing
-// `createSelector`), so stub the blocks module with just the shape needed.
+// `@wordpress/blocks` for `useVariationAndElements`. The blocks store's
+// transitive import chain fails under this file's `@wordpress/data` mock
+// (missing `createSelector`), so stub the blocks module with just the shape
+// needed.
 jest.mock( '@wordpress/blocks', () => ( {
 	store: { name: 'core/blocks' },
 	getBlockType: ( blockName ) =>
@@ -83,7 +85,10 @@ describe( 'useResolvedStyle hook', () => {
 	// The hook issues two `useSelect` reads: the merged Global Styles
 	// payload (block-editor store) and the block's registered styles
 	// (blocks store). Feed both from one stub.
-	function mockStores( rawGlobalStyles, blockStyles = [] ) {
+	function mockStores(
+		rawGlobalStyles,
+		{ blockStyles = [], attributes = {} } = {}
+	) {
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				// `globalStylesDataKey` holds the BARE merged styles tree
@@ -96,9 +101,106 @@ describe( 'useResolvedStyle hook', () => {
 					[ globalStylesDataKey ]: rawGlobalStyles,
 				} ),
 				getBlockStyles: () => blockStyles,
+				// The hook reads the block's `level` attribute to pick the
+				// heading element layers. No block edit context is provided
+				// here, so `clientId` is undefined; the stub returns whatever
+				// attributes the test supplies regardless.
+				getBlockAttributes: () => attributes,
 			} ) )
 		);
 	}
+
+	// Resolves a block's styles as rendered inside an Accordion, which supplies
+	// the heading level to every descendant through block context.
+	function resolveInAccordion( blockName, level = 3 ) {
+		render(
+			<BlockContextProvider
+				value={ { 'core/accordion-heading-level': level } }
+			>
+				<Probe blockName={ blockName } />
+			</BlockContextProvider>
+		);
+		return JSON.parse( screen.getByTestId( 'probe' ).textContent );
+	}
+
+	// Accordion Heading resolves its level from the parent Accordion's block
+	// context, not from its own `level` attribute, and has no level-0 state.
+	test( 'accordion-heading takes its level from block context', () => {
+		mockStores( {
+			elements: {
+				heading: { color: { text: '#111111' } },
+				h3: { typography: { fontSize: '19px' } },
+			},
+		} );
+		const parsed = resolveInAccordion( 'core/accordion-heading' );
+		expect( parsed.value.typography.fontSize ).toBe( '19px' );
+		expect( parsed.value.color.text ).toBe( '#111111' );
+	} );
+
+	test( 'accordion-heading with no context still resolves to h3', () => {
+		mockStores( {
+			elements: { h3: { typography: { fontSize: '19px' } } },
+		} );
+		render( <Probe blockName="core/accordion-heading" /> );
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.typography.fontSize ).toBe( '19px' );
+	} );
+
+	test( "accordion-heading's own level attribute wins over block context", () => {
+		mockStores(
+			{
+				elements: {
+					h3: { typography: { fontSize: '19px' } },
+					h5: { typography: { fontSize: '13px' } },
+				},
+			},
+			{ attributes: { level: 5 } }
+		);
+		const parsed = resolveInAccordion( 'core/accordion-heading' );
+		// The attribute is what the front end serializes (`save.js` renders
+		// `h${ level || 3 }`), so it takes precedence when the two disagree.
+		expect( parsed.value.typography.fontSize ).toBe( '13px' );
+	} );
+
+	// An ordinary Heading can be placed inside an Accordion Panel, which puts
+	// `core/accordion-heading-level` in its block context. Only the blocks that
+	// opt in may read that key.
+	test( 'a plain heading ignores an accordion level in block context', () => {
+		mockStores(
+			{
+				elements: {
+					h2: { typography: { fontSize: '24px' } },
+					h3: { typography: { fontSize: '19px' } },
+				},
+			},
+			{ attributes: { level: 2 } }
+		);
+		const parsed = resolveInAccordion( 'core/heading' );
+		expect( parsed.value.typography.fontSize ).toBe( '24px' );
+	} );
+
+	// A title block at level 0 renders a paragraph, so no heading element styles
+	// reach it. `0` is the one falsy level, and an `||` anywhere on the path
+	// from the `level` attribute to `getElementLayers` would silently turn it
+	// into "no level given" and wrongly fold the generic `heading` layer.
+	test( 'a title block at level 0 folds no heading element styles', () => {
+		mockStores(
+			{
+				typography: { lineHeight: '1.6' },
+				elements: {
+					heading: { typography: { fontSize: '30px' } },
+					h2: { typography: { fontSize: '24px' } },
+				},
+			},
+			{ attributes: { level: 0 } }
+		);
+		render( <Probe blockName="core/site-title" /> );
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.typography.fontSize ).toBeUndefined();
+		// Root styles still resolve, so the assertion above means "no heading
+		// layer", not "nothing resolved at all".
+		expect( parsed.value.typography.lineHeight ).toBe( '1.6' );
+	} );
 
 	test( 'returns empty value and sources when no block name is given', () => {
 		mockStores( { typography: { fontSize: '16px' } } );
@@ -226,6 +328,7 @@ describe( 'useResolvedStyle – production bare-tree shape', () => {
 					[ globalStylesDataKey ]: rawGlobalStyles,
 				} ),
 				getBlockStyles: () => [],
+				getBlockAttributes: () => ( {} ),
 			} ) )
 		);
 		return render( ui );

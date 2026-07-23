@@ -7,6 +7,8 @@
  * @covers ::gutenberg_translate_widget_metadata
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
+ * @covers ::gutenberg_sanitize_widget_actions
+ * @covers ::gutenberg_resolve_widget_action_href
  */
 class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
@@ -69,7 +71,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 	/**
 	 * The help content keeps minimal emphasis, everything else is stripped,
-	 * and malformed links are dropped.
+	 * and links are dropped when malformed or when their href does not
+	 * survive esc_url_raw().
 	 */
 	public function test_sanitize_widget_help_constrains_markup_and_links() {
 		$help = gutenberg_sanitize_widget_help(
@@ -81,6 +84,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 						'href'  => 'site-health.php',
 					),
 					array( 'label' => 'Missing href' ),
+					array(
+						'label' => 'Unsafe protocol',
+						'href'  => 'javascript:alert(1)',
+					),
 				),
 			)
 		);
@@ -103,6 +110,222 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	public function test_sanitize_widget_help_requires_content() {
 		$this->assertNull( gutenberg_sanitize_widget_help( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_help( array( 'links' => array() ) ) );
+	}
+
+	/**
+	 * Drops unsafe or malformed actions; sanitizes download filenames.
+	 */
+	public function test_sanitize_widget_actions_constrains_hrefs() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'           => 'view',
+					'label'        => 'View details',
+					'href'         => 'https://wordpress.org/',
+					'openInNewTab' => true,
+				),
+				array(
+					'id'       => 'export',
+					'label'    => 'Export CSV',
+					'href'     => 'admin.php?page=reports',
+					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'admin-fragment',
+					'label' => 'Admin with fragment',
+					'href'  => 'options-general.php#timezone',
+				),
+				array(
+					'id'    => 'nested-admin',
+					'label' => 'Nested admin path',
+					'href'  => 'network/settings.php',
+				),
+				array(
+					'id'    => 'dots-in-path',
+					'label' => 'Dots in absolute path',
+					'href'  => 'https://example.com/a..b/',
+				),
+				array(
+					'id'    => 'scheme-relative',
+					'label' => 'Scheme relative',
+					'href'  => '//example.com/x',
+				),
+				array(
+					'id'    => 'root-relative',
+					'label' => 'Root relative',
+					'href'  => '/report.csv',
+				),
+				array(
+					'id'    => 'unsafe',
+					'label' => 'Unsafe protocol',
+					'href'  => 'javascript:alert(1)',
+				),
+				array(
+					'id'    => 'obfuscated',
+					'label' => 'Obfuscated protocol',
+					'href'  => "jAvAsCrIpT:\talert(1)",
+				),
+				array(
+					'id'       => 'data-url',
+					'label'    => 'Data URL',
+					'href'     => 'data:text/csv;charset=utf-8,metric,value',
+					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'missing-href',
+					'label' => 'Missing href',
+				),
+				array(
+					'id'    => 'non-string-href',
+					'label' => 'Non-string href',
+					'href'  => array( 'https://example.com/' ),
+				),
+				array(
+					'id'       => 'nasty-filename',
+					'label'    => 'Nasty filename',
+					'href'     => 'https://wordpress.org/',
+					'download' => '../evil.csv',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'           => 'view',
+					'label'        => 'View details',
+					'href'         => 'https://wordpress.org/',
+					'openInNewTab' => true,
+				),
+				array(
+					'id'       => 'export',
+					'label'    => 'Export CSV',
+					'href'     => 'admin.php?page=reports',
+					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'admin-fragment',
+					'label' => 'Admin with fragment',
+					'href'  => 'options-general.php#timezone',
+				),
+				array(
+					'id'    => 'dots-in-path',
+					'label' => 'Dots in absolute path',
+					'href'  => 'https://example.com/a..b/',
+				),
+				array(
+					'id'    => 'scheme-relative',
+					'label' => 'Scheme relative',
+					'href'  => '//example.com/x',
+				),
+				array(
+					'id'    => 'root-relative',
+					'label' => 'Root relative',
+					'href'  => '/report.csv',
+				),
+				array(
+					'id'       => 'nasty-filename',
+					'label'    => 'Nasty filename',
+					'href'     => 'https://wordpress.org/',
+					'download' => 'evil.csv',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
+	 * Resolves widget-local files; leaves admin-relative hrefs alone.
+	 */
+	public function test_sanitize_widget_actions_resolves_local_assets() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'       => 'download-lyrics',
+					'label'    => 'Download lyrics',
+					'href'     => 'hello-dolly-lyrics.txt',
+					'download' => 'hello-dolly-lyrics.txt',
+				),
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+				array(
+					'id'    => 'traversal',
+					'label' => 'Traversal',
+					'href'  => '../load.php',
+				),
+			),
+			'hello-dolly'
+		);
+
+		$this->assertCount( 2, $actions );
+		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
+		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
+		$this->assertMatchesRegularExpression(
+			'#/widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
+			$actions[0]['href']
+		);
+		$this->assertSame(
+			array(
+				'id'    => 'health',
+				'label' => 'Site Health',
+				'href'  => 'site-health.php',
+			),
+			$actions[1]
+		);
+	}
+
+	/**
+	 * Missing relative non-admin files are dropped (not rewritten to http://…).
+	 */
+	public function test_sanitize_widget_actions_drops_missing_local_assets() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'    => 'missing',
+					'label' => 'Missing file',
+					'href'  => 'no-such-file.txt',
+				),
+				array(
+					'id'    => 'nested-admin',
+					'label' => 'Nested admin path',
+					'href'  => 'network/settings.php',
+				),
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+			),
+			'hello-dolly'
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
+	 * An empty or non-array actions list normalizes to null.
+	 */
+	public function test_sanitize_widget_actions_requires_entries() {
+		$this->assertNull( gutenberg_sanitize_widget_actions( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_actions( array() ) );
 	}
 
 	/**

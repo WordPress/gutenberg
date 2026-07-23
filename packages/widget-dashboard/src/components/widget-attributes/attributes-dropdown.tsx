@@ -19,19 +19,19 @@ import {
 /**
  * Internal dependencies
  */
-import styles from './widget-attribute-controls.module.css';
-import type { WidgetAttributes } from '../../types';
+import styles from './widget-attributes.module.css';
+import type { WidgetAttributeValues } from '../../types';
 
-export interface AttributeControlsDropdownProps {
+export interface AttributesDropdownProps {
 	/**
 	 * The high-relevance fields the inline surface would have shown.
 	 */
-	fields: Field< WidgetAttributes >[];
+	fields: Field< WidgetAttributeValues >[];
 
 	/**
 	 * Current attribute values.
 	 */
-	data: WidgetAttributes;
+	data: WidgetAttributeValues;
 
 	/**
 	 * Stages an attribute edit, exactly like the inline controls do.
@@ -51,14 +51,14 @@ export interface AttributeControlsDropdownProps {
  * popover holds the high-relevance fields as a form. The settings trigger
  * is not part of the collapse; it stays in the toolbar.
  *
- * @param {AttributeControlsDropdownProps} props Component props.
+ * @param {AttributesDropdownProps} props Component props.
  */
-export function AttributeControlsDropdown( {
+export function AttributesDropdown( {
 	fields,
 	data,
 	onChange,
 	onOpenChange,
-}: AttributeControlsDropdownProps ): React.ReactNode {
+}: AttributesDropdownProps ): React.ReactNode {
 	const form = useMemo< Form >(
 		() => ( {
 			layout: { type: 'regular', labelPosition: 'top' },
@@ -90,7 +90,7 @@ export function AttributeControlsDropdown( {
 						{ __( 'Widget controls' ) }
 					</VisuallyHidden>
 
-					<DataForm< WidgetAttributes >
+					<DataForm< WidgetAttributeValues >
 						data={ data }
 						fields={ fields }
 						form={ form }
