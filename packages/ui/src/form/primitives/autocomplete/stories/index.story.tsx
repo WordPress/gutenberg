@@ -535,8 +535,8 @@ function chunkItems< T >( items: T[], size: number ): T[][] {
 }
 
 /**
- * `Autocomplete.Row` groups multiple `Autocomplete.Item` cells in grid mode.
- * This example arranges emoji suggestions in a searchable grid.
+ * `Autocomplete.Row` groups multiple `Autocomplete.Item` cells into grid rows.
+ * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
  */
 export const Grid: Story = {
 	args: {
