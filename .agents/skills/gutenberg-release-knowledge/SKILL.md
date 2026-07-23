@@ -98,7 +98,9 @@ Before proposing text:
 
 Keep the change small and reviewable. Prefer one coherent topic over a release-wide grab bag.
 
-Match the destination file's existing source formatting. In Markdown files that keep prose paragraphs or list items on one source line, do the same for added text; do not hard-wrap prose at an arbitrary column. Never reflow unchanged prose solely to satisfy a preferred line length, and inspect the final diff for avoidable mid-sentence line breaks.
+Before editing handbook documentation or a package README, read [the documentation contribution guide](/docs/contributors/documentation/README.md) and follow its Markdown, heading, link, code-fence, and callout conventions. Also inspect the destination file and any closer instructions for local patterns.
+
+Match the destination file's existing source formatting. Gutenberg's Markdown tooling preserves existing prose wrapping and does not impose a practical line-length limit. In files that keep prose paragraphs or list items on one source line, do the same for added text; do not hard-wrap prose at an arbitrary column. Never reflow unchanged prose solely to satisfy a preferred line length, and inspect the final diff for avoidable mid-sentence line breaks.
 
 Use a concise PR description:
 
@@ -128,7 +130,8 @@ Before opening the PR:
 
 ## Validate and report
 
-- Run formatting or lint checks scoped to changed files when possible.
+- Run `npm run format -- <changed Markdown files>` and `npm run lint:md:docs -- <changed Markdown files>` for documentation changes, then inspect the resulting diff and reject unrelated reflow. Do not format untouched files.
+- Run other formatting or lint checks scoped to changed files when applicable.
 - Distinguish new failures from pre-existing warnings.
 - Confirm the pushed branch and ready-for-review status.
 - Summarize the selected guidance, unresolved dissent, omitted candidates, changed destinations, and validation result.
