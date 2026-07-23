@@ -117,6 +117,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
+		hasMultiSelection,
+		__unstableIsFullySelected,
 	} = blockEditorSelectors;
 	return useRefEffect(
 		( node ) => {
@@ -126,16 +128,18 @@ export default function useSelectionObserver() {
 			let isTripleClick = false;
 
 			function onMouseDown( event ) {
+				if ( ! node.contains( event.target ) ) {
+					return;
+				}
 				isTripleClick = event.detail === 3;
 				// A shift+click makes a multi-selection: mark the gesture as
 				// in progress so the clicked block's focus handler does not
 				// select it (collapsing the native range being made), and so
 				// use-multi-selection does not clear the native selection.
-				// The selection is built on mouseup.
 				if ( event.shiftKey ) {
 					startMultiSelect();
 
-					// The browser can only extend the selection to the
+// The browser can only extend the selection to the
 					// clicked position when a common editing host contains
 					// both it and the selection to extend. Blocks are
 					// separate editing hosts, so before the browser acts
@@ -146,6 +150,39 @@ export default function useSelectionObserver() {
 					// the edge of the block it started in (extending
 					// backward). Focus is left alone: the click moves it.
 					setContentEditableWrapper( node, true, { focus: false } );
+
+					// The browser extends the selection from the native
+					// anchor. When a block is selected without a text
+					// selection within it (e.g. an image or spacer),
+					// there is no native anchor, or a stale one in
+					// previously edited text. Give the browser the right
+					// anchor before it acts on the click: the near edge
+					// of the selected block, so the whole block ends up
+					// within the extended selection.
+					const { clientId, attributeKey } = getSelectionStart();
+					const selection = defaultView.getSelection();
+					const blockElement =
+						clientId &&
+						! attributeKey &&
+						ownerDocument.getElementById( `block-${ clientId }` );
+
+					if (
+						blockElement &&
+						! (
+							selection.anchorNode &&
+							blockElement.contains( selection.anchorNode )
+						)
+					) {
+						const isForward =
+							// eslint-disable-next-line no-bitwise
+							blockElement.compareDocumentPosition(
+								event.target
+							) & node.DOCUMENT_POSITION_FOLLOWING;
+						selection.setPosition(
+							blockElement,
+							isForward ? 0 : blockElement.childNodes.length
+						);
+					}
 				}
 			}
 
@@ -181,6 +218,20 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
+					// A block multi-selection clears the native selection
+					// (use-multi-selection), after which the browser may
+					// place a stray caret in the focused editing host.
+					// That caret must not dissolve the multi-selection. A
+					// real click or key press changes the block selection
+					// first, so this guard releases for them.
+					if (
+						hasMultiSelection() &&
+						__unstableIsFullySelected() &&
+						node.contentEditable === 'true'
+					) {
+						return;
+					}
+
 					const collapsedClientId = getBlockClientId( startNode );
 
 					// If the block supports an editable root, keep (or make)
@@ -245,25 +296,53 @@ export default function useSelectionObserver() {
 				// If the selection has changed and we had pressed `shift+click`,
 				// we need to check if in an element that doesn't support
 				// text selection has been clicked.
+				// When an endpoint needs correcting, the native selection
+				// disagrees with the gesture (e.g. there was no caret to
+				// extend from a block without text selection), so the
+				// result must be recorded as a block selection instead of
+				// a text selection between the native endpoints.
+				let isReconstructedClickShift = false;
 				if ( isClickShift ) {
 					const selectedClientId = getBlockSelectionStart();
-					const clickedClientId = getBlockClientId( event.target );
-					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
-					// We need to check if there was already a selection with a non-selectable focusNode.
-					const focusNodeIsNonSelectable =
-						clickedClientId !== endClientId;
+					// The element under the pointer, not `event.target`:
+					// browsers may retarget the mouseup (WebKit can
+					// dispatch it on the block the selection started
+					// from).
+					const clickedElement =
+						ownerDocument.elementFromPoint(
+							event.clientX,
+							event.clientY
+						) ?? event.target;
+					const clickedClientId =
+						getBlockClientId( clickedElement );
+					// When the click lands within text, the browser's own
+					// extension is the better end: pointer coordinates
+					// can be unreliable (WebKit reports stale positions
+					// after scrolling, cutting the selection short). The
+					// pointer only corrects the end when there is nothing
+					// to extend to at the click, e.g. a block without
+					// text selection.
+					const clickedText = clickedElement?.closest?.(
+						'[data-wp-block-attribute-key]'
+					);
 					if (
-						( startClientId === endClientId &&
+						clickedClientId &&
+						( ( startClientId === endClientId &&
 							selection.isCollapsed ) ||
-						! endClientId ||
-						focusNodeIsNonSelectable
+							! endClientId ||
+							( ! clickedText &&
+								clickedClientId !== endClientId ) )
 					) {
+						isReconstructedClickShift =
+							isReconstructedClickShift ||
+							endClientId !== clickedClientId;
 						endClientId = clickedClientId;
 					}
 					// Handle the case when we have a non-selectable block
 					// selected and click another one.
 					if ( startClientId !== selectedClientId ) {
 						startClientId = selectedClientId;
+						isReconstructedClickShift = true;
 					}
 				}
 
@@ -273,6 +352,16 @@ export default function useSelectionObserver() {
 					endClientId === undefined
 				) {
 					setContentEditableWrapper( node, false );
+					return;
+				}
+
+				// With only one endpoint in a block, there is nothing
+				// coherent to record: dispatching would produce a broken
+				// multi-selection between a block and nothing.
+				if (
+					startClientId === undefined ||
+					endClientId === undefined
+				) {
 					return;
 				}
 
@@ -393,6 +482,39 @@ export default function useSelectionObserver() {
 					// in the store.
 					const isAncestorDescendant =
 						depth >= startPath.length || depth >= endPath.length;
+
+					// A reconstructed shift+click selects blocks: the
+					// block the gesture started from and the clicked
+					// block. The native selection is noise (browsers may
+					// move it during the click), so it must not be
+					// recorded as a text selection, nor left behind to be
+					// recorded later.
+					if ( isReconstructedClickShift ) {
+						if ( isAncestorDescendant ) {
+							// One block contains the other: select the
+							// outer block.
+							selectBlock(
+								depth >= startPath.length
+									? startClientId
+									: endClientId
+							);
+						} else {
+							multiSelect(
+								startPath[ depth ],
+								endPath[ depth ]
+							);
+						}
+						// The native selection is noise here (the
+						// browser may have moved it during the click,
+						// from a stale position), but it is left alone:
+						// clearing it would leave the editing host
+						// without a selection, and browsers insert a
+						// caret at the start of the host and scroll to
+						// it. The collapsed-selection guard above keeps
+						// it from being recorded over the block
+						// selection.
+						return;
+					}
 
 					if (
 						! isAncestorDescendant &&
@@ -528,8 +650,12 @@ export default function useSelectionObserver() {
 			}
 
 			defaultView.addEventListener( 'mouseup', onMouseUp );
-			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'keydown', onKeyDown );
+			// On the document in the capture phase: this is passive
+			// gesture bookkeeping that must reliably see the events, even
+			// when a deeper handler stops their propagation, and before
+			// any of them runs.
+			ownerDocument.addEventListener( 'mousedown', onMouseDown, true );
+			ownerDocument.addEventListener( 'keydown', onKeyDown, true );
 			ownerDocument.addEventListener(
 				'copy',
 				ensureMultiBlockSelectionSync,
@@ -551,8 +677,12 @@ export default function useSelectionObserver() {
 					onSelectionChange
 				);
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
-				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'keydown', onKeyDown );
+				ownerDocument.removeEventListener(
+					'mousedown',
+					onMouseDown,
+					true
+				);
+				ownerDocument.removeEventListener( 'keydown', onKeyDown, true );
 				ownerDocument.removeEventListener(
 					'copy',
 					ensureMultiBlockSelectionSync,

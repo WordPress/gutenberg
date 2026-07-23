@@ -255,6 +255,8 @@ export function RichTextWrapper(
 		getSelectionEnd,
 		getBlockRootClientId,
 		isMultiSelecting,
+		hasMultiSelection,
+		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -266,12 +268,20 @@ export function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
-			// During a multi-block selection gesture (e.g. a
-			// shift+click), focusing the clicked block must not sync a
-			// selection for it: it would overwrite the selection the
-			// gesture is building. The selection observer records it on
-			// mouseup.
-			if ( isMultiSelecting() ) {
+			// Do not overwrite a multi-block selection. While a
+			// selection gesture builds one, focusing the clicked block
+			// syncs a selection for it, and after a block
+			// multi-selection is made, browsers may place a stray caret
+			// in the focused editing host. A partial text selection
+			// across blocks is not guarded: it relies on this sync to
+			// collapse back into a block. Real transitions out of a
+			// block multi-selection change the block selection first
+			// (block focus handlers, writing flow), which releases this
+			// guard.
+			if (
+				isMultiSelecting() ||
+				( hasMultiSelection() && __unstableIsFullySelected() )
+			) {
 				return;
 			}
 
@@ -330,6 +340,8 @@ export function RichTextWrapper(
 			instanceId,
 			selectionChange,
 			isMultiSelecting,
+			hasMultiSelection,
+			__unstableIsFullySelected,
 		]
 	);
 

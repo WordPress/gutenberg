@@ -1613,12 +1613,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		test( 'should not scroll the canvas when the selection spans a scrolled page', async ( {
 			editor,
 			page,
-			browserName,
 		} ) => {
-			test.fixme(
-				browserName === 'webkit',
-				'WebKit still scrolls through a different route: transient single selections during the gesture trigger the selected block scroll into view behavior. See #80608.'
-			);
 			await editor.insertBlock( { name: 'core/spacer' } );
 			for ( let i = 0; i < 30; i++ ) {
 				await editor.insertBlock( {
@@ -1659,19 +1654,26 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			);
 			expect( before ).toBeGreaterThan( 0 );
 
-			// Record every scroll movement for a second. The page may
-			// scroll up and back down again, so the position cannot be
-			// asserted after the fact.
+			// Sample the scroll position on every frame for a second.
+			// The page may scroll up and back down again, so the
+			// position cannot be asserted after the fact. Sampling on
+			// animation frames asserts what is rendered; scroll events
+			// would also catch a reveal scroll that is undone within
+			// the same frame and never painted (see use-multi-selection).
 			const scrollWatcher = frame.evaluate(
 				() =>
 					new Promise( ( resolve ) => {
-						const positions = [];
-						document.addEventListener( 'scroll', () => {
-							positions.push(
-								document.documentElement.scrollTop
-							);
-						} );
-						setTimeout( () => resolve( positions ), 1000 );
+						const positions = new Set();
+						const start = performance.now();
+						function sample() {
+							positions.add( document.documentElement.scrollTop );
+							if ( performance.now() - start < 1000 ) {
+								window.requestAnimationFrame( sample );
+							} else {
+								resolve( Array.from( positions ) );
+							}
+						}
+						sample();
 					} )
 			);
 
@@ -1682,7 +1684,33 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				.getByText( '28', { exact: true } )
 				.click( { modifiers: [ 'Shift' ] } );
 
-			expect( await scrollWatcher ).toEqual( [] );
+			expect( await scrollWatcher ).toEqual( [ before ] );
+
+			// The selection reaches from the spacer to the clicked
+			// paragraph. It survives the gesture: transient selections
+			// during the click must not overwrite it.
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							count: sel.getSelectedBlockClientIds().length,
+							multi: sel.hasMultiSelection(),
+						};
+					} )
+				)
+				.toEqual( { count: 30, multi: true } );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
+			expect(
+				await page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			).toBe( 30 );
 		} );
 	} );
 

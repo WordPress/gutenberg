@@ -18,6 +18,7 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
 		__unstableIsFullySelected,
+		getSelectionStart,
 	} = select( blockEditorStore );
 
 	return {
@@ -27,6 +28,7 @@ function selector( select ) {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isFullSelection: __unstableIsFullySelected(),
+		isShellSelection: ! getSelectionStart().attributeKey,
 	};
 }
 
@@ -38,6 +40,7 @@ export default function useMultiSelection() {
 		hasMultiSelection,
 		selectedBlockClientId,
 		isFullSelection,
+		isShellSelection,
 	} = useSelect( selector, [] );
 
 	/**
@@ -46,9 +49,6 @@ export default function useMultiSelection() {
 	 */
 	return useRefEffect(
 		( node ) => {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-
 			// Allow initialPosition to bypass focus behavior. This is useful
 			// for the list view or other areas where we don't want to transfer
 			// focus to the editor canvas.
@@ -56,7 +56,16 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			if ( ! hasMultiSelection || isMultiSelecting ) {
+			if ( isMultiSelecting ) {
+				return;
+			}
+
+			if ( ! hasMultiSelection ) {
+				// A single block selected as a block (without a text
+				// selection within) needs no editing host.
+				if ( selectedBlockClientId && isShellSelection ) {
+					setContentEditableWrapper( node, false );
+				}
 				return;
 			}
 
@@ -75,10 +84,16 @@ export default function useMultiSelection() {
 			// React because re-rending happens too slowly. We need to be
 			// able to select across instances immediately.
 			// For some browsers, like Safari, it is important that focus
-			// happens BEFORE selection removal.
+			// happens BEFORE the selection is read or changed.
 			setContentEditableWrapper( node, true );
 
-			defaultView.getSelection().removeAllRanges();
+			// The native selection is deliberately left alone: it is the
+			// selection the user made, presented as selected blocks (the
+			// text highlight is transparent within them). It stays real,
+			// so gestures can continue from it, and the focused editing
+			// host is never left without a selection, which browsers
+			// respond to by inserting a caret at its start and scrolling
+			// it into view.
 		},
 		[
 			hasMultiSelection,
@@ -87,6 +102,7 @@ export default function useMultiSelection() {
 			selectedBlockClientId,
 			initialPosition,
 			isFullSelection,
+			isShellSelection,
 		]
 	);
 }
