@@ -715,7 +715,10 @@
       - variant
   subcomponents:
       - name: Popover.Slot
-        props: []
+        props:
+            - key
+            - name
+            - ref
 - name: ProgressBar
   props:
       - className

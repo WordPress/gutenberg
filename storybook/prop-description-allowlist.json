@@ -70,7 +70,7 @@
 	"NumberControl:onDragEnd",
 	"NumberControl:onDragStart",
 	"NumberControl:onValidate",
-	"Popover.Slot",
+	"Popover.Slot:key",
 	"RangeControl:__next40pxDefaultSize",
 	"ResizableBox:__experimentalShowTooltip",
 	"ResizableBox:__experimentalTooltipProps",
