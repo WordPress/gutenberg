@@ -1,12 +1,8 @@
 @use "@wordpress/base-styles/variables" as *;
 
 // Inherited Global Styles values — visual treatment for inspector controls.
-//
-// Inheritance is the default, unmarked state: a control that inherits shows the
-// inherited value as an ordinary value (native placeholder) with no treatment.
-// `.has-local-override-from-global-styles` marks controls that locally override
-// an inherited value: an empty diamond indicator is rendered as a sibling at
-// the item's inline-end.
+// Inheritance is the unmarked default; only a local override gets a diamond
+// indicator, rendered as a sibling at the item's inline-end.
 .has-local-override-from-global-styles {
 	position: relative;
 }
@@ -21,14 +17,11 @@
 	justify-content: center;
 	pointer-events: none;
 
-	// Match the label line height so the indicator centers on the 16px label
-	// row rather than pinning to its top.
+	// Match the label line height so the indicator centers on the label row.
 	height: $grid-unit-20;
 
-	// Controls that render a 24px toggle at the item's inline-end (linked/
-	// unlink, units switch): shift the indicator one toggle width plus an 8px
-	// gap toward the inline-start so it sits just to the left of that toggle
-	// and the two never overlap.
+	// Shift past a 24px inline-end toggle (plus an 8px gap) so the two never
+	// overlap.
 	&--offset-toggle {
 		inset-inline-end: calc(24px + 8px);
 	}
@@ -46,11 +39,8 @@
 .global-styles-inheritance-indicator {
 	border-radius: 50% !important;
 
-	// Color/gradient control context: the button is positioned by
-	// `block-editor-panel-color-gradient-settings__reset` (absolute) as a
-	// sibling of the toggle. The shared rule above sets `position: relative`;
-	// re-assert `position: absolute` here (this compound selector wins on
-	// specificity) to sit in the reset slot.
+	// Color/gradient: sit in the toggle's reset slot, re-asserting the absolute
+	// placement the shared `position: relative` above would otherwise override.
 	&.block-editor-panel-color-gradient-settings__reset {
 		position: absolute;
 		justify-content: center;
@@ -89,9 +79,8 @@
 		opacity: 1;
 	}
 
-	// Background-image control context: the indicator reuses the background
-	// panel's reset slot, which is absolutely positioned and hover-revealed
-	// (`opacity: 0`). Keep it placed and always visible.
+	// Background image: reuses the hover-revealed reset slot; keep it placed
+	// and always visible.
 	&.block-editor-global-styles-background-panel__reset {
 		position: absolute;
 		justify-content: center;

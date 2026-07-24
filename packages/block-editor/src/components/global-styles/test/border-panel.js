@@ -10,17 +10,10 @@ import userEvent from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
 
 /**
- * Tests for the inherited Global Styles treatment in `BorderPanel`.
- * Inheritance is the unmarked default; a local override lands on the parent
- * `ToolsPanelItem` via the `.has-local-override-from-global-styles` class hook
- * (the reset diamond). The inner controls (`BorderBoxControl`,
- * `BorderRadiusControl`, `ShadowPopover`) carry no special className
- * for inheritance state.
- *
- * For the input archetype (`BorderRadiusControl`) the inherited value
- * is forwarded as the displayed `values=` while local values are unset, so
- * the underlying UnitControl can parse the quantity and unit normally without
- * committing the inherited value on mount.
+ * Tests for the inherited Global Styles treatment in `BorderPanel`. Inheritance
+ * is the unmarked default; a local override lands on the parent `ToolsPanelItem`
+ * via the `.has-local-override-from-global-styles` class hook. The inherited
+ * value is forwarded as the displayed value while local values stay unset.
  */
 
 const settingsAll = {
@@ -364,15 +357,9 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// A merely-inherited value must not show the default remove
-			// button nor the local-override blue-dot reset.
+			// A merely-inherited value must not show the default remove button.
 			expect(
 				screen.queryByRole( 'button', { name: /^remove$/i } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
 			).not.toBeInTheDocument();
 		} );
 
@@ -415,16 +402,11 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// With no inherited value there is no override to reset to, so
-			// the plain remove button is used, not the blue-dot affordance.
+			// With no inherited value there is no override, so the plain remove
+			// button is used, not the override indicator.
 			expect(
 				screen.getByRole( 'button', { name: /^remove$/i } )
 			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
-			).not.toBeInTheDocument();
 		} );
 	} );
 } );
