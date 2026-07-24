@@ -1108,6 +1108,72 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveText( /^\.a+$/ );
 	} );
 
+	test( 'should not scroll the page when moving the caret within a block taller than the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		const lines = Array.from(
+			{ length: 70 },
+			( _, i ) => `line ${ i + 1 }`
+		).join( '\n' );
+		await editor.insertBlock( {
+			name: 'core/code',
+			attributes: { content: lines },
+		} );
+
+		const frame = page.frame( { name: 'editor-canvas' } );
+
+		// Scroll the middle of the code block into view and click there.
+		await frame.evaluate( () => {
+			const code = document.querySelector( '[data-type="core/code"]' );
+			const rect = code.getBoundingClientRect();
+			const middle =
+				rect.top + document.documentElement.scrollTop + rect.height / 2;
+			document.documentElement.scrollTop =
+				middle - window.innerHeight / 2;
+		} );
+		const codeBox = await editor.canvas
+			.locator( '[data-type="core/code"] code' )
+			.boundingBox();
+		await page.mouse.click(
+			codeBox.x + 60,
+			codeBox.y + codeBox.height / 2
+		);
+
+		const getCaretLine = () =>
+			frame.evaluate( () =>
+				parseInt(
+					document
+						.getSelection()
+						.focusNode?.textContent.match( /line (\d+)/ )?.[ 1 ],
+					10
+				)
+			);
+		const lineBefore = await getCaretLine();
+
+		// Record every scroll movement for a second. Moving the caret
+		// within the block must not scroll the page: the caret stays
+		// within the viewport.
+		const scrollWatcher = frame.evaluate(
+			() =>
+				new Promise( ( resolve ) => {
+					const positions = [];
+					document.addEventListener( 'scroll', () => {
+						positions.push( document.documentElement.scrollTop );
+					} );
+					setTimeout( () => resolve( positions ), 1000 );
+				} )
+		);
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// The caret moved down one line net (down, down, up).
+		await expect.poll( getCaretLine ).toBe( lineBefore + 1 );
+		expect( await scrollWatcher ).toEqual( [] );
+	} );
+
 	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
 		page,
 		editor,
