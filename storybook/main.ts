@@ -69,57 +69,17 @@ const config: StorybookConfig = {
 	framework: getAbsolutePath( '@storybook/react-vite' ),
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
-		// Use experimental TypeScript LanguageService prop extractor for the
-		// components manifest to improve performance and accuracy.
-		//
-		// This only applies to the components manifest and not the Storybook
-		// UI. Storybook describes this extractor as the "successor" of both
-		// `react-docgen` and `react-docgen-typescript`, but it currently only
-		// applies to the manifest.
-		//
-		// See: https://github.com/storybookjs/storybook/issues/34824
-		experimentalReactComponentMeta: true,
+		// Server-side React Component Meta extraction shared by Docs,
+		// Controls, MCP, and the components manifest.
+		// https://github.com/storybookjs/storybook/discussions/35333
+		experimentalDocgenServer: true,
 	},
 	typescript: {
-		reactDocgen: 'react-docgen-typescript',
-		// Should match defaults in Storybook except for the propFilter.
-		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
-		reactDocgenTypescriptOptions: {
-			// Use a docgen-specific TypeScript configuration that disables
-			// project references. Without this, docgen follows referenced
-			// projects' built `.d.ts` declarations and emits a duplicate
-			// `__docgenInfo` block per component (one from source, one from the
-			// declaration file) that clobbers source-derived descriptions.
-			// Separate `tsconfig.json` is used instead of `compilerOptions` to
-			// allow the rest of the base `tsconfig.base.json` to be inherited.
-			tsconfigPath: path.join(
-				import.meta.dirname,
-				'tsconfig.docgen.json'
-			),
-			shouldExtractLiteralValuesFromEnum: true,
-			shouldRemoveUndefinedFromOptional: true,
-			// Keep JSDoc tags like `@ignore` in prop descriptions so Storybook
-			// native docs-tools parser can filter them. The Vite docgen plugin
-			// defaults `shouldIncludePropTagMap` to true, splitting tags into
-			// a separate object that Storybook does not read for `@ignore`.
-			shouldIncludePropTagMap: false,
-			// Component names should come from source (displayName or named
-			// functions / exports) rather than build-time plugin injection,
-			// which can clobber author-defined names unpredictably.
-			setDisplayName: false,
-			propFilter: ( prop ) => {
-				if ( ! prop.parent ) {
-					return true;
-				}
-
-				if ( /@base-ui|@ariakit/.test( prop.parent.fileName ) ) {
-					return true;
-				}
-
-				return ! /node_modules/.test( prop.parent.fileName );
-			},
-			savePropValueAsString: true,
-		},
+		// Unused while experimentalDocgenServer is on: the React Vite preset
+		// skips build-time react-docgen / react-docgen-typescript plugins.
+		// Keep this false so flipping the flag off does not silently re-enable
+		// the slow Vite docgen path.
+		reactDocgen: false,
 	},
 	viteFinal: async ( viteConfig ) => {
 		return mergeConfig( viteConfig, {

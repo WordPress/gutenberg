@@ -1,14 +1,14 @@
 import type { Component, ComponentDetail } from './types';
 
 /**
- * Format a component's name, package, and description as markdown.
+ * Format a component's name and description as markdown.
  *
  * @param component    - The component to format.
  * @param headingLevel - The heading level for the component name.
  * @return Markdown lines.
  */
 function formatComponentSummary(
-	component: Component,
+	component: Component | ComponentDetail,
 	headingLevel: number
 ): string[] {
 	const heading = '#'.repeat( headingLevel );
@@ -46,7 +46,9 @@ export function formatComponents( components: Component[] ): string {
 export function formatComponentDetail( detail: ComponentDetail ): string {
 	const lines = formatComponentSummary( detail, 1 );
 
-	lines.push( '', `**Package:** \`${ detail.packageName }\`` );
+	if ( detail.packageName ) {
+		lines.push( '', `**Package:** \`${ detail.packageName }\`` );
+	}
 
 	if ( detail.importStatement ) {
 		lines.push(

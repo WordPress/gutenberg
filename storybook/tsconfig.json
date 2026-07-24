@@ -6,6 +6,5 @@
 		"rootDir": ".",
 		"noEmit": true
 	},
-	"include": [ "**/*.tsx", "**/*.ts", "**/*.mjs" ],
-	"exclude": [ "scripts/inject-legacy-docgen.mjs" ]
+	"include": [ "**/*.tsx", "**/*.ts", "**/*.mjs" ]
 }

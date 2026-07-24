@@ -53,7 +53,12 @@ function buildImportStatement( name: string, packageName: string ): string {
  * @param storyPath - The story file path from the manifest.
  * @return The npm package name, or null for paths outside `packages/*`.
  */
-export function packageNameFromPath( storyPath: string ): string | null {
+export function packageNameFromPath(
+	storyPath: string | undefined
+): string | null {
+	if ( ! storyPath ) {
+		return null;
+	}
 	const match = storyPath.match( /\.\.\/packages\/([^/]+)\// );
 	return match ? `@wordpress/${ match[ 1 ] }` : null;
 }
@@ -69,8 +74,47 @@ export function packageNameFromPath( storyPath: string ): string | null {
  * @param name - The component name from the manifest.
  * @return The top-level importable identifier.
  */
-function canonicalComponentName( name: string ): string {
+export function canonicalComponentName( name: string ): string {
 	return name.split( '.', 1 )[ 0 ];
+}
+
+/**
+ * Normalize stories from either the legacy array shape or the docgen-server
+ * map-of-id shape into an array. Ref `{ $ref }` values are not handled here —
+ * hydrate the entry first.
+ *
+ * @param stories - Stories from a hydrated manifest entry.
+ */
+export function normalizeStories(
+	stories: ManifestComponent[ 'stories' ]
+): Array< {
+	name: string;
+	snippet?: string;
+	description?: string;
+} > {
+	let raw: Array< {
+		name: string;
+		snippet?: string;
+		description?: string;
+	} > = [];
+
+	if ( Array.isArray( stories ) ) {
+		raw = stories;
+	} else if (
+		stories &&
+		typeof stories === 'object' &&
+		! ( '$ref' in stories )
+	) {
+		raw = Object.values( stories );
+	}
+
+	return raw.map( ( story ) => ( {
+		name: story.name,
+		...( story.snippet !== undefined ? { snippet: story.snippet } : {} ),
+		...( story.description !== undefined
+			? { description: story.description }
+			: {} ),
+	} ) );
 }
 
 /**
@@ -112,53 +156,45 @@ export function parseProps(
 }
 
 /**
- * Parse manifest components into a flat list sorted alphabetically by name.
- * When a component is defined across multiple story files (e.g. a companion
- * file documenting a specific aspect), it is collapsed to a single entry keyed
- * by its canonical name and package.
+ * Parse manifest index entries into a list of name + description summaries.
+ * Dedupes by canonical name. Does not require `path` — ref manifests omit it
+ * on the index, and list view does not surface package.
  *
- * @param components - The manifest components record.
+ * @param components - The manifest components record (index or inline).
  * @return Flat list of components derived from the manifest.
  */
 export function parseComponents(
 	components: Record< string, ManifestComponent >
 ): Component[] {
-	const byKey = new Map< string, Component >();
+	const byName = new Map< string, Component >();
 
 	for ( const component of Object.values( components ) ) {
-		const packageName = packageNameFromPath( component.path );
-		if ( ! packageName ) {
-			continue;
-		}
-
 		const name = canonicalComponentName( component.name );
-		const key = `${ packageName }:${ name }`;
-		const existing = byKey.get( key );
 		const description = component.description || '';
+		const existing = byName.get( name.toLowerCase() );
 
 		if ( ! existing ) {
-			byKey.set( key, { name, description, packageName } );
+			byName.set( name.toLowerCase(), { name, description } );
 		} else {
-			// Prefer a non-empty description from a later entry over an
-			// empty one from the first.
 			existing.description ||= description;
 		}
 	}
 
-	return Array.from( byKey.values() ).sort( ( a, b ) =>
+	return Array.from( byName.values() ).sort( ( a, b ) =>
 		a.name.localeCompare( b.name )
 	);
 }
 
 /**
  * Find a single component by name (case-insensitive) and return its full
- * detail including props and stories. When a component is spread across
- * multiple story files, stories from every contributing file are collected
- * in manifest order. Descriptions and props are also authored on the component
- * itself, so in principle they should be identical across story files; in
- * practice one file may omit them, so we prefer any non-empty value found.
+ * detail including props and stories. Entries should already be hydrated when
+ * using a ref manifest. When a component is spread across multiple story
+ * files, stories from every contributing file are collected in manifest
+ * order. Descriptions and props are also authored on the component itself, so
+ * in principle they should be identical across story files; in practice one
+ * file may omit them, so we prefer any non-empty value found.
  *
- * @param components - The manifest components record.
+ * @param components - Hydrated manifest components record.
  * @param name       - The component name to look up.
  * @return The component detail, or null if not found.
  */
@@ -175,25 +211,30 @@ export function parseComponentDetail(
 		}
 
 		const pkg = packageNameFromPath( component.path );
-		if ( ! pkg ) {
-			continue;
-		}
-
 		const description = component.description || '';
 		const props = parseProps( component.reactComponentMeta?.props || {} );
-		const stories = component.stories || [];
+		const stories = normalizeStories( component.stories );
 
 		if ( ! detail ) {
 			detail = {
 				name: canonicalName,
 				description,
 				packageName: pkg,
-				importStatement: buildImportStatement( canonicalName, pkg ),
+				importStatement: pkg
+					? buildImportStatement( canonicalName, pkg )
+					: null,
 				props,
 				stories: [ ...stories ],
 			};
-		} else if ( detail.packageName === pkg ) {
+		} else if ( ! pkg || detail.packageName === pkg ) {
 			detail.description ||= description;
+			if ( ! detail.packageName && pkg ) {
+				detail.packageName = pkg;
+				detail.importStatement = buildImportStatement(
+					canonicalName,
+					pkg
+				);
+			}
 			if ( detail.props.length === 0 ) {
 				detail.props = props;
 			}

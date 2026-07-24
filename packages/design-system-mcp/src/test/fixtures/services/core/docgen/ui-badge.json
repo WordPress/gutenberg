@@ -1,0 +1,10 @@
+{
+	"components": {
+		"ui-badge": {
+			"id": "ui-badge",
+			"name": "Badge",
+			"path": "../packages/ui/src/badge/stories/index.story.tsx",
+			"description": "A badge."
+		}
+	}
+}

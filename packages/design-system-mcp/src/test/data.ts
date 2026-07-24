@@ -5,6 +5,10 @@ import {
 	resetCache,
 } from '../data';
 import manifestFixture from './fixtures/manifest.json';
+import manifestRefFixture from './fixtures/manifest-ref.json';
+import buttonDocgenFixture from './fixtures/services/core/docgen/components-button.json';
+import badgeDocgenFixture from './fixtures/services/core/docgen/ui-badge.json';
+import buttonStoryDocsFixture from './fixtures/services/core/story-docs/components-button.json';
 
 const MANIFEST_URL =
 	'https://wordpress.github.io/gutenberg/manifests/components.json';
@@ -44,7 +48,7 @@ describe( 'data', () => {
 		globalThis.fetch = originalFetch;
 	} );
 
-	describe( 'getComponents', () => {
+	describe( 'getComponents (inline manifest)', () => {
 		it( 'should fetch manifest and return parsed components', async () => {
 			mockFetchResponses( {
 				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
@@ -56,12 +60,10 @@ describe( 'data', () => {
 				{
 					name: 'Badge',
 					description: 'A badge.',
-					packageName: '@wordpress/ui',
 				},
 				{
 					name: 'Button',
 					description: 'A button.',
-					packageName: '@wordpress/components',
 				},
 			] );
 		} );
@@ -88,7 +90,7 @@ describe( 'data', () => {
 		} );
 	} );
 
-	describe( 'getComponentDetail', () => {
+	describe( 'getComponentDetail (inline manifest)', () => {
 		it( 'should return detail for a matching component', async () => {
 			mockFetchResponses( {
 				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
@@ -132,6 +134,80 @@ describe( 'data', () => {
 			await getComponentDetail( 'Button' );
 
 			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'ref manifest', () => {
+		const DOCGEN_BUTTON =
+			'https://wordpress.github.io/gutenberg/services/core/docgen/components-button.json';
+		const DOCGEN_BADGE =
+			'https://wordpress.github.io/gutenberg/services/core/docgen/ui-badge.json';
+		const STORY_DOCS_BUTTON =
+			'https://wordpress.github.io/gutenberg/services/core/story-docs/components-button.json';
+
+		it( 'lists components from the index without resolving refs', async () => {
+			mockFetchResponses( {
+				[ MANIFEST_URL ]: { ok: true, body: manifestRefFixture },
+			} );
+
+			const result = await getComponents();
+
+			expect( result ).toEqual( [
+				{ name: 'Badge', description: 'A badge.' },
+				{ name: 'Button', description: 'A button.' },
+			] );
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'resolves docgen and story-docs only for requested details', async () => {
+			mockFetchResponses( {
+				[ MANIFEST_URL ]: { ok: true, body: manifestRefFixture },
+				[ DOCGEN_BUTTON ]: { ok: true, body: buttonDocgenFixture },
+				[ STORY_DOCS_BUTTON ]: {
+					ok: true,
+					body: buttonStoryDocsFixture,
+				},
+			} );
+
+			const result = await getComponentDetail( 'Button' );
+
+			expect( result ).toEqual( {
+				name: 'Button',
+				description: 'A button.',
+				packageName: '@wordpress/components',
+				importStatement:
+					"import { Button } from '@wordpress/components';",
+				props: [
+					{
+						name: 'variant',
+						type: 'string',
+						required: false,
+						description: 'The variant.',
+						defaultValue: null,
+					},
+				],
+				stories: [ { name: 'Default', snippet: '<Button />' } ],
+			} );
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 3 );
+			expect( globalThis.fetch ).not.toHaveBeenCalledWith( DOCGEN_BADGE );
+		} );
+
+		it( 'hydrates badge detail from docgen when stories ref is absent', async () => {
+			mockFetchResponses( {
+				[ MANIFEST_URL ]: { ok: true, body: manifestRefFixture },
+				[ DOCGEN_BADGE ]: { ok: true, body: badgeDocgenFixture },
+			} );
+
+			const result = await getComponentDetail( 'Badge' );
+
+			expect( result ).toEqual( {
+				name: 'Badge',
+				description: 'A badge.',
+				packageName: '@wordpress/ui',
+				importStatement: "import { Badge } from '@wordpress/ui';",
+				props: [],
+				stories: [],
+			} );
 		} );
 	} );
 

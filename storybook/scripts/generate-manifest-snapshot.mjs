@@ -49,9 +49,13 @@ const ALLOWLIST_PATH = path.join(
  * Storybook writes but does not type, and typing `subcomponents` recursively
  * (Storybook types them as a narrower shape without props).
  *
+ * With `experimentalDocgenServer`, the index entry may only have summary
+ * fields plus a `docgen.$ref` into `services/core/docgen/*.json`.
+ *
  * @typedef {Omit<StorybookComponentManifest, 'subcomponents'> & {
  *   reactComponentMeta?: { props?: Record<string,WPPropInfo> },
  *   subcomponents?: Record<string,WPManifestNode>,
+ *   docgen?: { $ref: string },
  * }} WPManifestNode
  */
 
@@ -74,6 +78,91 @@ const ALLOWLIST_PATH = path.join(
  * @property {string[]}          props           Sorted visible prop names.
  * @property {WPSnapshotEntry[]} [subcomponents] Sorted subcomponents.
  */
+
+/**
+ * Resolve a JSON Pointer (`/components/foo`) against a document.
+ *
+ * @param {unknown} document
+ * @param {string} pointer
+ * @return {unknown}
+ */
+function resolveJsonPointer( document, pointer ) {
+	if ( ! pointer || pointer === '/' ) {
+		return document;
+	}
+	assert(
+		pointer.startsWith( '/' ),
+		`Invalid JSON pointer: ${ pointer }`
+	);
+	return pointer
+		.slice( 1 )
+		.split( '/' )
+		.map( ( segment ) =>
+			segment.replace( /~1/g, '/' ).replace( /~0/g, '~' )
+		)
+		.reduce( ( current, key ) => {
+			if (
+				current === null ||
+				current === undefined ||
+				typeof current !== 'object'
+			) {
+				return undefined;
+			}
+			return /** @type {Record<string, unknown>} */ ( current )[ key ];
+		}, document );
+}
+
+/**
+ * Load a `docgen.$ref` like
+ * `../services/core/docgen/<id>.json#/components/<id>` relative to the
+ * components manifest file.
+ *
+ * @param {string} ref
+ * @param {string} fromFile Absolute path of the file containing the ref.
+ * @return {Promise<WPManifestNode|undefined>}
+ */
+async function loadDocgenRef( ref, fromFile ) {
+	const [ filePart, pointer = '' ] = ref.split( '#' );
+	const targetPath = path.resolve( path.dirname( fromFile ), filePart );
+	try {
+		const document = JSON.parse( await readFile( targetPath, 'utf8' ) );
+		const payload = resolveJsonPointer( document, pointer );
+		if ( payload !== null && typeof payload === 'object' ) {
+			return /** @type {WPManifestNode} */ ( payload );
+		}
+	} catch {
+		// Missing service snapshot — treat as an empty docgen payload.
+	}
+	return undefined;
+}
+
+/**
+ * Merge an index entry with its docgen payload when `experimentalDocgenServer`
+ * wrote a `$ref` instead of inlining `reactComponentMeta`. Inline manifests
+ * are returned unchanged. Story-docs refs are ignored — the snapshot does not
+ * use stories.
+ *
+ * @param {WPManifestNode} entry
+ * @param {string}         fromFile Absolute path of the components manifest.
+ * @return {Promise<WPManifestNode>}
+ */
+async function hydrateManifestEntry( entry, fromFile ) {
+	if ( typeof entry.docgen?.$ref !== 'string' ) {
+		return entry;
+	}
+
+	const docgen = await loadDocgenRef( entry.docgen.$ref, fromFile );
+	/** @type {WPManifestNode} */
+	const hydrated = {
+		...entry,
+		...( docgen ?? {} ),
+		id: docgen?.id ?? entry.id,
+		name: docgen?.name ?? entry.name,
+		description: docgen?.description ?? entry.description,
+	};
+	delete hydrated.docgen;
+	return hydrated;
+}
 
 /**
  * Returns the props that show up in a component's documentation, leaving out
@@ -159,7 +248,8 @@ function toEntry( combined ) {
 	return entry;
 }
 
-const raw = await readFile( MANIFEST_PATH, 'utf8' );
+const manifestFile = path.resolve( MANIFEST_PATH );
+const raw = await readFile( manifestFile, 'utf8' );
 /** @type {Record<string,WPManifestNode>} */
 const components = JSON.parse( raw ).components;
 
@@ -171,7 +261,13 @@ assert(
 const componentsByName = new Map();
 const missingDescriptions = new Set();
 
-for ( const component of Object.values( components ) ) {
+const hydratedComponents = await Promise.all(
+	Object.values( components ).map( ( component ) =>
+		hydrateManifestEntry( component, manifestFile )
+	)
+);
+
+for ( const component of hydratedComponents ) {
 	mergeNode( component, componentsByName, missingDescriptions );
 }
 

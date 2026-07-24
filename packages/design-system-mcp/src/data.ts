@@ -1,5 +1,10 @@
 import {
-	packageNameFromPath,
+	hydrateManifestEntry,
+	isRefManifest,
+	type ComponentsManifest,
+} from './manifest';
+import {
+	canonicalComponentName,
 	parseComponents,
 	parseComponentDetail,
 } from './parse-components';
@@ -13,28 +18,28 @@ const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
-let cachedComponents: Record< string, ManifestComponent > | null = null;
+let cachedManifest: ComponentsManifest | null = null;
+let cachedManifestUrl: string | null = null;
 let cachedTokens: string | null = null;
 
 /**
  * Clear cached data. Intended for testing.
  */
 export function resetCache(): void {
-	cachedComponents = null;
+	cachedManifest = null;
+	cachedManifestUrl = null;
 	cachedTokens = null;
 }
 
 /**
- * Fetch and cache the components from the Storybook manifest, filtered to only
- * components from allowed packages.
- *
- * @return The filtered components record.
+ * Fetch and cache the components manifest index (inline or ref-shaped).
  */
-async function fetchComponents(): Promise<
-	Record< string, ManifestComponent >
-> {
-	if ( cachedComponents ) {
-		return cachedComponents;
+async function fetchManifest(): Promise< {
+	manifest: ComponentsManifest;
+	manifestUrl: string;
+} > {
+	if ( cachedManifest && cachedManifestUrl ) {
+		return { manifest: cachedManifest, manifestUrl: cachedManifestUrl };
 	}
 
 	const response = await fetch( COMPONENTS_MANIFEST_URL );
@@ -44,43 +49,79 @@ async function fetchComponents(): Promise<
 		);
 	}
 
-	const manifest: {
-		v: number;
-		components: Record< string, ManifestComponent >;
-	} = await response.json();
-
-	const filtered: Record< string, ManifestComponent > = {};
-	for ( const [ key, component ] of Object.entries( manifest.components ) ) {
-		if ( packageNameFromPath( component.path ) ) {
-			filtered[ key ] = component;
-		}
-	}
-
-	cachedComponents = filtered;
-	return cachedComponents;
+	const manifest = ( await response.json() ) as ComponentsManifest;
+	cachedManifest = manifest;
+	cachedManifestUrl = COMPONENTS_MANIFEST_URL;
+	return { manifest, manifestUrl: COMPONENTS_MANIFEST_URL };
 }
 
 /**
- * Get all components from allowed packages.
+ * Get all components from the manifest index (name + description).
  *
- * @return Parsed component list.
+ * Works for both inline and ref manifests without resolving `$ref`s.
  */
 export async function getComponents(): Promise< Component[] > {
-	const components = await fetchComponents();
-	return parseComponents( components );
+	const { manifest } = await fetchManifest();
+	return parseComponents(
+		manifest.components as Record< string, ManifestComponent >
+	);
+}
+
+/**
+ * Entries whose canonical name matches `name` (case-insensitive).
+ *
+ * @param components - Manifest components keyed by id.
+ * @param name       - Component name to match.
+ */
+function matchingEntries(
+	components: Record< string, ManifestComponent >,
+	name: string
+): ManifestComponent[] {
+	const needle = name.toLowerCase();
+	return Object.values( components ).filter(
+		( component ) =>
+			canonicalComponentName( component.name ).toLowerCase() === needle
+	);
 }
 
 /**
  * Get detailed documentation for a single component by name.
  *
+ * For ref manifests, resolves only the matching components' docgen and
+ * story-docs payloads. For inline manifests, uses the payload already on the
+ * index entry.
+ *
  * @param name - The component name (case-insensitive).
- * @return The component detail, or null if not found.
  */
 export async function getComponentDetail(
 	name: string
 ): Promise< ComponentDetail | null > {
-	const components = await fetchComponents();
-	return parseComponentDetail( components, name );
+	const { manifest, manifestUrl } = await fetchManifest();
+	const components = manifest.components as Record<
+		string,
+		ManifestComponent
+	>;
+	const matches = matchingEntries( components, name );
+	if ( matches.length === 0 ) {
+		return null;
+	}
+
+	let hydrated: Record< string, ManifestComponent >;
+	if ( isRefManifest( manifest ) ) {
+		const entries = await Promise.all(
+			matches.map( async ( entry ) => {
+				const full = await hydrateManifestEntry( manifestUrl, entry );
+				return [ full.id, full as ManifestComponent ] as const;
+			} )
+		);
+		hydrated = Object.fromEntries( entries );
+	} else {
+		hydrated = Object.fromEntries(
+			matches.map( ( entry ) => [ entry.id, entry ] )
+		);
+	}
+
+	return parseComponentDetail( hydrated, name );
 }
 
 /**

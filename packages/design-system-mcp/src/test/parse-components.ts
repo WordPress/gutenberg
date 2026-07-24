@@ -27,6 +27,10 @@ describe( 'packageNameFromPath', () => {
 			)
 		).toBeNull();
 	} );
+
+	it( 'should return null when path is missing', () => {
+		expect( packageNameFromPath( undefined ) ).toBeNull();
+	} );
 } );
 
 describe( 'parseProps', () => {
@@ -161,54 +165,38 @@ function createComponents(
 }
 
 describe( 'parseComponents', () => {
-	it( 'should return components from any recognized @wordpress/* package', () => {
+	it( 'should return name and description for each component', () => {
 		const components = createComponents( {
 			'ui-badge': {
 				name: 'Badge',
+				description: 'A badge.',
 				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'components-button': {
 				name: 'Button',
+				description: 'A button.',
 				path: '../packages/components/src/button/stories/index.story.tsx',
 			},
 		} );
 
 		expect( parseComponents( components ) ).toEqual( [
-			{
-				name: 'Badge',
-				description: '',
-				packageName: '@wordpress/ui',
-			},
-			{
-				name: 'Button',
-				description: '',
-				packageName: '@wordpress/components',
-			},
+			{ name: 'Badge', description: 'A badge.' },
+			{ name: 'Button', description: 'A button.' },
 		] );
 	} );
 
-	it( 'should exclude components with non-package paths', () => {
-		const components = createComponents( {
+	it( 'should include components without a path (ref-index entries)', () => {
+		const components = {
 			example: {
+				id: 'example',
 				name: 'ThemeProvider',
-				path: './stories/design-system/theme-example-application.story.tsx',
+				description: 'A playground example.',
 			},
-		} );
+		};
 
-		expect( parseComponents( components ) ).toHaveLength( 0 );
-	} );
-
-	it( 'should include description from manifest', () => {
-		const components = createComponents( {
-			badge: {
-				name: 'Badge',
-				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/index.story.tsx',
-			},
-		} );
-
-		const result = parseComponents( components );
-		expect( result[ 0 ].description ).toBe( 'A badge component.' );
+		expect( parseComponents( components ) ).toEqual( [
+			{ name: 'ThemeProvider', description: 'A playground example.' },
+		] );
 	} );
 
 	it( 'should use the root identifier as the canonical name for compound components', () => {
@@ -216,41 +204,24 @@ describe( 'parseComponents', () => {
 			'alert-dialog': {
 				name: 'AlertDialog.Root',
 				description: 'An alert dialog.',
-				path: '../packages/ui/src/alert-dialog/stories/index.story.tsx',
 			},
 		} );
 
 		expect( parseComponents( components ) ).toEqual( [
-			{
-				name: 'AlertDialog',
-				description: 'An alert dialog.',
-				packageName: '@wordpress/ui',
-			},
+			{ name: 'AlertDialog', description: 'An alert dialog.' },
 		] );
 	} );
 
 	it( 'should return components sorted alphabetically by name', () => {
 		const components = createComponents( {
-			a: {
-				name: 'Tabs',
-				path: '../packages/components/src/tabs/stories/index.story.tsx',
-			},
-			b: {
-				name: 'Badge',
-				path: '../packages/ui/src/badge/stories/index.story.tsx',
-			},
-			c: {
-				name: 'Notice',
-				path: '../packages/components/src/notice/stories/index.story.tsx',
-			},
+			a: { name: 'Tabs' },
+			b: { name: 'Badge' },
+			c: { name: 'Notice' },
 		} );
 
-		const result = parseComponents( components );
-		expect( result.map( ( c ) => c.name ) ).toEqual( [
-			'Badge',
-			'Notice',
-			'Tabs',
-		] );
+		expect( parseComponents( components ).map( ( c ) => c.name ) ).toEqual(
+			[ 'Badge', 'Notice', 'Tabs' ]
+		);
 	} );
 
 	it( 'should list a component only once when multiple story files contribute entries', () => {
@@ -258,21 +229,15 @@ describe( 'parseComponents', () => {
 			'badge-index': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'badge-intent': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 			},
 		} );
 
 		expect( parseComponents( components ) ).toEqual( [
-			{
-				name: 'Badge',
-				description: 'A badge component.',
-				packageName: '@wordpress/ui',
-			},
+			{ name: 'Badge', description: 'A badge component.' },
 		] );
 	} );
 
@@ -280,22 +245,15 @@ describe( 'parseComponents', () => {
 		const components = createComponents( {
 			'badge-index': {
 				name: 'Badge',
-				// First entry has no description
-				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'badge-intent': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 			},
 		} );
 
 		expect( parseComponents( components ) ).toEqual( [
-			{
-				name: 'Badge',
-				description: 'A badge component.',
-				packageName: '@wordpress/ui',
-			},
+			{ name: 'Badge', description: 'A badge component.' },
 		] );
 	} );
 } );
@@ -414,17 +372,23 @@ describe( 'parseComponentDetail', () => {
 		expect( result?.props[ 0 ].name ).toBe( 'variant' );
 	} );
 
-	it( 'should not match non-package story paths', () => {
+	it( 'should still return detail without package when path is non-package', () => {
 		const components = createComponents( {
 			example: {
 				name: 'ThemeProvider',
+				description: 'Playground theme provider.',
 				path: './stories/design-system/theme-example-application.story.tsx',
 			},
 		} );
 
-		expect(
-			parseComponentDetail( components, 'ThemeProvider' )
-		).toBeNull();
+		expect( parseComponentDetail( components, 'ThemeProvider' ) ).toEqual( {
+			name: 'ThemeProvider',
+			description: 'Playground theme provider.',
+			packageName: null,
+			importStatement: null,
+			props: [],
+			stories: [],
+		} );
 	} );
 
 	it( 'should include stories from every story file contributing to a component', () => {
@@ -466,7 +430,6 @@ describe( 'parseComponentDetail', () => {
 		const components = createComponents( {
 			'badge-index': {
 				name: 'Badge',
-				// First entry has no description
 				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'badge-intent': {
@@ -484,7 +447,6 @@ describe( 'parseComponentDetail', () => {
 		const components = createComponents( {
 			'badge-index': {
 				name: 'Badge',
-				// First entry has no component meta props
 				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'badge-intent': {
@@ -521,6 +483,25 @@ describe( 'parseComponentDetail', () => {
 				name: 'AlertDialog',
 				importStatement: "import { AlertDialog } from '@wordpress/ui';",
 			} )
+		);
+	} );
+
+	it( 'should normalize story maps from docgen-server payloads', () => {
+		const components = createComponents( {
+			button: {
+				name: 'Button',
+				path: '../packages/ui/src/button/stories/index.story.tsx',
+				stories: {
+					'button--default': {
+						name: 'Default',
+						snippet: '<Button />',
+					},
+				},
+			},
+		} );
+
+		expect( parseComponentDetail( components, 'Button' )?.stories ).toEqual(
+			[ { name: 'Default', snippet: '<Button />' } ]
 		);
 	} );
 } );

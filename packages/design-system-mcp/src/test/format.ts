@@ -6,12 +6,10 @@ describe( 'formatComponents', () => {
 			{
 				name: 'Button',
 				description: 'A button.',
-				packageName: '@wordpress/ui',
 			},
 			{
 				name: 'Badge',
 				description: 'A badge.',
-				packageName: '@wordpress/ui',
 			},
 		] );
 
@@ -39,7 +37,6 @@ A badge.`
 			{
 				name: 'Button',
 				description: '',
-				packageName: '@wordpress/ui',
 			},
 		] );
 
@@ -68,6 +65,23 @@ describe( 'formatComponentDetail', () => {
 A button component.
 
 **Package:** \`@wordpress/ui\``
+		);
+	} );
+
+	it( 'should omit package when unavailable', () => {
+		const result = formatComponentDetail( {
+			name: 'Button',
+			description: 'A button component.',
+			packageName: null,
+			importStatement: null,
+			props: [],
+			stories: [],
+		} );
+
+		expect( result ).toBe(
+			`# Button
+
+A button component.`
 		);
 	} );
 
