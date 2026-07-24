@@ -8,7 +8,6 @@ export * from './radio-control';
 export * from './range-control';
 export * from './content-editable-control';
 export * from './select-control';
-export * from './text-control';
 export * from './textarea-control';
 export * from './toggle-control';
 export * from './toggle-group-control';

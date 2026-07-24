@@ -22,7 +22,7 @@ import { math as icon } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 
-const { ValidatedTextControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -92,7 +92,7 @@ function InlineUI( {
 				style={ { minWidth: '300px', padding: '4px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
-				<ValidatedTextControl
+				<ValidatedInputControl
 					hideLabelFromVision
 					label={ __( 'LaTeX math syntax' ) }
 					value={ latex }
