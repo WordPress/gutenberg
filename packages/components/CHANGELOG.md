@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `ValidatedTextControl`: Remove from private APIs. Use `ValidatedInputControl` instead ([#80680](https://github.com/WordPress/gutenberg/pull/80680)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
+
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
@@ -18,12 +24,6 @@
 
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
-
-### Breaking Changes
-
--   Remove `ValidatedTextControl` from private APIs. Use `ValidatedInputControl` instead.
--   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
-    -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
 
 ### Internal
 
