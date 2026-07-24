@@ -17,9 +17,10 @@ import {
 	DuotoneSwatch,
 	Dropdown,
 	Flex,
-	FlexItem,
+	FlexBlock,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -119,12 +120,12 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 				) }
 			</Flex>
 		</ZStack>
-		<FlexItem
+		<FlexBlock
 			className="block-editor-panel-duotone-settings__label"
 			title={ label }
 		>
 			{ label }
-		</FlexItem>
+		</FlexBlock>
 	</HStack>
 );
 
@@ -160,10 +161,8 @@ const renderToggle = ( duotone, resetConfig ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceOverrideIndicator className="block-editor-panel-duotone-settings__reset" />
-					) : (
+				<Stack className="block-editor-panel-duotone-settings__actions">
+					{ hasLocalValue && (
 						<Button
 							size="small"
 							icon={ resetIcon }
@@ -171,7 +170,11 @@ const renderToggle = ( duotone, resetConfig ) =>
 							className="block-editor-panel-duotone-settings__reset"
 							onClick={ handleReset }
 						/>
-					) ) }
+					) }
+					{ hasLocalOverride && (
+						<InheritanceOverrideIndicator className="block-editor-panel-duotone-settings__inheritance-override-indicator" />
+					) }
+				</Stack>
 			</>
 		);
 	};

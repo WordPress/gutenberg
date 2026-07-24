@@ -38,19 +38,4 @@
 // diamond SVG and the "Overrides inherited styles" tooltip.
 .global-styles-inheritance-indicator {
 	border-radius: 50% !important;
-
-	// Duotone: the indicator reuses the control's reset slot, which is
-	// absolutely positioned and hover-revealed (`opacity: 0`). The indicator
-	// must stay visible, so re-assert placement and force `opacity: 1` (this
-	// compound selector wins on specificity).
-	&.block-editor-panel-duotone-settings__reset {
-		position: absolute;
-		justify-content: center;
-		inset-inline-end: $grid-unit;
-		top: 50%;
-		transform: translateY(-50%);
-		margin-block: 0;
-		margin-inline: 0;
-		opacity: 1;
-	}
 }
