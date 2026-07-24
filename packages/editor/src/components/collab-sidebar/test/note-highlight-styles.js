@@ -67,11 +67,15 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'emphasizes hover and focus-within by thickening that same underline', () => {
-		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
-		expect( css ).toContain(
-			'mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-thickness:3px;}'
-		);
+	/*
+	 * Hover is decorative, and a marker thickening under the pointer is a
+	 * silhouette change that reads as noise. Emphasis is reserved for selecting
+	 * the note. Guards against reintroducing a hover variant.
+	 */
+	it( 'never varies a marker on hover', () => {
+		const css = buildHighlightCss( [ { id: 7, author: 1 } ], '7' );
+		expect( css ).not.toContain( ':hover' );
+		expect( css ).not.toContain( ':focus-within' );
 	} );
 
 	/*

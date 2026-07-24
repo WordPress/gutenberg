@@ -57,9 +57,9 @@ function ruleColor( color ) {
  *
  * Present at rest, not only on hover or selection: a reader has to be able to
  * see which text carries a note without interacting with anything first, which
- * is the whole reason the marking exists. Emphasis is then a thicker version of
- * the same rule - a silhouette change rather than a stronger wash, so it costs
- * the theme's text contrast nothing.
+ * is the whole reason the marking exists. Selecting the note is then a thicker
+ * version of the same rule - a silhouette change rather than a stronger wash,
+ * so it costs the theme's text contrast nothing.
  *
  * @param {string} color     The author's `#RRGGBB` color.
  * @param {string} thickness Rule thickness.
@@ -138,9 +138,10 @@ export function getBlockLevelHighlights( threads, getBlockAttributes ) {
  *
  * Each marker gets a tint and an underline at rest, so which text carries a
  * note is legible without hovering or selecting anything. The tint stays at a
- * single low alpha in every state; hover, focus and selection only thicken the
+ * single low alpha in every state; only selecting the note thickens the
  * underline, so marking a note can cost the theme's text contrast the one fixed
- * amount and never more.
+ * amount and never more. Hover changes nothing: it is decorative, and a
+ * silhouette change there reads as noise.
  *
  * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
  * @param {string|null} selectedId ID of the currently selected note, if any.
@@ -161,9 +162,6 @@ export function buildHighlightCss( threads, selectedId = null ) {
 				color,
 				RULE_THICKNESS
 			) }}`
-		);
-		rules.push(
-			`${ sel }:hover,${ sel }:focus-within{text-decoration-thickness:${ RULE_THICKNESS_EMPHASIZED };}`
 		);
 		if ( selectedId && String( selectedId ) === String( thread.id ) ) {
 			rules.push(
@@ -269,9 +267,8 @@ export function buildBlockHighlightCss( blockHighlights ) {
  *
  * Inline markers are underlined and block-level notes ruled at rest, so
  * annotated content is legible without interaction. Markers thicken their
- * underline on `:hover`, `:focus-within` and when the matching thread is
- * selected; block-level tints stay flat and let the block's own outline carry
- * those states.
+ * underline when the matching thread is selected; block-level tints stay flat
+ * and let the block's own outline carry that state.
  *
  * @param {Object}      props
  * @param {Array}       props.threads      Unresolved note threads.
