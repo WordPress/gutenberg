@@ -80,14 +80,21 @@ function underline( color, thickness ) {
 // `<mark>` and would otherwise inherit the yellow default in the editor canvas.
 const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 
-// Forced-colors (e.g. Windows High Contrast) replaces the per-author tints
-// with system colors, and browsers force a `mark` background without touching
-// an author-specified `color:inherit` - which composes an unreadable pairing
-// when the canvas text color contrasts with the forced `Mark` background.
-// Opting into the `Mark`/`MarkText` pair keeps the two halves consistent.
+/*
+ * Forced-colors (e.g. Windows High Contrast) replaces the per-author tints with
+ * a system palette, and browsers paint a `mark` with the system `Mark`/`MarkText`
+ * pair: a solid highlight that swamps the annotated text and reads as nothing
+ * the rest of the editor uses. Markers drop it - `transparent` keeps its alpha
+ * through the forcing - and mark themselves with an outline instead, the way
+ * core signals state in that mode.
+ *
+ * `color` has to be restated rather than left to inherit: a `mark` is forced to
+ * `MarkText` even where the author asked to inherit, and `MarkText` is only
+ * legible against the `Mark` background this rule just removed.
+ */
 const FORCED_COLORS_RESET =
 	'@media (forced-colors: active){' +
-	'mark.wp-note{background-color:Mark;color:MarkText;}' +
+	'mark.wp-note{background-color:transparent;color:CanvasText;}' +
 	'}';
 
 /**
@@ -143,12 +150,18 @@ export function getBlockLevelHighlights( threads, getBlockAttributes ) {
  * amount and never more. Hover changes nothing: it is decorative, and a
  * silhouette change there reads as noise.
  *
+ * Under forced colors the tint is unavailable - the browser would paint the
+ * marker with the system highlight pair instead - so a marker drops it and
+ * carries a dashed outline in the system text color, the same fallback the
+ * block-level highlights use.
+ *
  * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
  * @param {string|null} selectedId ID of the currently selected note, if any.
  * @return {string} A serialized CSS string targeting the in-content note markers.
  */
 export function buildHighlightCss( threads, selectedId = null ) {
 	const rules = [ BASE_RESET, FORCED_COLORS_RESET ];
+	const markerSelectors = [];
 	for ( const thread of threads ?? [] ) {
 		if ( ! thread?.id ) {
 			continue;
@@ -157,6 +170,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
 		// The `core/note` format serializes the id into `data-id`, so the marker
 		// can be targeted directly without a separate annotation layer.
 		const sel = getNoteMarkerSelector( thread.id );
+		markerSelectors.push( sel );
 		rules.push(
 			`${ sel }{background-color:${ color }${ TINT_ALPHA };${ underline(
 				color,
@@ -168,6 +182,25 @@ export function buildHighlightCss( threads, selectedId = null ) {
 				`${ sel }{text-decoration-thickness:${ RULE_THICKNESS_EMPHASIZED };}`
 			);
 		}
+	}
+	/*
+	 * The marking a forced-colors palette allows: no tint (the forcing turns
+	 * the author color into the system highlight, so it has to be dropped here
+	 * where the per-note rules can be outranked, not in the reset above), and a
+	 * dashed outline in the system text color instead - the same fallback the
+	 * block-level highlights use. The underline is restated in that color too,
+	 * since an author `color-mix()` is left alone by the forcing and can land
+	 * anywhere against a system canvas.
+	 *
+	 * Emitted last and carrying the same specificity as the per-note rules, so
+	 * it is the cascade and not `!important` that settles which one applies.
+	 */
+	if ( markerSelectors.length > 0 ) {
+		rules.push(
+			`@media (forced-colors: active){${ markerSelectors.join(
+				','
+			) }{background-color:transparent;text-decoration-color:CanvasText;outline:${ RULE_THICKNESS } dashed;outline-offset:1px;}}`
+		);
 	}
 	return rules.join( '' );
 }
@@ -202,7 +235,9 @@ export function buildHighlightCss( threads, selectedId = null ) {
  *
  * Under forced colors both tints and shadows are stripped by the browser, so
  * each annotated block falls back to a dashed outline - dashed so it cannot be
- * mistaken for the solid outline the editor draws on the selected block.
+ * mistaken for the solid outline the editor draws on the selected block - and
+ * its underline is restated in the system text color, which the forcing does
+ * not do for an author `color-mix()`.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
@@ -210,6 +245,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
 export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
 	const blockSelectors = [];
+	const textSelectors = [];
 	for ( const highlight of blockHighlights ?? [] ) {
 		if ( ! highlight?.clientId ) {
 			continue;
@@ -227,15 +263,14 @@ export function buildBlockHighlightCss( blockHighlights ) {
 			color,
 			RULE_THICKNESS
 		) }`;
-		rules.push(
-			`${ blockSel }.block-editor-rich-text__editable{${ textDeclarations }}`
-		);
+		const textSel = `${ blockSel }.block-editor-rich-text__editable`;
 		// Containers whose direct children are block wrappers (list, quote,
 		// group) mark each of their rich-text leaves; a cover or image nests
 		// its editables inside non-block containers, so it won't match.
-		rules.push(
-			`${ blockSel }:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable{${ textDeclarations }}`
-		);
+		const leafSel = `${ blockSel }:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
+		textSelectors.push( textSel, leafSel );
+		rules.push( `${ textSel }{${ textDeclarations }}` );
+		rules.push( `${ leafSel }{${ textDeclarations }}` );
 		// Block wrappers are position:relative and the overlay sits above the
 		// content, so `inset:0` hugs the block exactly with no reflow.
 		rules.push(
@@ -245,10 +280,20 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		);
 	}
 	if ( blockSelectors.length > 0 ) {
+		/*
+		 * The underline is the one part of the resting treatment the forcing
+		 * leaves alone (an author `color-mix()` is not remapped), so it would
+		 * keep a palette color that can land anywhere against a system canvas;
+		 * restating it in the system text color keeps every marking in the
+		 * palette the mode allows. Same selectors as the resting rules, so it
+		 * is source order and not `!important` that settles the cascade.
+		 */
 		rules.push(
 			`@media (forced-colors: active){${ blockSelectors.join(
 				','
-			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}}`
+			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}${ textSelectors.join(
+				','
+			) }{text-decoration-color:CanvasText;}}`
 		);
 	}
 	return rules.join( '' );

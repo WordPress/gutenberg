@@ -20,7 +20,7 @@ import { getAvatarBorderColor } from '../utils';
 
 const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 const FORCED_COLORS_RESET =
-	'@media (forced-colors: active){mark.wp-note{background-color:Mark;color:MarkText;}}';
+	'@media (forced-colors: active){mark.wp-note{background-color:transparent;color:CanvasText;}}';
 
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
@@ -28,13 +28,44 @@ describe( 'buildHighlightCss', () => {
 	} );
 
 	/*
-	 * Forced colors (e.g. Windows High Contrast) forces a `mark` background
-	 * while an author-specified `color:inherit` keeps the canvas text color,
-	 * which can compose an unreadable pairing. Opting into the system
-	 * `Mark`/`MarkText` pair keeps the two halves consistent.
+	 * Forced colors (e.g. Windows High Contrast) paints a `mark` with the
+	 * system highlight pair, which swamps the annotated text. Markers drop the
+	 * background there; `color` has to be restated because the forcing pins a
+	 * `mark` to `MarkText`, which is only legible against the background this
+	 * removes.
 	 */
-	it( 'pairs Mark with MarkText under forced colors', () => {
+	it( 'drops the marker background and restates the text color under forced colors', () => {
 		expect( buildHighlightCss( [] ) ).toContain( FORCED_COLORS_RESET );
+		expect( buildHighlightCss( [] ) ).not.toContain( 'MarkText' );
+	} );
+
+	/*
+	 * With the tint gone, something still has to say "this text carries a
+	 * note", and an outline is what survives the forcing - drawn in the system
+	 * text color, dashed to match the block-level fallback. Dropping the tint
+	 * belongs here rather than in the reset: the per-note rules outrank the
+	 * reset, so only a rule at their specificity, emitted after them, wins.
+	 */
+	it( 'drops the tint and marks each marker with a dashed outline under forced colors', () => {
+		const css = buildHighlightCss( [
+			{ id: 7, author: 1 },
+			{ id: 12, author: 3 },
+		] );
+		const forcedRule =
+			'@media (forced-colors: active){mark.wp-note[data-id="7"],mark.wp-note[data-id="12"]{background-color:transparent;text-decoration-color:CanvasText;outline:1.5px dashed;outline-offset:1px;}}';
+		expect( css ).toContain( forcedRule );
+		// After the resting tint rules, which carry the same specificity.
+		expect( css.indexOf( forcedRule ) ).toBeGreaterThan(
+			css.indexOf(
+				`mark.wp-note[data-id="12"]{background-color:${ getAvatarBorderColor(
+					3
+				) }40;`
+			)
+		);
+	} );
+
+	it( 'emits no per-marker forced-colors rule when there are no threads', () => {
+		expect( buildHighlightCss( [] ) ).not.toContain( 'outline' );
 	} );
 
 	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
@@ -374,14 +405,23 @@ describe( 'buildBlockHighlightCss', () => {
 	 * an annotated block with no marking at all. The dashed outline fallback
 	 * survives (its color is forced to the system text color), and dashed keeps
 	 * it distinct from the solid outline the editor draws on selection.
+	 *
+	 * The underline is the one part the forcing leaves alone - an author
+	 * `color-mix()` is not remapped - so it is restated in the system text
+	 * color rather than left on a palette color the mode never chose.
 	 */
-	it( 'falls back to a dashed outline under forced colors', () => {
+	it( 'falls back to a dashed outline and a system-colored underline under forced colors', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
 		expect( css ).toContain(
-			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}}'
+			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}' +
+				`${ textSelectorFor( 'abc-1' ) },${ leafSelectorFor(
+					'abc-1'
+				) },${ textSelectorFor( 'abc-2' ) },${ leafSelectorFor(
+					'abc-2'
+				) }{text-decoration-color:CanvasText;}}`
 		);
 	} );
 
