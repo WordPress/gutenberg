@@ -23,7 +23,7 @@ import {
 	useCustomUnits,
 } from '../unit-control';
 import type { FontSizePickerProps } from './types';
-import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
+import { Container, Header, HeaderLabel } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
@@ -127,7 +127,7 @@ const UnforwardedFontSizePicker = (
 						{ __( 'Font size' ) }
 					</HeaderLabel>
 					{ ! disableCustomFontSizes && (
-						<HeaderToggle
+						<Button
 							label={
 								currentPickerType === 'custom'
 									? __( 'Use size preset' )
