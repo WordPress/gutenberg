@@ -193,7 +193,8 @@ function Iframe( {
 				( name ) =>
 					name.startsWith( 'admin-color-' ) ||
 					name.startsWith( 'post-type-' ) ||
-					name === 'wp-embed-responsive'
+					name === 'wp-embed-responsive' ||
+					name === 'rtl'
 			)
 		);
 
@@ -206,6 +207,7 @@ function Iframe( {
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
 			contentDocument.dir = ownerDocument.dir;
+			documentElement.lang = ownerDocument.documentElement.lang;
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
