@@ -51,9 +51,26 @@ describe( 'discussion field', () => {
 		expect( screen.getByText( 'Closed' ) ).toBeVisible();
 	} );
 
-	it( 'reports Closed when only one status is known and it is closed', () => {
+	it( 'reports only on comments when the ping status is unknown', () => {
+		// Editing just the comment setting in bulk used to render
+		// "Comments only", claiming pings are closed for posts whose ping
+		// setting is not being changed.
+		renderDiscussion( { comment_status: 'open' } );
+
+		expect( screen.getByText( 'Comments open' ) ).toBeVisible();
+
 		renderDiscussion( { comment_status: 'closed' } );
 
-		expect( screen.getByText( 'Closed' ) ).toBeVisible();
+		expect( screen.getByText( 'Comments closed' ) ).toBeVisible();
+	} );
+
+	it( 'reports only on pings when the comment status is unknown', () => {
+		renderDiscussion( { ping_status: 'open' } );
+
+		expect( screen.getByText( 'Pings open' ) ).toBeVisible();
+
+		renderDiscussion( { ping_status: 'closed' } );
+
+		expect( screen.getByText( 'Pings closed' ) ).toBeVisible();
 	} );
 } );
