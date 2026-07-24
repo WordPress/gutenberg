@@ -171,9 +171,7 @@ export function setContentEditableWrapper(
 	node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 	if ( focus ) {
-		// Without preventScroll, focusing the wrapper scrolls the
-		// viewport to the top of the wrapper.
-		node.focus( { preventScroll: true } );
+		node.focus();
 	}
 
 	return true;

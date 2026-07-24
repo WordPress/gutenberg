@@ -125,6 +125,8 @@ export default function useSelectionObserver() {
 
 			let isTripleClick = false;
 
+			let shiftClickAnchor = null;
+
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
 				// A shift+click makes a multi-selection: mark the gesture as
@@ -135,27 +137,29 @@ export default function useSelectionObserver() {
 				if ( event.shiftKey ) {
 					startMultiSelect();
 
+					// The selection anchor is correct at this point.
+					// Browsers may lose it while handling the click
+					// (Safari moves the whole selection to the clicked
+					// position); remember it so the selection can be
+					// rebuilt on mouseup.
+					const { anchorNode, anchorOffset } =
+						defaultView.getSelection();
+					shiftClickAnchor = anchorNode && {
+						node: anchorNode,
+						offset: anchorOffset,
+					};
+
 					// The browser can only extend the selection to the
 					// clicked position when a common editing host contains
-					// both it and the selection to extend, and the click
-					// must not move focus into the clicked block, which
-					// would reset the selection being extended. Blocks
-					// are separate editing hosts, so before the browser
-					// acts on a click in a different block than the
-					// selected one, the wrapper must become the editing
-					// host, and hold focus: the click then focuses the
-					// editing host it targets, which is now the wrapper
-					// itself. A shift+click within one block stays fully
-					// native.
-					const clickedClientId = getBlockClientId( event.target );
-					const { clientId } = getSelectionStart();
-					if (
-						clickedClientId &&
-						clientId &&
-						clickedClientId !== clientId
-					) {
-						setContentEditableWrapper( node, true );
-					}
+					// both it and the selection to extend. Blocks are
+					// separate editing hosts, so before the browser acts
+					// on the click, the wrapper must become the editing
+					// host, like it does for shift+arrow in use-arrow-nav.
+					// Without it, the selection collapses to a caret in
+					// the clicked block (extending forward) or stops at
+					// the edge of the block it started in (extending
+					// backward). Focus is left alone: the click moves it.
+					setContentEditableWrapper( node, true, { focus: false } );
 				}
 			}
 
@@ -485,7 +489,79 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
+			// Returns the caret position at the given point, like the
+			// standard `caretPositionFromPoint`, with a fallback to the
+			// WebKit-only `caretRangeFromPoint`.
+			function caretPositionFromPoint( x, y ) {
+				if ( ownerDocument.caretPositionFromPoint ) {
+					return ownerDocument.caretPositionFromPoint( x, y );
+				}
+				const range = ownerDocument.caretRangeFromPoint?.( x, y );
+				return (
+					range && {
+						offsetNode: range.startContainer,
+						offset: range.startOffset,
+					}
+				);
+			}
+
 			function onMouseUp( event ) {
+				// Browsers may fail to extend the selection to the
+				// clicked position in another block, even within a
+				// common editing host. Complete the selection between
+				// the anchor of the gesture and the clicked caret
+				// position before it is recorded. Firefox leaves the
+				// selection where it was, so only the focus needs to be
+				// extended; Safari moves the whole selection to the
+				// clicked position, losing the anchor, which is restored
+				// from the position remembered on mousedown.
+				if ( event.shiftKey ) {
+					const selection = defaultView.getSelection();
+					const clickedClientId = getBlockClientId( event.target );
+					const position =
+						clickedClientId &&
+						caretPositionFromPoint(
+							event.clientX,
+							event.clientY
+						);
+
+					if (
+						position &&
+						getBlockClientId( position.offsetNode ) ===
+							clickedClientId
+					) {
+						const anchorIsElsewhere =
+							selection.anchorNode &&
+							getBlockClientId( selection.anchorNode ) !==
+								clickedClientId;
+
+						if ( anchorIsElsewhere ) {
+							if (
+								getBlockClientId( selection.focusNode ) !==
+								clickedClientId
+							) {
+								selection.extend(
+									position.offsetNode,
+									position.offset
+								);
+							}
+						} else if (
+							shiftClickAnchor?.node.isConnected &&
+							getBlockClientId( shiftClickAnchor.node ) &&
+							getBlockClientId( shiftClickAnchor.node ) !==
+								clickedClientId
+						) {
+							selection.setBaseAndExtent(
+								shiftClickAnchor.node,
+								shiftClickAnchor.offset,
+								position.offsetNode,
+								position.offset
+							);
+						}
+					}
+				}
+
+				shiftClickAnchor = null;
 				onSelectionChange( event );
 				stopMultiSelect();
 			}
