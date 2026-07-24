@@ -161,6 +161,78 @@ class Theme_JSON_Dark_Scheme_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '#111111', $result['dark'] );
 	}
 
+	public function test_light_scheme_emits_gated_override() {
+		// A dark-by-default theme: base palette is dark, `light` is the override.
+		$result = $this->get_variables_split(
+			array(
+				'palette' => array(
+					array(
+						'slug'  => 'base',
+						'name'  => 'Base',
+						'color' => '#111111',
+					),
+				),
+				'light'   => array(
+					'palette' => array(
+						array(
+							'slug'  => 'base',
+							'name'  => 'Base',
+							'color' => '#ffffff',
+						),
+					),
+				),
+			)
+		);
+		$full   = $result['full'];
+
+		// Light override is gated on `prefers-color-scheme: light`, applied unless forced dark.
+		$this->assertStringContainsString( '@media (prefers-color-scheme: light)', $full );
+		$this->assertStringContainsString( ':root:not([data-scheme="dark"])', $full );
+		// A forced-light choice re-asserts the light values.
+		$this->assertStringContainsString( ':root[data-scheme="light"]', $full );
+		$this->assertStringContainsString( '#ffffff', $full );
+		// No dark gate is emitted when only `light` is defined.
+		$this->assertStringNotContainsString( 'prefers-color-scheme: dark', $full );
+	}
+
+	public function test_light_and_dark_can_coexist() {
+		$result = $this->get_variables_split(
+			array(
+				'palette' => array(
+					array(
+						'slug'  => 'base',
+						'name'  => 'Base',
+						'color' => '#888888',
+					),
+				),
+				'light'   => array(
+					'palette' => array(
+						array(
+							'slug'  => 'base',
+							'name'  => 'Base',
+							'color' => '#ffffff',
+						),
+					),
+				),
+				'dark'    => array(
+					'palette' => array(
+						array(
+							'slug'  => 'base',
+							'name'  => 'Base',
+							'color' => '#000000',
+						),
+					),
+				),
+			)
+		);
+		$full   = $result['full'];
+
+		$this->assertStringContainsString( '@media (prefers-color-scheme: light)', $full );
+		$this->assertStringContainsString( '@media (prefers-color-scheme: dark)', $full );
+		$this->assertStringContainsString( ':root[data-scheme="light"]', $full );
+		$this->assertStringContainsString( ':root[data-scheme="dark"]', $full );
+	}
+
 	public function test_no_dark_key_emits_no_gate_and_is_unchanged() {
 		$base_only = array(
 			'palette' => array(

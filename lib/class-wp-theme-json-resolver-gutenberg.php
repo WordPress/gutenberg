@@ -271,8 +271,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme_json_data = static::inject_variations_from_block_style_variation_files( $theme_json_data, $variations );
 			$theme_json_data = static::inject_variations_from_block_styles_registry( $theme_json_data );
 
-			// Resolve a `settings.color.darkScheme` variation reference into `settings.color.dark`.
-			$theme_json_data = static::resolve_dark_scheme_variation( $theme_json_data );
+			// Resolve `settings.color.<scheme>Scheme` variation references into `settings.color.<scheme>`.
+			$theme_json_data = static::resolve_scheme_variations( $theme_json_data );
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
@@ -763,47 +763,50 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Resolves a `settings.color.darkScheme` variation reference into
-	 * `settings.color.dark`.
+	 * Resolves `settings.color.lightScheme` / `settings.color.darkScheme`
+	 * variation references into `settings.color.light` / `settings.color.dark`.
 	 *
-	 * When a theme sets `settings.color.darkScheme` to the title of a style
+	 * When a theme sets `settings.color.<scheme>Scheme` to the title of a style
 	 * variation, this copies that variation's color palette and gradients into
-	 * `settings.color.dark` so they are emitted as the dark scheme. Only the
-	 * variation's color presets are used; its other styles are ignored. An
-	 * inline `settings.color.dark` takes precedence and is left untouched.
+	 * `settings.color.<scheme>` so they are emitted as that scheme. Only the
+	 * variation's color presets are used; its other styles are ignored. An inline
+	 * `settings.color.<scheme>` takes precedence and is left untouched.
 	 *
 	 * @since 6.9.0
 	 *
 	 * @param array $theme_json_data Raw theme.json data.
-	 * @return array The theme.json data, with `settings.color.dark` populated when applicable.
+	 * @return array The theme.json data, with `settings.color.<scheme>` populated when applicable.
 	 */
-	protected static function resolve_dark_scheme_variation( $theme_json_data ) {
-		$color       = $theme_json_data['settings']['color'] ?? array();
-		$dark_scheme = $color['darkScheme'] ?? null;
+	protected static function resolve_scheme_variations( $theme_json_data ) {
+		$color = $theme_json_data['settings']['color'] ?? array();
 
-		// Nothing to resolve, or an inline `dark` is present and wins.
-		if ( empty( $dark_scheme ) || ! empty( $color['dark'] ) ) {
-			return $theme_json_data;
-		}
+		foreach ( array( 'light', 'dark' ) as $scheme ) {
+			$reference = $color[ $scheme . 'Scheme' ] ?? null;
 
-		foreach ( static::get_style_variations( 'theme' ) as $variation ) {
-			if ( ! isset( $variation['title'] ) || $variation['title'] !== $dark_scheme ) {
+			// Nothing to resolve, or an inline override is present and wins.
+			if ( empty( $reference ) || ! empty( $color[ $scheme ] ) ) {
 				continue;
 			}
 
-			$variation_color = $variation['settings']['color'] ?? array();
-			$dark            = array();
-			if ( ! empty( $variation_color['palette'] ) ) {
-				$dark['palette'] = $variation_color['palette'];
-			}
-			if ( ! empty( $variation_color['gradients'] ) ) {
-				$dark['gradients'] = $variation_color['gradients'];
-			}
+			foreach ( static::get_style_variations( 'theme' ) as $variation ) {
+				if ( ! isset( $variation['title'] ) || $variation['title'] !== $reference ) {
+					continue;
+				}
 
-			if ( ! empty( $dark ) ) {
-				$theme_json_data['settings']['color']['dark'] = $dark;
+				$variation_color = $variation['settings']['color'] ?? array();
+				$overrides       = array();
+				if ( ! empty( $variation_color['palette'] ) ) {
+					$overrides['palette'] = $variation_color['palette'];
+				}
+				if ( ! empty( $variation_color['gradients'] ) ) {
+					$overrides['gradients'] = $variation_color['gradients'];
+				}
+
+				if ( ! empty( $overrides ) ) {
+					$theme_json_data['settings']['color'][ $scheme ] = $overrides;
+				}
+				break;
 			}
-			break;
 		}
 
 		return $theme_json_data;

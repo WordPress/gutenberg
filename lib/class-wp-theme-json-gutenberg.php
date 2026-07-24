@@ -420,6 +420,8 @@ class WP_Theme_JSON_Gutenberg {
 			'customGradient'   => null,
 			'dark'             => null,
 			'darkScheme'       => null,
+			'light'            => null,
+			'lightScheme'      => null,
 			'defaultDuotone'   => null,
 			'defaultGradients' => null,
 			'defaultPalette'   => null,
@@ -2528,22 +2530,30 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			/*
-			 * Emit theme-authored dark-scheme preset overrides (palette, gradients).
-			 * Because these override the existing `--wp--preset--*` custom properties,
-			 * any value referencing a preset flips automatically.
+			 * Emit theme-authored per-scheme preset overrides (palette, gradients),
+			 * mirroring the CSS `prefers-color-scheme` model: the base presets are
+			 * the default, and `color.light` / `color.dark` override the other
+			 * scheme. A theme can therefore be light by default with a dark override,
+			 * or dark by default with a light override. Because these override the
+			 * existing `--wp--preset--*` custom properties, any value referencing a
+			 * preset flips automatically.
 			 *
 			 * The overrides respond to a root `data-scheme` attribute so a visitor
-			 * control can override the automatic behavior:
+			 * control can override the automatic behavior. For each scheme:
 			 *   - no attribute / `system`: follow the OS via `prefers-color-scheme`,
-			 *   - `light`: never apply the dark values (opt out),
-			 *   - `dark`: always apply the dark values.
+			 *     unless the visitor forced the opposite scheme,
+			 *   - `data-scheme="<scheme>"`: always apply that scheme's values.
 			 */
-			$dark_declarations = static::compute_dark_preset_vars( $node );
-			if ( ! empty( $dark_declarations ) ) {
-				$auto_selector   = static::get_scheme_scoped_selector( $selector, ':not([data-scheme="light"])' );
-				$forced_selector = static::get_scheme_scoped_selector( $selector, '[data-scheme="dark"]' );
-				$stylesheet     .= '@media (prefers-color-scheme: dark){' . static::to_ruleset( $auto_selector, $dark_declarations ) . '}';
-				$stylesheet     .= static::to_ruleset( $forced_selector, $dark_declarations );
+			foreach ( array( 'light', 'dark' ) as $scheme ) {
+				$scheme_declarations = static::compute_scheme_preset_vars( $node, $scheme );
+				if ( empty( $scheme_declarations ) ) {
+					continue;
+				}
+				$opposite        = 'dark' === $scheme ? 'light' : 'dark';
+				$auto_selector   = static::get_scheme_scoped_selector( $selector, ':not([data-scheme="' . $opposite . '"])' );
+				$forced_selector = static::get_scheme_scoped_selector( $selector, '[data-scheme="' . $scheme . '"]' );
+				$stylesheet     .= '@media (prefers-color-scheme: ' . $scheme . '){' . static::to_ruleset( $auto_selector, $scheme_declarations ) . '}';
+				$stylesheet     .= static::to_ruleset( $forced_selector, $scheme_declarations );
 			}
 		}
 
@@ -2572,22 +2582,23 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Given a settings node, extracts theme-authored dark-scheme preset
-	 * overrides and returns them as CSS Custom Property declarations.
+	 * Given a settings node, extracts theme-authored per-scheme preset overrides
+	 * and returns them as CSS Custom Property declarations.
 	 *
-	 * Reads `color.dark.palette` and `color.dark.gradients`, which the resolver
-	 * also populates from a `color.darkScheme` variation reference. The dark
-	 * presets are matched by slug to the base presets they override, so only
-	 * overridden slugs emit a value; slugs without a dark counterpart keep their
-	 * single value in both schemes. This is fully opt-in: absent `color.dark`,
-	 * no declarations are produced and output is unchanged.
+	 * Reads `color.<scheme>.palette` and `color.<scheme>.gradients` (where
+	 * `<scheme>` is `light` or `dark`), which the resolver also populates from a
+	 * `color.<scheme>Scheme` variation reference. The overrides are matched by
+	 * slug to the base presets, so only overridden slugs emit a value; slugs
+	 * without a counterpart keep their single value in every scheme. This is fully
+	 * opt-in: absent the key, no declarations are produced and output is unchanged.
 	 *
-	 * @param array $node Settings node (global or block-level).
+	 * @param array  $node   Settings node (global or block-level).
+	 * @param string $scheme The scheme to read: `light` or `dark`.
 	 * @return array List of `array( 'name' => ..., 'value' => ... )` declarations.
 	 */
-	protected static function compute_dark_preset_vars( $node ) {
-		$dark = $node['color']['dark'] ?? array();
-		if ( empty( $dark ) || ! is_array( $dark ) ) {
+	protected static function compute_scheme_preset_vars( $node, $scheme ) {
+		$overrides = $node['color'][ $scheme ] ?? array();
+		if ( empty( $overrides ) || ! is_array( $overrides ) ) {
 			return array();
 		}
 
@@ -2604,16 +2615,16 @@ class WP_Theme_JSON_Gutenberg {
 
 		$declarations = array();
 		foreach ( $preset_css_vars as $preset_key => $meta ) {
-			if ( empty( $dark[ $preset_key ] ) || ! is_array( $dark[ $preset_key ] ) ) {
+			if ( empty( $overrides[ $preset_key ] ) || ! is_array( $overrides[ $preset_key ] ) ) {
 				continue;
 			}
 
 			/*
 			 * Accept both a flat list of presets (as authored inline in
-			 * `settings.color.dark`) and an origin-keyed structure (as it may
-			 * arrive when sourced from a `darkScheme` style variation).
+			 * `settings.color.<scheme>`) and an origin-keyed structure (as it may
+			 * arrive when sourced from a `color.<scheme>Scheme` style variation).
 			 */
-			$presets = $dark[ $preset_key ];
+			$presets = $overrides[ $preset_key ];
 			if ( ! wp_is_numeric_array( $presets ) ) {
 				$flattened = array();
 				foreach ( static::VALID_ORIGINS as $origin ) {

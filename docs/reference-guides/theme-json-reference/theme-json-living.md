@@ -99,8 +99,10 @@ Settings related to colors.
 | custom | Allow users to select custom colors. | `boolean` | `true` |
 | customDuotone | Allow users to create custom duotone filters. | `boolean` | `true` |
 | customGradient | Allow users to create custom gradients. | `boolean` | `true` |
-| dark | Dark-scheme overrides for color presets. Presets are matched by slug to the base palette/gradients and emitted as `--wp--preset--*` custom properties under a `prefers-color-scheme: dark` gate. Fully opt-in: omit to leave output unchanged. Duotone is not yet supported here. | `{ palette, gradients }` |  |
+| dark | Dark-scheme overrides for color presets. Presets are matched by slug to the base palette/gradients and emitted as `--wp--preset--*` custom properties under a `prefers-color-scheme: dark` gate (and a `data-scheme="dark"` override). Use for a light-by-default theme. Fully opt-in: omit to leave output unchanged. Duotone is not yet supported here. | `{ palette, gradients }` |  |
 | darkScheme | Title of a theme style variation (from the theme's `styles/` directory) whose color presets are used as the dark scheme. Only the variation's color palette/gradients are used; other styles are ignored. If `dark` is also set, `dark` takes precedence. | `string` |  |
+| light | Light-scheme overrides for color presets. Mirrors `dark`, but emitted under a `prefers-color-scheme: light` gate (and a `data-scheme="light"` override). Use for a dark-by-default theme that wants a light alternative. Fully opt-in. Duotone is not yet supported here. | `{ palette, gradients }` |  |
+| lightScheme | Title of a theme style variation (from the theme's `styles/` directory) whose color presets are used as the light scheme. Only the variation's color palette/gradients are used; other styles are ignored. If `light` is also set, `light` takes precedence. | `string` |  |
 | defaultDuotone | Allow users to choose filters from the default duotone filter presets. | `boolean` | `true` |
 | defaultGradients | Allow users to choose colors from the default gradients. | `boolean` | `true` |
 | defaultPalette | Allow users to choose colors from the default palette. | `boolean` | `true` |

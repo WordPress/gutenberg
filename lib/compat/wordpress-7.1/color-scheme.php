@@ -19,17 +19,18 @@
  */
 
 /**
- * Whether the active theme provides a dark color scheme.
+ * Whether the active theme provides an alternate color scheme.
  *
- * True when the merged theme.json defines inline dark presets
- * (`settings.color.dark`) or references a dark style variation
- * (`settings.color.darkScheme`).
+ * True when the merged theme.json defines inline per-scheme presets
+ * (`settings.color.light` / `settings.color.dark`) or references a scheme style
+ * variation (`settings.color.lightScheme` / `settings.color.darkScheme`).
  *
  * @return bool
  */
 function gutenberg_theme_supports_color_scheme() {
 	$color = gutenberg_get_global_settings( array( 'color' ) );
-	return ! empty( $color['dark'] ) || ! empty( $color['darkScheme'] );
+	return ! empty( $color['light'] ) || ! empty( $color['lightScheme'] )
+		|| ! empty( $color['dark'] ) || ! empty( $color['darkScheme'] );
 }
 
 /**

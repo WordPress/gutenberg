@@ -1,24 +1,26 @@
-# Dark color scheme (experimental)
+# Color schemes (experimental)
 
 > **Status:** experimental prototype, opened for discussion. The shape of these
 > keys may change. See the tracking discussion linked from the pull request.
 
-A theme can provide a dark variant of its color presets. When the visitor's
-operating system prefers a dark color scheme, the dark preset values are applied
-automatically. The feature is **fully opt-in**: without the keys below, output is
-unchanged and the site stays light.
+A theme can provide alternate light and/or dark variants of its color presets,
+mirroring the CSS [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
+model: the theme's base palette is the default, and `settings.color.light` /
+`settings.color.dark` override the *other* scheme. So a light-by-default theme adds
+a `dark` override, and a **dark-by-default theme adds a `light` override**. The
+feature is **fully opt-in**: without the keys below, output is unchanged.
 
 ## How it works
 
 Color and gradient presets are already emitted as CSS custom properties
-(`--wp--preset--color--{slug}`, `--wp--preset--gradient--{slug}`). The dark scheme
-**redefines those same custom properties** under a `prefers-color-scheme: dark`
-media query. Anything that references a preset — theme styles, block styles, user
-selections made through the palette — flips automatically. Nothing that uses raw,
-non-preset color values is changed.
+(`--wp--preset--color--{slug}`, `--wp--preset--gradient--{slug}`). A scheme override
+**redefines those same custom properties** under the matching
+`prefers-color-scheme` media query. Anything that references a preset — theme
+styles, block styles, user selections made through the palette — flips
+automatically. Nothing that uses raw, non-preset color values is changed.
 
-Presets are matched by `slug`. A base preset with no dark counterpart keeps its
-single value in both schemes.
+Presets are matched by `slug`. A base preset with no override keeps its single
+value in every scheme.
 
 ## Overriding the automatic scheme (`data-scheme`)
 
@@ -63,7 +65,7 @@ only emitted on the front end when the active theme provides a dark scheme.
 }
 ```
 
-This emits, roughly:
+This emits, roughly (the `data-scheme` rules let a visitor control override the OS):
 
 ```css
 :root {
@@ -71,14 +73,48 @@ This emits, roughly:
 	--wp--preset--color--contrast: #111111;
 }
 @media (prefers-color-scheme: dark) {
-	:root {
+	:root:not([data-scheme="light"]) {
 		--wp--preset--color--base: #111111;
 		--wp--preset--color--contrast: #ffffff;
 	}
 }
+:root[data-scheme="dark"] {
+	--wp--preset--color--base: #111111;
+	--wp--preset--color--contrast: #ffffff;
+}
 ```
 
-`dark` may contain `palette` and `gradients`. (Duotone is not yet supported.)
+`dark` (and `light`) may contain `palette` and `gradients`. (Duotone is not yet
+supported.)
+
+### Dark by default (a `light` override)
+
+For a theme whose base palette is dark, add a `light` override instead — it is
+emitted under `prefers-color-scheme: light`, so visitors whose OS is in light mode
+(or who opt into light) get the light values:
+
+```json
+{
+	"version": 3,
+	"settings": {
+		"color": {
+			"palette": [
+				{ "slug": "base", "name": "Base", "color": "#111111" },
+				{ "slug": "contrast", "name": "Contrast", "color": "#ffffff" }
+			],
+			"light": {
+				"palette": [
+					{ "slug": "base", "color": "#ffffff" },
+					{ "slug": "contrast", "color": "#111111" }
+				]
+			}
+		}
+	}
+}
+```
+
+A theme may define `light`, `dark`, or both. When both are set, the base palette is
+the fallback for visitors whose OS expresses no preference.
 
 ## Authoring source B — reference a style variation
 
@@ -98,14 +134,15 @@ can point at it by title instead of duplicating the palette:
 
 Only the variation's color palette and gradients are used as the dark scheme; its
 other styles are ignored. If both `dark` and `darkScheme` are present, the inline
-`dark` takes precedence.
+`dark` takes precedence. `lightScheme` works the same way for the light scheme.
 
 ## Backward compatibility
 
-`color.dark` and `color.darkScheme` are additive, optional keys under the current
-`theme.json` version — there is **no new version**. Older WordPress releases that
-don't recognize them simply strip them during sanitization, so the theme renders in
-its light scheme. A single `theme.json` works on old and new WordPress.
+`color.light`, `color.dark`, `color.lightScheme`, and `color.darkScheme` are
+additive, optional keys under the current `theme.json` version — there is **no new
+version**. Older WordPress releases that don't recognize them simply strip them
+during sanitization, so the theme renders with its base palette. A single
+`theme.json` works on old and new WordPress.
 
 ## Not covered (yet)
 
