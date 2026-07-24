@@ -41,13 +41,12 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$track_artist     = $track_attributes['artist'] ?? null;
 				$track_album      = $track_attributes['album'] ?? null;
 				$track_image      = $track_attributes['image'] ?? null;
-				$track_image_alt  = $track_attributes['imageAlt'] ?? null;
 				$track_src        = $track_attributes['src'] ?? null;
 				$title            = ! empty( $track_title_attr ) && is_string( $track_title_attr ) ? $track_title_attr : __( 'Unknown title' );
 				$artist           = is_string( $track_artist ) ? $track_artist : '';
 				$album            = is_string( $track_album ) ? $track_album : '';
 				$image            = is_string( $track_image ) ? $track_image : '';
-				$image_alt        = is_string( $track_image_alt ) ? $track_image_alt : '';
+				$image_alt        = $track_attributes['imageAlt'] ?? '';
 				$url              = is_string( $track_src ) ? $track_src : '';
 				$aria_label       = $title;
 

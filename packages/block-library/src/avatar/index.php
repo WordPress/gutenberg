@@ -59,15 +59,13 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			)
 		);
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			$label            = '';
-			$link_target_attr = $attributes['linkTarget'] ?? null;
-			$link_target      = is_string( $link_target_attr ) ? $link_target_attr : '';
-			if ( '_blank' === $link_target ) {
+			$label = '';
+			if ( '_blank' === $attributes['linkTarget'] ) {
 				// translators: %s is the Author name.
 				$label = 'aria-label="' . esc_attr( sprintf( __( '(%s author archive, opens in a new tab)' ), $author_name ) ) . '"';
 			}
 			// translators: 1: Author archive link. 2: Link target. %3$s Aria label. %4$s Avatar image.
-			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $link_target ), $label, $avatar_block );
+			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 		}
 		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 	}
@@ -88,14 +86,12 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		)
 	);
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
-		$label            = '';
-		$link_target_attr = $attributes['linkTarget'] ?? null;
-		$link_target      = is_string( $link_target_attr ) ? $link_target_attr : '';
-		if ( '_blank' === $link_target ) {
+		$label = '';
+		if ( '_blank' === $attributes['linkTarget'] ) {
 			// translators: %s: Comment author name.
 			$label = 'aria-label="' . esc_attr( sprintf( __( '(%s website link, opens in a new tab)' ), $comment->comment_author ) ) . '"';
 		}
-		$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( $comment->comment_author_url ), esc_attr( $link_target ), $label, $avatar_block );
+		$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( $comment->comment_author_url ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 	}
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 }
