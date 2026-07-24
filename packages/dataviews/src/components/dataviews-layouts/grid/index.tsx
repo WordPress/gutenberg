@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -50,10 +51,11 @@ function ViewGrid< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
 		selection,
 		onChangeSelection,
+		isMultiSelect: true,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 	} );
 	if ( ! hasData ) {
 		return (
