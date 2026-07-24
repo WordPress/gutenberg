@@ -40,6 +40,7 @@ const {
 	useHasBorderPanel,
 	useSettingsForBlockElement,
 	useHasColorPanel,
+	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
@@ -70,6 +71,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	const settings = useSettingsForBlockElement( rawSettings, blockName );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
@@ -77,6 +79,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||
+		hasBackgroundPanel ||
 		hasLayoutPanel ||
 		hasVariationsPanel;
 	return hasGlobalStyles;

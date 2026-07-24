@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
 ### Enhancements
 
 -   Math format: seed the LaTeX input from the current selection when marking text as math, and toggle an active math object back to its LaTeX source when the button is clicked again. ([79052](https://github.com/WordPress/gutenberg/pull/79052))

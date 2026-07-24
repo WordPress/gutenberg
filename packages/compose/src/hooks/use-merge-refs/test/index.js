@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -342,6 +342,74 @@ describe( 'useMergeRefs', () => {
 			],
 			[ [], [] ],
 			[ [], [] ],
+		] );
+	} );
+
+	it( 'should work for dependency change after attachment outside a render of the owner', () => {
+		// The merged ref is created by a parent, but the element is mounted
+		// by a child in a commit of its own (e.g. the editor iframe portals
+		// the canvas body once the iframe document is available). The parent
+		// does not render in that commit, so the hook must still detect and
+		// apply a later ref change on the parent's next render.
+		function Child( { mergedRefs } ) {
+			const [ attached, setAttached ] = useState( false );
+			return (
+				<>
+					<button onClick={ () => setAttached( true ) } />
+					{ attached && <ul ref={ mergedRefs } /> }
+				</>
+			);
+		}
+
+		function Parent( { count } ) {
+			function refCallback1( value ) {
+				refCallback1.history.push( value );
+			}
+
+			refCallback1.history = [];
+
+			function refCallback2( value ) {
+				refCallback2.history.push( value );
+			}
+
+			refCallback2.history = [];
+
+			renderCallback( [ refCallback1.history, refCallback2.history ] );
+
+			const ref1 = useCallback( refCallback1, [] );
+			const ref2 = useCallback( refCallback2, [ count ] );
+			return <Child mergedRefs={ useMergeRefs( [ ref1, ref2 ] ) } />;
+		}
+
+		const { rerender, unmount } = render( <Parent count={ 1 } /> );
+
+		// Mount the element in a child-only commit: the parent does not
+		// render.
+		fireEvent.click( screen.getByRole( 'button' ) );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement ] ],
+		] );
+
+		rerender( <Parent count={ 2 } /> );
+
+		// The dependency change must still swap the second ref: the initial
+		// function called with null, the new function with the attached node.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement, null ] ],
+			[ [], [ originalElement ] ],
+		] );
+
+		unmount();
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [ originalElement, null ] ],
 		] );
 	} );
 } );

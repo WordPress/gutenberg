@@ -9,13 +9,14 @@ exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
     <button
       aria-expanded="false"
       aria-haspopup="true"
-      aria-label="Align"
+      aria-label="Align block"
       class="components-button components-dropdown-menu__toggle has-icon"
       data-toolbar-item="true"
       type="button"
     >
       <svg
         aria-hidden="true"
+        fill="currentColor"
         focusable="false"
         height="24"
         viewBox="0 0 24 24"
@@ -36,7 +37,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
   <div
     class="components-toolbar"
     icon="[object Object]"
-    label="Align"
+    label="Align block"
   >
     <div>
       <button
@@ -48,6 +49,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -70,6 +72,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -92,6 +95,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -114,6 +118,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"

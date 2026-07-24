@@ -19,7 +19,6 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-import { isIsolatedEditorKey } from '../../store/private-keys';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
@@ -30,11 +29,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getTemplateLock,
 		getBlockEditingMode,
 		canEditBlock,
-		isWithinEditedContentOnlySection,
-		getSettings,
+		isSectionBlock,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
-	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
 
 	const hasTemplateLock = clientIds.some(
 		( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -48,8 +45,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hasPatternNameInSelection = clientIds.some(
 		( id ) =>
 			!! getBlockAttributes( id )?.metadata?.patternName &&
-			! isWithinEditedContentOnlySection( id ) &&
-			! isIsolatedEditor
+			isSectionBlock( id )
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -93,13 +89,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const {
-		getBlockName,
-		getBlockAttributes,
-		isWithinEditedContentOnlySection,
-		getSettings,
-	} = unlock( select( blockEditorStore ) );
-	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
+	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
+		unlock( select( blockEditorStore ) );
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
@@ -108,8 +99,7 @@ function getBlockIcon( { select, clientIds } ) {
 	if (
 		_isSingleBlock &&
 		blockAttributes?.metadata?.patternName &&
-		! isWithinEditedContentOnlySection( firstClientId ) &&
-		! isIsolatedEditor
+		isSectionBlock( firstClientId )
 	) {
 		return symbol;
 	}
@@ -118,7 +108,12 @@ function getBlockIcon( { select, clientIds } ) {
 	const blockType = getBlockType( blockName );
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
-		const match = getActiveBlockVariation( blockName, blockAttributes );
+		const match = getActiveBlockVariation(
+			blockName,
+			blockAttributes,
+			undefined,
+			getBlock?.( firstClientId )?.innerContent
+		);
 		return match?.icon || blockType?.icon;
 	}
 

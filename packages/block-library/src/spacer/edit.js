@@ -16,7 +16,6 @@ import {
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -351,7 +350,7 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<View
+			<div
 				{ ...useBlockProps( {
 					style,
 					className: clsx( className, {
@@ -361,7 +360,7 @@ const SpacerEdit = ( {
 			>
 				{ blockEditingMode === 'default' &&
 					resizableBoxWithOrientation( inheritedOrientation ) }
-			</View>
+			</div>
 			{ ! isFlexLayout && (
 				<SpacerControls
 					setAttributes={ setAttributes }

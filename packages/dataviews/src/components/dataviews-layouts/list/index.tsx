@@ -394,6 +394,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -535,6 +536,25 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Whether the server has more rows beyond the current window.
+	const hasMoreItems =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
+	const listClassName = clsx( 'dataviews-view-list', className, {
+		[ `has-${ view.layout?.density }-density` ]:
+			view.layout?.density &&
+			[ 'compact', 'comfortable' ].includes( view.layout.density ),
+		'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+	} );
+	const compositeProps = {
+		ref: compositeRef,
+		id: baseId,
+		render: <div />,
+		activeId: activeCompositeId,
+		setActiveId: setActiveCompositeId,
+		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+	};
 	if ( ! hasData ) {
 		return (
 			<div
@@ -551,26 +571,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	if ( hasData && groupField && dataByGroup ) {
 		return (
 			<Composite
-				ref={ compositeRef }
-				id={ `${ baseId }` }
-				render={ <div /> }
+				{ ...compositeProps }
 				className="dataviews-view-list__group"
 				role="grid"
-				activeId={ activeCompositeId }
-				setActiveId={ setActiveCompositeId }
 			>
-				<Stack
-					direction="column"
-					gap="lg"
-					className={ clsx( 'dataviews-view-list', className ) }
-				>
+				<Stack direction="column" gap="lg" className={ listClassName }>
 					{ Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<Stack
-								direction="column"
-								key={ groupName }
-								gap="sm"
-							>
+							<Stack direction="column" key={ groupName }>
 								<h3 className="dataviews-view-list__group-header">
 									{ view.groupBy?.showLabel === false
 										? groupName
@@ -617,24 +625,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	return (
 		<>
 			<Composite
-				ref={ compositeRef }
-				id={ baseId }
-				render={ <div /> }
-				className={ clsx( 'dataviews-view-list', className, {
-					[ `has-${ view.layout?.density }-density` ]:
-						view.layout?.density &&
-						[ 'compact', 'comfortable' ].includes(
-							view.layout.density
-						),
-					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
-				} ) }
+				{ ...compositeProps }
+				className={ listClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
-				activeId={ activeCompositeId }
-				setActiveId={ setActiveCompositeId }
-				// @ts-ignore
-				inert={
-					! isInfiniteScroll && !! isLoading ? 'true' : undefined
-				}
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );
@@ -663,8 +656,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ isInfiniteScroll && isLoading && (
-				<p className="dataviews-loading-more">
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
+				<p
+					className="dataviews-loading-more"
+					aria-hidden={ ! isLoading }
+				>
 					<Spinner />
 				</p>
 			) }

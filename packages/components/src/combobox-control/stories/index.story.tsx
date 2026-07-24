@@ -75,7 +75,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 	return (
 		<>
 			<ComboboxControl
-				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
@@ -88,7 +87,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Country',
 	options: countryOptions,
 	help: 'Help text to describe the control.',

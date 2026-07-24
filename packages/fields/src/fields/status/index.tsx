@@ -18,6 +18,10 @@ const statusField: Field< BasePost > = {
 	id: 'status',
 	type: 'text',
 	elements: STATUSES,
+	// An auto-draft is a draft that hasn't been saved yet, so treat it as
+	// one for display, selection, and filtering.
+	getValue: ( { item } ) =>
+		item.status === 'auto-draft' ? 'draft' : item.status,
 	render: StatusView,
 	Edit: 'radio',
 	enableSorting: false,

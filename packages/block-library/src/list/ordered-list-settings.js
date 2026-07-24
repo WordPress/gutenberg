@@ -66,7 +66,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					}
 				>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'List style' ) }
 						options={ LIST_STYLE_OPTIONS }
 						value={ type || 'decimal' }

@@ -11,8 +11,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-avymxl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
+-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
++         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -24,8 +24,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-avymxl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
+-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
++         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -44,8 +44,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
-+       class="components-item css-y16wpf-PolymorphicDiv-large-item e19lxcc00"
+-       class="css-17kujwd-medium css-1izz8ne-item components-item"
++       class="css-o0djae-large css-1izz8ne-item components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -68,34 +68,40 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   border-bottom-right-radius: 2px;
 }
 
-.emotion-2 {
+.emotion-1 {
   width: 100%;
   display: block;
 }
 
-.emotion-3 {
+.emotion-2 {
   padding: calc((36px - calc(13px * 1.4) - 2px) / 2) 12px;
+}
+
+.emotion-3 {
   box-sizing: border-box;
   width: 100%;
   display: block;
   margin: 0;
   color: inherit;
+}
+
+.emotion-4 {
   border-radius: 2px;
 }
 
 <div>
   <div
-    class="components-item-group emotion-0 emotion-1"
+    class="emotion-0 components-item-group"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
   >
     <div
-      class="emotion-2"
+      class="emotion-1"
       role="listitem"
     >
       <div
-        class="components-item emotion-3 emotion-1"
+        class="emotion-2 emotion-3 emotion-4 components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -114,8 +120,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
-+     class="components-item-group css-12ds22-PolymorphicDiv-separated-rounded e19lxcc00"
+-     class="css-1e6snp6-rounded components-item-group"
++     class="css-qr0sb5-separated css-1e6snp6-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -125,8 +131,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
+-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
++         class="css-17kujwd-medium css-1izz8ne-item components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -142,8 +148,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
-+     class="components-item-group css-z3k5b4-PolymorphicDiv-bordered-rounded e19lxcc00"
+-     class="css-1e6snp6-rounded components-item-group"
++     class="css-9rmwob-bordered css-1e6snp6-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -153,8 +159,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
+-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
++         class="css-17kujwd-medium css-1izz8ne-item components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -170,8 +176,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
-+     class="components-item-group css-1ragr82-PolymorphicDiv e19lxcc00"
+-     class="css-1e6snp6-rounded components-item-group"
++     class="components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"

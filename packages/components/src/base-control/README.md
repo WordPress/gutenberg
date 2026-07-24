@@ -30,8 +30,8 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
- - Required: No
+ - Type: `ElementType<any, keyof IntrinsicElements>`
+ - Required: Yes
 
 The HTML element or React component to render the component as.
 

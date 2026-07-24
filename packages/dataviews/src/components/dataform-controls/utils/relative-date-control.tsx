@@ -96,7 +96,6 @@ export default function RelativeDateControl< Item >( {
 		>
 			<Stack direction="row" gap="sm">
 				<NumberControl
-					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"
 					spinControls="none"
 					min={ 1 }
@@ -107,7 +106,6 @@ export default function RelativeDateControl< Item >( {
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
-					__next40pxDefaultSize
 					label={ __( 'Unit' ) }
 					value={ unit }
 					options={ options }

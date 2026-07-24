@@ -77,7 +77,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
--   Never run `npx prettier`. WordPress uses its own fork of prettier, `wp-prettier`. Use npm scripts (e.g. `npm run format`) commands to format code instead.
+-   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
 
 ## PR instructions
 

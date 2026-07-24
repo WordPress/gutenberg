@@ -6,11 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Disabled,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Disabled, Composite } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	BlockList,
@@ -36,6 +32,7 @@ import {
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as coreStore } from '@wordpress/core-data';
+import { Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -57,7 +54,6 @@ import { useStyle, useGlobalStyles } from '../global-styles';
 import { store as editorStore } from '../../store';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
@@ -311,15 +307,18 @@ function StyleBook(
 			} }
 		>
 			{ showTabs ? (
-				<Tabs>
+				<Tabs.Root
+					className="editor-style-book__tabs"
+					defaultValue={ tabs[ 0 ]?.slug }
+				>
 					<div className="editor-style-book__tablist-container">
-						<Tabs.TabList>
+						<Tabs.List>
 							{ tabs.map( ( tab ) => (
-								<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
+								<Tabs.Tab value={ tab.slug } key={ tab.slug }>
 									{ tab.title }
 								</Tabs.Tab>
 							) ) }
-						</Tabs.TabList>
+						</Tabs.List>
 					</div>
 					{ tabs.map( ( tab ) => {
 						const categoryDefinition = tab.slug
@@ -334,10 +333,10 @@ function StyleBook(
 							  )
 							: { examples };
 						return (
-							<Tabs.TabPanel
+							<Tabs.Panel
 								key={ tab.slug }
-								tabId={ tab.slug }
-								focusable={ false }
+								value={ tab.slug }
+								tabIndex={ -1 }
 								className="editor-style-book__tabpanel"
 							>
 								<StyleBookBody
@@ -349,10 +348,10 @@ function StyleBook(
 									title={ tab.title }
 									goTo={ goTo }
 								/>
-							</Tabs.TabPanel>
+							</Tabs.Panel>
 						);
 					} ) }
-				</Tabs>
+				</Tabs.Root>
 			) : (
 				<StyleBookBody
 					examples={ { examples: examplesForSinglePageUse } }

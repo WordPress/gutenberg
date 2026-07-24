@@ -6,16 +6,14 @@ import {
 	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tabs } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
 	useCallback,
-	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -50,7 +48,6 @@ import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
-import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -71,8 +68,6 @@ export type { MediaEditorSaveResult } from './use-save-media-editor';
 const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 interface EditorTab {
 	id: string;
@@ -116,7 +111,10 @@ export interface MediaEditorProps {
 }
 
 function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	const tabsContextValue = useContext( Tabs.Context );
+	// The tab list and panels must share one `<Tabs.Root>`, but they render in
+	// separate `ComplementaryArea` regions (header vs body). A non-virtual Slot
+	// reconciles both inline at the Slot, so the `Root` is lifted to wrap this
+	// Fill and that Slot together — see `MediaEditorContent`.
 	return (
 		<ComplementaryArea
 			scope="media-editor"
@@ -129,28 +127,20 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			headerClassName="media-editor__sidebar-header"
 			closeLabel={ __( 'Close media panel' ) }
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabList>
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } tabId={ tab.id }>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</Tabs.Context.Provider>
+				<Tabs.List variant="minimal">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
 			}
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel
-						key={ tab.id }
-						tabId={ tab.id }
-						focusable={ false }
-					>
-						{ tab.panel }
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs.Context.Provider>
+			{ tabs.map( ( tab ) => (
+				<Tabs.Panel key={ tab.id } value={ tab.id } tabIndex={ -1 }>
+					{ tab.panel }
+				</Tabs.Panel>
+			) ) }
 		</ComplementaryArea>
 	);
 }
@@ -501,6 +491,13 @@ function MediaEditorContent( {
 		isPanelLayout,
 	] );
 
+	// Control the active tab from state here so the selection survives the
+	// sidebar closing (which unmounts the `ComplementaryArea` Fill and its
+	// tabs). Fall back to the first tab until one is picked, so images open on
+	// Crop.
+	const [ selectedTabId, setSelectedTabId ] = useState< string >();
+	const activeTabId = selectedTabId ?? tabs[ 0 ]?.id;
+
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
@@ -581,58 +578,62 @@ function MediaEditorContent( {
 			onChange={ handleChange }
 			settings={ { fields } }
 		>
-			<div className="media-editor">
-				{ ! media ? (
+			{ ! media ? (
+				<div className="media-editor">
 					<div className="media-editor__loading">
 						<Spinner />
 					</div>
-				) : (
-					<>
-						<Tabs>
-							<MediaEditorSidebar tabs={ tabs } />
-						</Tabs>
-						<InterfaceSkeleton
-							className="media-editor__skeleton"
-							labels={ {
-								body: isImage
-									? __( 'Image editor' )
-									: __( 'Media preview' ),
-								sidebar: __( 'Media details' ),
-							} }
-							content={
-								<div className="media-editor__content">
-									<div className="media-editor__canvas-area">
-										{ isImage ? (
-											<MediaEditorCanvas
-												focusOnMount
-												isPlacementActive={
-													isPlacementActive
-												}
-												onGestureStart={
-													handleCanvasGestureStart
-												}
-												onGestureEnd={
-													handleCanvasGestureEnd
-												}
-											/>
-										) : (
-											<MediaPreview />
-										) }
-									</div>
-									{ isImage && (
-										<div className="media-editor__canvas-toolbar">
-											{ ruler }
-										</div>
+				</div>
+			) : (
+				<Tabs.Root
+					className="media-editor"
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						setSelectedTabId( value as string )
+					}
+				>
+					<MediaEditorSidebar tabs={ tabs } />
+					<InterfaceSkeleton
+						className="media-editor__skeleton"
+						labels={ {
+							body: isImage
+								? __( 'Image editor' )
+								: __( 'Media preview' ),
+							sidebar: __( 'Media details' ),
+						} }
+						content={
+							<div className="media-editor__content">
+								<div className="media-editor__canvas-area">
+									{ isImage ? (
+										<MediaEditorCanvas
+											focusOnMount
+											isPlacementActive={
+												isPlacementActive
+											}
+											onGestureStart={
+												handleCanvasGestureStart
+											}
+											onGestureEnd={
+												handleCanvasGestureEnd
+											}
+										/>
+									) : (
+										<MediaPreview />
 									) }
 								</div>
-							}
-							sidebar={
-								<ComplementaryArea.Slot scope="media-editor" />
-							}
-						/>
-					</>
-				) }
-			</div>
+								{ isImage && (
+									<div className="media-editor__canvas-toolbar">
+										{ ruler }
+									</div>
+								) }
+							</div>
+						}
+						sidebar={
+							<ComplementaryArea.Slot scope="media-editor" />
+						}
+					/>
+				</Tabs.Root>
+			) }
 			<ConfirmDialog
 				isOpen={ isDiscardDialogOpen }
 				confirmButtonText={ __( 'Discard' ) }

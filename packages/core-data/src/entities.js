@@ -49,8 +49,10 @@ export const rootEntitiesConfig = [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_max_bit_depth',
 				'image_sizes',
 				'image_size_threshold',
+				'image_strip_meta',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -247,6 +249,16 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
+	{
+		label: __( 'Icon Collections' ),
+		name: 'iconCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/icon-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'iconCollections',
+		key: 'slug',
+		supportsPagination: false,
+	},
 ];
 
 export const deprecatedEntities = {
@@ -313,7 +325,7 @@ export const prePersistPostType = async (
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
 			objectId
 		);

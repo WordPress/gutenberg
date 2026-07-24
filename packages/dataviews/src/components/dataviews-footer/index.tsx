@@ -13,7 +13,9 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import DataViewsPagination from '../dataviews-pagination';
+import DataViewsPagination, {
+	hasPaginationControls,
+} from '../dataviews-pagination';
 import {
 	BulkActionsFooter,
 	useSomeItemHasAPossibleBulkAction,
@@ -41,34 +43,33 @@ export default function DataViewsFooter() {
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
-	if (
-		! isRefreshing &&
-		( ! totalItems ||
-			! totalPages ||
-			( totalPages <= 1 && ! hasBulkActions ) )
-	) {
+	const hasPagination = hasPaginationControls( view, {
+		totalItems,
+		totalPages,
+	} );
+
+	if ( ! totalItems || ( ! hasBulkActions && ! hasPagination ) ) {
 		return null;
 	}
+
 	return (
-		( !! totalItems || isRefreshing ) && (
-			<div
-				className="dataviews-footer"
-				// @ts-ignore
-				inert={ isRefreshing ? 'true' : undefined }
+		<div
+			className="dataviews-footer"
+			// @ts-ignore
+			inert={ isRefreshing ? 'true' : undefined }
+		>
+			<Stack
+				direction="row"
+				justify="end"
+				align="center"
+				className={ clsx( 'dataviews-footer__content', {
+					'is-refreshing': isDelayedRefreshing,
+				} ) }
+				gap="sm"
 			>
-				<Stack
-					direction="row"
-					justify="end"
-					align="center"
-					className={ clsx( 'dataviews-footer__content', {
-						'is-refreshing': isDelayedRefreshing,
-					} ) }
-					gap="sm"
-				>
-					{ hasBulkActions && <BulkActionsFooter /> }
-					<DataViewsPagination />
-				</Stack>
-			</div>
-		)
+				{ hasBulkActions && <BulkActionsFooter /> }
+				<DataViewsPagination />
+			</Stack>
+		</div>
 	);
 }

@@ -94,6 +94,12 @@ export interface BlockVariation<
 	 */
 	innerBlocks?: Array< unknown[] >;
 	/**
+	 * Static HTML fragments interleaved with inner blocks, where `null`
+	 * entries mark inner block positions. Only applies to the Custom HTML
+	 * block.
+	 */
+	innerContent?: Array< string | null >;
+	/**
 	 * Example provides structured data for
 	 * the block preview. You can set to
 	 * `undefined` to disable the preview shown
@@ -243,6 +249,12 @@ export interface BlockType<
 	 */
 	example?: Partial< BlockType > & {
 		innerBlocks?: BlockExampleInnerBlock[];
+		/**
+		 * Static HTML fragments interleaved with inner blocks, where `null`
+		 * entries mark inner block positions. Only applies to the Custom HTML
+		 * block.
+		 */
+		innerContent?: Array< string | null >;
 		/**
 		 * The width of the preview container in pixels.
 		 */
@@ -487,6 +499,14 @@ export interface Block<
 	 * Inner blocks.
 	 */
 	innerBlocks: Block[];
+	/**
+	 * Static HTML fragments interleaved with inner blocks, for the Custom HTML
+	 * block. `null` entries mark the positions of the inner blocks within the
+	 * static markup. When present, this is the canonical source of the block's
+	 * own markup and is used for serialization instead of the `save`
+	 * implementation.
+	 */
+	innerContent?: Array< string | null >;
 	/**
 	 * Original content of the block before validation fixes.
 	 */

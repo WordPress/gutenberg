@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -44,7 +44,37 @@ jest.mock( '@wordpress/core-data', () => {
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
 	.useEntityRecordsWithPermissions as jest.Mock;
 
-function renderModal( { isOpen = true } = {} ) {
+const IMAGE_RECORDS = [
+	{
+		id: 1,
+		title: { raw: 'Cat', rendered: 'Cat' },
+		media_type: 'image',
+		mime_type: 'image/png',
+		source_url: 'https://example.com/cat.png',
+		alt_text: '',
+	},
+	{
+		id: 2,
+		title: { raw: 'Dog', rendered: 'Dog' },
+		media_type: 'image',
+		mime_type: 'image/png',
+		source_url: 'https://example.com/dog.png',
+		alt_text: '',
+	},
+];
+
+function mockRecords( records: unknown[] ) {
+	mockUseEntityRecordsWithPermissions.mockReturnValue( {
+		records,
+		isResolving: false,
+		totalItems: records.length,
+		totalPages: 1,
+	} );
+}
+
+type ModalProps = { isOpen?: boolean; value?: number | number[] };
+
+function renderModal( { isOpen = true, value }: ModalProps = {} ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
@@ -56,13 +86,14 @@ function renderModal( { isOpen = true } = {} ) {
 		<RegistryProvider value={ registry }>
 			<MediaUploadModal
 				isOpen={ isOpen }
+				value={ value }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
 		</RegistryProvider>
 	);
 
-	const rerender = ( props: { isOpen: boolean } ) => {
+	const rerender = ( props: ModalProps ) => {
 		view.rerender(
 			<RegistryProvider value={ registry }>
 				<MediaUploadModal
@@ -122,6 +153,65 @@ describe( 'MediaUploadModal', () => {
 				expect.objectContaining( { page: 1, search: '' } )
 			);
 		} );
+	} );
+
+	it( 'clears a user selection when the modal is closed and reopened', async () => {
+		const user = userEvent.setup();
+		mockRecords( IMAGE_RECORDS );
+
+		const { rerender } = renderModal();
+
+		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
+			'option'
+		);
+		await user.click( options[ 0 ] );
+		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+
+		// The modal instance stays mounted between opens, so the selection must
+		// be reset rather than persisting into the next open session.
+		rerender( { isOpen: false } );
+		rerender( { isOpen: true } );
+
+		const reopenedOptions = within(
+			screen.getByRole( 'listbox' )
+		).getAllByRole( 'option' );
+		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
+			'aria-selected',
+			'false'
+		);
+	} );
+
+	it( 'seeds the selection from `value`, reflecting an external change on the next open', async () => {
+		mockRecords( IMAGE_RECORDS );
+
+		// Opens with item 1 pre-selected via `value`.
+		const { rerender } = renderModal( { value: 1 } );
+
+		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
+			'option'
+		);
+		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
+
+		// Close first (still item 1), THEN change `value` to item 2 while the
+		// modal is closed. Keeping these as separate steps is what makes this
+		// exercise the open path: if the selection were only re-seeded on close,
+		// it would still hold item 1 on reopen.
+		rerender( { isOpen: false, value: 1 } );
+		rerender( { isOpen: false, value: 2 } );
+		rerender( { isOpen: true, value: 2 } );
+
+		const reopenedOptions = within(
+			screen.getByRole( 'listbox' )
+		).getAllByRole( 'option' );
+		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
+			'aria-selected',
+			'false'
+		);
+		expect( reopenedOptions[ 1 ] ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
 	} );
 
 	it( 'updates the media query when the picker changes page', async () => {

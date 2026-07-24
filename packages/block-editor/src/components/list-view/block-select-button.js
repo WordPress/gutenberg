@@ -46,6 +46,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		isDisabled = false,
 	},
 	ref
 ) {
@@ -79,6 +80,8 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
+		// Disabled list view items intentionally omit href so TreeGrid skips them.
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
@@ -94,7 +97,8 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ `#block-${ clientId }` }
+			href={ isDisabled ? undefined : `#block-${ clientId }` }
+			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>

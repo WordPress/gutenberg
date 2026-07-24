@@ -7,7 +7,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	Placeholder,
@@ -22,14 +22,12 @@ import { classic } from '@wordpress/icons';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
-import MigrationNotice from './migration-notice';
 import ModalEdit from './modal';
 
 export default function FreeformEdit( {
 	attributes,
 	setAttributes,
 	clientId,
-	onReplace,
 } ) {
 	const { content } = attributes;
 	const [ isOpen, setOpen ] = useState( false );
@@ -39,21 +37,13 @@ export default function FreeformEdit( {
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
-	const { removeBlock } = useDispatch( blockEditorStore );
-
-	// Gated by an experiment so authors can opt into a stronger nudge to
-	// migrate Classic block content ahead of its planned deprecation.
-	const isDeprecationMode = window.__experimentalClassicBlockDeprecation;
 
 	return (
 		<>
-			{ canRemove && ! isDeprecationMode && (
+			{ canRemove && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ConvertToBlocksButton
-							content={ content }
-							onReplace={ onReplace }
-						/>
+						<ConvertToBlocksButton clientId={ clientId } />
 					</ToolbarGroup>
 				</BlockControls>
 			) }
@@ -68,42 +58,19 @@ export default function FreeformEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...useBlockProps() }>
-				{ isDeprecationMode && canRemove && content && (
-					<MigrationNotice
-						content={ content }
-						onReplace={ onReplace }
-					/>
-				) }
 				{ content ? (
 					<RawHTML>{ content }</RawHTML>
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
 						label={ __( 'Classic' ) }
-						instructions={
-							isDeprecationMode
-								? __(
-										'The Classic block is being phased out. It’s recommended to use other blocks for the best editing experience.'
-								  )
-								: __( 'Use the classic editor to add content.' )
-						}
-					>
-						{ isDeprecationMode && canRemove && (
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								onClick={ () => removeBlock( clientId ) }
-							>
-								{ __( 'Remove block' ) }
-							</Button>
+						instructions={ __(
+							'Use the classic editor to add content.'
 						) }
+					>
 						<Button
 							__next40pxDefaultSize
-							variant={
-								isDeprecationMode && canRemove
-									? 'secondary'
-									: 'primary'
-							}
+							variant="primary"
 							onClick={ () => setOpen( true ) }
 						>
 							{ __( 'Edit contents' ) }

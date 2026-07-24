@@ -45,7 +45,6 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".editor-layout__toggle-sidebar-panel": 100000,
-	".edit-widgets-sidebar": 100000,
 	".editor-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
@@ -75,6 +74,7 @@ $z-layers: (
 	".components-popover": 1000000,
 
 	// Should be above the popover (dropdown)
+	".components-confirm-dialog": 1000001,
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
 	".fields-create-template-part-modal": 1000001,
@@ -83,6 +83,7 @@ $z-layers: (
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
 	".block-editor-block-allowed-blocks-modal": 1000001,
+	".block-editor-inserter__media-panel-detach-modal": 1000001,
 	".edit-site-list__rename-modal": 1000001,
 	".dataviews-action-modal": 1000001,
 	".editor-action-modal": 1000001,
@@ -91,9 +92,6 @@ $z-layers: (
 	".editor-sync-connection-error-modal": 1000001,
 	".media-editor-modal__footer": 1000001,
 	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
-
-	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
-	// because it uses emotion and not sass. We need it to render on top its parent popover.
 
 	// Show media replace flow and similar popovers beneath the media modal when its open.
 	".components-popover.block-editor-media-replace-flow__options": 99999,

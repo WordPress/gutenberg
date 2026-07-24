@@ -12,7 +12,6 @@ import {
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -132,13 +131,13 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				clientId={ clientId }
 			/>
 			{ showPlaceholder && (
-				<View>
+				<div>
 					{ innerBlocksProps.children }
 					<GroupPlaceHolder
 						name={ name }
 						onSelect={ selectVariation }
 					/>
-				</View>
+				</div>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (
 				<TagName { ...innerBlocksProps } />

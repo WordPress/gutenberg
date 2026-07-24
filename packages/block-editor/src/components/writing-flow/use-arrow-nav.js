@@ -18,8 +18,9 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -141,8 +142,16 @@ export function getClosestTabbable(
 			return false;
 		}
 
-		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		// Skip focusable elements such as links within content editable
+		// nodes: nodes whose closest editable host is an editable element
+		// within a block. When an editable root (e.g. the canvas wrapper)
+		// is the editing host, everything within it is content editable,
+		// but focusables like block wrappers are not text content.
+		if (
+			node.isContentEditable &&
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
+		) {
 			return false;
 		}
 
@@ -198,8 +207,17 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
+			// When the wrapper is contentEditable and holds focus (the
+			// selected block supports `editableRoot`), the event targets the
+			// wrapper; resolve the editable element containing the selection.
+			const target =
+				( event.target === node &&
+					getSelectionEditableElement(
+						node.ownerDocument.defaultView.getSelection(),
+						node
+					) ) ||
+				event.target;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -271,13 +289,22 @@ export default function useArrowNav() {
 			const { keepCaretInsideBlock } = getSettings();
 
 			if ( shiftKey ) {
-				if (
-					isClosestTabbableABlock( target, isReverse ) &&
-					isNavEdge( target, isReverse )
-				) {
-					node.contentEditable = true;
-					// Firefox doesn't automatically move focus.
-					node.focus();
+				if ( isNavEdge( target, isReverse ) ) {
+					if ( isClosestTabbableABlock( target, isReverse ) ) {
+						setContentEditableWrapper( node, true );
+					} else if ( node.contentEditable === 'true' ) {
+						// There is no block to extend the selection into.
+						// Within an editable wrapper the selection could
+						// natively escape into surrounding editable elements
+						// (e.g. the post title), so keep it inside the block
+						// by extending it to the block's edge.
+						const selection = defaultView.getSelection();
+						selection.extend(
+							target,
+							isReverse ? 0 : target.childNodes.length
+						);
+						event.preventDefault();
+					}
 				}
 			} else if (
 				isVertical &&

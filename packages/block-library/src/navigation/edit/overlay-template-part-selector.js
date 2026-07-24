@@ -309,7 +309,6 @@ export default function OverlayTemplatePartSelector( {
 					>
 						<FlexBlock>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Overlay template' ) }
 								hideLabelFromVision
 								aria-labelledby={ headingId }

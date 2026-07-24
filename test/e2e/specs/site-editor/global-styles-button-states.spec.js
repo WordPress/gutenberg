@@ -52,7 +52,14 @@ test.describe( 'Global Styles - Button States', () => {
 			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
 			.click();
 
-		await page.getByRole( 'button', { name: 'Background' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 
 		await page
 			.getByRole( 'option', { name: 'Luminous vivid orange' } )

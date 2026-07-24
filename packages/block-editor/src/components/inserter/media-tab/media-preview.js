@@ -21,7 +21,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
-import { moreVertical, external } from '@wordpress/icons';
+import { moreVertical, external, linkOff } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
@@ -43,11 +43,11 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
 
-function MediaPreviewOptions( { category, media } ) {
-	if ( ! category.getReportUrl ) {
+function MediaPreviewOptions( { category, media, onDetach } ) {
+	if ( ! category.getReportUrl && ! onDetach ) {
 		return null;
 	}
-	const reportUrl = category.getReportUrl( media );
+	const reportUrl = category.getReportUrl?.( media );
 	return (
 		<DropdownMenu
 			className="block-editor-inserter__media-list__item-preview-options"
@@ -57,18 +57,34 @@ function MediaPreviewOptions( { category, media } ) {
 		>
 			{ () => (
 				<MenuGroup>
-					<MenuItem
-						onClick={ () =>
-							window.open( reportUrl, '_blank' ).focus()
-						}
-						icon={ external }
-					>
-						{ sprintf(
-							/* translators: %s: The media type to report e.g: "image", "video", "audio" */
-							__( 'Report %s' ),
-							category.mediaType
-						) }
-					</MenuItem>
+					{ reportUrl && (
+						<MenuItem
+							onClick={ () =>
+								window.open( reportUrl, '_blank' ).focus()
+							}
+							icon={ external }
+						>
+							{ sprintf(
+								/* translators: %s: The media type to report e.g: "image", "video", "audio" */
+								__( 'Report %s' ),
+								category.mediaType
+							) }
+						</MenuItem>
+					) }
+					{ onDetach && (
+						<MenuItem
+							onClick={ () => onDetach( media ) }
+							icon={ linkOff }
+						>
+							{ category.postTypeLabel
+								? sprintf(
+										/* translators: %s: Name of the post type e.g: "Page". */
+										__( 'Detach from %s' ),
+										category.postTypeLabel
+								  )
+								: __( 'Detach from post' ) }
+						</MenuItem>
+					) }
 				</MenuGroup>
 			) }
 		</DropdownMenu>
@@ -122,7 +138,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 	);
 }
 
-export function MediaPreview( { media, onClick, category } ) {
+export function MediaPreview( { media, onClick, onDetach, category } ) {
 	const [ showExternalUploadModal, setShowExternalUploadModal ] =
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -294,6 +310,7 @@ export function MediaPreview( { media, onClick, category } ) {
 								<MediaPreviewOptions
 									category={ category }
 									media={ media }
+									onDetach={ onDetach }
 								/>
 							) }
 						</div>

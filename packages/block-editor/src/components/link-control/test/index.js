@@ -1731,7 +1731,7 @@ describe( 'Selecting links', () => {
 					);
 				};
 
-				const { container } = render( <LinkControlConsumer /> );
+				render( <LinkControlConsumer /> );
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1804,8 +1804,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Make sure focus is retained after submission.
-				// eslint-disable-next-line testing-library/no-node-access
-				expect( container.firstChild ).toHaveFocus();
+				expect( currentLinkAnchor ).toHaveFocus();
 
 				expect( currentLink ).toBeVisible();
 				expect(
@@ -3279,7 +3278,7 @@ describe( 'URL validation', () => {
 	] )(
 		'should prevent submission for $description',
 		async ( { inputUrl } ) => {
-			render(
+			const { container } = render(
 				<LinkControl
 					value={ { url: '' } }
 					forceIsEditingLink
@@ -3296,7 +3295,7 @@ describe( 'URL validation', () => {
 			// Wait for validation error to appear
 			await waitFor( () => {
 				expect(
-					screen.getByText( 'Please enter a valid URL.' )
+					within( container ).getByText( 'Please enter a valid URL.' )
 				).toBeInTheDocument();
 			} );
 
@@ -3408,7 +3407,7 @@ describe( 'URL validation', () => {
 	it( 'should show validation error when clicking Apply button with invalid URL', async () => {
 		// When editing an existing link, use Apply button
 		const existingLink = { url: 'https://example.com', title: 'Example' };
-		render(
+		const { container } = render(
 			<LinkControl
 				value={ existingLink }
 				forceIsEditingLink
@@ -3429,7 +3428,7 @@ describe( 'URL validation', () => {
 		await waitFor(
 			() => {
 				expect(
-					screen.getByText( 'Please enter a valid URL.' )
+					within( container ).getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			},
 			{ timeout: 100 }
@@ -3442,7 +3441,7 @@ describe( 'URL validation', () => {
 	it( 'should show validation error when pressing Enter to submit with an invalid URL', async () => {
 		// When editing an existing link, use Apply button
 		const existingLink = { url: 'https://example.com', title: 'Example' };
-		render(
+		const { container } = render(
 			<LinkControl
 				value={ existingLink }
 				forceIsEditingLink
@@ -3461,7 +3460,7 @@ describe( 'URL validation', () => {
 		await waitFor(
 			() => {
 				expect(
-					screen.getByText( 'Please enter a valid URL.' )
+					within( container ).getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			},
 			{ timeout: 100 }

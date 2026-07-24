@@ -7,6 +7,8 @@ import {
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -3657,6 +3659,54 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'surfaces innerContent on a block variation inserter item', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'widgets',
+				title: 'Custom HTML',
+				variations: [
+					{
+						name: 'card',
+						title: 'Card',
+						innerContent: [ '<div class="card">', null, '</div>' ],
+						innerBlocks: [ [ 'core/test-block-a' ] ],
+					},
+				],
+			} );
+
+			const items = select( store ).getInserterItems();
+			const variationItem = items.find(
+				( item ) => item.id === 'core/html/card'
+			);
+
+			expect( variationItem.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+
+			// Replicate how `useBlockTypesState` builds the block on insert,
+			// to guard the full path from variation to created block.
+			const block = createBlock(
+				variationItem.name,
+				variationItem.initialAttributes,
+				createBlocksFromInnerBlocksTemplate(
+					variationItem.innerBlocks
+				),
+				variationItem.innerContent
+			);
+			expect( block.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block-a' );
+
+			unregisterBlockType( 'core/html' );
+		} );
+
 		it( 'should correctly cache the return values', async () => {
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [
@@ -4799,6 +4849,89 @@ describe( 'selectors', () => {
 			};
 			expect( canRemoveBlock( state, 'child1' ) ).toBe( true );
 			setDefaultBlockName( previousDefaultBlockName );
+		} );
+	} );
+
+	describe( 'static inner content (Custom HTML block)', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Custom HTML',
+				icon: 'test',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/html' );
+		} );
+
+		// The Custom HTML block parent with a child container, which has a
+		// child of its own. The direct child is fixed in place; the grandchild
+		// is regular, fully editable content.
+		const buildState = () => ( {
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						parent: { name: 'core/html' },
+						child: { name: 'core/test-block-b' },
+						grandchild: { name: 'core/test-block-b' },
+					} )
+				),
+				attributes: new Map(
+					Object.entries( {
+						parent: {},
+						child: {},
+						grandchild: {},
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						parent: '',
+						child: 'parent',
+						grandchild: 'child',
+					} )
+				),
+				order: new Map( [
+					[ '', [ 'parent' ] ],
+					[ 'parent', [ 'child' ] ],
+					[ 'child', [ 'grandchild' ] ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[ 'parent', {} ],
+				[ 'child', {} ],
+			] ),
+			settings: {},
+			derivedBlockEditingModes: new Map(),
+		} );
+
+		it( 'prevents removing a direct child', () => {
+			expect( canRemoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents moving a direct child', () => {
+			expect( canMoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents insertion into the inner content root', () => {
+			expect(
+				canInsertBlockType(
+					buildState(),
+					'core/test-block-b',
+					'parent'
+				)
+			).toBe( false );
+		} );
+
+		it( 'does not cascade to deeper descendants', () => {
+			expect( canRemoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect( canMoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect(
+				canInsertBlockType( buildState(), 'core/test-block-b', 'child' )
+			).toBe( true );
 		} );
 	} );
 

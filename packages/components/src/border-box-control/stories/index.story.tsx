@@ -57,7 +57,6 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	return (
 		<>
 			<BorderBoxControl
-				__next40pxDefaultSize
 				{ ...otherProps }
 				onChange={ onChangeMerged }
 				value={ borders }
@@ -90,5 +89,4 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
-	__next40pxDefaultSize: true,
 };

@@ -1,16 +1,31 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import type { CSSProperties } from 'react';
+
 import { useMemo } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import type { ThemeProps } from './types';
+import type { ThemeOutputValues, ThemeProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import { colorVariables, Wrapper } from './styles';
 import { generateThemeVariables } from './color-algorithms';
-import { useCx } from '../utils';
+import styles from './style.module.scss';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+
+const getColorVariables = ( {
+	colors,
+}: ThemeOutputValues ): CSSProperties => ( {
+	'--wp-components-color-accent': colors.accent,
+	'--wp-components-color-accent-darker-10': colors.accentDarker10,
+	'--wp-components-color-accent-darker-20': colors.accentDarker20,
+	'--wp-components-color-accent-inverted': colors.accentInverted,
+	'--wp-components-color-background': colors.background,
+	'--wp-components-color-foreground': colors.foreground,
+	'--wp-components-color-foreground-inverted': colors.foregroundInverted,
+	...Object.fromEntries(
+		Object.entries( colors.gray ?? {} ).map( ( [ key, value ] ) => [
+			`--wp-components-color-gray-${ key }`,
+			value,
+		] )
+	),
+} );
 
 /**
  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
@@ -35,21 +50,31 @@ function Theme( {
 	accent,
 	background,
 	className,
+	style,
 	...props
 }: WordPressComponentProps< ThemeProps, 'div', true > ) {
-	const cx = useCx();
-	const classes = useMemo(
+	const themeVariables = useMemo(
 		() =>
-			cx(
-				...colorVariables(
-					generateThemeVariables( { accent, background } )
-				),
-				className
+			getColorVariables(
+				generateThemeVariables( { accent, background } )
 			),
-		[ accent, background, className, cx ]
+		[ accent, background ]
+	);
+	const wrapperStyle = useMemo(
+		() => ( {
+			...themeVariables,
+			...style,
+		} ),
+		[ style, themeVariables ]
 	);
 
-	return <Wrapper className={ classes } { ...props } />;
+	return (
+		<PolymorphicElement
+			className={ clsx( styles.wrapper, className ) }
+			style={ wrapperStyle }
+			{ ...props }
+		/>
+	);
 }
 
 export default Theme;

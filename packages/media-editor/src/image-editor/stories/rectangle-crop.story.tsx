@@ -395,7 +395,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -417,7 +416,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -450,7 +448,6 @@ const WithControlsComponent = () => {
 				</Flex>
 				<div className="image-editor-story__sliders">
 					<RangeControl
-						__next40pxDefaultSize
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -459,7 +456,6 @@ const WithControlsComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -831,7 +827,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
@@ -866,7 +861,6 @@ const DebugComponent = () => {
 				</Flex>
 				<div className="image-editor-story__sliders">
 					<RangeControl
-						__next40pxDefaultSize
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -875,7 +869,6 @@ const DebugComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }

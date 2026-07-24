@@ -23,6 +23,8 @@ import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
 
+// `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
+// Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 

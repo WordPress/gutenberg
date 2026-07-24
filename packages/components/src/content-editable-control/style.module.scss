@@ -1,0 +1,34 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.editable {
+	width: 100%;
+	background: $components-color-background;
+	color: $components-color-foreground;
+	@include input-control( $components-color-accent );
+	border-color: $components-color-border;
+
+	// `::placeholder` only applies to native form fields, so draw the text
+	// from the `aria-placeholder` attribute while the element has no content.
+	&[aria-placeholder]:empty::before {
+		content: attr(aria-placeholder);
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	min-height: $grid-unit-50;
+
+	// Subtract 1px to account for the border, which isn't included on the element
+	// on newer components like InputControl, SelectControl, etc.
+	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
+	padding: $grid-unit-15;
+
+	// Match the disabled treatment of native form controls (see the
+	// `&:disabled` rules in the textarea/input control styles).
+	&[aria-disabled="true"] {
+		background: $components-color-gray-100;
+		border-color: $components-color-gray-300;
+		color: $components-color-gray-700;
+		cursor: default;
+	}
+}

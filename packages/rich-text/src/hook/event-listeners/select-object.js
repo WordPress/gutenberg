@@ -47,11 +47,15 @@ export default () => ( element ) => {
 	}
 
 	function onFocusIn( event ) {
-		// When there is incoming focus from a link, select the object.
+		// When focus moves into the element and lands on a nested
+		// non-editable child (e.g. fragment navigation to a footnote
+		// marker), select the object. The focus source may be a link, or
+		// an editing host in between (links are not mouse focusable within
+		// an editable context, so the source link never receives focus
+		// when the editor canvas is an editing host).
 		if (
 			event.relatedTarget &&
-			! element.contains( event.relatedTarget ) &&
-			event.relatedTarget.tagName === 'A'
+			! element.contains( event.relatedTarget )
 		) {
 			onClick( event );
 		}

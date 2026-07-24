@@ -236,7 +236,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Taxonomy' ) }
 								options={ taxonomies.map( ( t ) => ( {
 									label: t.name,

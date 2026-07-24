@@ -75,6 +75,7 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
+import useLayoutCustomProperties from './use-layout-custom-properties';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -280,6 +281,11 @@ function Navigation( {
 	} = attributes;
 
 	const ref = attributes.ref;
+	useLayoutCustomProperties( {
+		clientId,
+		layout: attributes.layout,
+		style: attributes.style,
+	} );
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -297,22 +303,30 @@ function Navigation( {
 		onNavigateToEntityRecord,
 		currentTheme,
 		editorDisabledResponsive,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
+		hasSelectedStyleState,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				hasSelectedStyleState: hasSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
-		return {
-			isPreviewMode: settings.isPreviewMode,
-			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-			// Needed to construct the template part ID for the overlay preview.
-			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			// When editing a navigation post directly in an isolated editor,
-			// always show navigation expanded (no hamburger) so users can see
-			// and interact with all menu items.
-			editorDisabledResponsive:
-				!! settings?.[ isNavigationPostEditorKey ],
-		};
-	}, [] );
+			return {
+				isPreviewMode: settings.isPreviewMode,
+				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+				// Needed to construct the template part ID for the overlay preview.
+				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+				// When editing a navigation post directly in an isolated editor,
+				// always show navigation expanded (no hamburger) so users can see
+				// and interact with all menu items.
+				editorDisabledResponsive:
+					!! settings?.[ isNavigationPostEditorKey ],
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -820,7 +834,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleGroupControl
-										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
 										value={ submenuVisibility }
 										onChange={ ( value ) => {
@@ -925,26 +938,28 @@ function Navigation( {
 					/>
 				</InspectorControls>
 			) }
-			<InspectorControls group="color">
-				{ /*
-				 * Avoid useMultipleOriginColorsAndGradients and detectColors
-				 * on block mount. InspectorControls only mounts this component
-				 * when the block is selected.
-				 * */ }
-				<ColorTools
-					textColor={ textColor }
-					setTextColor={ setTextColor }
-					backgroundColor={ backgroundColor }
-					setBackgroundColor={ setBackgroundColor }
-					overlayTextColor={ overlayTextColor }
-					setOverlayTextColor={ setOverlayTextColor }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					setOverlayBackgroundColor={ setOverlayBackgroundColor }
-					clientId={ clientId }
-					navRef={ navRef }
-					hasCustomOverlay={ !! overlay }
-				/>
-			</InspectorControls>
+			{ ! hasSelectedStyleState && (
+				<InspectorControls group="color">
+					{ /*
+					 * Avoid useMultipleOriginColorsAndGradients and detectColors
+					 * on block mount. InspectorControls only mounts this component
+					 * when the block is selected.
+					 * */ }
+					<ColorTools
+						textColor={ textColor }
+						setTextColor={ setTextColor }
+						backgroundColor={ backgroundColor }
+						setBackgroundColor={ setBackgroundColor }
+						overlayTextColor={ overlayTextColor }
+						setOverlayTextColor={ setOverlayTextColor }
+						overlayBackgroundColor={ overlayBackgroundColor }
+						setOverlayBackgroundColor={ setOverlayBackgroundColor }
+						clientId={ clientId }
+						navRef={ navRef }
+						hasCustomOverlay={ !! overlay }
+					/>
+				</InspectorControls>
+			) }
 		</>
 	);
 

@@ -28,6 +28,7 @@ import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
+import formatSpaceCorrector from './format-space-corrector';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
@@ -62,7 +63,11 @@ function filterInlineHTML( HTML: string ): string {
 		true
 	);
 
-	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
+	HTML = deepFilterHTML( HTML, [
+		htmlFormattingRemover,
+		formatSpaceCorrector,
+		brRemover,
+	] );
 
 	// Allows us to ask for this information when we get a report.
 	log( 'Processed inline HTML:\n\n', HTML );
@@ -231,7 +236,12 @@ export function pasteHandler( {
 			piece = normaliseBlocks( piece );
 			piece = deepFilterHTML(
 				piece,
-				[ htmlFormattingRemover, brRemover, emptyParagraphRemover ],
+				[
+					htmlFormattingRemover,
+					formatSpaceCorrector,
+					brRemover,
+					emptyParagraphRemover,
+				],
 				blockContentSchema
 			);
 

@@ -1,13 +1,13 @@
 /**
- * Internal dependencies
- */
-import type { TruncateProps } from '../truncate/types';
-
-/**
  * External dependencies
  */
 import type { CSSProperties } from 'react';
 import type { FindAllArgs } from 'highlight-words-core';
+
+/**
+ * Internal dependencies
+ */
+import type { TruncateProps } from '../truncate/types';
 
 export type TextSize =
 	| 'body'

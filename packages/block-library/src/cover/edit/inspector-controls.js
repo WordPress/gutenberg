@@ -87,7 +87,6 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange
@@ -476,7 +475,6 @@ export default function CoverInspectorControls( {
 							max={ 100 }
 							step={ 10 }
 							required
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>

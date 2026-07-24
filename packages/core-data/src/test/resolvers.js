@@ -183,6 +183,51 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
+	it( 'does not load entity with sync manager when collaboration is unsupported', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+		const select = {
+			isCollaborationSupported: jest.fn( () => false ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.load ).not.toHaveBeenCalled();
+		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			POST_RECORD,
+			undefined
+		);
+	} );
+
 	it( 'notifies core-data when the sync undo manager stack changes', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {

@@ -213,13 +213,24 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await blockWrapper.click();
 		await editor.openDocumentSettingsSidebar();
 
-		const colorsButton = page.getByRole( 'button', { name: /Color/i } );
-		await colorsButton.click();
+		// Background color now lives in the Background panel and is hidden by
+		// default for this block, so reveal it via the panel options menu.
+		await page
+			.getByRole( 'button', { name: 'Background options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show Color' } )
+			.click();
 
-		const backgroundButton = page.getByRole( 'button', {
-			name: /Background/i,
-		} );
-		await backgroundButton.click();
+		const backgroundColorButton = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await backgroundColorButton.click();
+
 		const firstColor = page.getByRole( 'option' ).first();
 		const colorName = await firstColor.getAttribute( 'aria-label' );
 		await firstColor.click();

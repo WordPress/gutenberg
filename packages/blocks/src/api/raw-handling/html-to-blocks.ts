@@ -39,7 +39,9 @@ export function htmlToBlocks(
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+				{},
+				[],
+				[ node.outerHTML ]
 			);
 		}
 

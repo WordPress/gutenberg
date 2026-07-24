@@ -1,6 +1,8 @@
 import { flushSync } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
+import { warnCompat } from './warn-compat';
+
 const internalsKey = '_reactInternals';
 
 // HostComponent fiber tag, represents a DOM element like <div>.
@@ -55,6 +57,11 @@ function findHostFiberImpl( fiber ) {
 }
 
 export function findDOMNode( instance ) {
+	warnCompat(
+		'findDOMNode',
+		'`ReactDOM.findDOMNode` was removed in React 19 and is emulated by a compatibility polyfill. Use refs instead.'
+	);
+
 	if ( instance === null || instance === undefined ) {
 		return null;
 	}
@@ -81,6 +88,11 @@ export function findDOMNode( instance ) {
 const roots = new WeakMap();
 
 export function render( element, container, callback ) {
+	warnCompat(
+		'render',
+		'`ReactDOM.render` was removed in React 19 and is emulated by a compatibility polyfill. Use `createRoot` instead.'
+	);
+
 	let root = roots.get( container );
 	if ( ! root ) {
 		root = createRoot( container );
@@ -97,6 +109,11 @@ export function render( element, container, callback ) {
 }
 
 export function hydrate( element, container, callback ) {
+	warnCompat(
+		'hydrate',
+		'`ReactDOM.hydrate` was removed in React 19 and is emulated by a compatibility polyfill. Use `hydrateRoot` instead.'
+	);
+
 	let root = roots.get( container );
 	if ( ! root ) {
 		root = hydrateRoot( container, element );
@@ -111,6 +128,11 @@ export function hydrate( element, container, callback ) {
 }
 
 export function unmountComponentAtNode( container ) {
+	warnCompat(
+		'unmountComponentAtNode',
+		'`ReactDOM.unmountComponentAtNode` was removed in React 19 and is emulated by a compatibility polyfill. Use `root.unmount` instead.'
+	);
+
 	const root = roots.get( container );
 	if ( ! root ) {
 		return false;

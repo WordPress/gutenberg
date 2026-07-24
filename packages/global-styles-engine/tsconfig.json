@@ -9,6 +9,7 @@
 		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../i18n" },
+		{ "path": "../private-apis" },
 		{ "path": "../style-engine" }
 	],
 	"files": [ "global.d.ts" ]

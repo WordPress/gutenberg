@@ -35,13 +35,12 @@ const meta: Meta< typeof FormFileUpload > = {
 export default meta;
 
 const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
-	return <FormFileUpload __next40pxDefaultSize { ...props } />;
+	return <FormFileUpload { ...props } />;
 };
 
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Select file',
-	__next40pxDefaultSize: true,
 };
 
 export const RestrictFileTypes = Template.bind( {} );

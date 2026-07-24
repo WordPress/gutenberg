@@ -67,7 +67,6 @@ function CustomEditControl< Item >( {
 			value={ value ?? '' }
 			help={ description }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);

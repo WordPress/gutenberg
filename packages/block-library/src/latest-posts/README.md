@@ -23,8 +23,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `excerptLength` | `number` | `55` | — |
 | `displayAuthor` | `boolean` | `false` | — |
 | `displayPostDate` | `boolean` | `false` | — |
-| `postLayout` | `string` | `"list"` | — |
-| `columns` | `number` | `3` | — |
 | `order` | `string` | `"desc"` | — |
 | `orderBy` | `string` | `"date"` | — |
 | `displayFeaturedImage` | `boolean` | `false` | — |
@@ -41,12 +39,14 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+  - `blockGap`: `{"__experimentalDefault":"1.25em"}`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`

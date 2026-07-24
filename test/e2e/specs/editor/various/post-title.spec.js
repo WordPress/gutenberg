@@ -18,12 +18,20 @@ test.describe( 'Post title', () => {
 
 			await expect( pageTitleField ).toBeFocused();
 			await page.keyboard.press( 'Enter' );
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Empty block',
-				} ),
-				'should move focus to an empty paragraph block when the Enter key is pressed'
-			).toBeFocused();
+			await expect
+				.poll(
+					() =>
+						editor.ownsSelection(
+							editor.canvas.getByRole( 'document', {
+								name: 'Empty block',
+							} )
+						),
+					{
+						message:
+							'should move the selection to an empty paragraph block when the Enter key is pressed',
+					}
+				)
+				.toBe( true );
 		} );
 
 		test( 'should focus on the post title field when creating a new post in code editor mode', async ( {

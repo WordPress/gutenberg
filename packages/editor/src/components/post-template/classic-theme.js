@@ -159,7 +159,6 @@ function PostTemplateDropdownContent( { onClose } ) {
 				</Notice>
 			) : (
 				<SelectControl
-					__next40pxDefaultSize
 					hideLabelFromVision
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }

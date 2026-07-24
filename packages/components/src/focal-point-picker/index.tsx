@@ -94,6 +94,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
 export function FocalPointPicker( {
 	// Prevent passing to internal component.
 	__nextHasNoMarginBottom: _,
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	autoPlay = true,
 	className,
 	help,

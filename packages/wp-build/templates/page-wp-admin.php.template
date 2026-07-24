@@ -155,6 +155,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		// 2. It initializes the boot module as an inline script.
 		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $asset['dependencies'], $asset['version'], true );
 
+		$init_modules = {{INIT_MODULES_JSON}};
+
 		/*
 		 * Add inline script to initialize the app using initSinglePage (no menuItems).
 		 * The dynamic import is deferred until DOMContentLoaded so that all classic
@@ -166,10 +168,10 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		 * "Cannot unlock an undefined object". See <https://core.trac.wordpress.org/ticket/65103>.
 		 */
 		$init_js_function = <<<'JS'
-		( mountId, routes ) => {
+		( mountId, routes, initModules ) => {
 			const run = async () => {
 				const mod = await import( "@wordpress/boot" );
-				mod.initSinglePage( { mountId, routes } );
+				mod.initSinglePage( { mountId, routes, initModules } );
 			};
 			if ( document.readyState === "loading" ) {
 				document.addEventListener( "DOMContentLoaded", run );
@@ -181,10 +183,11 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		wp_add_inline_script(
 			'{{PAGE_SLUG}}-wp-admin-prerequisites',
 			sprintf(
-				'( %s )( %s, %s );',
+				'( %s )( %s, %s, %s );',
 				$init_js_function,
 				wp_json_encode( '{{PAGE_SLUG}}-wp-admin-app', JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);
 
@@ -204,6 +207,9 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 				'id'     => '@wordpress/boot',
 			),
 		);
+
+		// Add init modules as static dependencies
+{{INIT_MODULES_PHP_ARRAY}}
 
 		// Add all registered routes as dependencies
 		foreach ( $routes as $route ) {

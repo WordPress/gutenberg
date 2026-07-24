@@ -1,15 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useReducer } from '@wordpress/element';
+import { useEffect, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import ContrastChecker from '../components/contrast-checker';
+import { getContrastWarning } from '../components/contrast-checker';
+
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedValue( node, property ) {
@@ -80,23 +82,47 @@ function reducer( prevColors, newColors ) {
 	return hasChanged ? newColors : prevColors;
 }
 
-export default function BlockColorContrastChecker( { clientId, name } ) {
+/**
+ * Returns a contrast warning message for a block's computed colors, or
+ * `undefined` when contrast is sufficient or checking is disabled.
+ *
+ * Colors are read from the rendered block element so that inherited values
+ * (e.g. from Global Styles or ancestor blocks) are taken into account.
+ *
+ * @param {Object}  props
+ * @param {string}  props.clientId          Block client ID.
+ * @param {string}  props.name              Block name.
+ * @param {boolean} [props.enabled]         Whether contrast checking is active.
+ * @param {boolean} [props.checkTextColor]  Whether to evaluate the text/background pair.
+ * @param {boolean} [props.checkLinkColor]  Whether to evaluate the link/background pair.
+ * @param {string}  [props.messageOverride] Caller-provided copy used in place of the generic guidance.
+ *
+ * @return {?string} The warning message, if any.
+ */
+export default function useBlockColorContrastWarning( {
+	clientId,
+	name,
+	enabled = true,
+	checkTextColor = true,
+	checkLinkColor = true,
+	messageOverride,
+} ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
 
 	const blockType = useSelect(
 		( select ) => {
-			return name
+			return name && enabled
 				? select( blocksStore ).getBlockType( name )
 				: undefined;
 		},
-		[ name ]
+		[ name, enabled ]
 	);
 
 	// There are so many things that can change the color of a block
 	// So we perform this check on every render.
 	useLayoutEffect( () => {
-		if ( ! blockEl || ! blockType ) {
+		if ( ! enabled || ! blockEl || ! blockType ) {
 			return;
 		}
 
@@ -112,7 +138,7 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 	// Runs in its own effect with dependencies so the observer is only
 	// recreated when the block element or block type changes.
 	useLayoutEffect( () => {
-		if ( ! blockEl || ! blockType ) {
+		if ( ! enabled || ! blockEl || ! blockType ) {
 			return;
 		}
 
@@ -123,19 +149,36 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 		observer.observe( blockEl, {
 			attributes: true,
 			attributeFilter: [ 'class', 'style' ],
+			subtree: true,
 		} );
 
 		return () => {
 			observer.disconnect();
 		};
-	}, [ blockEl, blockType ] );
+	}, [ enabled, blockEl, blockType ] );
 
-	return (
-		<ContrastChecker
-			backgroundColor={ colors.backgroundColor }
-			textColor={ colors.textColor }
-			linkColor={ colors.linkColor }
-			enableAlphaChecker
-		/>
-	);
+	const warning = enabled
+		? getContrastWarning( {
+				backgroundColor: colors.backgroundColor,
+				textColor: checkTextColor ? colors.textColor : undefined,
+				linkColor: checkLinkColor ? colors.linkColor : undefined,
+				messageOverride,
+				enableAlphaChecker: true,
+		  } )
+		: null;
+
+	// The popover Notice that displays this warning is muted
+	// (`spokenMessage={ null }`), so this hook is the single source of the
+	// spoken announcement. Announce only when the warning message itself
+	// appears or changes; keying off `speakMessage` rather than the raw
+	// computed `colors` avoids re-announcing the same warning when colors
+	// recompute without changing the outcome.
+	const speakMessage = warning?.speakMessage;
+	useEffect( () => {
+		if ( speakMessage ) {
+			speak( speakMessage );
+		}
+	}, [ speakMessage ] );
+
+	return warning?.message;
 }

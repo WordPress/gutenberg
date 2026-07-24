@@ -48,7 +48,6 @@ const FontSizePickerWithState = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
-			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ ( nextValue ) => {
@@ -80,7 +79,6 @@ const TwoFontSizePickersWithState = ( {
 export const Default: FontSizePickerStory = {
 	render: FontSizePickerWithState,
 	args: {
-		__next40pxDefaultSize: true,
 		disableCustomFontSizes: false,
 		fontSizes: [
 			{

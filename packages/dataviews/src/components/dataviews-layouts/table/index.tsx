@@ -41,6 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -78,6 +79,8 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
+	onMouseDown: ( event: React.MouseEvent ) => void;
+	onClickCapture: ( event: React.MouseEvent ) => void;
 	isItemClickable: ( item: Item ) => boolean;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -130,6 +133,8 @@ function TableRow< Item >( {
 	onClickItem,
 	renderItemLink,
 	onChangeSelection,
+	onMouseDown,
+	onClickCapture,
 	isActionsColumnSticky,
 	posinset,
 }: TableRowProps< Item > ) {
@@ -142,10 +147,6 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
-	// Will be set to true if `onTouchStart` fires. This happens before
-	// `onClick` and can be used to exclude touchscreen devices from certain
-	// behaviours.
-	const isTouchDeviceRef = useRef( false );
 	const columns = view.fields ?? [];
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -158,14 +159,12 @@ function TableRow< Item >( {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
-			onTouchStart={ () => {
-				isTouchDeviceRef.current = true;
-			} }
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
+			onClickCapture={ onClickCapture }
 			onMouseDown={ ( event ) => {
 				// Firefox has a unique feature where ctrl/cmd + click selects a
 				// table cell. This interferes with the bulk selection behavior,
@@ -178,31 +177,9 @@ function TableRow< Item >( {
 						.toLowerCase()
 						.includes( 'firefox' )
 				) {
-					event?.preventDefault();
+					event.preventDefault();
 				}
-			} }
-			onClick={ ( event ) => {
-				if ( ! hasPossibleBulkAction ) {
-					return;
-				}
-
-				// Only handle Ctrl/Cmd+Click for multi-selection
-				const isModifierKeyPressed = isAppleOS()
-					? event.metaKey
-					: event.ctrlKey;
-
-				if (
-					isModifierKeyPressed &&
-					! isTouchDeviceRef.current &&
-					document.getSelection()?.type !== 'Range'
-				) {
-					// Handle non-consecutive selection with Ctrl/Cmd+Click
-					onChangeSelection(
-						selection.includes( id )
-							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
-					);
-				}
+				onMouseDown( event );
 			} }
 		>
 			{ hasBulkActions && (
@@ -302,6 +279,22 @@ function ViewTable< Item >( {
 }: ViewTableProps< Item > ) {
 	const { containerRef } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	// When grouping is enabled the rendered order is by group rather than the
+	// order of `data`; ranges follow what the user sees.
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		actions,
+		getItemId,
+		selection,
+		onChangeSelection,
+	} );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
@@ -375,10 +368,6 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupBy?.field
-		? fields.find( ( f ) => f.id === view.groupBy?.field )
-		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -605,7 +594,55 @@ function ViewTable< Item >( {
 											  ) }
 									</td>
 								</tr>
-								{ groupItems.map( ( item, index ) => (
+								{ groupItems.map( ( item, index ) => {
+									const id =
+										getItemId( item ) || index.toString();
+									return (
+										<TableRow
+											key={ getItemId( item ) }
+											item={ item }
+											level={
+												view.showLevels &&
+												typeof getItemLevel ===
+													'function'
+													? getItemLevel( item )
+													: undefined
+											}
+											hasBulkActions={ hasBulkActions }
+											actions={ actions }
+											fields={ fields }
+											id={ id }
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											{ ...getSelectionProps( id ) }
+											onClickItem={ onClickItem }
+											renderItemLink={ renderItemLink }
+											isItemClickable={ isItemClickable }
+											isActionsColumnSticky={
+												! isHorizontalScrollEnd
+											}
+										/>
+									);
+								} ) }
+							</tbody>
+						)
+					)
+				) : (
+					<tbody>
+						{ hasData &&
+							data.map( ( item, index ) => {
+								const id =
+									getItemId( item ) || index.toString();
+								return (
 									<TableRow
 										key={ getItemId( item ) }
 										item={ item }
@@ -618,10 +655,7 @@ function ViewTable< Item >( {
 										hasBulkActions={ hasBulkActions }
 										actions={ actions }
 										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
+										id={ id }
 										view={ view }
 										titleField={ titleField }
 										mediaField={ mediaField }
@@ -629,52 +663,21 @@ function ViewTable< Item >( {
 										selection={ selection }
 										getItemId={ getItemId }
 										onChangeSelection={ onChangeSelection }
+										{ ...getSelectionProps( id ) }
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
 										}
+										posinset={
+											isInfiniteScroll
+												? index + 1
+												: undefined
+										}
 									/>
-								) ) }
-							</tbody>
-						)
-					)
-				) : (
-					<tbody>
-						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
-									hasBulkActions={ hasBulkActions }
-									actions={ actions }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									onClickItem={ onClickItem }
-									renderItemLink={ renderItemLink }
-									isItemClickable={ isItemClickable }
-									isActionsColumnSticky={
-										! isHorizontalScrollEnd
-									}
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
-								/>
-							) ) }
+								);
+							} ) }
 					</tbody>
 				) }
 			</table>

@@ -39,7 +39,7 @@ const meta: Meta< typeof Tooltip > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Tooltip` from `@wordpress/ui` instead.',
+			notes: 'Use [`Tooltip`](?path=/docs/design-system-components-tooltip--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

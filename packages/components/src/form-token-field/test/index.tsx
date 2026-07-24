@@ -22,11 +22,7 @@ import { logged } from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import _FormTokenField from '../';
-
-const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
-	<_FormTokenField __next40pxDefaultSize { ...props } />
-);
+import FormTokenField from '../';
 
 const FormTokenFieldWithState = ( {
 	onChange,

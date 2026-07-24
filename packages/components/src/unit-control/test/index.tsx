@@ -12,12 +12,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import _UnitControl from '..';
+import UnitControl from '..';
 import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
-
-const UnitControl = ( props: React.ComponentProps< typeof _UnitControl > ) => (
-	<_UnitControl __next40pxDefaultSize { ...props } />
-);
 
 const getInput = ( {
 	isInputTypeText = false,

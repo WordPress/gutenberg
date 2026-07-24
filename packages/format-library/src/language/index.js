@@ -110,7 +110,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					) }
 				/>
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [

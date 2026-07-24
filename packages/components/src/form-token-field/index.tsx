@@ -25,17 +25,15 @@ import deprecated from '@wordpress/deprecated';
  */
 import Token from './token';
 import TokenInput from './token-input';
-import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
-import { FlexItem } from '../flex';
+import { Flex, FlexItem } from '../flex';
+import styles from './style.module.scss';
 import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const identity = ( value: string ) => value;
 
@@ -78,17 +76,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo,
-		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		tokenizeOnBlur = false,
 		help,
-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FormTokenField',
-		size: undefined,
-		__next40pxDefaultSize,
-	} );
+	} = props;
 
 	const defaultHelp = tokenizeOnSpace
 		? __( 'Separate with commas, spaces, or the Enter key.' )
@@ -835,16 +826,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				<TokensAndInputWrapperFlex
+				<Flex
+					className={ styles[ 'tokens-and-input' ] }
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
 					wrap
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }
-				</TokensAndInputWrapperFlex>
+				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }

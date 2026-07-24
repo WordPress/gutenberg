@@ -5,17 +5,6 @@
  */
 const program = require( 'commander' );
 
-const catchException = ( command ) => {
-	return async ( ...args ) => {
-		try {
-			await command( ...args );
-		} catch ( error ) {
-			console.error( error );
-			process.exitCode = 1;
-		}
-	};
-};
-
 /**
  * Internal dependencies
  */
@@ -44,7 +33,7 @@ program
 	.description(
 		'Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version)'
 	)
-	.action( catchException( publishNpmGutenbergPlugin ) );
+	.action( publishNpmGutenbergPlugin );
 
 program
 	.command( 'publish-npm-packages-bugfix-latest' )
@@ -54,7 +43,7 @@ program
 	.description(
 		'Publishes to npm bugfixes for packages (latest dist-tag, production version)'
 	)
-	.action( catchException( publishNpmBugfixLatest ) );
+	.action( publishNpmBugfixLatest );
 
 program
 	.command( 'publish-npm-packages-wordpress-core' )
@@ -65,7 +54,7 @@ program
 	.description(
 		'Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version)'
 	)
-	.action( catchException( publishNpmBugfixWordPressCore ) );
+	.action( publishNpmBugfixWordPressCore );
 
 program
 	.command( 'publish-npm-packages-next' )
@@ -76,7 +65,7 @@ program
 	.description(
 		'Publishes to npm development version of packages (next dist-tag, prerelease version)'
 	)
-	.action( catchException( publishNpmNext ) );
+	.action( publishNpmNext );
 
 program
 	.command( 'release-plugin-changelog' )
@@ -88,7 +77,7 @@ program
 		"Only include PRs that haven't been included in a release yet"
 	)
 	.description( 'Generates a changelog from merged Pull Requests' )
-	.action( catchException( getReleaseChangelog ) );
+	.action( getReleaseChangelog );
 
 program
 	.command( 'performance-tests [branches...]' )
@@ -109,6 +98,29 @@ program
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)
-	.action( catchException( runPerformanceTests ) );
+	.action( runPerformanceTests );
 
-program.parse( process.argv );
+/**
+ * Runs the release CLI and reports command failures.
+ *
+ * @param {string[]}                    args        Command-line arguments.
+ * @param {import('commander').Command} commandLine Commander program to run.
+ */
+async function run( args = process.argv, commandLine = program ) {
+	try {
+		await commandLine.parseAsync( args );
+	} catch ( error ) {
+		let errorMessage = String( error );
+		if ( error instanceof Error ) {
+			errorMessage = process.env.DEBUG ? error.stack : error.message;
+		}
+		console.error( errorMessage );
+		process.exitCode = 1;
+	}
+}
+
+if ( require.main === module ) {
+	run();
+}
+
+module.exports = { run };

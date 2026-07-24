@@ -65,7 +65,6 @@ export function TemplatePartAdvancedControls( {
 						onFocus={ ( event ) => event.target.select() }
 					/>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }

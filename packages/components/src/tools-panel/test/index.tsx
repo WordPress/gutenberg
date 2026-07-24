@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
@@ -17,6 +19,25 @@ import type {
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 const noop = () => undefined;
+
+type EmotionStyleFragment = Parameters< ReturnType< typeof useCx > >[ 0 ];
+
+const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
+	Array.from( element.classList ).filter( ( className ) =>
+		/^(css|emotion)-/.test( className )
+	);
+
+function EmotionStyleTest( {
+	styleFragment,
+}: {
+	styleFragment: EmotionStyleFragment;
+} ) {
+	const cx = useCx();
+
+	return (
+		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
+	);
+}
 
 type ControlValue = boolean | undefined;
 
@@ -257,6 +278,24 @@ describe( 'ToolsPanel', () => {
 			const resetAllItem = await screen.findByRole( 'menuitem' );
 
 			expect( resetAllItem ).toBeInTheDocument();
+		} );
+
+		it( 'should compose inner wrapper visibility styles in a single generated class', () => {
+			render(
+				<EmotionStyleTest
+					styleFragment={ styles.getToolsPanelStyles( {
+						columns: 2,
+						hasInnerWrapper: true,
+						areAllOptionalControlsHidden: true,
+					} ) }
+				/>
+			);
+
+			expect(
+				getGeneratedEmotionClassNames(
+					screen.getByTestId( 'emotion-style' )
+				)
+			).toHaveLength( 1 );
 		} );
 
 		it( 'should render panel menu items correctly', async () => {

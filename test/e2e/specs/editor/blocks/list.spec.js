@@ -1738,6 +1738,481 @@ test.describe( 'List (@firefox)', () => {
 		}
 	} );
 
+	test( 'should select the outer item fully when a text selection crosses the nesting boundary backward', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Move the caret to the middle of "cd", and verify the setup:
+		// "ab" with a nested "cd" item, then a top-level sibling "zz".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'ab' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'c‸d' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection backward into "ab": over "c", over the
+		// nesting boundary, then over "b". Yield so the selection
+		// observer can process it.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// The native selection is untouched (only hidden by the block
+		// overlay), so the gesture could still continue.
+		expect(
+			await page
+				.frame( { name: 'editor-canvas' } )
+				.evaluate( () =>
+					document.getSelection().toString().replace( /\s/g, '' )
+				)
+		).toBe( 'bc' );
+
+		// A partial selection across a nesting boundary is not
+		// mergeable; the press removes the fully selected item as a
+		// whole, together with its nested list; the unrelated sibling
+		// remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select the outer item fully when a text selection crosses the nesting boundary forward', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Move the caret to the middle of "ab" and verify.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸b' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'cd' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection forward past the nesting boundary into
+		// "cd", then yield so the selection observer can process it.
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// A partial selection across a nesting boundary is not
+		// mergeable; the press removes the fully selected item as a
+		// whole, together with its nested list; the unrelated sibling
+		// remains.
+		await page.keyboard.press( 'Delete' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select the outer item fully when dragging a selection across the nesting boundary', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Drag from the middle of "ab" to the middle of "cd".
+		const outer = await editor.canvas
+			.getByText( 'ab', { exact: true } )
+			.boundingBox();
+		const nested = await editor.canvas
+			.getByText( 'cd', { exact: true } )
+			.boundingBox();
+		await page.mouse.move(
+			outer.x + outer.width / 2,
+			outer.y + outer.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			nested.x + nested.width / 2,
+			nested.y + nested.height / 2,
+			{ steps: 10 }
+		);
+
+		await page.mouse.up();
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// The press removes the fully selected item as a whole, together
+		// with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select the outer item fully when extending a selection down into its nested item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Move the caret to the middle of "ab" and verify the setup:
+		// "ab" with a nested "cd" item, then a top-level sibling "zz".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸b' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'cd' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection down into the nested "cd" line, then
+		// yield so the selection observer can process it.
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// The native selection is untouched (only hidden by the block
+		// overlay), so the gesture could still continue. It reaches from
+		// the middle of "ab" into the nested "cd" item. The selected
+		// text is not asserted because the line navigation lands at the
+		// start of the indented nested line, right before "cd".
+		expect(
+			await page.frame( { name: 'editor-canvas' } ).evaluate( () => {
+				const selection = document.getSelection();
+				return {
+					anchor: selection.anchorNode.textContent,
+					anchorOffset: selection.anchorOffset,
+					focus: selection.focusNode.textContent,
+					focusOffset: selection.focusOffset,
+				};
+			} )
+		).toMatchObject( {
+			anchor: 'ab',
+			anchorOffset: 1,
+			focus: 'cd',
+			focusOffset: 0,
+		} );
+
+		// The press removes the fully selected item as a whole, together
+		// with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should multi-select the top level items when extending a selection down across an item with a nested item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' nested' );
+
+		// Move the caret to the end of "one" and verify the setup: "one"
+		// and "two" at the top level, "nested" indented under "two".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 11 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one‸' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection down across "two" into "nested".
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The endpoints are promoted to the top level items, which are
+		// multi-selected as blocks.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+
+		// Both items, including the nested one, are removed.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [],
+			},
+		] );
+	} );
+
+	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' nested' );
+
+		// Verify setup: "one" and "two" at the top level, "nested"
+		// indented under "two"; caret at the end of "nested".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested‸' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection up across "two" to "one".
+		await page.keyboard.press( 'Shift+ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Shift+ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The endpoints are promoted to the top level items, which are
+		// multi-selected as blocks.
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'2 blocks selected.'
+		);
+
+		// Both items, including the nested one, are removed.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [],
+			},
+		] );
+	} );
+
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
 		editor,
 		page,

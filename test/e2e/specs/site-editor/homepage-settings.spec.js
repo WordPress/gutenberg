@@ -75,7 +75,9 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await expect( page.getByRole( 'dialog' ) ).toBeHidden();
 
 		await homePageRow.getByRole( 'button', { name: 'Actions' } ).click();
-		await expect( page.getByRole( 'menu' ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeVisible();
 		await expect(
 			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
 		).toBeHidden();
@@ -83,7 +85,9 @@ test.describe( 'Homepage Settings via Editor', () => {
 			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
 		).toBeHidden();
 		await page.keyboard.press( 'Escape' );
-		await expect( page.getByRole( 'menu' ) ).toBeHidden();
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
 
 		const postsPage = page
 			.getByRole( 'gridcell' )
@@ -104,7 +108,9 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await expect( page.getByRole( 'dialog' ) ).toBeHidden();
 
 		await postsPageRow.getByRole( 'button', { name: 'Actions' } ).click();
-		await expect( page.getByRole( 'menu' ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeVisible();
 		await expect(
 			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
 		).toBeHidden();
@@ -112,6 +118,8 @@ test.describe( 'Homepage Settings via Editor', () => {
 			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
 		).toBeHidden();
 		await page.keyboard.press( 'Escape' );
-		await expect( page.getByRole( 'menu' ) ).toBeHidden();
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
 	} );
 } );

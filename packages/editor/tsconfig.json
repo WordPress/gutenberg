@@ -39,6 +39,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render" },
+		{ "path": "../theme" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },

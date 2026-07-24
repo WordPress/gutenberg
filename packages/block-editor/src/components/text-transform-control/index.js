@@ -55,7 +55,6 @@ export default function TextTransformControl( { className, value, onChange } ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__next40pxDefaultSize
 			label={ __( 'Letter case' ) }
 			className={ clsx(
 				'block-editor-text-transform-control',

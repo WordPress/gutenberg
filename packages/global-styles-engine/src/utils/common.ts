@@ -317,14 +317,19 @@ export function getBlockStyleVariationSelector(
 		return variationClass;
 	}
 
-	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
-	const addVariationClass = (
-		_match: string,
-		group1: string,
-		group2: string
-	) => {
-		return group1 + group2 + variationClass;
-	};
+	/*
+	 * Append the variation class to each selector's ancestor: the first run
+	 * of characters before any combinator (whitespace) or pseudo-class (`:`).
+	 * `String.prototype.replace` only replaces the first match.
+	 *
+	 * Examples ("custom" variation):
+	 * - `.wp-block`              => `.wp-block.is-style-custom`
+	 * - `.wp-block .inner`       => `.wp-block.is-style-custom .inner`
+	 * - `.wp-block:where(.a .b)` => `.wp-block.is-style-custom:where(.a .b)`
+	 * - `:where(.outer .inner)`  => `:where(.outer.is-style-custom .inner)`
+	 */
+	const ancestorRegex = /[^\s:]+/;
+	const addVariationClass = ( match: string ) => match + variationClass;
 
 	const result = splitSelectorList( blockSelector ).map( ( part ) =>
 		part.replace( ancestorRegex, addVariationClass )

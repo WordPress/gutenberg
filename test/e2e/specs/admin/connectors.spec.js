@@ -552,6 +552,208 @@ test.describe( 'Connectors', () => {
 		} );
 	} );
 
+	test.describe( 'Application password setup flow', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-application-password-connector';
+		const CREDENTIALS_SETTING =
+			'connectors_content_source_test_remote_wordpress_credentials';
+		const APPLICATION_PASSWORD = 'abcd efgh ijkl mnop 1234';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+			const status = await requestUtils.rest( {
+				path: '/gutenberg-test-connectors/v1/application-password',
+			} );
+			// The companion Core change can land independently of this UI.
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! status.is_registered,
+				'Requires application_password support in WordPress Core.'
+			);
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ CREDENTIALS_SETTING ]: {
+						username: '',
+						password: '',
+					},
+				},
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should save, mask, reload, and remove both credentials', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = getConnectorCardByName(
+				page,
+				'Test Remote WordPress'
+			);
+			await card.getByRole( 'button', { name: 'Set up' } ).click();
+
+			const usernameInput = card.getByRole( 'textbox', {
+				name: 'Username',
+			} );
+			const passwordInput = card.getByLabel( 'Application password' );
+			const saveButton = card.getByRole( 'button', { name: 'Save' } );
+
+			await expect( saveButton ).toBeDisabled();
+			await usernameInput.fill( 'remote-user' );
+			await passwordInput.fill( APPLICATION_PASSWORD );
+			await expect( saveButton ).toBeEnabled();
+			await expect(
+				card.getByRole( 'link', {
+					name: 'example.com',
+				} )
+			).toHaveAttribute(
+				'href',
+				'https://example.com/wp-admin/profile.php'
+			);
+			await saveButton.click();
+
+			await expect(
+				card.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
+			const editButton = card.getByRole( 'button', { name: 'Edit' } );
+			await expect( editButton ).toBeFocused();
+
+			const settings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( settings[ CREDENTIALS_SETTING ].username ).toBe(
+				'remote-user'
+			);
+			expect( settings[ CREDENTIALS_SETTING ].password ).toBe(
+				'\u2022'.repeat( 16 )
+			);
+
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+			const reloadedCard = getConnectorCardByName(
+				page,
+				'Test Remote WordPress'
+			);
+			await reloadedCard.getByRole( 'button', { name: 'Edit' } ).click();
+
+			await expect(
+				reloadedCard.getByRole( 'textbox', { name: 'Username' } )
+			).toHaveValue( 'remote-user' );
+			await expect(
+				reloadedCard.getByLabel( 'Application password' )
+			).toHaveValue( '•'.repeat( 16 ) );
+			await reloadedCard
+				.getByRole( 'button', { name: 'Remove and replace' } )
+				.click();
+
+			await expect(
+				reloadedCard.getByText( 'Connected', { exact: true } )
+			).toBeHidden();
+			await expect(
+				reloadedCard.getByRole( 'textbox', { name: 'Username' } )
+			).toHaveValue( '' );
+
+			const clearedSettings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( clearedSettings[ CREDENTIALS_SETTING ] ).toEqual( {
+				username: '',
+				password: '',
+			} );
+		} );
+
+		test( 'should keep the stored password when a masked settings response is saved back', async ( {
+			requestUtils,
+		} ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ CREDENTIALS_SETTING ]: {
+						username: 'remote-user',
+						password: APPLICATION_PASSWORD,
+					},
+				},
+			} );
+
+			// Read the settings back; the REST API masks the password.
+			const settings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( settings[ CREDENTIALS_SETTING ].password ).toBe(
+				'\u2022'.repeat( 16 )
+			);
+
+			// Save the masked response back, as a read-modify-write client
+			// would, and confirm the stored password is not overwritten.
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ CREDENTIALS_SETTING ]: settings[ CREDENTIALS_SETTING ],
+				},
+			} );
+
+			const storedCredentials = await requestUtils.rest( {
+				path: '/gutenberg-test-connectors/v1/application-password-credentials',
+			} );
+			expect( storedCredentials ).toEqual( {
+				username: 'remote-user',
+				password: APPLICATION_PASSWORD,
+			} );
+		} );
+
+		test( 'should show an environment-configured connector as connected and read-only', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = getConnectorCardByName(
+				page,
+				'Test Env Configured WordPress'
+			);
+			await expect(
+				card.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
+			await card.getByRole( 'button', { name: 'Edit' } ).click();
+
+			const usernameInput = card.getByRole( 'textbox', {
+				name: 'Username',
+			} );
+			await expect( usernameInput ).toBeDisabled();
+			await expect( usernameInput ).toHaveValue( '•'.repeat( 16 ) );
+			await expect(
+				card.getByLabel( 'Application password' )
+			).toBeDisabled();
+			await expect(
+				card.getByText(
+					'These credentials are configured using an environment variable.'
+				)
+			).toBeVisible();
+			await expect(
+				card.getByRole( 'button', { name: 'Remove and replace' } )
+			).toBeHidden();
+		} );
+	} );
+
 	test.describe( 'JS extensibility', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-js-extensibility';
 

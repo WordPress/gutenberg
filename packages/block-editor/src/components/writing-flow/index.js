@@ -14,6 +14,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import useEditableRoot from './use-editable-root';
+import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
@@ -21,6 +23,7 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
@@ -37,8 +40,11 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useEditableRootEventHandlers(),
 			useClipboardHandler(),
 			useInput(),
+			useEditableRoot(),
+			useHomeEnd(),
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),
@@ -64,7 +70,17 @@ export function useWritingFlow() {
 
 					return () => {
 						delete node.dataset.hasMultiSelection;
-						node.removeAttribute( 'aria-label' );
+						// The wrapper may remain the editing host (the
+						// collapsed block supports `editableRoot`): keep it
+						// named, as the textbox role requires.
+						if ( node.contentEditable === 'true' ) {
+							node.setAttribute(
+								'aria-label',
+								__( 'Editor canvas' )
+							);
+						} else {
+							node.removeAttribute( 'aria-label' );
+						}
 					};
 				},
 				[ hasMultiSelection ]

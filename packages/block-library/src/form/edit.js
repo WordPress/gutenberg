@@ -108,7 +108,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						isShownByDefault
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Submissions method' ) }
 							options={ [
 								// TODO: Allow plugins to add their own submission methods.
@@ -173,7 +172,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			{ submissionMethod !== 'email' && (
 				<InspectorControls group="advanced">
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Method' ) }
 						options={ [
 							{ label: 'Get', value: 'get' },

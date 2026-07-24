@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	FocalPointPicker,
@@ -34,7 +38,6 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	useSettings,
-	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
@@ -84,6 +87,7 @@ const {
 	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
+	mediaSideloadFromUrlKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -391,6 +395,12 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	// URL of a freshly generated file (crop/rotate result) from the media
+	// editor that the browser may not have finished loading; cleared by the
+	// <img> load/error handlers, or by the settle effect below when the
+	// rendered image already shows it.
+	const [ pendingSwapUrl, setPendingSwapUrl ] = useState();
+	const isSwappingMedia = !! pendingSwapUrl;
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
 		[]
@@ -399,6 +409,7 @@ export default function Image( {
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
+		onUrlChange: setPendingSwapUrl,
 	} );
 
 	const {
@@ -416,8 +427,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const [ externalBlob, setExternalBlob ] = useState();
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
@@ -464,31 +473,16 @@ export default function Image( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	// If an image is externally hosted, try to fetch the image data. This may
-	// fail if the image host doesn't allow CORS with the domain. If it works,
-	// we can enable a button in the toolbar to upload the image.
-	useEffect( () => {
-		if (
-			! isExternalImage( id, url ) ||
-			! isSingleSelected ||
-			! getSettings().mediaUpload
-		) {
-			setExternalBlob();
-			return;
-		}
-
-		if ( externalBlob ) {
-			return;
-		}
-
-		window
-			// Avoid cache, which seems to help avoid CORS problems.
-			.fetch( url.includes( '?' ) ? url : url + '?' )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) )
-			// Do nothing, cannot upload.
-			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
+	/*
+	 * Externally hosted images can be uploaded to the media library. The
+	 * server sideloads the URL (see mediaSideloadFromUrl), so this works even
+	 * when the editor is cross-origin isolated and the browser cannot read the
+	 * cross-origin image's bytes itself.
+	 */
+	const canUploadExternalImage =
+		isSingleSelected &&
+		isExternalImage( id, url ) &&
+		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -503,18 +497,34 @@ export default function Image( {
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
+	// A media editor update can be undone or superseded before its
+	// attributes land, leaving the rendered image untouched. No load event
+	// fires in that case, so clear the pending swap whenever the rendered
+	// image already shows the pending URL.
+	useEffect( () => {
+		if (
+			pendingSwapUrl &&
+			pendingSwapUrl === url &&
+			imageElement?.complete
+		) {
+			setPendingSwapUrl( undefined );
+		}
+	}, [ pendingSwapUrl, url, imageElement ] );
+
 	function onImageError() {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
 
 	function onImageLoad( event ) {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -605,42 +615,23 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		const { mediaUpload } = getSettings();
-		if ( ! mediaUpload ) {
+		const mediaSideloadFromUrl = getSettings()[ mediaSideloadFromUrlKey ];
+		if ( ! mediaSideloadFromUrl ) {
 			return;
 		}
-		let notified = false;
-		mediaUpload( {
-			filesList: [ externalBlob ],
-			onFileChange( [ img ] ) {
+		mediaSideloadFromUrl( {
+			url,
+			onSuccess( img ) {
 				onSelectImage( img );
-
-				if ( isBlobURL( img.url ) ) {
-					return;
-				}
-
-				// With client-side media processing, onFileChange fires
-				// for each generated sub-size. Only show the notice once.
-				if ( ! notified ) {
-					notified = true;
-					setExternalBlob();
-					createSuccessNotice( __( 'Image uploaded.' ), {
-						type: 'snackbar',
-					} );
-				}
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
 			},
-			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {
 				createErrorNotice( message, { type: 'snackbar' } );
 			},
 		} );
 	}
-
-	useEffect( () => {
-		if ( ! isSingleSelected ) {
-			setIsEditingImage( false );
-		}
-	}, [ isSingleSelected ] );
 
 	const canEditImage =
 		id &&
@@ -651,7 +642,7 @@ export default function Image( {
 	const allowCrop =
 		isSingleSelected &&
 		canEditImage &&
-		! isEditingImage &&
+		!! openImageMediaEditorModal &&
 		! isContentOnlyMode &&
 		! isUploading;
 
@@ -663,8 +654,8 @@ export default function Image( {
 	}
 
 	// TODO: Can allow more units after figuring out how they should interact
-	// with the ResizableBox and ImageEditor components. Calculations later on
-	// for those components are currently assuming px units.
+	// with the ResizableBox component. Calculations later on for that
+	// component are currently assuming px units.
 	const dimensionsUnitsOptions = useCustomUnits( {
 		availableUnits: [ 'px' ],
 	} );
@@ -881,7 +872,6 @@ export default function Image( {
 
 	const showUrlInput =
 		isSingleSelected &&
-		! isEditingImage &&
 		! lockHrefControls &&
 		! lockUrlControls &&
 		! isDecorative;
@@ -891,10 +881,9 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
-	const mediaReplaceFlow = isSingleSelected &&
-		! isEditingImage &&
-		! lockUrlControls && (
-			// For contentOnly mode, put this button in its own area so it has borders around it.
+	const mediaControls = isSingleSelected && ! lockUrlControls && (
+		<>
+			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<MediaReplaceFlow
 					mediaId={ id }
@@ -908,7 +897,8 @@ export default function Image( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-		);
+		</>
+	);
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
@@ -936,16 +926,14 @@ export default function Image( {
 					{ allowCrop && (
 						<ToolbarButton
 							ref={ cropButtonRef }
-							onClick={
-								openImageMediaEditorModal
-									? openImageMediaEditorModal
-									: () => setIsEditingImage( true )
-							}
-							aria-haspopup={
-								openImageMediaEditorModal ? 'dialog' : undefined
-							}
+							onClick={ openImageMediaEditorModal }
+							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (
@@ -957,7 +945,7 @@ export default function Image( {
 					) }
 				</BlockControls>
 			) }
-			{ isSingleSelected && externalBlob && (
+			{ canUploadExternalImage && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -1194,108 +1182,90 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
-	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	const { postType, postId, queryId } = context;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 
-	let img =
-		temporaryURL && hasImageErrored ? (
-			// Show a placeholder during upload when the blob URL can't be loaded. This can
-			// happen when the user uploads a HEIC image in a browser that doesn't support them.
-			<Placeholder
-				className="wp-block-image__placeholder"
-				withIllustration
-			>
-				<Spinner />
-			</Placeholder>
-		) : (
-			<>
-				<img
-					src={ temporaryURL || url }
-					alt={ defaultedAlt }
-					onError={ onImageError }
-					onLoad={ onImageLoad }
-					ref={ setRefs }
-					className={ borderProps.className }
-					width={ naturalWidth }
-					height={ naturalHeight }
-					style={ {
-						aspectRatio,
-						...( resizeDelta
-							? {
-									width: pixelSize.width + resizeDelta.width,
-									height:
-										pixelSize.height + resizeDelta.height,
-							  }
-							: ( () => {
-									const style = {};
-									if ( width === 'auto' ) {
-										style.width = 'auto';
-									} else if (
-										width !== undefined &&
-										width !== null
-									) {
-										style.width =
-											typeof width === 'number'
-												? `${ width }px`
-												: width;
-									}
-									if (
-										height === 'auto' ||
-										height === undefined ||
-										height === null
-									) {
-										style.height = 'auto';
-									} else {
-										style.height =
-											typeof height === 'number'
-												? `${ height }px`
-												: height;
-									}
-									return style;
-							  } )() ),
-						objectFit: scale,
-						objectPosition:
-							focalPoint && scale
-								? mediaPosition( focalPoint )
-								: undefined,
-						...borderProps.style,
-						...shadowProps.style,
-					} }
-				/>
-				{ isUploading && <Spinner /> }
-			</>
-		);
-
-	if ( canEditImage && isEditingImage ) {
-		img = (
-			<ImageWrapper href={ href }>
-				<ImageEditor
-					id={ id }
-					url={ url }
-					{ ...pixelSize }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-					onSaveImage={ ( imageAttributes ) =>
-						setAttributes( imageAttributes )
-					}
-					onFinishEditing={ () => {
-						setIsEditingImage( false );
-					} }
-					borderProps={ isRounded ? undefined : borderProps }
-				/>
-			</ImageWrapper>
-		);
-	} else {
-		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
-	}
+	const img = (
+		<ImageWrapper href={ href }>
+			{ temporaryURL && hasImageErrored ? (
+				// Show a placeholder during upload when the blob URL can't be loaded. This can
+				// happen when the user uploads a HEIC image in a browser that doesn't support them.
+				<Placeholder
+					className="wp-block-image__placeholder"
+					withIllustration
+				>
+					<Spinner />
+				</Placeholder>
+			) : (
+				<>
+					<img
+						src={ temporaryURL || url }
+						alt={ defaultedAlt }
+						onError={ onImageError }
+						onLoad={ onImageLoad }
+						ref={ setRefs }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
+						width={ naturalWidth }
+						height={ naturalHeight }
+						style={ {
+							aspectRatio,
+							...( resizeDelta
+								? {
+										width:
+											pixelSize.width + resizeDelta.width,
+										height:
+											pixelSize.height +
+											resizeDelta.height,
+								  }
+								: ( () => {
+										const style = {};
+										if ( width === 'auto' ) {
+											style.width = 'auto';
+										} else if (
+											width !== undefined &&
+											width !== null
+										) {
+											style.width =
+												typeof width === 'number'
+													? `${ width }px`
+													: width;
+										}
+										if (
+											height === 'auto' ||
+											height === undefined ||
+											height === null
+										) {
+											style.height = 'auto';
+										} else {
+											style.height =
+												typeof height === 'number'
+													? `${ height }px`
+													: height;
+										}
+										return style;
+								  } )() ),
+							objectFit: scale,
+							objectPosition:
+								focalPoint && scale
+									? mediaPosition( focalPoint )
+									: undefined,
+							...borderProps.style,
+							...shadowProps.style,
+						} }
+					/>
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
+				</>
+			) }
+		</ImageWrapper>
+	);
 
 	let resizableBox;
 	if (
 		isResizable &&
 		isSingleSelected &&
-		! isEditingImage &&
 		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
@@ -1420,7 +1390,7 @@ export default function Image( {
 	if ( ! url && ! temporaryURL ) {
 		return (
 			<>
-				{ mediaReplaceFlow }
+				{ mediaControls }
 				{ controls }
 			</>
 		);
@@ -1455,7 +1425,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ mediaReplaceFlow }
+			{ mediaControls }
 			{ controls }
 			{ featuredImageControl }
 			{ img }

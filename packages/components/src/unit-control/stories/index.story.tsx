@@ -55,7 +55,6 @@ const DefaultTemplate: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {
@@ -71,7 +70,6 @@ export const Default: StoryFn< typeof UnitControl > = DefaultTemplate.bind(
 );
 Default.args = {
 	label: 'Label',
-	__next40pxDefaultSize: true,
 };
 
 /**
@@ -123,7 +121,6 @@ export const WithCustomUnits: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {
