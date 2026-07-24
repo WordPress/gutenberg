@@ -28,6 +28,8 @@ const bulkSummaryKeys = {
 
 function withBulkSummary( field ) {
 	const keys = bulkSummaryKeys[ field.id ];
+	// A field with no `render` of its own falls back to the one its type
+	// provides, which already renders nothing for an absent value.
 	if ( ! keys || ! field.render ) {
 		return field;
 	}
