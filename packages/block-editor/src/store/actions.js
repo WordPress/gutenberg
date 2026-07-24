@@ -1253,10 +1253,19 @@ export const mergeBlocks =
 		}
 
 		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
+			// The first block only holds the selection when it is being
+			// merged forward (forward delete from an empty block). The
+			// caret must end up at the start of the next block, not at
+			// the end of the previous one.
+			const wasSelected = select.isBlockSelected( clientIdA );
+
+			registry.batch( () => {
+				dispatch.removeBlock( clientIdA, false );
+
+				if ( wasSelected ) {
+					dispatch.selectBlock( clientIdB, 0 );
+				}
+			} );
 			return;
 		}
 
