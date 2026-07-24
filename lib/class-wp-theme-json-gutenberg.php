@@ -418,6 +418,8 @@ class WP_Theme_JSON_Gutenberg {
 			'custom'           => null,
 			'customDuotone'    => null,
 			'customGradient'   => null,
+			'dark'             => null,
+			'darkScheme'       => null,
 			'defaultDuotone'   => null,
 			'defaultGradients' => null,
 			'defaultPalette'   => null,
@@ -2524,9 +2526,89 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $vars_by_selector as $rule_selector => $declarations ) {
 				$stylesheet .= static::to_ruleset( $rule_selector, $declarations );
 			}
+
+			/*
+			 * Emit theme-authored dark-scheme preset overrides (palette, gradients)
+			 * under a `prefers-color-scheme: dark` gate. Because these override the
+			 * existing `--wp--preset--*` custom properties, any value referencing a
+			 * preset flips automatically. The gate is authored so a future opt-out
+			 * layer (a root `data-scheme` attribute) can be layered on top.
+			 */
+			$dark_declarations = static::compute_dark_preset_vars( $node );
+			if ( ! empty( $dark_declarations ) ) {
+				$stylesheet .= '@media (prefers-color-scheme: dark){' . static::to_ruleset( $selector, $dark_declarations ) . '}';
+			}
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Given a settings node, extracts theme-authored dark-scheme preset
+	 * overrides and returns them as CSS Custom Property declarations.
+	 *
+	 * Reads `color.dark.palette` and `color.dark.gradients`, which the resolver
+	 * also populates from a `color.darkScheme` variation reference. The dark
+	 * presets are matched by slug to the base presets they override, so only
+	 * overridden slugs emit a value; slugs without a dark counterpart keep their
+	 * single value in both schemes. This is fully opt-in: absent `color.dark`,
+	 * no declarations are produced and output is unchanged.
+	 *
+	 * @param array $node Settings node (global or block-level).
+	 * @return array List of `array( 'name' => ..., 'value' => ... )` declarations.
+	 */
+	protected static function compute_dark_preset_vars( $node ) {
+		$dark = $node['color']['dark'] ?? array();
+		if ( empty( $dark ) || ! is_array( $dark ) ) {
+			return array();
+		}
+
+		$preset_css_vars = array(
+			'palette'   => array(
+				'css_var'   => '--wp--preset--color--$slug',
+				'value_key' => 'color',
+			),
+			'gradients' => array(
+				'css_var'   => '--wp--preset--gradient--$slug',
+				'value_key' => 'gradient',
+			),
+		);
+
+		$declarations = array();
+		foreach ( $preset_css_vars as $preset_key => $meta ) {
+			if ( empty( $dark[ $preset_key ] ) || ! is_array( $dark[ $preset_key ] ) ) {
+				continue;
+			}
+
+			/*
+			 * Accept both a flat list of presets (as authored inline in
+			 * `settings.color.dark`) and an origin-keyed structure (as it may
+			 * arrive when sourced from a `darkScheme` style variation).
+			 */
+			$presets = $dark[ $preset_key ];
+			if ( ! wp_is_numeric_array( $presets ) ) {
+				$flattened = array();
+				foreach ( static::VALID_ORIGINS as $origin ) {
+					if ( ! empty( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
+						$flattened = array_merge( $flattened, $presets[ $origin ] );
+					}
+				}
+				$presets = $flattened;
+			}
+
+			foreach ( $presets as $preset ) {
+				if ( ! isset( $preset['slug'], $preset[ $meta['value_key'] ] ) ) {
+					continue;
+				}
+				$slug           = _wp_to_kebab_case( $preset['slug'] );
+				$declarations[] = array(
+					'name'  => static::replace_slug_in_string( $meta['css_var'], $slug ),
+					'value' => $preset[ $meta['value_key'] ],
+				);
+			}
+		}
+
+		return $declarations;
 	}
 
 	/**

@@ -271,6 +271,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme_json_data = static::inject_variations_from_block_style_variation_files( $theme_json_data, $variations );
 			$theme_json_data = static::inject_variations_from_block_styles_registry( $theme_json_data );
 
+			// Resolve a `settings.color.darkScheme` variation reference into `settings.color.dark`.
+			$theme_json_data = static::resolve_dark_scheme_variation( $theme_json_data );
+
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
 			 *
@@ -757,6 +760,53 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_style_variations( $scope = 'theme' ) {
 		return static::get_style_variations_from_directory( get_stylesheet_directory(), $scope );
+	}
+
+	/**
+	 * Resolves a `settings.color.darkScheme` variation reference into
+	 * `settings.color.dark`.
+	 *
+	 * When a theme sets `settings.color.darkScheme` to the title of a style
+	 * variation, this copies that variation's color palette and gradients into
+	 * `settings.color.dark` so they are emitted as the dark scheme. Only the
+	 * variation's color presets are used; its other styles are ignored. An
+	 * inline `settings.color.dark` takes precedence and is left untouched.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param array $theme_json_data Raw theme.json data.
+	 * @return array The theme.json data, with `settings.color.dark` populated when applicable.
+	 */
+	protected static function resolve_dark_scheme_variation( $theme_json_data ) {
+		$color       = $theme_json_data['settings']['color'] ?? array();
+		$dark_scheme = $color['darkScheme'] ?? null;
+
+		// Nothing to resolve, or an inline `dark` is present and wins.
+		if ( empty( $dark_scheme ) || ! empty( $color['dark'] ) ) {
+			return $theme_json_data;
+		}
+
+		foreach ( static::get_style_variations( 'theme' ) as $variation ) {
+			if ( ! isset( $variation['title'] ) || $variation['title'] !== $dark_scheme ) {
+				continue;
+			}
+
+			$variation_color = $variation['settings']['color'] ?? array();
+			$dark            = array();
+			if ( ! empty( $variation_color['palette'] ) ) {
+				$dark['palette'] = $variation_color['palette'];
+			}
+			if ( ! empty( $variation_color['gradients'] ) ) {
+				$dark['gradients'] = $variation_color['gradients'];
+			}
+
+			if ( ! empty( $dark ) ) {
+				$theme_json_data['settings']['color']['dark'] = $dark;
+			}
+			break;
+		}
+
+		return $theme_json_data;
 	}
 
 	/**
