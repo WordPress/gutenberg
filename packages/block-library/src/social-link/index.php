@@ -26,7 +26,8 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$service      = is_string( $service_attr ) ? $service_attr : 'Icon';
 	$url          = $attributes['url'] ?? false;
 	$text         = $text ? $text : block_core_social_link_get_name( $service );
-	$rel          = $attributes['rel'] ?? '';
+	$rel_attr     = $attributes['rel'] ?? null;
+	$rel          = is_string( $rel_attr ) ? $rel_attr : '';
 	$show_labels  = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
