@@ -111,6 +111,24 @@ class WP_Duotone_Gutenberg {
 	private static $used_svg_filter_data = array();
 
 	/**
+	 * Per-scheme duotone overrides from theme.json (`settings.color.light.duotone`
+	 * and `settings.color.dark.duotone`), keyed by scheme then base preset slug.
+	 * Lazily built by get_scheme_duotone_overrides().
+	 *
+	 * @var array
+	 */
+	private static $scheme_duotone_overrides;
+
+	/**
+	 * Used per-scheme duotone variant presets, keyed by variant filter id. Each
+	 * entry records the scheme, the base preset slug, and the variant filter URL
+	 * so the gated CSS custom-property overrides can be emitted.
+	 *
+	 * @var array
+	 */
+	private static $used_scheme_duotone_presets = array();
+
+	/**
 	 * All of the block CSS declarations for styles on the page.
 	 *
 	 * Example:
@@ -644,6 +662,38 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Gets the gated CSS custom-property overrides for used per-scheme duotone
+	 * variants.
+	 *
+	 * Redefines `--wp--preset--duotone--<slug>` to point at the variant filter
+	 * under the matching `prefers-color-scheme` media query (unless the visitor
+	 * forced the opposite scheme) and under a `data-scheme="<scheme>"` override,
+	 * mirroring the palette/gradient scheme model. Because duotone is referenced
+	 * through this custom property, blocks flip automatically.
+	 *
+	 * @return string The CSS for the per-scheme duotone overrides ('' if none).
+	 */
+	private static function get_scheme_global_styles_presets() {
+		if ( empty( self::$used_scheme_duotone_presets ) ) {
+			return '';
+		}
+
+		$root = WP_Theme_JSON_Gutenberg::ROOT_CSS_PROPERTIES_SELECTOR;
+		$css  = '';
+		foreach ( self::$used_scheme_duotone_presets as $data ) {
+			$scheme      = $data['scheme'];
+			$opposite    = 'dark' === $scheme ? 'light' : 'dark';
+			$declaration = self::get_css_custom_property_name( $data['slug'] ) . ':' . $data['filter'] . ';';
+
+			$css .= '@media (prefers-color-scheme: ' . $scheme . '){' .
+				$root . ':not([data-scheme="' . $opposite . '"]){' . $declaration . '}}';
+			$css .= $root . '[data-scheme="' . $scheme . '"]{' . $declaration . '}';
+		}
+
+		return $css;
+	}
+
+	/**
 	 * Get the CSS selector for a block type.
 	 *
 	 * @param WP_Block_Type $block_type Block type to check for support.
@@ -745,6 +795,86 @@ class WP_Duotone_Gutenberg {
 		}
 		self::$used_global_styles_presets[ $filter_id ] = $global_styles_presets[ $filter_id ];
 		self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $global_styles_presets[ $filter_id ] );
+		self::enqueue_scheme_duotone_variants( $global_styles_presets[ $filter_id ]['slug'] );
+	}
+
+	/**
+	 * Reads per-scheme duotone overrides from theme.json.
+	 *
+	 * Returns a map of scheme (`light`/`dark`) to a map of base preset slug to the
+	 * override colors, from `settings.color.<scheme>.duotone`. Fully opt-in: absent
+	 * the keys, the map is empty and duotone output is unchanged.
+	 *
+	 * @return array
+	 */
+	private static function get_scheme_duotone_overrides() {
+		if ( isset( self::$scheme_duotone_overrides ) ) {
+			return self::$scheme_duotone_overrides;
+		}
+
+		self::$scheme_duotone_overrides = array();
+		$settings                       = gutenberg_get_global_settings();
+
+		foreach ( array( 'light', 'dark' ) as $scheme ) {
+			$duotones = $settings['color'][ $scheme ]['duotone'] ?? array();
+			if ( empty( $duotones ) || ! is_array( $duotones ) ) {
+				continue;
+			}
+			// Accept a flat list, as authored inline, or an origin-keyed structure.
+			if ( ! wp_is_numeric_array( $duotones ) ) {
+				$flattened = array();
+				foreach ( $duotones as $by_origin ) {
+					if ( is_array( $by_origin ) ) {
+						$flattened = array_merge( $flattened, $by_origin );
+					}
+				}
+				$duotones = $flattened;
+			}
+			foreach ( $duotones as $preset ) {
+				if ( ! isset( $preset['slug'], $preset['colors'] ) ) {
+					continue;
+				}
+				$slug = _wp_to_kebab_case( $preset['slug'] );
+				self::$scheme_duotone_overrides[ $scheme ][ $slug ] = $preset['colors'];
+			}
+		}
+
+		return self::$scheme_duotone_overrides;
+	}
+
+	/**
+	 * Registers per-scheme variant filters for a used duotone preset.
+	 *
+	 * For each scheme that overrides the given preset slug, injects an additional
+	 * SVG filter built from the override colors (id `wp-duotone-<slug>--<scheme>`)
+	 * and records it so a gated custom-property override can be emitted.
+	 *
+	 * @param string $slug The base duotone preset slug.
+	 * @return void
+	 */
+	private static function enqueue_scheme_duotone_variants( $slug ) {
+		$slug      = _wp_to_kebab_case( $slug );
+		$overrides = self::get_scheme_duotone_overrides();
+
+		foreach ( array( 'light', 'dark' ) as $scheme ) {
+			if ( empty( $overrides[ $scheme ][ $slug ] ) ) {
+				continue;
+			}
+			$variant_filter_id = self::get_filter_id( $slug ) . '--' . $scheme;
+
+			// Inject the variant SVG filter alongside the base one.
+			self::$used_svg_filter_data[ $variant_filter_id ] = array(
+				'slug'   => $slug . '--' . $scheme,
+				'colors' => $overrides[ $scheme ][ $slug ],
+			);
+
+			// Record the variant so its gated custom-property override is emitted.
+			self::$used_scheme_duotone_presets[ $variant_filter_id ] = array(
+				'scheme' => $scheme,
+				'slug'   => $slug,
+				'filter' => self::get_filter_url( $variant_filter_id ),
+			);
+		}
 	}
 
 	/**
@@ -1025,6 +1155,10 @@ class WP_Duotone_Gutenberg {
 		if ( ! empty( self::$used_global_styles_presets ) ) {
 			wp_add_inline_style( 'global-styles', self::get_global_styles_presets( self::$used_global_styles_presets ) );
 		}
+		$scheme_css = self::get_scheme_global_styles_presets();
+		if ( '' !== $scheme_css ) {
+			wp_add_inline_style( 'global-styles', $scheme_css );
+		}
 	}
 
 	/**
@@ -1043,6 +1177,10 @@ class WP_Duotone_Gutenberg {
 			wp_register_style( $style_tag_id, false );
 			if ( ! empty( self::$used_global_styles_presets ) ) {
 				wp_add_inline_style( $style_tag_id, self::get_global_styles_presets( self::$used_global_styles_presets ) );
+			}
+			$scheme_css = self::get_scheme_global_styles_presets();
+			if ( '' !== $scheme_css ) {
+				wp_add_inline_style( $style_tag_id, $scheme_css );
 			}
 			if ( ! empty( self::$block_css_declarations ) ) {
 				wp_add_inline_style( $style_tag_id, gutenberg_style_engine_get_stylesheet_from_css_rules( self::$block_css_declarations ) );
