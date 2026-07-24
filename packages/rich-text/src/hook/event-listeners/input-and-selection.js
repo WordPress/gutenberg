@@ -269,10 +269,7 @@ export default ( props ) => ( element ) => {
 
 		// When the whole editor is editable, let writing flow handle
 		// selection.
-		const editingHost = element.parentElement.closest(
-			'[contenteditable="true"]'
-		);
-		if ( editingHost ) {
+		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
 			// A nested editable element does not receive a caret from being
 			// focused, unlike an editing host. When the element does not
 			// contain the selection, restore the internal record's selection,
@@ -283,18 +280,6 @@ export default ( props ) => ( element ) => {
 				! selection.anchorNode ||
 				! element.contains( selection.anchorNode )
 			) {
-				// A selection anchored elsewhere within the same editing
-				// host is a selection across elements in the making
-				// (e.g. a shift+click extending from another block into
-				// this one): it must be left alone for the browser to
-				// extend.
-				if (
-					selection.anchorNode &&
-					editingHost.contains( selection.anchorNode )
-				) {
-					return;
-				}
-
 				if ( isSelected && record.current.start !== undefined ) {
 					applyRecord( record.current );
 				} else {
