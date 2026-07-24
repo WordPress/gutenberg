@@ -24,9 +24,7 @@
 
 -   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
--   `discussion`: Render nothing instead of "Closed" when neither the comment nor the ping status is known ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
-
-### Accessibility
+-   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
 -   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 

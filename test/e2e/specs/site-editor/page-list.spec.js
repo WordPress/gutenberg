@@ -655,13 +655,16 @@ test.describe( 'Page List', () => {
 				.locator( '.dataviews-bulk-actions-footer__container' )
 				.getByRole( 'button', { name: 'Quick Edit' } )
 				.click();
+
+			await expect(
+				page.locator( '.dataviews-action-modal__quick-edit' )
+			).toBeVisible();
 		} );
 
 		test( 'summarizes untouched fields as "No change"', async ( {
 			page,
 		} ) => {
 			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
-			await expect( modal ).toBeVisible();
 
 			for ( const name of [
 				'Edit Status',
@@ -677,10 +680,13 @@ test.describe( 'Page List', () => {
 			// Bulk edit has no record to read, so these rows used to state
 			// values the selected pages don't necessarily have: the current
 			// date, and "Closed" discussion. See #68746.
-			await expect( modal ).not.toContainText(
+			const summaries = modal.locator(
+				'.dataviews-action-modal__quick-edit-content'
+			);
+			await expect( summaries ).not.toContainText(
 				String( new Date().getFullYear() )
 			);
-			await expect( modal ).not.toContainText( 'Closed' );
+			await expect( summaries ).not.toContainText( 'Closed' );
 		} );
 
 		test( 'summarizes a field once it has been edited', async ( {
