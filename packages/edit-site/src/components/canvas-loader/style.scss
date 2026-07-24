@@ -8,14 +8,11 @@
 	opacity: 0;
 	align-items: center;
 	justify-content: center;
+	--wp-components-color-foreground: var(--wp-edit-site-canvas-loader-foreground, var(--wpds-color-foreground-content-neutral));
 
 	@media not (prefers-reduced-motion) {
 		animation: 0.5s ease 0.2s edit-site-canvas-loader__fade-in-animation;
 		animation-fill-mode: forwards;
-	}
-
-	& > div {
-		width: 160px;
 	}
 }
 
