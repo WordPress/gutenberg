@@ -1,8 +1,4 @@
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Context from './context';
