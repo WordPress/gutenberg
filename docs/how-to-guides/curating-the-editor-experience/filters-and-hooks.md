@@ -87,7 +87,7 @@ DataViews-powered screens (such as the Pages list and its Quick Edit form) build
 
 The configuration has four top-level keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
 
-The filter receives a `Gutenberg_View_Config_Data` object holding the entity's view configuration. Change the configuration by calling its methods and **return the object** (a callback that returns anything else is ignored and the unfiltered configuration is used). Only the four documented top-level keys are accepted; a patch that names any other key, or that declares an unsupported `$version`, is rejected with a `_doing_it_wrong()` notice.
+The filter receives a `Gutenberg_View_Config_Data` object holding the entity's view configuration. Change the configuration by calling its methods and **return the object**: as with any filter, the return value is passed to the next callback as `$data`, so a callback that returns anything else hands that value to callbacks hooked at a later priority. Only the four documented top-level keys are accepted; a patch that names any other key, or that declares an unsupported `$version`, is rejected with a `_doing_it_wrong()` notice.
 
 ### Merging a patch
 
