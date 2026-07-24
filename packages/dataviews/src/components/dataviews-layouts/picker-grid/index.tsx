@@ -328,11 +328,12 @@ function ViewPickerGrid< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
+		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		pickerMultiselect: isMultiselect,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
 	} );
 
 	const currentPage = view?.page ?? 1;
