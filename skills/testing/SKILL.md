@@ -13,6 +13,10 @@ Before writing any test bodies, draft the test names — behavior from the user'
 
 No loosened assertions, no added waits or timeouts, no skipped cases without saying so. Diagnose the root cause, or report the failure honestly.
 
+## Never make a failing test pass by changing the production code unless the production code is the source of a bug
+
+The e2e test passing is not the final task success criteria. The core goal is to verify that the production code works as expected.
+
 ## By test type
 
 -   **JavaScript unit and integration tests (Jest)**: read [references/jest.md](references/jest.md).
