@@ -56,10 +56,8 @@ export default function useInnerBlockTemplateSync(
 			getSelectedBlocksInitialCaretPosition,
 			isBlockSelected,
 		} = registry.select( blockEditorStore );
-		const {
-			replaceInnerBlocks,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = registry.dispatch( blockEditorStore );
+		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+			registry.dispatch( blockEditorStore );
 
 		// Access private store APIs for the template-sync flag.
 		const { wasTemplateSyncApplied } = unlock(
