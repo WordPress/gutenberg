@@ -46,7 +46,9 @@ test.describe( 'Revision Block Diff Panel', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
 			.click();
 
 		// Wait for revisions mode.
@@ -112,7 +114,9 @@ test.describe( 'Revision Block Diff Panel', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
 			.click();
 
 		await expect(

@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { RawHTML, useEffect, renderToString } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -93,9 +93,9 @@ function Notice( {
 }: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
-	const classes = clsx( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	// Dismissibility is not a wrapper modifier; target `.components-notice__dismiss`
+	// or `.components-notice:has(.components-notice__dismiss)` from outside CSS.
+	const classes = clsx( className, 'components-notice', 'is-' + status );
 
 	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
@@ -109,71 +109,64 @@ function Notice( {
 	return (
 		<div className={ classes }>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
-			<div className="components-notice__content">
-				{ children }
-				{ actions.length > 0 && (
-					<div className="components-notice__actions">
-						{ actions.map(
-							(
-								{
-									className: buttonCustomClasses,
-									label,
-									isPrimary,
-									variant,
-									noDefaultClasses = false,
-									onClick,
-									url,
-									disabled,
-								}: NoticeAction &
-									// `isPrimary` is a legacy prop included for
-									// backcompat, but `variant` should be used
-									// instead.
-									Pick< DeprecatedButtonProps, 'isPrimary' >,
-								index
-							) => {
-								let computedVariant = variant;
-								if (
-									variant !== 'primary' &&
-									! noDefaultClasses
-								) {
-									computedVariant = ! url
-										? 'secondary'
-										: 'link';
-								}
-								if (
-									typeof computedVariant === 'undefined' &&
-									isPrimary
-								) {
-									computedVariant = 'primary';
-								}
-
-								return (
-									<Button
-										__next40pxDefaultSize
-										key={ index }
-										href={ url }
-										variant={ computedVariant }
-										onClick={ onClick }
-										disabled={ disabled }
-										accessibleWhenDisabled
-										className={ clsx(
-											'components-notice__action',
-											buttonCustomClasses
-										) }
-									>
-										{ label }
-									</Button>
-								);
+			<div className="components-notice__content">{ children }</div>
+			{ actions.length > 0 && (
+				<div className="components-notice__actions">
+					{ actions.map(
+						(
+							{
+								className: buttonCustomClasses,
+								label,
+								isPrimary,
+								variant,
+								noDefaultClasses = false,
+								onClick,
+								url,
+								disabled,
+							}: NoticeAction &
+								// `isPrimary` is a legacy prop included for
+								// backcompat, but `variant` should be used
+								// instead.
+								Pick< DeprecatedButtonProps, 'isPrimary' >,
+							index
+						) => {
+							let computedVariant = variant;
+							if ( variant !== 'primary' && ! noDefaultClasses ) {
+								computedVariant = ! url ? 'secondary' : 'link';
 							}
-						) }
-					</div>
-				) }
-			</div>
+							if (
+								typeof computedVariant === 'undefined' &&
+								isPrimary
+							) {
+								computedVariant = 'primary';
+							}
+
+							return (
+								<Button
+									size="compact"
+									key={ index }
+									href={ url }
+									variant={ computedVariant }
+									onClick={ onClick }
+									disabled={ disabled }
+									accessibleWhenDisabled
+									className={ clsx(
+										'components-notice__action',
+										buttonCustomClasses
+									) }
+								>
+									{ label }
+								</Button>
+							);
+						}
+					) }
+				</div>
+			) }
 			{ isDismissible && (
 				<Button
 					size="small"
 					className="components-notice__dismiss"
-					icon={ close }
+					icon={ closeSmall }
 					label={ __( 'Close' ) }
 					onClick={ onDismissNotice }
 				/>

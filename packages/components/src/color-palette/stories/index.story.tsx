@@ -14,19 +14,21 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/ColorPalette',
 	id: 'components-colorpalette',
 	component: ColorPalette,
 	argTypes: {
 		as: { control: false },
 		onChange: { action: 'onChange', control: false },
+		selectedSlug: { control: false },
 		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -38,17 +40,21 @@ type ColorPaletteStory = StoryObj< typeof ColorPalette >;
 const Template = ( {
 	onChange,
 	value,
+	selectedSlug,
 	...args
 }: React.ComponentProps< typeof ColorPalette > ) => {
 	const [ color, setColor ] = useState< string | undefined >( value );
+	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
 
 	return (
 		<ColorPalette
 			{ ...args }
 			value={ color }
-			onChange={ ( newColor ) => {
+			selectedSlug={ slug }
+			onChange={ ( newColor, index, newSlug ) => {
 				setColor( newColor );
-				onChange?.( newColor );
+				setSlug( newSlug );
+				onChange?.( newColor, index, newSlug );
 			} }
 		/>
 	);
@@ -98,6 +104,19 @@ export const MultipleOrigins: ColorPaletteStory = {
 				],
 			},
 		],
+	},
+};
+
+export const DuplicateColors: ColorPaletteStory = {
+	render: Template,
+	args: {
+		colors: [
+			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
+			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+			{ name: 'Brand', slug: 'brand', color: '#0073aa' },
+		],
+		value: '#000',
+		selectedSlug: 'dark-text',
 	},
 };
 

@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import {
+	ColorSpace,
 	clone,
 	set,
 	to,
@@ -11,16 +9,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {
@@ -34,6 +23,8 @@ import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
 
+// `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
+// Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
@@ -49,23 +40,23 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-fg-interactive-brand-strong)',
+		'var(--wpds-color-foreground-interactive-brand-strong)',
 	],
 	[
 		'--wp-components-color-background',
-		'var(--wpds-color-bg-surface-neutral-strong)',
+		'var(--wpds-color-background-surface-neutral-strong)',
 	],
 	[
 		'--wp-components-color-foreground',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 	[
 		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-100',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-200',
@@ -85,11 +76,11 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-gray-700',
-		'var(--wpds-color-fg-content-neutral-weak)',
+		'var(--wpds-color-foreground-content-neutral-weak)',
 	],
 	[
 		'--wp-components-color-gray-800',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 ];
 
@@ -101,6 +92,7 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+	ColorSpace.register( sRGB );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
@@ -171,9 +163,11 @@ function generateStyles( {
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,
+	cornerRadius,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
+	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -185,35 +179,43 @@ export function useThemeProviderStyles( {
 		color.primary ??
 		inheritedSettings.color?.primary ??
 		DEFAULT_SEED_COLORS.primary;
-	const bg =
-		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const background =
+		color.background ??
+		inheritedSettings.color?.background ??
+		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	const cornerRadiusPreset =
+		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 
 	const resolvedSettings = useMemo(
 		() => ( {
 			color: {
 				primary,
-				bg,
+				background,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
+			cornerRadius: cornerRadiusPreset,
 		} ),
-		[ primary, bg, cursorControl ]
+		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
 	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
-			bg,
+			background,
 			primary,
 		};
 
-		// Generate ramps.
+		// Generate ramps, keyed by their primitive token group name. The
+		// `background` seed maps to the `bg` primitive ramp group, whose name
+		// is kept abbreviated even though the semantic tokens it feeds are
+		// exposed under the spelled-out `background` group.
 		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = getCachedBgRamp( seeds.bg );
+		const bgRamp = getCachedBgRamp( seeds.background );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
-			if ( rampName === 'bg' ) {
-				computedColorRamps.set( rampName, bgRamp );
+			if ( rampName === 'background' ) {
+				computedColorRamps.set( 'bg', bgRamp );
 			} else {
 				computedColorRamps.set(
 					rampName,
@@ -226,9 +228,9 @@ export function useThemeProviderStyles( {
 			primary: seeds.primary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, background ] );
 
-	const themeProviderStyles = useMemo(
+	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
 			...colorStyles,
 			...( cursorControl && {

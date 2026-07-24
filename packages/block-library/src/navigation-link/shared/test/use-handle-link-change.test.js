@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import { renderHook } from '@testing-library/react';
@@ -423,6 +419,51 @@ describe( 'useHandleLinkChange', () => {
 				} )
 			);
 		} );
+
+		it( 'should update text when editing text and changing a bound entity link to a custom URL in the link editing UI', () => {
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				createBinding: mockCreateBinding,
+				clearBinding: mockClearBinding,
+			} );
+
+			const attributes = {
+				id: 456,
+				url: 'https://example.com/my-page',
+				label: 'My Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+					allowTextUpdate: true,
+				} )
+			);
+
+			const updatedLink = {
+				url: 'https://external-site.com',
+				title: 'Updated Navigation Text',
+			};
+
+			result.current( updatedLink );
+
+			expect( mockClearBinding ).toHaveBeenCalled();
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				expect.objectContaining( {
+					url: 'https://external-site.com',
+					kind: 'custom',
+					type: 'custom',
+					id: undefined,
+					label: 'Updated Navigation Text',
+				} )
+			);
+			expect( updateAttributes ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'updating existing links', () => {
@@ -500,6 +541,87 @@ describe( 'useHandleLinkChange', () => {
 				} ),
 				mockSetAttributes,
 				attributes
+			);
+		} );
+
+		it( 'should preserve label when changing the link without editing text in the link editing UI', () => {
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Custom Label',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+					allowTextUpdate: true,
+				} )
+			);
+
+			const updatedLink = {
+				id: 456,
+				url: 'https://example.com/new-page',
+				title: 'Custom Label',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.not.objectContaining( {
+					title: 'Custom Label',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+			expect( mockUpdateBlockAttributes ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should include title when editing text and changing the entity link in the link editing UI', () => {
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+					allowTextUpdate: true,
+				} )
+			);
+
+			const updatedLink = {
+				id: 456,
+				url: 'https://example.com/new-page',
+				title: 'Updated Navigation Text',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Updated Navigation Text',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				{
+					label: 'Updated Navigation Text',
+				}
 			);
 		} );
 
@@ -603,6 +725,92 @@ describe( 'useHandleLinkChange', () => {
 				expect.not.objectContaining( {
 					title: 'Page Title',
 				} )
+			);
+		} );
+
+		it( 'should include title when editing text for the same existing entity link', () => {
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+					allowTextUpdate: true,
+				} )
+			);
+
+			const updatedLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Updated Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Updated Sample Page',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				{
+					label: 'Updated Sample Page',
+				}
+			);
+		} );
+
+		it( 'should clear text when the inline link editing UI title is emptied', () => {
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+					allowTextUpdate: true,
+				} )
+			);
+
+			const updatedLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: '',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: '',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				{
+					label: '',
+				}
 			);
 		} );
 

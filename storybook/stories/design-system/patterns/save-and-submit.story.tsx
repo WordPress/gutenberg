@@ -41,6 +41,7 @@ const LayoutCardSaveExample = () => {
 						variant="primary"
 						isBusy
 						style={ { marginTop: '16px' } }
+						__next40pxDefaultSize
 					>
 						Save
 					</Button>

@@ -1,19 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 
-function listener( event ) {
-	if ( event.defaultPrevented ) {
-		return;
-	}
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
 
-	event.preventDefault();
-	event.currentTarget.classList.toggle(
-		'is-hovered',
-		event.type === 'mouseover'
-	);
-}
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Adds `is-hovered` class when the block is hovered and in navigation or
@@ -31,12 +29,31 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				return;
 			}
 
-			node.addEventListener( 'mouseout', listener );
-			node.addEventListener( 'mouseover', listener );
+			function listener( event ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
+				event.preventDefault();
+				node.classList.toggle(
+					'is-hovered',
+					event.type === 'mouseover'
+				);
+			}
+
+			const unsubscribeOut = subscribeDelegatedListener(
+				node,
+				'mouseout',
+				listener
+			);
+			const unsubscribeOver = subscribeDelegatedListener(
+				node,
+				'mouseover',
+				listener
+			);
 
 			return () => {
-				node.removeEventListener( 'mouseout', listener );
-				node.removeEventListener( 'mouseover', listener );
+				unsubscribeOut();
+				unsubscribeOver();
 
 				// Remove class in case it lingers.
 				node.classList.remove( 'is-hovered' );

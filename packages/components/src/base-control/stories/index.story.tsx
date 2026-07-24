@@ -10,6 +10,7 @@ import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
@@ -25,9 +26,9 @@ const meta: Meta< typeof BaseControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

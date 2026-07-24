@@ -9,7 +9,10 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -64,7 +67,7 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 			) }
 			{ ! imageUrl && (
 				<div className="fields-controls__author-icon">
-					<Icon icon={ authorIcon } />
+					<WCIcon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="fields-controls__author-name">{ text }</span>

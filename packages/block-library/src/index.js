@@ -23,15 +23,10 @@ import HtmlRenderer from './utils/html-renderer';
 /**
  * Internal dependencies
  */
-// When IS_GUTENBERG_PLUGIN is set to false, imports of experimental blocks
-// are transformed by packages/block-library/src/index.js as follows:
-//    import * as experimentalBlock from './experimental-block'
-// becomes
-//    const experimentalBlock = null;
-// This enables webpack to eliminate the experimental blocks code from the
-// production build to make the final bundle smaller.
-//
-// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+// Experimental blocks are only registered in the Gutenberg plugin (see
+// `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
+// filters them out via `isBlockMetadataExperimental`, so they are never
+// available in WordPress core regardless of what ends up in the bundle.
 import * as accordion from './accordion';
 import * as accordionItem from './accordion-item';
 import * as accordionHeading from './accordion-heading';
@@ -135,13 +130,12 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
-import * as tab from './tab';
 import * as tabPanel from './tab-panel';
+import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabList from './tab-list';
 import * as tabs from './tabs';
-import * as tabsMenu from './tabs-menu';
-import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -203,6 +197,8 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
+		playlist,
+		playlistTrack,
 		preformatted,
 		pullquote,
 		reusableBlock,
@@ -214,6 +210,10 @@ const getAllBlocks = () => {
 		socialLinks,
 		spacer,
 		table,
+		tabs,
+		tabList,
+		tabPanels,
+		tabPanel,
 		tagCloud,
 		textColumns,
 		verse,
@@ -287,31 +287,11 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanel );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
+		// Blocks added here are only registered when the "Block experiments"
+		// option is enabled in the Gutenberg > Experiments settings page.
 	}
 
-	// When in a WordPress context, conditionally
-	// add the classic block and TinyMCE editor
-	// under any of the following conditions:
-	//   - the current post contains a classic block
-	//   - the experiment to disable TinyMCE isn't active.
-	//   - a query argument specifies that TinyMCE should be loaded
-	if (
-		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
-				'requiresTinymce'
-			) )
-	) {
-		blocks.push( classic );
-	}
+	blocks.push( classic );
 
 	return blocks.filter( Boolean );
 };
@@ -365,13 +345,23 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
+				// Always pass the postId context so the server-side render can
+				// reproduce the same output as the front end, while preserving
+				// any context declared in the block's PHP registration.
+				usesContext: Array.from(
+					new Set( [
+						...( bootstrappedBlockType?.usesContext ?? [] ),
+						'postId',
+					] )
+				),
 				// Inspector controls are rendered by the auto-register hook in block-editor
-				edit: function Edit( { attributes } ) {
+				edit: function Edit( { attributes, context } ) {
 					const disabledRef = useDisabled();
 					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
+						urlQueryArgs: { post_id: context?.postId },
 					} );
 
 					if ( status === 'loading' ) {

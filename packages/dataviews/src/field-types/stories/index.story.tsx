@@ -3,7 +3,7 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
@@ -88,7 +88,7 @@ const DollarPrefix = () => (
 );
 const StarIconPrefix = () => (
 	<InputControlPrefixWrapper variant="icon">
-		<Icon icon={ starFilled } />
+		<WCIcon icon={ starFilled } />
 	</InputControlPrefixWrapper>
 );
 const PercentSuffix = () => (
@@ -715,7 +715,7 @@ const FieldTypeStory = ( {
 						},
 					] }
 					defaultLayouts={ {
-						table: {},
+						table: true,
 					} }
 					selection={ selectedIds.map( ( id ) => id.toString() ) }
 					onChangeSelection={ ( newSelection ) =>

@@ -28,7 +28,6 @@ const MyFontFamilyControl = () => {
 			onChange={ ( newFontFamily ) => {
 				setFontFamily( newFontFamily );
 			} }
-			__next40pxDefaultSize
 		/>
 	);
 };
@@ -74,11 +73,3 @@ The current font family value.
 - Default: ''
 
 The rest of the props are passed down to the underlying `<SelectControl />` instance.
-
-#### `__next40pxDefaultSize`
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Start opting into the larger default height that will become the default size in a future version.

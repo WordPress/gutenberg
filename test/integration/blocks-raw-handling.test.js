@@ -414,6 +414,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
+			'google-docs-link-spacing',
 			'ms-word',
 			'ms-word-list',
 			'ms-word-styled',

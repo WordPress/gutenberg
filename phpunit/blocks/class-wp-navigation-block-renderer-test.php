@@ -27,7 +27,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
@@ -61,7 +63,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
@@ -99,7 +103,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -153,7 +159,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -175,7 +183,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$attributes = array( 'ref' => 0 );
 
 		$actual   = $method->invoke( $reflection, $attributes );
@@ -376,5 +386,49 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that shortcodes inside a Navigation Overlay template part are expanded
+	 * rather than output as raw shortcode tokens.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/77510
+	 */
+	public function test_shortcode_block_in_navigation_overlay_is_rendered() {
+		add_shortcode(
+			'gb_test_overlay_shortcode',
+			static function () {
+				return 'Hello, World!';
+			}
+		);
+
+		$current_theme = get_stylesheet();
+		$slug          = 'test-overlay-with-shortcode';
+
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay With Shortcode',
+				'post_name'    => $slug,
+				'post_content' => '<!-- wp:shortcode -->[gb_test_overlay_shortcode]<!-- /wp:shortcode -->',
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'
+		);
+
+		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
+		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
 }

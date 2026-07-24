@@ -32,6 +32,8 @@ import useRefEffect from '../use-ref-effect';
  */
 export default function useDisabled( {
 	isDisabled: isDisabledProp = false,
+}: {
+	isDisabled?: boolean;
 } = {} ) {
 	return useRefEffect(
 		( node ) => {
@@ -45,7 +47,7 @@ export default function useDisabled( {
 			}
 
 			/** A variable keeping track of the previous updates in order to restore them. */
-			const updates: Function[] = [];
+			const updates: ( () => void )[] = [];
 			const disable = () => {
 				node.childNodes.forEach( ( child ) => {
 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {

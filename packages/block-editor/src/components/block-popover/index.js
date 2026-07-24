@@ -52,25 +52,35 @@ function BlockPopover(
 		0
 	);
 
-	// When blocks are moved up/down, they are animated to their new position by
-	// updating the `transform` property manually (i.e. without using CSS
-	// transitions or animations). The animation, which can also scroll the block
-	// editor, can sometimes cause the position of the Popover to get out of sync.
-	// A MutationObserver is therefore used to make sure that changes to the
-	// selectedElement's attribute (i.e. `transform`) can be tracked and used to
-	// trigger the Popover to rerender.
+	// `useMovingAnimation` writes the block's `transform` on every spring tick.
+	// Reacting synchronously to each mutation would race with Floating UI's own
+	// autoUpdate frame loop and cause the toolbar to visibly jump. Coalescing
+	// to one recompute per animation frame avoids that. The observer can't
+	// simply be removed: with autoUpdate's animationFrame mode alone, the
+	// toolbar trails the block by ~1 frame because the spring's rAF and
+	// autoUpdate's rAF are independently scheduled.
 	useLayoutEffect( () => {
 		if ( ! selectedElement ) {
 			return;
 		}
 
-		const observer = new window.MutationObserver(
-			forceRecomputePopoverDimensions
-		);
+		let rafId;
+		const observer = new window.MutationObserver( () => {
+			if ( rafId ) {
+				return;
+			}
+			rafId = window.requestAnimationFrame( () => {
+				rafId = null;
+				forceRecomputePopoverDimensions();
+			} );
+		} );
 		observer.observe( selectedElement, { attributes: true } );
 
 		return () => {
 			observer.disconnect();
+			if ( rafId ) {
+				window.cancelAnimationFrame( rafId );
+			}
 		};
 	}, [ selectedElement ] );
 

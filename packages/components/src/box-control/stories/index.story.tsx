@@ -36,7 +36,7 @@ const meta: Meta< typeof BoxControl > = {
 export default meta;
 
 const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
-	return <BoxControl __next40pxDefaultSize { ...props } />;
+	return <BoxControl { ...props } />;
 };
 
 const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
@@ -44,7 +44,6 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 
 	return (
 		<BoxControl
-			__next40pxDefaultSize
 			values={ values }
 			{ ...props }
 			onChange={ ( nextValue ) => {
@@ -58,7 +57,6 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 export const Default = TemplateUncontrolled.bind( {} );
 Default.args = {
 	label: 'Label',
-	__next40pxDefaultSize: true,
 };
 
 export const Controlled = TemplateControlled.bind( {} );

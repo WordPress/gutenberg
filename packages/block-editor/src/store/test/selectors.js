@@ -7,6 +7,8 @@ import {
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -3657,6 +3659,54 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'surfaces innerContent on a block variation inserter item', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'widgets',
+				title: 'Custom HTML',
+				variations: [
+					{
+						name: 'card',
+						title: 'Card',
+						innerContent: [ '<div class="card">', null, '</div>' ],
+						innerBlocks: [ [ 'core/test-block-a' ] ],
+					},
+				],
+			} );
+
+			const items = select( store ).getInserterItems();
+			const variationItem = items.find(
+				( item ) => item.id === 'core/html/card'
+			);
+
+			expect( variationItem.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+
+			// Replicate how `useBlockTypesState` builds the block on insert,
+			// to guard the full path from variation to created block.
+			const block = createBlock(
+				variationItem.name,
+				variationItem.initialAttributes,
+				createBlocksFromInnerBlocksTemplate(
+					variationItem.innerBlocks
+				),
+				variationItem.innerContent
+			);
+			expect( block.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block-a' );
+
+			unregisterBlockType( 'core/html' );
+		} );
+
 		it( 'should correctly cache the return values', async () => {
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [
@@ -4030,6 +4080,82 @@ describe( 'selectors', () => {
 					frecency: 2.5,
 				} )
 			);
+		} );
+
+		it( 'should use variation metadata for transformation items', () => {
+			registerBlockType( 'core/variation-transform-source', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Variation Transform Source',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/variation-transform-target' ],
+							variationName: 'grid',
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/variation-transform-target', {
+				apiVersion: 3,
+				category: 'design',
+				title: 'Group',
+				icon: 'group',
+				edit: () => {},
+				save: () => {},
+				variations: [
+					{
+						name: 'grid',
+						title: 'Grid',
+						icon: 'grid',
+						attributes: { layout: { type: 'grid' } },
+						scope: [ 'transform' ],
+					},
+				],
+			} );
+
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
+					cache: {},
+					blockEditingModes: new Map(),
+				},
+				preferences: {
+					insertUsage: {
+						'core/variation-transform-target/grid': {
+							count: 10,
+							time: 1000,
+						},
+					},
+				},
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			const blocks = [ { name: 'core/variation-transform-source' } ];
+
+			try {
+				const items = getBlockTransformItems( state, blocks );
+
+				expect( items ).toHaveLength( 1 );
+				expect( items[ 0 ] ).toMatchObject( {
+					id: 'core/variation-transform-target/grid',
+					name: 'core/variation-transform-target',
+					variationName: 'grid',
+					title: 'Grid',
+					icon: 'grid',
+					frecency: 2.5,
+				} );
+			} finally {
+				unregisterBlockType( 'core/variation-transform-source' );
+				unregisterBlockType( 'core/variation-transform-target' );
+			}
 		} );
 	} );
 
@@ -4726,6 +4852,89 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'static inner content (Custom HTML block)', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Custom HTML',
+				icon: 'test',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/html' );
+		} );
+
+		// The Custom HTML block parent with a child container, which has a
+		// child of its own. The direct child is fixed in place; the grandchild
+		// is regular, fully editable content.
+		const buildState = () => ( {
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						parent: { name: 'core/html' },
+						child: { name: 'core/test-block-b' },
+						grandchild: { name: 'core/test-block-b' },
+					} )
+				),
+				attributes: new Map(
+					Object.entries( {
+						parent: {},
+						child: {},
+						grandchild: {},
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						parent: '',
+						child: 'parent',
+						grandchild: 'child',
+					} )
+				),
+				order: new Map( [
+					[ '', [ 'parent' ] ],
+					[ 'parent', [ 'child' ] ],
+					[ 'child', [ 'grandchild' ] ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[ 'parent', {} ],
+				[ 'child', {} ],
+			] ),
+			settings: {},
+			derivedBlockEditingModes: new Map(),
+		} );
+
+		it( 'prevents removing a direct child', () => {
+			expect( canRemoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents moving a direct child', () => {
+			expect( canMoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents insertion into the inner content root', () => {
+			expect(
+				canInsertBlockType(
+					buildState(),
+					'core/test-block-b',
+					'parent'
+				)
+			).toBe( false );
+		} );
+
+		it( 'does not cascade to deeper descendants', () => {
+			expect( canRemoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect( canMoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect(
+				canInsertBlockType( buildState(), 'core/test-block-b', 'child' )
+			).toBe( true );
+		} );
+	} );
+
 	describe( 'canMoveBlock', () => {
 		it( 'allows moving within a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
@@ -5005,6 +5214,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {

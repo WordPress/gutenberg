@@ -11,9 +11,9 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
+import { parsedBlocksCache, getCacheKey } from '../parsed-blocks-cache';
 
 const EMPTY_ARRAY = [];
-const parsedBlocksCache = new Map();
 
 /**
  * Hook that returns block content getters and setters for
@@ -69,7 +69,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 		// Cache parsed blocks by entity identity. Store the content
 		// alongside the blocks so we can validate it hasn't changed.
-		const cacheKey = `${ kind }:${ name }:${ id }`;
+		const cacheKey = getCacheKey( kind, name, id );
 		const cached = parsedBlocksCache.get( cacheKey );
 		let _blocks;
 

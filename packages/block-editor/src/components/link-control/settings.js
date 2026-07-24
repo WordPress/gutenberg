@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl, VisuallyHidden } from '@wordpress/components';
+import { CheckboxControl } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 const noop = () => {};
 
@@ -58,7 +59,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 
 	return (
 		<fieldset className="block-editor-link-control__settings">
-			<VisuallyHidden as="legend">
+			<VisuallyHidden render={ <legend /> }>
 				{ __( 'Currently selected link settings' ) }
 			</VisuallyHidden>
 			{ theSettings }

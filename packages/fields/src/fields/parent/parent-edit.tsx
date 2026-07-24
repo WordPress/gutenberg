@@ -149,6 +149,7 @@ export function PageAttributesParent( {
 					// Perform a search by relevance when the field is changed.
 					search: fieldValue,
 					orderby: 'relevance',
+					search_columns: [ 'post_title' ],
 				} ),
 			};
 
@@ -260,7 +261,6 @@ export function PageAttributesParent( {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }
 			value={ pageId?.toString() }

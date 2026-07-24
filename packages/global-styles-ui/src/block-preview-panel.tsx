@@ -3,29 +3,89 @@
  */
 // @ts-expect-error: Not typed yet.
 import { BlockPreview } from '@wordpress/block-editor';
-// @ts-expect-error: Not typed yet.
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
+import {
+	privateApis as globalStylesEnginePrivateApis,
+	__unstableGeneratePreviewStateStyles as generatePreviewStateStyles,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { getVariationClassName } from './utils';
+import { unlock } from './lock-unlock';
+
+const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
+	selectedViewport?: string;
 	selectedState?: string;
 	stateStyles?: any;
+	viewportSettings?: {
+		mobile?: string;
+		tablet?: string;
+	};
+}
+
+const DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
+	default: 783,
+	'@tablet': 600,
+	'@mobile': 480,
+};
+
+function getPreviewWidthByViewport(
+	selectedViewport: string,
+	viewportSettings: BlockPreviewPanelProps[ 'viewportSettings' ]
+) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+	const mobileWidth = getViewportBreakpointValueInPixels(
+		breakpoints.mobile
+	);
+
+	if ( selectedViewport === '@mobile' && mobileWidth ) {
+		return mobileWidth;
+	}
+
+	const tabletWidth = getViewportBreakpointValueInPixels(
+		breakpoints.tablet
+	);
+
+	if ( selectedViewport === '@tablet' && tabletWidth ) {
+		if ( ! mobileWidth ) {
+			return tabletWidth;
+		}
+		if (
+			breakpoints.mobile === '480px' &&
+			breakpoints.tablet === '782px'
+		) {
+			return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT[ '@tablet' ];
+		}
+		return Math.round( ( mobileWidth + tabletWidth ) / 2 );
+	}
+
+	if ( selectedViewport === 'default' ) {
+		const desktopBreakpoint = tabletWidth ?? mobileWidth;
+		if ( desktopBreakpoint ) {
+			return desktopBreakpoint + 1;
+		}
+	}
+
+	return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ];
 }
 
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
+	selectedViewport = 'default',
 	selectedState = 'default',
 	stateStyles,
+	viewportSettings,
 }: BlockPreviewPanelProps ) => {
 	const blockExample = getBlockType( name )?.example;
 	const blocks = useMemo( () => {
@@ -56,7 +116,17 @@ const BlockPreviewPanel = ( {
 		return generatePreviewStateStyles( stateStyles, name );
 	}, [ selectedState, stateStyles, name ] );
 
-	const viewportWidth = blockExample?.viewportWidth ?? 500;
+	if ( ! blockExample ) {
+		return null;
+	}
+
+	const viewportWidth =
+		getPreviewWidthByViewport( selectedViewport, viewportSettings ) ??
+		blockExample.viewportWidth ??
+		500;
+	const normalizedViewportWidth = blockExample.viewportWidth ?? 500;
+	const previewScale = Math.max( viewportWidth / normalizedViewportWidth, 1 );
+	const previewPadding = 24 * previewScale;
 	// Same as height of InserterPreviewPanel.
 	const previewHeight = 144;
 	const sidebarWidth = 235;
@@ -65,10 +135,6 @@ const BlockPreviewPanel = ( {
 		scale !== 0 && scale < 1 && previewHeight
 			? previewHeight / scale
 			: previewHeight;
-
-	if ( ! blockExample ) {
-		return null;
-	}
 
 	return (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
@@ -86,12 +152,15 @@ const BlockPreviewPanel = ( {
 							{
 								css: `
 								body{
-									padding: 24px;
+									padding: ${ previewPadding }px;
 									min-height:${ Math.round( minHeight ) }px;
 									display:flex;
-									align-items:center;
 								}
-								.is-root-container { width: 100%; }
+								.is-root-container {
+									width: ${ 100 / previewScale }%;
+									transform: scale(${ previewScale });
+									transform-origin: top left;
+								}
 								${ stateCSS }
 							`,
 							},

@@ -165,7 +165,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'inline_valid_dimensions_style'                => array(
+			'inline_valid_dimensions_min_height_style'     => array(
 				'block_styles'    => array(
 					'dimensions' => array(
 						'minHeight' => '50vh',
@@ -176,6 +176,36 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css'          => 'min-height:50vh;',
 					'declarations' => array(
 						'min-height' => '50vh',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_min_width_style'      => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'minWidth' => '25vw',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'min-width:25vw;',
+					'declarations' => array(
+						'min-width' => '25vw',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_width_style'          => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'width' => '50%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'width:50%;',
+					'declarations' => array(
+						'width' => '50%',
 					),
 				),
 			),
@@ -788,6 +818,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( ".wp-duotone-ffffff-000000-1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet with important declarations.
+	 *
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_with_important_declarations() {
+		$declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			array(
+				'important' => true,
+			)
+		);
+		$css_rules = array(
+			array(
+				'selector'     => '.responsive-state',
+				'declarations' => $declarations,
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( '.responsive-state{background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;}', $compiled_stylesheet );
 	}
 
 	/**

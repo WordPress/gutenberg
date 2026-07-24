@@ -57,7 +57,6 @@ export function TemplatePartAdvancedControls( {
 			{ isEntityAvailable && (
 				<>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {
@@ -66,7 +65,6 @@ export function TemplatePartAdvancedControls( {
 						onFocus={ ( event ) => event.target.select() }
 					/>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }

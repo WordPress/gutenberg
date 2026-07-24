@@ -52,22 +52,31 @@ export default function DisableNonPageContentBlocks() {
 	// Child blocks of templates and templateParts are also loaded separately,
 	// so these are kept in separate effects.
 	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
+		__unstableMarkNextChangeAsNotPersistent();
 		setBlockEditingMode( '', 'disabled' );
 
 		return () => {
+			__unstableMarkNextChangeAsNotPersistent();
 			unsetBlockEditingMode( '' );
 		};
 	}, [ registry ] );
 
 	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
 		registry.batch( () => {
 			for ( const clientId of templateParts ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 		} );
@@ -75,6 +84,7 @@ export default function DisableNonPageContentBlocks() {
 		return () => {
 			registry.batch( () => {
 				for ( const clientId of templateParts ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					unsetBlockEditingMode( clientId );
 				}
 			} );
@@ -82,17 +92,22 @@ export default function DisableNonPageContentBlocks() {
 	}, [ templateParts, registry ] );
 
 	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
 		const contentOnlySet = new Set( contentOnlyIds );
 
 		registry.batch( () => {
 			for ( const clientId of contentOnlyIds ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 			for ( const clientId of templatePartChildren ) {
 				if ( ! contentOnlySet.has( clientId ) ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					setBlockEditingMode( clientId, 'disabled' );
 				}
 			}
@@ -101,10 +116,12 @@ export default function DisableNonPageContentBlocks() {
 		return () => {
 			registry.batch( () => {
 				for ( const clientId of contentOnlyIds ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					unsetBlockEditingMode( clientId );
 				}
 				for ( const clientId of templatePartChildren ) {
 					if ( ! contentOnlySet.has( clientId ) ) {
+						__unstableMarkNextChangeAsNotPersistent();
 						unsetBlockEditingMode( clientId );
 					}
 				}

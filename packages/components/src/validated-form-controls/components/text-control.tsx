@@ -17,11 +17,7 @@ const UnforwardedValidatedTextControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof TextControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof TextControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -34,11 +30,7 @@ const UnforwardedValidatedTextControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<TextControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<TextControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };

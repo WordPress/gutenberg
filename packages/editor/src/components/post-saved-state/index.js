@@ -45,6 +45,8 @@ export default function PostSavedState( { forceIsDirty } ) {
 		isPublished,
 		isSaveable,
 		isSaving,
+		isSavingLocked,
+		isSavingNonPostEntityChanges,
 		isScheduled,
 		hasPublishAction,
 		showIconLabels,
@@ -53,33 +55,25 @@ export default function PostSavedState( { forceIsDirty } ) {
 		postType,
 	} = useSelect(
 		( select ) => {
-			const {
-				isEditedPostNew,
-				isCurrentPostPublished,
-				isCurrentPostScheduled,
-				isEditedPostDirty,
-				isSavingPost,
-				isEditedPostSaveable,
-				getCurrentPost,
-				isAutosavingPost,
-				getEditedPostAttribute,
-				getPostEdits,
-			} = select( editorStore );
+			const store = select( editorStore );
 			const { get } = select( preferencesStore );
 			return {
-				isAutosaving: isAutosavingPost(),
-				isDirty: forceIsDirty || isEditedPostDirty(),
-				isNew: isEditedPostNew(),
-				isPublished: isCurrentPostPublished(),
-				isSaving: isSavingPost(),
-				isSaveable: isEditedPostSaveable(),
-				isScheduled: isCurrentPostScheduled(),
+				isAutosaving: store.isAutosavingPost(),
+				isDirty: forceIsDirty || store.isEditedPostDirty(),
+				isNew: store.isEditedPostNew(),
+				isPublished: store.isCurrentPostPublished(),
+				isSaving: store.isSavingPost(),
+				isSaveable: store.isEditedPostSaveable(),
+				isSavingLocked: store.isPostSavingLocked(),
+				isSavingNonPostEntityChanges:
+					store.isSavingNonPostEntityChanges(),
+				isScheduled: store.isCurrentPostScheduled(),
 				hasPublishAction:
-					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
+					!! store.getCurrentPost()?._links?.[ 'wp:action-publish' ],
 				showIconLabels: get( 'core', 'showIconLabels' ),
-				postStatus: getEditedPostAttribute( 'status' ),
-				postStatusHasChanged: !! getPostEdits()?.status,
-				postType: select( editorStore ).getCurrentPostType(),
+				postStatus: store.getEditedPostAttribute( 'status' ),
+				postStatusHasChanged: !! store.getPostEdits()?.status,
+				postType: store.getCurrentPostType(),
 			};
 		},
 		[ forceIsDirty ]
@@ -140,7 +134,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;
-	const isDisabled = isSaving || isSaved || ! isSaveable;
+	const isDisabled =
+		isSaving ||
+		isSaved ||
+		! isSaveable ||
+		isSavingLocked ||
+		// Disable while a non-post entity (e.g. a newly created term) is mid-save.
+		isSavingNonPostEntityChanges;
 	let text;
 
 	if ( isSaving ) {

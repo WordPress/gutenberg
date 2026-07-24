@@ -16,12 +16,14 @@
 }
 
 .editor-collab-sidebar-panel {
+	position: relative;
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
 }
 
-.editor-collab-sidebar-panel__thread {
+.editor-collab-sidebar-panel__thread,
+.editor-collab-sidebar-panel__add-note {
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
@@ -46,6 +48,14 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
+		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas scroll.
+		transform: translateY(var(--canvas-scroll, 0));
+		will-change: transform;
+		// Keep the reply input reachable when a thread is taller than the viewport
+		// (e.g. many replies on short content where the canvas can't scroll).
+		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
+		overflow-y: auto;
 	}
 }
 
@@ -66,9 +76,29 @@
 	color: $gray-700;
 }
 
-.editor-collab-sidebar-panel__user-comment {
+.editor-collab-sidebar-panel__show-more-button {
+	width: fit-content;
+	color: var(--wpds-color-foreground-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+}
+
+.editor-collab-sidebar-panel__note-content {
 	p:last-child {
 		margin-bottom: 0;
+	}
+
+	&.is-collapsed {
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 }
 
@@ -81,7 +111,7 @@
 	background: $white;
 }
 
-.editor-collab-sidebar-panel__comment-status {
+.editor-collab-sidebar-panel__note-actions {
 	margin-left: auto;
 
 	button {
@@ -95,42 +125,59 @@
 	}
 }
 
-.editor-collab-sidebar-panel__comment-dropdown-menu {
-	flex-shrink: 0;
-}
-
-.editor-collab-sidebar-panel__more-reply-separator {
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
 	&::before,
 	&::after {
 		content: "";
-		display: block;
-		width: 100%;
+		flex: 1;
 		height: 1px;
 		background-color: $gray-300;
-		flex: 1;
 	}
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.editor-collab-sidebar-panel__deleted-block-notice {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	color: $gray-700;
 }
 
 .editor-collab-sidebar-panel__resolution-text {
 	font-style: italic;
 }
 
-.editor-collab-sidebar-panel__comment-form textarea {
-	@include input-control;
-	// Vertical padding is to match the standard 40px control height when rows=1,
-	// in conjunction with the 20px line-height.
-	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
-	padding: 9px 11px;
-	line-height: 20px !important;
-	display: block;
+// The ContentEditableControl shell provides its own base styling (border, focus
+// ring, padding). Scope the few multi-line and inline-format tweaks the note
+// form needs to the editable element as rendered inside the note form. The
+// shell exposes no stable class name, so target the editable by its role.
+.editor-collab-sidebar-panel__note-form [role="textbox"] {
+	line-height: 20px;
+	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
+	overflow-y: auto;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+
+	// Inline formats inherit the surrounding text styles but keep
+	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
+	code {
+		font-family: Menlo, Consolas, monaco, monospace;
+		font-size: 0.9em;
+		padding: 0 2px;
+		background: $gray-100;
+		border-radius: 2px;
+	}
+
+	a {
+		color: var(--wp-admin-theme-color);
+		text-decoration: underline;
+	}
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-note,
 .editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
@@ -147,7 +194,7 @@
 		right: $grid-unit-10;
 	}
 }
-.editor-collab-sidebar-panel__skip-to-comment:focus {
+.editor-collab-sidebar-panel__skip-to-note:focus {
 	top: $grid-unit-10;
 }
 .editor-collab-sidebar-panel__skip-to-block:focus {
@@ -155,7 +202,7 @@
 	bottom: $grid-unit-10;
 }
 
-.comment-avatar {
+.editor-note-indicator__avatar {
 	width: $icon-size;
 	border-radius: $radius-round;
 	margin-left: -12px;
@@ -170,8 +217,12 @@
 	}
 }
 
+.editor-note-indicator__overflow {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
 .show-icon-labels {
-	.comment-avatar-indicator {
+	.editor-note-indicator {
 		width: auto;
 		// Hide the user avatars container when labels are set to display...
 		div {
@@ -183,4 +234,38 @@
 			font-size: $helptext-font-size;
 		}
 	}
+}
+
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}
+
+// Mention chips, both in the note input and the rendered note content. A
+// mention is a non-interactive `span` carrying the mentioned user's ID in a
+// `user-N` class, styled as a chip.
+.wp-note-mention {
+	display: inline;
+	padding: 0 var(--wpds-dimension-padding-xs);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	white-space: nowrap;
+
+	// Keep the chip boundary visible when forced-colors drops the background tint.
+	@media (forced-colors: active) {
+		border: 1px solid;
+	}
+}
+
+// Match the rounded avatars used for note bylines and the block toolbar
+// indicator in the mention suggestions popover (the shared completer style
+// leaves them square).
+.editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
+	border-radius: $radius-round;
 }

@@ -53,7 +53,6 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 				<UnitControl
 					label={ __( 'Width' ) }
 					__unstableInputWidth="calc(50% - 8px)"
-					__next40pxDefaultSize
 					value={ width || '' }
 					onChange={ ( nextWidth ) => {
 						nextWidth =

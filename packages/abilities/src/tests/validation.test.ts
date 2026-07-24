@@ -249,6 +249,16 @@ describe( 'validateValueFromSchema', () => {
 				' is not a valid hostname.'
 			);
 		} );
+
+		it( 'should validate URI format', () => {
+			const schema = { type: 'string', format: 'uri' };
+			expect(
+				validateValueFromSchema( 'https://example.com/path', schema )
+			).toBe( true );
+			expect( validateValueFromSchema( 'not a uri', schema ) ).toBe(
+				' is not a valid URI.'
+			);
+		} );
 	} );
 
 	describe( 'pattern validation', () => {
@@ -527,6 +537,73 @@ describe( 'validateValueFromSchema', () => {
 			expect( validateValueFromSchema( 'different-value', schema ) ).toBe(
 				'must be equal to constant'
 			);
+		} );
+	} );
+
+	describe( 'WordPress-specific schema keywords', () => {
+		// All of these keywords are valid on WordPress REST API schemas
+		// (sanitize_callback / validate_callback / arg_options from
+		// register_meta and route args, context / readonly from REST
+		// response shaping, example / examples from OpenAPI-style docs,
+		// and boolean `required` from per-arg flags) but are not part of
+		// JSON Schema draft-04. AJV rejects them at compile time (either
+		// strict mode or meta-schema), so the catch block surfaces a
+		// generic "Invalid schema" error rather than ignoring them.
+		it.each( [
+			[ 'sanitize_callback', 'sanitize_text_field' ],
+			[ 'validate_callback', 'rest_validate_request_arg' ],
+			[ 'arg_options', { sanitize_callback: 'sanitize_key' } ],
+			[ 'example', 'an example value' ],
+			[ 'examples', [ 'first', 'second' ] ],
+			[ 'context', [ 'view', 'edit', 'embed' ] ],
+			[ 'readonly', true ],
+			[ 'required', true ],
+		] )(
+			'should fail compilation when a property uses `%s`',
+			( keyword, value ) => {
+				const schema = {
+					type: 'object',
+					properties: {
+						name: {
+							type: 'string',
+							[ keyword ]: value,
+						},
+					},
+				};
+				const consoleErrorSpy = jest
+					.spyOn( console, 'error' )
+					.mockImplementation();
+
+				expect(
+					validateValueFromSchema( { name: 'hello' }, schema )
+				).toBe( 'Invalid schema provided for validation.' );
+				expect( consoleErrorSpy ).toHaveBeenCalledWith(
+					'Schema compilation error:',
+					expect.any( Error )
+				);
+
+				consoleErrorSpy.mockRestore();
+			}
+		);
+
+		it( 'should fail compilation when a WP-specific keyword sits at the top level of the schema', () => {
+			const schema = {
+				type: 'string',
+				sanitize_callback: 'sanitize_text_field',
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
 		} );
 	} );
 } );

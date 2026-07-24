@@ -30,6 +30,11 @@ import type {
 
 export { Fill };
 
+/**
+ * `Slot` marks a location where content rendered by matching `Fill` components
+ * elsewhere will appear. Use it to allow a component to define UI areas that
+ * can be extended from other parts of the application.
+ */
 export const Slot = forwardRef(
 	(
 		props: SlotComponentProps &

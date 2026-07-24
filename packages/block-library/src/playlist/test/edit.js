@@ -1,16 +1,7 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * Internal dependencies
  */
 import { getTrackAttributes } from '../utils';
-
-// Mock uuid to return predictable values.
-jest.mock( 'uuid', () => ( {
-	v4: jest.fn( () => 'mock-uuid-1234' ),
-} ) );
 
 describe( 'Playlist block edit utilities', () => {
 	describe( 'getTrackAttributes', () => {
@@ -22,20 +13,23 @@ describe( 'Playlist block edit utilities', () => {
 				artist: 'The Artist',
 				album: 'Great Album',
 				fileLength: '3:45',
-				image: { src: 'https://example.com/cover.jpg' },
+				image: {
+					src: 'https://example.com/cover.jpg',
+					alt: 'A bright abstract track image',
+				},
 			};
 
 			const result = getTrackAttributes( media );
 
 			expect( result ).toEqual( {
 				id: 123,
-				uniqueId: 'mock-uuid-1234',
 				src: 'https://example.com/song.mp3',
 				title: 'My Song',
 				artist: 'The Artist',
 				album: 'Great Album',
 				length: '3:45',
 				image: 'https://example.com/cover.jpg',
+				imageAlt: 'A bright abstract track image',
 			} );
 		} );
 
@@ -48,6 +42,38 @@ describe( 'Playlist block edit utilities', () => {
 			const result = getTrackAttributes( media );
 
 			expect( result.id ).toBe( 'https://example.com/song.mp3' );
+			expect( result.image ).toBeUndefined();
+			expect( result.imageAlt ).toBeUndefined();
+		} );
+
+		it( 'should transform raw uploaded attachment data to track attributes', () => {
+			const media = {
+				id: 123,
+				source_url: 'https://example.com/song.mp3',
+				title: { raw: 'My &amp; Song' },
+				media_details: {
+					artist: 'Media Details Artist',
+					album: 'Media Details Album',
+					length_formatted: '4:30',
+				},
+				image: {
+					source_url: 'https://example.com/cover.jpg',
+					alt_text: 'A black and white portrait',
+				},
+			};
+
+			const result = getTrackAttributes( media );
+
+			expect( result ).toEqual( {
+				id: 123,
+				src: 'https://example.com/song.mp3',
+				title: 'My & Song',
+				artist: 'Media Details Artist',
+				album: 'Media Details Album',
+				length: '4:30',
+				image: 'https://example.com/cover.jpg',
+				imageAlt: 'A black and white portrait',
+			} );
 		} );
 
 		it( 'should fall back to meta.artist when artist is not available', () => {
@@ -120,18 +146,23 @@ describe( 'Playlist block edit utilities', () => {
 			const result = getTrackAttributes( media );
 
 			expect( result.image ).toBe( '' );
+			expect( result.imageAlt ).toBe( '' );
 		} );
 
 		it( 'should include image URLs', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',
 				title: 'My Song',
-				image: { src: 'https://example.com/cover.jpg' },
+				image: {
+					src: 'https://example.com/cover.jpg',
+					alt_text: 'A black and white portrait',
+				},
 			};
 
 			const result = getTrackAttributes( media );
 
 			expect( result.image ).toBe( 'https://example.com/cover.jpg' );
+			expect( result.imageAlt ).toBe( 'A black and white portrait' );
 		} );
 	} );
 } );

@@ -51,7 +51,6 @@ function RenameFontSizeDialog( {
 			>
 				<VStack spacing="3">
 					<InputControl
-						__next40pxDefaultSize
 						autoComplete="off"
 						value={ newName }
 						onChange={ setNewName }

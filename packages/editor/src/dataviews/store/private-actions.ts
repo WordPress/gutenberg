@@ -30,16 +30,26 @@ import {
 	slugField,
 	statusField,
 	authorField,
+	templateAuthorField,
+	templatePartAuthorField,
 	titleField,
 	templateField,
 	templateTitleField,
 	pageTitleField,
 	patternTitleField,
+	patternDescriptionField,
+	patternSyncStatusField,
 	notesField,
 	scheduledDateField,
+	lastEditedDateField,
 	formatField,
 	postContentInfoField,
 	stickyField,
+	descriptionField,
+	readOnlyDescriptionField,
+	postsPerPageField,
+	siteDiscussionField,
+	postsPageTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -47,7 +57,7 @@ import {
 	authorField as mediaAuthorField,
 	captionField,
 	dateAddedField,
-	descriptionField,
+	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
@@ -65,7 +75,6 @@ import { unlock } from '../../lock-unlock';
 declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
-		__experimentalMediaEditor?: boolean;
 	}
 }
 
@@ -165,7 +174,7 @@ const ORDERED_MEDIA_FIELDS = [
 	titleField,
 	altTextField,
 	captionField,
-	descriptionField,
+	mediaDescriptionField,
 ];
 
 export const registerPostTypeSchema =
@@ -258,39 +267,59 @@ export const registerPostTypeSchema =
 		if ( postType === ATTACHMENT_POST_TYPE ) {
 			fields = ORDERED_MEDIA_FIELDS;
 		} else {
+			const postTypeSlug = postTypeConfig.slug;
+			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
+			const isPattern = postTypeSlug === 'wp_block';
+
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
 					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
 					featuredImageField,
-				postTypeConfig.supports?.author && authorField,
-				statusField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					dateField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					scheduledDateField,
-				slugField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+				! isDesignPostType &&
+					postTypeConfig.supports?.author &&
+					authorField,
+				postTypeSlug === 'wp_template' && templateAuthorField,
+				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
+				! isDesignPostType && statusField,
+				! isDesignPostType && dateField,
+				! isDesignPostType && scheduledDateField,
+				lastEditedDateField,
+				! isDesignPostType && slugField,
+				! isDesignPostType &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
+				isPattern &&
+					postTypeConfig.supports?.excerpt &&
+					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
 					discussionField,
-				templateField,
+				! isDesignPostType && templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+				( ! isDesignPostType || isPattern ) &&
 					postTypeConfig.supports?.editor &&
 					postContentInfoField,
-				passwordField,
-				postTypeConfig.slug === 'post' && stickyField,
+				! isDesignPostType && passwordField,
+				postTypeSlug === 'post' && stickyField,
+				postTypeSlug === 'wp_template' && descriptionField,
+				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
+				// The `home`/`index` template summary exposes a few fields that
+				// target other entities (`root/site` and the posts page).
+				// `DataFormPostSummary` overrides them to read/write the right
+				// entity and to control their visibility.
+				postTypeSlug === 'wp_template' && postsPageTitleField,
+				postTypeSlug === 'wp_template' && postsPerPageField,
+				postTypeSlug === 'wp_template' && siteDiscussionField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
 				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				isPattern && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
@@ -298,7 +327,9 @@ export const registerPostTypeSchema =
 					_titleField = pageTitleField;
 				} else if ( postType === 'wp_template' ) {
 					_titleField = templateTitleField;
-				} else if ( postType === 'wp_block' ) {
+				} else if (
+					[ 'wp_block', 'wp_template_part' ].includes( postType )
+				) {
 					_titleField = patternTitleField;
 				} else {
 					_titleField = titleField;

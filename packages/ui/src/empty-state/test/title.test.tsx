@@ -10,4 +10,17 @@ describe( 'EmptyState.Title', () => {
 
 		expect( ref.current ).toBeInstanceOf( HTMLHeadingElement );
 	} );
+
+	it( 'forwards ref to custom render element', () => {
+		const ref = createRef< HTMLHeadingElement >();
+
+		render(
+			<Title ref={ ref } render={ <h3 /> }>
+				No results found
+			</Title>
+		);
+
+		expect( ref.current ).toBeInstanceOf( HTMLHeadingElement );
+		expect( ref.current?.tagName ).toBe( 'H3' );
+	} );
 } );

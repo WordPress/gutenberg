@@ -111,6 +111,7 @@ async function downloadTestSuite(
 			directory,
 			{
 				'--depth': '1',
+				'--filter': 'blob:none',
 				'--no-checkout': null,
 			}
 		);

@@ -7,7 +7,6 @@
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-require_once __DIR__ . '/navigation-link/shared/build-css-font-sizes.php';
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -82,6 +81,66 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
 }
 
 /**
+ * Build an array with CSS classes and inline styles defining the font sizes
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * This function is no longer used internally and is kept only for backward
+ * compatibility with third-party code that may call it directly.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0
+ *
+ * @param  array $context Navigation block context.
+ * @return array Font size CSS classes and inline styles.
+ */
+function block_core_navigation_link_build_css_font_sizes( $context ) {
+	_deprecated_function( __FUNCTION__, '7.0.0' );
+
+	// CSS classes.
+	$font_sizes = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	$has_named_font_size  = array_key_exists( 'fontSize', $context );
+	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
+
+	if ( $has_named_font_size ) {
+		// Add the font size class.
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
+	} elseif ( $has_custom_font_size ) {
+		// Add the custom font size inline style.
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
+	}
+
+	return $font_sizes;
+}
+
+/**
+ * Returns the top-level submenu SVG chevron icon.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_render_submenu_icon() instead.
+ *
+ * @return string
+ */
+function block_core_navigation_link_render_submenu_icon() {
+	_deprecated_function(
+		__FUNCTION__,
+		'7.0.0',
+		'block_core_shared_navigation_render_submenu_icon()'
+	);
+	return block_core_shared_navigation_render_submenu_icon();
+}
+
+/**
  * Decodes a url if it's encoded, returning the same url if not.
  *
  * @since 6.2.0
@@ -128,9 +187,12 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Check if this navigation item should render based on post status.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		if ( ! gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block ) ) {
-			return '';
-		}
+		$should_render = gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block );
+	} else {
+		$should_render = block_core_shared_navigation_item_should_render( $attributes, $block );
+	}
+	if ( ! $should_render ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
@@ -138,19 +200,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// The build system prefixes this function with "gutenberg_" to avoid
-	// collisions with the core version. Until this function is backported to
-	// core, we need to guard its use and only call the prefixed name in
-	//  the plugin.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
-	} else {
-		$font_sizes = block_core_shared_navigation_build_css_font_sizes( $block->context );
-	}
-	$classes         = array_merge(
-		$font_sizes['css_classes']
-	);
-	$style_attribute = $font_sizes['inline_styles'];
+	$classes = array();
 
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
@@ -174,7 +224,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 				( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, PanelBody } from '@wordpress/components';
+import { Icon as WCIcon, PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { wordpress } from '@wordpress/icons';
 import { filterURLForDisplay } from '@wordpress/url';
@@ -53,7 +53,11 @@ function PostPublishPanelPrepublish( { children } ) {
 	}, [] );
 
 	let siteIcon = (
-		<Icon className="components-site-icon" size="36px" icon={ wordpress } />
+		<WCIcon
+			className="components-site-icon"
+			size="36px"
+			icon={ wordpress }
+		/>
 	);
 
 	if ( siteIconUrl ) {

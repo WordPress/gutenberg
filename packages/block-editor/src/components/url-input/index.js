@@ -510,7 +510,6 @@ class URLInput extends Component {
 					{ ...( this.hasRenderedValidation.current
 						? validationProps
 						: {} ) }
-					__next40pxDefaultSize
 				/>
 				{ loading && <Spinner /> }
 			</BaseControl>

@@ -121,7 +121,6 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			<form onSubmit={ submit }>
 				<VStack spacing="3">
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

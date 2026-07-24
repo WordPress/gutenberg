@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Added `RequestUtils.resetThemeGlobalStyles()` to reset the current theme's user global styles to an empty config for test isolation.
+
+### Bug Fixes
+
+-   Resolve root-relative `page.goto()` URLs against the full `baseURL`, including any subdirectory path, so tests work against WordPress installs served from a subdirectory.
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
 ## 1.43.0 (2026-04-01)
 
 ## 1.42.0 (2026-03-18)

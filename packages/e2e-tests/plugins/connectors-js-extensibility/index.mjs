@@ -33,3 +33,23 @@ registerConnector( 'test_custom_service', {
 			)
 		),
 } );
+
+// Registers a custom render for an api_key connector to verify that a
+// subsequent default registration for the same slug does not replace it.
+registerConnector( 'test_api_key_with_custom_render', {
+	render: ( props ) =>
+		h(
+			ConnectorItem,
+			{
+				className: 'connector-item--test_api_key_with_custom_render',
+				name: props.name,
+				description: props.description,
+				logo: props.logo,
+			},
+			h(
+				'p',
+				{ className: 'test-api-key-with-custom-render-content' },
+				'Custom render survived registerDefaultConnectors().'
+			)
+		),
+} );

@@ -7,7 +7,6 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 	test( 'persists CRDT document when loading existing post without one', async ( {
 		admin,
 		collaborationUtils,
-		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -19,14 +18,7 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		} );
 
 		// Open the post in the editor.
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.editPost( post.id );
 
 		// Wait for collaboration runtime and entity record to be ready.
 		await collaborationUtils.waitForEntityReady( page );
@@ -51,20 +43,16 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 	test( 'does not save CRDT document for auto-draft posts', async ( {
 		admin,
 		collaborationUtils,
-		editor,
 		page,
 	} ) => {
 		// Navigate to create a new post (auto-draft).
-		await admin.visitAdminPage( 'post-new.php' );
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.createNewPost();
 
 		// Wait for collaboration runtime to initialize separately first, then
 		// wait for the entity record resolver to finish.
 		await page.waitForFunction(
 			() => ( window as any )._wpCollaborationEnabled === true,
+			undefined,
 			{ timeout: 5000 }
 		);
 		await collaborationUtils.waitForEntityReady( page, {
@@ -93,14 +81,7 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		} );
 
 		// Open the post in the editor.
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.editPost( post.id );
 
 		// Wait for collaboration runtime and entity record to be ready.
 		await collaborationUtils.waitForEntityReady( page );

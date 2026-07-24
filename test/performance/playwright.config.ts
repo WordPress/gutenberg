@@ -31,6 +31,12 @@ const config = defineConfig( {
 		...baseConfig.use,
 		actionTimeout: 120_000, // 2 minutes.
 		video: 'off',
+		// Playwright's own tracing injects a DOM snapshot recorder into
+		// every page (captureSnapshot/visitNode/_getSheetText), which runs
+		// on the main thread on each action and shows up as ~750ms of
+		// extra work in our captured Chromium traces. We don't need
+		// Playwright's trace artifacts for perf measurements.
+		trace: 'off',
 	},
 } );
 

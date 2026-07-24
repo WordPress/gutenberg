@@ -69,6 +69,9 @@ function render_block_core_search( $attributes ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
+	if ( ! $show_button && ! empty( $color_classes ) ) {
+		$input_classes[] = $color_classes;
+	}
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
@@ -188,8 +191,32 @@ function render_block_core_search( $attributes ) {
 		';
 	}
 
+	/*
+	 * The semantic <search> landmark wrapper is opt-in to preserve back
+	 * compatibility with themes targeting <form role="search">. The block
+	 * exposes a per-instance HTML element selector with three values:
+	 *
+	 *   - 'search' forces the <search> wrapper
+	 *   - 'form'   forces the original <form role="search"> markup
+	 *   - empty    defers to the 'search-element' html5 sub-feature
+	 *              ( add_theme_support( 'html5', array( 'search-element' ) ) ),
+	 *              matching the opt-in added to get_search_form() in core
+	 */
+	$tag_name           = $attributes['tagName'] ?? '';
+	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'html5', 'search-element' ) );
+
+	/*
+	 * Only the wrapper markup differs between the semantic <search> landmark
+	 * and the classic <form role="search">. Positional specifiers keep a
+	 * single argument list usable by both formats, since the action URL
+	 * precedes the wrapper attributes in the <search> variant.
+	 */
+	$format = $use_search_element
+		? '<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>'
+		: '<form role="search" method="get" action="%1$s" %2$s %3$s>%4$s</form>';
+
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		$format,
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
@@ -430,20 +457,37 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	$use_input_for_colors = ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'];
+
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
-		$button_styles[] = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+		$text_color_style = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $text_color_style;
+		} else {
+			$button_styles[] = $text_color_style;
+		}
 	}
 
 	$has_background_color = ! empty( $attributes['style']['color']['background'] );
 	if ( $has_background_color ) {
-		$button_styles[] = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+		$background_color_style = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $background_color_style;
+		} else {
+			$button_styles[] = $background_color_style;
+		}
 	}
 
 	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
 	if ( $has_custom_gradient ) {
-		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+		$custom_gradient_style = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $custom_gradient_style;
+		} else {
+			$button_styles[] = $custom_gradient_style;
+		}
 	}
 
 	// Get typography styles to be shared across inner elements.

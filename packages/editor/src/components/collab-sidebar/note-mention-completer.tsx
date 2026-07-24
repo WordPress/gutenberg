@@ -1,0 +1,78 @@
+/**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { getUserLabel } from '../autocompleters/user';
+
+/**
+ * The subset of the REST users response the completion consumes.
+ */
+type MentionableUser = {
+	id: number;
+	name: string;
+};
+
+/**
+ * A user mention completer for notes.
+ *
+ * Mirrors the editor's `@` user completer but inserts the mention as a
+ * `<span class="wp-note-mention user-N">` chip, carrying the mentioned user's
+ * ID in the `user-N` class so the mention can be styled and, in a follow-up,
+ * resolved to a notification recipient. A mention is deliberately not a link:
+ * a `span` keeps it out of the Link format UI (which would strip the mention
+ * markup on edit), and the `wp-note-mention` class keeps other formats from
+ * claiming the element. RichText preserves the unregistered `span` as-is, so
+ * no dedicated mention format is needed.
+ */
+const noteMentionCompleter = {
+	name: 'note-mentions',
+	className:
+		'editor-autocompleters__user editor-collab-sidebar-panel__mention-suggestion',
+	triggerPrefix: '@',
+
+	useItems( filterValue: string ) {
+		const users = useSelect(
+			( select ) => {
+				const { getUsers } = select( coreStore );
+				return getUsers( {
+					context: 'view',
+					search: filterValue,
+				} );
+			},
+			[ filterValue ]
+		);
+
+		const options = useMemo(
+			() =>
+				users
+					? users.map( ( user ) => ( {
+							key: `note-mention-${ user.slug }`,
+							value: user,
+							label: getUserLabel( user ),
+					  } ) )
+					: [],
+			[ users ]
+		);
+
+		return [ options ] as const;
+	},
+
+	getOptionCompletion( user: MentionableUser ) {
+		return {
+			action: 'insert-at-caret' as const,
+			value: (
+				<span className={ `wp-note-mention user-${ user.id }` }>
+					{ '@' + user.name }
+				</span>
+			),
+		};
+	},
+};
+
+export default noteMentionCompleter;

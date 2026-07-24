@@ -29,7 +29,7 @@ const globalTips = [
 ];
 
 function Tips() {
-	const [ randomIndex ] = useState(
+	const [ randomIndex ] = useState( () =>
 		Math.floor( Math.random() * globalTips.length )
 	);
 

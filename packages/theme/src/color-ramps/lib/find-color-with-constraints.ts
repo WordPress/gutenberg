@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
 import { solveWithBisect } from './utils';
 import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
 import { clampToGamut, getContrast } from './color-utils';
@@ -86,8 +78,9 @@ export function findColorMeetingRequirements(
 		}
 
 		return clampToGamut( {
-			spaceId: 'oklch',
+			space: OKLCH,
 			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+			alpha: seed.alpha,
 		} );
 	}
 

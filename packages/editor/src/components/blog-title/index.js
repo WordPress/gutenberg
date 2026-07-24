@@ -112,7 +112,6 @@ export default function BlogTitle() {
 						/>
 						<InputControl
 							placeholder={ __( 'No title' ) }
-							size="__unstable-large"
 							value={ postsPageTitle }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }

@@ -119,6 +119,16 @@ import {
 	type YBlockAttributes,
 } from '../crdt-blocks';
 import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
+import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
+import { type WPBlockSelection } from '../../types';
+
+function createCursorSelection( offset: number ): WPBlockSelection {
+	return {
+		attributeKey: 'content',
+		clientId: 'block-1',
+		offset: asRichTextOffset( offset ),
+	};
+}
 
 describe( 'crdt-blocks', () => {
 	let doc: Y.Doc;
@@ -155,6 +165,64 @@ describe( 'crdt-blocks', () => {
 			expect( content.toString() ).toBe( 'Hello World' );
 		} );
 
+		it( 'syncs innerContent of static inner-content blocks into the Y.Doc', () => {
+			const incomingBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Editable' },
+							innerBlocks: [],
+							clientId: 'inner-1',
+						},
+					],
+					innerContent: [ '<div class="banner">', null, '</div>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, incomingBlocks, null );
+
+			const block = yblocks.get( 0 );
+			expect( block.get( 'innerContent' ) ).toEqual( [
+				'<div class="banner">',
+				null,
+				'</div>',
+			] );
+		} );
+
+		it( 'updates innerContent when the static markup changes', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>one</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>two</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.get( 0 ).get( 'innerContent' ) ).toEqual( [
+				'<p>two</p>',
+			] );
+		} );
+
 		it( 'updates existing blocks when content changes', () => {
 			const initialBlocks: Block[] = [
 				{
@@ -180,6 +248,78 @@ describe( 'crdt-blocks', () => {
 
 			expect( yblocks.length ).toBe( 1 );
 			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'updates the clientId when an updated block arrives with a different clientId', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'initial-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'initial-id' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'updated-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'updated-id' );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'preserves the local clientId when requested for reparsed content blocks', () => {
+			// Simulates the Code Editor flow: the sender re-parses raw HTML on
+			// every keystroke, which mints a fresh clientId for every block.
+			// The Y.Doc's clientId should stay stable so remote peers don't
+			// remount the block (and any embed iframe within it).
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'stable-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'stable-id' );
+
+			const reparsedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'freshly-parsed-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, reparsedBlocks, null, {
+				preserveClientIds: true,
+			} );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'stable-id' );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
@@ -1006,6 +1146,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1016,10 +1157,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'XHello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 0 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 0 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -1034,6 +1180,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1044,10 +1191,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World!' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 11 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 11 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -1062,6 +1214,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1072,10 +1225,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 999 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 999 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -1428,7 +1586,7 @@ describe( 'crdt-blocks', () => {
 			expect( a1Content.toString() ).toBe( 'A1-edited' );
 		} );
 
-		it( 'rebuilds Y.Array when row count changes (structural edit)', () => {
+		it( 'preserves existing elements and appends new rows when row count increases', () => {
 			const tableBlocks: Block[] = [
 				{
 					name: 'core/table',
@@ -1565,6 +1723,549 @@ describe( 'crdt-blocks', () => {
 			}
 
 			doc2.destroy();
+		} );
+
+		it( 'concurrent cell edit is preserved when another user appends a row', () => {
+			// Two users: A edits a cell, B appends a row. After sync,
+			// A's edit should be preserved alongside the new row.
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			// Set up doc1 (User A).
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Set up doc2 (User B) by syncing initial state.
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A edits cell A1.
+			const userABlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-userA', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks, userABlocks, null );
+
+			// User B appends a third row (concurrently, before syncing).
+			const userBBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A3', tag: 'td' },
+									{ content: 'B3', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks2, userBBlocks, null );
+
+			// Sync: apply each other's changes.
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			// Both docs should have A's cell edit and B's new row.
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const attrs = checkBlocks
+					.get( 0 )
+					.get( 'attributes' ) as YBlockAttributes;
+				const body = (
+					attrs.get( 'body' ) as Y.Array< unknown >
+				 ).toJSON() as { cells: { content: string }[] }[];
+
+				expect( body.length ).toBe( 3 );
+				expect( body[ 0 ].cells[ 0 ].content ).toBe( 'A1-userA' );
+				expect( body[ 0 ].cells[ 1 ].content ).toBe( 'B1' );
+				expect( body[ 1 ].cells[ 0 ].content ).toBe( 'A2' );
+				expect( body[ 2 ].cells[ 0 ].content ).toBe( 'A3' );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'concurrent cell edit is preserved when another user deletes a different row', () => {
+			// Two users: A edits a cell in row 1, B deletes row 2.
+			// After sync, A's edit should survive and row 2 should be gone.
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A3', tag: 'td' },
+									{ content: 'B3', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			// Set up doc1 (User A).
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Set up doc2 (User B) by syncing initial state.
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A edits cell A1 in row 1.
+			const userABlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-userA', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A3', tag: 'td' },
+									{ content: 'B3', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks, userABlocks, null );
+
+			// User B deletes row 2 (the middle row).
+			const userBBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A3', tag: 'td' },
+									{ content: 'B3', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks2, userBBlocks, null );
+
+			// Sync: apply each other's changes.
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			// Both docs should have A's cell edit and B's row deletion.
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const attrs = checkBlocks
+					.get( 0 )
+					.get( 'attributes' ) as YBlockAttributes;
+				const body = (
+					attrs.get( 'body' ) as Y.Array< unknown >
+				 ).toJSON() as { cells: { content: string }[] }[];
+
+				expect( body.length ).toBe( 2 );
+				expect( body[ 0 ].cells[ 0 ].content ).toBe( 'A1-userA' );
+				expect( body[ 1 ].cells[ 0 ].content ).toBe( 'A3' );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'preserves Y.Map identity for untouched rows when a row is appended', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Capture a reference to the Y.Map for the first row.
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+
+			// Append a second row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			// The first row's Y.Map should be the exact same object.
+			const row0After = body.get( 0 ) as Y.Map< unknown >;
+			expect( row0After ).toBe( row0Before );
+
+			// And the new row should exist.
+			expect( body.length ).toBe( 2 );
+			const row1 = body.get( 1 ) as Y.Map< unknown >;
+			const cells = ( row1.get( 'cells' ) as Y.Array< unknown > ).get(
+				0
+			) as Y.Map< unknown >;
+			const content = cells.get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'A2' );
+		} );
+
+		it( 'preserves Y.Map identity when a row is prepended', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Prepend a new row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'NEW', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 3 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'NEW' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 2 ].cells[ 0 ].content ).toBe( 'A2' );
+
+			// Original rows should be the same Y.Map objects (shifted).
+			expect( body.get( 1 ) ).toBe( row0Before );
+			expect( body.get( 2 ) ).toBe( row1Before );
+		} );
+
+		it( 'preserves Y.Map identity when a row is inserted in the middle', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Insert a new row in the middle.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 3 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A2' );
+			expect( bodyJson[ 2 ].cells[ 0 ].content ).toBe( 'A3' );
+
+			// Original rows should be preserved.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 2 ) ).toBe( row1Before );
+		} );
+
+		it( 'preserves Y.Map identity when a row is deleted from the end', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A3', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Delete the last row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 2 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'A1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'A2' );
+
+			// Remaining rows should be the same Y.Map objects.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 1 ) ).toBe( row1Before );
+		} );
+
+		it( 'updates all elements in-place when every row changes', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row0Before = body.get( 0 ) as Y.Map< unknown >;
+			const row1Before = body.get( 1 ) as Y.Map< unknown >;
+
+			// Replace all row contents.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'X1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'X2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( body.length ).toBe( 2 );
+
+			const bodyJson = body.toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'X1' );
+			expect( bodyJson[ 1 ].cells[ 0 ].content ).toBe( 'X2' );
+
+			// Y.Map objects should be updated in-place, not recreated.
+			expect( body.get( 0 ) ).toBe( row0Before );
+			expect( body.get( 1 ) ).toBe( row1Before );
 		} );
 
 		it( 'migrates plain array to Y.Array on first update', () => {
@@ -2059,7 +2760,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after 'Hello 😀' = 6 + 2 = 8
-			mergeCrdtBlocks( yblocks, updatedBlocks, 8 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 8 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2090,7 +2795,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor at position 6 (after 'Hello ', emoji was deleted)
-			mergeCrdtBlocks( yblocks, updatedBlocks, 6 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 6 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2121,7 +2830,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after 'a😀x' = 1 + 2 + 1 = 4
-			mergeCrdtBlocks( yblocks, updatedBlocks, 4 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 4 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2153,7 +2866,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after '😀 hello ' = 2 + 7 = 9
-			mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 9 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2186,7 +2903,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'a😀c', 4 );
+			mergeRichTextUpdate( yText, 'a😀c', asHtmlStringIndex( 4 ) );
 
 			expect( yText.toString() ).toBe( 'a😀c' );
 		} );
@@ -2195,7 +2912,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'ab' );
 
-			mergeRichTextUpdate( yText, 'a😀b', 3 );
+			mergeRichTextUpdate( yText, 'a😀b', asHtmlStringIndex( 3 ) );
 
 			expect( yText.toString() ).toBe( 'a😀b' );
 		} );
@@ -2204,7 +2921,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'ab', 1 );
+			mergeRichTextUpdate( yText, 'ab', asHtmlStringIndex( 1 ) );
 
 			expect( yText.toString() ).toBe( 'ab' );
 		} );
@@ -2213,7 +2930,11 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'Hello 😀 World 🎉' );
 
-			mergeRichTextUpdate( yText, 'Hello 😀 Beautiful World 🎉', 19 );
+			mergeRichTextUpdate(
+				yText,
+				'Hello 😀 Beautiful World 🎉',
+				asHtmlStringIndex( 19 )
+			);
 
 			expect( yText.toString() ).toBe( 'Hello 😀 Beautiful World 🎉' );
 		} );
@@ -2223,7 +2944,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a🏳️‍🌈b' );
 
-			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', 7 );
+			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', asHtmlStringIndex( 7 ) );
 
 			expect( yText.toString() ).toBe( 'a🏳️‍🌈xb' );
 		} );
@@ -2233,9 +2954,29 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'Hi 👋🏽' );
 
-			mergeRichTextUpdate( yText, 'Hi 👋🏽!', 6 );
+			mergeRichTextUpdate( yText, 'Hi 👋🏽!', asHtmlStringIndex( 6 ) );
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
+		} );
+	} );
+
+	describe( 'mergeRichTextUpdate - rapid typing', () => {
+		it( 'appends repeated text one character at a time with cursor hints', () => {
+			const text =
+				'987654321098765432109876543210987654321098765432109876543210';
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'p1' );
+
+			for ( let i = 1; i <= text.length; i++ ) {
+				const value = `p1${ text.slice( 0, i ) }`;
+				mergeRichTextUpdate(
+					yText,
+					value,
+					asHtmlStringIndex( value.length )
+				);
+			}
+
+			expect( yText.toString() ).toBe( `p1${ text }` );
 		} );
 	} );
 
@@ -2269,7 +3010,11 @@ describe( 'crdt-blocks', () => {
 				];
 
 				// Cursor after '𠮷野家は美味しい' = 2+1+1+1+1+1+1+1 = 9
-				mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+				mergeCrdtBlocks(
+					yblocks,
+					updatedBlocks,
+					createCursorSelection( 9 )
+				);
 
 				const block = yblocks.get( 0 );
 				const content = (
@@ -2300,7 +3045,11 @@ describe( 'crdt-blocks', () => {
 					},
 				];
 
-				mergeCrdtBlocks( yblocks, updatedBlocks, 18 );
+				mergeCrdtBlocks(
+					yblocks,
+					updatedBlocks,
+					createCursorSelection( 18 )
+				);
 
 				const block = yblocks.get( 0 );
 				const content = (
@@ -2324,7 +3073,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𠮷b' );
 
-				mergeRichTextUpdate( yText, 'a𠮷xb', 4 );
+				mergeRichTextUpdate( yText, 'a𠮷xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𠮷xb' );
 			} );
@@ -2334,7 +3083,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝐀b' );
 
-				mergeRichTextUpdate( yText, 'a𝐀xb', 4 );
+				mergeRichTextUpdate( yText, 'a𝐀xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝐀xb' );
 			} );
@@ -2354,7 +3103,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝄞b' );
 
-				mergeRichTextUpdate( yText, 'a𝄞xb', 4 );
+				mergeRichTextUpdate( yText, 'a𝄞xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝄞xb' );
 			} );

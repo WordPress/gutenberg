@@ -15,12 +15,12 @@ import Button from '../button';
 import { RadioGroupContext } from './context';
 import type { WordPressComponentProps } from '../context';
 import type { RadioProps } from './types';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedRadio(
 	{
 		value,
 		children,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...props
 	}: WordPressComponentProps< RadioProps, 'button', false >,
 	ref: React.ForwardedRef< any >
@@ -30,12 +30,6 @@ function UnforwardedRadio(
 	const selectedValue = Ariakit.useStoreState( store, 'value' );
 	const isChecked = selectedValue !== undefined && selectedValue === value;
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'Radio',
-		size: undefined,
-		__next40pxDefaultSize: props.__next40pxDefaultSize,
-	} );
-
 	return (
 		<Ariakit.Radio
 			disabled={ disabled }
@@ -43,10 +37,9 @@ function UnforwardedRadio(
 			ref={ ref }
 			value={ value }
 			render={
-				// Disable: the parent component already takes care of the `__next40pxDefaultSize` prop.
-				// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 				<Button
 					variant={ isChecked ? 'primary' : 'secondary' }
+					__next40pxDefaultSize
 					{ ...props }
 				/>
 			}

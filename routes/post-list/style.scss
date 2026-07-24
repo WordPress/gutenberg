@@ -12,6 +12,7 @@
 	align-items: stretch;
 
 	.components-modal__frame {
+		// stylelint-disable-next-line declaration-property-max-values -- TODO: Please fix
 		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
 		height: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$grid-unit-20 * 2});

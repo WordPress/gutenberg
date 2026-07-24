@@ -52,8 +52,8 @@ export function initializeYjsDoc( ydoc: CRDTDoc ): void {
 }
 
 /**
- * Record that the entity was saved (persisted to the database) in the CRDT
- * document record metadata.
+ * Record that the entity was saved by a user-facing entity save in the CRDT
+ * document metadata. Background CRDT snapshots should not update this marker.
  *
  * @param {CRDTDoc} ydoc CRDT document.
  */

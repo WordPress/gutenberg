@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables";
-
 .block-editor-block-quick-navigation__item {
-	font-weight: variables.$font-weight-regular;
+	font-weight: var(--wpds-typography-font-weight-default);
 }

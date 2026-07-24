@@ -136,15 +136,20 @@ describe( 'prePersistPostType', () => {
 
 describe( 'loadPostTypeEntities', () => {
 	let originalCollaborationEnabled;
+	let originalCollaborationDisabledPostTypes;
 
 	beforeEach( () => {
 		apiFetch.mockReset();
 		applyPostChangesToCRDTDoc.mockReset();
 		originalCollaborationEnabled = window._wpCollaborationEnabled;
+		originalCollaborationDisabledPostTypes =
+			window._wpCollaborationDisabledPostTypes;
 	} );
 
 	afterEach( () => {
 		window._wpCollaborationEnabled = originalCollaborationEnabled;
+		window._wpCollaborationDisabledPostTypes =
+			originalCollaborationDisabledPostTypes;
 	} );
 
 	it( 'should include custom taxonomy rest_bases in synced properties when collaboration is enabled', async () => {
@@ -222,6 +227,52 @@ describe( 'loadPostTypeEntities', () => {
 		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
 		expect( syncedProperties ).not.toContain( 'categories' );
 		expect( syncedProperties ).not.toContain( 'tags' );
+	} );
+
+	it( 'should sync post type entities by default', async () => {
+		window._wpCollaborationEnabled = false;
+		window._wpCollaborationDisabledPostTypes = undefined;
+
+		const mockPostTypes = {
+			post: {
+				name: 'Posts',
+				rest_base: 'posts',
+				rest_namespace: 'wp/v2',
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockPostTypes );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const postEntity = entities.find( ( e ) => e.name === 'post' );
+
+		expect( postEntity.syncConfig.shouldSync() ).toBe( true );
+	} );
+
+	it( 'should not sync post type entities disabled for collaboration', async () => {
+		window._wpCollaborationEnabled = false;
+		window._wpCollaborationDisabledPostTypes = [ 'book' ];
+
+		const mockPostTypes = {
+			book: {
+				name: 'Books',
+				rest_base: 'books',
+				rest_namespace: 'wp/v2',
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockPostTypes );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+
+		expect( bookEntity.syncConfig.shouldSync() ).toBe( false );
 	} );
 
 	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {

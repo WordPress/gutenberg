@@ -1,18 +1,29 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
+import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
+import { ownsSelection } from '../../owns-selection';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
-		const { record } = props.current;
+		const { record, handleChange } = props.current;
 		const { ownerDocument } = element;
 		if (
 			isCollapsed( record.current ) ||
-			! element.contains( ownerDocument.activeElement )
+			( ! element.contains( ownerDocument.activeElement ) &&
+				! ownsSelection( element ) )
 		) {
 			return;
 		}
@@ -26,16 +37,27 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		if ( event.type === 'cut' ) {
-			ownerDocument.execCommand( 'delete' );
+			// Remove the selection through the record rather than the
+			// deprecated `execCommand( 'delete' )`. The record is
+			// synchronized on capture of the `cut` event, and `handleChange`
+			// processes the removal like any input.
+			handleChange( remove( record.current ) );
 		}
 	}
 
 	const { defaultView } = element.ownerDocument;
-
-	defaultView.addEventListener( 'copy', onCopy );
-	defaultView.addEventListener( 'cut', onCopy );
+	const unsubscribeCopy = subscribeDelegatedListener(
+		defaultView,
+		'copy',
+		onCopy
+	);
+	const unsubscribeCut = subscribeDelegatedListener(
+		defaultView,
+		'cut',
+		onCopy
+	);
 	return () => {
-		defaultView.removeEventListener( 'copy', onCopy );
-		defaultView.removeEventListener( 'cut', onCopy );
+		unsubscribeCopy();
+		unsubscribeCut();
 	};
 };

@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
+import { unlock } from '../lock-unlock';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
@@ -248,9 +249,24 @@ export function FitTextControl( {
 	fontSize,
 	style,
 } ) {
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
+
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
+
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
 	}
+
+	if ( hasSelectedStyleState ) {
+		return null;
+	}
+
 	return (
 		<ToolsPanelItem
 			hasValue={ () => fitText }

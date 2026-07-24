@@ -65,11 +65,5 @@ export async function createPost(
 	this: RequestUtils,
 	payload: CreatePostPayload
 ) {
-	const post = await this.rest< Post >( {
-		method: 'POST',
-		path: `/wp/v2/posts`,
-		data: { ...payload },
-	} );
-
-	return post;
+	return this.createRecord< Post >( 'posts', { ...payload } );
 }

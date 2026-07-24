@@ -69,6 +69,65 @@ interface MockBlockEditorOverrides {
 	getSelectionEnd?: jest.Mock;
 }
 
+type SeededRandom = {
+	bool: ( probability?: number ) => boolean;
+	int: ( maxExclusive: number ) => number;
+	intBetween: ( minInclusive: number, maxInclusive: number ) => number;
+	pick: < T >( values: readonly T[] ) => T;
+};
+
+/* eslint-disable no-bitwise */
+function createSeededRandom( seed: number ): SeededRandom {
+	let state = seed >>> 0;
+
+	if ( state === 0 ) {
+		state = 0x9e3779b9;
+	}
+
+	function nextUint32(): number {
+		state += 0x6d2b79f5;
+		let value = state;
+		value = Math.imul( value ^ ( value >>> 15 ), value | 1 );
+		value ^= value + Math.imul( value ^ ( value >>> 7 ), value | 61 );
+		return ( value ^ ( value >>> 14 ) ) >>> 0;
+	}
+
+	function next(): number {
+		return nextUint32() / 0x100000000;
+	}
+
+	function int( maxExclusive: number ): number {
+		if ( maxExclusive <= 0 ) {
+			return 0;
+		}
+
+		return Math.floor( next() * maxExclusive );
+	}
+
+	return {
+		bool( probability = 0.5 ) {
+			return next() < probability;
+		},
+		int,
+		intBetween( minInclusive, maxInclusive ) {
+			return minInclusive + int( maxInclusive - minInclusive + 1 );
+		},
+		pick< T >( values: readonly T[] ): T {
+			if ( values.length === 0 ) {
+				throw new Error( 'Cannot pick from an empty array.' );
+			}
+
+			return values[ int( values.length ) ];
+		},
+	};
+}
+/* eslint-enable no-bitwise */
+
+const NESTED_SELECTION_SEEDS = Array.from(
+	{ length: 8 },
+	( _value, index ) => 1401 + index
+);
+
 /**
  * Mock the block-editor store selectors returned by `select( blockEditorStore )`.
  *
@@ -168,6 +227,66 @@ function createTestDocWithBlocks( blocks?: Y.Map< any >[] ) {
 	}
 
 	return ydoc;
+}
+
+type NestedTextTarget = {
+	label: string;
+	text: Y.Text;
+};
+
+function createNestedAttributeBlock(
+	clientId: string,
+	seed: number
+): {
+	block: Y.Map< any >;
+	targets: NestedTextTarget[];
+} {
+	const block = new Y.Map();
+	block.set( 'clientId', clientId );
+	block.set( 'name', 'test/nested-rich-text' );
+
+	const attrs = new Y.Map();
+	const hero = new Y.Map();
+	const headline = new Y.Text( `Headline ${ seed } alpha beta` );
+	const caption = new Y.Text( `Caption ${ seed } gamma delta` );
+	hero.set( 'headline', headline );
+	hero.set( 'caption', caption );
+
+	const cards = new Y.Array();
+	const card0 = new Y.Map();
+	const card0Title = new Y.Text( `Card ${ seed } title one` );
+	const card0Body = new Y.Text( `Card ${ seed } body one two` );
+	const card0Meta = new Y.Map();
+	const card0Caption = new Y.Text( `Meta ${ seed } caption` );
+	card0.set( 'title', card0Title );
+	card0.set( 'body', card0Body );
+	card0Meta.set( 'caption', card0Caption );
+	card0.set( 'meta', card0Meta );
+
+	const card1 = new Y.Map();
+	const card1Title = new Y.Text( `Card ${ seed } title two` );
+	const card1Body = new Y.Text( `Card ${ seed } body three four` );
+	card1.set( 'title', card1Title );
+	card1.set( 'body', card1Body );
+	cards.push( [ card0, card1 ] );
+
+	attrs.set( 'hero', hero );
+	attrs.set( 'cards', cards );
+	block.set( 'attributes', attrs );
+	block.set( 'innerBlocks', new Y.Array() );
+
+	return {
+		block,
+		targets: [
+			{ label: 'hero.headline', text: headline },
+			{ label: 'hero.caption', text: caption },
+			{ label: 'cards.0.title', text: card0Title },
+			{ label: 'cards.0.body', text: card0Body },
+			{ label: 'cards.0.meta.caption', text: card0Caption },
+			{ label: 'cards.1.title', text: card1Title },
+			{ label: 'cards.1.body', text: card1Body },
+		],
+	};
 }
 
 describe( 'PostEditorAwareness', () => {
@@ -465,6 +584,14 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'convertSelectionStateToAbsolute', () => {
+		const defaultEditorBlocks = [
+			{
+				clientId: 'block-1',
+				name: 'core/paragraph',
+				innerBlocks: [],
+			},
+		];
+
 		test( 'should return nulls when relative position cannot be resolved', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
@@ -492,8 +619,10 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				defaultEditorBlocks
+			);
 
 			// Should return nulls when the relative position's type cannot be found
 			expect( result.richTextOffset ).toBeNull();
@@ -528,14 +657,18 @@ describe( 'PostEditorAwareness', () => {
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
+					attributeKey: 'content',
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				defaultEditorBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBe( 'content' );
 		} );
 
 		test( 'should resolve WholeBlock selection to block client ID', () => {
@@ -563,11 +696,68 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				defaultEditorBlocks
+			);
 
 			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should return null attributeKey for SelectionType.None', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const result = awareness.convertSelectionStateToAbsolute(
+				{ type: SelectionType.None },
+				[]
+			);
+
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should pass through nested attributeKey for a cursor selection', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block = blocks.get( 0 );
+			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = attrs.get( 'content' );
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText as Y.Text,
+				3
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 3,
+					attributeKey: 'body.0.cells.0.content',
+				},
+			};
+
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				defaultEditorBlocks
+			);
+
+			expect( result.attributeKey ).toBe( 'body.0.cells.0.content' );
 		} );
 	} );
 
@@ -732,13 +922,23 @@ describe( 'PostEditorAwareness', () => {
 				} ),
 			] );
 
-			mockBlockEditorStore( {
-				blocks: [
-					{ clientId: 'local-0', innerBlocks: [] },
-					{ clientId: 'local-1', innerBlocks: [] },
-					{ clientId: 'local-2', innerBlocks: [] },
-				],
-			} );
+			const editorBlocks = [
+				{
+					clientId: 'local-0',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'local-1',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'local-2',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				nestedDoc,
@@ -769,8 +969,10 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				editorBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 2 );
 			expect( result.localClientId ).toBe( 'local-2' );
@@ -795,17 +997,24 @@ describe( 'PostEditorAwareness', () => {
 
 			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
 
-			mockBlockEditorStore( {
-				blocks: [
-					{
-						clientId: 'local-outer',
-						innerBlocks: [
-							{ clientId: 'local-inner-0', innerBlocks: [] },
-							{ clientId: 'local-inner-1', innerBlocks: [] },
-						],
-					},
-				],
-			} );
+			const editorBlocks = [
+				{
+					clientId: 'local-outer',
+					name: 'core/column',
+					innerBlocks: [
+						{
+							clientId: 'local-inner-0',
+							name: 'core/paragraph',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'local-inner-1',
+							name: 'core/paragraph',
+							innerBlocks: [],
+						},
+					],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				nestedDoc,
@@ -842,8 +1051,10 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				editorBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'local-inner-1' );
@@ -859,16 +1070,19 @@ describe( 'PostEditorAwareness', () => {
 
 			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
 
-			mockBlockEditorStore( {
-				blocks: [
-					{
-						clientId: 'local-col',
-						innerBlocks: [
-							{ clientId: 'local-img', innerBlocks: [] },
-						],
-					},
-				],
-			} );
+			const editorBlocks = [
+				{
+					clientId: 'local-col',
+					name: 'core/column',
+					innerBlocks: [
+						{
+							clientId: 'local-img',
+							name: 'core/image',
+							innerBlocks: [],
+						},
+					],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				nestedDoc,
@@ -897,8 +1111,10 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				editorBlocks
+			);
 
 			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'local-img' );
@@ -930,29 +1146,35 @@ describe( 'PostEditorAwareness', () => {
 				outerColumns1,
 			] );
 
-			mockBlockEditorStore( {
-				blocks: [
-					{ clientId: 'local-outer-0', innerBlocks: [] },
-					{
-						clientId: 'local-outer-1',
-						innerBlocks: [
-							{
-								clientId: 'local-mid',
-								innerBlocks: [
-									{
-										clientId: 'local-deep-0',
-										innerBlocks: [],
-									},
-									{
-										clientId: 'local-deep-1',
-										innerBlocks: [],
-									},
-								],
-							},
-						],
-					},
-				],
-			} );
+			const editorBlocks = [
+				{
+					clientId: 'local-outer-0',
+					name: 'core/columns',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'local-outer-1',
+					name: 'core/columns',
+					innerBlocks: [
+						{
+							clientId: 'local-mid',
+							name: 'core/column',
+							innerBlocks: [
+								{
+									clientId: 'local-deep-0',
+									name: 'core/paragraph',
+									innerBlocks: [],
+								},
+								{
+									clientId: 'local-deep-1',
+									name: 'core/paragraph',
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				nestedDoc,
@@ -991,8 +1213,10 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				editorBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 7 );
 			expect( result.localClientId ).toBe( 'local-deep-1' );
@@ -1001,9 +1225,79 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	describe( 'template mode (core/post-content handling)', () => {
-		test( 'should resolve cursor when getBlocks returns template tree with core/post-content', () => {
-			// Yjs doc has only the post content blocks (no template wrapper)
+	describe( 'convertSelectionStateToAbsolute with nested rich-text attributes', () => {
+		const editorBlocks = [
+			{
+				clientId: 'local-nested-attrs',
+				name: 'test/nested-rich-text',
+				innerBlocks: [],
+			},
+		];
+
+		test.each( NESTED_SELECTION_SEEDS )(
+			'resolves fuzzed nested rich-text cursor (seed %i)',
+			( seed ) => {
+				const rng = createSeededRandom( seed );
+				const { block, targets } = createNestedAttributeBlock(
+					'yjs-nested-attrs',
+					seed
+				);
+				const nestedDoc = createTestDocWithBlocks( [ block ] );
+
+				const target = rng.pick( targets );
+				const initialOffset = rng.intBetween(
+					1,
+					Math.max( 1, target.text.length - 1 )
+				);
+				const relativePosition = Y.createRelativePositionFromTypeIndex(
+					target.text,
+					initialOffset
+				);
+				let expectedOffset = initialOffset;
+
+				if ( rng.bool() ) {
+					const prefix = `p${ seed % 97 } `;
+					target.text.insert( 0, prefix );
+					expectedOffset += prefix.length;
+				} else {
+					const deleteLength = Math.min(
+						initialOffset,
+						rng.intBetween( 1, 3 )
+					);
+					target.text.delete( 0, deleteLength );
+					expectedOffset -= deleteLength;
+				}
+
+				const awareness = new PostEditorAwareness(
+					nestedDoc,
+					'postType',
+					'post',
+					123
+				);
+
+				const selection: SelectionCursor = {
+					type: SelectionType.Cursor,
+					cursorPosition: {
+						relativePosition,
+						absoluteOffset: initialOffset,
+					},
+				};
+
+				const result = awareness.convertSelectionStateToAbsolute(
+					selection,
+					editorBlocks
+				);
+
+				expect( result.richTextOffset ).toBe( expectedOffset );
+				expect( result.localClientId ).toBe( 'local-nested-attrs' );
+
+				nestedDoc.destroy();
+			}
+		);
+	} );
+
+	describe( 'post content blocks resolution', () => {
+		test( 'should resolve cursor with post content blocks', () => {
 			const templateDoc = createTestDocWithBlocks( [
 				createYBlock( 'yjs-para-0', 'core/paragraph', {
 					textContent: 'Post paragraph 1',
@@ -1013,55 +1307,20 @@ describe( 'PostEditorAwareness', () => {
 				} ),
 			] );
 
-			// In template mode, getBlocks() returns the full template tree.
-			// The Yjs paths are relative to post content, so the receiver needs
-			// to find core/post-content and navigate from there.
-			const postContentClientId = 'local-post-content';
-			const mockGetBlocks = jest
-				.fn()
-				.mockImplementation( ( rootClientId?: string ) => {
-					if ( rootClientId === postContentClientId ) {
-						// Controlled inner blocks of core/post-content
-						return [
-							{
-								clientId: 'local-para-0',
-								name: 'core/paragraph',
-								innerBlocks: [],
-							},
-							{
-								clientId: 'local-para-1',
-								name: 'core/paragraph',
-								innerBlocks: [],
-							},
-						];
-					}
-					// Full template tree
-					return [
-						{
-							clientId: 'local-header',
-							name: 'core/template-part',
-							innerBlocks: [],
-						},
-						{
-							clientId: 'local-group',
-							name: 'core/group',
-							innerBlocks: [
-								{
-									clientId: postContentClientId,
-									name: 'core/post-content',
-									innerBlocks: [], // empty because they're controlled inner blocks
-								},
-							],
-						},
-						{
-							clientId: 'local-footer',
-							name: 'core/template-part',
-							innerBlocks: [],
-						},
-					];
-				} );
-
-			mockBlockEditorStore( { getBlocks: mockGetBlocks } );
+			// The caller provides post content blocks directly
+			// (template detection is handled by usePostContentBlocks).
+			const postContentBlocks = [
+				{
+					clientId: 'local-para-0',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'local-para-1',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				templateDoc,
@@ -1092,55 +1351,29 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				postContentBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 4 );
-			// Should resolve to the post-content inner block, not a template block
 			expect( result.localClientId ).toBe( 'local-para-1' );
-			// Verify getBlocks was called with the post-content clientId
-			expect( mockGetBlocks ).toHaveBeenCalledWith( postContentClientId );
 
 			templateDoc.destroy();
 		} );
 
-		test( 'should resolve WholeBlock in template mode', () => {
+		test( 'should resolve WholeBlock with post content blocks', () => {
 			const templateDoc = createTestDocWithBlocks( [
 				createYBlock( 'yjs-img', 'core/image' ),
 			] );
 
-			const postContentClientId = 'local-post-content';
-			const mockGetBlocks = jest
-				.fn()
-				.mockImplementation( ( rootClientId?: string ) => {
-					if ( rootClientId === postContentClientId ) {
-						return [
-							{
-								clientId: 'local-img',
-								name: 'core/image',
-								innerBlocks: [],
-							},
-						];
-					}
-					return [
-						{
-							clientId: 'local-group',
-							name: 'core/group',
-							innerBlocks: [
-								{
-									clientId: postContentClientId,
-									name: 'core/post-content',
-									innerBlocks: [],
-								},
-							],
-						},
-					];
-				} );
-
-			mockBlockEditorStore( {
-				getBlocks: mockGetBlocks,
-				getBlockName: 'core/image',
-			} );
+			const postContentBlocks = [
+				{
+					clientId: 'local-img',
+					name: 'core/image',
+					innerBlocks: [],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				templateDoc,
@@ -1164,8 +1397,10 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				postContentBlocks
+			);
 
 			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'local-img' );
@@ -1173,17 +1408,20 @@ describe( 'PostEditorAwareness', () => {
 			templateDoc.destroy();
 		} );
 
-		test( 'should fall back to root blocks when no core/post-content exists', () => {
-			// Normal mode (no template) — should use root blocks directly
+		test( 'should resolve with root blocks directly', () => {
 			const normalDoc = createTestDocWithBlocks( [
 				createYBlock( 'yjs-para', 'core/paragraph', {
 					textContent: 'Normal mode',
 				} ),
 			] );
 
-			mockBlockEditorStore( {
-				blocks: [ { clientId: 'local-para', innerBlocks: [] } ],
-			} );
+			const editorBlocks = [
+				{
+					clientId: 'local-para',
+					name: 'core/paragraph',
+					innerBlocks: [],
+				},
+			];
 
 			const awareness = new PostEditorAwareness(
 				normalDoc,
@@ -1213,8 +1451,10 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result =
-				awareness.convertSelectionStateToAbsolute( selection );
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				editorBlocks
+			);
 
 			expect( result.richTextOffset ).toBe( 3 );
 			expect( result.localClientId ).toBe( 'local-para' );

@@ -18,16 +18,19 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { SyncUpdateType } from '../types';
+import { MAX_UPDATE_SIZE_IN_BYTES } from '../config';
 import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
 	intValueOrDefault,
 	postSyncUpdate,
+	rotateWindow,
 	uint8ArrayToBase64,
 } from '../utils';
 
 const mockApiFetch = jest.mocked( apiFetch );
+const SERVER_MAX_UPDATE_DATA_SIZE_IN_BYTES = 1024 * 1024;
 
 describe( 'http-polling utils', () => {
 	describe( 'SyncUpdateType', () => {
@@ -135,6 +138,17 @@ describe( 'http-polling utils', () => {
 	} );
 
 	describe( 'createSyncUpdate', () => {
+		it( 'keeps the largest allowed raw update within the server encoded update limit', () => {
+			const result = createSyncUpdate(
+				new Uint8Array( MAX_UPDATE_SIZE_IN_BYTES ),
+				SyncUpdateType.UPDATE
+			);
+
+			expect( result.data.length ).toBeLessThanOrEqual(
+				SERVER_MAX_UPDATE_DATA_SIZE_IN_BYTES
+			);
+		} );
+
 		it( 'creates a typed update with UPDATE type', () => {
 			const data = new Uint8Array( [ 1, 2, 3 ] );
 			const result = createSyncUpdate( data, SyncUpdateType.UPDATE );
@@ -658,6 +672,130 @@ describe( 'http-polling utils', () => {
 		it( 'handles edge cases', () => {
 			expect( intValueOrDefault( '   15   ', 0 ) ).toBe( 15 ); // whitespace
 			expect( intValueOrDefault( '08', 0 ) ).toBe( 8 ); // leading zero
+		} );
+	} );
+
+	describe( 'rotateWindow', () => {
+		it( 'returns an empty window for an empty list', () => {
+			expect( rotateWindow( [], 0, 3 ) ).toEqual( {
+				window: [],
+				nextOffset: 0,
+			} );
+		} );
+
+		it( 'returns an empty window for any offset when the list is empty', () => {
+			expect( rotateWindow( [], 42, 10 ) ).toEqual( {
+				window: [],
+				nextOffset: 0,
+			} );
+		} );
+
+		it( 'returns every item and advances the offset when size fits', () => {
+			const items = [ 'a', 'b', 'c', 'd' ];
+
+			expect( rotateWindow( items, 0, 4 ) ).toEqual( {
+				window: [ 'a', 'b', 'c', 'd' ],
+				nextOffset: 0,
+			} );
+		} );
+
+		it( 'returns a prefix window when size is smaller than the list', () => {
+			const items = [ 'a', 'b', 'c', 'd', 'e' ];
+
+			expect( rotateWindow( items, 0, 2 ) ).toEqual( {
+				window: [ 'a', 'b' ],
+				nextOffset: 2,
+			} );
+		} );
+
+		it( 'starts the window at the given offset', () => {
+			const items = [ 'a', 'b', 'c', 'd', 'e' ];
+
+			expect( rotateWindow( items, 2, 2 ) ).toEqual( {
+				window: [ 'c', 'd' ],
+				nextOffset: 4,
+			} );
+		} );
+
+		it( 'wraps around the end of the list', () => {
+			const items = [ 'a', 'b', 'c', 'd', 'e' ];
+
+			expect( rotateWindow( items, 4, 3 ) ).toEqual( {
+				window: [ 'e', 'a', 'b' ],
+				nextOffset: 2,
+			} );
+		} );
+
+		it( 'normalizes offsets larger than the list length', () => {
+			const items = [ 'a', 'b', 'c' ];
+
+			// offset 7 mod 3 === 1, so the window starts at 'b'.
+			expect( rotateWindow( items, 7, 2 ) ).toEqual( {
+				window: [ 'b', 'c' ],
+				nextOffset: 0,
+			} );
+		} );
+
+		it( 'normalizes negative offsets into the valid range', () => {
+			const items = [ 'a', 'b', 'c' ];
+
+			// -1 should resolve to the last element.
+			expect( rotateWindow( items, -1, 2 ) ).toEqual( {
+				window: [ 'c', 'a' ],
+				nextOffset: 1,
+			} );
+		} );
+
+		it( 'clamps the window when size exceeds the list length', () => {
+			const items = [ 'a', 'b', 'c' ];
+
+			expect( rotateWindow( items, 0, 10 ) ).toEqual( {
+				window: [ 'a', 'b', 'c' ],
+				nextOffset: 1,
+			} );
+		} );
+
+		it( 'returns an empty window and leaves offset unchanged for size 0', () => {
+			const items = [ 'a', 'b', 'c' ];
+
+			expect( rotateWindow( items, 2, 0 ) ).toEqual( {
+				window: [],
+				nextOffset: 2,
+			} );
+		} );
+
+		it( 'treats negative sizes as zero', () => {
+			const items = [ 'a', 'b', 'c' ];
+
+			expect( rotateWindow( items, 1, -5 ) ).toEqual( {
+				window: [],
+				nextOffset: 1,
+			} );
+		} );
+
+		it( 'does not mutate the input list', () => {
+			const items = [ 'a', 'b', 'c', 'd' ];
+			const snapshot = [ ...items ];
+
+			rotateWindow( items, 2, 3 );
+
+			expect( items ).toEqual( snapshot );
+		} );
+
+		it( 'supports successive calls that cover every item exactly once', () => {
+			const items = [ 'a', 'b', 'c', 'd', 'e' ];
+			const seen: string[] = [];
+			let offset = 0;
+
+			for ( let i = 0; i < 3; i++ ) {
+				const { window, nextOffset } = rotateWindow( items, offset, 2 );
+				seen.push( ...window );
+				offset = nextOffset;
+			}
+
+			// Three rotations of size 2 => 6 slots; across 5 items that means
+			// each item is seen at least once.
+			expect( new Set( seen ) ).toEqual( new Set( items ) );
 		} );
 	} );
 } );

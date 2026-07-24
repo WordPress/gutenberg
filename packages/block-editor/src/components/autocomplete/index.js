@@ -3,7 +3,7 @@
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
 import {
-	Autocomplete,
+	Autocomplete as WCAutocomplete,
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
@@ -68,7 +68,9 @@ export function useBlockEditorAutocompleteProps( props ) {
  * @type {React.FC}
  */
 function BlockEditorAutocomplete( props ) {
-	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;
+	return (
+		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
+	);
 }
 
 /**

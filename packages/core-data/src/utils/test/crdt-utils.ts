@@ -2,14 +2,82 @@
  * External dependencies
  */
 import { describe, expect, it } from '@jest/globals';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import {
-	htmlIndexToRichTextOffset,
-	richTextOffsetToHtmlIndex,
+	asHtmlStringIndex,
+	asRichTextOffset,
+	getYTextByAttributeKey,
+	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
+	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
 } from '../crdt-utils';
+
+function htmlIndexToRichTextOffset( html: string, htmlIndex: number ) {
+	return typedHtmlIndexToRichTextOffset(
+		html,
+		asHtmlStringIndex( htmlIndex )
+	);
+}
+
+function richTextOffsetToHtmlIndex( html: string, richTextOffset: number ) {
+	return typedRichTextOffsetToHtmlIndex(
+		html,
+		asRichTextOffset( richTextOffset )
+	);
+}
+
+function createAttachedAttributes(): Y.Map< unknown > {
+	const ydoc = new Y.Doc();
+	const root = ydoc.getMap( 'test' );
+	const attributes = new Y.Map< unknown >();
+	root.set( 'attributes', attributes );
+	return attributes;
+}
+
+describe( 'getYTextByAttributeKey', () => {
+	it( 'returns a top-level rich-text attribute', () => {
+		const attributes = createAttachedAttributes();
+		const text = new Y.Text( 'Top level' );
+		attributes.set( 'content', text );
+
+		expect( getYTextByAttributeKey( attributes, 'content' ) ).toBe( text );
+	} );
+
+	it( 'returns a nested rich-text attribute by dot path', () => {
+		const attributes = createAttachedAttributes();
+		const body = new Y.Array< Y.Map< unknown > >();
+		const row = new Y.Map< unknown >();
+		const cells = new Y.Array< Y.Map< unknown > >();
+		const cell = new Y.Map< unknown >();
+		const text = new Y.Text( 'Cell text' );
+
+		cell.set( 'content', text );
+		cells.push( [ cell ] );
+		row.set( 'cells', cells );
+		body.push( [ row ] );
+		attributes.set( 'body', body );
+
+		expect(
+			getYTextByAttributeKey( attributes, 'body.0.cells.0.content' )
+		).toBe( text );
+	} );
+
+	it( 'returns null for invalid array path segments', () => {
+		const attributes = createAttachedAttributes();
+		const body = new Y.Array< Y.Map< unknown > >();
+		attributes.set( 'body', body );
+
+		expect(
+			getYTextByAttributeKey( attributes, 'body.01.cells.0.content' )
+		).toBeNull();
+		expect(
+			getYTextByAttributeKey( attributes, 'body.-1.cells.0.content' )
+		).toBeNull();
+	} );
+} );
 
 describe( 'htmlIndexToRichTextOffset', () => {
 	it( 'returns the index unchanged when there are no tags', () => {

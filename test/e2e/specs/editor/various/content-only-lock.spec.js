@@ -118,7 +118,7 @@ test.describe( 'Content-only lock', () => {
 			.first()
 			.click();
 		await expect(
-			page.locator( '.color-block-support-panel' )
+			page.locator( '.typography-block-support-panel' )
 		).toBeAttached();
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
 		// Click "Exit pattern" button to exit edit mode
@@ -133,7 +133,7 @@ test.describe( 'Content-only lock', () => {
 			.click();
 		// Block is content locked again, simple styles like color cannot be changed.
 		await expect(
-			page.locator( '.color-block-support-panel' )
+			page.locator( '.typography-block-support-panel' )
 		).not.toBeAttached();
 	} );
 
@@ -180,7 +180,7 @@ test.describe( 'Content-only lock', () => {
 			.first()
 			.click();
 		await expect(
-			editorSettings.getByRole( 'heading', { name: 'Color' } )
+			editorSettings.getByRole( 'heading', { name: 'Background' } )
 		).toBeVisible();
 		await expect(
 			editorSettings.getByRole( 'heading', { name: 'Typography' } )
@@ -203,7 +203,7 @@ test.describe( 'Content-only lock', () => {
 			.click();
 		// Block is content locked again — style panels are hidden.
 		await expect(
-			editorSettings.getByRole( 'heading', { name: 'Color' } )
+			editorSettings.getByRole( 'heading', { name: 'Background' } )
 		).toBeHidden();
 		await expect(
 			editorSettings.getByRole( 'heading', { name: 'Typography' } )
@@ -264,7 +264,7 @@ test.describe( 'Content-only lock', () => {
 		// Verify Block is not content locked
 		// Styles can be changed and nested blocks can be removed
 		await expect(
-			page.locator( '.color-block-support-panel' )
+			page.locator( '.typography-block-support-panel' )
 		).toBeAttached();
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
 		// Select an outside block to exit edit mode
@@ -279,7 +279,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Block is content locked again simple styles like position can not be changed.
 		await expect(
-			page.locator( '.color-block-support-panel' )
+			page.locator( '.typography-block-support-panel' )
 		).not.toBeAttached();
 	} );
 
@@ -322,6 +322,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
+
 		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
 			// Test paragraph.
 			await editor.selectBlocks( heading );
@@ -459,6 +460,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
+
 		await test.step( 'Blocks can be inserted before/after or duplicated', async () => {
 			// Test first list item.
 			await editor.selectBlocks( firstListItem );
@@ -623,7 +625,7 @@ test.describe( 'Content-only lock', () => {
 		// Verify no new paragraph was inserted in the Column.
 		const afterBlocks = await editor.getBlocks();
 		const afterColumn = afterBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
-		expect( afterColumn.innerBlocks.length ).toBe( initialColumnChildren );
+		expect( afterColumn.innerBlocks ).toHaveLength( initialColumnChildren );
 	} );
 
 	test( 'should insert blocks via Add before and Add after for paragraphs in contentOnly mode', async ( {

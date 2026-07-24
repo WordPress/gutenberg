@@ -12,11 +12,11 @@ import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
@@ -131,6 +131,7 @@ function NavigationList() {
 		<>
 			<Page
 				title={ __( 'Navigation' ) }
+				headingLevel={ 2 }
 				className="navigation-page"
 				hasPadding={ false }
 				actions={
@@ -155,7 +156,7 @@ function NavigationList() {
 						totalPages,
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 					getItemId={ getItemId }
 					selection={ selection }

@@ -18,18 +18,19 @@ export const patternsRoute = {
 			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
 		},
 		content: <PagePatterns />,
-		mobile( { siteData, query } ) {
-			const { categoryId } = query;
+		mobileSidebar( { siteData, query } ) {
+			if ( query.categoryId ) {
+				return undefined;
+			}
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			const backPath =
 				isBlockTheme || isClassicThemeWithStyleBookSupport( siteData )
 					? '/'
 					: undefined;
-			return !! categoryId ? (
-				<PagePatterns />
-			) : (
-				<SidebarNavigationScreenPatterns backPath={ backPath } />
-			);
+			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
+		},
+		mobileContent( { query } ) {
+			return query.categoryId ? <PagePatterns /> : undefined;
 		},
 	},
 };

@@ -8,26 +8,51 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
-import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './constants';
+import {
+	cloneFile,
+	convertBlobToFile,
+	isAnimatedGif,
+	renameFile,
+} from '../utils';
+import { canvasConvertToJpeg } from '../canvas-utils';
+import { getUnappliedExifOrientation } from '../heic-parser';
+import {
+	isClientSideMediaSupported,
+	exceedsClientProcessingMemory,
+} from '../feature-detection';
+import { getImageDimensions } from '../get-image-dimensions';
+import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { UploadError } from '../upload-error';
+import { ErrorCode, UploadError } from '../upload-error';
+import { debug, measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
+	maybeRecycleVipsWorker,
 } from './utils';
+import {
+	convertGifToVideo,
+	isConversionTimeoutError,
+	isSizeLimitConversionError,
+	isUnsupportedConversionError,
+	terminateVideoConversionWorker,
+} from './utils/video-conversion';
 import type {
+	AccumulateSubSizeAction,
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
+	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
 	ImageFormat,
@@ -43,27 +68,37 @@ import type {
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
-	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
 	Settings,
 	State,
+	SubSizeData,
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
-import type { cancelItem } from './actions';
+import type { cancelItem, executeRetry } from './actions';
+import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
+/**
+ * Tracks parent item IDs whose source file is an UltraHDR JPEG so that
+ * sub-size resize operations can route through libvips's uhdrload/uhdrsave
+ * to preserve the gain map. Entries are cleared in `removeItem` when the
+ * parent item leaves the queue, covering both successful completion and
+ * cancellation.
+ */
+const ultraHdrItems = new Set< QueueItemId >();
+
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
+	executeRetry: typeof executeRetry;
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
 	pauseItem: typeof pauseItem;
-	resumeItemByPostId: typeof resumeItemByPostId;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
@@ -72,10 +107,12 @@ type ActionCreators = {
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
+	transcodeGifItem: typeof transcodeGifItem;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	detectUltraHdr: typeof detectUltraHdr;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -93,32 +130,6 @@ type ThunkArgs = {
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
 };
-
-/**
- * Determines if an upload should be paused to avoid race conditions.
- *
- * When sideloading thumbnails, we need to pause uploads if another
- * upload to the same post is already in progress.
- *
- * @param item      Queue item to check.
- * @param operation Current operation type.
- * @param select    Store selectors.
- * @return Whether the upload should be paused.
- */
-function shouldPauseForSideload(
-	item: QueueItem,
-	operation: OperationType | undefined,
-	select: Selectors
-): boolean {
-	if (
-		operation !== OperationType.Upload ||
-		! item.parentId ||
-		! item.additionalData.post
-	) {
-		return false;
-	}
-	return select.isUploadingToPost( item.additionalData.post as number );
-}
 
 interface AddItemArgs {
 	// It should always be a File, but some consumers might still pass Blobs only.
@@ -195,7 +206,6 @@ export function addItem( {
 					url: blobUrl,
 				},
 				additionalData: {
-					convert_format: false,
 					generate_sub_sizes: false,
 					...additionalData,
 				},
@@ -306,16 +316,6 @@ export function processItem( id: QueueItemId ) {
 			? item.operations[ 0 ][ 1 ]
 			: undefined;
 
-		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
-		// It will be resumed after the previous upload finishes.
-		if ( shouldPauseForSideload( item, operation, select ) ) {
-			dispatch< PauseItemAction >( {
-				type: Type.PauseItem,
-				id,
-			} );
-			return;
-		}
-
 		/*
 		 * If the next operation is an upload, check concurrency limit.
 		 * If at capacity, the item remains queued and will be processed
@@ -346,8 +346,26 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
+		 * Limit to 1 concurrent transcoding operation.
+		 */
+		if ( operation === OperationType.TranscodeGif ) {
+			const activeCount = select.getActiveVideoProcessingCount();
+			if ( activeCount >= 1 ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
-			onChange?.( [ attachment ] );
+			// Don't update the block with a HEIC URL — the browser can't
+			// display it.  The scaled JPEG sideload will call onChange
+			// with a usable URL once the client-side conversion completes.
+			const isHeicUrl =
+				attachment.url && /\.hei[cf]$/i.test( attachment.url );
+			if ( ! isHeicUrl ) {
+				onChange?.( [ attachment ] );
+			}
 		}
 
 		/*
@@ -426,6 +444,10 @@ export function processItem( id: QueueItemId ) {
 			operation,
 		} );
 
+		debug(
+			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+		);
+
 		switch ( operation ) {
 			case OperationType.Prepare:
 				dispatch.prepareItem( item.id );
@@ -452,6 +474,13 @@ export function processItem( id: QueueItemId ) {
 				);
 				break;
 
+			case OperationType.TranscodeGif:
+				dispatch.transcodeGifItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
+				);
+				break;
+
 			case OperationType.Upload:
 				if ( item.parentId ) {
 					dispatch.sideloadItem( id );
@@ -466,6 +495,10 @@ export function processItem( id: QueueItemId ) {
 
 			case OperationType.Finalize:
 				dispatch.finalizeItem( id );
+				break;
+
+			case OperationType.DetectUltraHdr:
+				dispatch.detectUltraHdr( id );
 				break;
 		}
 	};
@@ -497,7 +530,14 @@ export function resumeQueue() {
 		} );
 
 		for ( const item of select.getAllItems() ) {
-			dispatch.processItem( item.id );
+			// Items left in PendingRetry while paused had their timers
+			// cleared when the timer fired during pause. Re-trigger the
+			// retry now that the queue is active again.
+			if ( item.status === ItemStatus.PendingRetry ) {
+				dispatch.executeRetry( item.id );
+			} else {
+				dispatch.processItem( item.id );
+			}
 		}
 	};
 }
@@ -517,28 +557,6 @@ export function pauseItem( id: QueueItemId ) {
 }
 
 /**
- * Resumes processing for a given post/attachment ID.
- *
- * This function looks up paused uploads by post ID and resumes them.
- * It's typically called after a sideload completes to resume paused
- * thumbnail uploads.
- *
- * @param postOrAttachmentId Post or attachment ID.
- */
-export function resumeItemByPostId( postOrAttachmentId: number ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getPausedUploadForPost( postOrAttachmentId );
-		if ( item ) {
-			dispatch< ResumeItemAction >( {
-				type: Type.ResumeItem,
-				id: item.id,
-			} );
-			dispatch.processItem( item.id );
-		}
-	};
-}
-
-/**
  * Removes a specific item from the queue.
  *
  * @param id Item ID.
@@ -550,17 +568,27 @@ export function removeItem( id: QueueItemId ) {
 			return;
 		}
 
+		// Clear any UltraHDR tracking for this item. removeItem runs on both
+		// successful completion and cancellation, so this prevents the set
+		// from growing unbounded over a long editing session.
+		ultraHdrItems.delete( id );
+
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
+
 		dispatch( {
 			type: Type.Remove,
 			id,
 		} );
 
 		/*
-		 * If the queue is now empty, terminate the VIPS worker to free
-		 * WASM memory. The worker will be lazily re-created if needed.
+		 * If the queue is now empty, terminate the background workers to free
+		 * their memory (WASM for VIPS, the WebCodecs encoder for video
+		 * conversion). Both are lazily re-created if needed.
 		 */
 		if ( select.getAllItems().length === 0 ) {
 			terminateVipsWorker();
+			terminateVideoConversionWorker();
 		}
 	};
 }
@@ -612,6 +640,28 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		/*
+		 * If a video processing operation just finished, there may be items
+		 * waiting due to the video processing concurrency limit.
+		 */
+		if ( previousOperation === OperationType.TranscodeGif ) {
+			const pendingItems = select.getPendingVideoProcessing();
+			for ( const pendingItem of pendingItems ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
+
+		// Track vips operations across success and failure paths so a
+		// burst of failures can't bypass the recycle budget; the cancel
+		// path calls the same helper.
+		if (
+			previousOperation === OperationType.ResizeCrop ||
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.TranscodeImage
+		) {
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
+		}
 	};
 }
 
@@ -628,29 +678,6 @@ function isValidImageFormat( format: string ): format is ImageFormat {
 }
 
 /**
- * Gets the appropriate interlace setting for the given output format.
- *
- * @param outputMimeType The output mime type.
- * @param settings       The upload settings.
- * @return Whether to use interlaced encoding.
- */
-function getInterlacedSetting(
-	outputMimeType: string,
-	settings: Settings
-): boolean {
-	switch ( outputMimeType ) {
-		case 'image/jpeg':
-			return settings.jpegInterlaced ?? false;
-		case 'image/png':
-			return settings.pngInterlaced ?? false;
-		case 'image/gif':
-			return settings.gifInterlaced ?? false;
-		default:
-			return false;
-	}
-}
-
-/**
  * Determines if an image should be transcoded to a different format.
  *
  * Handles PNG to JPEG conversion carefully by checking for transparency
@@ -658,13 +685,15 @@ function getInterlacedSetting(
  *
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
- * @param settings       Media settings.
+ * @param interlaced     Whether to use interlaced encoding.
+ * @param quality        Re-encode quality (0-1). Defaults to DEFAULT_OUTPUT_QUALITY.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	settings: Settings
+	interlaced: boolean = false,
+	quality: number = DEFAULT_OUTPUT_QUALITY
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -700,8 +729,8 @@ export async function getTranscodeImageOperation(
 		OperationType.TranscodeImage,
 		{
 			outputFormat: formatPart,
-			outputQuality: DEFAULT_OUTPUT_QUALITY,
-			interlaced: getInterlacedSetting( outputMimeType, settings ),
+			outputQuality: quality,
+			interlaced,
 		},
 	];
 }
@@ -718,6 +747,9 @@ export async function getTranscodeImageOperation(
  * Or videos need to be compressed, and then need poster generation
  * before upload.
  *
+ * UltraHDR JPEG images are detected and uploaded unmodified — they are
+ * already backwards compatible (SDR displays use the embedded base image).
+ *
  * @param id Item ID.
  */
 export function prepareItem( id: QueueItemId ) {
@@ -731,27 +763,147 @@ export function prepareItem( id: QueueItemId ) {
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
 
+		// Animated GIF → video. WebCodecs is required; client-side media
+		// already runs only under cross-origin isolation, so this is a
+		// capability check, not a browser-support fallback path.
+		//
+		// The GIF uploads through the normal image pipeline so the block
+		// starts as a valid core/image. The converted video is sideloaded as
+		// a companion file of this same attachment after upload (see
+		// generateThumbnails) — like the HEIC original — not as a separate
+		// media library attachment. It is recorded in attachment metadata; the
+		// editor offers switching the block to the Video block's GIF variation
+		// playing that companion via a block transform (see
+		// packages/block-library/src/image/transforms.js).
+		if (
+			file.type === 'image/gif' &&
+			settings.gifConvert !== false &&
+			typeof ImageDecoder !== 'undefined' &&
+			typeof VideoEncoder !== 'undefined'
+		) {
+			let isAnimated = false;
+			try {
+				isAnimated = isAnimatedGif( await file.arrayBuffer() );
+			} catch {
+				// If the GIF cannot be read/inspected, fall through to the
+				// normal image pipeline rather than failing the upload.
+				isAnimated = false;
+			}
+			if ( isAnimated ) {
+				// Skip the conversion for transparent GIFs: a <video> cannot
+				// reproduce GIF transparency, so converting would visibly
+				// change the image (e.g. small decorative or emoji-like GIFs
+				// over a colored background). Such GIFs upload as a normal
+				// image instead. Mirrors the PNG → JPEG transparency check in
+				// getTranscodeImageOperation().
+				let hasTransparency = false;
+				const blobUrl = createBlobURL( file );
+				try {
+					hasTransparency = await vipsHasTransparency( blobUrl );
+				} catch {
+					// If the check fails, err on the side of caution and keep
+					// the GIF rather than risk a lossy conversion.
+					hasTransparency = true;
+				} finally {
+					revokeBlobURL( blobUrl );
+				}
+
+				if ( ! hasTransparency ) {
+					operations.push(
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize
+					);
+
+					dispatch< AddOperationsAction >( {
+						type: Type.AddOperations,
+						id,
+						operations,
+					} );
+
+					// Keep the original GIF so generateThumbnails can
+					// transcode and sideload it once the attachment exists.
+					dispatch.finishOperation( id, {
+						animatedGifFile: item.file,
+					} );
+					return;
+				}
+			}
+		}
+
+		let heicJpeg: File | null = null;
+
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
+		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
-		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		// Gate very large images out of client-side processing. wasm-vips is
+		// capped at 1 GiB of memory, so high-megapixel images, especially
+		// interlaced/progressive ones, which can't be decoded with
+		// shrink-on-load, can exhaust it and fail. These are routed to the
+		// server, which has no comparable per-image ceiling. If dimensions
+		// can't be determined, the image stays on the client-side path.
+		let tooLargeForClient = false;
 		if ( isImage && isVipsSupported ) {
-			const { imageOutputFormats } = settings;
+			const dimensions = await getImageDimensions( file );
+			if ( dimensions && exceedsClientProcessingMemory( dimensions ) ) {
+				tooLargeForClient = true;
+			}
+		}
 
-			// Check if we need to transcode to a different format.
-			// Uses WordPress image_editor_output_format filter settings.
-			const outputMimeType = imageOutputFormats?.[ file.type ];
-			if ( outputMimeType && outputMimeType !== file.type ) {
-				const transcodeOperation = await getTranscodeImageOperation(
+		// Check for UltraHDR in JPEG files before other operations. Skipped for
+		// images routed to the server: the gain map is only preserved by the
+		// client-side resize path, and the probe runs wasm-vips, which the
+		// large-image gate above is specifically meant to avoid.
+		if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
+			operations.push( OperationType.DetectUltraHdr );
+		}
+
+		// For images that can be processed by vips, upload the original and
+		// let generateThumbnails() handle threshold scaling as a sideload.
+		//
+		// Uploading the original (rather than a pre-scaled copy) preserves
+		// the un-suffixed basename in attachment.filename, so sub-size
+		// names are derived from the original — matching WordPress core's
+		// wp_create_image_subsizes() naming convention where only the
+		// scaled-down full-size copy carries the `-scaled` suffix and the
+		// original is kept alongside it as `original_image`.
+		//
+		// Main-file format conversion is handled server-side via the
+		// image_editor_output_format filter during create_item.
+		// The response carries image_output_format so generateThumbnails
+		// can transcode sub-sizes to the same target format.
+		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
+			operations.push(
+				OperationType.Upload,
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
+			);
+		} else if ( isImage && isHeic ) {
+			// HEIC/HEIF: convert to JPEG client-side before upload.
+			// The server may not support HEIC, so decode it using the
+			// browser's native HEVC codec (createImageBitmap or VideoDecoder)
+			// and upload the resulting JPEG. The server then handles it like
+			// any normal JPEG (threshold scaling, sub-sizes, etc.).
+			// This matches iOS behavior where HEIC is converted on the fly.
+			try {
+				heicJpeg = await canvasConvertToJpeg(
 					file,
-					outputMimeType,
-					settings
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
 				);
-				if ( transcodeOperation ) {
-					operations.push( transcodeOperation );
-				}
+			} catch {
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.HEIC_DECODE_ERROR,
+						message:
+							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						file,
+					} )
+				);
+				return;
 			}
 
 			operations.push(
@@ -769,20 +921,84 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		// If the file is not processed by vips, tell the server to
-		// generate sub-sizes since they won't be created client-side.
-		const updates =
-			! isVipsSupported || ! isImage
-				? {
-						additionalData: {
-							...item.additionalData,
-							generate_sub_sizes: true,
-							convert_format: true,
-						},
-				  }
-				: {};
+		// Tell the server whether to generate sub-sizes.
+		// When vips handles processing client-side, set generate_sub_sizes
+		// to false so the server skips the image-type support check
+		// (allowing formats like AVIF that the server can't process).
+		let updates: Partial< QueueItem >;
+		if ( isHeic && heicJpeg ) {
+			// HEIC was converted to JPEG client-side. Upload the JPEG
+			// and let the server handle it normally (threshold scaling,
+			// sub-sizes, format conversion). Keep the original HEIC in
+			// a separate field so it can be sideloaded as the "original"
+			// after upload, preserving the user's file without leaking it
+			// into paths that expect an editor-supported image.
+			const vipsAvailable = isClientSideMediaSupported();
+			updates = {
+				file: heicJpeg,
+				sourceFile: heicJpeg,
+				originalHeicFile: item.file,
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: ! vipsAvailable,
+					convert_format: true,
+				},
+			};
+		} else if ( ! isVipsSupported || ! isImage || tooLargeForClient ) {
+			// Either the format isn't vips-processable, it isn't an image, or
+			// it's too large for client-side processing. Let the server
+			// generate sub-sizes and handle format conversion.
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: true,
+					convert_format: true,
+				},
+			};
+		} else {
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
+				},
+			};
+		}
 
 		dispatch.finishOperation( id, updates );
+	};
+}
+
+/**
+ * Detects whether a JPEG is an UltraHDR image and records the parent item
+ * ID so that downstream resize operations route through libvips's
+ * uhdrload/uhdrsave pipeline (which preserves the gain map).
+ *
+ * @param id Item ID.
+ */
+export function detectUltraHdr( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		let info;
+		try {
+			const buffer = await item.file.arrayBuffer();
+			info = await vipsGetUltraHdrInfo( buffer );
+		} catch {
+			// If UltraHDR detection fails, continue with regular upload.
+		}
+
+		// Track the item so downstream resize operations preserve the gain
+		// map and skip format transcoding. The original file is uploaded
+		// unmodified — UltraHDR JPEGs are already backwards compatible (SDR
+		// displays use the embedded base image).
+		if ( info ) {
+			ultraHdrItems.add( id );
+		}
+
+		dispatch.finishOperation( id, {} );
 	};
 }
 
@@ -798,21 +1014,44 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+		let finished = false;
+
+		const finishUpload = ( attachment: Partial< Attachment > ) => {
+			if ( finished ) {
+				return;
+			}
+			finished = true;
+
+			measure( {
+				measureName: `Upload ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
+			dispatch.finishOperation( id, { attachment } );
+		};
+
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			// The queue's own items drive upload progress UI and save
+			// locking; without this, consumers that track uploads themselves
+			// (e.g. the editor's progress snackbar) would count this file a
+			// second time.
+			isTransportOnly: true,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
-					dispatch.finishOperation( id, {
-						attachment,
-					} );
+					finishUpload( attachment );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, {
-					attachment,
-				} );
+				finishUpload( attachment );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
@@ -843,18 +1082,36 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
-			onFileChange: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, { attachment } );
-				dispatch.resumeItemByPostId( post as number );
+			onSuccess: ( subSize: SubSizeData ) => {
+				measure( {
+					measureName: `Sideload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
+				// Accumulate sub-size data on the parent item for finalize.
+				if ( item.parentId ) {
+					dispatch< AccumulateSubSizeAction >( {
+						type: Type.AccumulateSubSize,
+						id: item.parentId,
+						subSize,
+					} );
+				}
+				dispatch.finishOperation( id, {} );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
-				dispatch.resumeItemByPostId( post as number );
 			},
 		} );
 	};
@@ -882,21 +1139,42 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		// Add dimension suffix for sub-sizes (thumbnails).
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
+
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
 
 		try {
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
+
+			measure( {
+				measureName: `ResizeCrop ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -915,8 +1193,10 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'File could not be uploaded',
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -952,6 +1232,8 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		try {
 			const file = await vipsRotateImage(
 				item.id,
@@ -959,6 +1241,16 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				args.orientation,
 				item.abortController?.signal
 			);
+
+			measure( {
+				measureName: `Rotate ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -977,8 +1269,10 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_ROTATION_ERROR',
-					message: 'Image could not be rotated',
+					code: ErrorCode.IMAGE_ROTATION_ERROR,
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -1016,6 +1310,8 @@ export function transcodeImageItem(
 			return;
 		}
 
+		const startTime = performance.now();
+
 		const outputMimeType = `image/${ args.outputFormat }` as
 			| 'image/jpeg'
 			| 'image/png'
@@ -1025,14 +1321,32 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
+
+			measure( {
+				measureName: `Transcode ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1051,12 +1365,164 @@ export function transcodeImageItem(
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'MEDIA_TRANSCODING_ERROR',
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
 					message:
 						'Image could not be transcoded to the target format',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
+			);
+		}
+	};
+}
+
+type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
+
+/**
+ * Converts an animated GIF to a video file (MP4 or WebM).
+ *
+ * Runs inside a sideload item whose parent is the GIF's image attachment
+ * (see generateThumbnails). The next Upload op then sideloads the
+ * transcoded video as a companion of that attachment under the
+ * `animated_video` image size; the GIF stays the primary attachment and
+ * the editor block stays `core/image`.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeGifItem(
+	id: QueueItemId,
+	args?: TranscodeGifItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const outputFormat = args?.outputFormat ?? 'mp4';
+		const outputMimeType = `video/${ outputFormat }`;
+
+		/*
+		 * item.file is the original GIF until finishOperation swaps in the
+		 * transcoded video below; capture it for the poster sideload.
+		 */
+		const gifFile = item.file;
+
+		try {
+			const file = await convertGifToVideo(
+				item.id,
+				gifFile,
+				outputMimeType,
+				{
+					timeout: args?.timeout,
+					maxTotalPixels: args?.maxTotalPixels,
+				}
+			);
+
+			// Hand the transcoded video to the next Upload op as the
+			// sideload's payload. The parent attachment (the GIF) is
+			// already uploaded; no blob URL is needed for any block.
+			dispatch.finishOperation( id, { file } );
+
+			/*
+			 * Only now that the video exists, sideload a static first-frame
+			 * poster as a companion (vips decodes just the first GIF frame).
+			 * Queued here rather than alongside the video in
+			 * generateThumbnails so an unsupported/failed conversion never
+			 * leaves an orphaned `animated_video_poster` with no matching
+			 * `animated_video`. This sibling is registered while the video's
+			 * own Upload op is still pending, so the parent's finalize gate
+			 * stays closed until both companions finish. Stored under
+			 * metadata `animated_video_poster`.
+			 */
+			dispatch.addSideloadItem( {
+				file: gifFile,
+				batchId: uuidv4(),
+				parentId: item.parentId,
+				additionalData: {
+					post: item.additionalData?.post,
+					image_size: 'animated_video_poster',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeImage,
+						{
+							outputFormat: 'jpeg',
+							outputQuality: DEFAULT_OUTPUT_QUALITY,
+							interlaced: false,
+						} as OperationArgs[ OperationType.TranscodeImage ],
+					],
+					OperationType.Upload,
+				],
+			} );
+		} catch ( error ) {
+			// An "Unsupported" outcome is a graceful skip, not a failure:
+			// the parent GIF attachment already exists and stays as-is, so
+			// we silently cancel this sideload (no companion video, no
+			// user-facing error). Uploading the original GIF here would
+			// create an `animated_video` meta entry pointing at the GIF
+			// itself — meaningless.
+			if ( isUnsupportedConversionError( error ) ) {
+				/*
+				 * A GIF skipped for exceeding the total-pixel budget is a
+				 * graceful outcome like any other unsupported conversion,
+				 * but worth a SCRIPT_DEBUG diagnostic so developers testing
+				 * large GIFs understand why no companion video was produced.
+				 */
+				if ( isSizeLimitConversionError( error ) ) {
+					debug(
+						`Skipping GIF to video conversion: ${
+							error instanceof Error ? error.message : error
+						}`
+					);
+				}
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
+				return;
+			}
+			/*
+			 * The conversion ran past the allowed time and was abandoned:
+			 * the GIF attachment stands alone, which is exactly what the
+			 * user uploaded. SCRIPT_DEBUG diagnostic only, no user-facing
+			 * error.
+			 */
+			if ( isConversionTimeoutError( error ) ) {
+				debug(
+					`GIF to video conversion timed out; keeping the original GIF only: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion timed out' ),
+					true
+				);
+				return;
+			}
+			// Real engine failure. The parent GIF attachment is fine —
+			// the user just won't get a companion video. Log the cause
+			// for debuggability and silently cancel the sideload; we do
+			// not surface a "could not be converted to video" toast on
+			// what the user thinks of as an image upload.
+			// eslint-disable-next-line no-console
+			console.error(
+				'[video-conversion] GIF to video conversion failed:',
+				error
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.GIF_TRANSCODING_ERROR,
+					message: 'Animated GIF could not be converted to video',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} ),
+				true
 			);
 		}
 	};
@@ -1082,30 +1548,128 @@ export function generateThumbnails( id: QueueItemId ) {
 			return;
 		}
 		const attachment = item.attachment;
+		const settings = select.getSettings();
 
-		// Check if image needs rotation.
-		// If exif_orientation is not 1, the image needs rotation.
-		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
-		const needsRotation =
-			attachment.exif_orientation &&
-			attachment.exif_orientation !== 1 &&
-			! item.file.name.includes( '-scaled' );
+		// HEIC/HEIF: preserve the original file under a dedicated metadata
+		// key so it never collides with `original_image`, which the scaled
+		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
+		// the uploaded file is a JPEG conversion. parentId guarantees
+		// processItem routes this to the sideload endpoint, never the main
+		// create endpoint. The `source_original` image_size token is
+		// format-agnostic (it also covers HEIF) and matches the server-side
+		// WP_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL constant.
+		if ( item.originalHeicFile && attachment.id ) {
+			dispatch.addSideloadItem( {
+				file: item.originalHeicFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'source_original',
+					convert_format: false,
+				},
+				operations: [ OperationType.Upload ],
+			} );
+		}
 
-		// If rotation is needed for a non-scaled image, sideload the rotated version.
-		// This matches WordPress core's behavior of creating a -rotated version.
-		if ( needsRotation && attachment.id ) {
-			try {
-				const rotatedFile = await vipsRotateImage(
-					item.id,
-					item.sourceFile,
-					attachment.exif_orientation as number,
-					item.abortController?.signal
-				);
+		// Animated GIF: transcode the original to a video and sideload it
+		// as a companion file of this attachment (recorded in metadata as
+		// `animated_video`), mirroring the HEIC original flow. The
+		// TranscodeGif step keeps the WebCodecs concurrency limit;
+		// parentId routes the result to the sideload endpoint, so no
+		// separate attachment is created.
+		if ( item.animatedGifFile && attachment.id ) {
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
 
-				// Sideload the rotated file as the "original" to set original_image metadata.
-				// The server will store this in $metadata['original_image'].
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated_video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload,
+				],
+			} );
+
+			/*
+			 * The static first-frame poster companion is sideloaded by the
+			 * TranscodeGif operation once the video conversion succeeds (see
+			 * transcodeGifItem), so a failed conversion leaves no orphaned
+			 * poster.
+			 */
+		}
+
+		// Determine the EXIF orientation. For JPEG/TIFF the server reads it and
+		// libvips auto-rotates the sub-sizes from EXIF. For AVIF/HEIF libheif/
+		// libvips only auto-rotate from a native `irot` transform, never from
+		// EXIF, so those sub-sizes must be rotated explicitly. Read the EXIF
+		// orientation on the client for those formats and treat it as the
+		// source of truth: `getUnappliedExifOrientation` returns 1 when an
+		// `irot` transform is present (already handled on decode), otherwise
+		// the EXIF orientation that nothing else applies.
+		// See https://github.com/WordPress/gutenberg/issues/79383.
+		let exifOrientation = attachment.exif_orientation || 1;
+		const sourceType = item.sourceFile.type;
+		const isHeifFamily =
+			sourceType === 'image/avif' || sourceType === 'image/heif';
+
+		let needsClientRotation = false;
+		if ( isHeifFamily ) {
+			exifOrientation = getUnappliedExifOrientation(
+				await item.sourceFile.arrayBuffer()
+			);
+			// libvips will not auto-rotate these sub-sizes, so they must be
+			// generated from an explicitly rotated source rather than the
+			// original file.
+			needsClientRotation = exifOrientation !== 1;
+		}
+
+		// Rotate the source once and reuse it for the sideloaded "original"
+		// (original_image metadata) and, for the client-rotation case, as the
+		// thumbnail/scaled source. Images that were scaled
+		// (bigImageSizeThreshold) are already rotated by vips, so the original
+		// is skipped for them, matching WordPress core.
+		let rotatedSource: File | undefined;
+		{
+			const needsRotation =
+				exifOrientation !== 1 && ! item.file.name.includes( '-scaled' );
+
+			if ( ( needsRotation || needsClientRotation ) && attachment.id ) {
+				try {
+					rotatedSource = await vipsRotateImage(
+						item.id,
+						item.sourceFile,
+						exifOrientation,
+						item.abortController?.signal
+					);
+				} catch {
+					// If rotation fails, continue with thumbnail generation.
+					// Thumbnails will still be rotated correctly by vips for
+					// server-readable formats.
+					// eslint-disable-next-line no-console
+					console.warn(
+						'Failed to rotate image, continuing with thumbnails'
+					);
+				}
+			}
+
+			// Sideload the rotated file as the "original" to set
+			// original_image metadata; the server stores it in
+			// $metadata['original_image'].
+			if ( needsRotation && rotatedSource && attachment.id ) {
 				dispatch.addSideloadItem( {
-					file: rotatedFile,
+					file: rotatedSource,
 					batchId: uuidv4(),
 					parentId: item.id,
 					additionalData: {
@@ -1115,13 +1679,6 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: [ OperationType.Upload ],
 				} );
-			} catch {
-				// If rotation fails, continue with thumbnail generation.
-				// Thumbnails will still be rotated correctly by vips.
-				// eslint-disable-next-line no-console
-				console.warn(
-					'Failed to rotate image, continuing with thumbnails'
-				);
 			}
 		}
 
@@ -1131,27 +1688,53 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
-			const settings = select.getSettings();
 			const allImageSizes = settings.allImageSizes || {};
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			// Use sourceFile for thumbnail generation to preserve quality.
-			// WordPress core generates thumbnails from the original (unscaled) image.
-			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
+			const thumbnailSource =
+				needsClientRotation && rotatedSource
+					? rotatedSource
+					: item.sourceFile;
 			const file = attachment.filename
-				? renameFile( item.sourceFile, attachment.filename )
-				: item.sourceFile;
+				? renameFile( thumbnailSource, attachment.filename )
+				: thumbnailSource;
 			const batchId = uuidv4();
 
-			const { imageOutputFormats } = settings;
+			// Sub-sizes inherit the parent's UltraHDR status so that the
+			// resize step routes through libvips's uhdrload/uhdrsave pipeline
+			// (which preserves the gain map). Format transcoding is skipped
+			// for UltraHDR sources because converting to a different codec
+			// would strip the ISO 21496-1 gain map data.
+			const isUltraHdr = ultraHdrItems.has( item.id );
+
+			// Read per-file format conversion data from the attachment response.
+			const outputMimeType = attachment.image_output_format;
+			const interlaced = attachment.image_save_progressive ?? false;
+
+			// Resolve the size-aware encode quality from the
+			// wp_editor_set_quality filter, carried in the upload response.
+			// Quality is reported as 1-100 (WordPress scale); the vips worker
+			// expects 0-1. Fall back to the generic setting, then the
+			// hardcoded default, when the response predates this field.
+			const imageQuality = attachment.image_quality;
+			const fallbackQuality =
+				settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+			const defaultQuality =
+				typeof imageQuality?.default === 'number'
+					? imageQuality.default / 100
+					: fallbackQuality;
+			const qualityForSize = ( sizeName: string ): number => {
+				const sized = imageQuality?.sizes?.[ sizeName ];
+				if ( typeof sized === 'number' ) {
+					return sized / 100;
+				}
+				return defaultQuality;
+			};
 
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
-			const sourceType = item.sourceFile.type;
-			const outputMimeType = imageOutputFormats?.[ sourceType ];
-
 			let thumbnailTranscodeOperation:
 				| [
 						OperationType.TranscodeImage,
@@ -1159,14 +1742,20 @@ export function generateThumbnails( id: QueueItemId ) {
 				  ]
 				| null = null;
 
-			if ( outputMimeType && outputMimeType !== sourceType ) {
+			if ( ! isUltraHdr && outputMimeType ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
-					item.sourceFile,
+					thumbnailSource,
 					outputMimeType,
-					settings
+					interlaced,
+					defaultQuality
 				);
 			}
 
+			// Group sizes by dimensions to avoid creating duplicate files.
+			// When multiple size names have the same width/height/crop,
+			// only one physical file is generated and registered under
+			// all matching size names via a single sideload request.
+			const dimensionGroups = new Map< string, string[] >();
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1176,103 +1765,124 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 					continue;
 				}
+				const key = `${ imageSize.width }x${ imageSize.height }x${ imageSize.crop }`;
+				const group = dimensionGroups.get( key );
+				if ( group ) {
+					group.push( name );
+				} else {
+					dimensionGroups.set( key, [ name ] );
+				}
+			}
 
-				// Build operations list for this thumbnail.
+			for ( const [ , names ] of dimensionGroups ) {
+				const imageSize = allImageSizes[ names[ 0 ] ];
+
+				// Sizes grouped here share dimensions, so wp_editor_set_quality
+				// (which is dimension-aware) resolves to the same value for
+				// every name in the group.
+				const sizeQuality = qualityForSize( names[ 0 ] );
+
+				// Build operations list for this thumbnail. The resize step
+				// is UltraHDR-aware and will preserve the gain map automatically.
 				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
+					[
+						OperationType.ResizeCrop,
+						{ resize: imageSize, quality: sizeQuality },
+					],
 				];
 
 				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
-				if ( thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( thumbnailTranscodeOperation );
+				// the transparency check passed. For UltraHDR sources the
+				// transcode is skipped so the gain map survives the resize.
+				// Otherwise override the template's quality with this size's
+				// resolved value.
+				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+					thumbnailOperations.push( [
+						thumbnailTranscodeOperation[ 0 ],
+						{
+							...thumbnailTranscodeOperation[ 1 ],
+							outputQuality: sizeQuality,
+						},
+					] );
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
 
+				// Pass all size names so the server registers the same
+				// file under every matching size name in metadata.
+				const imageSizeParam = names.length === 1 ? names[ 0 ] : names;
+
 				dispatch.addSideloadItem( {
 					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
 					batchId,
 					parentId: item.id,
 					additionalData: {
 						// Sideloading does not use the parent post ID but the
 						// attachment ID as the image sizes need to be added to it.
 						post: attachment.id,
-						image_size: name,
+						image_size: imageSizeParam,
 						convert_format: false,
 					},
 					operations: thumbnailOperations,
 				} );
 			}
 
-			// Create and sideload the scaled version.
-			const { bigImageSizeThreshold } = settings;
-			if ( bigImageSizeThreshold && attachment.id ) {
-				// Check if the image actually exceeds the threshold.
-				// Only create a scaled version for images larger than the threshold,
-				// matching WordPress core's wp_create_image_subsizes() behavior.
-				const bitmap = await createImageBitmap( item.sourceFile );
-				const needsScaling =
-					bitmap.width > bigImageSizeThreshold ||
-					bitmap.height > bigImageSizeThreshold;
-				bitmap.close();
+			// Create and sideload the scaled version if it exceeds the threshold.
+			{
+				const { bigImageSizeThreshold } = settings;
+				if ( bigImageSizeThreshold && attachment.id ) {
+					// Check if the image actually exceeds the threshold.
+					// Only create a scaled version for images larger than the threshold,
+					// matching WordPress core's wp_create_image_subsizes() behavior.
+					const bitmap = await createImageBitmap( thumbnailSource );
+					const needsScaling =
+						bitmap.width > bigImageSizeThreshold ||
+						bitmap.height > bigImageSizeThreshold;
+					bitmap.close();
 
-				if ( needsScaling ) {
-					// Rename sourceFile to match the server attachment filename.
-					const sourceForScaled = attachment.filename
-						? renameFile( item.sourceFile, attachment.filename )
-						: item.sourceFile;
+					if ( needsScaling ) {
+						// Rename sourceFile to match the server attachment filename.
+						const sourceForScaled = attachment.filename
+							? renameFile( thumbnailSource, attachment.filename )
+							: thumbnailSource;
 
-					// Add scaling to queue.
-					const scaledOperations: Operation[] = [
-						[
-							OperationType.ResizeCrop,
-							{
-								resize: {
-									width: bigImageSizeThreshold,
-									height: bigImageSizeThreshold,
+						// Add scaling to queue. The resize step is UltraHDR-aware
+						// and will preserve the gain map automatically.
+						const scaledOperations: Operation[] = [
+							[
+								OperationType.ResizeCrop,
+								{
+									resize: {
+										width: bigImageSizeThreshold,
+										height: bigImageSizeThreshold,
+									},
+									isThresholdResize: true,
+									quality: defaultQuality,
 								},
-								isThresholdResize: true,
+							],
+						];
+
+						if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+							// Add transcoding if format conversion is configured.
+							scaledOperations.push(
+								thumbnailTranscodeOperation
+							);
+						}
+
+						scaledOperations.push( OperationType.Upload );
+
+						dispatch.addSideloadItem( {
+							file: sourceForScaled,
+							batchId,
+							parentId: item.id,
+							additionalData: {
+								post: attachment.id,
+								image_size: 'scaled',
+								convert_format: false,
 							},
-						],
-					];
-
-					// Add transcoding if format conversion is configured.
-					if ( thumbnailTranscodeOperation ) {
-						scaledOperations.push( thumbnailTranscodeOperation );
+							operations: scaledOperations,
+						} );
 					}
-
-					scaledOperations.push( OperationType.Upload );
-
-					dispatch.addSideloadItem( {
-						file: sourceForScaled,
-						onChange: ( [ updatedAttachment ] ) => {
-							if ( isBlobURL( updatedAttachment.url ) ) {
-								return;
-							}
-							item.onChange?.( [ updatedAttachment ] );
-						},
-						batchId,
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: 'scaled',
-							convert_format: false,
-						},
-						operations: scaledOperations,
-					} );
 				}
 			}
 		}
@@ -1299,11 +1909,24 @@ export function finalizeItem( id: QueueItemId ) {
 
 		const attachment = item.attachment;
 		const { mediaFinalize } = select.getSettings();
+		const updates: Partial< QueueItem > = {};
 
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id );
+				// Pass the post-finalize attachment through so the reducer
+				// merges the updated URL (now pointing at the `-scaled` file)
+				// into item.attachment. The next processItem pass fires
+				// onChange with that URL, which is what the block stores —
+				// and what `wp_calculate_image_srcset()` needs in order to
+				// match a known size and emit srcset on the front end.
+				const updatedAttachment = await mediaFinalize(
+					attachment.id,
+					item.subSizes || []
+				);
+				if ( updatedAttachment ) {
+					updates.attachment = updatedAttachment;
+				}
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
@@ -1311,7 +1934,7 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation( id, updates );
 	};
 }
 

@@ -128,7 +128,6 @@ export function LinkUIPageCreator( {
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }

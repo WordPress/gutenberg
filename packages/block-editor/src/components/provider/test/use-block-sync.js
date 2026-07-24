@@ -277,6 +277,46 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
+	it( 'passes undoIgnore when a non-persistent block change ignores history', async () => {
+		const onChange = jest.fn();
+		const onInput = jest.fn();
+		const value1 = [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+		];
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ value1 }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		onChange.mockClear();
+		onInput.mockClear();
+
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( 'a', { foo: 2 } );
+
+		expect( onInput ).toHaveBeenCalledWith(
+			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
+			expect.objectContaining( {
+				selection: expect.any( Object ),
+				undoIgnore: true,
+			} )
+		);
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
 	it( 'calls onChange if a persistent change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();

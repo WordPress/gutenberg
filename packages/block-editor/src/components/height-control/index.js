@@ -164,7 +164,6 @@ export default function HeightControl( {
 						onChange={ onChange }
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
-						size="__unstable-large"
 						label={ label }
 						hideLabelFromVision
 					/>
@@ -172,7 +171,6 @@ export default function HeightControl( {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
-							__next40pxDefaultSize
 							value={ customRangeValue }
 							min={ 0 }
 							max={

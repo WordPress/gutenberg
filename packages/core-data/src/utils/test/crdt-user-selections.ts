@@ -396,6 +396,15 @@ function createTestDocWithBlocks() {
 	block2.set( 'clientId', 'block-2' );
 	const block2Attrs = new Y.Map();
 	block2Attrs.set( 'content', new Y.Text( 'Second block content' ) );
+	const body = new Y.Array();
+	const row = new Y.Map();
+	const cells = new Y.Array();
+	const cell = new Y.Map();
+	cell.set( 'content', new Y.Text( 'Cell text' ) );
+	cells.push( [ cell ] );
+	row.set( 'cells', cells );
+	body.push( [ row ] );
+	block2Attrs.set( 'body', body );
 	block2.set( 'attributes', block2Attrs );
 	block2.set( 'innerBlocks', new Y.Array() );
 	blocks.push( [ block2 ] );
@@ -529,6 +538,9 @@ describe( 'getSelectionState', () => {
 			expect(
 				( result as SelectionCursor ).cursorPosition.absoluteOffset
 			).toBe( 5 );
+			expect(
+				( result as SelectionCursor ).cursorPosition.attributeKey
+			).toBe( 'content' );
 		} );
 
 		test( 'returns Cursor at start of block (offset 0)', () => {
@@ -553,6 +565,33 @@ describe( 'getSelectionState', () => {
 			expect(
 				( result as SelectionCursor ).cursorPosition.absoluteOffset
 			).toBe( 0 );
+		} );
+
+		test( 'returns Cursor for a nested rich-text attribute path', () => {
+			const selectionStart: WPBlockSelection = {
+				clientId: 'block-2',
+				attributeKey: 'body.0.cells.0.content',
+				offset: 4,
+			};
+			const selectionEnd: WPBlockSelection = {
+				clientId: 'block-2',
+				attributeKey: 'body.0.cells.0.content',
+				offset: 4,
+			};
+
+			const result = getSelectionState(
+				selectionStart,
+				selectionEnd,
+				testDoc
+			);
+
+			expect( result.type ).toBe( SelectionType.Cursor );
+			expect(
+				( result as SelectionCursor ).cursorPosition.absoluteOffset
+			).toBe( 4 );
+			expect(
+				( result as SelectionCursor ).cursorPosition.attributeKey
+			).toBe( 'body.0.cells.0.content' );
 		} );
 
 		test( 'returns None when block does not exist', () => {

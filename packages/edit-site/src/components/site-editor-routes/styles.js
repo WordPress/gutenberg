@@ -14,23 +14,12 @@ import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-gl
 import SidebarGlobalStyles from '../sidebar-global-styles';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-const { StyleBookPreview } = unlock( editorPrivateApis );
+const { StyleBookPreview, useGlobalStyles } = unlock( editorPrivateApis );
 
-function MobileGlobalStylesUI() {
-	const { query = {} } = useLocation();
-	const { canvas } = query;
-
-	if ( canvas === 'edit' ) {
-		return <Editor />;
-	}
-
-	return <SidebarGlobalStyles />;
-}
-
-function StylesPreviewArea() {
+function StyleBookPreviewArea( { siteData } ) {
 	const { path, query } = useLocation();
 	const history = useHistory();
-	const isStylebook = query.preview === 'stylebook';
+	const { user: userConfig } = useGlobalStyles();
 
 	// Get section from URL query params
 	const section = query.section ?? '/';
@@ -42,13 +31,22 @@ function StylesPreviewArea() {
 		);
 	};
 
-	if ( isStylebook ) {
-		return (
-			<StyleBookPreview
-				path={ section }
-				onPathChange={ onChangeSection }
-			/>
-		);
+	return (
+		<StyleBookPreview
+			path={ section }
+			onPathChange={ onChangeSection }
+			settings={ siteData.editorSettings }
+			// Without userConfig the preview falls back to the static `settings` styles and unsaved global styles edits are not shown.
+			userConfig={ userConfig }
+		/>
+	);
+}
+
+function StylesPreviewArea( { siteData } ) {
+	const { query } = useLocation();
+
+	if ( query.preview === 'stylebook' ) {
+		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 
 	return <Editor />;
@@ -60,8 +58,10 @@ export const stylesRoute = {
 	areas: {
 		content: <SidebarGlobalStyles />,
 		sidebar: <SidebarNavigationScreenGlobalStyles backPath="/" />,
-		preview: <StylesPreviewArea />,
-		mobile: <MobileGlobalStylesUI />,
+		preview: ( { siteData } ) => (
+			<StylesPreviewArea siteData={ siteData } />
+		),
+		mobileContent: <SidebarGlobalStyles />,
 	},
 	widths: {
 		content: 380,

@@ -14,10 +14,10 @@ Context.displayName = 'RegistryProviderContext';
 const { Consumer, Provider } = Context;
 
 /**
- * A custom react Context consumer exposing the provided `registry` to
+ * A custom React context consumer exposing the provided `registry` to
  * children components. Used along with the RegistryProvider.
  *
- * You can read more about the react context api here:
+ * You can read more about the React context API here:
  * https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context
  *
  * @example
@@ -50,7 +50,7 @@ export const RegistryConsumer = Consumer;
  * A custom Context provider for exposing the provided `registry` to children
  * components via a consumer.
  *
- * See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
+ * See <a href="#registryconsumer">RegistryConsumer</a> documentation for
  * example.
  */
 export default Provider;

@@ -14,6 +14,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/File Upload/FormFileUpload',
 	id: 'components-formfileupload',
 	component: FormFileUpload,
@@ -26,7 +27,7 @@ const meta: Meta< typeof FormFileUpload > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -34,13 +35,12 @@ const meta: Meta< typeof FormFileUpload > = {
 export default meta;
 
 const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
-	return <FormFileUpload __next40pxDefaultSize { ...props } />;
+	return <FormFileUpload { ...props } />;
 };
 
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Select file',
-	__next40pxDefaultSize: true,
 };
 
 export const RestrictFileTypes = Template.bind( {} );

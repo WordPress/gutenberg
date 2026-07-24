@@ -16,21 +16,16 @@ import type { VisualizerProps } from '../types';
 export function useBorderBoxControlVisualizer(
 	props: WordPressComponentProps< VisualizerProps, 'div' >
 ) {
-	const {
-		className,
-		value,
-		size = 'default',
-		...otherProps
-	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
+	const { className, value, ...otherProps } = useContextSystem(
+		props,
+		'BorderBoxControlVisualizer'
+	);
 
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx(
-			styles.borderBoxControlVisualizer( value, size ),
-			className
-		);
-	}, [ cx, className, value, size ] );
+		return cx( styles.borderBoxControlVisualizer( value ), className );
+	}, [ cx, className, value ] );
 
 	return { ...otherProps, className: classes, value };
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { contents as icon } from '@wordpress/icons';
+import { tabPanel as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

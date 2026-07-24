@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/playlist-track",
 	"title": "Playlist track",
 	"category": "media",
@@ -9,7 +8,7 @@
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
-	"usesContext": [ "showArtists", "currentTrack" ],
+	"usesContext": [ "showArtists", "showImages" ],
 	"attributes": {
 		"blob": {
 			"type": "string",
@@ -17,9 +16,6 @@
 		},
 		"id": {
 			"type": "number"
-		},
-		"uniqueId": {
-			"type": "string"
 		},
 		"src": {
 			"type": "string"
@@ -35,6 +31,9 @@
 			"type": "string"
 		},
 		"image": {
+			"type": "string"
+		},
+		"imageAlt": {
 			"type": "string"
 		},
 		"length": {

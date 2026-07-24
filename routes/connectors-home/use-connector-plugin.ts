@@ -1,15 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
 
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
+
+type ApplicationPasswordSettingValue = {
+	username: string;
+	password: string;
+};
+
+type ConnectorSettingValue = string | ApplicationPasswordSettingValue;
 
 interface UseConnectorPluginOptions {
 	file?: string;
@@ -30,11 +37,18 @@ interface UseConnectorPluginReturn {
 	isBusy: boolean;
 	isConnected: boolean;
 	currentApiKey: string;
+	currentUsername: string;
+	hasResolvedSettings: boolean;
 	keySource: ApiKeySource;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
 	removeApiKey: () => Promise< void >;
+	saveCredentials: ( credentials: {
+		username: string;
+		applicationPassword: string;
+	} ) => Promise< void >;
+	removeCredentials: () => Promise< void >;
 }
 
 export function useConnectorPlugin( {
@@ -63,32 +77,58 @@ export function useConnectorPlugin( {
 		derivedPluginStatus,
 		canManagePlugins,
 		currentApiKey,
+		currentUsername,
+		hasStoredCredentials,
+		hasResolvedSettings,
 		canInstallPlugins,
 	} = useSelect(
 		( select ) => {
 			const store = select( coreStore );
 			const siteSettings = store.getEntityRecord( 'root', 'site' ) as
-				| Record< string, string >
+				| Record<
+						string,
+						| string
+						| {
+								username?: string;
+								password?: string;
+						  }
+				  >
 				| undefined;
-			const apiKey = siteSettings?.[ settingName ] ?? '';
+			const settingValue = siteSettings?.[ settingName ];
+			const apiKey = typeof settingValue === 'string' ? settingValue : '';
+			const credentials =
+				typeof settingValue === 'object' && settingValue !== null
+					? settingValue
+					: undefined;
+			const credentialsExist =
+				credentials !== undefined
+					? !! credentials.username && !! credentials.password
+					: !! apiKey;
+			const settingsResolved = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'site' ]
+			);
 
 			const canCreate = !! store.canUser( 'create', {
 				kind: 'root',
 				name: 'plugin',
 			} );
 
+			const common = {
+				currentApiKey: apiKey,
+				currentUsername: credentials?.username ?? '',
+				hasStoredCredentials: credentialsExist,
+				hasResolvedSettings: settingsResolved,
+				canInstallPlugins: canCreate,
+			};
+
 			if ( ! pluginFileFromServer ) {
-				const hasLoaded = store.hasFinishedResolution(
-					'getEntityRecord',
-					[ 'root', 'site' ]
-				);
 				return {
-					derivedPluginStatus: ( hasLoaded
+					...common,
+					derivedPluginStatus: ( settingsResolved
 						? 'active'
 						: 'checking' ) as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
-					currentApiKey: apiKey,
-					canInstallPlugins: canCreate,
 				};
 			}
 
@@ -105,22 +145,24 @@ export function useConnectorPlugin( {
 
 			if ( ! hasFinished ) {
 				return {
+					...common,
 					derivedPluginStatus: 'checking' as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
-					currentApiKey: apiKey,
-					canInstallPlugins: canCreate,
 				};
 			}
 
 			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
+				// Treat both single-site and network-active plugins as active.
+				const isPluginActive =
+					plugin.status === 'active' ||
+					plugin.status === 'network-active';
 				return {
-					derivedPluginStatus: ( plugin.status === 'active'
+					...common,
+					derivedPluginStatus: ( isPluginActive
 						? 'active'
 						: 'inactive' ) as PluginStatus,
 					canManagePlugins: true,
-					currentApiKey: apiKey,
-					canInstallPlugins: canCreate,
 				};
 			}
 
@@ -134,13 +176,18 @@ export function useConnectorPlugin( {
 				status = 'inactive';
 			}
 			return {
+				...common,
 				derivedPluginStatus: status,
 				canManagePlugins: false,
-				currentApiKey: apiKey,
-				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginBasename, settingName, isInstalled, isActivated ]
+		[
+			pluginFileFromServer,
+			pluginBasename,
+			settingName,
+			isInstalled,
+			isActivated,
+		]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -150,11 +197,63 @@ export function useConnectorPlugin( {
 
 	const isConnected =
 		( pluginStatus === 'active' && connectedState ) ||
-		// After install/activate, if settings re-fetch reveals an existing key,
+		// After install/activate, if settings re-fetch reveals stored credentials,
 		// update connected state (mirrors what the server would report on page load).
-		( pluginStatusOverride === 'active' && !! currentApiKey );
+		( pluginStatusOverride === 'active' && hasStoredCredentials );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
+	const saveConnectorSetting = ( value: ConnectorSettingValue ) =>
+		saveEntityRecord(
+			'root',
+			'site',
+			{ [ settingName ]: value },
+			{ throwOnError: true }
+		);
+
+	const createConnectedNotice = () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( '%s connected successfully.' ),
+				connectorName
+			),
+			{
+				id: 'connector-connect-success',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const createDisconnectedNotice = () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( '%s disconnected.' ),
+				connectorName
+			),
+			{
+				id: 'connector-disconnect-success',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const createDisconnectErrorNotice = () => {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( 'Failed to disconnect %s.' ),
+				connectorName
+			),
+			{
+				id: 'connector-disconnect-error',
+				type: 'snackbar',
+			}
+		);
+	};
 
 	const installPlugin = async () => {
 		if ( ! pluginSlug ) {
@@ -172,21 +271,28 @@ export function useConnectorPlugin( {
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s installed and activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-install-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to install plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-install-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -212,21 +318,28 @@ export function useConnectorPlugin( {
 			// Re-fetch settings since the activated plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-activate-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to activate plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-activate-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -276,12 +389,7 @@ export function useConnectorPlugin( {
 	const saveApiKey = async ( apiKey: string ) => {
 		const previousApiKey = currentApiKey;
 		try {
-			const updatedRecord = await saveEntityRecord(
-				'root',
-				'site',
-				{ [ settingName ]: apiKey },
-				{ throwOnError: true }
-			);
+			const updatedRecord = await saveConnectorSetting( apiKey );
 
 			// The server rejects invalid keys in two ways:
 			// 1. Returns the previous (unchanged) value
@@ -301,13 +409,7 @@ export function useConnectorPlugin( {
 			}
 
 			setConnectedState( true );
-			speak(
-				sprintf(
-					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
-					__( '%s connected successfully.' ),
-					connectorName
-				)
-			);
+			createConnectedNotice();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to save API key:', error );
@@ -317,35 +419,66 @@ export function useConnectorPlugin( {
 		}
 	};
 
+	const saveCredentials = async ( {
+		username,
+		applicationPassword,
+	}: {
+		username: string;
+		applicationPassword: string;
+	} ) => {
+		try {
+			const updatedRecord = await saveConnectorSetting( {
+				username,
+				password: applicationPassword,
+			} );
+			const record = updatedRecord as
+				| Record< string, { username?: string; password?: string } >
+				| undefined;
+			const credentials = record?.[ settingName ];
+			// The server sanitizes the username, so verify persistence rather
+			// than exact equality.
+			if ( ! credentials?.username || ! credentials?.password ) {
+				throw new Error(
+					__( 'It was not possible to save these credentials.' )
+				);
+			}
+
+			setConnectedState( true );
+			createConnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to save credentials:', error );
+			// The error is rendered with role="alert" in the UI,
+			// which already announces it to screen readers.
+			throw error;
+		}
+	};
+
 	const removeApiKey = async () => {
 		try {
-			await saveEntityRecord(
-				'root',
-				'site',
-				{ [ settingName ]: '' },
-				{ throwOnError: true }
-			);
+			await saveConnectorSetting( '' );
 			// Store auto-updates; currentApiKey reactively becomes ''.
 			setConnectedState( false );
-			speak(
-				sprintf(
-					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
-					__( '%s disconnected.' ),
-					connectorName
-				)
-			);
+			createDisconnectedNotice();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
-			speak(
-				sprintf(
-					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
-					__( 'Failed to disconnect %s.' ),
-					connectorName
-				),
-				'assertive'
-			);
-			throw error;
+			createDisconnectErrorNotice();
+		}
+	};
+
+	const removeCredentials = async () => {
+		try {
+			await saveConnectorSetting( {
+				username: '',
+				password: '',
+			} );
+			setConnectedState( false );
+			createDisconnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to remove credentials:', error );
+			createDisconnectErrorNotice();
 		}
 	};
 
@@ -358,10 +491,14 @@ export function useConnectorPlugin( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		currentUsername,
+		hasResolvedSettings,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
 		saveApiKey,
 		removeApiKey,
+		saveCredentials,
+		removeCredentials,
 	};
 }

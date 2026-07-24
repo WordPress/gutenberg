@@ -29,9 +29,3 @@ function Example() {
 **Type**: `string`,`E`
 
 Render the component as another React Component or HTML Element.
-
-### css
-
-**Type**: `InterpolatedCSS`
-
-Render custom CSS using the style system.

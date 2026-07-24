@@ -13,7 +13,17 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+import type {
+	ObjectData,
+	RecordHandlers,
+	SyncUndoManager,
+	SyncUndoStackState,
+} from './types';
+
+type UndoMetaHandlers = Pick<
+	RecordHandlers,
+	'addUndoMeta' | 'onUndoStackChange' | 'restoreUndoMeta'
+>;
 
 interface StackItemEvent {
 	stackItem: { meta: Map< any, any > };
@@ -30,6 +40,7 @@ interface StackItemEvent {
  * without conflicts.
  */
 export function createUndoManager(): SyncUndoManager {
+	const undoMetaHandlers = new Map< Y.Doc, UndoMetaHandlers >();
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures after 500ms of inactivity.
 		// 500 was selected from subjective local UX testing, shorter timeouts
@@ -38,6 +49,47 @@ export function createUndoManager(): SyncUndoManager {
 		// Ensure that we only scope the undo/redo to the current editor.
 		// The yjs document's clientID is added once it's available.
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
+	} );
+
+	const getUndoStackState = (): SyncUndoStackState => ( {
+		hasRedo: yUndoManager.canRedo(),
+		hasUndo: yUndoManager.canUndo(),
+	} );
+
+	const notifyUndoStackChange = ( ydoc: Y.Doc ): void => {
+		undoMetaHandlers
+			.get( ydoc )
+			?.onUndoStackChange?.( getUndoStackState() );
+	};
+
+	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+		const handlers = undoMetaHandlers.get( event.ydoc );
+		if ( ! handlers ) {
+			return;
+		}
+
+		handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
+		notifyUndoStackChange( event.ydoc );
+	} );
+
+	yUndoManager.on( 'stack-item-updated', ( event: StackItemEvent ) => {
+		notifyUndoStackChange( event.ydoc );
+	} );
+
+	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+		const handlers = undoMetaHandlers.get( event.ydoc );
+		if ( ! handlers ) {
+			return;
+		}
+
+		handlers.restoreUndoMeta( event.ydoc, event.stackItem.meta );
+		notifyUndoStackChange( event.ydoc );
+	} );
+
+	yUndoManager.on( 'stack-cleared', () => {
+		undoMetaHandlers.forEach( ( handlers ) => {
+			handlers.onUndoStackChange?.( getUndoStackState() );
+		} );
 	} );
 
 	return {
@@ -60,15 +112,13 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
-		 * @param                handlers
-		 * @param                handlers.addUndoMeta
-		 * @param                handlers.restoreUndoMeta
+		 * @param {Y.Map< any >} ymap                       The Yjs map to add to the scope.
+		 * @param                handlers                   Handlers for the scoped document.
+		 * @param                handlers.addUndoMeta       Handler to add metadata to undo items.
+		 * @param                handlers.onUndoStackChange Handler for undo stack changes.
+		 * @param                handlers.restoreUndoMeta   Handler to restore metadata from undo items.
 		 */
-		addToScope(
-			ymap: Y.Map< any >,
-			handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
-		): void {
+		addToScope( ymap: Y.Map< any >, handlers: UndoMetaHandlers ): void {
 			if ( ymap.doc === null ) {
 				// Necessary for a type check, but this shouldn't happen.
 				return;
@@ -77,15 +127,10 @@ export function createUndoManager(): SyncUndoManager {
 			const ydoc = ymap.doc;
 			yUndoManager.addToScope( ymap );
 
-			const { addUndoMeta, restoreUndoMeta } = handlers;
-
-			yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-				addUndoMeta( ydoc, event.stackItem.meta );
-			} );
-
-			yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-				restoreUndoMeta( ydoc, event.stackItem.meta );
-			} );
+			if ( ! undoMetaHandlers.has( ydoc ) ) {
+				ydoc.on( 'destroy', () => undoMetaHandlers.delete( ydoc ) );
+			}
+			undoMetaHandlers.set( ydoc, handlers );
 		},
 
 		/**

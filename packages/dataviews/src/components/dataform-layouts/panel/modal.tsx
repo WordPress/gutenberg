@@ -197,7 +197,7 @@ function PanelModal< Item >( {
 				touched={ touched }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
-				aria-expanded={ isOpen }
+				isOpen={ isOpen }
 			/>
 			{ isOpen && (
 				<ModalContent

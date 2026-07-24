@@ -9,7 +9,6 @@ import { useRef } from '@wordpress/element';
 import Button from '../button';
 import type { WordPressComponentProps } from '../context';
 import type { FormFileUploadProps } from './types';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 /**
  * FormFileUpload allows users to select files from their local device.
@@ -19,7 +18,6 @@ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
  *
  * const MyFormFileUpload = () => (
  *   <FormFileUpload
- *     __next40pxDefaultSize
  *     accept="image/*"
  *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
  *   >
@@ -35,6 +33,7 @@ export function FormFileUpload( {
 	onChange,
 	onClick,
 	render,
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	...props
 }: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
 	const ref = useRef< HTMLInputElement >( null );
@@ -42,21 +41,10 @@ export function FormFileUpload( {
 		ref.current?.click();
 	};
 
-	if ( ! render ) {
-		maybeWarnDeprecated36pxSize( {
-			componentName: 'FormFileUpload',
-			__next40pxDefaultSize: props.__next40pxDefaultSize,
-			// @ts-expect-error - We don't "officially" support all Button props but this likely happens.
-			size: props.size,
-		} );
-	}
-
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
-		// Disable reason: the parent component already takes care of the `__next40pxDefaultSize` prop.
-		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-		<Button onClick={ openFileDialog } { ...props }>
+		<Button onClick={ openFileDialog } __next40pxDefaultSize { ...props }>
 			{ children }
 		</Button>
 	);

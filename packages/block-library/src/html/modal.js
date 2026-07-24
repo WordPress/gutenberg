@@ -26,12 +26,7 @@ import { parseContent, serializeContent } from './utils';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-export default function HTMLEditModal( {
-	isOpen,
-	onRequestClose,
-	content,
-	setAttributes,
-} ) {
+export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 	// Parse content into separate sections and use as initial state
 	const { html, css, js } = parseContent( content );
 	const [ editedHtml, setEditedHtml ] = useState( html );
@@ -54,20 +49,16 @@ export default function HTMLEditModal( {
 	const hasRestrictedContent =
 		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
 	const handleUpdate = () => {
 		// For users without unfiltered_html capability, strip CSS and JS content
 		// to prevent kses from leaving broken content
-		setAttributes( {
-			content: serializeContent( {
+		onUpdate(
+			serializeContent( {
 				html: editedHtml,
 				css: canUserUseUnfilteredHTML ? editedCss : '',
 				js: canUserUseUnfilteredHTML ? editedJs : '',
-			} ),
-		} );
+			} )
+		);
 	};
 	const handleUpdateAndClose = () => {
 		handleUpdate();
@@ -153,6 +144,7 @@ export default function HTMLEditModal( {
 										placeholder={ __( 'Write HTML…' ) }
 										aria-label={ __( 'HTML' ) }
 										className="block-library-html__modal-editor"
+										async
 									/>
 								</Tabs.TabPanel>
 								{ canUserUseUnfilteredHTML && (
@@ -167,6 +159,7 @@ export default function HTMLEditModal( {
 											placeholder={ __( 'Write CSS…' ) }
 											aria-label={ __( 'CSS' ) }
 											className="block-library-html__modal-editor"
+											async
 										/>
 									</Tabs.TabPanel>
 								) }
@@ -184,6 +177,7 @@ export default function HTMLEditModal( {
 											) }
 											aria-label={ __( 'JavaScript' ) }
 											className="block-library-html__modal-editor"
+											async
 										/>
 									</Tabs.TabPanel>
 								) }

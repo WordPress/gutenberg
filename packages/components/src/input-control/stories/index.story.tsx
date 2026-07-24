@@ -31,7 +31,7 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onChange: fn(),
 		onValidate: fn(),
@@ -41,23 +41,22 @@ const meta: Meta< typeof InputControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
 export default meta;
 
 const Template: StoryFn< typeof InputControl > = ( args ) => (
-	<InputControl __next40pxDefaultSize { ...args } />
+	<InputControl { ...args } />
 );
 
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
-	__next40pxDefaultSize: true,
 };
 
 export const WithHelpText = Template.bind( {} );
@@ -128,7 +127,6 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
 	const [ visible, setVisible ] = useState( false );
 	return (
 		<InputControl
-			__next40pxDefaultSize
 			type={ visible ? 'text' : 'password' }
 			suffix={
 				<InputControlSuffixWrapper variant="control">

@@ -145,15 +145,13 @@ function useResourcePermissions< IdType = void >(
 		( resolve ) => {
 			const hasId = isEntity ? !! resource.id : !! id;
 			const { canUser } = resolve( coreStore );
-			const create = canUser(
-				'create',
-				isEntity
-					? { kind: resource.kind, name: resource.name }
-					: resource
-			);
+			const collectionResource = isEntity
+				? { kind: resource.kind, name: resource.name }
+				: resource;
+			const create = canUser( 'create', collectionResource );
 
 			if ( ! hasId ) {
-				const read = canUser( 'read', resource );
+				const read = canUser( 'read', collectionResource );
 
 				const isResolving = create.isResolving || read.isResolving;
 				const hasResolved = create.hasResolved && read.hasResolved;

@@ -87,7 +87,6 @@ const SlugEdit = ( {
 						</ExternalLink>
 					</VStack>
 					<InputControl
-						__next40pxDefaultSize
 						prefix={
 							<InputControlPrefixWrapper>
 								/

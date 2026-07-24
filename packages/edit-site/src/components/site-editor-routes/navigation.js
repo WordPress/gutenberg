@@ -1,29 +1,10 @@
 /**
- * WordPress dependencies
- */
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
  * Internal dependencies
  */
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
-import { unlock } from '../../lock-unlock';
 import { isThemeDataLoaded } from './utils';
-
-const { useLocation } = unlock( routerPrivateApis );
-
-function MobileNavigationView() {
-	const { query = {} } = useLocation();
-	const { canvas = 'view' } = query;
-
-	return canvas === 'edit' ? (
-		<Editor />
-	) : (
-		<SidebarNavigationScreenNavigationMenus backPath="/" />
-	);
-}
 
 export const navigationRoute = {
 	name: 'navigation',
@@ -43,12 +24,12 @@ export const navigationRoute = {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? <Editor /> : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}
 			return siteData.currentTheme.is_block_theme ? (
-				<MobileNavigationView />
+				<SidebarNavigationScreenNavigationMenus backPath="/" />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);

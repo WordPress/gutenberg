@@ -53,9 +53,7 @@ const colorPickerRegex = /Border color picker/;
 function TestBorderBoxControl(
 	restProps: ComponentProps< typeof BorderBoxControl >
 ) {
-	return (
-		<BorderBoxControl __next40pxDefaultSize { ...props } { ...restProps } />
-	);
+	return <BorderBoxControl { ...props } { ...restProps } />;
 }
 
 describe( 'BorderBoxControl', () => {

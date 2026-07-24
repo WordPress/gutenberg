@@ -52,15 +52,9 @@ Default.args = {
 	defaultChecked: 'option2',
 	children: (
 		<>
-			<Radio __next40pxDefaultSize value="option1">
-				Option 1
-			</Radio>
-			<Radio __next40pxDefaultSize value="option2">
-				Option 2
-			</Radio>
-			<Radio __next40pxDefaultSize value="option3">
-				Option 3
-			</Radio>
+			<Radio value="option1">Option 1</Radio>
+			<Radio value="option2">Option 2</Radio>
+			<Radio value="option3">Option 3</Radio>
 		</>
 	),
 };

@@ -146,6 +146,11 @@ const UnforwardedPopover = (
 		getAnchorRect,
 		isAlternate,
 
+		// `onKeyDown` is forwarded to `useDialog` so the consumer's handler
+		// is merged with the close-on-Escape one (rather than being silently
+		// overridden by the spread of `dialogProps` further below).
+		onKeyDown,
+
 		// Rest
 		...contentProps
 	} = useContextSystem( props, 'Popover' );
@@ -279,6 +284,28 @@ const UnforwardedPopover = (
 				) {
 					return;
 				}
+				// Treat focus moves involving portaled descendants as
+				// internal: either the next focus target is in the
+				// `@wordpress/ui` compat overlay slot, or focus is back
+				// inside this popover by the time we evaluate (e.g. when
+				// a portaled overlay is dismissed and synchronously
+				// restores focus to its trigger).
+				// See https://github.com/WordPress/gutenberg/issues/78406.
+				const relatedTarget =
+					'relatedTarget' in event ? event.relatedTarget : null;
+				if (
+					relatedTarget instanceof Element &&
+					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
+				) {
+					return;
+				}
+				if (
+					floatingElement &&
+					ownerDocument?.activeElement instanceof Element &&
+					floatingElement.contains( ownerDocument.activeElement )
+				) {
+					return;
+				}
 				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
 					onFocusOutside( event );
@@ -295,6 +322,7 @@ const UnforwardedPopover = (
 	const [ dialogRef, dialogProps ] = useDialog( {
 		constrainTabbing,
 		focusOnMount,
+		onKeyDown,
 		__unstableOnClose: onDialogClose,
 		// @ts-expect-error The __unstableOnClose property needs to be deprecated first (see https://github.com/WordPress/gutenberg/pull/27675)
 		onClose: onDialogClose,

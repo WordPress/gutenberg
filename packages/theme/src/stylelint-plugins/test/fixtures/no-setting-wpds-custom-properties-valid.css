@@ -1,7 +1,7 @@
 /* Valid: Using wpds tokens as values is allowed */
 .example {
-	color: var(--wpds-color-fg-content-neutral);
-	background-color: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	background-color: var(--wpds-color-background-surface-neutral);
 }
 
 /* Valid: Setting non-wpds custom properties is allowed */

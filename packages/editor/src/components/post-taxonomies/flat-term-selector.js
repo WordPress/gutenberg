@@ -3,11 +3,8 @@
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import {
-	FormTokenField,
-	withFilters,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
@@ -90,7 +87,10 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds?.join( ',' ),
+				// Sort ids so reordering alone doesn't produce a new query key and re-fetch.
+				include: _termIds?.length
+					? [ ..._termIds ].sort( ( a, b ) => a - b ).join( ',' )
+					: undefined,
 				per_page: -1,
 			};
 
@@ -209,6 +209,7 @@ export function FlatTermSelector( { slug } ) {
 		// Optimistically update term values.
 		// The selector will always re-fetch terms later.
 		setValues( uniqueTerms );
+		setSearch( '' );
 
 		if ( newTermNames.length === 0 ) {
 			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
@@ -280,9 +281,8 @@ export function FlatTermSelector( { slug } ) {
 	);
 
 	return (
-		<VStack spacing={ 4 }>
+		<Stack direction="column" gap="lg">
 			<FormTokenField
-				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }
@@ -296,7 +296,7 @@ export function FlatTermSelector( { slug } ) {
 				} }
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
-		</VStack>
+		</Stack>
 	);
 }
 

@@ -29,7 +29,10 @@ import {
 	FiltersToggle,
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
-import { DataViewsPickerFooter } from '../components/dataviews-picker-footer';
+import {
+	DataViewsPickerFooter,
+	DataViewsPickerBulkActionToolbar,
+} from '../components/dataviews-picker-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
@@ -62,7 +65,7 @@ type DataViewsPickerProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
@@ -71,12 +74,17 @@ type DataViewsPickerProps< Item > = {
 	};
 	itemListLabel?: string;
 	empty?: ReactNode;
+	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_PICKER_LAYOUTS: SupportedLayouts = {
+	pickerGrid: true,
+	pickerTable: true,
+};
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
@@ -132,13 +140,14 @@ function DataViewsPicker< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_PICKER_LAYOUTS,
 	selection,
 	onChangeSelection,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	itemListLabel,
 	empty,
+	onReset,
 }: DataViewsPickerProps< Item > ) {
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
 	const { data: displayData, setVisibleEntries } = useData( {
@@ -198,17 +207,20 @@ function DataViewsPicker< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Filter out DataViewsPicker layouts.
+	// Filter out non-picker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsPickerLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);
@@ -243,6 +255,7 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
+				onReset,
 				hasInitiallyLoaded: true,
 				intersectionObserver,
 			} }
@@ -256,10 +269,16 @@ function DataViewsPicker< Item >( {
 	);
 }
 
+/**
+ * `DataViewsPicker` renders a dataset allowing users to select one or multiple
+ * items. It shares the layouts, search, and filtering of `DataViews` but is
+ * geared toward choosing items rather than managing them.
+ */
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
-		BulkActionToolbar: typeof DataViewsPickerFooter;
+		BulkActionToolbar: typeof DataViewsPickerBulkActionToolbar;
+		Footer: typeof DataViewsPickerFooter;
 		Filters: typeof Filters;
 		FiltersToggled: typeof FiltersToggled;
 		FiltersToggle: typeof FiltersToggle;
@@ -270,7 +289,9 @@ const DataViewsPickerSubComponents =
 		ViewConfig: typeof DataviewsViewConfigDropdown;
 	};
 
-DataViewsPickerSubComponents.BulkActionToolbar = DataViewsPickerFooter;
+DataViewsPickerSubComponents.BulkActionToolbar =
+	DataViewsPickerBulkActionToolbar;
+DataViewsPickerSubComponents.Footer = DataViewsPickerFooter;
 DataViewsPickerSubComponents.Filters = Filters;
 DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;

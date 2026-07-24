@@ -13,6 +13,7 @@ function MediaList( {
 	mediaList,
 	category,
 	onClick,
+	onDetach,
 	label = __( 'Media List' ),
 } ) {
 	return (
@@ -27,6 +28,7 @@ function MediaList( {
 					media={ media }
 					category={ category }
 					onClick={ onClick }
+					onDetach={ onDetach }
 				/>
 			) ) }
 		</Composite>

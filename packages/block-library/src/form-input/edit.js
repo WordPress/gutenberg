@@ -102,7 +102,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					autoComplete="off"
 					label={ __( 'Name' ) }
 					value={ name }
@@ -117,7 +116,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 				/>
 				{ 'hidden' === type && (
 					<TextControl
-						__next40pxDefaultSize
 						autoComplete="off"
 						label={ __( 'Value' ) }
 						value={ value }

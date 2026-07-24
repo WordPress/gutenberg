@@ -28,7 +28,9 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 			} )
 			.filter( { hasText: 'Dummy text' } );
 
-		await expect( dummyParagraph ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( dummyParagraph ) )
+			.toBe( true );
 
 		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
 		await page.keyboard.press( 'Control+`' );

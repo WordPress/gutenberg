@@ -76,7 +76,6 @@ const GradientTypePicker = ( {
 	);
 
 	if ( type === 'linear-gradient' && gradientAST.orientation ) {
-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		lastLinearOrientationAngle.current = Number(
 			gradientAST.orientation.value
 		);
@@ -121,7 +120,6 @@ const GradientTypePicker = ( {
 			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
-			size="__unstable-large"
 			value={ hasGradient ? type : undefined }
 		/>
 	);

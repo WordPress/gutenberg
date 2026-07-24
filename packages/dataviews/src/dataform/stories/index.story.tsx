@@ -13,6 +13,7 @@ import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataForm',
 	component: DataForm,
 };

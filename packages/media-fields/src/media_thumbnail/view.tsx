@@ -11,7 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { useState, useRef, useLayoutEffect } from '@wordpress/element';
 import type { Attachment } from '@wordpress/core-data';
@@ -91,7 +91,7 @@ function FallbackView( {
 				className="dataviews-media-field__media-thumbnail__stack"
 				spacing={ 0 }
 			>
-				<Icon
+				<WCIcon
 					className="dataviews-media-field__media-thumbnail--icon"
 					icon={ getMediaTypeFromMimeType( item.mime_type ).icon }
 					size={ 24 }

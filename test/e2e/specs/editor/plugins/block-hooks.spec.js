@@ -45,6 +45,7 @@ test.describe( 'Block Hooks API', () => {
 	].forEach( ( { name, postType, blockType, createMethod } ) => {
 		test.describe( `Hooked blocks in ${ name } (blocks)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -185,6 +186,7 @@ test.describe( 'Block Hooks API', () => {
 
 		test.describe( `Hooked blocks in ${ name } (classic)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -308,6 +310,7 @@ test.describe( 'Block Hooks API', () => {
 
 	test.describe( 'Hooked blocks in Navigation Menu', () => {
 		let postObject, containerPost;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			postObject = await requestUtils.createNavigationMenu( {
 				title: 'Navigation Menu',

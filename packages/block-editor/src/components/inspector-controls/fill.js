@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-import { useEffect, useContext } from '@wordpress/element';
+import { useEffect, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,10 +19,13 @@ import {
 	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
+import {
+	scopeResetAllFilterToState,
+	useBlockStyleState,
+} from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
-const TEMPLATE_PART_GROUPS = [ 'default', 'settings', 'advanced' ];
 
 export default function InspectorControlsFill( {
 	children,
@@ -52,17 +55,16 @@ export default function InspectorControlsFill( {
 
 	// During pattern editing:
 	// - All blocks can show pattern editing groups (content, list).
-	// - Template parts can show a settings tab (default, settings, advanced groups).
+	// - Template parts can show any inspector group.
 	// - Other blocks cannot show a settings tab.
 	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
-		// Template parts are allowed to show a settings tab to allow access to the
-		// 'Design' and 'Advanced' panels.
+		// Template parts have also historically supported
+		// any block inspector groups for extenders. The settings
+		// tab is also used by core for the 'Design' panel. Specifically
+		// for that block the restrictions on allowed groups are lessened.
 		const isTemplatePart = context.name === 'core/template-part';
-		const isTemplatePartGroup = TEMPLATE_PART_GROUPS.includes( group );
 		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
-
-		const canShowGroup =
-			( isTemplatePart && isTemplatePartGroup ) || isPatternEditingGroup;
+		const canShowGroup = isTemplatePart || isPatternEditingGroup;
 
 		if ( ! canShowGroup ) {
 			return null;
@@ -117,18 +119,27 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
+	const selectedState = useBlockStyleState();
+	const scopedResetAllFilter = useMemo(
+		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
+		[ resetAllFilter, selectedState ]
+	);
 	useEffect( () => {
 		if (
-			resetAllFilter &&
+			scopedResetAllFilter &&
 			registerResetAllFilter &&
 			deregisterResetAllFilter
 		) {
-			registerResetAllFilter( resetAllFilter );
+			registerResetAllFilter( scopedResetAllFilter );
 			return () => {
-				deregisterResetAllFilter( resetAllFilter );
+				deregisterResetAllFilter( scopedResetAllFilter );
 			};
 		}
-	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	}, [
+		scopedResetAllFilter,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+	] );
 	return children;
 }
 

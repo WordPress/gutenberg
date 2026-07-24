@@ -30,10 +30,10 @@ const toolsPanelGrid = {
 	},
 };
 
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 export const ToolsPanel = ( columns: number ) => css`
 	${ toolsPanelGrid.columns( columns ) }
 	${ toolsPanelGrid.spacing }
-
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
@@ -62,6 +62,22 @@ export const ToolsPanelHiddenInnerWrapper = css`
 	}
 `;
 
+export function getToolsPanelStyles( {
+	columns,
+	hasInnerWrapper,
+	areAllOptionalControlsHidden,
+}: {
+	columns: number;
+	hasInnerWrapper: boolean;
+	areAllOptionalControlsHidden: boolean;
+} ) {
+	return css(
+		ToolsPanel( columns ),
+		hasInnerWrapper && ToolsPanelWithInnerWrapper( columns ),
+		areAllOptionalControlsHidden && ToolsPanelHiddenInnerWrapper
+	);
+}
+
 export const ToolsPanelHeader = css`
 	${ toolsPanelGrid.item.fullWidth }
 	gap: ${ space( 2 ) };
@@ -85,7 +101,7 @@ export const ToolsPanelHeader = css`
 
 export const ToolsPanelHeading = css`
 	font-size: inherit;
-	font-weight: ${ CONFIG.fontWeightMedium };
+	font-weight: ${ CONFIG.fontWeightEmphasis };
 	line-height: normal;
 
 	/* Required to meet specificity requirements to ensure zero margin */
@@ -136,7 +152,7 @@ export const DropdownMenu = css`
 export const ResetLabel = styled.span`
 	color: ${ COLORS.theme.accentDarker10 };
 	font-size: 11px;
-	font-weight: ${ CONFIG.fontWeightMedium };
+	font-weight: ${ CONFIG.fontWeightEmphasis };
 	line-height: 1.4;
 	${ rtl( { marginLeft: space( 3 ) } ) }
 	text-transform: uppercase;

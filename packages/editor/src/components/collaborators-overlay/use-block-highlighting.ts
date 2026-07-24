@@ -3,7 +3,7 @@
  */
 import {
 	privateApis as coreDataPrivateApis,
-	SelectionType,
+	type CoreDataPrivateApis,
 	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -14,10 +14,17 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
-import { useDebouncedRecompute } from './use-debounced-recompute';
+import {
+	useDebouncedRecompute,
+	useRequestAnimationFrameRecompute,
+} from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
+	CoreDataPrivateApis,
+	'SelectionType'
+>;
 
 export interface BlockHighlightData {
 	blockId: string;
@@ -48,6 +55,7 @@ export function useBlockHighlighting(
 ): {
 	highlights: BlockHighlightData[];
 	rerenderHighlightsAfterDelay: () => () => void;
+	rerenderHighlightsOnResize: () => void;
 } {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
 	const userStates: ActiveCollaborator[] = useActiveCollaborators(
@@ -66,6 +74,10 @@ export function useBlockHighlighting(
 	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
 	const [ recomputeToken, rerenderHighlightsAfterDelay ] =
 		useDebouncedRecompute( delayMs );
+	// Separate token for resize events: fires on the next animation frame so
+	// getBoundingClientRect() reflects the post-resize layout immediately.
+	const [ resizeToken, rerenderHighlightsOnResize ] =
+		useRequestAnimationFrameRecompute();
 
 	// All DOM mutations and position computations live inside useEffect.
 	useEffect( () => {
@@ -202,10 +214,15 @@ export function useBlockHighlighting(
 		blockEditorDocument,
 		overlayElement,
 		recomputeToken,
+		resizeToken,
 		resolveSelection,
 	] );
 
-	return { highlights, rerenderHighlightsAfterDelay };
+	return {
+		highlights,
+		rerenderHighlightsAfterDelay,
+		rerenderHighlightsOnResize,
+	};
 }
 
 const getBlockElementById = (
