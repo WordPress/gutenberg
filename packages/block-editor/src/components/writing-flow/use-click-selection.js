@@ -13,8 +13,12 @@ import { getBlockClientId } from '../../utils/dom';
 
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { isSelectionEnabled, getBlockSelectionStart, hasMultiSelection } =
-		useSelect( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		getBlockSelectionStart,
+		getSelectionStart,
+		hasMultiSelection,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
@@ -31,7 +35,17 @@ export default function useClickSelection() {
 					// When selecting a single block in a document by holding the shift key,
 					// don't mark this action as multiselection.
 					if ( startClientId && startClientId !== clickedClientId ) {
-						setContentEditableWrapper( node, true );
+						// When the selected block has no text selection
+						// within it (e.g. an image or spacer), there is no
+						// native selection for the wrapper to adopt when it
+						// is focused, so Safari inserts a caret at the start
+						// of the wrapper and asynchronously reveals it,
+						// scrolling a scrolled-down viewport back up, which
+						// `preventScroll` does not cover. Leave focus alone
+						// in that case: the click moves it.
+						setContentEditableWrapper( node, true, {
+							focus: !! getSelectionStart().attributeKey,
+						} );
 					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
@@ -54,6 +68,7 @@ export default function useClickSelection() {
 			selectBlock,
 			isSelectionEnabled,
 			getBlockSelectionStart,
+			getSelectionStart,
 			hasMultiSelection,
 		]
 	);
