@@ -53,7 +53,7 @@ function LibraryFontVariant( {
 				/>
 				<label htmlFor={ checkboxId }>
 					<FontDemo
-						font={ face }
+						font={ { ...face, preview: undefined } }
 						text={ displayName }
 						onClick={ handleToggleActivation }
 					/>

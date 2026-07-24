@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getNewIndexFromPresets } from '../utils';
+import { getFontFaceVariantName } from '../font-library/utils';
 
 const validPresets = {
 	single: [ { slug: 'preset-1' } ],
@@ -55,5 +56,37 @@ describe( 'getNewIndexFromPresets', () => {
 				expect( newIndex ).toBe( 1 );
 			} );
 		} );
+	} );
+} );
+
+describe( 'getFontFaceVariantName', () => {
+	it( 'uses the start of a variable weight range and explicit style', () => {
+		expect(
+			getFontFaceVariantName( {
+				fontFamily: 'Afacad',
+				fontStyle: 'normal',
+				fontWeight: '400 700',
+			} )
+		).toBe( '400 Normal' );
+	} );
+
+	it( 'includes normal style for static weights', () => {
+		expect(
+			getFontFaceVariantName( {
+				fontFamily: 'Afacad',
+				fontStyle: 'normal',
+				fontWeight: '600',
+			} )
+		).toBe( '600 Normal' );
+	} );
+
+	it( 'keeps numeric normal weight instead of semantic duplicated names', () => {
+		expect(
+			getFontFaceVariantName( {
+				fontFamily: 'AR One Sans',
+				fontStyle: 'normal',
+				fontWeight: '400',
+			} )
+		).toBe( '400 Normal' );
 	} );
 } );
