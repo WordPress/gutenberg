@@ -19,6 +19,8 @@ import path from 'node:path';
 import assert from 'node:assert';
 import jsYaml from 'js-yaml';
 
+/** @typedef {import('storybook/internal/types').ComponentManifest} StorybookComponentManifest */
+
 const MANIFEST_PATH = process.argv[ 2 ];
 assert( MANIFEST_PATH, 'Usage: generate-manifest-snapshot.mjs <manifestPath>' );
 
@@ -42,22 +44,15 @@ const ALLOWLIST_PATH = path.join(
  */
 
 /**
- * A component's extracted metadata in the manifest.
+ * A component or subcomponent in the manifest. Based on Storybook's
+ * `ComponentManifest`, adding the `reactComponentMeta` docgen output that
+ * Storybook writes but does not type, and typing `subcomponents` recursively
+ * (Storybook types them as a narrower shape without props).
  *
- * @typedef WPReactComponentMeta
- *
- * @property {Record<string,WPPropInfo>} [props] The component's props by name.
- */
-
-/**
- * A component or subcomponent in the manifest.
- *
- * @typedef WPManifestNode
- *
- * @property {string}                        name                 The component name.
- * @property {string}                        [description]        Its description.
- * @property {WPReactComponentMeta}          [reactComponentMeta] Extracted metadata.
- * @property {Record<string,WPManifestNode>} [subcomponents]      Subcomponents by name.
+ * @typedef {Omit<StorybookComponentManifest, 'subcomponents'> & {
+ *   reactComponentMeta?: { props?: Record<string,WPPropInfo> },
+ *   subcomponents?: Record<string,WPManifestNode>,
+ * }} WPManifestNode
  */
 
 /**
