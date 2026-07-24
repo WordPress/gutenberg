@@ -914,8 +914,6 @@ export function getClosestAllowedInsertionPointForPattern(
 	pattern,
 	clientId
 ) {
-	const { allowedBlockTypes } = getSettings( state );
-
 	// A synced pattern is inserted as a `core/block` reference rather than its
 	// parsed grammar. The wrapper block — not the pattern's inner blocks —
 	// therefore determines whether the pattern can be inserted. Checking the
@@ -930,6 +928,7 @@ export function getClosestAllowedInsertionPointForPattern(
 		return getClosestAllowedInsertionPoint( state, 'core/block', clientId );
 	}
 
+	const { allowedBlockTypes } = getSettings( state );
 	const isAllowed = checkAllowListRecursive(
 		getGrammar( pattern ),
 		allowedBlockTypes

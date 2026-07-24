@@ -33,7 +33,9 @@ import {
 	getClosestAllowedInsertionPointForPattern,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
-import { store } from '../';
+// Import for its side effect: registers the block-editor store so the registry
+// selectors used below (e.g. canInsertBlockType) resolve.
+import '../';
 import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
@@ -2623,8 +2625,7 @@ describe( 'private selectors', () => {
 			const pattern = {
 				type: 'theme',
 				syncStatus: 'unsynced',
-				content:
-					'<!-- wp:paragraph --><p>hi</p><!-- /wp:paragraph -->',
+				content: '<!-- wp:paragraph --><p>hi</p><!-- /wp:paragraph -->',
 			};
 			expect(
 				getClosestAllowedInsertionPointForPattern( state, pattern, '' )
