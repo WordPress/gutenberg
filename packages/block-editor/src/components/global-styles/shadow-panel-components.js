@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
-	FlexItem,
+	FlexBlock,
 	Dropdown,
 	Composite,
 } from '@wordpress/components';
@@ -20,7 +20,7 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
  */
 import clsx from 'clsx';
 
-import { Tooltip } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -197,22 +197,25 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 							icon={ shadowIcon }
 							size={ 24 }
 						/>
-						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
+						<FlexBlock className="block-editor-global-styles__shadow-editor__label">
+							{ __( 'Drop shadow' ) }
+						</FlexBlock>
 					</HStack>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceOverrideIndicator className="block-editor-global-styles__shadow-editor__remove-button" />
-					) : (
+				<Stack className="block-editor-global-styles__shadow-editor__actions">
+					{ hasLocalValue && (
 						<Button
-							__next40pxDefaultSize
 							size="small"
 							icon={ reset }
 							label={ __( 'Remove' ) }
 							className="block-editor-global-styles__shadow-editor__remove-button"
 							onClick={ handleReset }
 						/>
-					) ) }
+					) }
+					{ hasLocalOverride && (
+						<InheritanceOverrideIndicator className="block-editor-global-styles__shadow-editor__inheritance-override-indicator" />
+					) }
+				</Stack>
 			</>
 		);
 	};

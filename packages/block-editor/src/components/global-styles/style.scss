@@ -56,19 +56,42 @@
 	}
 }
 
-.block-editor-global-styles__shadow-editor__remove-button {
+// The actions row overlays the inline end, so the label reserves one slot
+// per button in it.
+.block-editor-global-styles__shadow-dropdown-toggle {
+
+	// A single action: the hover-revealed remove button.
+	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(1)) {
+		padding-right: $grid-unit + $button-size-small;
+	}
+
+	// Two actions: the remove button plus the override indicator.
+	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(2)) {
+		padding-right: $grid-unit + ($button-size-small * 2);
+	}
+}
+
+.block-editor-global-styles__shadow-editor__label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: start;
+}
+
+.block-editor-global-styles__shadow-editor__actions {
 	position: absolute;
-	right: 0;
-	top: $grid-unit;
-	margin: auto $grid-unit auto;
+	right: $grid-unit;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.block-editor-global-styles__shadow-editor__remove-button {
 	opacity: 0;
 	@media not (prefers-reduced-motion) {
 		transition: opacity 0.1s ease-in-out;
 	}
 
-	.block-editor-global-styles__shadow-dropdown:hover &,
-	&:focus,
-	&:hover {
+	.block-editor-global-styles__shadow-dropdown:is(:hover, :focus-within) & {
 		opacity: 1;
 	}
 

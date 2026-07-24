@@ -39,11 +39,11 @@
 .global-styles-inheritance-indicator {
 	border-radius: 50% !important;
 
-	// Shadow and duotone: the indicator reuses each control's remove/reset
-	// slot, which is absolutely positioned and hover-revealed (`opacity: 0`).
-	// The indicator must stay visible, so re-assert placement and force
-	// `opacity: 1` (these compound selectors win on specificity).
-	&:is(.block-editor-global-styles__shadow-editor__remove-button, .block-editor-panel-duotone-settings__reset) {
+	// Duotone: the indicator reuses the control's reset slot, which is
+	// absolutely positioned and hover-revealed (`opacity: 0`). The indicator
+	// must stay visible, so re-assert placement and force `opacity: 1` (this
+	// compound selector wins on specificity).
+	&.block-editor-panel-duotone-settings__reset {
 		position: absolute;
 		justify-content: center;
 		inset-inline-end: $grid-unit;
