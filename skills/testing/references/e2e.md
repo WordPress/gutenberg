@@ -1,6 +1,6 @@
 # E2e tests: agent rules and routing
 
-Agent-specific guidance for Playwright e2e tests. Requires the wp-env test environment (see [SKILL.md](../SKILL.md)).
+Agent-specific guidance for Playwright e2e tests. They require the wp-env test environment: check `npm run wp-env-test status` first, and run `npm run wp-env-test start` only if it is not already running.
 
 ## Procedure for writing tests
 
@@ -13,7 +13,7 @@ Plan the test list with the author first — see "Plan the tests with the author
 ## Rules
 
 -   **Stay headless** (the default). Do not use `--headed`, `--ui`, or `--debug` — the human docs recommend them, but they open a GUI and block an agent session.
--   **Run a scoped subset** (`npm run test:e2e -- <path_to_test_file.spec.js>`); the full suite is slow.
+-   **Run a scoped subset** (`npm run test:e2e -- <path_to_test_file.spec.js>`), scoped to the specs affected by the change. The full suite takes a long time — if asked to run the e2e tests with no scope, confirm which specs matter before launching everything; when working unattended, scope to the affected areas and say so in your summary.
 
 ## Routing
 
