@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createBlock } from '@wordpress/blocks';
@@ -122,7 +122,9 @@ export default function useDynamicGallery( {
 	const sourceOrderby = dynamicContent?.args?.orderBy ?? DEFAULT_ORDERBY;
 	const sourceOrder = dynamicContent?.args?.order ?? DEFAULT_ORDER;
 
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Resolve the configured source to a media query. `null` (static mode, or an
 	// unresolvable source) short-circuits the select below so no request fires.
@@ -208,21 +210,34 @@ export default function useDynamicGallery( {
 	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
 	// on any gallery reachable here.
 	function enableDynamicMode() {
-		setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
-		replaceInnerBlocks( clientId, [] );
+		// Batch the attribute change and the inner-block reset into a single
+		// undo level: they're two halves of one mode switch, so one undo should
+		// revert both. Marking the second dispatch non-persistent stops it from
+		// opening a second undo level, which would otherwise leave the gallery
+		// in a half-switched state (dynamic source set, images still present).
+		registry.batch( () => {
+			setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [] );
+		} );
 	}
 
 	// "Pins" a dynamic gallery: materializes the currently-resolved media as
 	// real, editable image blocks and leaves dynamic mode.
 	function convertToStatic() {
-		// Build fresh blocks rather than reusing the preview's `dynamicImageBlocks`
-		// so the materialized inner blocks get their own client IDs, distinct from
-		// the (disabled) preview instances.
-		replaceInnerBlocks(
-			clientId,
-			buildImageBlocks( dynamicMedia, imageAttributes )
-		);
-		setAttributes( { dynamicContent: undefined } );
+		// Batch the inner-block materialization and the attribute change into a
+		// single undo level so one undo reverts the whole conversion (see
+		// `enableDynamicMode`). Build fresh blocks rather than reusing the
+		// preview's `dynamicImageBlocks` so the materialized inner blocks get
+		// their own client IDs, distinct from the (disabled) preview instances.
+		registry.batch( () => {
+			replaceInnerBlocks(
+				clientId,
+				buildImageBlocks( dynamicMedia, imageAttributes )
+			);
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { dynamicContent: undefined } );
+		} );
 	}
 
 	// Updates the source ordering within `dynamicContent.args`. Passing
