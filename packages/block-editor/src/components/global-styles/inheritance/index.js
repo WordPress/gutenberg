@@ -7,12 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	Button,
 	Rect,
 	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- The infotip pattern (an info trigger that reveals arbitrary content, accessible to touch and screen readers) requires the @wordpress/ui Popover per the design-system Tooltip usage guidelines.
-import { Popover, VisuallyHidden } from '@wordpress/ui';
+import { Tooltip } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -81,48 +81,9 @@ export function getInheritanceProps(
 }
 
 /**
- * The filled diamond drawn inside the override indicator. Meaning comes from the
- * shape plus the button's accessible name, not from color.
- *
- * @return {Element} The diamond.
- */
-function Diamond() {
-	return (
-		<SVG
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<Rect
-				x="7.75736"
-				y="12"
-				width="6"
-				height="6"
-				rx="1"
-				transform="rotate(-45 7.75736 12)"
-				fill="currentColor"
-			/>
-		</SVG>
-	);
-}
-
-/**
  * Renders the small filled diamond that marks a control holding a local override
- * of an inherited Global Styles value. Shared by `<InheritanceToolsPanelItem>`
- * (the standard controls) and the custom controls (color, shadow, duotone,
- * background image) that render it in their own slot.
- *
- * The diamond is an **infotip**, not a tooltip: its whole purpose is to reveal
- * the "Overrides inherited styles" explanation, so it uses `@wordpress/ui`
- * `Popover` with an `openOnHover` trigger rather than `Tooltip`. That makes the
- * content reachable by hover, keyboard focus, *and* tap — a tooltip would be
- * unavailable to touch and screen-reader users. See the infotip guidance in the
- * `@wordpress/ui` Tooltip usage guidelines.
- *
- * The indicator carries no reset action; clearing a local override relies on the
- * panel's existing reset options (e.g. the `ToolsPanel` options menu via
- * `onDeselect`).
+ * of an inherited Global Styles value. It carries no action — resetting is done
+ * through the `ToolsPanel` options menu.
  *
  * @param {Object} props
  * @param {string} [props.className] Optional className for slot positioning
@@ -132,29 +93,49 @@ function Diamond() {
  */
 export function InheritanceOverrideIndicator( { className } ) {
 	return (
-		<Popover.Root>
-			<Popover.Trigger
-				openOnHover
-				delay={ 200 }
-				closeDelay={ 200 }
-				aria-label={ OVERRIDE_INDICATOR_LABEL }
-				className={ clsx(
-					'global-styles-inheritance-indicator',
-					className
-				) }
-			>
-				<Diamond />
-			</Popover.Trigger>
-			<Popover.Popup className="global-styles-inheritance-indicator__infotip">
-				<Popover.Arrow />
-				<VisuallyHidden render={ <Popover.Title /> }>
-					{ OVERRIDE_INDICATOR_LABEL }
-				</VisuallyHidden>
-				<Popover.Description>
-					{ OVERRIDE_INDICATOR_LABEL }
-				</Popover.Description>
-			</Popover.Popup>
-		</Popover.Root>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					// Intentionally small (16×16) control; exempt from the
+					// 40px default-size enforcement rule.
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					<Button
+						__next40pxDefaultSize={ false }
+						aria-label={ OVERRIDE_INDICATOR_LABEL }
+						className={ clsx(
+							'global-styles-inheritance-indicator',
+							className
+						) }
+						onClick={ ( event ) => {
+							// The button exists only to host the tooltip, so a
+							// click does nothing. Prevent it from reaching any
+							// wrapping `<label htmlFor>` association (which would
+							// otherwise focus/activate the control).
+							event.preventDefault();
+							event.stopPropagation();
+						} }
+					>
+						<SVG
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<Rect
+								x="7.75736"
+								y="12"
+								width="6"
+								height="6"
+								rx="1"
+								transform="rotate(-45 7.75736 12)"
+								fill="currentColor"
+							/>
+						</SVG>
+					</Button>
+				}
+			/>
+			<Tooltip.Popup>{ OVERRIDE_INDICATOR_LABEL }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
