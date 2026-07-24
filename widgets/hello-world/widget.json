@@ -4,5 +4,5 @@
 	"description": "A minimal example widget.",
 	"category": "demo",
 	"presentation": "full-bleed",
-	"textdomain": "default"
+	"textdomain": "gutenberg"
 }

@@ -4,5 +4,5 @@
 	"description": "Shows preview of the site homepage.",
 	"category": "dashboard",
 	"presentation": "full-bleed",
-	"textdomain": "default"
+	"textdomain": "gutenberg"
 }

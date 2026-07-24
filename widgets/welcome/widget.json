@@ -4,5 +4,5 @@
 	"description": "Displays a welcome panel to introduce users to WordPress.",
 	"category": "dashboard",
 	"presentation": "full-bleed",
-	"textdomain": "default"
+	"textdomain": "gutenberg"
 }
