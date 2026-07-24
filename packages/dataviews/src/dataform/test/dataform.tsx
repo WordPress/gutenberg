@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -772,6 +772,59 @@ describe( 'DataForm component', () => {
 			expect(
 				await screen.findByText( 'Constraints not satisfied' )
 			).toBeVisible();
+		} );
+	} );
+
+	describe( 'in details mode', () => {
+		const fieldsWithRequiredTitle = fields.map( ( field ) =>
+			field.id === 'title'
+				? { ...field, isValid: { required: true } }
+				: field
+		);
+
+		const formDetailsMode = {
+			layout: { type: 'details' as const },
+			fields: [
+				{
+					id: 'moreDetails',
+					label: 'More details',
+					children: [ 'title', 'order' ],
+				},
+			],
+		};
+
+		it( 'should show errors for invalid fields once focus leaves it', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formDetailsMode }
+						data={ { ...data, title: '' } }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Expand the disclosure so its fields, and any error they show,
+			// are visible.
+			await user.click( screen.getByText( 'More details' ) );
+			await waitFor( () =>
+				expect( fieldsSelector.order.edit() ).toBeVisible()
+			);
+			await user.click( fieldsSelector.order.edit() );
+
+			// Leave by keyboard: a click would re-assign focus afterwards and
+			// mask a focus steal.
+			await user.tab();
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			).toHaveFocus();
 		} );
 	} );
 } );
