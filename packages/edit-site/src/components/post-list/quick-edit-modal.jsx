@@ -32,15 +32,14 @@ function withBulkSummary( field ) {
 		return field;
 	}
 	const Summary = field.render;
-	return {
-		...field,
-		render: ( props ) =>
-			keys.some( ( key ) => key in props.item ) ? (
-				<Summary { ...props } />
-			) : (
-				__( 'No change' )
-			),
-	};
+	const BulkSummary = ( props ) =>
+		keys.some( ( key ) => key in props.item ) ? (
+			<Summary { ...props } />
+		) : (
+			__( 'No change' )
+		);
+	BulkSummary.displayName = `BulkSummary(${ field.id })`;
+	return { ...field, render: BulkSummary };
 }
 
 export function QuickEditModal( {
