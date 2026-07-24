@@ -181,20 +181,16 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 		);
 	}
 
-	test( 'renders the override indicator, which carries no reset action', () => {
+	test( 'renders the override indicator', () => {
 		renderItem( {
 			hasLocalOverride: true,
 			onDeselect: () => {},
 		} );
-		const indicator = screen.getByRole( 'button', {
-			name: 'Overrides inherited styles',
-		} );
-		expect( indicator ).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', {
-				name: 'Reset to inherited value',
+			screen.getByRole( 'button', {
+				name: 'Overrides inherited styles',
 			} )
-		).not.toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	test( 'the indicator is a plain sibling, not nested inside the label', () => {

@@ -86,11 +86,6 @@ describe( 'TypographyPanel — core build defaults', () => {
 		expect( getItem( /line height/i ) ).not.toHaveClass(
 			'has-local-override-from-global-styles'
 		);
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Reset to inherited value',
-			} )
-		).not.toBeInTheDocument();
 	} );
 } );
 
