@@ -24,15 +24,18 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 	icon?: IconProps[ 'icon' ] | null;
 
 	/**
-	 * The content to be rendered inside the notice.
+	 * The content to be rendered inside the notice. Compose with `Title`,
+	 * `Description`, `Actions`, and `CloseIcon`.
 	 */
 	children?: ReactNode;
 
 	/**
-	 * The message to be announced to screen readers. Defaults to the children content.
-	 * Used by the `speak()` function from `@wordpress/a11y`.
+	 * The message announced to screen readers via `speak()` from `@wordpress/a11y`.
+	 *
+	 * Defaults to the combined `Title` and `Description` text. Provide an
+	 * explicit string when the announcement should differ from the visible copy.
 	 */
-	spokenMessage?: ReactNode;
+	spokenMessage?: string;
 
 	/**
 	 * The politeness level for screen reader announcements.
@@ -44,15 +47,21 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 export interface TitleProps extends ComponentProps< 'span' > {
 	/**
 	 * The title text of the notice.
+	 *
+	 * For screen reader accessibility, this should only contain plain text,
+	 * and no semantics such as links. Put links in `Notice.ActionLink`.
 	 */
-	children?: ReactNode;
+	children?: string;
 }
 
 export interface DescriptionProps extends ComponentProps< 'span' > {
 	/**
 	 * The description text of the notice.
+	 *
+	 * For screen reader accessibility, this should only contain plain text,
+	 * and no semantics such as links. Put links in `Notice.ActionLink`.
 	 */
-	children?: ReactNode;
+	children?: string;
 }
 
 export interface ActionsProps extends ComponentProps< 'div' > {

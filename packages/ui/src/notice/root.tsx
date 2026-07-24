@@ -1,10 +1,17 @@
 import { speak } from '@wordpress/a11y';
-import { forwardRef, renderToString, useEffect } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { info, published, error, caution } from '@wordpress/icons';
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
 import { Icon } from '../icon';
 import resetStyles from '../utils/css/resets.module.css';
+import { NoticeContext } from './context';
 import type { NoticeIntent, RootProps } from './types';
 import type { IconProps } from '../icon/types';
 import styles from './style.module.css';
@@ -26,39 +33,26 @@ function getDefaultPoliteness( intent: NoticeIntent ): 'polite' | 'assertive' {
 }
 
 /**
- * Safely converts a message to a string for screen reader announcement.
- * Returns undefined if the message can't be safely serialized.
+ * Builds the default spoken message from registered title and description text.
  */
-function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
-	if ( ! message ) {
-		return undefined;
-	}
-	if ( typeof message === 'string' ) {
-		return message;
-	}
-	try {
-		return renderToString( message );
-	} catch {
-		// If renderToString fails (e.g., due to complex components like Tooltip),
-		// return undefined and skip the announcement
-		return undefined;
-	}
-}
+const getDefaultSpokenMessage = (
+	title: string | undefined,
+	description: string | undefined
+): string | undefined =>
+	[ title, description ].filter( Boolean ).join( '. ' ) || undefined;
 
 /**
  * Custom hook which announces the message with the given politeness.
  */
 function useSpokenMessage(
-	message: RootProps[ 'spokenMessage' ],
+	message: string | undefined,
 	politeness: 'polite' | 'assertive'
 ) {
-	const spokenMessage = safeRenderToString( message );
-
 	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, politeness );
+		if ( message ) {
+			speak( message, politeness );
 		}
-	}, [ spokenMessage, politeness ] );
+	}, [ message, politeness ] );
 }
 
 /**
@@ -86,16 +80,36 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		intent = 'neutral',
 		children,
 		icon,
-		spokenMessage = children,
+		spokenMessage,
 		politeness = getDefaultPoliteness( intent ),
 		render,
 		...restProps
 	},
 	ref
 ) {
+	const [ title, setTitleState ] = useState< string | undefined >();
+	const [ description, setDescriptionState ] = useState<
+		string | undefined
+	>();
+
+	const setTitle = useCallback( ( value: string | undefined ) => {
+		setTitleState( value );
+	}, [] );
+	const setDescription = useCallback( ( value: string | undefined ) => {
+		setDescriptionState( value );
+	}, [] );
+
+	const contextValue = useMemo(
+		() => ( { setTitle, setDescription } ),
+		[ setTitle, setDescription ]
+	);
+
+	const resolvedSpokenMessage =
+		spokenMessage ?? getDefaultSpokenMessage( title, description );
+
 	// Announce to screen readers via speak() API - no role attribute needed
 	// as it would cause double announcements
-	useSpokenMessage( spokenMessage, politeness );
+	useSpokenMessage( resolvedSpokenMessage, politeness );
 
 	const iconElement = icon === null ? null : icon ?? icons[ intent ];
 
@@ -128,5 +142,9 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		),
 	} );
 
-	return element;
+	return (
+		<NoticeContext.Provider value={ contextValue }>
+			{ element }
+		</NoticeContext.Provider>
+	);
 } );

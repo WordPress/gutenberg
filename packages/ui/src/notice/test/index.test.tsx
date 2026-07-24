@@ -202,5 +202,65 @@ describe( 'Notice', () => {
 				} )
 			).toBeInTheDocument();
 		} );
+
+		it( 'announces the combined title and description by default', () => {
+			render(
+				<Notice.Root intent="info">
+					<Notice.Title>Update available</Notice.Title>
+					<Notice.Description>
+						A new version is ready to install.
+					</Notice.Description>
+				</Notice.Root>
+			);
+			expect(
+				screen.getByText(
+					'Update available. A new version is ready to install.',
+					{ selector: '[aria-live="polite"]' }
+				)
+			).toBeInTheDocument();
+		} );
+
+		it( 'announces an explicit spokenMessage instead of title and description', () => {
+			render(
+				<Notice.Root intent="info" spokenMessage="Custom announcement">
+					<Notice.Title>Update available</Notice.Title>
+					<Notice.Description>
+						A new version is ready to install.
+					</Notice.Description>
+				</Notice.Root>
+			);
+			expect(
+				screen.getByText( 'Custom announcement', {
+					selector: '[aria-live="polite"]',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByText(
+					'Update available. A new version is ready to install.',
+					{ selector: '[aria-live="polite"]' }
+				)
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'does not include action labels in the default announcement', () => {
+			render(
+				<Notice.Root intent="info">
+					<Notice.Description>Notice with actions</Notice.Description>
+					<Notice.Actions>
+						<Notice.ActionButton>Retry</Notice.ActionButton>
+					</Notice.Actions>
+				</Notice.Root>
+			);
+			expect(
+				screen.getByText( 'Notice with actions', {
+					selector: '[aria-live="polite"]',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByText( /Retry/, {
+					selector: '[aria-live="polite"]',
+				} )
+			).not.toBeInTheDocument();
+		} );
 	} );
 } );
