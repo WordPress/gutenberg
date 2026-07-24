@@ -43,9 +43,45 @@ export default function useClickSelection() {
 						// scrolling a scrolled-down viewport back up, which
 						// `preventScroll` does not cover. Leave focus alone
 						// in that case: the click moves it.
+						const { clientId, attributeKey } = getSelectionStart();
 						setContentEditableWrapper( node, true, {
-							focus: !! getSelectionStart().attributeKey,
+							focus: !! attributeKey,
 						} );
+
+						// The browser extends the selection from the native
+						// anchor. When a block is selected without a text
+						// selection within it, there is no native anchor,
+						// and browsers synthesize one at the nearest text
+						// instead, excluding the block itself. Give the
+						// browser the right anchor before it acts on the
+						// click: the near edge of the selected block, so the
+						// whole block ends up within the extended selection.
+						const { ownerDocument } = node;
+						const selection =
+							ownerDocument.defaultView.getSelection();
+						const blockElement =
+							! attributeKey &&
+							ownerDocument.getElementById(
+								`block-${ clientId }`
+							);
+
+						if (
+							blockElement &&
+							! (
+								selection.anchorNode &&
+								blockElement.contains( selection.anchorNode )
+							)
+						) {
+							const isForward =
+								// eslint-disable-next-line no-bitwise
+								blockElement.compareDocumentPosition(
+									event.target
+								) & node.DOCUMENT_POSITION_FOLLOWING;
+							selection.setPosition(
+								blockElement,
+								isForward ? 0 : blockElement.childNodes.length
+							);
+						}
 					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
