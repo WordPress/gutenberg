@@ -131,6 +131,36 @@ class Theme_JSON_Dark_Scheme_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '--wp--preset--color--secondary', $result['dark'] );
 	}
 
+	public function test_dark_overrides_respond_to_data_scheme_attribute() {
+		$result = $this->get_variables_split(
+			array(
+				'palette' => array(
+					array(
+						'slug'  => 'base',
+						'name'  => 'Base',
+						'color' => '#ffffff',
+					),
+				),
+				'dark'    => array(
+					'palette' => array(
+						array(
+							'slug'  => 'base',
+							'name'  => 'Base',
+							'color' => '#111111',
+						),
+					),
+				),
+			)
+		);
+
+		// Automatic dark (OS) applies unless the visitor opted out to light.
+		$this->assertStringContainsString( ':root:not([data-scheme="light"])', $result['full'] );
+		// An explicit dark choice forces the dark values regardless of OS.
+		$this->assertStringContainsString( ':root[data-scheme="dark"]', $result['full'] );
+		// Both scheme-scoped rules carry the dark value.
+		$this->assertStringContainsString( '#111111', $result['dark'] );
+	}
+
 	public function test_no_dark_key_emits_no_gate_and_is_unchanged() {
 		$base_only = array(
 			'palette' => array(

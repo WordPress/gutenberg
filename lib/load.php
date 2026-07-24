@@ -75,6 +75,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-7.1/color-scheme.php';
 	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 

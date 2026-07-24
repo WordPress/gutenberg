@@ -2528,19 +2528,47 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			/*
-			 * Emit theme-authored dark-scheme preset overrides (palette, gradients)
-			 * under a `prefers-color-scheme: dark` gate. Because these override the
-			 * existing `--wp--preset--*` custom properties, any value referencing a
-			 * preset flips automatically. The gate is authored so a future opt-out
-			 * layer (a root `data-scheme` attribute) can be layered on top.
+			 * Emit theme-authored dark-scheme preset overrides (palette, gradients).
+			 * Because these override the existing `--wp--preset--*` custom properties,
+			 * any value referencing a preset flips automatically.
+			 *
+			 * The overrides respond to a root `data-scheme` attribute so a visitor
+			 * control can override the automatic behavior:
+			 *   - no attribute / `system`: follow the OS via `prefers-color-scheme`,
+			 *   - `light`: never apply the dark values (opt out),
+			 *   - `dark`: always apply the dark values.
 			 */
 			$dark_declarations = static::compute_dark_preset_vars( $node );
 			if ( ! empty( $dark_declarations ) ) {
-				$stylesheet .= '@media (prefers-color-scheme: dark){' . static::to_ruleset( $selector, $dark_declarations ) . '}';
+				$auto_selector   = static::get_scheme_scoped_selector( $selector, ':not([data-scheme="light"])' );
+				$forced_selector = static::get_scheme_scoped_selector( $selector, '[data-scheme="dark"]' );
+				$stylesheet     .= '@media (prefers-color-scheme: dark){' . static::to_ruleset( $auto_selector, $dark_declarations ) . '}';
+				$stylesheet     .= static::to_ruleset( $forced_selector, $dark_declarations );
 			}
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Attaches a `data-scheme` condition to the root element of a selector so
+	 * dark-scheme overrides can respond to a visitor's chosen color scheme.
+	 *
+	 * The `data-scheme` attribute lives on the root (`<html>`) element, so the
+	 * condition is inserted directly after the leading `:root` token. Selectors
+	 * that do not start with `:root` are scoped under an `html` root carrying the
+	 * condition.
+	 *
+	 * @param string $selector  The base selector (e.g. `:root` or `:root :where(...)`).
+	 * @param string $condition The attribute condition (e.g. `[data-scheme="dark"]`).
+	 * @return string The scheme-scoped selector.
+	 */
+	protected static function get_scheme_scoped_selector( $selector, $condition ) {
+		$root = static::ROOT_CSS_PROPERTIES_SELECTOR; // ':root'.
+		if ( 0 === strpos( $selector, $root ) ) {
+			return $root . $condition . substr( $selector, strlen( $root ) );
+		}
+		return 'html' . $condition . ' ' . $selector;
 	}
 
 	/**

@@ -20,6 +20,27 @@ non-preset color values is changed.
 Presets are matched by `slug`. A base preset with no dark counterpart keeps its
 single value in both schemes.
 
+## Overriding the automatic scheme (`data-scheme`)
+
+The dark overrides respond to a `data-scheme` attribute on the root (`<html>`)
+element, so a visitor's choice can override the operating system:
+
+| `data-scheme` | Behavior |
+| --- | --- |
+| _absent_ or `system` | Follow the OS via `prefers-color-scheme` (the default). |
+| `light` | Never apply the dark values — stay light even if the OS is dark. |
+| `dark` | Always apply the dark values, regardless of the OS. |
+
+The preference is persisted in `localStorage` under the `wp-color-scheme` key and
+applied to the root element **before first paint** by a small inline bootstrap
+script, so a saved choice never flashes the wrong scheme on load. The bootstrap is
+only emitted on the front end when the active theme provides a dark scheme.
+
+> A visitor-facing **toggle block** that writes this preference is added in a
+> follow-up change. Until then you can exercise the mechanism by setting
+> `localStorage.setItem( 'wp-color-scheme', 'dark' )` (or `'light'`) in the browser
+> console and reloading.
+
 ## Authoring source A — inline `settings.color.dark`
 
 ```json
@@ -88,8 +109,9 @@ its light scheme. A single `theme.json` works on old and new WordPress.
 
 ## Not covered (yet)
 
-- A visitor-facing toggle to override the automatic scheme, and a site-wide setting
-  to disable automatic switching. These are planned as a follow-up.
+- A visitor-facing toggle **block** that writes the `wp-color-scheme` preference,
+  and a site-wide setting to disable automatic switching. The `data-scheme` runtime
+  above is in place; the block UI is the next follow-up.
 - Dark duotone variants.
 - Automatic generation of dark values — the theme must define them; the system
   never derives colors automatically.
