@@ -1,0 +1,30 @@
+{
+	"name": "Write an e2e test for a specific behavior",
+	"skills": [ "testing" ],
+	"query": "Add an e2e test for the paragraph block that checks that the `&` key is not output as `&amp;` in the editor",
+	"expected_behavior": [
+		"Step 1: Read skills/testing/SKILL.md and skills/testing/references/e2e.md",
+		"Step 2: Read the End-to-End Testing guide (docs/contributors/code/e2e/README.md) before writing any test body",
+		"Step 3: Surface the proposed test names for review (in the summary when running unattended)",
+		"Step 4: Extend the existing paragraph spec rather than creating a parallel file"
+	],
+	"success_criteria": [
+		"The right guidance is consulted: both testing skill files and the e2e authoring guide, the guide before the first attempted edit",
+		"The unrelated references (Jest, PHP) are not read"
+	],
+	"timeoutSeconds": 900,
+	"assertions": {
+		"readsInclude": [
+			"skills/testing/SKILL.md",
+			"skills/testing/references/e2e.md",
+			"docs/contributors/code/e2e/README.md"
+		],
+		"readsExclude": [
+			"skills/testing/references/php.md",
+			"skills/testing/references/jest.md"
+		],
+		"readsBeforeWrite": [
+			{ "read": "docs/contributors/code/e2e/README.md" }
+		]
+	}
+}

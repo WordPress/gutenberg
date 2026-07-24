@@ -74,4 +74,5 @@ Walking through how the live testing skill applies these conventions:
 1. Confirm the public docs can't cover it — improve them first if they can.
 2. Create `skills/<domain>/SKILL.md` following the conventions above.
 3. Add a routing entry to the root `AGENTS.md`.
-4. Run `npm run lint:md:docs`.
+4. Add at least one eval scenario under `eval/scenarios/` (see [its README](https://github.com/WordPress/gutenberg/blob/trunk/eval/scenarios/README.md)) describing a task the skill covers and how to verify an agent followed it.
+5. Run `npm run lint:md:docs` and `node eval/harness/run.mjs`.

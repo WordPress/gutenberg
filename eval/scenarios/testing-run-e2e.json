@@ -1,0 +1,40 @@
+{
+	"name": "Run e2e tests for a specific block",
+	"skills": [ "testing" ],
+	"query": "Run the e2e tests for the paragraph block",
+	"expected_behavior": [
+		"Step 1: Read skills/testing/SKILL.md, then skills/testing/references/e2e.md (not the Jest or PHP references)",
+		"Step 2: Check npm run wp-env-test status before any wp-env-test start",
+		"Step 3: Run the paragraph spec scoped and headless"
+	],
+	"success_criteria": [
+		"Discovery chain root AGENTS.md → SKILL.md → e2e reference is followed before the first test command",
+		"Test run is scoped to a spec path and headless, with the environment checked first"
+	],
+	"timeoutSeconds": 1800,
+	"assertions": {
+		"readsInclude": [
+			"skills/testing/SKILL.md",
+			"skills/testing/references/e2e.md"
+		],
+		"readsExclude": [
+			"skills/testing/references/php.md",
+			"skills/testing/references/jest.md"
+		],
+		"readsBeforeCommand": [
+			{ "read": "skills/testing/SKILL.md", "command": "test:e2e" },
+			{
+				"read": "skills/testing/references/e2e.md",
+				"command": "test:e2e"
+			}
+		],
+		"commandOrder": [ [ "wp-env-test status", "wp-env-test start" ] ],
+		"commandRules": [
+			{
+				"matching": "test:e2e",
+				"mustContain": ".spec.js",
+				"mustNotContain": [ "--headed", "--ui", "--debug" ]
+			}
+		]
+	}
+}
