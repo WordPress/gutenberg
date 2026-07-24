@@ -28,7 +28,7 @@ function Example() {
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `PolymorphicAs`
  - Required: No
 
 The HTML element or React component to render the component as.
