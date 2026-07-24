@@ -32,6 +32,20 @@ describe( 'DateView', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
+	it( 'still renders a time for a date that is being cleared', () => {
+		// Quick Edit nulls the date when a scheduled post moves to another
+		// status, meaning "use the time it is saved at" — unlike an absent
+		// date, the current time is the right thing to show for it.
+		render(
+			<DateView
+				item={ { status: 'draft', date: null } as BasePost }
+				field={ {} as never }
+			/>
+		);
+
+		expect( screen.getByText( /^Modified:/ ) ).toBeVisible();
+	} );
+
 	it( 'labels a published post with its publish date', () => {
 		render(
 			<DateView
