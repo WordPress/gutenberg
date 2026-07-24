@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support Storybook 10.5 ref-based components manifests (`experimentalDocgenServer`) alongside the existing inline shape. List views read the index only; detail views resolve `$ref` payloads on demand.
+-   Drop package name from the components list output. Package and import information remain available from `get_component_details`.
+
 ## 0.15.0 (2026-10-20)
 
 ### Breaking Changes

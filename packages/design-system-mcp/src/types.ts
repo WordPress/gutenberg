@@ -1,13 +1,24 @@
 export interface ManifestComponent {
 	id: string;
 	name: string;
-	path: string;
+	/** Present on inline manifests; resolved from docgen payload for ref manifests. */
+	path?: string;
 	description?: string;
-	stories?: Array< {
-		name: string;
-		snippet?: string;
-		description?: string;
-	} >;
+	stories?:
+		| Array< {
+				name: string;
+				snippet?: string;
+				description?: string;
+		  } >
+		| Record<
+				string,
+				{
+					name: string;
+					snippet?: string;
+					description?: string;
+				}
+		  >
+		| { $ref: string };
 	reactComponentMeta?: {
 		description?: string;
 		displayName?: string;
@@ -22,12 +33,14 @@ export interface ManifestComponent {
 			}
 		>;
 	};
+	/** Ref-manifest index pointer into `services/core/docgen`. */
+	docgen?: { $ref: string };
 }
 
+/** List-view summary. Package is intentionally omitted; see detail. */
 export interface Component {
 	name: string;
 	description: string;
-	packageName: string;
 }
 
 export interface ComponentProp {
@@ -41,7 +54,7 @@ export interface ComponentProp {
 export interface ComponentDetail {
 	name: string;
 	description: string;
-	packageName: string;
+	packageName: string | null;
 	importStatement: string | null;
 	props: ComponentProp[];
 	stories: Array< {

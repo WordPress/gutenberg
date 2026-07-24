@@ -66,7 +66,6 @@
 		"playwright": "^1.63.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"react": "^19.3.0",
-		"react-docgen-typescript": "^2.4.0",
 		"react-dom": "^19.3.0",
 		"storybook": "^10.6.3",
 		"storybook-addon-tag-badges": "^3.1.0",
@@ -81,7 +80,7 @@
 	"scripts": {
 		"manifest-snapshot": "node ./scripts/generate-manifest-snapshot.mjs ./build/manifests/components.json",
 		"postmanifest-snapshot": "prettier --write components-manifest.yml",
-		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/sanitize-components-manifest.mjs ./build/manifests/components.json && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json",
+		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/sanitize-components-manifest.mjs ./build/manifests/components.json",
 		"storybook:dev": "storybook dev -c . -p 50240",
 		"test:smoke": "npm run test:smoke:build && vitest run --config vitest.config.mts",
 		"test:smoke:build": "node ./scripts/smoke-static-build.mjs",

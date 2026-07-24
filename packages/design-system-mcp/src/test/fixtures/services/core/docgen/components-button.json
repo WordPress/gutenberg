@@ -1,0 +1,20 @@
+{
+	"components": {
+		"components-button": {
+			"id": "components-button",
+			"name": "Button",
+			"path": "../packages/components/src/button/stories/index.story.tsx",
+			"description": "A button.",
+			"reactComponentMeta": {
+				"props": {
+					"variant": {
+						"required": false,
+						"type": { "name": "string" },
+						"description": "The variant.",
+						"defaultValue": null
+					}
+				}
+			}
+		}
+	}
+}
