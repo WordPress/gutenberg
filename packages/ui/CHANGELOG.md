@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Notice`: Constrain `Title` and `Description` children and `spokenMessage` to plain strings. The default screen reader announcement is now the combined title and description text, instead of serializing the full compound tree (which could include action labels and other controls) ([#80706](https://github.com/WordPress/gutenberg/pull/80706)).
+
 ### Enhancements
 
 -   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).
