@@ -75,4 +75,6 @@ Walking through how the live testing skill applies these conventions:
 2. Create `skills/<domain>/SKILL.md` following the conventions above.
 3. Add a routing entry to the root `AGENTS.md`.
 4. Add at least one eval scenario under `test/ai-development/scenarios/` (see [its README](https://github.com/WordPress/gutenberg/blob/trunk/test/ai-development/scenarios/README.md)) describing a task the skill covers and how to verify an agent followed it.
-5. Run `npm run lint:md:docs` and `node test/ai-development/run.mjs`.
+5. Run your scenario live and confirm it passes: `node test/ai-development/run.mjs --live --scenario <your-slug>`.
+6. Run the full suite to confirm nothing else regressed: `node test/ai-development/run.mjs --live` (the static sanity checks run first automatically).
+7. Once everything passes, run `npm run lint:md:docs`.
