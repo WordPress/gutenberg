@@ -413,11 +413,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const { getSelectionProps } = useSelectionProps( {
 		data,
 		getItemId,
+		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		isMultiSelect: false,
+		isMultiselect: false,
 		shouldSelectOnClick: true,
-		isItemSelectable: () => true,
 	} );
 
 	const generateCompositeItemIdPrefix = useCallback(

@@ -52,10 +52,10 @@ function ViewGrid< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
-		isMultiSelect: true,
-		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		isMultiselect: true,
 	} );
 	if ( ! hasData ) {
 		return (

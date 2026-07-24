@@ -171,8 +171,8 @@ export default function useSelectionProps< Item >( {
 	isItemSelectable,
 	selection,
 	onChangeSelection,
-	isMultiSelect: multiselect,
-	shouldSelectOnClick: selectOnClick,
+	isMultiselect,
+	shouldSelectOnClick,
 }: {
 	data: Item[];
 	getItemId: ( item: Item ) => string;
@@ -183,7 +183,7 @@ export default function useSelectionProps< Item >( {
 	// Whether the selection can hold more than one item. Enables the Shift+Click
 	// range gesture and makes modifier clicks add to the selection rather than
 	// replace it.
-	isMultiSelect: boolean;
+	isMultiselect: boolean;
 	// Whether a plain click selects (and anchors the range) rather than opening
 	// the item. When it does, the hook returns the `onClick` that performs it.
 	shouldSelectOnClick?: boolean;
@@ -223,7 +223,7 @@ export default function useSelectionProps< Item >( {
 	// A single-select view has no range to extend and no second item to add, so
 	// the modifier gestures have nothing to offer; plain clicks, when they
 	// select, are handled in `onClick` below.
-	const hasRangeGesture = hasSelectableItems && multiselect;
+	const hasRangeGesture = hasSelectableItems && isMultiselect;
 
 	const getSelectionProps = ( id: string ): SelectionProps => {
 		const isSelectable = selectableIdSet.has( id );
@@ -231,7 +231,7 @@ export default function useSelectionProps< Item >( {
 			// When a plain click selects, that click is also what anchors the
 			// range a following Shift+Click extends from. Modifier clicks never
 			// reach here: `onClickCapture` stops them.
-			...( selectOnClick && {
+			...( shouldSelectOnClick && {
 				onClick: () => {
 					if ( selection.includes( id ) ) {
 						onChangeSelection(
@@ -239,7 +239,7 @@ export default function useSelectionProps< Item >( {
 						);
 					} else {
 						onChangeSelection(
-							multiselect ? [ ...selection, id ] : [ id ]
+							isMultiselect ? [ ...selection, id ] : [ id ]
 						);
 					}
 					anchorTo( id );

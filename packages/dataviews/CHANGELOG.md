@@ -17,7 +17,7 @@
 
 ### Internal
 
--   DataViews: Model `useSelectionProps` with orthogonal semantic props (`isMultiSelect`, `shouldSelectOnClick`, and a caller-supplied `isItemSelectable`) instead of a picker-specific flag, and route the `list` layout's selection through the shared hook. No behavior change. [#00000](https://github.com/WordPress/gutenberg/pull/00000)
+-   DataViews: Model `useSelectionProps` with orthogonal semantic props (`isMultiselect`, `shouldSelectOnClick`, and a caller-supplied `isItemSelectable`) instead of a picker-specific flag, and route the `list` layout's selection through the shared hook. No behavior change. [#00000](https://github.com/WordPress/gutenberg/pull/00000)
 -   DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of document-level focus bookkeeping, and drop the field-owned `Popover.Slot` so format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 

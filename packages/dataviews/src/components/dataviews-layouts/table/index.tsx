@@ -292,10 +292,10 @@ function ViewTable< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
-		isMultiSelect: true,
-		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		isMultiselect: true,
 	} );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
