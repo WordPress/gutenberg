@@ -24,7 +24,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -227,10 +227,8 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
-							( hasLocalOverride ? (
-								<InheritanceOverrideIndicator className="block-editor-global-styles-background-panel__reset" />
-							) : (
+						<Stack className="block-editor-global-styles-background-panel__actions">
+							{ onReset && (
 								<Button
 									__next40pxDefaultSize
 									label={ __( 'Reset' ) }
@@ -247,7 +245,11 @@ function BackgroundControlsPanel( {
 										focusToggleButton( containerRef );
 									} }
 								/>
-							) ) }
+							) }
+							{ hasLocalOverride && (
+								<InheritanceOverrideIndicator className="block-editor-global-styles-background-panel__inheritance-override-indicator" />
+							) }
+						</Stack>
 					</>
 				);
 			} }
