@@ -17,6 +17,7 @@
 
 ### Internal
 
+-   Upgrade Storybook to 10.5.3 and remove a temporary `render` workaround from the DataViews story that is no longer needed ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 -   DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of document-level focus bookkeeping, and drop the field-owned `Popover.Slot` so format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 

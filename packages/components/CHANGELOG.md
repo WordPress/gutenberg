@@ -26,6 +26,7 @@
 
 ### Internal
 
+-   Upgrade Storybook to 10.5.3 and remove temporary `render` workarounds from `ColorPicker`, `Composite`, `Dropdown`, and `Navigator` stories that are no longer needed ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
 -   `SearchControl`: Migrate styles from Emotion to an SCSS Module ([#80474](https://github.com/WordPress/gutenberg/pull/80474)).

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade Storybook to 10.5.3 ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
+
 ## 0.3.0 (2026-07-14)
 
 ### Enhancements
