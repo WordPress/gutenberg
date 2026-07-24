@@ -49,6 +49,9 @@ jobs:
 
             # Fails when the generated snapshot or pruned allowlist differs from
             # what's committed, surfacing documentation changes for sign-off.
+            # This is similar to the "Check local changes" step of the static
+            # checks workflow, but the other workflow does not build Storybook,
+            # which is an expensive operation and only happens here.
             - name: Check manifest snapshot is up to date
               run: |
                   if ! git diff --exit-code -- storybook/components-manifest.yml storybook/prop-description-allowlist.json; then
