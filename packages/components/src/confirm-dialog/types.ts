@@ -19,6 +19,10 @@ export type ConfirmDialogProps = {
 	 */
 	children: ReactNode;
 	/**
+	 * Size of the underlying Modal. See `Modal`'s `size` prop.
+	 */
+	size?: ModalProps[ 'size' ];
+	/**
 	 * The callback that's called when the user confirms.
 	 * A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
 	 */

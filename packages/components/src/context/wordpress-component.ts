@@ -54,14 +54,26 @@ export type WordPressComponent<
 > = ( IsPolymorphic extends true
 	? {
 			/**
-			 * Polymorphic call signature. When `as` is provided, additional intrinsic
-			 * attributes are accepted via a flat attribute bag.
+			 * Intrinsic `as` (e.g. `as="label"`): accept a flat HTML/SVG attribute
+			 * bag instead of remapping to that tag's props.
 			 */
 			(
 				props: WordPressComponentProps< O, T, false > & {
-					/** The HTML element or React component to render the component as. */
-					as: PolymorphicAs;
+					/** The HTML element to render the component as. */
+					as: keyof React.JSX.IntrinsicElements;
 				} & Omit< PolymorphicIntrinsicProps, keyof O >
+			): React.ReactNode;
+			/**
+			 * Component `as` (e.g. `as={ Item }`): remap to that component's props.
+			 */
+			< C extends React.JSXElementConstructor< any > >(
+				props: WordPressComponentProps< O, T, false > & {
+					/** The React component to render the component as. */
+					as: C;
+				} & Omit<
+						React.ComponentPropsWithoutRef< C >,
+						'as' | keyof O | 'children'
+					>
 			): React.ReactNode;
 	  }
 	: unknown ) & {
