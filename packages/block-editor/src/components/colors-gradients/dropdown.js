@@ -10,7 +10,7 @@ import {
 	Button,
 	ColorIndicator,
 	Dropdown,
-	FlexItem,
+	FlexBlock,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -71,12 +71,12 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem
+		<FlexBlock
 			className="block-editor-panel-color-gradient-settings__color-name"
 			title={ label }
 		>
 			{ label }
-		</FlexItem>
+		</FlexBlock>
 	</HStack>
 );
 

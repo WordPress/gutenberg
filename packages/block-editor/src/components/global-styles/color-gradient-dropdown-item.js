@@ -12,11 +12,12 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	ColorIndicator,
 	Flex,
-	FlexItem,
+	FlexBlock,
 	Dropdown,
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
@@ -122,9 +123,9 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 				</Flex>
 			) ) }
 		</ZStack>
-		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
+		<FlexBlock className="block-editor-panel-color-gradient-settings__color-name">
 			{ label }
-		</FlexItem>
+		</FlexBlock>
 	</HStack>
 );
 
@@ -260,10 +261,8 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceOverrideIndicator className="block-editor-panel-color-gradient-settings__reset" />
-								) : (
+							<Stack className="block-editor-panel-color-gradient-settings__actions">
+								{ hasValue() && (
 									<Button
 										__next40pxDefaultSize
 										label={ __( 'Reset' ) }
@@ -278,23 +277,27 @@ export default function ColorGradientDropdownItem( {
 											colorGradientDropdownButtonRef.current?.focus();
 										} }
 									/>
-								) ) }
-							{ contrastWarning && (
-								// An icon-only warning that stays visible while a
-								// contrast warning is in effect. It is not a menu;
-								// activating it opens the color picker popover where
-								// the full warning notice is shown, so the indicator
-								// doubles as a shortcut to where the issue is fixed.
-								<Button
-									__next40pxDefaultSize
-									size="small"
-									icon={ cautionIcon }
-									label={ __( 'Low contrast' ) }
-									className="block-editor-panel-color-gradient-settings__contrast-warning"
-									aria-expanded={ isOpen }
-									onClick={ onToggle }
-								/>
-							) }
+								) }
+								{ hasValue() && hasLocalOverride && (
+									<InheritanceOverrideIndicator className="block-editor-panel-color-gradient-settings__inheritance-override-indicator" />
+								) }
+								{ contrastWarning && (
+									// An icon-only warning that stays visible while a
+									// contrast warning is in effect. It is not a menu;
+									// activating it opens the color picker popover where
+									// the full warning notice is shown, so the indicator
+									// doubles as a shortcut to where the issue is fixed.
+									<Button
+										__next40pxDefaultSize
+										size="small"
+										icon={ cautionIcon }
+										label={ __( 'Low contrast' ) }
+										className="block-editor-panel-color-gradient-settings__contrast-warning"
+										aria-expanded={ isOpen }
+										onClick={ onToggle }
+									/>
+								) }
+							</Stack>
 						</>
 					);
 				} }

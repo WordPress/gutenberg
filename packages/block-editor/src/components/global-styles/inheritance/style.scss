@@ -39,55 +39,18 @@
 .global-styles-inheritance-indicator {
 	border-radius: 50% !important;
 
-	// Color/gradient: sit in the toggle's reset slot, re-asserting the absolute
-	// placement the shared `position: relative` above would otherwise override.
-	&.block-editor-panel-color-gradient-settings__reset {
+	// Shadow, duotone and background image: the indicator reuses each control's
+	// remove/reset slot, which is absolutely positioned and hover-revealed
+	// (`opacity: 0`). The indicator must stay visible, so re-assert placement
+	// and force `opacity: 1` (these compound selectors win on specificity).
+	&:is(.block-editor-global-styles__shadow-editor__remove-button, .block-editor-panel-duotone-settings__reset, .block-editor-global-styles-background-panel__reset) {
 		position: absolute;
 		justify-content: center;
+		inset-inline-end: $grid-unit;
 		top: 50%;
 		transform: translateY(-50%);
 		margin-block: 0;
-		margin-inline-start: 0;
-		opacity: 1;
-	}
-
-	// Shadow control context: the indicator reuses the shadow remove-button
-	// slot, which is absolutely positioned and hover-revealed (`opacity: 0`).
-	// The indicator must stay visible, so re-assert placement and force
-	// `opacity: 1` (this compound selector wins on specificity).
-	&.block-editor-global-styles__shadow-editor__remove-button {
-		position: absolute;
-		justify-content: center;
-		inset-inline-end: 8px;
-		top: 50%;
-		transform: translateY(-50%);
-		margin-block: 0;
-		margin-inline-start: 0;
-		opacity: 1;
-	}
-
-	// Reuses the hover-revealed remove-button slot; keep the indicator placed
-	// and always visible.
-	&.block-editor-panel-duotone-settings__reset {
-		position: absolute;
-		justify-content: center;
-		inset-inline-end: 8px;
-		top: 50%;
-		transform: translateY(-50%);
-		margin-block: 0;
-		margin-inline-start: 0;
-		opacity: 1;
-	}
-
-	// Background image: reuses the hover-revealed reset slot; keep it placed
-	// and always visible.
-	&.block-editor-global-styles-background-panel__reset {
-		position: absolute;
-		justify-content: center;
-		top: 50%;
-		transform: translateY(-50%);
-		margin-block: 0;
-		margin-inline: 0 $grid-unit;
+		margin-inline: 0;
 		opacity: 1;
 	}
 }

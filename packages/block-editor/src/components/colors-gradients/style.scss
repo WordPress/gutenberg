@@ -128,19 +128,6 @@ $swatch-gap: 12px;
 			color: var(--wp-admin-theme-color);
 		}
 	}
-
-	.block-editor-panel-color-gradient-settings__color-name {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
-	}
-
-	// Reserve extra space for the always-visible contrast warning icon,
-	// which sits alongside the hover-revealed reset button.
-	> button.has-contrast-warning .block-editor-panel-color-gradient-settings__color-name {
-		max-width: calc(100% - ($button-size-next-default-40px + $button-size-small + $grid-unit));
-	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown {
@@ -151,11 +138,14 @@ $swatch-gap: 12px;
 	}
 }
 
-.block-editor-panel-color-gradient-settings__reset {
+.block-editor-panel-color-gradient-settings__actions {
 	position: absolute;
-	right: 0;
-	top: $grid-unit;
-	margin: auto $grid-unit auto;
+	right: $grid-unit;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.block-editor-panel-color-gradient-settings__reset {
 	opacity: 0;
 	@media not ( prefers-reduced-motion ) {
 		transition: opacity 0.1s ease-in-out;
@@ -165,9 +155,7 @@ $swatch-gap: 12px;
 		border-radius: $radius-small;
 	}
 
-	.block-editor-panel-color-gradient-settings__dropdown:hover + &,
-	&:focus,
-	&:hover {
+	.block-editor-color-gradient-item:is(:hover, :focus-within) & {
 		opacity: 1;
 	}
 
@@ -175,11 +163,31 @@ $swatch-gap: 12px;
 		// Show reset button on devices that do not support hover.
 		opacity: 1;
 	}
+}
 
-	// While a contrast warning is in effect the warning icon occupies the
-	// far-right slot, so the reset button shifts left to sit beside it.
-	.block-editor-panel-color-gradient-settings__dropdown.has-contrast-warning + & {
-		right: $button-size-small + $grid-unit-05;
+// The actions row overlays the toggle's inline end, so the label reserves one
+// slot per button in it.
+.block-editor-panel-color-gradient-settings__color-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	// A single action: the hover-revealed reset button, or a lone contrast
+	// warning when there is no value to reset.
+	.block-editor-panel-color-gradient-settings__dropdown:has(+ .block-editor-panel-color-gradient-settings__actions > :nth-child(1)) & {
+		max-width: calc(100% - ( $grid-unit-30 + $button-size-small));
+	}
+
+	// Two actions: the reset button plus either the override indicator or the
+	// contrast warning.
+	.block-editor-panel-color-gradient-settings__dropdown:has(+ .block-editor-panel-color-gradient-settings__actions > :nth-child(2)) & {
+		max-width: calc(100% - ( $grid-unit-30 + ($button-size-small * 2)));
+	}
+
+	// Three actions: the reset button, the override indicator and the contrast
+	// warning.
+	.block-editor-panel-color-gradient-settings__dropdown:has(+ .block-editor-panel-color-gradient-settings__actions > :nth-child(3)) & {
+		max-width: calc(100% - ( $grid-unit-30 + ($button-size-small * 3)));
 	}
 }
 
@@ -190,11 +198,6 @@ $swatch-gap: 12px;
 // warning notice lives), so it doubles as a shortcut to the fix. The
 // accessible name and hover/focus tooltip come from the button label.
 .block-editor-panel-color-gradient-settings__contrast-warning {
-	position: absolute;
-	right: 0;
-	top: $grid-unit;
-	margin: auto $grid-unit auto;
-
 	&.block-editor-panel-color-gradient-settings__contrast-warning {
 		border-radius: $radius-small;
 	}
