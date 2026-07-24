@@ -122,6 +122,15 @@ ruleTester.run( 'use-recommended-components', rule, {
 				},
 			],
 		},
+		{
+			code: "import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Theme } = unlock( privateApis );",
+			errors: [
+				{
+					message:
+						'Use `ThemeProvider` from `@wordpress/theme` instead.',
+				},
+			],
+		},
 	],
 } );
 
