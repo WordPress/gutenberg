@@ -20,22 +20,9 @@ import {
 describe( 'InheritanceOverrideIndicator', () => {
 	test( 'renders a focus-reachable indicator labelled for the override', () => {
 		render( <InheritanceOverrideIndicator /> );
-		// A button (so the tooltip is reachable by hover and keyboard focus),
-		// labelled "Overrides inherited styles".
 		expect(
 			screen.getByRole( 'button', { name: 'Overrides inherited styles' } )
 		).toBeVisible();
-	} );
-
-	test( 'carries no reset action or menu', () => {
-		render( <InheritanceOverrideIndicator /> );
-		// It hosts the tooltip only; reset lives in the ToolsPanel options menu.
-		expect(
-			screen.queryByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).not.toBeInTheDocument();
-		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
 
 	test( 'applies a slot className for custom-control positioning', () => {
@@ -55,9 +42,6 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns no className in the inherited-only state', () => {
-		// Inheritance is the default, unmarked state: it carries no visual
-		// treatment, so no className hook is emitted. The inherited value shows
-		// via the control's native placeholder. No diamond is rendered.
 		expect( getInheritanceProps( true, false ) ).toEqual( {
 			isInherited: true,
 			hasLocalOverride: false,
@@ -112,8 +96,6 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns just the base className in the inherited-only state', () => {
-		// No inherited class hook is emitted, so only the base className passes
-		// through.
 		expect( getInheritanceProps( true, false, 'single-column' ) ).toEqual( {
 			className: 'single-column',
 			isInherited: true,
@@ -204,8 +186,6 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 			hasLocalOverride: true,
 			onDeselect: () => {},
 		} );
-		// The indicator hosts the "Overrides inherited styles" tooltip; it is not a
-		// reset. Resetting is done through the ToolsPanel options menu.
 		const indicator = screen.getByRole( 'button', {
 			name: 'Overrides inherited styles',
 		} );

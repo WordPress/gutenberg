@@ -703,10 +703,8 @@ export default function BackgroundImagePanel( {
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
-	// The override indicator is part of the inherited-value treatment. When that
-	// treatment is disabled (e.g. in the Global Styles panel, where the edited
-	// value *is* the global style rather than a local override of it), fall back
-	// to the plain reset control.
+	// Gated on the inherited-value treatment: in the Global Styles panel the
+	// edited value *is* the global style, so there is no override to mark.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators &&
 		localHasImageValue &&
