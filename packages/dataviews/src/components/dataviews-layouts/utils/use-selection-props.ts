@@ -186,7 +186,7 @@ export default function useSelectionProps< Item >( {
 	isMultiselect: boolean;
 	// Whether a plain click selects (and anchors the range) rather than opening
 	// the item. When it does, the hook returns the `onClick` that performs it.
-	shouldSelectOnClick?: boolean;
+	shouldSelectOnClick: boolean;
 } ) {
 	// The Shift+Click range gesture in progress: the anchor ranges extend from
 	// — the last item whose selection was directly toggled — and the target of

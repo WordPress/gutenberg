@@ -296,6 +296,7 @@ function ViewTable< Item >( {
 		selection,
 		onChangeSelection,
 		isMultiselect: true,
+		shouldSelectOnClick: false,
 	} );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >

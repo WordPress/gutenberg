@@ -56,6 +56,7 @@ function ViewGrid< Item >( {
 		selection,
 		onChangeSelection,
 		isMultiselect: true,
+		shouldSelectOnClick: false,
 	} );
 	if ( ! hasData ) {
 		return (
