@@ -135,6 +135,7 @@ export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
 	// Only returned when a plain click selects (`shouldSelectOnClick`).
+	onClick?: ( event: React.MouseEvent ) => void;
 }
 
 // Encapsulates the pointer gestures for multi-selection, shared by layouts:
