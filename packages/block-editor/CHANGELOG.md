@@ -15,7 +15,7 @@
 ### Bug Fixes
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
--   Inserter: gate synced pattern insertion on the `core/block` reference that is actually inserted, so a synced pattern made up of otherwise-allowed blocks is no longer silently dropped (leaving only a misleading success notice) when `allowed_block_types_all` restricts the block list ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   Inserter: gate synced pattern insertion on the `core/block` reference that is actually inserted, so a synced pattern made up of otherwise-allowed blocks is no longer silently dropped (leaving only a misleading success notice) when `allowed_block_types_all` restricts the block list ([#80681](https://github.com/WordPress/gutenberg/pull/80681)).
 
 ## 16.0.0 (2026-07-14)
 
