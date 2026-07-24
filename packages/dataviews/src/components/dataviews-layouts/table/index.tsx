@@ -151,6 +151,11 @@ function TableRow< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
+	const {
+		width: titleWidth,
+		maxWidth: titleMaxWidth,
+		minWidth: titleMinWidth,
+	} = ( titleField?.id && view.layout?.styles?.[ titleField.id ] ) || {};
 
 	return (
 		<tr
@@ -222,15 +227,9 @@ function TableRow< Item >( {
 			{ hasPrimaryColumn && (
 				<td
 					style={ {
-						width:
-							titleField?.id &&
-							view.layout?.styles?.[ titleField.id ]?.width,
-						maxWidth:
-							titleField?.id &&
-							view.layout?.styles?.[ titleField.id ]?.maxWidth,
-						minWidth:
-							titleField?.id &&
-							view.layout?.styles?.[ titleField.id ]?.minWidth,
+						width: titleWidth,
+						maxWidth: titleMaxWidth,
+						minWidth: titleMinWidth,
 					} }
 				>
 					<ColumnPrimary
@@ -399,6 +398,11 @@ function ViewTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = view.fields ?? [];
+	const {
+		width: titleWidth,
+		maxWidth: titleMaxWidth,
+		minWidth: titleMinWidth,
+	} = ( titleField?.id && view.layout?.styles?.[ titleField.id ] ) || {};
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -503,18 +507,9 @@ function ViewTable< Item >( {
 							<th
 								scope="col"
 								style={ {
-									width:
-										titleField?.id &&
-										view.layout?.styles?.[ titleField.id ]
-											?.width,
-									maxWidth:
-										titleField?.id &&
-										view.layout?.styles?.[ titleField.id ]
-											?.maxWidth,
-									minWidth:
-										titleField?.id &&
-										view.layout?.styles?.[ titleField.id ]
-											?.minWidth,
+									width: titleWidth,
+									maxWidth: titleMaxWidth,
+									minWidth: titleMinWidth,
 								} }
 							>
 								{ titleField && (

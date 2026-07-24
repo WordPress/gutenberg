@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Apply width styles to titleField in table layout. [#69191](https://github.com/WordPress/gutenberg/pull/69191)
+
 ### Enhancements
 
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
