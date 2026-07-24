@@ -18,6 +18,7 @@
 ### Internal
 
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+-   Upgrade Storybook to 10.5.3 ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 
 ## 0.3.0 (2026-07-14)
 

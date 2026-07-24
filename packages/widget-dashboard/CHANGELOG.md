@@ -66,6 +66,7 @@
 ### Internal
 
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+-   Upgrade Storybook to 10.5.3 ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 -   Add a Storybook story reproducing the tile header with multiple
     high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Mark the default runtime module `import()` with `@vite-ignore` alongside
