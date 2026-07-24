@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `createInterpolateElement`: Return the original string instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).
+-   `createInterpolateElement`: Warn and return the original string instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).
 
 ## 8.3.0 (2026-07-14)
 

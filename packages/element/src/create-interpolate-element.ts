@@ -260,8 +260,12 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 			}
 
 			// A closing tag with no matching opening tag on the stack is
-			// invalid. Bail and return the string as-is.
+			// invalid. Warn and bail, returning the string as-is.
 			if ( 0 === stackDepth ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					`Unmatched closing tag '</${ name }>' found in string passed to createInterpolateElement. The string was returned without interpolation.`
+				);
 				addText();
 				return false;
 			}
