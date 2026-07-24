@@ -12,15 +12,7 @@ import {
 	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { Tooltip } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Accessible name / tooltip for the local-override indicator.
- *
- * @type {string}
- */
-const OVERRIDE_INDICATOR_LABEL = __( 'Overrides inherited styles' );
 
 /**
  * Whether the inspector surfaces inherited Global Styles values.
@@ -82,60 +74,42 @@ export function getInheritanceProps(
 
 /**
  * Renders the small filled diamond that marks a control holding a local override
- * of an inherited Global Styles value. It carries no action — resetting is done
- * through the `ToolsPanel` options menu.
+ * of an inherited Global Styles value.
  *
  * @param {Object} props
- * @param {string} [props.className] Optional className for slot positioning
- *                                   (color/shadow/duotone/background controls).
+ * @param {string} [props.className] Optional className for slot positioning.
  *
  * @return {Element} The override indicator.
  */
 export function InheritanceOverrideIndicator( { className } ) {
 	return (
-		<Tooltip.Root>
-			<Tooltip.Trigger
-				render={
-					// Intentionally small (16×16) control; exempt from the
-					// 40px default-size enforcement rule.
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-					<Button
-						__next40pxDefaultSize={ false }
-						aria-label={ OVERRIDE_INDICATOR_LABEL }
-						className={ clsx(
-							'global-styles-inheritance-indicator',
-							className
-						) }
-						onClick={ ( event ) => {
-							// The button exists only to host the tooltip, so a
-							// click does nothing. Prevent it from reaching any
-							// wrapping `<label htmlFor>` association (which would
-							// otherwise focus/activate the control).
-							event.preventDefault();
-							event.stopPropagation();
-						} }
-					>
-						<SVG
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<Rect
-								x="7.75736"
-								y="12"
-								width="6"
-								height="6"
-								rx="1"
-								transform="rotate(-45 7.75736 12)"
-								fill="currentColor"
-							/>
-						</SVG>
-					</Button>
-				}
-			/>
-			<Tooltip.Popup>{ OVERRIDE_INDICATOR_LABEL }</Tooltip.Popup>
-		</Tooltip.Root>
+		<Button
+			size="small"
+			label={ __( 'Overrides inherited styles' ) }
+			className={ clsx(
+				'global-styles-inheritance-indicator',
+				className
+			) }
+			icon={
+				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<Rect
+						x="7.75736"
+						y="12"
+						width="6"
+						height="6"
+						rx="1"
+						transform="rotate(-45 7.75736 12)"
+						fill="currentColor"
+					/>
+				</SVG>
+			}
+			onClick={ ( event ) => {
+				// The button exists only to host the tooltip, so a click does
+				// nothing.
+				event.preventDefault();
+				event.stopPropagation();
+			} }
+		/>
 	);
 }
 

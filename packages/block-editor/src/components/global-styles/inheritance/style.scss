@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 
 // Inherited Global Styles values — visual treatment for inspector controls.
 //
@@ -43,39 +42,9 @@
 }
 
 // The override indicator: a small, focus-reachable button hosting the filled
-// diamond SVG and the "Overrides inherited styles" tooltip. It carries no
-// action — reset lives in the ToolsPanel options menu.
+// diamond SVG and the "Overrides inherited styles" tooltip.
 .global-styles-inheritance-indicator {
-	display: inline-flex !important;
-	align-items: center;
-	justify-content: center;
-	vertical-align: middle;
-	position: relative;
-	margin-inline-start: 6px;
-
-	// Override the default IconButton chrome so the trigger appears as a tight
-	// inline control that never shifts the sibling label text.
-	min-width: $grid-unit-20 !important;
-	width: $grid-unit-20 !important;
-	height: $grid-unit-20 !important;
-	padding: 0 !important;
 	border-radius: 50% !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	overflow: hidden;
-
-	// `<Button>` does not preserve text-transform overrides from its parent
-	// label. Belt-and-braces: ensure the trigger never inherits an uppercase
-	// transform from a label that happens to use one.
-	text-transform: none;
-	letter-spacing: normal;
-
-	// Some `<label>` rules style descendant text/buttons (legacy pre-existing
-	// CSS). Reset to the design-system pointer token.
-	cursor: var(--wpds-cursor-control);
-
-	// Neutral near-black diamond (the SVG stroke reads `currentColor`).
-	color: $gray-900 !important;
 
 	// Color/gradient control context: the button is positioned by
 	// `block-editor-panel-color-gradient-settings__reset` (absolute) as a
