@@ -5,12 +5,49 @@ import type { RequestUtils } from './index';
 import { WP_BASE_URL } from '../config';
 
 const THEMES_URL = new URL( 'wp-admin/themes.php', WP_BASE_URL ).href;
+const MAX_THEME_ACTIVATION_ATTEMPTS = 3;
+const TRANSIENT_THEME_ACTIVATION_ERROR =
+	/socket hang up|ECONNRESET|ETIMEDOUT|ERR_HTTP|timeout|\b5\d{2}\b/i;
 
 async function activateTheme(
 	this: RequestUtils,
 	themeSlug: string
 ): Promise< void > {
+	for (
+		let attempt = 1;
+		attempt <= MAX_THEME_ACTIVATION_ATTEMPTS;
+		attempt++
+	) {
+		try {
+			await activateThemeOnce.call( this, themeSlug );
+			await verifyThemeActive.call( this, themeSlug );
+			return;
+		} catch ( error ) {
+			if (
+				! isTransientThemeActivationError( error ) ||
+				attempt === MAX_THEME_ACTIVATION_ATTEMPTS
+			) {
+				throw error;
+			}
+
+			await new Promise( ( resolve ) =>
+				setTimeout( resolve, 500 * attempt )
+			);
+		}
+	}
+}
+
+async function activateThemeOnce(
+	this: RequestUtils,
+	themeSlug: string
+): Promise< void > {
 	let response = await this.request.get( THEMES_URL );
+	if ( ! response.ok() ) {
+		const status = response.status();
+		await response.dispose();
+		throw new Error( `Failed to load themes page. Status: ${ status }` );
+	}
+
 	const html = await response.text();
 	const optionalFolder = '([a-z0-9-]+%2F)?';
 
@@ -46,8 +83,45 @@ async function activateTheme(
 		THEMES_URL + `?${ activateQuery }`.replace( /&amp;/g, '&' );
 
 	response = await this.request.get( activateLink );
+	if ( ! response.ok() ) {
+		const status = response.status();
+		await response.dispose();
+		throw new Error( `Failed to activate theme. Status: ${ status }` );
+	}
 
 	await response.dispose();
+}
+
+async function verifyThemeActive(
+	this: RequestUtils,
+	themeSlug: string
+): Promise< void > {
+	type ThemeItem = {
+		stylesheet: string;
+		status: string;
+	};
+
+	const themes = await this.rest< ThemeItem[] >( {
+		path: '/wp/v2/themes',
+	} );
+
+	const activeTheme = themes.find( ( { status } ) => status === 'active' );
+	const activeStylesheet = activeTheme?.stylesheet;
+	const isActive =
+		activeStylesheet === themeSlug ||
+		activeStylesheet?.endsWith( `/${ themeSlug }` );
+
+	if ( ! isActive ) {
+		throw new Error(
+			`Theme activation failed. Expected "${ themeSlug }", got "${ activeStylesheet }".`
+		);
+	}
+}
+
+function isTransientThemeActivationError( error: unknown ) {
+	const message = error instanceof Error ? error.message : String( error );
+
+	return TRANSIENT_THEME_ACTIVATION_ERROR.test( message );
 }
 
 // https://developer.wordpress.org/rest-api/reference/themes/#definition
