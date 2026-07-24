@@ -633,4 +633,74 @@ test.describe( 'Page List', () => {
 			await expect( datetimeInput ).toHaveValue( '2026-03-20T09:45' );
 		} );
 	} );
+
+	test.describe( 'Bulk Quick Edit', () => {
+		test.beforeEach( async ( { admin, page } ) => {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			const table = page.getByRole( 'table' );
+			await table
+				.getByRole( 'checkbox', { name: 'Privacy Policy' } )
+				.check();
+			await table
+				.getByRole( 'checkbox', { name: 'Sample Page' } )
+				.check();
+
+			// Every row renders its own primary "Quick Edit" action, so the
+			// bulk one has to be taken from the selection footer.
+			await page
+				.locator( '.dataviews-bulk-actions-footer__container' )
+				.getByRole( 'button', { name: 'Quick Edit' } )
+				.click();
+		} );
+
+		test( 'summarizes untouched fields as "No change"', async ( {
+			page,
+		} ) => {
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			await expect( modal ).toBeVisible();
+
+			for ( const name of [
+				'Edit Status',
+				'Edit Date',
+				'Edit Author',
+				'Edit Discussion',
+			] ) {
+				await expect(
+					modal.getByRole( 'button', { name } )
+				).toHaveAccessibleDescription( 'No change' );
+			}
+
+			// Bulk edit has no record to read, so these rows used to state
+			// values the selected pages don't necessarily have: the current
+			// date, and "Closed" discussion. See #68746.
+			await expect( modal ).not.toContainText(
+				String( new Date().getFullYear() )
+			);
+			await expect( modal ).not.toContainText( 'Closed' );
+		} );
+
+		test( 'summarizes a field once it has been edited', async ( {
+			page,
+		} ) => {
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			const editButton = modal.getByRole( 'button', {
+				name: 'Edit Status',
+			} );
+
+			await editButton.locator( '..' ).hover();
+			await editButton.click();
+			await page.getByRole( 'radio', { name: 'Draft' } ).check();
+			await page.keyboard.press( 'Escape' );
+
+			await expect( editButton ).toHaveAccessibleDescription( 'Draft' );
+			// The fields the user hasn't touched keep the placeholder.
+			await expect(
+				modal.getByRole( 'button', { name: 'Edit Author' } )
+			).toHaveAccessibleDescription( 'No change' );
+		} );
+	} );
 } );

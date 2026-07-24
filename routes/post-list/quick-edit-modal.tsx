@@ -55,6 +55,34 @@ function withEditorAssets( FieldEdit: any ) {
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
+// The record keys each bulk-editable field's summary reads. Bulk edit starts
+// from an empty record, so until the user edits a field there is no value to
+// summarize and rendering one would invent it: `date` would show the current
+// time and `discussion` would report "Closed".
+const bulkSummaryKeys: Record< string, string[] > = {
+	status: [ 'status' ],
+	date: [ 'date' ],
+	author: [ 'author' ],
+	discussion: [ 'comment_status', 'ping_status' ],
+};
+
+function withBulkSummary( field: any ) {
+	const keys = bulkSummaryKeys[ field.id ];
+	if ( ! keys || ! field.render ) {
+		return field;
+	}
+	const Summary = field.render;
+	return {
+		...field,
+		render: ( props: { item: Record< string, any > } ) =>
+			keys.some( ( key ) => key in props.item ) ? (
+				<Summary { ...props } />
+			) : (
+				__( 'No change' )
+			),
+	};
+}
+
 interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
@@ -114,18 +142,18 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
+				let nextField = field;
+
 				if ( field.id === 'status' ) {
-					return {
+					nextField = {
 						...field,
 						elements: field.elements.filter(
 							( element: { value: string } ) =>
 								element.value !== 'trash'
 						),
 					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
+				} else if ( field.id === 'template' ) {
+					nextField = {
 						...field,
 						readOnly: ! canSwitchTemplate,
 					};
@@ -137,9 +165,9 @@ export function QuickEditModal( {
 					};
 				}
 
-				return field;
+				return isBulk ? withBulkSummary( nextField ) : nextField;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields, canSwitchTemplate, isBulk ]
 	);
 
 	const form = useMemo( () => {

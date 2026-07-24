@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import {
@@ -49,10 +48,12 @@ export default function AuthorView( {
 						'is-loaded': loadingState === 'loaded',
 					} ) }
 				>
+					{ /* Decorative: the author's name follows it, so naming
+					     the image would only repeat that name. */ }
 					<img
 						ref={ imgRef }
 						onLoad={ handleLoad }
-						alt={ __( 'Author avatar' ) }
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>

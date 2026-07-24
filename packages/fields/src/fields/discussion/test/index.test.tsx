@@ -1,0 +1,59 @@
+/**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+
+/**
+ * Internal dependencies
+ */
+import discussionField from '../index';
+import type { BasePost } from '../../../types';
+
+const Discussion = discussionField.render!;
+
+function renderDiscussion( item: Partial< BasePost > ) {
+	return render(
+		<Discussion item={ item as BasePost } field={ {} as never } />
+	);
+}
+
+describe( 'discussion field', () => {
+	it( 'renders nothing when neither status is known', () => {
+		// Both statuses absent used to fall through to "Closed", reporting a
+		// setting the post may not have. Bulk Quick Edit starts from an empty
+		// record, so this is the state it renders before any edit.
+		const { container } = renderDiscussion( {} );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'reports Open when comments and pings are both open', () => {
+		renderDiscussion( { comment_status: 'open', ping_status: 'open' } );
+
+		expect( screen.getByText( 'Open' ) ).toBeVisible();
+	} );
+
+	it( 'reports Comments only when pings are closed', () => {
+		renderDiscussion( { comment_status: 'open', ping_status: 'closed' } );
+
+		expect( screen.getByText( 'Comments only' ) ).toBeVisible();
+	} );
+
+	it( 'reports Pings only when comments are closed', () => {
+		renderDiscussion( { comment_status: 'closed', ping_status: 'open' } );
+
+		expect( screen.getByText( 'Pings only' ) ).toBeVisible();
+	} );
+
+	it( 'reports Closed when both are closed', () => {
+		renderDiscussion( { comment_status: 'closed', ping_status: 'closed' } );
+
+		expect( screen.getByText( 'Closed' ) ).toBeVisible();
+	} );
+
+	it( 'reports Closed when only one status is known and it is closed', () => {
+		renderDiscussion( { comment_status: 'closed' } );
+
+		expect( screen.getByText( 'Closed' ) ).toBeVisible();
+	} );
+} );

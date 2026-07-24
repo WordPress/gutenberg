@@ -10,6 +10,13 @@ const getFormattedDate = ( dateToDisplay: string | null ) =>
 	);
 
 const DateView = ( { item }: { item: BasePost } ) => {
+	// Every branch below formats `item.date`, and `getDate( null )` falls back
+	// to the current time, so without a date we would render a moment the post
+	// has no relation to.
+	if ( ! item.date ) {
+		return null;
+	}
+
 	const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 		item.status ?? ''
 	);
