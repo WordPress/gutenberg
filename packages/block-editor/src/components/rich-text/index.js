@@ -247,47 +247,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// Setting tabIndex to 0 is unnecessary, the element is already focusable
-	// because it's contentEditable. This also fixes a Safari bug where it's
-	// not possible to Shift+Click multi select blocks when Shift Clicking
-	// into an element with tabIndex because Safari will focus the element.
-	// However, Safari will correctly ignore nested contentEditable elements.
-	// While the writing flow wrapper is contentEditable (the selected block
-	// supports `editableRoot`), nested editable elements are no longer
-	// focusable areas on their own, so an explicit tabIndex restores their
-	// focusability.
-	const tabIndex = useSelect(
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
 		( select ) => {
-			// `canHostEditableRoot` is the only store-dependent input, and it
-			// only matters while this block is the selected, default-mode
-			// editing host. Every other case is store-independent, so skip the
-			// subscription entirely.
 			if (
-				! shouldDisableEditing &&
-				hasDefaultEditingMode &&
-				isBlockSelected
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
 			) {
-				const { getSelectedBlockClientId, canHostEditableRoot } =
-					unlock( select( blockEditorStore ) );
-				// Whether the wrapper is an editing host, which depends on the
-				// selected block, not necessarily this one.
-				if ( canHostEditableRoot( getSelectedBlockClientId() ) ) {
-					return props.tabIndex ?? 0;
-				}
+				return false;
 			}
 
-			// Strip an explicit `tabIndex={ 0 }`, unless editing is disabled.
-			return ! shouldDisableEditing && props.tabIndex === 0
-				? null
-				: props.tabIndex;
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
 		},
-		[
-			shouldDisableEditing,
-			hasDefaultEditingMode,
-			isBlockSelected,
-			props.tabIndex,
-		]
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
 	);
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -452,6 +432,22 @@ export function RichTextWrapper(
 
 	function onFocus() {
 		anchorRef.current?.focus();
+	}
+
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
 	}
 
 	const TagName = tagName;
