@@ -3,6 +3,25 @@
  */
 import type * as React from 'react';
 
+/**
+ * Loose intrinsic attribute bag used when a polymorphic component is rendered
+ * with an `as` prop. Previous implementations enabled precise typings for the
+ * given `as` element (e.g. `as="label"` unlocks `htmlFor`), but doing so
+ * contributed to high memory usage and slow compilation times.
+ */
+type PolymorphicIntrinsicProps = Omit<
+	React.AllHTMLAttributes< any > & React.SVGAttributes< any >,
+	'as' | 'children'
+>;
+
+/**
+ * Compatible with Emotion/`styled` `as` props and React's `ElementType`, without
+ * using the default `React.ElementType` mapped type helper directly.
+ */
+type PolymorphicAs =
+	| keyof React.JSX.IntrinsicElements
+	| React.JSXElementConstructor< any >;
+
 // Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
 	/** Prop types. */
@@ -24,7 +43,7 @@ export type WordPressComponentProps<
 	( IsPolymorphic extends true
 		? {
 				/** The HTML element or React component to render the component as. */
-				as?: T | keyof React.JSX.IntrinsicElements;
+				as?: T | PolymorphicAs;
 		  }
 		: {} );
 
@@ -32,16 +51,20 @@ export type WordPressComponent<
 	T extends React.ElementType | null,
 	O,
 	IsPolymorphic extends boolean,
-> = {
-	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, false > &
-			( IsPolymorphic extends true
-				? {
-						/** The HTML element or React component to render the component as. */
-						as: TT;
-				  }
-				: {} )
-	): React.ReactNode;
+> = ( IsPolymorphic extends true
+	? {
+			/**
+			 * Polymorphic call signature. When `as` is provided, additional intrinsic
+			 * attributes are accepted via a flat attribute bag.
+			 */
+			(
+				props: WordPressComponentProps< O, T, false > & {
+					/** The HTML element or React component to render the component as. */
+					as: PolymorphicAs;
+				} & Omit< PolymorphicIntrinsicProps, keyof O >
+			): React.ReactNode;
+	  }
+	: unknown ) & {
 	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
 	/**
