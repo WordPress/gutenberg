@@ -30,8 +30,10 @@ import {
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
 	getStyleOverrides,
+	getClosestAllowedInsertionPointForPattern,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+import { store } from '../';
 import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
@@ -2548,6 +2550,85 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'getClosestAllowedInsertionPointForPattern', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Paragraph',
+				attributes: {},
+			} );
+			registerBlockType( 'core/block', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Pattern',
+				attributes: { ref: { type: 'number' } },
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/paragraph' );
+			unregisterBlockType( 'core/block' );
+		} );
+
+		const emptyBlocksState = {
+			blocks: {
+				byClientId: new Map(),
+				attributes: new Map(),
+				order: new Map(),
+				parents: new Map(),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map(),
+		};
+
+		// Regression tests for https://core.trac.wordpress.org/ticket/65701.
+		// A synced pattern is inserted as a `core/block` reference, so it must be
+		// gated on `core/block` — not the pattern's inner grammar — otherwise the
+		// wrapper is silently dropped while a success notice still fires.
+		it( 'returns null for a synced pattern when core/block is not allowed', () => {
+			const state = {
+				...emptyBlocksState,
+				settings: { allowedBlockTypes: [ 'core/paragraph' ] },
+			};
+			const pattern = { type: 'user', syncStatus: 'fully', id: 1 };
+			expect(
+				getClosestAllowedInsertionPointForPattern( state, pattern, '' )
+			).toBe( null );
+		} );
+
+		it( 'returns an insertion point for a synced pattern when core/block is allowed', () => {
+			const state = {
+				...emptyBlocksState,
+				settings: {
+					allowedBlockTypes: [ 'core/paragraph', 'core/block' ],
+				},
+			};
+			const pattern = { type: 'user', syncStatus: 'fully', id: 1 };
+			expect(
+				getClosestAllowedInsertionPointForPattern( state, pattern, '' )
+			).toBe( '' );
+		} );
+
+		it( 'still validates the inner grammar for unsynced patterns', () => {
+			const state = {
+				...emptyBlocksState,
+				settings: { allowedBlockTypes: [ 'core/paragraph' ] },
+			};
+			const pattern = {
+				type: 'theme',
+				syncStatus: 'unsynced',
+				content:
+					'<!-- wp:paragraph --><p>hi</p><!-- /wp:paragraph -->',
+			};
+			expect(
+				getClosestAllowedInsertionPointForPattern( state, pattern, '' )
+			).toBe( '' );
 		} );
 	} );
 } );

@@ -41,6 +41,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -914,6 +915,21 @@ export function getClosestAllowedInsertionPointForPattern(
 	clientId
 ) {
 	const { allowedBlockTypes } = getSettings( state );
+
+	// A synced pattern is inserted as a `core/block` reference rather than its
+	// parsed grammar. The wrapper block — not the pattern's inner blocks —
+	// therefore determines whether the pattern can be inserted. Checking the
+	// grammar here would wrongly allow the insertion (e.g. an allow-list of
+	// `[ 'core/paragraph' ]` passes the inner check) while the `core/block`
+	// wrapper is silently dropped, leaving a success notice but no content.
+	// See https://core.trac.wordpress.org/ticket/65701.
+	const isSyncedPattern =
+		pattern.type === INSERTER_PATTERN_TYPES.user &&
+		pattern.syncStatus !== 'unsynced';
+	if ( isSyncedPattern ) {
+		return getClosestAllowedInsertionPoint( state, 'core/block', clientId );
+	}
+
 	const isAllowed = checkAllowListRecursive(
 		getGrammar( pattern ),
 		allowedBlockTypes
