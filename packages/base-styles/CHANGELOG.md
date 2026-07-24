@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wpds-*` design tokens internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
+-   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wp-admin-theme-color` internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 
 ### Internal
 
