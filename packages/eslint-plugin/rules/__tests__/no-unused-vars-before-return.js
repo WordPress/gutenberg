@@ -62,6 +62,26 @@ function MyComponent() {
 	return <Foo />;
 }`,
 		},
+		{
+			code: `
+function lazyEdit( load ) {
+	const Load = lazy( load );
+	return function LoadEdit( props ) {
+		return (
+			<Suspense fallback={ null }>
+				<Load { ...props } />
+			</Suspense>
+		);
+	};
+}`,
+		},
+		{
+			code: `
+function createComponent() {
+	const Foo = getSomeComponent();
+	return () => <Foo />;
+}`,
+		},
 	],
 	invalid: [
 		{

@@ -28,6 +28,29 @@ function getClosestFunctionScope( context, node ) {
 	return functionScope;
 }
 
+/**
+ * Returns all function scopes enclosing the given node, ordered from the
+ * closest outwards.
+ *
+ * @param {ESLintRuleContext} context ESLint context object.
+ * @param {ESTreeNode}        node    Current AST node.
+ *
+ * @return {ESLintScope[]} Enclosing function scopes.
+ */
+function getEnclosingFunctionScopes( context, node ) {
+	const functionScopes = [];
+
+	let scope = context.sourceCode.getScope( node );
+	while ( scope ) {
+		if ( scope.type === 'function' ) {
+			functionScopes.push( scope );
+		}
+		scope = scope.upper;
+	}
+
+	return functionScopes;
+}
+
 module.exports = /** @type {import('eslint').Rule} */ ( {
 	meta: {
 		type: 'problem',
@@ -70,23 +93,32 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 
 		return {
 			JSXIdentifier( node ) {
-				// Currently, a scope's variable references does not include JSX
-				// identifiers. Account for this by visiting JSX identifiers
-				// first, and tracking them in a map per function scope, which
-				// is later merged with the known variable references.
-				const functionScope = getClosestFunctionScope( context, node );
-				if ( ! functionScope ) {
-					return;
-				}
+				// Depending on the ESLint version in use, a scope's variable
+				// references may not include JSX identifiers. Account for this
+				// by visiting JSX identifiers first, and tracking them in a map
+				// per function scope, which is later merged with the known
+				// variable references.
+				//
+				// The identifier is tracked for every enclosing function scope,
+				// not only the closest one, since JSX nested in a local
+				// function can still reference a variable of an outer scope.
+				for ( const functionScope of getEnclosingFunctionScopes(
+					context,
+					node
+				) ) {
+					if (
+						! FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope )
+					) {
+						FUNCTION_SCOPE_JSX_IDENTIFIERS.set(
+							functionScope,
+							new Set()
+						);
+					}
 
-				if ( ! FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope ) ) {
-					FUNCTION_SCOPE_JSX_IDENTIFIERS.set(
-						functionScope,
-						new Set()
+					FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope ).add(
+						node
 					);
 				}
-
-				FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope ).add( node );
 			},
 			'ReturnStatement:exit'( node ) {
 				const functionScope = getClosestFunctionScope( context, node );
