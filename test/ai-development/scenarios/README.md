@@ -8,23 +8,23 @@ Each `<slug>.json` defines a human-readable spec — `name`, `skills`, `query`, 
 
 ```bash
 # Static sanity checks — fast, free:
-node eval/harness/run.mjs
+node test/ai-development/run.mjs
 
 # Live mode — run scenario queries through real agent sessions and check the
 # transcripts. Costs minutes and real tokens per run.
-node eval/harness/run.mjs --live
-node eval/harness/run.mjs --live --scenario testing-run-e2e --repeat 3
-node eval/harness/run.mjs --live --scenario testing-write-e2e --model haiku
+node test/ai-development/run.mjs --live
+node test/ai-development/run.mjs --live --scenario testing-run-e2e --repeat 3
+node test/ai-development/run.mjs --live --scenario testing-write-e2e --model haiku
 ```
 
-`--model` is passed through to the agent CLI, so the same scenario can be checked against any model you have access to. `--agent` selects the CLI adapter (default `claude`); supporting another agent CLI means adding one adapter entry in `eval/harness/run.mjs` that invokes it headless and normalizes its transcript into read/write/command events — the assertions are agent-agnostic.
+`--model` is passed through to the agent CLI, so the same scenario can be checked against any model you have access to. `--agent` selects the CLI adapter (default `claude`); supporting another agent CLI means adding one adapter entry in `test/ai-development/run.mjs` that invokes it headless and normalizes its transcript into read/write/command events — the assertions are agent-agnostic.
 
 Notes:
 
 -   No environment is required: the point is what the agent *consults and attempts*, not whether Gutenberg's tests execute. Agents run without write permissions, so a denied edit still shows up in the transcript as the attempt the assertions need — and your checkout is never modified.
 -   Agent compliance is probabilistic: use `--repeat 3` before treating a failure as a regression, and read the reported rates (`PASS (3/3)`).
 -   Results are colored by your personal agent configuration (`~/.claude`, `CLAUDE.local.md`, memory).
--   Transcripts are saved under `eval/artifacts/` for debugging; failures print the actual reads/commands next to the expectation.
+-   Transcripts are saved under `test/ai-development/artifacts/` for debugging; failures print the actual reads/commands next to the expectation.
 
 ## Assertion vocabulary
 
