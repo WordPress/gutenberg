@@ -18,6 +18,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
 	Button,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -30,7 +31,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -236,6 +237,12 @@ export default function GalleryEdit( props ) {
 		postId,
 		postType,
 	} );
+
+	// Converting a dynamic gallery to a static one is a one-way change: the
+	// gallery stops resolving from its source and keeps whatever it shows now.
+	// Both the toolbar and inspector controls open this shared confirm dialog
+	// (rendered once below) so the consequence is spelled out before the switch.
+	const [ isConvertingToStatic, setIsConvertingToStatic ] = useState( false );
 
 	// State that drives counts/size options should reflect the dynamic media
 	// when the gallery is in dynamic mode.
@@ -716,6 +723,9 @@ export default function GalleryEdit( props ) {
 					dynamic={ dynamic }
 					dropdownMenuProps={ dropdownMenuProps }
 					hasImages={ hasImages }
+					requestConvertToStatic={ () =>
+						setIsConvertingToStatic( true )
+					}
 				/>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -953,6 +963,9 @@ export default function GalleryEdit( props ) {
 					blockProps={ blockProps }
 					innerBlocksProps={ innerBlocksProps }
 					multiGallerySelection={ multiGallerySelection }
+					requestConvertToStatic={ () =>
+						setIsConvertingToStatic( true )
+					}
 				/>
 			) : (
 				<Gallery
@@ -963,6 +976,24 @@ export default function GalleryEdit( props ) {
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
 				/>
+			) }
+			{ isConvertingToStatic && (
+				<ConfirmDialog
+					isOpen
+					title={ __( 'Convert to a static gallery?' ) }
+					__experimentalHideHeader={ false }
+					confirmButtonText={ __( 'Convert to static' ) }
+					onConfirm={ () => {
+						dynamic.convertToStatic();
+						setIsConvertingToStatic( false );
+					} }
+					onCancel={ () => setIsConvertingToStatic( false ) }
+					size="medium"
+				>
+					{ __(
+						'This gallery will stop updating automatically and keep the images it shows now. You can edit them like any manual gallery.'
+					) }
+				</ConfirmDialog>
 			) }
 		</>
 	);

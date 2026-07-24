@@ -77,21 +77,23 @@ function OrderControl( { orderby, order, onChange } ) {
 /**
  * The Gallery block's "Source" inspector panel.
  *
- * In dynamic mode it shows the resolved source, a control to convert back to
- * individual images, and the source ordering. In static mode it offers the
- * entry point into dynamic mode — and, since switching discards any hand-added
- * images, owns the confirmation dialog for that one-way change. Rendered inside
- * the block's `InspectorControls`, alongside the Settings panel.
+ * In dynamic mode it shows the resolved source, a control to convert the
+ * gallery to a static one, and the source ordering. In static mode it offers
+ * the entry point into dynamic mode — and, since switching discards any
+ * hand-added images, owns the confirmation dialog for that one-way change.
+ * Rendered inside the block's `InspectorControls`, alongside the Settings panel.
  *
- * @param {Object}  props
- * @param {Object}  props.dynamic           The `useDynamicGallery` result.
- * @param {Object}  props.dropdownMenuProps Shared ToolsPanel dropdown menu props.
- * @param {boolean} props.hasImages         Whether the gallery has manually-added images.
+ * @param {Object}   props
+ * @param {Object}   props.dynamic                The `useDynamicGallery` result.
+ * @param {Object}   props.dropdownMenuProps      Shared ToolsPanel dropdown menu props.
+ * @param {boolean}  props.hasImages              Whether the gallery has manually-added images.
+ * @param {Function} props.requestConvertToStatic Opens the shared confirm dialog for converting to a static gallery.
  */
 export function GallerySourcePanel( {
 	dynamic,
 	dropdownMenuProps,
 	hasImages,
+	requestConvertToStatic,
 } ) {
 	const {
 		dynamicContent,
@@ -100,7 +102,6 @@ export function GallerySourcePanel( {
 		sourceOrderby,
 		sourceOrder,
 		setSourceOrder,
-		convertToStatic,
 		enableDynamicMode,
 		resetSource,
 		isResolvingDynamic,
@@ -136,14 +137,14 @@ export function GallerySourcePanel( {
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
-						onClick={ convertToStatic }
+						onClick={ requestConvertToStatic }
 						// Guard the race where the media is still resolving:
 						// converting now would map over an incomplete (or empty)
 						// list and produce a gallery missing images.
 						disabled={ isResolvingDynamic }
 						accessibleWhenDisabled
 					>
-						{ __( 'Convert to individual images' ) }
+						{ __( 'Convert to static gallery' ) }
 					</Button>
 				</div>
 				{ hasMoreImagesThanCap && (
@@ -266,7 +267,7 @@ function GalleryImagesPreview( { imageBlocks } ) {
 /**
  * Renders a dynamic-mode gallery on the canvas:
  *
- * - a block-toolbar control to convert back to individual images;
+ * - a block-toolbar control to convert the gallery to a static one;
  * - the gallery `<figure>` wrapper holding a non-editable preview of the
  *   resolved media (or a placeholder while resolving / when nothing is found),
  *   with the gallery's provided context so the previewed images inherit
@@ -277,15 +278,16 @@ function GalleryImagesPreview( { imageBlocks } ) {
  *   List View).
  *
  * @param {Object}   props
- * @param {Object}   props.dynamic               The `useDynamicGallery` result.
- * @param {Object}   props.blockProps            The gallery's `useBlockProps()` result.
- * @param {Object}   props.innerBlocksProps      The gallery's `useInnerBlocksProps()` result.
- * @param {Object}   props.attributes            The gallery block attributes.
- * @param {Function} props.setAttributes         The block's `setAttributes`.
- * @param {boolean}  props.isSelected            Whether the gallery block is selected.
- * @param {Function} props.insertBlocksAfter     Inserts blocks after the gallery.
- * @param {boolean}  props.isContentLocked       Whether the gallery is content-locked.
- * @param {boolean}  props.multiGallerySelection Whether multiple galleries are selected.
+ * @param {Object}   props.dynamic                The `useDynamicGallery` result.
+ * @param {Object}   props.blockProps             The gallery's `useBlockProps()` result.
+ * @param {Object}   props.innerBlocksProps       The gallery's `useInnerBlocksProps()` result.
+ * @param {Object}   props.attributes             The gallery block attributes.
+ * @param {Function} props.setAttributes          The block's `setAttributes`.
+ * @param {boolean}  props.isSelected             Whether the gallery block is selected.
+ * @param {Function} props.insertBlocksAfter      Inserts blocks after the gallery.
+ * @param {boolean}  props.isContentLocked        Whether the gallery is content-locked.
+ * @param {boolean}  props.multiGallerySelection  Whether multiple galleries are selected.
+ * @param {Function} props.requestConvertToStatic Opens the shared confirm dialog for converting to a static gallery.
  */
 export function GalleryDynamicView( {
 	dynamic,
@@ -297,13 +299,13 @@ export function GalleryDynamicView( {
 	insertBlocksAfter,
 	isContentLocked,
 	multiGallerySelection,
+	requestConvertToStatic,
 } ) {
 	const {
 		sourceDescriptor,
 		dynamicImageBlocks,
 		galleryContext,
 		isResolvingDynamic,
-		convertToStatic,
 	} = dynamic;
 
 	// Converting to a static gallery materializes editable inner blocks, which
@@ -328,14 +330,15 @@ export function GalleryDynamicView( {
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="other">
 					<ToolbarButton
-						onClick={ convertToStatic }
-						// Same guard as the inspector's "Convert to individual
-						// images": both call `convertToStatic`, which would map over
-						// a still-resolving (or empty) media list. (`ToolbarButton`
+						onClick={ requestConvertToStatic }
+						// Same guard as the inspector's "Convert to static
+						// gallery": both open the confirm dialog, whose confirm
+						// runs `convertToStatic`, which would otherwise map over a
+						// still-resolving (or empty) media list. (`ToolbarButton`
 						// stays focusable when disabled by default.)
 						disabled={ isResolvingDynamic }
 					>
-						{ __( 'Convert to images' ) }
+						{ __( 'Convert to static gallery' ) }
 					</ToolbarButton>
 				</BlockControls>
 			) }
