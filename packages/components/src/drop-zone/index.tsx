@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import clsx from 'clsx';
 
 /**
