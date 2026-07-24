@@ -20,6 +20,16 @@
 
 -   Export `build-style/*`, so the stylesheet can be imported as `@wordpress/fields/build-style/style.css` [#81769](https://github.com/WordPress/gutenberg/pull/81769)).
 
+### Bug Fixes
+
+-   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+
+-   `discussion`: Render nothing instead of "Closed" when neither the comment nor the ping status is known ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+
+### Accessibility
+
+-   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
