@@ -36,7 +36,7 @@ These conventions match [WordPress/agent-skills](https://github.com/WordPress/ag
 -   One directory per domain: `skills/<domain>/`, lowercase kebab-case.
 -   `SKILL.md` starts with YAML frontmatter containing only `name` (matching the directory) and `description`. Phrase the description as a trigger: "Use when …".
 -   Keep the body short and procedural. Link to depth rather than inlining it, and keep every linked file one hop from `SKILL.md`.
--   Do not restate what the root `AGENTS.md` already provides — agents have both loaded.
+-   Link a doc the agent **must** read as part of the procedure step that needs it ("read the [guide] before writing your first body"). In testing, if an agent finds a skill that matches its task, it will focus on that task rather than re-considering generalized "read the relevant docs" files from AGENTS.md.
 -   An optional `skills/<domain>/references/` directory holds agent-specific depth that has no home in the public docs.
 
 The [testing skill](https://github.com/WordPress/gutenberg/blob/trunk/skills/testing/SKILL.md) and its [`references/` directory](https://github.com/WordPress/gutenberg/tree/trunk/skills/testing/references) are the live example of these conventions. In skeleton form, a skill looks like:
