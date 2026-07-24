@@ -1677,6 +1677,83 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				] );
 		} );
 
+		test( 'should grow and shrink a full selection with shift+arrow', async ( {
+			editor,
+			page,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			const spacerBlocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Spacer',
+			} );
+
+			await spacerBlocks.nth( 0 ).click();
+			await spacerBlocks.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
+
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+
+			// A fully selected multi-selection grows by one block at the
+			// focus end.
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
+				] );
+
+			// And shrinks the same way.
+			await page.keyboard.press( 'Shift+ArrowUp' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+		} );
+
+		test( 'should extend the selection from a block without a text selection', async ( {
+			page,
+			editor,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Spacer' } )
+				.click();
+
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
+				] );
+		} );
+
 		test( 'should not scroll the canvas when the selection spans a scrolled page', async ( {
 			editor,
 			page,
