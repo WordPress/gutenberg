@@ -28,14 +28,7 @@ export default function CanvasLoader( { id } ) {
 	return (
 		<div
 			className="edit-site-canvas-loader"
-			style={
-				textColor
-					? {
-							'--wp-edit-site-canvas-loader-foreground':
-								textColor,
-					  }
-					: undefined
-			}
+			style={ textColor ? { '--color': textColor } : undefined }
 		>
 			<ProgressBar id={ id } max={ total } value={ elapsed } />
 		</div>
