@@ -1886,9 +1886,30 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Extend the selection forward past the nesting boundary into
-		// "cd", then yield so the selection observer can process it.
+		// "cd". Chromium often stops at the start of the nested item
+		// (before "c") on the second Shift+ArrowRight; nudge once more
+		// when needed so the native range covers "bc", matching the
+		// backward-crossing test.
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		const selectedAfterCross = await editor.canvas.evaluate( () =>
+			document.getSelection().toString().replace( /\s/g, '' )
+		);
+		if ( selectedAfterCross !== 'bc' ) {
+			await page.keyboard.press( 'Shift+ArrowRight' );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+		}
+
+		await expect
+			.poll( () =>
+				editor.canvas.evaluate( () =>
+					document.getSelection().toString().replace( /\s/g, '' )
+				)
+			)
+			.toBe( 'bc' );
 
 		// The outer "ab" item is presented as fully selected, like a
 		// block multi-selection.
