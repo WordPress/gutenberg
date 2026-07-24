@@ -87,7 +87,10 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds?.join( ',' ),
+				// Sort ids so reordering alone doesn't produce a new query key and re-fetch.
+				include: _termIds?.length
+					? [ ..._termIds ].sort( ( a, b ) => a - b ).join( ',' )
+					: undefined,
 				per_page: -1,
 			};
 
@@ -206,6 +209,7 @@ export function FlatTermSelector( { slug } ) {
 		// Optimistically update term values.
 		// The selector will always re-fetch terms later.
 		setValues( uniqueTerms );
+		setSearch( '' );
 
 		if ( newTermNames.length === 0 ) {
 			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
