@@ -490,7 +490,7 @@ export default dedupePlugins( [
 			...jestPlugin.configs[ 'flat/recommended' ].rules,
 			/*
 			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
-			so the docblock pragma is redundant.
+			 * so the docblock pragma is redundant.
 			 */
 			'no-warning-comments': [
 				'error',
