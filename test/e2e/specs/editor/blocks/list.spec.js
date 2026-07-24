@@ -1842,6 +1842,16 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
+		const getCanvasSelectedText = async () => {
+			const frame = page.frame( { name: 'editor-canvas' } );
+			if ( ! frame ) {
+				return '';
+			}
+			return frame.evaluate( () =>
+				document.getSelection().toString().replace( /\s/g, '' )
+			);
+		};
+
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
@@ -1885,32 +1895,20 @@ test.describe( 'List (@firefox)', () => {
 		] );
 		await page.keyboard.press( 'Backspace' );
 
-		// Extend the selection forward past the nesting boundary into
-		// "cd". Chromium often stops at the start of the nested item
-		// (before "c") on the second Shift+ArrowRight; nudge once more
-		// when needed so the native range covers "bc", matching the
-		// backward-crossing test.
+		// Extend until the native range covers "bc". Browsers often stop at
+		// the nesting boundary before "c" on the second Shift+ArrowRight.
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-
-		const canvasFrame = page.frame( { name: 'editor-canvas' } );
-		const selectedAfterCross = await canvasFrame.evaluate( () =>
-			document.getSelection().toString().replace( /\s/g, '' )
-		);
-		if ( selectedAfterCross !== 'bc' ) {
+		for ( let i = 0; i < 3; i++ ) {
+			if ( ( await getCanvasSelectedText() ) === 'bc' ) {
+				break;
+			}
 			await page.keyboard.press( 'Shift+ArrowRight' );
 			await page.evaluate(
 				() => new Promise( window.requestIdleCallback )
 			);
 		}
-
-		await expect
-			.poll( () =>
-				canvasFrame.evaluate( () =>
-					document.getSelection().toString().replace( /\s/g, '' )
-				)
-			)
-			.toBe( 'bc' );
+		await expect.poll( getCanvasSelectedText ).toBe( 'bc' );
 
 		// The outer "ab" item is presented as fully selected, like a
 		// block multi-selection.
@@ -1951,8 +1949,16 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Prefer insertBlock over arrow navigation: from "xy", ArrowLeft
-		// enters nested "ef", and ArrowUp is inconsistent across browsers.
+		const getCanvasSelectedText = async () => {
+			const frame = page.frame( { name: 'editor-canvas' } );
+			if ( ! frame ) {
+				return '';
+			}
+			return frame.evaluate( () =>
+				document.getSelection().toString().replace( /\s/g, '' )
+			);
+		};
+
 		await editor.insertBlock( {
 			name: 'core/list',
 			innerBlocks: [
@@ -1991,9 +1997,10 @@ test.describe( 'List (@firefox)', () => {
 			],
 		} );
 
-		// Land in "cd", then force offset 1 (click position varies by browser).
+		// Place the caret at offset 1 of "cd" (Home/ArrowRight is more
+		// stable across browsers than arrowing up from "xy").
 		await editor.canvas.getByText( 'cd', { exact: true } ).click();
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Home' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -2040,15 +2047,20 @@ test.describe( 'List (@firefox)', () => {
 		// Extend into "ab" until the native range covers "bc".
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		for ( let i = 0; i < 3; i++ ) {
+			if ( ( await getCanvasSelectedText() ) === 'bc' ) {
+				break;
+			}
+			await page.keyboard.press( 'Shift+ArrowLeft' );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+		}
+		await expect.poll( getCanvasSelectedText ).toBe( 'bc' );
 
-		const canvasFrame = page.frame( { name: 'editor-canvas' } );
-		await expect
-			.poll( () =>
-				canvasFrame.evaluate( () =>
-					document.getSelection().toString().replace( /\s/g, '' )
-				)
-			)
-			.toBe( 'bc' );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
 
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '‸' );
