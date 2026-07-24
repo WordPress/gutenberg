@@ -251,7 +251,16 @@ export default function useArrowNav() {
 					// A fully selected multi-selection has no native
 					// selection to extend (use-multi-selection cleared it),
 					// so grow or shrink it by one block at the focus end.
-					if ( __unstableIsFullySelected() ) {
+					// Only without a usable native selection: a selection
+					// that is fully selected because it resolves to a
+					// nesting ancestor keeps its native selection, which
+					// the browser extends natively (and the observer
+					// promotes to the common level).
+					const selection = defaultView.getSelection();
+					if (
+						__unstableIsFullySelected() &&
+						( ! selection.rangeCount || selection.isCollapsed )
+					) {
 						const anchorClientId =
 							getMultiSelectedBlocksStartClientId();
 						const focusClientId =
