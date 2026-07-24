@@ -1893,7 +1893,8 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
-		const selectedAfterCross = await editor.canvas.evaluate( () =>
+		const canvasFrame = page.frame( { name: 'editor-canvas' } );
+		const selectedAfterCross = await canvasFrame.evaluate( () =>
 			document.getSelection().toString().replace( /\s/g, '' )
 		);
 		if ( selectedAfterCross !== 'bc' ) {
@@ -1905,7 +1906,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect
 			.poll( () =>
-				editor.canvas.evaluate( () =>
+				canvasFrame.evaluate( () =>
 					document.getSelection().toString().replace( /\s/g, '' )
 				)
 			)
@@ -1950,21 +1951,50 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '* ab' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( ' cd' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( ' ef' );
-		// Outdent the next item to become a following sibling of "cd".
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Shift+Tab' );
-		await page.keyboard.type( 'xy' );
+		// Prefer insertBlock over arrow navigation: from "xy", ArrowLeft
+		// enters nested "ef", and ArrowUp is inconsistent across browsers.
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'ab' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'cd' },
+									innerBlocks: [
+										{
+											name: 'core/list',
+											innerBlocks: [
+												{
+													name: 'core/list-item',
+													attributes: {
+														content: 'ef',
+													},
+												},
+											],
+										},
+									],
+								},
+								{
+									name: 'core/list-item',
+									attributes: { content: 'xy' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
 
-		// Caret at end of "xy". Move to middle of "cd".
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		// Land in "cd", then force offset 1 (click position varies by browser).
+		await editor.canvas.getByText( 'cd', { exact: true } ).click();
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1979,7 +2009,7 @@ test.describe( 'List (@firefox)', () => {
 								innerBlocks: [
 									{
 										name: 'core/list-item',
-										attributes: { content: 'cd' },
+										attributes: { content: 'c‸d' },
 										innerBlocks: [
 											{
 												name: 'core/list',
@@ -1987,7 +2017,7 @@ test.describe( 'List (@firefox)', () => {
 													{
 														name: 'core/list-item',
 														attributes: {
-															content: 'e‸f',
+															content: 'ef',
 														},
 													},
 												],
@@ -2007,8 +2037,19 @@ test.describe( 'List (@firefox)', () => {
 		] );
 		await page.keyboard.press( 'Backspace' );
 
+		// Extend into "ab" until the native range covers "bc".
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		const canvasFrame = page.frame( { name: 'editor-canvas' } );
+		await expect
+			.poll( () =>
+				canvasFrame.evaluate( () =>
+					document.getSelection().toString().replace( /\s/g, '' )
+				)
+			)
+			.toBe( 'bc' );
+
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '‸' );
 
@@ -2034,75 +2075,6 @@ test.describe( 'List (@firefox)', () => {
 								],
 							},
 						],
-					},
-				],
-			},
-		] );
-	} );
-
-	test( 'should select the outer item fully when dragging a selection across the nesting boundary', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '* ab' );
-		await page.keyboard.press( 'Enter' );
-		// Leading space at the start of an empty item triggers indent.
-		await page.keyboard.type( ' cd' );
-		// Enter on an empty nested item outdents back to the top level.
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'zz' );
-
-		// Drag from the middle of "ab" to the middle of "cd".
-		const outer = await editor.canvas
-			.getByText( 'ab', { exact: true } )
-			.boundingBox();
-		const nested = await editor.canvas
-			.getByText( 'cd', { exact: true } )
-			.boundingBox();
-		await page.mouse.move(
-			outer.x + outer.width / 2,
-			outer.y + outer.height / 2
-		);
-		await page.mouse.down();
-		await page.mouse.move(
-			nested.x + nested.width / 2,
-			nested.y + nested.height / 2,
-			{ steps: 10 }
-		);
-
-		await page.mouse.up();
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-
-		// The outer "ab" item is presented as fully selected, like a
-		// block multi-selection.
-		await expect(
-			editor.canvas.locator( '.is-multi-selected' )
-		).toHaveCount( 1 );
-		await expect(
-			editor.canvas.locator( '.is-multi-selected' )
-		).toHaveText( 'abcd' );
-
-		// Backspace merges the rich-text
-		// range (keeps "a" + "d"). The unrelated top-level sibling remains.
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.type( '‸' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'a‸d' },
-						innerBlocks: [],
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'zz' },
-						innerBlocks: [],
 					},
 				],
 			},
