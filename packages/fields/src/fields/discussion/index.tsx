@@ -7,6 +7,16 @@ const discussionField: Field< BasePost > = {
 	label: __( 'Discussion' ),
 	type: 'text',
 	render: ( { item } ) => {
+		// Neither status is known, so there is nothing to report. Falling
+		// through would claim "Closed" for a post whose discussion settings
+		// simply haven't been loaded.
+		if (
+			item.comment_status === undefined &&
+			item.ping_status === undefined
+		) {
+			return null;
+		}
+
 		const commentsOpen = item.comment_status === 'open';
 		const pingsOpen = item.ping_status === 'open';
 
