@@ -1644,6 +1644,22 @@ test.describe( 'Block Notes', () => {
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toBeVisible();
 
+			/*
+			 * The range that anchored the note is collapsed once the marker is
+			 * written: browsers paint text decorations inside a selected range
+			 * with the selection's text color, so a lingering selection would
+			 * mask the author-colored underline until the next click.
+			 */
+			await expect
+				.poll( () =>
+					mark.evaluate(
+						( el ) =>
+							el.ownerDocument.defaultView.getSelection()
+								.isCollapsed
+					)
+				)
+				.toBe( true );
+
 			const alphaOf = async () => {
 				const bg = await mark.evaluate(
 					( el ) => window.getComputedStyle( el ).backgroundColor
