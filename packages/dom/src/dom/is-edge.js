@@ -97,6 +97,27 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	// pixels. `getComputedStyle` may return a value with different units.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? containerRect.top + 1 : containerRect.bottom - 1;
+
+	// The test point can only be hit-tested when it is within the viewport
+	// (`caretRangeFromPoint` returns nothing for a point outside it, upon
+	// which `scrollIfNoRange` scrolls the container's edge into view to
+	// measure, e.g. on every arrow press within a container taller than the
+	// viewport). When the edge is outside the viewport and the selection is
+	// within it, they are at least a viewport boundary apart, so the
+	// selection cannot be at the edge.
+	if (
+		( y < 0 ||
+			y > defaultView.innerHeight ||
+			x < 0 ||
+			x > defaultView.innerWidth ) &&
+		rangeRect.top >= 0 &&
+		rangeRect.bottom <= defaultView.innerHeight &&
+		rangeRect.left >= 0 &&
+		rangeRect.right <= defaultView.innerWidth
+	) {
+		return false;
+	}
+
 	const testRange = scrollIfNoRange( container, isReverse, () =>
 		hiddenCaretRangeFromPoint( ownerDocument, x, y, container )
 	);
