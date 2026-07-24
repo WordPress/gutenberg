@@ -1979,7 +1979,7 @@ test.describe( 'List (@firefox)', () => {
 								innerBlocks: [
 									{
 										name: 'core/list-item',
-										attributes: { content: 'c‸d' },
+										attributes: { content: 'cd' },
 										innerBlocks: [
 											{
 												name: 'core/list',
@@ -1987,7 +1987,7 @@ test.describe( 'List (@firefox)', () => {
 													{
 														name: 'core/list-item',
 														attributes: {
-															content: 'ef',
+															content: 'e‸f',
 														},
 													},
 												],
