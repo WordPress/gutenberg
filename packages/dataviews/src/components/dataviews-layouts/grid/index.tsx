@@ -55,7 +55,7 @@ function ViewGrid< Item >( {
 		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
-		isMultiselect: true,
+		selectionMode: 'multi',
 		shouldSelectOnClick: false,
 	} );
 	if ( ! hasData ) {

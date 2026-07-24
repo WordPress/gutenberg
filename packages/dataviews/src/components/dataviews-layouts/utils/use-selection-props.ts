@@ -131,6 +131,10 @@ export function getClosestSelectedId( {
 	return closestId;
 }
 
+// How many items the selection can hold, and — for single selection — whether a
+// plain click on the selected item may clear it. See `useSelectionProps`.
+export type SelectionMode = 'multi' | 'single-required' | 'single-clearable';
+
 export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
@@ -147,12 +151,19 @@ export interface SelectionProps {
 // an `isItemSelectable` predicate; the hook derives the selectable items from
 // those. Spread `getSelectionProps( id )` on each item's container element.
 //
-// The selection semantics are described by three props. `multiselect` says
-// whether the selection can hold more than one item, which enables the range
-// gesture and makes modifier clicks add rather than replace. `selectOnClick`
-// says whether a plain click selects (and anchors the range) instead of opening
-// the item; when it does, the hook also returns the `onClick` that performs it.
-// `isItemSelectable` says which items can be selected.
+// The selection semantics are described by three props. `selectionMode` says
+// how many items the selection can hold and, for single selection, whether a
+// plain click on the selected item may clear it:
+//   - `'multi'`: the selection can hold more than one item, which enables the
+//     Shift+Click range gesture and makes modifier clicks add rather than
+//     replace. A plain click on a selected item removes it from the selection.
+//   - `'single-required'`: at most one item, and a plain click always leaves
+//     something selected — re-clicking the selected item keeps it (one-of-N).
+//   - `'single-clearable'`: at most one item, but a plain click on the selected
+//     item clears the selection (zero-or-one).
+// `selectOnClick` says whether a plain click selects (and anchors the range)
+// instead of opening the item; when it does, the hook also returns the `onClick`
+// that performs it. `isItemSelectable` says which items can be selected.
 //
 // The selection model is one-dimensional: a range is the contiguous run of
 // selectable items between the anchor and the target. Two-dimensional layouts
@@ -171,7 +182,7 @@ export default function useSelectionProps< Item >( {
 	isItemSelectable,
 	selection,
 	onChangeSelection,
-	isMultiselect,
+	selectionMode,
 	shouldSelectOnClick,
 }: {
 	data: Item[];
@@ -180,14 +191,22 @@ export default function useSelectionProps< Item >( {
 	isItemSelectable: ( item: Item ) => boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
-	// Whether the selection can hold more than one item. Enables the Shift+Click
-	// range gesture and makes modifier clicks add to the selection rather than
-	// replace it.
-	isMultiselect: boolean;
+	// How the selection behaves: `'multi'` allows more than one item (enabling
+	// the Shift+Click range gesture and making modifier clicks add rather than
+	// replace), while `'single-required'` and `'single-clearable'` cap it at one
+	// item and differ only in whether a plain click on the selected item clears
+	// the selection.
+	selectionMode: SelectionMode;
 	// Whether a plain click selects (and anchors the range) rather than opening
 	// the item. When it does, the hook returns the `onClick` that performs it.
 	shouldSelectOnClick: boolean;
 } ) {
+	// `multi` is the only mode holding more than one item, so it alone enables
+	// the range gesture and additive modifier clicks. Deselecting on a plain
+	// click is offered by every mode except `single-required`, which always
+	// keeps something selected.
+	const isMultiselect = selectionMode === 'multi';
+	const allowDeselect = selectionMode !== 'single-required';
 	// The Shift+Click range gesture in progress: the anchor ranges extend from
 	// — the last item whose selection was directly toggled — and the target of
 	// the last Shift+Click, which is the other end of the range currently
@@ -233,7 +252,7 @@ export default function useSelectionProps< Item >( {
 			// reach here: `onClickCapture` stops them.
 			...( shouldSelectOnClick && {
 				onClick: () => {
-					if ( selection.includes( id ) ) {
+					if ( allowDeselect && selection.includes( id ) ) {
 						onChangeSelection(
 							selection.filter( ( itemId ) => id !== itemId )
 						);

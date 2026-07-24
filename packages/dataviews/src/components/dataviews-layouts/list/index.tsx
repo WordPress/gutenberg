@@ -416,7 +416,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		isMultiselect: false,
+		selectionMode: 'single-required',
 		shouldSelectOnClick: true,
 	} );
 

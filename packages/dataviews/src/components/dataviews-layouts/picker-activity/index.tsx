@@ -270,7 +270,7 @@ export default function ViewPickerActivity< Item >( {
 		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		isMultiselect,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
 		shouldSelectOnClick: true,
 	} );
 
