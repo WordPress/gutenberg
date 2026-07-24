@@ -67,7 +67,6 @@ import {
 	getAllWidgets,
 	getWidgetMetadata,
 	getWidgetFiles,
-	collectWidgetTranslatableStrings,
 } from './widget-utils.mjs';
 import {
 	generateWorkerPlaceholder,
@@ -115,7 +114,6 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
-const DEFAULT_TEXTDOMAIN = WP_PLUGIN_CONFIG.textdomain || null;
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -2051,7 +2049,7 @@ function collectWidgets() {
 				presentation: metadata.presentation ?? null,
 				category: metadata.category ?? null,
 				keywords: metadata.keywords ?? null,
-				textdomain: metadata.textdomain ?? DEFAULT_TEXTDOMAIN,
+				textdomain: metadata.textdomain ?? null,
 			},
 		];
 	} );
@@ -2226,54 +2224,6 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'widget-registry.php.template',
 		path.join( BUILD_DIR, 'widgets', 'registry.php' ),
 		{ ...replacements, '{{WIDGETS}}': widgetEntries }
-	);
-}
-
-/**
- * Generate `build/widgets/widget-strings.php`: one `_x()` call per
- * translatable `widget.json` value, for gettext extraction tooling.
- * Never loaded at runtime. Widgets without a `textdomain` are skipped,
- * matching the runtime translation no-op.
- *
- * @param {Array}                  widgets      Array of widget objects.
- * @param {Record<string, string>} replacements PHP template replacements.
- */
-async function generateWidgetStrings( widgets, replacements ) {
-	const seen = new Set();
-	const calls = [ ...widgets ]
-		.filter( ( widget ) => widget.textdomain )
-		.sort( ( a, b ) => a.dirName.localeCompare( b.dirName ) )
-		.flatMap( ( widget ) =>
-			collectWidgetTranslatableStrings( widget ).flatMap(
-				( { value, context } ) => {
-					const key = JSON.stringify( [
-						widget.textdomain,
-						context,
-						value,
-					] );
-					if ( seen.has( key ) ) {
-						return [];
-					}
-					seen.add( key );
-
-					const valueStr = toPhpStringLiteral( value );
-					const contextStr = toPhpStringLiteral( context );
-					const domainStr = toPhpStringLiteral( widget.textdomain );
-					return [
-						`_x( ${ valueStr }, ${ contextStr }, ${ domainStr } );`,
-					];
-				}
-			)
-		);
-
-	if ( calls.length === 0 ) {
-		return;
-	}
-
-	await generatePhpFromTemplate(
-		'widget-strings.php.template',
-		path.join( BUILD_DIR, 'widgets', 'widget-strings.php' ),
-		{ ...replacements, '{{WIDGET_STRINGS}}': calls.join( '\n' ) }
 	);
 }
 
@@ -2455,7 +2405,6 @@ async function buildAll( baseUrlExpression ) {
 		generateRoutesRegistry( activeRoutes, phpReplacements ),
 		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generateWidgetRegistry( widgets, phpReplacements ),
-		generateWidgetStrings( widgets, phpReplacements ),
 		generateWidgetsPhp( widgets, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
@@ -2471,14 +2420,6 @@ async function buildAll( baseUrlExpression ) {
 	if ( widgets.length > 0 ) {
 		console.log( '   ✔ Generated build/widgets.php' );
 		console.log( '   ✔ Generated build/widgets/registry.php' );
-		const hasWidgetStrings = widgets.some(
-			( widget ) =>
-				widget.textdomain &&
-				collectWidgetTranslatableStrings( widget ).length > 0
-		);
-		if ( hasWidgetStrings ) {
-			console.log( '   ✔ Generated build/widgets/widget-strings.php' );
-		}
 	}
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
