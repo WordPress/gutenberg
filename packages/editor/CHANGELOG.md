@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Notes: Hide the Edit/Reopen and Delete actions in a note's menu when the current user isn't allowed to perform them, instead of showing options that fail with a permissions error when clicked.
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ## 14.51.0 (2026-07-14)

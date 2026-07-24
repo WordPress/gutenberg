@@ -16,6 +16,8 @@ import {
 import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -97,23 +99,38 @@ export function Note( {
 		( note.meta._wp_note_status === 'resolved' ||
 			note.meta._wp_note_status === 'reopen' );
 
+	// Notes can only be edited or deleted by their author or by users who
+	// can moderate comments, so check the actual REST permission for this
+	// note rather than assuming every menu action is available.
+	const { canEdit, canDelete } = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const resource = { kind: 'root', name: 'comment', id: note.id };
+			return {
+				canEdit: canUser( 'update', resource ),
+				canDelete: canUser( 'delete', resource ),
+			};
+		},
+		[ note.id ]
+	);
+
 	const menuItems = [
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: ( { status } ) => status !== 'approved',
+			isEligible: ( { status } ) => status !== 'approved' && canEdit,
 			onClick: () => setActionState( 'edit' ),
 		},
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => status === 'approved',
+			isEligible: ( { status } ) => status === 'approved' && canEdit,
 			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () => true,
+			isEligible: () => canDelete,
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
