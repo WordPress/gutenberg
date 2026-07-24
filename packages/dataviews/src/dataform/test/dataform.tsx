@@ -8,12 +8,15 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 const noop = () => {};
 
@@ -706,6 +709,43 @@ describe( 'DataForm component', () => {
 			await user.click( outsideButton );
 
 			expect( await screen.findByText( errorText ) ).toBeVisible();
+		} );
+
+		it( 'should announce how many fields need attention when focus leaves the card', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formCardMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							mainCard: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			await user.click( fieldsSelector.order.edit() );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'1 field needs attention',
+				'polite'
+			);
 		} );
 
 		it( 'should show errors for invalid fields after the card is collapsed and expanded', async () => {

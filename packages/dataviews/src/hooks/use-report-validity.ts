@@ -19,7 +19,8 @@ import { useCallback, useEffect } from '@wordpress/element';
  *                     open/visible state.
  *
  * @return A callback that reveals the errors on demand, for layouts that also
- *         need to report on a recurring event such as losing focus.
+ *         need to report on a recurring event such as losing focus. It returns
+ *         how many inputs it revealed an error for.
  */
 export default function useReportValidity(
 	ref: React.RefObject< HTMLElement | null >,
@@ -29,13 +30,16 @@ export default function useReportValidity(
 		const inputs = ref.current?.querySelectorAll<
 			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 		>( 'input, textarea, select' );
+		let reportedCount = 0;
 		inputs?.forEach( ( input ) => {
 			if ( input.willValidate && ! input.validity.valid ) {
+				reportedCount++;
 				input.dispatchEvent(
 					new Event( 'invalid', { cancelable: true } )
 				);
 			}
 		} );
+		return reportedCount;
 	}, [ ref ] );
 
 	useEffect( () => {

@@ -90,11 +90,12 @@ export default function FormDetailsField< Item >( {
 			return;
 		}
 		setTouched( true );
-		reportValidity();
 		// The errors appear without moving focus, so announce them: their
-		// arrival is otherwise imperceptible to assistive technology.
+		// arrival is otherwise imperceptible to assistive technology. A
+		// collapsed element reveals nothing, so it stays silent.
+		const reportedCount = reportValidity();
 		const message = getValidationMessage( validity );
-		if ( message ) {
+		if ( reportedCount > 0 && message ) {
 			speak( message, 'polite' );
 		}
 	}, [ reportValidity, validity ] );
