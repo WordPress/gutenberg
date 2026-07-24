@@ -72,3 +72,4 @@ For full architecture details, see `docs/explanations/architecture/`.
 
 -   Ensure build passes
 -   Fix all formatting/linting issues; these are enforced through CI in PRs
+-   Base the PR description on the committed diff, not your local working tree.
