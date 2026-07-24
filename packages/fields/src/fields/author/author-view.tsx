@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import {
@@ -47,9 +46,13 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
+					{ /* Decorative: the author's name follows it. Naming the
+					     image would repeat that name, and in the DataForm
+					     panel it would leak into the edit button's
+					     accessible description. */ }
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
-						alt={ __( 'Author avatar' ) }
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>
