@@ -32,39 +32,6 @@ export default function useClickSelection() {
 					// don't mark this action as multiselection.
 					if ( startClientId && startClientId !== clickedClientId ) {
 						setContentEditableWrapper( node, true );
-
-						// Safari does not extend the selection to a
-						// clicked position within an element with a
-						// tabIndex, or within a block whose wrapper has
-						// one (a list item): it focuses the element
-						// instead, discarding the selection. Remove the
-						// tabIndex for the duration of the click.
-						const stripped = [];
-						let element = event.target;
-						while ( element && element !== node ) {
-							if (
-								element.hasAttribute?.( 'tabindex' ) &&
-								element.contentEditable !== 'true'
-							) {
-								stripped.push( [
-									element,
-									element.getAttribute( 'tabindex' ),
-								] );
-								element.removeAttribute( 'tabindex' );
-							}
-							element = element.parentElement;
-						}
-						if ( stripped.length ) {
-							node.ownerDocument.defaultView.addEventListener(
-								'mouseup',
-								() => {
-									for ( const [ el, value ] of stripped ) {
-										el.setAttribute( 'tabindex', value );
-									}
-								},
-								{ once: true }
-							);
-						}
 					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
