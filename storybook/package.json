@@ -65,6 +65,7 @@
 		"http-server": "^14.1.1",
 		"playwright": "^1.62.1",
 		"js-yaml": "^3.15.0",
+		"prettier": "npm:wp-prettier@^3.0.3",
 		"react": "^18.3.1",
 		"react-docgen-typescript": "^2.4.0",
 		"react-dom": "^18.3.1",
@@ -80,6 +81,7 @@
 	},
 	"scripts": {
 		"manifest-snapshot": "node ./scripts/generate-manifest-snapshot.mjs ./build/manifests/components.json",
+		"postmanifest-snapshot": "prettier --write components-manifest.yml",
 		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json",
 		"storybook:dev": "storybook dev -c . -p 50240",
 		"test:smoke": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"http-server ./build --port 50240 --silent\" \"wait-on tcp:127.0.0.1:50240 && test-storybook --url http://localhost:50240 --config-dir .\"",
