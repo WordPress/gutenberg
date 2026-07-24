@@ -189,7 +189,9 @@
  */
 
 @mixin outset-ring__focus() {
-	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
+	--focus-color: #{ wpds.var("--wpds-color-stroke-focus") };
+
+	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color);
 	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
