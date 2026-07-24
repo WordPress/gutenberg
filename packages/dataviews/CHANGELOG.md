@@ -74,6 +74,7 @@
 ### Bug Fix
 
 -   DataForms: Stop the `card` and `details` layouts from hijacking focus when they reveal validation errors. Errors for every field in the container are now shown once focus leaves it, instead of on each internal blur, and revealing them no longer moves focus, so the natural tab sequence is preserved. [#80685](https://github.com/WordPress/gutenberg/pull/80685)
+-   DataForms: Fix focus not returning to a `panel` layout field's edit button after its flyout is opened by clicking the field row. Focus landed on the dropdown's container element instead, so the field could not be reopened with <kbd>Enter</kbd>. The edit button is now the actual dropdown toggle, instead of the row delegating clicks to it. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
@@ -87,6 +88,7 @@
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   DataViews: Model `useSelectionProps` with orthogonal semantic props (`selectionMode`, `shouldSelectOnClick`, and a caller-supplied `isItemSelectable`) instead of a picker-specific flag, and route the `list` layout's selection through the shared hook. `selectionMode` distinguishes multi-selection from the two single-selection semantics (`'single-required'` keeps an item selected on re-click, `'single-clearable'` allows clearing it), so the `list` layout keeps its always-selected behavior while single-select pickers stay clearable. No behavior change. [#80677](https://github.com/WordPress/gutenberg/pull/80677)
+-   DataForms: Simplify the `panel` layout field trigger. The row is now a plain layout container and the edit button owns the click handling, with its hit area stretched over the row for pointer users. Removes the row-level click/keydown handlers and the text-selection guard they needed. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
 -   DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of document-level focus bookkeeping, and drop the field-owned `Popover.Slot` so format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 

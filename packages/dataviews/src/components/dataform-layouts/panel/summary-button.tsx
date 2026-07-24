@@ -69,43 +69,8 @@ export default function SummaryButton< Item >( {
 				fieldLabel || ''
 		  );
 
-	const rowRef = useRef< HTMLDivElement >( null );
-	const editButtonRef = useRef< HTMLButtonElement >( null );
-
-	const handleRowClick = ( event: React.MouseEvent ) => {
-		// Prevent a drag-to-select from opening the flyout — focus could move
-		// in and lose the selection. Skip the guard for double-clicks (standard
-		// button behavior), an already-open flyout, and the edit button.
-		if (
-			! isOpen &&
-			event.detail < 2 &&
-			! editButtonRef.current?.contains( event.target as Node ) &&
-			rowRef.current?.ownerDocument.defaultView
-				?.getSelection()
-				?.toString()
-		) {
-			return;
-		}
-		onClick();
-	};
-
-	const handleKeyDown = ( event: React.KeyboardEvent ) => {
-		if (
-			event.target === event.currentTarget &&
-			( event.key === 'Enter' || event.key === ' ' )
-		) {
-			event.preventDefault();
-			onClick();
-		}
-	};
-
 	return (
-		<div
-			ref={ rowRef }
-			className={ className }
-			onClick={ ! disabled ? handleRowClick : undefined }
-			onKeyDown={ ! disabled ? handleKeyDown : undefined }
-		>
+		<div className={ className }>
 			{ labelPosition !== 'none' && (
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
@@ -163,7 +128,6 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
-					ref={ editButtonRef }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
@@ -171,6 +135,7 @@ export default function SummaryButton< Item >( {
 					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
 					aria-describedby={ `${ controlId }` }
+					onClick={ onClick }
 				/>
 			) }
 		</div>
