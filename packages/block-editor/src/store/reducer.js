@@ -1881,6 +1881,62 @@ export const blockListSettings = ( state = new Map(), action ) => {
 };
 
 /**
+ * Reducer tracking which block client IDs have had their inner-block template
+ * applied at least once. Stored as a Set so lookups are O(1).
+ *
+ * The flag is intentionally preserved across MOVE_BLOCKS_TO_POSITION so that
+ * dragging a block to a new parent does not cause the template to be
+ * re-applied when the Edit component remounts.
+ *
+ * @param {Set}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Set} Updated state.
+ */
+export const syncedTemplateClientIds = ( state = new Set(), action ) => {
+	switch ( action.type ) {
+		case 'MARK_TEMPLATE_SYNC_APPLIED': {
+			if ( state.has( action.clientId ) ) {
+				return state;
+			}
+			const newState = new Set( state );
+			newState.add( action.clientId );
+			return newState;
+		}
+		case 'REPLACE_BLOCKS': {
+			// Collect every clientId present in the replacement blocks (including
+			// descendants) so that reused block instances keep their flag.
+			const replacementIds = new Set();
+			const stack = [ ...action.blocks ];
+			while ( stack.length ) {
+				const block = stack.shift();
+				replacementIds.add( block.clientId );
+				stack.push( ...block.innerBlocks );
+			}
+			const newState = new Set( state );
+			for ( const clientId of action.clientIds ) {
+				if ( ! replacementIds.has( clientId ) ) {
+					newState.delete( clientId );
+				}
+			}
+			return newState.size === state.size ? state : newState;
+		}
+		case 'REMOVE_BLOCKS': {
+			const newState = new Set( state );
+			for ( const clientId of action.clientIds ) {
+				newState.delete( clientId );
+			}
+			return newState.size === state.size ? state : newState;
+		}
+		case 'RESET_BLOCKS': {
+			// Full post load / reset — all flags are stale.
+			return new Set();
+		}
+	}
+	return state;
+};
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -2435,6 +2491,7 @@ const combinedReducers = combineReducers( {
 	initialPosition,
 	blocksMode,
 	blockListSettings,
+	syncedTemplateClientIds,
 	insertionPoint,
 	insertionCue,
 	template,

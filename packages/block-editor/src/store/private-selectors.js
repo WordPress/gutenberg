@@ -85,6 +85,21 @@ export function getBlockWithoutAttributes( state, clientId ) {
 }
 
 /**
+ * Returns true if the inner-block template for the given block client ID has
+ * already been applied (i.e. `markTemplateSyncApplied` was dispatched for it).
+ * Returns false for blocks where the template has never been applied, so the
+ * initial template insertion still happens correctly.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The client ID of the block to check.
+ *
+ * @return {boolean} Whether the block's template has previously been applied.
+ */
+export function wasTemplateSyncApplied( state, clientId ) {
+	return state.syncedTemplateClientIds.has( clientId );
+}
+
+/**
  * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *

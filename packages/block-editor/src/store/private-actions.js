@@ -589,3 +589,21 @@ export function setResponsiveEditing( enabled ) {
 		enabled,
 	};
 }
+
+/**
+ * Marks that the inner-block template for a given block client ID has been
+ * applied at least once. This flag is stored in the block-editor store so it
+ * survives React component remounts (e.g. when a block is moved via
+ * drag-and-drop), preventing the template from being unexpectedly re-inserted
+ * into blocks that the user has intentionally modified.
+ *
+ * @param {string} clientId The client ID of the block whose template has been applied.
+ *
+ * @return {Object} Action object.
+ */
+export function markTemplateSyncApplied( clientId ) {
+	return {
+		type: 'MARK_TEMPLATE_SYNC_APPLIED',
+		clientId,
+	};
+}
