@@ -134,8 +134,7 @@ export function getClosestSelectedId( {
 export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
-	// Only returned when a plain click selects (`selectOnClick`).
-	onClick?: () => void;
+	// Only returned when a plain click selects (`shouldSelectOnClick`).
 }
 
 // Encapsulates the pointer gestures for multi-selection, shared by layouts:
