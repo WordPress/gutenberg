@@ -38,6 +38,54 @@ test.describe( 'Playlist block', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test( 'shows the add track control when a playlist track is selected', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const uniqueId = 'playlist-selected-track';
+		const playlistAttributes = { currentTrack: uniqueId };
+		const trackAttributes = {
+			id: uploadedAudio.id,
+			uniqueId,
+			src: uploadedAudio.source_url,
+			title: 'Selected Track',
+			artist: 'Test Artist',
+			length: '0:12',
+		};
+		const playlistComment = `<!-- wp:playlist ${ JSON.stringify(
+			playlistAttributes
+		) } -->`;
+		const trackComment = `<!-- wp:playlist-track ${ JSON.stringify(
+			trackAttributes
+		) } /-->`;
+
+		await admin.createNewPost( {
+			content: [
+				playlistComment,
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">',
+				trackComment,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+			].join( '' ),
+		} );
+
+		const playlistTrack = editor.canvas
+			.locator( '[data-type="core/playlist-track"]' )
+			.first();
+		await expect( playlistTrack ).toBeVisible();
+
+		await editor.selectBlocks( playlistTrack );
+		await editor.showBlockToolbar();
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add track' } )
+		).toBeVisible();
+	} );
+
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
 		page,
 		requestUtils,

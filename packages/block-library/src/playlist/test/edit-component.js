@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,21 +15,7 @@ import PlaylistEdit from '../edit';
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
-	BlockControls: ( {
-		children,
-		group = 'default',
-		__experimentalShareWithChildBlocks,
-	} ) => (
-		<div
-			data-testid={ `block-controls-${
-				__experimentalShareWithChildBlocks
-					? 'shared-with-child-blocks'
-					: group
-			}` }
-		>
-			{ children }
-		</div>
-	),
+	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
@@ -168,7 +154,7 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
-	it( 'adds tracks from controls shared with selected track blocks', () => {
+	it( 'adds tracks from the add track control', () => {
 		render(
 			<PlaylistEdit
 				attributes={ defaultAttributes }
@@ -179,12 +165,8 @@ describe( 'PlaylistEdit', () => {
 			/>
 		);
 
-		const sharedControls = screen.getByTestId(
-			'block-controls-shared-with-child-blocks'
-		);
-
 		fireEvent.click(
-			within( sharedControls ).getByRole( 'button', {
+			screen.getByRole( 'button', {
 				name: 'Add track',
 			} )
 		);
