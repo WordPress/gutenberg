@@ -6,12 +6,12 @@ import {
 	Flex,
 	FlexItem,
 	Modal,
-	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _x, __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -58,11 +58,11 @@ export default function BlockAllowedBlocksModal( {
 				} }
 				spacing="4"
 			>
-				<WCText>
+				<Text>
 					{ __(
 						'Select which blocks can be added inside this container.'
 					) }
-				</WCText>
+				</Text>
 				<BlockManager
 					blockTypes={ blockTypes }
 					selectedBlockTypes={ currentSelectedBlockTypes }
