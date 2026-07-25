@@ -6,9 +6,9 @@ import { RangeControl, Spinner, Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useMemo } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { useFocusOnMount } from '@wordpress/compose';
 
 /**
@@ -16,6 +16,7 @@ import { useFocusOnMount } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useBlockChangedRevisions } from './use-block-changed-revisions';
 
 /**
  * Slider component for navigating revisions with pagination.
@@ -80,6 +81,11 @@ function RevisionsSlider() {
 		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
+	const blockChangedIndices = useBlockChangedRevisions(
+		revisions,
+		selectedIndex
+	);
+
 	const handleSliderChange = ( index ) => {
 		const revision = revisions?.[ index ];
 		if ( revision ) {
@@ -98,6 +104,51 @@ function RevisionsSlider() {
 	};
 
 	const showPagination = totalPages > 1;
+
+	// Read the `left`/`right` offset that RangeControl already computed for
+	// each tick mark and reuse it verbatim, keeping our marks pixel-aligned
+	// with the track regardless of thumb-radius inset, RTL, or resize.
+	const sliderWrapperRef = useRef( null );
+	const [ markOffsets, setMarkOffsets ] = useState( [] );
+
+	useLayoutEffect( () => {
+		const wrapper = sliderWrapperRef.current;
+		if ( ! wrapper ) {
+			return;
+		}
+
+		const updateOffsets = () => {
+			const markEls = wrapper.querySelectorAll(
+				'.components-range-control__mark'
+			);
+			setMarkOffsets(
+				Array.from( markEls ).map( ( el ) => ( {
+					left: el.style.left || undefined,
+					right: el.style.right || undefined,
+				} ) )
+			);
+		};
+
+		updateOffsets();
+
+		const { defaultView } = wrapper.ownerDocument;
+		const resizeObserver = new defaultView.ResizeObserver( updateOffsets );
+		resizeObserver.observe( wrapper );
+		return () => resizeObserver.disconnect();
+	}, [ revisions?.length ] );
+
+	// Must be before any early returns to satisfy Rules of Hooks.
+	const blockChangedMarkPositions = useMemo( () => {
+		if ( ! revisions?.length || blockChangedIndices.size === 0 ) {
+			return [];
+		}
+		return [ ...blockChangedIndices ]
+			.filter( ( index ) => markOffsets[ index ] )
+			.map( ( index ) => ( {
+				index,
+				offset: markOffsets[ index ],
+			} ) );
+	}, [ revisions, blockChangedIndices, markOffsets ] );
 
 	if ( isLoading && ! showPagination ) {
 		return <Spinner />;
@@ -134,20 +185,55 @@ function RevisionsSlider() {
 		isLoading || selectedIndex === -1 ? (
 			<Spinner />
 		) : (
-			<RangeControl
-				ref={ focusOnMountRef }
-				aria-valuetext={ renderTooltipContent( selectedIndex ) }
-				className="editor-revisions-header__slider"
-				hideLabelFromVision
-				label={ __( 'Revision' ) }
-				max={ revisions?.length - 1 }
-				min={ 0 }
-				marks
-				onChange={ handleSliderChange }
-				renderTooltipContent={ renderTooltipContent }
-				value={ selectedIndex }
-				withInputField={ false }
-			/>
+			<span
+				className="editor-revisions-header__slider-wrapper"
+				ref={ sliderWrapperRef }
+			>
+				<RangeControl
+					ref={ focusOnMountRef }
+					aria-valuetext={ renderTooltipContent( selectedIndex ) }
+					className="editor-revisions-header__slider"
+					hideLabelFromVision
+					label={ __( 'Revision' ) }
+					max={ revisions?.length - 1 }
+					min={ 0 }
+					marks
+					onChange={ handleSliderChange }
+					renderTooltipContent={ renderTooltipContent }
+					value={ selectedIndex }
+					withInputField={ false }
+				/>
+				{ blockChangedMarkPositions.map( ( { index, offset } ) => (
+					<Tooltip.Root key={ index }>
+						<Tooltip.Trigger
+							render={
+								<button
+									type="button"
+									className="editor-revisions-header__block-changed-mark"
+									style={ offset }
+									onClick={ () =>
+										handleSliderChange( index )
+									}
+									aria-label={ sprintf(
+										/* translators: %s: revision date */
+										__(
+											'Selected block changed in revision from %s'
+										),
+										renderTooltipContent( index )
+									) }
+								/>
+							}
+						/>
+						<Tooltip.Popup>
+							{ sprintf(
+								/* translators: %s: revision date */
+								__( 'Selected block changed — %s' ),
+								renderTooltipContent( index )
+							) }
+						</Tooltip.Popup>
+					</Tooltip.Root>
+				) ) }
+			</span>
 		);
 
 	if ( ! showPagination ) {
