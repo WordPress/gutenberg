@@ -44,6 +44,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		displayAuthor,
 		displayDate,
 		displayExcerpt,
+		displayFeaturedImage,
 		excerptLength,
 		feedURL,
 		itemsToShow,
@@ -153,6 +154,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							displayAuthor: false,
 							displayDate: false,
 							displayExcerpt: false,
+							displayFeaturedImage: false,
 							excerptLength: 55,
 							columns: 2,
 							openInNewTab: false,
@@ -175,6 +177,23 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
 							required
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						label={ __( 'Display featured image' ) }
+						hasValue={ () => !! displayFeaturedImage }
+						onDeselect={ () =>
+							setAttributes( { displayFeaturedImage: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={ __( 'Display featured image' ) }
+							checked={ displayFeaturedImage }
+							onChange={ toggleAttribute(
+								'displayFeaturedImage'
+							) }
 						/>
 					</ToolsPanelItem>
 

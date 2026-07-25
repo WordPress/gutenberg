@@ -41,3 +41,15 @@ ul.wp-block-rss { // The ul is needed for specificity to override the reset styl
 	list-style: none;
 	padding: 0;
 }
+
+.wp-block-rss__item-featured-image {
+	display: block;
+	margin-bottom: 0.5em;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+		max-width: 100%;
+	}
+}
