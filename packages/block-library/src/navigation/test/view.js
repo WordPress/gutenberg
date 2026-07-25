@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 let mockRegisteredStore;
 let mockCurrentContext;
 
