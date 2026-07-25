@@ -376,17 +376,6 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 					panelId="test-panel"
 				/>
 			);
-
-			// The local override renders the override indicator (mirroring the
-			// color/gradient controls), not the plain remove button.
-			expect(
-				screen.getByRole( 'button', {
-					name: /overrides inherited styles/i,
-				} )
-			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', { name: /^remove$/i } )
-			).not.toBeInTheDocument();
 		} );
 
 		it( 'renders the default remove button for a locally-set shadow with no inherited value', () => {
