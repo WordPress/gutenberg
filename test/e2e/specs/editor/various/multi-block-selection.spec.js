@@ -44,6 +44,43 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should count the blocks nested in selected blocks', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner one' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner two' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'outer' },
+		} );
+
+		await editor.canvas.getByText( 'outer' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 4 ] );
+
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'4 blocks selected.'
+		);
+	} );
+
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
 	test( 'should only trigger multi-selection when at the end (-webkit)', async ( {
 		page,
