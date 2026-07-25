@@ -315,18 +315,20 @@ test.describe( 'Block Grouping', () => {
 				name: 'core/heading',
 				attributes: { content: 'Heading', level: 2 },
 			} );
-			const alignOptions = page.getByRole( 'menu', { name: 'Align' } );
+			const alignOptions = page.getByRole( 'menu', {
+				name: 'Align block',
+			} );
 
 			// Full width image.
 			await editor.insertBlock( { name: 'core/image' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await alignOptions
 				.getByRole( 'menuitemradio', { name: 'Full width' } )
 				.click();
 
 			// Wide width image.
 			await editor.insertBlock( { name: 'core/image' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await alignOptions
 				.getByRole( 'menuitemradio', {
 					name: 'Wide width',
@@ -344,7 +346,7 @@ test.describe( 'Block Grouping', () => {
 
 			// We expect Group block align setting to match that
 			// of the widest of it's "child" innerBlocks
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				alignOptions.getByRole( 'menuitemradio', { checked: true } )
 			).toHaveText( 'Full width' );

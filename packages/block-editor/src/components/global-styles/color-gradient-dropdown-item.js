@@ -170,6 +170,7 @@ function ColorGradientTab( {
 			colorValue={ isGradient ? undefined : displayed }
 			colorSlug={ isGradient ? undefined : displayedSlug }
 			gradientValue={ isGradient ? displayed : undefined }
+			gradientSlug={ isGradient ? displayedSlug : undefined }
 			onColorChange={ isGradient ? undefined : onChange }
 			onGradientChange={ isGradient ? onChange : undefined }
 			/*

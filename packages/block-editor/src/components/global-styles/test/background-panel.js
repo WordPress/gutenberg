@@ -130,6 +130,89 @@ const baseSettings = {
 	},
 };
 
+describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
+	const SHARED_GRADIENT =
+		'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)';
+	const duplicateGradientSettings = {
+		background: {
+			gradient: true,
+		},
+		color: {
+			gradients: {
+				theme: [
+					{
+						name: 'Dark background',
+						slug: 'dup-background',
+						gradient: SHARED_GRADIENT,
+					},
+					{
+						name: 'Dark text',
+						slug: 'dup-text',
+						gradient: SHARED_GRADIENT,
+					},
+				],
+			},
+		},
+	};
+
+	async function openGradientDropdown( user ) {
+		await user.click( screen.getByRole( 'button', { name: /Gradient/ } ) );
+		return screen.findAllByRole( 'option' );
+	}
+
+	it( 'commits the inherited preset slug when accepting the preselected inherited gradient', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BackgroundPanel
+				value={ {} }
+				inheritedValue={ {
+					background: { gradient: 'var:preset|gradient|dup-text' },
+				} }
+				settings={ duplicateGradientSettings }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		const swatches = await openGradientDropdown( user );
+		// swatch[1] ('Dark text') is the preselected inherited option;
+		// activating it is the "accept inherited value" gesture. The commit
+		// must carry the inherited slug, not re-encode the shared gradient
+		// string to whichever duplicate appears first.
+		await user.click( swatches[ 1 ] );
+
+		const result = onChange.mock.calls[ 0 ][ 0 ];
+		expect( result?.background?.gradient ).toBe(
+			'var:preset|gradient|dup-text'
+		);
+	} );
+
+	it( 'marks only the local preset as selected when another preset shares its gradient', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<BackgroundPanel
+				value={ {
+					background: { gradient: 'var:preset|gradient|dup-text' },
+				} }
+				inheritedValue={ {} }
+				settings={ duplicateGradientSettings }
+				onChange={ jest.fn() }
+				panelId="test-panel"
+			/>
+		);
+
+		// swatch[0] = 'Dark background', swatch[1] = 'Dark text'. Selection
+		// must follow the stored slug; matching by gradient string would
+		// mark both.
+		const swatches = await openGradientDropdown( user );
+		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
+
 describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	describe( 'Background gradient slot', () => {
 		it( 'applies the local-override className when a local gradient is set', () => {
