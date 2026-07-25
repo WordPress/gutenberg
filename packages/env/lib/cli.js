@@ -314,5 +314,19 @@ module.exports = function cli() {
 	// formatting is applied even when stdout is not a terminal.
 	yargs.wrap( Math.min( 100, yargs.terminalWidth() ?? 100 ) );
 
+	// Adds a `completion` subcommand and a `--get-yargs-completions`
+	// flag. The generated bash/zsh script auto-completes commands,
+	// options, and positional choices (containers, environments, runtimes).
+	// Declare the flag as a known option so the `unknown-options-as-args`
+	// parser config does not swallow it before the completion handler runs.
+	yargs.option( 'get-yargs-completions', {
+		type: 'string',
+		hidden: true,
+	} );
+	yargs.completion(
+		'completion',
+		'Generate a bash/zsh completion script. (Fish uses the shipped wp-env.fish file.)'
+	);
+
 	return yargs;
 };

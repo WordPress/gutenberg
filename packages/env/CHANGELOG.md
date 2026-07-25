@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add shell completion for `wp-env` (Bash, Zsh, and Fish). Run `wp-env completion` and source the output to complete commands, options, and run containers. ([#79941](https://github.com/WordPress/gutenberg/issues/79941))
+
 ## 11.11.0 (2026-07-14)
 
 ## 11.10.0 (2026-07-01)
