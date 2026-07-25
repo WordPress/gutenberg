@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `no-unused-vars-before-return`: no longer reports a false positive when a variable is only referenced by JSX nested inside a local function ([#55552](https://github.com/WordPress/gutenberg/issues/55552)).
+
 ## 25.7.0 (2026-07-14)
 
 ## 25.6.0 (2026-07-01)
