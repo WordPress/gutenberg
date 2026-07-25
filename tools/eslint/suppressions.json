@@ -338,11 +338,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/math/edit.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/media-text/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -706,11 +701,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/form-token-field/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/grid/hook.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -795,11 +785,6 @@
 		}
 	},
 	"packages/components/src/scrollable/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/search-control/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}

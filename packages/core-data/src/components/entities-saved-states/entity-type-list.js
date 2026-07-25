@@ -4,13 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import EntityRecordItem from './entity-record-item';
+import { STORE_NAME } from '../../name';
 
 function getEntityDescription( entity, count ) {
 	switch ( entity ) {
@@ -32,7 +32,7 @@ function GlobalStylesDescription( { record } ) {
 	const { editedRecord, savedRecord } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getEntityRecord } =
-				select( coreStore );
+				select( STORE_NAME );
 			return {
 				editedRecord: getEditedEntityRecord(
 					record.kind,
@@ -82,7 +82,7 @@ export default function EntityTypeList( {
 	const firstRecord = list[ 0 ];
 	const entityConfig = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityConfig(
+			select( STORE_NAME ).getEntityConfig(
 				firstRecord.kind,
 				firstRecord.name
 			),

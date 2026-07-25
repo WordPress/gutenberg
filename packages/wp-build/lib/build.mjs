@@ -1671,6 +1671,11 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
+	// Skip build-generated worker bundles written back into src/.
+	if ( relativePath.endsWith( '/src/worker-code.ts' ) ) {
+		return false;
+	}
+
 	return PACKAGES.some( ( packageName ) => {
 		const packagePath = normalizePath(
 			path.join( 'packages', packageName )
@@ -2592,6 +2597,9 @@ async function watchMode() {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
 			'**/*.{spec,test}.{js,ts,tsx}',
+			// Avoid rebuild loops: worker packages write bundled WASM/JS back
+			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
+			'**/worker-code.ts',
 		],
 		persistent: true,
 		ignoreInitial: true,
