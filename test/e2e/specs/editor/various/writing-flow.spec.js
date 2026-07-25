@@ -1151,6 +1151,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			);
 		const lineBefore = await getCaretLine();
 
+		// Without a caret the line reads are NaN and the final assertion
+		// would compare NaN to NaN, which passes.
+		expect( lineBefore ).toBeGreaterThan( 1 );
+
 		// Record every scroll movement for a second. Moving the caret
 		// within the block must not scroll the page: the caret stays
 		// within the viewport.
