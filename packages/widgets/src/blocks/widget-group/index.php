@@ -30,19 +30,27 @@ function render_block_core_widget_group( $attributes, $content, $block ) {
 		$after_title  = '</h2>';
 	}
 
-	$html = '';
+	$inner_html = '';
 
 	if ( ! empty( $attributes['title'] ) ) {
-		$html .= $before_title . esc_html( $attributes['title'] ) . $after_title;
+		$inner_html .= $before_title . esc_html( $attributes['title'] ) . $after_title;
 	}
 
-	$html .= '<div class="wp-widget-group__inner-blocks">';
+	$inner_html .= '<div class="wp-widget-group__inner-blocks">';
 	foreach ( $block->inner_blocks as $inner_block ) {
-		$html .= $inner_block->render();
+		$inner_html .= $inner_block->render();
 	}
-	$html .= '</div>';
+	$inner_html .= '</div>';
 
-	return $html;
+	// Match the editor wrapper (see edit.js) and output custom class names from the block.
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => 'widget',
+		),
+		$block
+	);
+
+	return '<div ' . $wrapper_attributes . '>' . $inner_html . '</div>';
 }
 
 /**
