@@ -482,18 +482,23 @@ export function getBlockSelectionEnd( state ) {
 }
 
 /**
- * Returns the number of blocks currently selected in the post.
+ * Returns the number of blocks currently selected in the post, including
+ * the descendants of multi-selected blocks, since a multi-selection
+ * contains the full content of the selected blocks.
  *
  * @param {Object} state Global application state.
  *
  * @return {number} Number of blocks selected in the post.
  */
 export function getSelectedBlockCount( state ) {
-	const multiSelectedBlockCount =
-		getMultiSelectedBlockClientIds( state ).length;
+	const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds( state );
 
-	if ( multiSelectedBlockCount ) {
-		return multiSelectedBlockCount;
+	if ( multiSelectedBlockClientIds.length ) {
+		return (
+			multiSelectedBlockClientIds.length +
+			getClientIdsOfDescendants( state, multiSelectedBlockClientIds )
+				.length
+		);
 	}
 
 	return state.selection.selectionStart.clientId ? 1 : 0;
