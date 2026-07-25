@@ -1162,9 +1162,19 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			() =>
 				new Promise( ( resolve ) => {
 					const positions = [];
-					document.addEventListener( 'scroll', () => {
-						positions.push( document.documentElement.scrollTop );
-					} );
+					// Capture phase so scrolls of nested containers are
+					// caught too, not only the document.
+					document.addEventListener(
+						'scroll',
+						( event ) => {
+							positions.push(
+								event.target === document
+									? document.documentElement.scrollTop
+									: event.target.scrollTop
+							);
+						},
+						true
+					);
 					setTimeout( () => resolve( positions ), 1000 );
 				} )
 		);
