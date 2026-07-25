@@ -2,7 +2,7 @@
 
 ## Overview
 
-The iframe integration is part of an ongoing effort to modernize the editing experience. WordPress is moving toward running the post editor inside an iframe, building upon the original iframe migration in the template editor.
+The iframe integration is part of an ongoing effort to modernize the editing experience. The Gutenberg plugin always runs the post editor inside an iframe, building upon the original iframe migration in the template editor. WordPress Core is moving toward the same behavior.
 
 This guide encourages migration of blocks to API version 3 in preparation for the planned iframe integration of the post editor. It helps verify in advance that blocks work in the iframe editor and assists in updating blocks so they work correctly in the iframe environment.
 
@@ -22,16 +22,16 @@ The iframed post editor will make life easier for block and theme authors by red
 
 ### When does the post editor work as an iframe?
 
-While most editors, including the template editor, already work as iframes, for backward compatibility, the current post editor only works as an iframe when the following conditions are met (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
+While most editors, including the template editor, already work as iframes, WordPress 7.0 retains a conditional fallback for backward compatibility (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
 
-- **If the Gutenberg plugin is enabled:** The editor always works as an iframe.
-- **If the Gutenberg plugin is not enabled:** The editor always works as an iframe when any of the following is true: the device type is not `Desktop` (e.g., tablet or mobile previews), the current post type is `wp_template` or `wp_block`, zoom-out mode is active, or all blocks present in the post content have `apiVersion` 3 or higher.
+-   **If the Gutenberg plugin is enabled:** The editor always works as an iframe.
+-   **If the Gutenberg plugin is not enabled:** The editor works as an iframe when any of the following is true: the device type is not `Desktop` (for example, tablet or mobile previews), the current post type is `wp_template` or `wp_block`, zoom-out mode is active, or all blocks present in the post content have `apiVersion` 3 or higher.
 
-In summary, if you haven't been able to fully test your blocks in the iframe editor yet, by maintaining `apiVersion` 2, you can prevent the post editor from working as an iframe in most cases. Once you've confirmed that your blocks work in the iframe editor, you can then migrate to `apiVersion` 3.
+In WordPress 7.0 without the Gutenberg plugin, keeping a block at `apiVersion` 2 can trigger the non-iframe fallback when that block is present in the post. This is only a temporary compatibility path: it does not apply when the Gutenberg plugin is enabled and is planned for removal in WordPress 7.1. Blocks should migrate to `apiVersion` 3 after they have been tested in the iframe editor.
 
 ### When will the post editor work as an iframe?
 
-**In WordPress 7.1, the post editor always works as an iframe, regardless of the `apiVersion` of the blocks in the post content.** The conditional fallback to a non-iframe editor is removed, so blocks with `apiVersion` 2 or lower always run inside the iframe.
+**In Gutenberg 23.6 and WordPress 7.1, the post editor always works as an iframe, regardless of the `apiVersion` of the blocks in the post content.** The conditional fallback to a non-iframe editor is removed, so blocks with `apiVersion` 2 or lower always run inside the iframe.
 
 Ahead of this, to encourage developers to test in the iframe editor, WordPress 6.9 introduces a browser console warning when blocks are registered with `apiVersion` 2 or lower, and updates the [block.json schema](https://github.com/WordPress/gutenberg/blob/trunk/schemas/json/block.json) to only allow `apiVersion: 3`. For details, see [Preparing the post editor for full iframe integration](https://make.wordpress.org/core/2025/11/12/preparing-the-post-editor-for-full-iframe-integration/).
 
@@ -39,9 +39,9 @@ In WordPress 7.0, the iframe condition is evaluated against the `apiVersion` of 
 
 ## How to test your blocks in the iframe post editor
 
-All core blocks are already using `apiVersion` 3, so simply changing your `apiVersion` to 3 should allow your blocks to work in the iframe post editor.
+All core blocks already use `apiVersion` 3. After testing your block in the iframe editor, update it to `apiVersion` 3.
 
-However, make sure that no other third-party blocks registered with version 2 or lower are present. If blocks with version 2 or lower are registered, the post editor may not work as an iframe editor.
+The simplest way to test is with Gutenberg 23.6 or later, where the post editor always uses the iframe. In WordPress 7.0 without the Gutenberg plugin, the editor may fall back to a non-iframe editor when the post contains a block using `apiVersion` 2 or lower.
 
 ## Technical considerations for the iframe editor
 
