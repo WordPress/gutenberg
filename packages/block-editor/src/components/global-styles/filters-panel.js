@@ -35,7 +35,6 @@ import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
 	InheritanceOverrideIndicator,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -187,7 +186,7 @@ export default function FiltersPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );

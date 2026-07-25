@@ -15,16 +15,6 @@ import {
 import { __ } from '@wordpress/i18n';
 
 /**
- * Whether the inspector surfaces inherited Global Styles values.
- * Plugin-only, so Core builds show locally-set values alone.
- *
- * @type {boolean}
- */
-export const ENABLE_GLOBAL_STYLES_INHERITANCE = globalThis.IS_GUTENBERG_PLUGIN
-	? true
-	: false;
-
-/**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`. Only a
  * local override is marked with the diamond indicator; inheritance is the
  * unmarked default. `isInherited` is accepted and returned unchanged but no
