@@ -38,6 +38,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import { getAttributesDiff, applyAttributesDiff } from '../../utils/object';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -267,20 +268,43 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( nextAttributes ) {
-			const { getMultiSelectedBlockClientIds } =
+			const { getMultiSelectedBlockClientIds, getBlocksByClientId } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
 			const { clientId, attributes } = ownProps;
-			const clientIds = multiSelectedBlockClientIds.length
-				? multiSelectedBlockClientIds
-				: [ clientId ];
 			const newAttributes =
 				typeof nextAttributes === 'function'
 					? nextAttributes( attributes )
 					: nextAttributes;
 
-			updateBlockAttributes( clientIds, newAttributes );
+			if ( multiSelectedBlockClientIds.length > 0 ) {
+				const diff = getAttributesDiff( attributes, newAttributes );
+				if ( diff !== undefined ) {
+					const blocks = getBlocksByClientId(
+						multiSelectedBlockClientIds
+					);
+					const updates = {};
+					multiSelectedBlockClientIds.forEach( ( id, index ) => {
+						const block = blocks[ index ];
+						if ( block ) {
+							updates[ id ] = applyAttributesDiff(
+								block.attributes,
+								diff
+							);
+						}
+					} );
+					updateBlockAttributes(
+						multiSelectedBlockClientIds,
+						updates,
+						{
+							uniqueByBlock: true,
+						}
+					);
+				}
+			} else {
+				updateBlockAttributes( clientId, newAttributes );
+			}
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
