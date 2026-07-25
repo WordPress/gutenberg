@@ -103,17 +103,22 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	// which `scrollIfNoRange` scrolls the container's edge into view to
 	// measure, e.g. on every arrow press within a container taller than the
 	// viewport). When the edge is outside the viewport and the selection is
-	// within it, they are at least a viewport boundary apart, so the
-	// selection cannot be at the edge.
-	if (
-		( y < 0 ||
-			y > defaultView.innerHeight ||
-			x < 0 ||
-			x > defaultView.innerWidth ) &&
+	// within it, they are at least a viewport boundary apart along that
+	// axis, so the selection cannot be at the edge. Check each axis
+	// separately: the vertical check must not be short-circuited by a
+	// horizontally overflowing container, and vice versa.
+	const isFarFromVerticalEdge =
+		( y < 0 || y > defaultView.innerHeight ) &&
 		rangeRect.top >= 0 &&
-		rangeRect.bottom <= defaultView.innerHeight &&
+		rangeRect.bottom <= defaultView.innerHeight;
+	const isFarFromHorizontalEdge =
+		( x < 0 || x > defaultView.innerWidth ) &&
 		rangeRect.left >= 0 &&
-		rangeRect.right <= defaultView.innerWidth
+		rangeRect.right <= defaultView.innerWidth;
+
+	if (
+		isFarFromVerticalEdge ||
+		( ! onlyVertical && isFarFromHorizontalEdge )
 	) {
 		return false;
 	}
