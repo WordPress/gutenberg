@@ -164,8 +164,13 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 
 			// The new tab's panel is the active one and is visible.
+			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
+			// Use `includeHidden: true` to check the number of hidden panels. getByRole()
+			// only returns visible elements by default.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
+				exact: true,
+				includeHidden: true,
 			} );
 			await expect( panels ).toHaveCount( 3 );
 			await expect( panels.nth( 2 ) ).toBeVisible();

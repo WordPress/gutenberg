@@ -83,7 +83,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
-		"colorjs.io": "^0.6.0",
+		"colorjs.io": "^0.7.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
@@ -106,12 +106,12 @@
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"esbuild": "^0.27.2",
+		"esbuild": ">=0.27.2 <1.0.0",
 		"postcss": "^8.0.0",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19",
-		"stylelint": "^16.8.2",
-		"vite": "^7.3.2"
+		"stylelint": "^16 || ^17",
+		"vite": "^7 || ^8"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
@@ -101,12 +101,14 @@ export default function UploadProgressSnackbar() {
 
 	// Track peak total across sources during a session. The CSM queue removes
 	// items on completion, and the tracker tops out at its recorded total, so
-	// `total` has to be tracked as the high-water mark.
-	const [ peak, setPeak ] = useState( 0 );
+	// `total` has to be tracked as the high-water mark. Held in a ref (updated
+	// inside the effect below) because it never drives rendering - setting
+	// state during render here discarded the in-progress render pass, which
+	// corrupted `useSyncExternalStore`'s snapshot bookkeeping and made it drop
+	// the tracker's completion notification, leaving the snackbar stuck in its
+	// uploading state (see gutenberg#80343).
 	const sessionTotal = csmRemaining + ( tracker ? tracker.total : 0 );
-	if ( sessionTotal > peak ) {
-		setPeak( sessionTotal );
-	}
+	const peakRef = useRef( 0 );
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
 
@@ -139,7 +141,7 @@ export default function UploadProgressSnackbar() {
 			if ( completionTimeoutRef.current ) {
 				clearTimeout( completionTimeoutRef.current );
 				completionTimeoutRef.current = null;
-				setPeak( 0 );
+				peakRef.current = 0;
 			}
 		} else if ( ! isUploading && wasUploadingRef.current ) {
 			speak( __( 'Media upload complete' ), 'polite' );
@@ -160,10 +162,10 @@ export default function UploadProgressSnackbar() {
 				completionTimeoutRef.current = setTimeout( () => {
 					removeNotice( NOTICE_ID );
 					completionTimeoutRef.current = null;
-					setPeak( 0 );
+					peakRef.current = 0;
 				}, COMPLETION_DISPLAY_MS );
 			} else {
-				setPeak( 0 );
+				peakRef.current = 0;
 			}
 		}
 
@@ -173,7 +175,11 @@ export default function UploadProgressSnackbar() {
 			return;
 		}
 
-		const total = peak;
+		if ( sessionTotal > peakRef.current ) {
+			peakRef.current = sessionTotal;
+		}
+
+		const total = peakRef.current;
 		const current = total - remaining + 1;
 
 		// Prefer the CSM queue's first original filename, then fall back to
@@ -210,7 +216,14 @@ export default function UploadProgressSnackbar() {
 				dismissedRef.current = true;
 			},
 		} );
-	}, [ remaining, peak, csmOriginals, tracker, createNotice, removeNotice ] );
+	}, [
+		remaining,
+		sessionTotal,
+		csmOriginals,
+		tracker,
+		createNotice,
+		removeNotice,
+	] );
 
 	return null;
 }

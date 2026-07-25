@@ -206,15 +206,23 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		 * best-effort cleanup: when the worker has crashed, the cancel call
 		 * itself rejects, and that must not abort the cancellation flow —
 		 * onError, item removal, and worker teardown below still need to run.
+		 *
+		 * Deliberately NOT awaited: a busy worker is synchronously blocked
+		 * inside a wasm call and cannot answer the cancellation RPC until
+		 * the current operation — and every operation already queued behind
+		 * it — finishes. For a large animated GIF that is minutes, and
+		 * awaiting here would leave the cancelled item in the queue (gating
+		 * the parent's finalization) that whole time. Nothing below depends
+		 * on the result.
 		 */
-		await vipsCancelOperations( id ).catch( () => {} );
+		vipsCancelOperations( id ).catch( () => {} );
 
 		/*
 		 * Cancel any ongoing GIF-to-video conversion for this item so a
 		 * cancelled upload does not leave the encoder running off-thread.
-		 * Best-effort for the same reason as above.
+		 * Best-effort and fire-and-forget for the same reasons as above.
 		 */
-		await cancelGifToVideoOperations( id ).catch( () => {} );
+		cancelGifToVideoOperations( id ).catch( () => {} );
 
 		if ( ! silent ) {
 			const { onError } = item;

@@ -915,7 +915,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			page.getByRole( 'option', { name: 'Image', selected: true } )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		await editor.clickBlockToolbarButton( 'Align' );
+		await editor.clickBlockToolbarButton( 'Align block' );
 
 		const wideButton = page.locator(
 			'role=menuitemradio[name="Wide width"i]'

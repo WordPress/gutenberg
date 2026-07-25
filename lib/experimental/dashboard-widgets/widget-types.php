@@ -40,8 +40,8 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 /**
  * Translates a widget's user-facing metadata strings.
  *
- * Runs `title`, `description`, `help`, and `keywords` through the widget
- * i18n schema using the widget's `textdomain`, leaving every other key
+ * Runs `title`, `description`, `help`, `actions`, and `keywords` through the
+ * widget i18n schema using the widget's `textdomain`, leaving every other key
  * untouched. A no-op when the widget declares no `textdomain`.
  *
  * @param array $widget Widget data from the build manifest.
@@ -55,7 +55,7 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
 
-	foreach ( array( 'title', 'description', 'help', 'keywords' ) as $field ) {
+	foreach ( array( 'title', 'description', 'help', 'actions', 'keywords' ) as $field ) {
 		if ( isset( $widget[ $field ], $i18n_schema->$field ) ) {
 			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema->$field, $widget[ $field ], $textdomain );
 		}
@@ -66,8 +66,8 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 /**
  * Constrains a widget help note to its allowed shape: `content` keeps
- * only `em`/`strong` markup, and links missing a `label` or `href` are
- * dropped.
+ * only `em`/`strong` markup, and links are dropped unless they carry a
+ * `label` and an `href` that survives `esc_url_raw()`.
  *
  * @param array|null $help Help note from the build manifest.
  * @return array|null Sanitized help note, or null when there is no content.
@@ -91,10 +91,14 @@ function gutenberg_sanitize_widget_help( $help ) {
 		$links = array();
 		foreach ( $help['links'] as $link ) {
 			if ( is_array( $link ) && ! empty( $link['label'] ) && ! empty( $link['href'] ) ) {
-				$links[] = array(
-					'label' => $link['label'],
-					'href'  => $link['href'],
-				);
+				$href = esc_url_raw( $link['href'] );
+
+				if ( $href ) {
+					$links[] = array(
+						'label' => $link['label'],
+						'href'  => $href,
+					);
+				}
 			}
 		}
 
@@ -104,6 +108,136 @@ function gutenberg_sanitize_widget_help( $help ) {
 	}
 
 	return $sanitized;
+}
+
+/**
+ * Resolves a widget-local file href to a plugin URL.
+ *
+ * Leaves absolute, scheme-relative, root-relative, and single-segment admin
+ * `.php` hrefs unchanged. Returns '' for local path traversal and for
+ * relative hrefs that are not a file under `widgets/{dir}/` (so
+ * `esc_url_raw()` cannot invent `http://filename`). Query strings on local
+ * filenames are not stripped: `report.csv?v=2` will not resolve as a file.
+ *
+ * @param string $href     Action href.
+ * @param string $dir_name Widget directory name.
+ * @return string Plugin URL, original href, or ''.
+ */
+function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
+	if ( ! is_string( $href ) || '' === $href ) {
+		return '';
+	}
+
+	// Absolute, scheme-relative, or schemed — including URLs with `..` in the path.
+	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
+		return $href;
+	}
+
+	// Root-relative paths (e.g. /wp-admin/…, /report.csv).
+	if ( str_starts_with( $href, '/' ) ) {
+		return $href;
+	}
+
+	if ( str_contains( $href, '..' ) ) {
+		return '';
+	}
+
+	$path_only = preg_split( '/[?#]/', $href, 2 )[0];
+	if ( str_ends_with( strtolower( $path_only ), '.php' ) ) {
+		// Single-segment admin entry points stay as-is. Deeper relative
+		// paths would come out of `esc_url_raw()` as `http://` URLs, and
+		// PHP files never resolve as local widget assets.
+		return str_contains( $path_only, '/' ) ? '' : $href;
+	}
+
+	if ( ! is_string( $dir_name ) || '' === $dir_name ) {
+		return '';
+	}
+
+	$candidate = 'widgets/' . $dir_name . '/' . $href;
+
+	if ( is_file( gutenberg_dir_path() . $candidate ) ) {
+		return gutenberg_url( $candidate );
+	}
+
+	return '';
+}
+
+/**
+ * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
+ * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe
+ * entries; dropped hrefs are reported through `_doing_it_wrong()`. With
+ * `$dir_name`, resolves widget-local file hrefs first.
+ *
+ * This is the registration gate for manifest-sourced widget types. Definitions
+ * registered only on the client do not pass through it; any future CPT/API
+ * source should reuse this helper at that boundary.
+ *
+ * @param array|null $actions  Actions from the build manifest.
+ * @param string     $dir_name Optional widget directory for local asset hrefs.
+ * @return array|null Sanitized actions, or null.
+ */
+function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
+	if ( ! is_array( $actions ) ) {
+		return null;
+	}
+
+	$sanitized = array();
+	foreach ( $actions as $action ) {
+		if (
+			! is_array( $action ) ||
+			! isset( $action['id'], $action['label'], $action['href'] ) ||
+			! is_string( $action['id'] ) ||
+			! is_string( $action['label'] ) ||
+			! is_string( $action['href'] ) ||
+			'' === $action['id'] ||
+			'' === $action['label'] ||
+			'' === $action['href']
+		) {
+			continue;
+		}
+
+		$href = gutenberg_resolve_widget_action_href( $action['href'], $dir_name );
+		$href = esc_url_raw( $href );
+		if ( ! $href ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: 1: Widget action id. 2: Declared action href. */
+					__( 'Dropped widget action "%1$s": href "%2$s" is neither an allowed URL nor an existing widget file.', 'gutenberg' ),
+					$action['id'],
+					$action['href']
+				),
+				'23.7.0'
+			);
+			continue;
+		}
+
+		$entry = array(
+			'id'    => $action['id'],
+			'label' => $action['label'],
+			'href'  => $href,
+		);
+
+		if ( isset( $action['download'] ) ) {
+			if ( is_bool( $action['download'] ) ) {
+				$entry['download'] = $action['download'];
+			} else {
+				$filename = sanitize_file_name( (string) $action['download'] );
+				if ( $filename ) {
+					$entry['download'] = $filename;
+				}
+			}
+		}
+
+		if ( isset( $action['openInNewTab'] ) ) {
+			$entry['openInNewTab'] = (bool) $action['openInNewTab'];
+		}
+
+		$sanitized[] = $entry;
+	}
+
+	return $sanitized ? $sanitized : null;
 }
 
 /**
@@ -139,6 +273,10 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
+				'actions'       => gutenberg_sanitize_widget_actions(
+					$widget['actions'] ?? null,
+					$widget['dir_name'] ?? ''
+				),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

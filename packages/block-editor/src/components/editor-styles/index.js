@@ -75,7 +75,22 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
 
-		for ( const [ id, override ] of overrides ) {
+		/*
+		 * Custom CSS overrides are applied after all other overrides so they
+		 * win the cascade at equal specificity, mirroring the front end where
+		 * the custom CSS stylesheet is printed last. Both partitions keep the
+		 * block order established by getStyleOverrides.
+		 */
+		const orderedOverrides = [
+			...overrides.filter(
+				( [ , override ] ) => override?.__unstableType !== 'custom-css'
+			),
+			...overrides.filter(
+				( [ , override ] ) => override?.__unstableType === 'custom-css'
+			),
+		];
+
+		for ( const [ id, override ] of orderedOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
 			const overrideWithId = { ...override, id };
 			if ( index === -1 ) {

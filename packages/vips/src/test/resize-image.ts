@@ -86,6 +86,31 @@ describe( 'resizeImage', () => {
 		expect( mockCrop ).not.toHaveBeenCalled();
 	} );
 
+	it( 'resizes animated images from the first frame only', async () => {
+		const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+			lastModified: 1234567891,
+			type: 'image/gif',
+		} );
+		const buffer = await gifFile.arrayBuffer();
+
+		await resizeImage( 'itemId', buffer, 'image/gif', {
+			width: 100,
+			height: 100,
+		} );
+
+		/*
+		 * Sub-sizes of animated images are static, generated from the first
+		 * frame, matching WordPress core's server-side behavior. All frames
+		 * must NOT be loaded (no `option_string: '[n=-1]'`), which used to
+		 * re-encode a full animated GIF per sub-size.
+		 */
+		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+			height: 100,
+			size: 'down',
+		} );
+		expect( mockCrop ).not.toHaveBeenCalled();
+	} );
+
 	it( 'resizes with center crop', async () => {
 		const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
 			lastModified: 1234567891,

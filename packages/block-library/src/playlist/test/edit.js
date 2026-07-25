@@ -46,6 +46,36 @@ describe( 'Playlist block edit utilities', () => {
 			expect( result.imageAlt ).toBeUndefined();
 		} );
 
+		it( 'should transform raw uploaded attachment data to track attributes', () => {
+			const media = {
+				id: 123,
+				source_url: 'https://example.com/song.mp3',
+				title: { raw: 'My &amp; Song' },
+				media_details: {
+					artist: 'Media Details Artist',
+					album: 'Media Details Album',
+					length_formatted: '4:30',
+				},
+				image: {
+					source_url: 'https://example.com/cover.jpg',
+					alt_text: 'A black and white portrait',
+				},
+			};
+
+			const result = getTrackAttributes( media );
+
+			expect( result ).toEqual( {
+				id: 123,
+				src: 'https://example.com/song.mp3',
+				title: 'My & Song',
+				artist: 'Media Details Artist',
+				album: 'Media Details Album',
+				length: '4:30',
+				image: 'https://example.com/cover.jpg',
+				imageAlt: 'A black and white portrait',
+			} );
+		} );
+
 		it( 'should fall back to meta.artist when artist is not available', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',

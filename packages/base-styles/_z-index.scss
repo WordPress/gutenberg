@@ -74,6 +74,7 @@ $z-layers: (
 	".components-popover": 1000000,
 
 	// Should be above the popover (dropdown)
+	".components-confirm-dialog": 1000001,
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
 	".fields-create-template-part-modal": 1000001,
@@ -91,9 +92,6 @@ $z-layers: (
 	".editor-sync-connection-error-modal": 1000001,
 	".media-editor-modal__footer": 1000001,
 	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
-
-	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
-	// because it uses emotion and not sass. We need it to render on top its parent popover.
 
 	// Show media replace flow and similar popovers beneath the media modal when its open.
 	".components-popover.block-editor-media-replace-flow__options": 99999,

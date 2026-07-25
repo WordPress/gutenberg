@@ -225,14 +225,6 @@ export type RangeControlProps = Pick<
 		 * @default true
 		 */
 		withInputField?: boolean;
-		/**
-		 * Do not throw a warning for the deprecated 36px default size.
-		 * For internal components of other components that already throw the warning.
-		 *
-		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-		 * @ignore
-		 */
-		__shouldNotWarnDeprecated36pxSize?: boolean;
 	};
 
 export type RailProps = MarksProps & {

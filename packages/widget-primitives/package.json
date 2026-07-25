@@ -41,6 +41,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": false,
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

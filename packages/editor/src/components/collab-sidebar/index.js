@@ -10,7 +10,6 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 import { getQueryArg } from '@wordpress/url';
 
 /**
@@ -30,18 +29,10 @@ import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
-import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
-	useEffect( () => {
-		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-		return () => {
-			unregisterFormatType( NOTE_FORMAT_NAME );
-		};
-	}, [] );
-
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(

@@ -5,7 +5,7 @@
 // Don't apply transition when resized using the resizer handle.
 .editor-resizable-editor:not(.is-resizing) {
 	@media (prefers-reduced-motion: no-preference) {
-		transition: width 0.2s ease-out;
+		transition: width 0.2s ease-out, height 0.2s ease-out;
 	}
 }
 

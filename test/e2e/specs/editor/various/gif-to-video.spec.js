@@ -420,4 +420,95 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		}, posterUrl.href );
 		expect( posterDimensions ).toEqual( { width: 100, height: 100 } );
 	} );
+
+	test( 'generates static first-frame sub-sizes for animated GIFs, matching core', async ( {
+		editor,
+		page,
+		gifToVideoUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * WordPress core's server-side editors (GD, Imagick) flatten animated
+		 * images to the first frame when generating sub-sizes, and
+		 * wp_calculate_image_srcset() keeps flattened sub-sizes and the
+		 * animated full-size image from mixing. The client-side path must
+		 * match: re-encoding a full animated GIF per sub-size took tens of
+		 * seconds per size for long GIFs and produced sub-sizes larger than
+		 * the original. See
+		 * https://github.com/WordPress/gutenberg/issues/80266.
+		 */
+		await expect(
+			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+		).toBeVisible();
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await gifToVideoUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			ANIMATED_GIF_FIXTURE
+		);
+
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		const uploadedImage = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.find( ( block ) => block.name === 'core/image' )
+		);
+		const attachmentId = uploadedImage.attributes.id;
+		expect( attachmentId ).toBeDefined();
+
+		// The medium sub-size (uncropped) is recorded in the attachment
+		// metadata shortly after the queue drains.
+		let media;
+		await expect
+			.poll(
+				async () => {
+					media = await requestUtils.rest( {
+						method: 'GET',
+						path: `/wp/v2/media/${ attachmentId }`,
+					} );
+					return media.media_details?.sizes?.medium?.source_url;
+				},
+				{ timeout: 30_000 }
+			)
+			.toMatch( /\.gif$/i );
+
+		// The source GIF is animated (the fixture has 12 frames); its
+		// uncropped medium sub-size must be a static single frame.
+		const frameCounts = await page.evaluate(
+			async ( { fullUrl, mediumUrl } ) => {
+				const countFrames = async ( url ) => {
+					const data = await ( await fetch( url ) ).arrayBuffer();
+					const decoder = new window.ImageDecoder( {
+						data,
+						type: 'image/gif',
+					} );
+					try {
+						await decoder.tracks.ready;
+						return decoder.tracks.selectedTrack?.frameCount ?? 0;
+					} finally {
+						decoder.close();
+					}
+				};
+				return {
+					full: await countFrames( fullUrl ),
+					medium: await countFrames( mediumUrl ),
+				};
+			},
+			{
+				fullUrl: media.source_url,
+				mediumUrl: media.media_details.sizes.medium.source_url,
+			}
+		);
+
+		expect( frameCounts.full ).toBeGreaterThan( 1 );
+		expect( frameCounts.medium ).toBe( 1 );
+	} );
 } );

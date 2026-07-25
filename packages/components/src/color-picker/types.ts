@@ -59,6 +59,8 @@ export interface PickerProps {
 	hsla: HslaColor;
 	enableAlpha: boolean;
 	onChange: ( nextHsla: HslaColor ) => void;
+	onInteractionStart?: () => void;
+	onInteractionEnd?: () => void;
 }
 
 export interface ColorInputProps {

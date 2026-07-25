@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Font Library: Give the "Install fonts" search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes ([#80315](https://github.com/WordPress/gutenberg/pull/80315)).
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
 ## 1.18.0 (2026-07-14)
 
 ### Enhancements

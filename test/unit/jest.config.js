@@ -100,7 +100,7 @@ module.exports = {
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 		process.env.CI
 			? [
-					'@flakiness/jest',
+					require.resolve( '@flakiness/jest' ),
 					{
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',

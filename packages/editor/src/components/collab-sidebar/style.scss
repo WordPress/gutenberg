@@ -170,7 +170,7 @@
 		border-radius: 2px;
 	}
 
-	a:not(.wp-note-mention) {
+	a {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -246,17 +246,21 @@ mark.wp-note {
 }
 
 // Mention chips, both in the note input and the rendered note content. A
-// mention is a link to the mentioned user's author page, styled as a chip
-// rather than an underlined link.
+// mention is a non-interactive `span` carrying the mentioned user's ID in a
+// `user-N` class, styled as a chip.
 .wp-note-mention {
 	display: inline;
-	padding: 0 $grid-unit-05;
-	border-radius: $radius-small;
-	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
-	color: var(--wp-admin-theme-color);
+	padding: 0 var(--wpds-dimension-padding-xs);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	white-space: nowrap;
-	text-decoration: none;
+
+	// Keep the chip boundary visible when forced-colors drops the background tint.
+	@media (forced-colors: active) {
+		border: 1px solid;
+	}
 }
 
 // Match the rounded avatars used for note bylines and the block toolbar

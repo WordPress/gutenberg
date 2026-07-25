@@ -359,6 +359,8 @@ export function RichTextWrapper(
 	// to the focused element.
 	const {
 		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
 		'aria-owns': ariaOwns,
 		'aria-activedescendant': ariaActiveDescendant,
 	} = autocompleteProps;
@@ -377,6 +379,8 @@ export function RichTextWrapper(
 
 		const attributes = {
 			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
 			'aria-owns': ariaOwns,
 			'aria-activedescendant': ariaActiveDescendant,
 		};
@@ -398,6 +402,8 @@ export function RichTextWrapper(
 		hasEditableRoot,
 		isSelected,
 		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
 		ariaOwns,
 		ariaActiveDescendant,
 	] );
@@ -424,7 +430,7 @@ export function RichTextWrapper(
 	if ( ! shouldDisableEditing ) {
 		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
 			tabIndex = props.tabIndex ?? 0;
-		} else if ( hasEditableRoot && props.tabIndex === 0 ) {
+		} else if ( props.tabIndex === 0 ) {
 			tabIndex = null;
 		}
 	}

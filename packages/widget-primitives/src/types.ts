@@ -71,6 +71,40 @@ export interface WidgetHelp {
 type WidgetAttributeRelevance = 'high' | 'low';
 
 /**
+ * A user-triggerable action a widget type declares. The declaration is
+ * serializable data; the host materializes it as an affordance and owns
+ * placement. The action points at a `link` target the host renders as an
+ * anchor; `download` turns it into a file download.
+ */
+export interface WidgetAction {
+	/**
+	 * Stable identifier, local to the widget type.
+	 */
+	id: string;
+
+	/**
+	 * Human-readable label naming the action. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Destination: URL, admin path, or widget-local file.
+	 */
+	href: string;
+
+	/**
+	 * When set, the browser downloads the destination instead of navigating.
+	 * A string supplies the suggested filename.
+	 */
+	download?: string | boolean;
+
+	/**
+	 * Whether the destination opens in a new browser tab.
+	 */
+	openInNewTab?: boolean;
+}
+
+/**
  * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
  * read. Its `type` may also reference a registered field type by name
  * (see `registerFieldType`); `useWidgetTypes` resolves such references
@@ -178,6 +212,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	attributes?: WidgetAttribute< Item >[];
 
 	/**
+	 * Declarative actions the widget type exposes. Hosts materialize each
+	 * one as an affordance and decide where to place it.
+	 */
+	actions?: WidgetAction[];
+
+	/**
 	 * Structured example data hosts use for previews, and the default
 	 * attributes applied when a new instance is created without initial
 	 * attributes.
@@ -253,6 +293,7 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
+		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 

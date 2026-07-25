@@ -38,6 +38,16 @@ export type ComboboxEmptyProps = ComponentProps< typeof _Combobox.Empty > & {
 	children?: React.ReactNode;
 };
 
+export type ComboboxGroupProps = ComponentProps< typeof _Combobox.Group > & {
+	children?: React.ReactNode;
+};
+
+export type ComboboxGroupLabelProps = ComponentProps<
+	typeof _Combobox.GroupLabel
+> & {
+	children?: React.ReactNode;
+};
+
 export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
 	'size'

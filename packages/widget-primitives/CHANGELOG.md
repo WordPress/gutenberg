@@ -2,8 +2,21 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
+    user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Enhancements
+
+-   Ship the package as a WordPress script module
+    (`wpScriptModuleExports`) ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
+
 ### Documentation
 
+-   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
+-   Add an Actions doc page and a `WithActions` story, and cover `actions`
+    in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
 -   Spell out the accepted field-type name syntax: lowercase kebab-case
     segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
