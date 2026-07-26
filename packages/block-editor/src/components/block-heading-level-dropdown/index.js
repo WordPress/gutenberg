@@ -3,6 +3,8 @@
  */
 import { ToolbarDropdownMenu } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -46,6 +48,12 @@ export default function HeadingLevelDropdown( {
 		)
 		.sort( ( a, b ) => a - b ); // Sorts numerically in ascending order;
 
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
+
 	return (
 		<ToolbarDropdownMenu
 			popoverProps={ POPOVER_PROPS }
@@ -53,16 +61,18 @@ export default function HeadingLevelDropdown( {
 			label={ __( 'Change level' ) }
 			controls={ validOptions.map( ( targetLevel ) => {
 				const isActive = targetLevel === value;
+				const title =
+					targetLevel === 0
+						? __( 'Paragraph' )
+						: sprintf(
+								// translators: %d: heading level e.g: "1", "2", "3"
+								__( 'Heading %d' ),
+								targetLevel
+						  );
+
 				return {
 					icon: <HeadingLevelIcon level={ targetLevel } />,
-					title:
-						targetLevel === 0
-							? __( 'Paragraph' )
-							: sprintf(
-									// translators: %d: heading level e.g: "1", "2", "3"
-									__( 'Heading %d' ),
-									targetLevel
-							  ),
+					title: showIconLabels ? title : undefined,
 					isActive,
 					onClick() {
 						onChange( targetLevel );
