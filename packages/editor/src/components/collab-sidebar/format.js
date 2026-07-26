@@ -50,9 +50,14 @@ function NoteFormat( { isActive, activeAttributes } ) {
 			return;
 		}
 
-		if ( String( getSelectedNote() ) !== String( noteId ) ) {
-			selectNote( Number( noteId ) );
+		if ( String( getSelectedNote() ) === String( noteId ) ) {
+			return;
 		}
+
+		// Select-only; no cleanup on leave. The block-level sync owns
+		// clearing/reverting, and deselecting here would drop the block's
+		// note while the caret is still inside the block.
+		selectNote( Number( noteId ) );
 	}, [
 		isActive,
 		noteId,
