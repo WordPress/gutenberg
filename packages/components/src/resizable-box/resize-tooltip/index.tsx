@@ -1,23 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { Ref, ForwardedRef } from 'react';
 
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import Label from './label';
 import type { Axis, Position } from './utils';
 import { useResizeLabel, POSITIONS } from './utils';
-import { Root } from './styles/resize-tooltip.styles';
+import styles from './style.module.scss';
 
-type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
+type ResizeTooltipProps = React.ComponentProps< 'div' > & {
 	'aria-hidden'?: boolean;
 	axis?: Axis;
 	className?: string;
@@ -59,10 +50,10 @@ function ResizeTooltip(
 		return null;
 	}
 
-	const classes = clsx( 'components-resize-tooltip', className );
+	const classes = clsx( 'components-resize-tooltip', styles.root, className );
 
 	return (
-		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>
+		<div aria-hidden="true" className={ classes } ref={ ref } { ...props }>
 			{ resizeListener }
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
@@ -71,7 +62,7 @@ function ResizeTooltip(
 				ref={ labelRef }
 				zIndex={ zIndex }
 			/>
-		</Root>
+		</div>
 	);
 }
 
