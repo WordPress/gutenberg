@@ -1470,7 +1470,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
@@ -1519,7 +1519,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
@@ -1565,8 +1565,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     // Comments stay with the selector they follow.
 	 *     array( '.a /* a, the first *\/', '.b' ) === self::split_selector_list( '.a /* a, the first *\/,.b' );
 	 *
-	 * @see https://www.w3.org/TR/selectors/#parse-selector
-	 * @see https://www.w3.org/TR/css-syntax-3/
+	 * @link https://www.w3.org/TR/selectors/#parse-selector
+	 * @link https://www.w3.org/TR/css-syntax-3/
 	 *
 	 * @param string $selector CSS selector list.
 	 * @return string[] Selectors.
@@ -1671,8 +1671,8 @@ class WP_Theme_JSON_Gutenberg {
 				 * > not included in this definition, as they are converted
 				 * > to U+000A LINE FEED during preprocessing.
 				 *
-				 * @see https://www.w3.org/TR/css-syntax/#whitespace
-				 * @see https://www.w3.org/TR/css-syntax/#newline
+				 * @link https://www.w3.org/TR/css-syntax/#whitespace
+				 * @link https://www.w3.org/TR/css-syntax/#newline
 				 */
 				$selectors[] = trim( substr( $selector, $was_at, $next_at - $was_at ), " \t\n" );
 				$at          = $next_at + 1;
