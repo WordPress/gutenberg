@@ -23,11 +23,14 @@ export function normalizeSearchInput( input = '' ) {
 /**
  * Get the search rank for a given pattern and a specific search term.
  *
- * @param {Object} pattern     Pattern to rank
- * @param {string} searchValue Search term
+ * @param {{title: string}} pattern     Pattern to rank
+ * @param {string}          searchValue Search term
  * @return {number} A pattern search rank
  */
-export function getPatternSearchRank( pattern, searchValue ) {
+export function getPatternSearchRank< T extends { title: string } >(
+	pattern: T,
+	searchValue: string
+): number {
 	const normalizedSearchValue = normalizeSearchInput( searchValue );
 	const normalizedTitle = normalizeSearchInput( pattern.title );
 
@@ -60,14 +63,20 @@ export function getPatternSearchRank( pattern, searchValue ) {
  *
  * @return {Array} Filtered pattern list.
  */
-export function searchPatterns( patterns = [], searchValue = '' ) {
+export function searchPatterns< T extends { title: string } >(
+	patterns: T[] = [],
+	searchValue = ''
+): T[] {
 	if ( ! searchValue ) {
 		return patterns;
 	}
 
 	const rankedPatterns = patterns
 		.map( ( pattern ) => {
-			return [ pattern, getPatternSearchRank( pattern, searchValue ) ];
+			return [
+				pattern,
+				getPatternSearchRank( pattern, searchValue ),
+			] as [ T, number ];
 		} )
 		.filter( ( [ , rank ] ) => rank > 0 );
 
