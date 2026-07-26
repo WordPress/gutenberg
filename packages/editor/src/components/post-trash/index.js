@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,15 +24,28 @@ import PostTrashCheck from './check';
  */
 export default function PostTrash( { onActionPerformed } ) {
 	const registry = useRegistry();
-	const { isNew, isDeleting, postId, title } = useSelect( ( select ) => {
-		const store = select( editorStore );
-		return {
-			isNew: store.isEditedPostNew(),
-			isDeleting: store.isDeletingPost(),
-			postId: store.getCurrentPostId(),
-			title: store.getCurrentPostAttribute( 'title' ),
-		};
-	}, [] );
+	const { isNew, isTrashDisabled, isDeleting, postId, title } = useSelect(
+		( select ) => {
+			const store = select( editorStore );
+			const coreStore = select( coreDataStore );
+			const currentPostType = store.getCurrentPostType();
+
+			// Get Post Type entity to check supports
+			const postTypeEntity = coreStore.getPostType( currentPostType );
+
+			// Check if 'trash' is supported. Default to true if undefined.
+			const supportsTrash = postTypeEntity?.supports?.trash ?? true;
+
+			return {
+				isNew: store.isEditedPostNew(),
+				isTrashDisabled: ! supportsTrash,
+				isDeleting: store.isDeletingPost(),
+				postId: store.getCurrentPostId(),
+				title: store.getCurrentPostAttribute( 'title' ),
+			};
+		},
+		[]
+	);
 	const { trashPost } = useDispatch( editorStore );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
@@ -49,6 +63,23 @@ export default function PostTrash( { onActionPerformed } ) {
 		// to the post view depending on if the user is on post editor or site editor.
 		onActionPerformed?.( 'move-to-trash', [ item ] );
 	};
+
+	const buttonLabel = isTrashDisabled
+		? __( 'Delete permanently' )
+		: __( 'Move to trash' );
+
+	const confirmMessage = isTrashDisabled
+		? sprintf(
+				/* translators: %s: The item's title. */
+				__( 'Are you sure you want to delete "%s" permanently?' ),
+				title
+		  )
+		: sprintf(
+				/* translators: %s: The item's title. */
+				__( 'Are you sure you want to move "%s" to the trash?' ),
+				title
+		  );
+
 	return (
 		<PostTrashCheck>
 			<Button
@@ -62,20 +93,16 @@ export default function PostTrash( { onActionPerformed } ) {
 					isDeleting ? undefined : () => setShowConfirmDialog( true )
 				}
 			>
-				{ __( 'Move to trash' ) }
+				{ buttonLabel }
 			</Button>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
-				confirmButtonText={ __( 'Move to trash' ) }
+				confirmButtonText={ buttonLabel }
 				size="small"
 			>
-				{ sprintf(
-					// translators: %s: The item's title.
-					__( 'Are you sure you want to move "%s" to the trash?' ),
-					title
-				) }
+				{ confirmMessage }
 			</ConfirmDialog>
 		</PostTrashCheck>
 	);
