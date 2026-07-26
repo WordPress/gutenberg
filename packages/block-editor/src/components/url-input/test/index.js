@@ -415,6 +415,13 @@ describe( 'URLInput', () => {
 				'aria-activedescendant',
 				firstOption.id
 			);
+
+			fireEvent.keyDown( input, KEY_EVENTS.up );
+
+			expect( input ).toHaveAttribute(
+				'aria-activedescendant',
+				secondOption.id
+			);
 		} );
 
 		it( 'should select and submit the active suggestion when pressing Enter', async () => {
@@ -490,6 +497,11 @@ describe( 'URLInput', () => {
 
 			fireEvent.keyDown( input, KEY_EVENTS.down );
 			expect( input.selectionStart ).toBe( 5 );
+
+			// A selection reaching an end is collapsed to it first.
+			input.setSelectionRange( 0, 5 );
+			fireEvent.keyDown( input, KEY_EVENTS.up );
+			expect( input.selectionEnd ).toBe( 0 );
 		} );
 	} );
 
