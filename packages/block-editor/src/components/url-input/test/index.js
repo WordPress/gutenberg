@@ -236,21 +236,21 @@ describe( 'URLInput', () => {
 			} );
 		} );
 
-		it( 'should not fetch initial suggestions on mount when a value is already present', async () => {
+		it( 'should fetch suggestions on mount for a value that is already present', async () => {
 			render(
 				<ControlledURLInput
-					value="https://example.com"
+					value="hello"
 					__experimentalFetchLinkSuggestions={ fetchLinkSuggestions }
-					__experimentalShowInitialSuggestions
 				/>
 			);
 
-			await flushDebounce();
-
-			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+			expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+			expect( fetchLinkSuggestions ).toHaveBeenCalledWith( 'hello', {
+				isInitialSuggestions: false,
+			} );
 		} );
 
-		it( 'should still request initial suggestions on mount when `disableSuggestions` is set', async () => {
+		it( 'should not fetch initial suggestions on mount when `disableSuggestions` is set', async () => {
 			render(
 				<ControlledURLInput
 					__experimentalFetchLinkSuggestions={ fetchLinkSuggestions }
@@ -259,11 +259,9 @@ describe( 'URLInput', () => {
 				/>
 			);
 
-			await waitFor( () =>
-				expect( fetchLinkSuggestions ).toHaveBeenCalledWith( '', {
-					isInitialSuggestions: true,
-				} )
-			);
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
@@ -284,8 +282,11 @@ describe( 'URLInput', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should fetch suggestions on focus when a value is already present', async () => {
+		it( 'should fetch suggestions on focus when the previous search returned no results', async () => {
 			const user = userEvent.setup();
+			fetchLinkSuggestions
+				.mockResolvedValueOnce( [] )
+				.mockResolvedValue( SUGGESTIONS );
 
 			render(
 				<ControlledURLInput
@@ -294,12 +295,16 @@ describe( 'URLInput', () => {
 				/>
 			);
 
+			// Let the request made on mount settle without results.
+			await waitFor( () =>
+				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 )
+			);
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
 			await user.click( screen.getByRole( 'combobox' ) );
 
 			expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
-			expect( fetchLinkSuggestions ).toHaveBeenCalledWith( 'hello', {
-				isInitialSuggestions: false,
-			} );
+			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'should not fetch suggestions again on refocus when suggestions are already displayed', async () => {
@@ -312,11 +317,11 @@ describe( 'URLInput', () => {
 				/>
 			);
 
+			await screen.findByRole( 'listbox' );
+
 			const input = screen.getByRole( 'combobox' );
 
 			await user.click( input );
-			await screen.findByRole( 'listbox' );
-
 			await user.tab();
 			await user.click( input );
 			await flushDebounce();

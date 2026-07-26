@@ -195,26 +195,14 @@ export default function URLInput( props ) {
 
 	const debouncedUpdateSuggestions = useDebounce( updateSuggestions, 200 );
 
-	// The value that suggestions were last requested for. Seeded with the value
-	// the field is mounted with, so that a pre-filled field doesn't search until
-	// the value is edited.
-	const requestedValueRef = useRef( value );
-
+	// Keep the suggestions in sync with the value being searched for. An empty
+	// value requests the initial suggestions, when those are enabled.
 	useEffect( () => {
-		if ( requestedValueRef.current === value ) {
-			return;
-		}
-
-		requestedValueRef.current = value;
-
-		if ( disableSuggestions ) {
-			return;
-		}
-
-		if ( value?.length ) {
-			debouncedUpdateSuggestions( value );
-		} else if ( showInitialSuggestions ) {
-			debouncedUpdateSuggestions();
+		if (
+			! disableSuggestions &&
+			( value?.length || showInitialSuggestions )
+		) {
+			debouncedUpdateSuggestions( value ?? '' );
 		}
 	}, [
 		value,
@@ -222,14 +210,6 @@ export default function URLInput( props ) {
 		showInitialSuggestions,
 		debouncedUpdateSuggestions,
 	] );
-
-	useEffect( () => {
-		if ( showInitialSuggestions && ! value?.length ) {
-			debouncedUpdateSuggestions();
-		}
-		// Initial suggestions are only loaded for a field that mounts empty.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
 
 	// Persist the hidden state, so that the list can't reappear with stale
 	// results once the value or the props allow suggestions again.
