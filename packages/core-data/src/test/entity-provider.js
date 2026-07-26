@@ -350,4 +350,157 @@ describe( 'useEntityBlockEditor', () => {
 			firstClientIds
 		);
 	} );
+
+	it( 'derives missing footnote content from block attributes when meta has no entries', () => {
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'postType', 'post', [
+				{
+					id: 1,
+					type: 'post',
+					content: { raw: '', rendered: '' },
+					meta: { footnotes: '[]' },
+				},
+			] );
+
+		let onChange;
+		const TestComponent = () => {
+			[ , , onChange ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 1,
+			} );
+			return <div />;
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		act( () => {
+			onChange(
+				[
+					createBlock( 'core/paragraph', {
+						content:
+							'Paragraph with footnote<sup data-fn="abcd" data-fn-content="Footnote text" class="fn"><a href="#abcd" id="abcd-link">1</a></sup>',
+					} ),
+					createBlock( 'core/footnotes' ),
+				],
+				{}
+			);
+		} );
+
+		const post = registry
+			.select( coreDataStore )
+			.getEditedEntityRecord( 'postType', 'post', 1 );
+
+		expect( JSON.parse( post.meta.footnotes ) ).toEqual( [
+			{ id: 'abcd', content: 'Footnote text' },
+		] );
+	} );
+
+	it( 'prefers existing footnote meta content over inline block attribute content', () => {
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'postType', 'post', [
+				{
+					id: 1,
+					type: 'post',
+					content: { raw: '', rendered: '' },
+					meta: {
+						footnotes: JSON.stringify( [
+							{ id: 'abcd', content: 'Saved footnote' },
+						] ),
+					},
+				},
+			] );
+
+		let onChange;
+		const TestComponent = () => {
+			[ , , onChange ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 1,
+			} );
+			return <div />;
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		act( () => {
+			onChange(
+				[
+					createBlock( 'core/paragraph', {
+						content:
+							'Paragraph<sup data-fn="abcd" data-fn-content="Stale attribute" class="fn"><a href="#abcd" id="abcd-link">1</a></sup>' +
+							'<sup data-fn="xyz" data-fn-content="New footnote" class="fn"><a href="#xyz" id="xyz-link">2</a></sup>',
+					} ),
+					createBlock( 'core/footnotes' ),
+				],
+				{}
+			);
+		} );
+
+		const post = registry
+			.select( coreDataStore )
+			.getEditedEntityRecord( 'postType', 'post', 1 );
+		const footnotes = JSON.parse( post.meta.footnotes );
+
+		expect( footnotes.find( ( fn ) => fn.id === 'abcd' ).content ).toBe(
+			'Saved footnote'
+		);
+		expect( footnotes.find( ( fn ) => fn.id === 'xyz' ).content ).toBe(
+			'New footnote'
+		);
+	} );
+
+	it( 'creates an empty footnote entry when no content source is available', () => {
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'postType', 'post', [
+				{
+					id: 1,
+					type: 'post',
+					content: { raw: '', rendered: '' },
+					meta: { footnotes: '[]' },
+				},
+			] );
+
+		let onChange;
+		const TestComponent = () => {
+			[ , , onChange ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 1,
+			} );
+			return <div />;
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		act( () => {
+			onChange(
+				[
+					createBlock( 'core/paragraph', {
+						content:
+							'Paragraph<sup data-fn="abcd" class="fn"><a href="#abcd" id="abcd-link">1</a></sup>',
+					} ),
+					createBlock( 'core/footnotes' ),
+				],
+				{}
+			);
+		} );
+
+		const post = registry
+			.select( coreDataStore )
+			.getEditedEntityRecord( 'postType', 'post', 1 );
+
+		expect( JSON.parse( post.meta.footnotes ) ).toEqual( [
+			{ id: 'abcd', content: '' },
+		] );
+	} );
 } );

@@ -1,14 +1,87 @@
 /**
  * WordPress dependencies
  */
+import { decodeEntities } from '@wordpress/html-entities';
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import getFootnotesOrder from './get-footnotes-order';
+import getRichTextValuesCached from './get-rich-text-values-cached';
 
 let oldFootnotes = {};
+
+function getFootnotesFromRawAttributes( value, footnotesFromAttributes ) {
+	if ( typeof value === 'string' ) {
+		const regex =
+			/<sup\b[^>]*\bdata-fn="([^"]+)"[^>]*\bdata-fn-content="([^"]*)"[^>]*>/g;
+		let match;
+
+		while ( ( match = regex.exec( value ) ) !== null ) {
+			const [ , id, content ] = match;
+			if ( id && content ) {
+				footnotesFromAttributes[ id ] = decodeEntities( content );
+			}
+		}
+
+		return;
+	}
+
+	if ( Array.isArray( value ) ) {
+		value.forEach( ( item ) =>
+			getFootnotesFromRawAttributes( item, footnotesFromAttributes )
+		);
+		return;
+	}
+
+	if (
+		value &&
+		typeof value === 'object' &&
+		! ( value instanceof RichTextData )
+	) {
+		Object.values( value ).forEach( ( item ) =>
+			getFootnotesFromRawAttributes( item, footnotesFromAttributes )
+		);
+	}
+}
+
+function getFootnoteContentFromAttributes( blocks ) {
+	const footnotesFromAttributes = {};
+
+	for ( const block of blocks ) {
+		getFootnotesFromRawAttributes(
+			block.attributes,
+			footnotesFromAttributes
+		);
+
+		for ( const value of getRichTextValuesCached( block ) ) {
+			if ( ! value ) {
+				continue;
+			}
+
+			value.replacements.forEach( ( replacement ) => {
+				if ( replacement.type !== 'core/footnote' ) {
+					return;
+				}
+
+				const id = replacement.attributes?.[ 'data-fn' ];
+				const content = replacement.attributes?.[ 'data-fn-content' ];
+
+				if ( id && typeof content === 'string' && content ) {
+					footnotesFromAttributes[ id ] = content;
+				}
+			} );
+		}
+
+		Object.assign(
+			footnotesFromAttributes,
+			getFootnoteContentFromAttributes( block.innerBlocks )
+		);
+	}
+
+	return footnotesFromAttributes;
+}
 
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
@@ -30,9 +103,14 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 		return output;
 	}
 
+	const footnotesFromAttributes = getFootnoteContentFromAttributes( blocks );
+
 	const newFootnotes = newOrder.map(
 		( fnId ) =>
 			footnotes.find( ( fn ) => fn.id === fnId ) ||
+			( footnotesFromAttributes[ fnId ]
+				? { id: fnId, content: footnotesFromAttributes[ fnId ] }
+				: null ) ||
 			oldFootnotes[ fnId ] || {
 				id: fnId,
 				content: '',
