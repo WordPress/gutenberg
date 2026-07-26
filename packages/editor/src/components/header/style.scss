@@ -243,6 +243,10 @@
 	}
 }
 
+.editor-zoom-control {
+	width: 50px;
+}
+
 .editor-editor-interface.is-distraction-free {
 	.interface-interface-skeleton__header {
 		border-bottom: none;
@@ -266,7 +270,8 @@
 		& > .editor-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .editor-header__settings > .editor-preview-dropdown,
 		& > .editor-header__settings > .interface-pinned-items,
-		& > .editor-header__settings > .editor-zoom-out-toggle {
+		& > .editor-header__settings > .editor-zoom-out-toggle
+		& > .editor-header__settings > .editor-zoom-control {
 			display: none;
 		}
 
