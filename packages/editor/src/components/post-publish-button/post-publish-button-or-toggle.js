@@ -85,7 +85,7 @@ export default function PostPublishButtonOrToggle( {
 	} else if (
 		isPublished ||
 		( postStatusHasChanged &&
-			! [ 'future', 'publish' ].includes( postStatus ) ) ||
+			! [ 'future', 'publish', 'private' ].includes( postStatus ) ) ||
 		( isScheduled && isBeingScheduled ) ||
 		( isPending && ! hasPublishAction && ! isSmallerThanMediumViewport )
 	) {
