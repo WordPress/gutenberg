@@ -6,6 +6,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	store as blocksStore,
+	createBlock,
 } from '@wordpress/blocks';
 
 /**
@@ -98,6 +99,44 @@ export default function BlockActions( {
 		},
 		onInsertAfter() {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
+		},
+		onAddAlongside() {
+			if ( ! clientIds.length ) {
+				return;
+			}
+
+			const originalBlock = getBlocksByClientId( clientIds )[ 0 ];
+
+			if ( ! originalBlock ) {
+				return;
+			}
+
+			const groupingBlockName = getGroupingBlockName();
+
+			// Create the new block to go alongside
+			const newBlock = createBlock( getDefaultBlockName() );
+
+			// Create the row/group block with flex layout
+			const rowBlock = createBlock(
+				groupingBlockName,
+				{
+					layout: {
+						type: 'flex',
+						orientation: 'horizontal',
+						justifyContent: 'left',
+					},
+				},
+				[
+					createBlock(
+						originalBlock.name,
+						originalBlock.attributes,
+						originalBlock.innerBlocks
+					),
+					newBlock,
+				]
+			);
+
+			replaceBlocks( clientIds, rowBlock, 0, 0 );
 		},
 		onGroup() {
 			if ( ! clientIds.length ) {
