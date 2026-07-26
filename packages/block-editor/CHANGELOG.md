@@ -11,12 +11,12 @@
 ### Internal
 
 -   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#80555](https://github.com/WordPress/gutenberg/pull/80555)).
--   `URLInput`: Convert the class component to a function component with hooks, replacing the `compose( withSafeTimeout, withSpokenMessages, withInstanceId, withSelect )` wrapper. The unused `setTimeout` prop injected by `withSafeTimeout` is dropped, and the block editor settings are now read on demand rather than subscribed to.
+-   `URLInput`: Convert the class component to a function component with hooks, replacing the `compose( withSafeTimeout, withSpokenMessages, withInstanceId, withSelect )` wrapper. The unused `setTimeout` prop injected by `withSafeTimeout` is dropped, and the block editor settings are now read on demand rather than subscribed to ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 
 ### Bug Fixes
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
--   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set.
+-   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 
 ## 16.0.0 (2026-07-14)
 
