@@ -25,6 +25,11 @@ add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
  */
 function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
+	gutenberg_register_site_editor_v2_menu_item( 'customize', __( 'Customize', 'gutenberg' ), '', '' );
+	gutenberg_register_site_editor_v2_menu_item( 'customize-identity', __( 'Logo & Icon', 'gutenberg' ), '/identity', 'customize' );
+	gutenberg_register_site_editor_v2_menu_item( 'customize-colors', __( 'Colors', 'gutenberg' ), '/styles', 'customize' );
+	gutenberg_register_site_editor_v2_menu_item( 'customize-typography', __( 'Typography', 'gutenberg' ), '/styles', 'customize' );
+	gutenberg_register_site_editor_v2_menu_item( 'customize-navigation', __( 'Navigation', 'gutenberg' ), '/navigation', 'customize' );
 	gutenberg_register_site_editor_v2_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
