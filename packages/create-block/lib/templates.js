@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-const { existsSync } = require( 'fs' );
+const { existsSync, rmSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
 const { join, resolve } = require( 'path' );
 const inquirer = require( '@inquirer/prompts' );
 const { command } = require( 'execa' );
-const glob = require( 'fast-glob' );
+const { glob } = require( 'tinyglobby' );
 const npmPackageArg = require( 'npm-package-arg' );
-const rimraf = require( 'rimraf' ).sync;
 
 /**
  * Internal dependencies
@@ -80,6 +79,7 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 	const outputTemplatesFiles = await glob( '**/*.mustache', {
 		cwd: outputTemplatesPath,
 		dot: true,
+  		expandDirectories: false
 	} );
 	return Object.fromEntries(
 		await Promise.all(
@@ -269,7 +269,7 @@ const getProjectTemplate = async ( templateName ) => {
 		}
 	} finally {
 		if ( tempCwd ) {
-			rimraf( tempCwd );
+			rmSync( tempCwd, { recursive: true, force: true } );
 		}
 	}
 };

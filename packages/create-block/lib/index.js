@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { confirm, select } = require( '@inquirer/prompts' );
-const { capitalCase } = require( 'change-case' );
+const { titleCase } = require( 'scule' );
 const program = require( 'commander' );
 
 /**
@@ -125,7 +125,7 @@ program
 						...defaultValues,
 						slug,
 						// Transforms slug to title as a fallback.
-						title: capitalCase( slug ),
+						title: titleCase( slug ),
 						...optionsValues,
 						variant,
 					};

@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { join } = require( 'path' );
-const { pascalCase, snakeCase } = require( 'change-case' );
+const { pascalCase, snakeCase } = require( 'scule' );
 
 /**
  * Internal dependencies

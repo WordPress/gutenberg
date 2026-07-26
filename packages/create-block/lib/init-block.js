@@ -2,8 +2,7 @@
  * External dependencies
  */
 const { join } = require( 'path' );
-const makeDir = require( 'make-dir' );
-const { writeFile } = require( 'fs' ).promises;
+const { writeFile, mkdir } = require( 'fs' ).promises;
 
 /**
  * Internal dependencies
@@ -43,7 +42,7 @@ async function initBlockJSON( {
 	const blockFolderName = plugin
 		? join( rootDirectory, folderName )
 		: rootDirectory;
-	await makeDir( blockFolderName );
+	await mkdir( blockFolderName, { recursive: true } );
 
 	await writeFile(
 		join( blockFolderName, 'block.json' ),
