@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -24,9 +23,6 @@ export const DownloadableBlockNotice = ( { block } ) => {
 		<div className="block-directory-downloadable-block-notice">
 			<div className="block-directory-downloadable-block-notice__content">
 				{ errorNotice.message }
-				{ errorNotice.isFatal
-					? ' ' + __( 'Try reloading the page.' )
-					: null }
 			</div>
 		</div>
 	);
