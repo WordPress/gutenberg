@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
+
+let cachedSiteTitle = '';
+
+apiFetch( { path: '/wp/v2/settings' } ).then( ( res ) => {
+	cachedSiteTitle = res?.title ?? '';
+} );
 
 const transforms = {
 	from: [
@@ -125,6 +132,20 @@ const transforms = {
 						} ),
 					} );
 				} ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/heading' ],
+			transform: ( attributes ) => {
+				// Fallback: if site title not loaded yet, retain original content
+				const newContent = cachedSiteTitle || attributes.content;
+
+				return createBlock( 'core/heading', {
+					...attributes,
+					content: newContent,
+				} );
+			},
+			__experimentalLabel: 'Replace content with Site Title',
 		},
 	],
 };
