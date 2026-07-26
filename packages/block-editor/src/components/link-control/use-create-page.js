@@ -1,3 +1,5 @@
+/* global navigator */
+
 /**
  * WordPress dependencies
  */
@@ -14,6 +16,11 @@ export default function useCreatePage( handleCreatePage ) {
 		setErrorMessage( null );
 
 		try {
+			// Check for offline status
+			if ( ! navigator.onLine ) {
+				throw new Error( __( 'You are probably offline.' ) );
+			}
+
 			// Make cancellable in order that we can avoid setting State
 			// if the component unmounts during the call to `createSuggestion`
 			cancelableCreateSuggestion.current = makeCancelable(
