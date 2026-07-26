@@ -3,11 +3,13 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
@@ -90,15 +92,50 @@ function getImagesFromBlock( block, isExpanded ) {
  * @return {Array} Images.
  */
 export default function useListViewImages( { clientId, isExpanded } ) {
-	const { block } = useSelect(
+	const { block, resolvedAttributes } = useSelect(
 		( select ) => {
-			return { block: select( blockEditorStore ).getBlock( clientId ) };
+			const _block = select( blockEditorStore ).getBlock( clientId );
+			const _attributes = _block?.attributes;
+			const bindings = _attributes?.metadata?.bindings;
+
+			// Return raw attributes when no binding present.
+			if ( ! bindings ) {
+				return { block: _block, resolvedAttributes: _attributes };
+			}
+
+			// Get bound attributes (similar to block-fields/index.js)
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const _resolvedAttributes = Object.entries( bindings ).reduce(
+				( acc, [ attribute, binding ] ) => {
+					const source = getBlockBindingsSource( binding.source );
+					if ( ! source ) {
+						return acc;
+					}
+					const values = source.getValues( {
+						select,
+						context: {},
+						bindings: { [ attribute ]: binding },
+					} );
+					return { ...acc, ...values };
+				},
+				_attributes
+			);
+
+			return {
+				block: _block,
+				resolvedAttributes: _resolvedAttributes,
+			};
 		},
 		[ clientId ]
 	);
 	const images = useMemo( () => {
-		return getImagesFromBlock( block, isExpanded );
-	}, [ block, isExpanded ] );
+		const blockWithResolvedAttributes = {
+			...block,
+			attributes: resolvedAttributes,
+		};
+
+		return getImagesFromBlock( blockWithResolvedAttributes, isExpanded );
+	}, [ block, resolvedAttributes, isExpanded ] );
 
 	return images;
 }
