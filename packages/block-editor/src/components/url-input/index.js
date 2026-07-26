@@ -30,6 +30,8 @@ import { unlock } from '../../lock-unlock';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
+const noop = () => {};
+
 /**
  * Whether the argument is a function.
  *
@@ -248,6 +250,12 @@ export default function URLInput( props ) {
 		controlInputRef.current.focus();
 	}
 
+	function handleChange( newValue ) {
+		// `InputControl` passes an `{ event }` object as its second argument,
+		// which callers would mistake for a selected suggestion.
+		onChange( newValue );
+	}
+
 	function handleFocus() {
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
@@ -376,10 +384,10 @@ export default function URLInput( props ) {
 		type: 'text',
 		name: inputId,
 		autoComplete: 'off',
-		onChange: disabled ? () => {} : ( newValue ) => onChange( newValue ), // Disable onChange when disabled
-		onFocus: disabled ? () => {} : handleFocus, // Disable onFocus when disabled
+		onChange: disabled ? noop : handleChange,
+		onFocus: disabled ? noop : handleFocus,
+		onKeyDown: disabled ? noop : handleKeyDown,
 		placeholder,
-		onKeyDown: disabled ? () => {} : handleKeyDown, // Disable onKeyDown when disabled
 		role: 'combobox',
 		'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 		'aria-expanded': showSuggestions,
