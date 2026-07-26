@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
+const { x } = require( 'tinyexec' );
 const npmPackageArg = require( 'npm-package-arg' );
 const writePkg = require( 'write-pkg' );
 
@@ -133,8 +133,11 @@ module.exports = async ( {
 			);
 
 			try {
-				await command( 'npm install', {
-					cwd: rootDirectory,
+				await x( 'npm', [ 'install' ], {
+					throwOnError: true,
+					nodeOptions: {
+						cwd: rootDirectory
+					}
 				} );
 
 				info( '' );

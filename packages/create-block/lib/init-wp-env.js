@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
+const { x } = require( 'tinyexec' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
 
@@ -15,8 +15,11 @@ module.exports = async ( { rootDirectory } ) => {
 	info(
 		'Installing `@wordpress/env` package. It might take a couple of minutes...'
 	);
-	await command( 'npm install @wordpress/env --save-dev', {
-		cwd: rootDirectory,
+	await x( 'npm', [ 'install', '@wordpress/env', '--save-dev' ], {
+		throwOnError: true,
+		nodeOptions: {
+			cwd: rootDirectory,
+		},
 	} );
 
 	info( '' );

@@ -6,7 +6,7 @@ const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
 const { join, resolve } = require( 'path' );
 const inquirer = require( '@inquirer/prompts' );
-const { command } = require( 'execa' );
+const { x } = require( 'tinyexec' );
 const { glob } = require( 'tinyglobby' );
 const npmPackageArg = require( 'npm-package-arg' );
 
@@ -117,7 +117,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 
 const externalTemplateExists = async ( templateName ) => {
 	try {
-		await command( `npm view ${ templateName }` );
+		await x( 'npm', [ 'view', templateName ], { throwOnError: true } );
 	} catch {
 		return false;
 	}
@@ -247,8 +247,11 @@ const getProjectTemplate = async ( templateName ) => {
 
 		tempCwd = await mkdtemp( join( tmpdir(), 'wp-create-block-' ) );
 
-		await command( `npm install ${ templateName } --no-save`, {
-			cwd: tempCwd,
+		await x( 'npm', [ 'install', templateName, '--no-save' ], {
+			throwOnError: true,
+			nodeOpions: {
+				cwd: tempCwd,
+			}
 		} );
 
 		const { name } = npmPackageArg( templateName );
