@@ -4,7 +4,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
@@ -27,7 +26,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 
 			beforeEach( () => {
 				rimraf( outputDirectory );
-				mkdirp( outputDirectory );
+				fs.mkdirSync( outputDirectory, { recursive: true } );
 			} );
 
 			// This afterEach is necessary to prevent watched tests from retriggering on every run.
@@ -148,7 +147,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 
 		beforeEach( () => {
 			rimraf( workingDirectory );
-			mkdirp( sourceDirectory );
+			fs.mkdirSync( sourceDirectory, { recursive: true } );
 			for ( const file of [ 'index.js', 'style.css' ] ) {
 				fs.copyFileSync(
 					path.join( fixtureDirectory, file ),
