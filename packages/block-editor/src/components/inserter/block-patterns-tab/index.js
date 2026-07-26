@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,6 +16,8 @@ import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 function BlockPatternsTab( {
 	onSelectCategory,
@@ -24,12 +27,37 @@ function BlockPatternsTab( {
 	children,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
+	const [ isLoading, setIsLoading ] = useState( true );
 
 	const categories = usePatternCategories( rootClientId );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	if ( ! categories.length ) {
+	const isResolvingPatterns = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).isResolvingPatterns(),
+		[]
+	);
+
+	/**
+	 * Hide spinner when atleast one category is loaded or pattern resolution is complete.
+	 */
+	useEffect( () => {
+		if (
+			( categories?.length > 0 || ! isResolvingPatterns ) &&
+			isLoading
+		) {
+			setIsLoading( false );
+		}
+	}, [ isLoading, categories, isResolvingPatterns ] );
+
+	if ( isLoading ) {
+		return (
+			<Spinner className="block-editor-inserter__categories-panel-spinner" />
+		);
+	}
+
+	if ( ! categories.length && ! isResolvingPatterns ) {
 		return <InserterNoResults />;
 	}
 

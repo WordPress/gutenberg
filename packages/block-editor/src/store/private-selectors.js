@@ -605,6 +605,30 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	}, getAllPatternsDependants( select ) )
 );
 
+/**
+ * Returns whether the patterns are being resolved.
+ * This is used to determine if the patterns are still being fetched
+ * from the server or if they are already available in the store.
+ *
+ * @param {Function} select The selector function.
+ *
+ * @return {boolean} Whether the patterns are being resolved.
+ */
+export const isResolvingPatterns = createRegistrySelector( ( select ) =>
+	createSelector( ( state ) => {
+		const blockPatternsSelect = state.settings[ selectBlockPatternsKey ];
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return (
+			( blockPatternsSelect
+				? blockPatternsSelect( select ) === undefined
+				: false ) ||
+			( reusableBlocksSelect
+				? reusableBlocksSelect( select ) === undefined
+				: false )
+		);
+	}, getAllPatternsDependants( select ) )
+);
+
 const EMPTY_ARRAY = [];
 
 export const getReusableBlocks = createRegistrySelector(
