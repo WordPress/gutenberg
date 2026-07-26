@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, dispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
 	blockDefault,
@@ -14,6 +14,7 @@ import {
 	external,
 	keyboard,
 	symbol,
+	check,
 	page,
 	layout,
 	rotateRight,
@@ -428,10 +429,16 @@ const getPatternEditingContextualCommands = () =>
 
 const getEditedEntityContextualCommands = () =>
 	function useEditedEntityContextualCommands() {
-		const { postType } = useSelect( ( select ) => {
-			const { getCurrentPostType } = select( editorStore );
+		const { postType, isViewable, status } = useSelect( ( select ) => {
+			const { getCurrentPostType, getEditedPostAttribute } =
+				select( editorStore );
+			const { getPostType } = select( coreStore );
+
 			return {
 				postType: getCurrentPostType(),
+				isViewable:
+					getPostType( getCurrentPostType() )?.viewable ?? false,
+				status: getEditedPostAttribute( 'status' ),
 			};
 		}, [] );
 		const { openModal } = useDispatch( interfaceStore );
@@ -460,6 +467,25 @@ const getEditedEntityContextualCommands = () =>
 			} );
 		}
 
+		if ( postType !== 'page' && status !== 'publish' && isViewable ) {
+			commands.push( {
+				name: 'core/publish-' + postType,
+				label: sprintf(
+					/* translators: %s: Post type name (e.g., "Page", "Product") */
+					__( 'Publish %s' ),
+					postType.charAt( 0 ).toUpperCase() + postType.slice( 1 )
+				),
+				scope: 'core/edit-post',
+				icon: check,
+				callback: async ( { close } ) => {
+					close();
+					await dispatch( editorStore ).editPost( {
+						status: 'publish',
+					} );
+					await dispatch( editorStore ).savePost();
+				},
+			} );
+		}
 		return { isLoading: false, commands };
 	};
 
