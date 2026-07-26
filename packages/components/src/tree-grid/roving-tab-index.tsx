@@ -21,12 +21,19 @@ export default function RovingTabIndex( {
 	const [ lastFocusedElement, setLastFocusedElement ] =
 		useState< HTMLElement >();
 
+	// Add state to track if we've already set an initial focusable item
+	const [ hasInitialFocusableItem, setHasInitialFocusableItem ] =
+		useState( false );
+
 	// Use `useMemo` to avoid creation of a new object for the providerValue
-	// on every render. Only create a new object when the `lastFocusedElement`
-	// value changes.
 	const providerValue = useMemo(
-		() => ( { lastFocusedElement, setLastFocusedElement } ),
-		[ lastFocusedElement ]
+		() => ( {
+			lastFocusedElement,
+			setLastFocusedElement,
+			hasInitialFocusableItem,
+			setHasInitialFocusableItem,
+		} ),
+		[ lastFocusedElement, hasInitialFocusableItem ]
 	);
 
 	return (

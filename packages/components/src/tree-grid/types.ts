@@ -66,6 +66,13 @@ export type RovingTabIndexItemProps = {
 	 * If `children` is not a function, this component will be used instead.
 	 */
 	as?: React.ComponentType< RovingTabIndexItemPassThruProps >;
+	/**
+	 * When true, this item will be the initially focusable item (tabIndex="0").
+	 * Only one item should have this set to true.
+	 *
+	 * @default false
+	 */
+	initiallyFocusable?: boolean;
 	[ key: string ]: any;
 };
 

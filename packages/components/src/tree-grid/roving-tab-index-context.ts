@@ -9,6 +9,11 @@ const RovingTabIndexContext = createContext<
 			setLastFocusedElement: React.Dispatch<
 				React.SetStateAction< HTMLElement | undefined >
 			>;
+			// Add a flag to track if we've already set an initial item
+			hasInitialFocusableItem: boolean;
+			setHasInitialFocusableItem: React.Dispatch<
+				React.SetStateAction< boolean >
+			>;
 	  }
 	| undefined
 >( undefined );
