@@ -14,6 +14,7 @@ import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * This hook makes sure that a block's inner blocks stay in sync with the given
@@ -58,6 +59,14 @@ export default function useInnerBlockTemplateSync(
 		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 			registry.dispatch( blockEditorStore );
 
+		// Access private store APIs for the template-sync flag.
+		const { wasTemplateSyncApplied } = unlock(
+			registry.select( blockEditorStore )
+		);
+		const { markTemplateSyncApplied } = unlock(
+			registry.dispatch( blockEditorStore )
+		);
+
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
 		// we need to schedule this one in a microtask as well.
@@ -70,8 +79,20 @@ export default function useInnerBlockTemplateSync(
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
 			const currentInnerBlocks = getBlocks( clientId );
+
+			// When there is no templateLock the template only serves as an
+			// initial default. Once we have successfully applied the template
+			// for this clientId (recorded in the store), we must NOT re-apply
+			// it on subsequent mounts (e.g. after a drag-and-drop remount),
+			// even if inner blocks are currently empty because the user deleted
+			// them intentionally.
+			const isUnlocked =
+				templateLock !== 'all' && templateLock !== 'contentOnly';
+			const alreadyApplied =
+				isUnlocked && wasTemplateSyncApplied( clientId );
+
 			const shouldApplyTemplate =
-				currentInnerBlocks.length === 0 ||
+				( currentInnerBlocks.length === 0 && ! alreadyApplied ) ||
 				templateLock === 'all' ||
 				templateLock === 'contentOnly';
 
@@ -107,6 +128,14 @@ export default function useInnerBlockTemplateSync(
 					// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
 					getSelectedBlocksInitialCaretPosition()
 				);
+			}
+
+			// Persist the fact that this template has been applied for this
+			// clientId. The flag lives in the block-editor store and survives
+			// React remounts (e.g. drag-and-drop), unlike a useRef which is
+			// reset every time the component is destroyed and recreated.
+			if ( isUnlocked ) {
+				markTemplateSyncApplied( clientId );
 			}
 		} );
 
