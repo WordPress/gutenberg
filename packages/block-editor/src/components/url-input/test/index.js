@@ -284,8 +284,14 @@ describe( 'URLInput', () => {
 
 		it( 'should fetch suggestions on focus when the previous search returned no results', async () => {
 			const user = userEvent.setup();
+			let resolveMountRequest;
 			fetchLinkSuggestions
-				.mockResolvedValueOnce( [] )
+				.mockImplementationOnce(
+					() =>
+						new Promise( ( resolve ) => {
+							resolveMountRequest = resolve;
+						} )
+				)
 				.mockResolvedValue( SUGGESTIONS );
 
 			render(
@@ -295,10 +301,19 @@ describe( 'URLInput', () => {
 				/>
 			);
 
-			// Let the request made on mount settle without results.
 			await waitFor( () =>
 				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 )
 			);
+
+			// The request made on mount returns no results. The spinner is only
+			// removed once it has settled.
+			resolveMountRequest( [] );
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'presentation' )
+				).not.toBeInTheDocument()
+			);
+
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
 			await user.click( screen.getByRole( 'combobox' ) );

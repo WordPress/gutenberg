@@ -103,7 +103,7 @@ export default function URLInput( props ) {
 	const showSuggestions =
 		isSuggestionsListOpen &&
 		disableSuggestions !== true &&
-		( showInitialSuggestions || !! value?.length );
+		( showInitialSuggestions || !! value.length );
 
 	const updateSuggestions = useEvent( ( searchValue = '' ) => {
 		const fetchLinkSuggestions = isFunction( fetchLinkSuggestionsProp )
@@ -200,9 +200,9 @@ export default function URLInput( props ) {
 	useEffect( () => {
 		if (
 			! disableSuggestions &&
-			( value?.length || showInitialSuggestions )
+			( value.length || showInitialSuggestions )
 		) {
-			debouncedUpdateSuggestions( value ?? '' );
+			debouncedUpdateSuggestions( value );
 		}
 	}, [
 		value,
