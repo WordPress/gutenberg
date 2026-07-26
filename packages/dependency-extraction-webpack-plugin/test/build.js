@@ -3,7 +3,6 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { globSync } from 'glob';
-import { mkdirpSync } from 'mkdirp';
 import { rimrafSync } from 'rimraf';
 import {
 	afterAll,
@@ -41,7 +40,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 
 			beforeEach( () => {
 				rimrafSync( outputDirectory );
-				mkdirpSync( outputDirectory );
+				fs.mkdirSync( outputDirectory, { recursive: true } );
 			} );
 
 			// This afterEach is necessary to prevent watched tests from retriggering on every run.
@@ -158,7 +157,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 
 		beforeEach( () => {
 			rimrafSync( workingDirectory );
-			mkdirpSync( sourceDirectory );
+			fs.mkdirSync( sourceDirectory, { recursive: true } );
 			for ( const file of [ 'index.js', 'style.css' ] ) {
 				fs.copyFileSync(
 					path.join( fixtureDirectory, file ),

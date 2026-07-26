@@ -34,7 +34,6 @@
 	},
 	"devDependencies": {
 		"glob": "^13.0.6",
-		"mkdirp": "^3.0.1",
 		"rimraf": "^5.0.10",
 		"terser-webpack-plugin": "^5.3.10",
 		"vitest": "^4.1.10",

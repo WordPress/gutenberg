@@ -44,7 +44,6 @@
 		"commander": "^9.2.0",
 		"execa": "^4.0.2",
 		"fast-glob": "^3.2.7",
-		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
 		"npm-package-arg": "^8.1.5",
 		"rimraf": "^5.0.10",
