@@ -8,6 +8,7 @@
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
+    -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
 
 ### Enhancements
 
@@ -16,6 +17,7 @@
 -   `PaletteEdit`: Name the swatch picker after the palette's heading, so it is announced as Theme, Default or Custom rather than an unlabelled list ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+-   `BoxControl`: Keep the reset button focusable when disabled, preventing accidental focus loss ([#80715](https://github.com/WordPress/gutenberg/pull/80715)).
 
 ### Bug Fixes
 
@@ -43,6 +45,7 @@
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   `BoxControl`: Migrate styles from Emotion to an SCSS Module ([#80715](https://github.com/WordPress/gutenberg/pull/80715)).
 
 ## 39.0.0 (2026-08-12)
 
@@ -136,7 +139,6 @@
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
 -   `SearchControl`: Migrate styles from Emotion to an SCSS Module ([#80474](https://github.com/WordPress/gutenberg/pull/80474)).
 -   `FormTokenField`: Migrate styles from Emotion to an SCSS Module ([#80472](https://github.com/WordPress/gutenberg/pull/80472)).
--   `BoxControl`: Migrate styles from Emotion to an SCSS Module.([#80715](https://github.com/WordPress/gutenberg/pull/80715)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`, `ToggleGroupControl`, and `RangeControl`: Remove obsolete internal `__shouldNotWarnDeprecated36pxSize` prop ([#80323](https://github.com/WordPress/gutenberg/pull/80323)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
