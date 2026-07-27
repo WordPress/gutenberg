@@ -23,6 +23,7 @@ import {
 	uploadItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
+import { ErrorCode } from '../../upload-error';
 import {
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
@@ -448,33 +449,41 @@ describe( 'private actions', () => {
 			} );
 		} );
 
-		it( 'should handle mediaFinalize errors gracefully', async () => {
-			const mediaFinalize = jest
-				.fn()
-				.mockRejectedValue( new Error( 'Network error' ) );
+		it( 'should cancel the item when mediaFinalize fails', async () => {
+			// Finalize is the server's commit point. When it fails the
+			// attachment metadata was never written, so the item must be
+			// cancelled (surfacing the error) rather than finished — which
+			// would falsely report "upload complete".
+			const cause = new Error( 'Network error' );
+			const mediaFinalize = jest.fn().mockRejectedValue( cause );
 			const finishOperation = jest.fn();
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
+			const cancelItem = jest.fn();
+			const file = new File( [ 'foo' ], 'foo.jpg', {
+				type: 'image/jpeg',
+			} );
 			const select = {
 				getItem: () => ( {
+					file,
 					attachment: { id: 42 },
 					subSizes: mockSubSizes,
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = { finishOperation, cancelItem };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
-			expect( warnSpy ).toHaveBeenCalledWith(
-				'Media finalization failed:',
-				expect.any( Error )
+			expect( finishOperation ).not.toHaveBeenCalled();
+			expect( cancelItem ).toHaveBeenCalledWith(
+				'test-id',
+				expect.objectContaining( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					file,
+					cause,
+				} )
 			);
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
-			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {
