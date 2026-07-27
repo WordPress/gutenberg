@@ -454,10 +454,15 @@ describe( 'private actions', () => {
 			// attachment metadata was never written, so the item must be
 			// cancelled (surfacing the error) rather than finished — which
 			// would falsely report "upload complete".
-			const cause = new Error( 'Network error' );
-			const mediaFinalize = jest.fn().mockRejectedValue( cause );
+			// apiFetch rejects a failed REST request with a plain object, not
+			// an Error instance, so reject with one here to mirror that.
+			const restError = { code: 'rest_error', message: 'Server error' };
+			const mediaFinalize = jest.fn().mockRejectedValue( restError );
 			const finishOperation = jest.fn();
 			const cancelItem = jest.fn();
+			const warnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
 			const file = new File( [ 'foo' ], 'foo.jpg', {
 				type: 'image/jpeg',
 			} );
@@ -475,15 +480,19 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( warnSpy ).toHaveBeenCalledWith(
+				'Media finalization failed:',
+				restError
+			);
 			expect( finishOperation ).not.toHaveBeenCalled();
 			expect( cancelItem ).toHaveBeenCalledWith(
 				'test-id',
 				expect.objectContaining( {
 					code: ErrorCode.MEDIA_FINALIZE_ERROR,
 					file,
-					cause,
 				} )
 			);
+			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {

@@ -1928,6 +1928,13 @@ export function finalizeItem( id: QueueItemId ) {
 					updates.attachment = updatedAttachment;
 				}
 			} catch ( error ) {
+				// Log the underlying failure so it is visible in every
+				// environment; `apiFetch` may reject with a plain object
+				// rather than an Error, and the user-facing notice below is
+				// deliberately generic.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
+
 				// Finalize is the server's commit point: it writes the
 				// attachment metadata (responsive sub-sizes and the final
 				// `-scaled` file reference). If it fails, none of that was
@@ -1943,7 +1950,6 @@ export function finalizeItem( id: QueueItemId ) {
 						code: ErrorCode.MEDIA_FINALIZE_ERROR,
 						message: __( 'Could not finalize the upload.' ),
 						file: item.file,
-						cause: error instanceof Error ? error : undefined,
 					} )
 				);
 				return;
