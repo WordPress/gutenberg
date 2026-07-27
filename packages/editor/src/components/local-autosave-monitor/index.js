@@ -131,6 +131,39 @@ function useAutosaveNotice() {
 									},
 								],
 							} );
+
+							const postType = registry
+								.select( editorStore )
+								.getCurrentPostType();
+
+							const initialEdits = registry
+								.select( coreStore )
+								.getEntityRecordNonTransientEdits(
+									'postType',
+									postType,
+									postId
+								);
+							const unsubscribe = registry.subscribe( () => {
+								const currentEdits = registry
+									.select( coreStore )
+									.getEntityRecordNonTransientEdits(
+										'postType',
+										postType,
+										postId
+									);
+								if ( currentEdits !== initialEdits ) {
+									// Safely unsubscribe first to prevent loops
+									unsubscribe();
+									// Defer dispatch to avoid nested dispatch issues
+									setTimeout( () => {
+										registry
+											.dispatch( noticesStore )
+											.removeNotice(
+												'wpEditorAutosaveRestored'
+											);
+									}, 0 );
+								}
+							} );
 						},
 					},
 				],
