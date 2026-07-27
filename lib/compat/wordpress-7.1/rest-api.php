@@ -36,9 +36,7 @@ function gutenberg_add_date_wp_template_schema() {
 					if ( ! empty( $item['wp_id'] ) ) {
 						$post = get_post( $item['wp_id'] );
 						if ( $post && isset( $post->post_date ) ) {
-							// `mysql_to_rfc3339()` returns `false` on failure, which the schema does not allow.
-							$date = mysql_to_rfc3339( $post->post_date );
-							return false !== $date ? $date : null;
+							return mysql_to_rfc3339( $post->post_date );
 						}
 					}
 					return null;
