@@ -44,7 +44,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 	} );
 
-	test( 'should count the blocks nested in selected blocks', async ( {
+	test( 'should disclose the blocks nested in selected blocks', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -77,8 +77,16 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 4 ] );
 
 		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
-			'4 blocks selected.'
+			'2 blocks selected, 4 including nested blocks.'
 		);
+
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '2 Blocks' );
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '4 including nested blocks' );
 	} );
 
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
