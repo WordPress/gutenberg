@@ -141,24 +141,24 @@ $blocks-block__margin: 0.5em;
 	}
 
 	:where(
-	.wp-block-button.is-style-outline
-	> .wp-block-button__link:not(.has-text-color)
-),
-	:where(
-	.wp-block-button
-	.wp-block-button__link.is-style-outline:not(.has-text-color)
-) {
+		.wp-block-button.is-style-outline
+		> .wp-block-button__link:not(.has-text-color)
+	),
+		:where(
+		.wp-block-button
+		.wp-block-button__link.is-style-outline:not(.has-text-color)
+	) {
 		color: currentColor;
 	}
 
 	:where(
-	.wp-block-button.is-style-outline
-	> .wp-block-button__link:not(.has-background)
-),
-	:where(
-	.wp-block-button
-	.wp-block-button__link.is-style-outline:not(.has-background)
-) {
+		.wp-block-button.is-style-outline
+		> .wp-block-button__link:not(.has-background)
+	),
+		:where(
+		.wp-block-button
+		.wp-block-button__link.is-style-outline:not(.has-background)
+	) {
 		background-color: transparent;
 		// background-image is required to overwrite a gradient background
 		background-image: none;
