@@ -56,16 +56,12 @@
 	}
 }
 
-// The actions row overlays the inline end, so the label reserves one slot
-// per button in it.
 .block-editor-global-styles__shadow-dropdown-toggle {
-
-	// A single action: the hover-revealed remove button.
+	// The actions are absolutely positioned, so reserve room on the right
+	// for as many of them as are rendered.
 	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(1)) {
 		padding-right: $grid-unit + $button-size-small;
 	}
-
-	// Two actions: the remove button plus the override indicator.
 	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(2)) {
 		padding-right: $grid-unit + ($button-size-small * 2);
 	}
@@ -148,16 +144,12 @@
 	}
 }
 
-// The actions row overlays the inline end, so the label reserves one slot
-// per button in it.
 .block-editor-global-styles-filters-panel__dropdown-toggle {
-
-	// A single action: the hover-revealed reset button.
+	// The actions are absolutely positioned, so reserve room on the right
+	// for as many of them as are rendered.
 	&:has(+ .block-editor-panel-duotone-settings__actions > :nth-child(1)) {
 		padding-right: $grid-unit + $button-size-small;
 	}
-
-	// Two actions: the reset button plus the override indicator.
 	&:has(+ .block-editor-panel-duotone-settings__actions > :nth-child(2)) {
 		padding-right: $grid-unit + ($button-size-small * 2);
 	}

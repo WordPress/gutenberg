@@ -81,15 +81,13 @@
 	width: 100%;
 	padding-left: $grid-unit-15;
 
-	// No actions.
+	// The actions are absolutely positioned, so reserve room on the right
+	// for as many of them as are rendered.
 	padding-right: $grid-unit-15;
 
-	// A single action: the hover-revealed reset button.
 	&:has(+ .block-editor-global-styles-background-panel__actions > :nth-child(1)) {
 		padding-right: $grid-unit + $button-size-small;
 	}
-
-	// Two actions: the reset button plus the override indicator.
 	&:has(+ .block-editor-global-styles-background-panel__actions > :nth-child(2)) {
 		padding-right: $grid-unit + ($button-size-small * 2);
 	}
