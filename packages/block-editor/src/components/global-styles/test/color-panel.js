@@ -275,7 +275,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
+				screen.getAllByRole( 'img', {
 					name: /overrides inherited styles/i,
 				} ).length
 			).toBeGreaterThanOrEqual( 1 );

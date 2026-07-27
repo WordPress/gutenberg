@@ -7,12 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Button,
 	Rect,
 	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`. Only a
@@ -52,34 +52,44 @@ export function getInheritanceProps(
  * @return {Element} The override indicator.
  */
 export function InheritanceOverrideIndicator( { className } ) {
+	const label = __( 'Overrides inherited styles' );
+
 	return (
-		<Button
-			size="small"
-			label={ __( 'Overrides inherited styles' ) }
-			className={ clsx(
-				'global-styles-inheritance-indicator',
-				className
-			) }
-			icon={
-				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<Rect
-						x="7.75736"
-						y="12"
-						width="6"
-						height="6"
-						rx="1"
-						transform="rotate(-45 7.75736 12)"
-						fill="currentColor"
-					/>
-				</SVG>
-			}
-			onClick={ ( event ) => {
-				// The button exists only to host the tooltip, so a click does
-				// nothing.
-				event.preventDefault();
-				event.stopPropagation();
-			} }
-		/>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					// Not interactive: it is focusable only so keyboard users
+					// can reach the tooltip.
+					<span
+						role="img"
+						aria-label={ label }
+						tabIndex={ 0 }
+						className={ clsx(
+							'global-styles-inheritance-indicator',
+							className
+						) }
+					>
+						<SVG
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<Rect
+								x="7.75736"
+								y="12"
+								width="6"
+								height="6"
+								rx="1"
+								transform="rotate(-45 7.75736 12)"
+								fill="currentColor"
+							/>
+						</SVG>
+					</span>
+				}
+			/>
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 

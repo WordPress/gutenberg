@@ -21,14 +21,14 @@ describe( 'InheritanceOverrideIndicator', () => {
 	test( 'renders a focus-reachable indicator labelled for the override', () => {
 		render( <InheritanceOverrideIndicator /> );
 		expect(
-			screen.getByRole( 'button', { name: 'Overrides inherited styles' } )
+			screen.getByRole( 'img', { name: 'Overrides inherited styles' } )
 		).toBeVisible();
 	} );
 
 	test( 'applies a slot className for custom-control positioning', () => {
 		render( <InheritanceOverrideIndicator className="my-slot-class" /> );
 		expect(
-			screen.getByRole( 'button', { name: 'Overrides inherited styles' } )
+			screen.getByRole( 'img', { name: 'Overrides inherited styles' } )
 		).toHaveClass( 'my-slot-class' );
 	} );
 } );
@@ -155,7 +155,7 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 	test( 'does not render an override indicator in the inherited state', () => {
 		renderInheritedItem( 'Line height', 'components-base-control__label' );
 		expect(
-			screen.queryByRole( 'button', {
+			screen.queryByRole( 'img', {
 				name: 'Overrides inherited styles',
 			} )
 		).not.toBeInTheDocument();
@@ -187,7 +187,7 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 			onDeselect: () => {},
 		} );
 		expect(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'img', {
 				name: 'Overrides inherited styles',
 			} )
 		).toBeVisible();
@@ -198,7 +198,7 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 			hasLocalOverride: true,
 			onDeselect: () => {},
 		} );
-		const indicator = screen.getByRole( 'button', {
+		const indicator = screen.getByRole( 'img', {
 			name: 'Overrides inherited styles',
 		} );
 		expect(
@@ -216,7 +216,7 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 			onDeselect: () => {},
 		} );
 		expect(
-			screen.queryByRole( 'button', {
+			screen.queryByRole( 'img', {
 				name: 'Overrides inherited styles',
 			} )
 		).not.toBeInTheDocument();
@@ -224,7 +224,7 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 
 	test( 'does not offset the indicator by default', () => {
 		renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
-		const indicator = screen.getByRole( 'button', {
+		const indicator = screen.getByRole( 'img', {
 			name: 'Overrides inherited styles',
 		} );
 		const affordance =
@@ -241,7 +241,7 @@ describe( 'InheritanceToolsPanelItem local-override indicator', () => {
 			hasInlineEndToggle: true,
 			onDeselect: () => {},
 		} );
-		const indicator = screen.getByRole( 'button', {
+		const indicator = screen.getByRole( 'img', {
 			name: 'Overrides inherited styles',
 		} );
 		const affordance =

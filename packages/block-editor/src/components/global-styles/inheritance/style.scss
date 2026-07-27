@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
 
 // Inherited Global Styles values — visual treatment for inspector controls.
@@ -37,5 +38,14 @@
 // The override indicator: a small, focus-reachable button hosting the filled
 // diamond SVG and the "Overrides inherited styles" tooltip.
 .global-styles-inheritance-indicator {
-	border-radius: 50% !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: $button-size-small;
+	height: $button-size-small;
+	border-radius: 50%;
+
+	&:focus-visible {
+		@include mixins.outset-ring__focus();
+	}
 }

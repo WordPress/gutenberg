@@ -135,7 +135,7 @@ function renderPanel( props ) {
 // rather than the label's CSS class hook.
 function expectLocalOverride() {
 	expect(
-		screen.getByRole( 'button', {
+		screen.getByRole( 'img', {
 			name: /overrides inherited styles/i,
 		} )
 	).toBeInTheDocument();

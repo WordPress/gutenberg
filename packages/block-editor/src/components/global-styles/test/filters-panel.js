@@ -65,7 +65,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 		);
 
 		expect(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'img', {
 				name: /overrides inherited styles/i,
 			} )
 		).toBeInTheDocument();

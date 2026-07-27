@@ -646,7 +646,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// Both zero values are local overrides, so each control surfaces the
 		// non-interactive override indicator.
 		expect(
-			screen.getAllByRole( 'button', {
+			screen.getAllByRole( 'img', {
 				name: /overrides inherited styles/i,
 			} )
 		).toHaveLength( 2 );

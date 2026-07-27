@@ -107,7 +107,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( radiusInput ).toHaveValue( 12 );
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'img', {
 					name: /overrides inherited styles/i,
 				} )
 			).toBeInTheDocument();
@@ -225,7 +225,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			// The local override surfaces the override indicator.
 			expect(
-				screen.getAllByRole( 'button', {
+				screen.getAllByRole( 'img', {
 					name: /overrides inherited styles/i,
 				} ).length
 			).toBeGreaterThanOrEqual( 1 );
@@ -319,7 +319,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'img', {
 					name: /overrides inherited styles/i,
 				} )
 			).toBeInTheDocument();
