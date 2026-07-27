@@ -26,6 +26,10 @@ $input-size: 300px;
 		}
 	}
 
+	&.has-spinner .components-input-control__input {
+		padding-right: $grid-unit-40;
+	}
+
 	.components-spinner {
 		position: absolute;
 		margin: 0;

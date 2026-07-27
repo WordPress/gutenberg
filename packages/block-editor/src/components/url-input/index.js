@@ -427,6 +427,8 @@ class URLInput extends Component {
 			instanceId,
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
+			__experimentalShowInitialSuggestions: showInitialSuggestions,
+			__experimentalHandleURLSuggestions: handleURLSuggestions,
 			value = '',
 			hideLabelFromVision = false,
 			help = null,
@@ -450,6 +452,7 @@ class URLInput extends Component {
 			label,
 			className: clsx( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
+				'has-spinner': showInitialSuggestions || handleURLSuggestions,
 			} ),
 			hideLabelFromVision,
 		};
