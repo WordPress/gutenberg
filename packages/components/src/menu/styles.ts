@@ -69,11 +69,11 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 `;
 
 /**
- * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
- * this element wraps the inner surface that receives all merged menu props
- * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
- * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
- * surface via `:has(> …)`.
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit's `render` prop so
+ * this element directly receives all merged menu props (ref, role, `data-*`,
+ * children) from Ariakit. This ensures Ariakit can properly detect the CSS
+ * transition properties and manage focus restoration timing (e.g. when a menu
+ * item opens a Modal).
  */
 export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
@@ -84,40 +84,40 @@ export const MenuMotionRoot = styled.div`
 			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ) {
+		&:not( [data-submenu] ) {
 			/* Regardless of the side, fade in and out. */
 			opacity: 0;
-			&:has( > ${ MenuSurface }[data-enter] ) {
+			&[data-enter] {
 				opacity: 1;
 			}
 
 			/* Slide in the direction the menu is opening. */
-			&:has( > ${ MenuSurface }[data-side='bottom'] ) {
+			&[data-side='bottom'] {
 				transform: translateY(
 					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&:has( > ${ MenuSurface }[data-side='top'] ) {
+			&[data-side='top'] {
 				transform: translateY(
 					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&:has( > ${ MenuSurface }[data-side='left'] ) {
+			&[data-side='left'] {
 				transform: translateX(
 					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&:has( > ${ MenuSurface }[data-side='right'] ) {
+			&[data-side='right'] {
 				transform: translateX(
 					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&:has( > ${ MenuSurface }[data-enter][data-side='bottom'] ),
-			&:has( > ${ MenuSurface }[data-enter][data-side='top'] ) {
+			&[data-enter][data-side='bottom'],
+			&[data-enter][data-side='top'] {
 				transform: translateY( 0 );
 			}
-			&:has( > ${ MenuSurface }[data-enter][data-side='left'] ),
-			&:has( > ${ MenuSurface }[data-enter][data-side='right'] ) {
+			&[data-enter][data-side='left'],
+			&[data-enter][data-side='right'] {
 				transform: translateX( 0 );
 			}
 		}

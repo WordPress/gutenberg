@@ -68,14 +68,16 @@ export const Popover = forwardRef<
 	}
 
 	const renderMenu = useCallback(
-		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
-			<Styled.MenuMotionRoot>
-				<Styled.MenuSurface
-					{ ...htmlProps }
-					variant={ menuContext.variant }
-				/>
-			</Styled.MenuMotionRoot>
-		),
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => {
+			const { children, ...restHtmlProps } = htmlProps;
+			return (
+				<Styled.MenuMotionRoot { ...restHtmlProps }>
+					<Styled.MenuSurface variant={ menuContext.variant }>
+						{ children }
+					</Styled.MenuSurface>
+				</Styled.MenuMotionRoot>
+			);
+		},
 		[ menuContext.variant ]
 	);
 
