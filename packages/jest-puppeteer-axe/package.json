@@ -44,7 +44,7 @@
 		"@axe-core/puppeteer": "^4.0.0"
 	},
 	"peerDependencies": {
-		"jest": ">=29",
+		"jest": ">=30",
 		"puppeteer": ">=11"
 	},
 	"peerDependenciesMeta": {

@@ -31,7 +31,7 @@
 		"y-websocket": "^3.0.0"
 	},
 	"peerDependencies": {
-		"jest": ">=29",
+		"jest": ">=30",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
 	},

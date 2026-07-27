@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require Jest v30 or newer ([#72593](https://github.com/WordPress/gutenberg/issues/72593)).
+
 ## 9.16.0 (2026-07-14)
 
 ### Enhancements

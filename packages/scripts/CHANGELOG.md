@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade the bundled Jest packages from v29 to v30 ([#72593](https://github.com/WordPress/gutenberg/issues/72593)).
+
 ### Enhancements
 
 - 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
