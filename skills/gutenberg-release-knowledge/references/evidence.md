@@ -20,6 +20,7 @@ For every shortlisted pull request, read:
 -   Treat contributor roles as context about project direction, not proof that a claim is correct or agreed upon.
 -   Do not infer consensus from authority, comment volume, reactions, or a merge alone. Preserve meaningful disagreement and distinguish what shipped from what remains undecided.
 -   Treat bot output as automation, not evidence of project intent unless it links to a human-authored decision.
+-   Before proposing a change, confirm the guidance is Gutenberg-specific, not already covered by canonical documentation, and can be explained with enough context to be useful. If a finding depends on a broader concept, propose the canonical documentation needed to explain that concept rather than adding an isolated instruction. If that broader change is outside the scope of the release review, report the gap and omit the pull request.
 
 ## Verify against the repository
 
