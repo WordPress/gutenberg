@@ -59,7 +59,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 ## Common pitfalls
 
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
--   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+-   PHP features in `lib/compat/` MUST target the `wordpress-X.Y/` directory for the intended WordPress release; inspect the available compatibility directories before choosing a target.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
