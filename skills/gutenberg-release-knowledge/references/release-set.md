@@ -1,12 +1,5 @@
 # Establish the release set
 
-## Prepare the repository
-
-1. Check the worktree, current branch, remotes, and GitHub authentication.
-2. Fetch the upstream default branch and relevant release tags.
-3. Refresh a stale fork only to the scope the user authorized. Do not delete unrelated remote branches merely because the default branch is stale.
-4. Create a dedicated topic branch from the requested base.
-
 ## Resolve the shipped changes
 
 1. Resolve the exact stable tag `v<release>` and the preceding stable Gutenberg tag. When the input omits a patch number, use `v<release>.0`.
