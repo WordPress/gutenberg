@@ -2425,7 +2425,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *     background: value;
 	 *   }
 	 *
-	 *   p.has-value-gradient-background {
+	 *   :where(p).has-value-gradient-background {
 	 *     background: value;
 	 *   }
 	 *
