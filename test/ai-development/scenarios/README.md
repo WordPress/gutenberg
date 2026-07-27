@@ -6,25 +6,29 @@ Each `<slug>.json` defines a human-readable spec — `name`, `skills`, `query`, 
 
 ## Running
 
+The tests use Playwright purely as a test runner — no browsers are involved. Each test spawns a real, headless agent session, which costs minutes and real tokens per scenario, so they run only through this explicit command (never in CI or default test sweeps):
+
 ```bash
-# Static sanity checks — fast, free:
-node test/ai-development/run.mjs
+# All scenarios:
+npm run test:ai-development
 
-# Live mode — run scenario queries through real agent sessions and check the
-# transcripts. Costs minutes and real tokens per run.
-node test/ai-development/run.mjs --live
-node test/ai-development/run.mjs --live --scenario testing-run-e2e --repeat 3
-node test/ai-development/run.mjs --live --scenario testing-write-e2e --model haiku
+# One scenario, by name:
+npm run test:ai-development -- -g "Negative control"
+
+# Repeat for confidence (agent compliance is probabilistic):
+npm run test:ai-development -- --repeat-each=3
+
+# Against a specific model (passed through to the agent CLI):
+AI_EVAL_MODEL=haiku npm run test:ai-development
 ```
-
-`--model` is passed through to the agent CLI, so the same scenario can be checked against any model you have access to. `--agent` selects the CLI adapter (default `claude`); supporting another agent CLI means adding one adapter entry in `test/ai-development/run.mjs` that invokes it headless and normalizes its transcript into read/write/command events — the assertions are agent-agnostic.
 
 Notes:
 
 -   No environment is required: the point is what the agent *consults and attempts*, not whether Gutenberg's tests execute. Agents run without write permissions, so a denied edit still shows up in the transcript as the attempt the assertions need — and your checkout is never modified.
--   Agent compliance is probabilistic: use `--repeat 3` before treating a failure as a regression, and read the reported rates (`PASS (3/3)`).
+-   Treat a single-run failure as a smoke signal, not a verdict — re-run with `--repeat-each=3` before calling it a regression.
 -   Results are colored by your personal agent configuration (`~/.claude`, `CLAUDE.local.md`, memory).
--   Transcripts are saved under `test/ai-development/artifacts/` for debugging; failures print the actual reads/commands next to the expectation.
+-   Each run's raw transcript is saved under `test/ai-development/artifacts/` (failure messages include the exact path).
+-   Supporting another agent CLI means adding one adapter entry in `test/ai-development/agent.mjs` that invokes it headless and normalizes its transcript into read/write/command events — the assertions are agent-agnostic.
 
 ## Assertion vocabulary
 
