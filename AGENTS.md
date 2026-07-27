@@ -4,7 +4,7 @@
 
 ```bash
 # Setup
-nvm use                    # Node >= 20.19.0 required.
+nvm use                    # Use the required node version
 npm install && composer install
 npm run wp-env status      # Always check status first.
 npm run wp-env start       # Only start if not already running.
