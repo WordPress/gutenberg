@@ -8,7 +8,8 @@ description: Use when reviewing a Gutenberg, plugin, or application UI/UX change
 ## Authority and scope
 
 - Keep the review read-only. Do not modify source, commit, push, post review
-  comments, or update pull-request metadata.
+  comments to GitHub, or update pull-request metadata. Deliver findings in the
+  review response.
 - Review any application, plugin, or Gutenberg UI/UX diff. Route a change to
   `packages/components`, `packages/ui`, or `packages/theme` to
   `design-system-code-review`.

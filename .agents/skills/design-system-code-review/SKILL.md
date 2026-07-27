@@ -8,7 +8,8 @@ description: Use when reviewing a Gutenberg change to a WordPress Design System 
 ## Authority and scope
 
 - Keep the review read-only. Do not modify source or generated files, commit,
-  push, post review comments, or update pull-request metadata.
+  push, post review comments to GitHub, or update pull-request metadata.
+  Deliver findings in the review response.
 - Review a diff that changes `packages/components`, `packages/ui`, or
   `packages/theme`. Require the target Gutenberg checkout or a complete diff.
 - Treat the target checkout's code, package documentation, and compatibility

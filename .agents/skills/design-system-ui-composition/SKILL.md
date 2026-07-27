@@ -33,7 +33,8 @@ current vocabulary and components. Then verify the recommendation against the
 target's public contract. The MCP result does not make an API available in an
 older checkout or package release.
 
-Read the target package documentation before coding:
+Read the target package documentation before coding. In a local Gutenberg
+checkout, use:
 
 - [`@wordpress/components`](../../packages/components/README.md)
 - [`@wordpress/ui`](../../packages/ui/README.md)
@@ -42,10 +43,15 @@ Read the target package documentation before coding:
 - [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
 
 When the target package is installed rather than checked out, read the
-corresponding documentation shipped with that package. Use the
-[Gutenberg `trunk` documentation](https://github.com/WordPress/gutenberg/tree/trunk/packages)
-only when the target documentation is unavailable, and do not infer that it
-describes APIs available to the target version.
+corresponding documentation shipped with that package. When target
+documentation is unavailable, use these portable fallback links only to
+discover possibilities, not to establish target-version availability:
+
+- [`@wordpress/components`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/README.md)
+- [`@wordpress/ui`](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md)
+- [`@wordpress/theme`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md)
+- [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)
+- [Working with WordPress Design System packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/design/design-system-packages.md)
 
 ## Choose and compose
 
