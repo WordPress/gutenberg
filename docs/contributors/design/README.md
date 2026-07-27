@@ -3,7 +3,7 @@
 A guide on how to get started contributing design to the Gutenberg project.
 
 For guidance on consuming or maintaining the WordPress Design System packages,
-see [Working with WordPress Design System packages](design-system-packages.md).
+see [Working with WordPress Design System packages](/docs/contributors/design/design-system-packages.md).
 
 ## Discussions
 

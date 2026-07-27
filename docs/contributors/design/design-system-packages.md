@@ -30,10 +30,10 @@ not bypass that decision with a package-private import.
 
 Use the package documentation as the source of durable facts:
 
-- [`@wordpress/components` README](../../../packages/components/README.md)
-- [`@wordpress/ui` README](../../../packages/ui/README.md)
-- [`@wordpress/theme` README](../../../packages/theme/README.md)
-- [Design Tokens Reference](../../../packages/theme/docs/tokens.md)
+- [`@wordpress/components` README](/packages/components/README.md)
+- [`@wordpress/ui` README](/packages/ui/README.md)
+- [`@wordpress/theme` README](/packages/theme/README.md)
+- [Design Tokens Reference](/packages/theme/docs/tokens.md)
 
 ## Build with public packages
 
@@ -65,9 +65,9 @@ Start with a consumer and precedent audit: who needs the behaviour, which
 existing component or token is closest, and why public composition is not
 enough. Then follow the source guidance for the package being changed:
 
-- [`@wordpress/components` contribution guide](../../../packages/components/CONTRIBUTING.md)
-- [`@wordpress/ui` contribution guide](../../../packages/ui/CONTRIBUTING.md)
-- [Design Tokens Maintainer's Guide](../../../packages/theme/tokens/README.md)
+- [`@wordpress/components` contribution guide](/packages/components/CONTRIBUTING.md)
+- [`@wordpress/ui` contribution guide](/packages/ui/CONTRIBUTING.md)
+- [Design Tokens Maintainer's Guide](/packages/theme/tokens/README.md)
 
 Keep implementation details distinct from public API. For public changes,
 decide and document compatibility, migration, release, generated-output, and
