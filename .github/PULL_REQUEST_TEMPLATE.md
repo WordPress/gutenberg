@@ -5,7 +5,7 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 <!-- Link this PR to its associated issue with an appropriate keyword: Closes, See, Follow up to, etc. -->
 Closes <!-- #ISSUE-NUMBER or URL -->
 
-<!-- Briefly (1 - 3 sentences) explain at a high level what the PR is doing. Don't discuss implementation details here. -->
+<!-- Briefly (1 - 2 sentences) explain at a high level what the PR is doing. Don't discuss implementation details here. -->
 
 ## Why?
 <!-- Explain why this PR is necessary. What problem is it solving? Reference any existing previous issue(s) or PR(s), but please add a short summary here, too -->

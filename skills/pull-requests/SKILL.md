@@ -7,6 +7,9 @@ description: Use when authoring or updating a pull request description for the G
 
 Follow the section structure and comments in `.github/PULL_REQUEST_TEMPLATE.md`.
 
+## Writing style
+Be succinct and straightforward. Short, clear, concise sentences. Your audience is developers who need to get up to speed quickly, not wade through long paragraphs.
+
 ## Describe the committed diff
 
 Base the description on what the pull request actually contains, not your local working tree.
