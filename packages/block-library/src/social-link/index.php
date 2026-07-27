@@ -19,16 +19,23 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = $block->context['openInNewTab'] ?? false;
 
-	$text = ! empty( $attributes['label'] ) ? trim( $attributes['label'] ) : '';
+	$label_attr = $attributes['label'] ?? null;
+	$text       = is_string( $label_attr ) && '' !== $label_attr ? trim( $label_attr ) : '';
 
-	$service     = $attributes['service'] ?? 'Icon';
-	$url         = $attributes['url'] ?? false;
-	$text        = $text ? $text : block_core_social_link_get_name( $service );
-	$rel         = $attributes['rel'] ?? '';
-	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
+	$service_attr = $attributes['service'] ?? null;
+	$service      = is_string( $service_attr ) ? $service_attr : 'Icon';
+	$url          = $attributes['url'] ?? false;
+	$text         = $text ? $text : block_core_social_link_get_name( $service );
+	$rel_attr     = $attributes['rel'] ?? null;
+	$rel          = is_string( $rel_attr ) ? $rel_attr : '';
+	$show_labels  = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
+		return '';
+	}
+
+	if ( ! is_string( $url ) ) {
 		return '';
 	}
 
@@ -100,7 +107,7 @@ add_action( 'init', 'register_block_core_social_link' );
  */
 function block_core_social_link_get_icon( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
 		return $services[ $service ]['icon'];
 	}
 
@@ -118,7 +125,7 @@ function block_core_social_link_get_icon( $service ) {
  */
 function block_core_social_link_get_name( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
 		return $services[ $service ]['name'];
 	}
 
@@ -136,6 +143,9 @@ function block_core_social_link_get_name( $service ) {
  * @return array|string
  */
 function block_core_social_link_services( $service = '', $field = '' ) {
+	if ( ! is_string( $service ) || ! is_string( $field ) ) {
+		return array();
+	}
 	$services_data = array(
 		'fivehundredpx' => array(
 			'name' => _x( '500px', 'social link block variation name' ),
