@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -268,9 +273,9 @@ function IsolatedSandBox( {
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
-	const sandbox = `allow-scripts allow-presentation${
-		allowPopups ? ' allow-popups' : ''
-	}`;
+	const sandbox = clsx( 'allow-scripts', 'allow-presentation', {
+		'allow-popups': allowPopups,
+	} );
 
 	const srcDoc = useMemo(
 		() =>
@@ -393,9 +398,14 @@ function SameOriginSandBox( {
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
-	const sandbox = `allow-scripts allow-same-origin allow-presentation${
-		allowPopups ? ' allow-popups' : ''
-	}`;
+	const sandbox = clsx(
+		'allow-scripts',
+		'allow-same-origin',
+		'allow-presentation',
+		{
+			'allow-popups': allowPopups,
+		}
+	);
 
 	function isFrameAccessible() {
 		try {
