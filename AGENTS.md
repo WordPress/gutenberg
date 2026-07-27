@@ -34,6 +34,10 @@ Read only what your task needs, when it needs it:
 -   **Task procedures (skills)**: before starting a matching task, read the relevant `skills/<domain>/SKILL.md` (e.g. `skills/testing/SKILL.md` for writing, running, or debugging tests).
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
+## Testing
+
+For writing, running, or debugging JavaScript, PHP, or E2E tests, read [`skills/testing/SKILL.md`](skills/testing/SKILL.md) before choosing a command.
+
 ## Code quality
 
 ```bash
