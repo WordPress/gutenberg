@@ -303,4 +303,36 @@ HTML;
 		$router_config = wp_interactivity_config( 'core/router' );
 		$this->assertArrayNotHasKey( 'clientNavigationDisabled', $router_config );
 	}
+
+	/**
+	 * Tests that a non-scalar `queryId` (e.g. from hand-edited, imported, or
+	 * AI-generated content) does not cause a fatal error and falls back to
+	 * non-enhanced rendering.
+	 */
+	public function test_rendering_query_with_non_scalar_query_id_does_not_error() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":["0"],"query":{"inherit":true},"enhancedPagination":true} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+HTML;
+
+		$wp_query     = new WP_Query( array( 'posts_per_page' => 1 ) );
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$this->assertIsString( $output, 'A non-scalar queryId must not cause a fatal error.' );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertNull(
+			$p->get_attribute( 'data-wp-router-region' ),
+			'Enhanced pagination should not be applied when queryId is non-scalar.'
+		);
+	}
 }
