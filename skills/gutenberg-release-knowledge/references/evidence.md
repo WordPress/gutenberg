@@ -1,6 +1,6 @@
 # Collect and interpret evidence
 
-Keep collection deterministic and analysis interpretive. Focus the investigation on finding important documentation gaps, not ranking contributors or proving every claim exhaustively.
+Keep collection deterministic and analysis interpretive. Focus the investigation on finding important documentation gaps.
 
 ## Collect the discussion and implementation
 
@@ -15,9 +15,9 @@ For every shortlisted pull request, read:
 
 ## Decide what matters
 
--   Prioritize gaps affecting public APIs, compatibility, recurring implementation mistakes, or behavior users and contributors need to understand.
+-   Prioritize gaps affecting public APIs, backwards compatibility, recurring implementation mistakes, or behavior users and contributors need to understand.
 -   Verify a candidate against the merged implementation, current documentation, and obvious follow-up work. If its validity remains ambiguous, record the uncertainty and move on rather than expanding the investigation.
--   Treat contributor roles as context about project direction, not proof that a claim is correct or agreed upon. Do not build trust tiers or reconstruct historical team membership.
+-   Treat contributor roles as context about project direction, not proof that a claim is correct or agreed upon.
 -   Do not infer consensus from authority, comment volume, reactions, or a merge alone. Preserve meaningful disagreement and distinguish what shipped from what remains undecided.
 -   Treat bot output as automation, not evidence of project intent unless it links to a human-authored decision.
 
