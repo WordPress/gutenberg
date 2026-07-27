@@ -12,6 +12,31 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 
 /**
+ * Returns true when the event originates from an element that handles undo
+ * and redo itself, marked with `data-editor-undo="false"`. Such elements hold
+ * local state that is not yet committed to the editor (a dialog input, an
+ * HTML editing field), so the browser's own undo must be left to act on them
+ * instead of the editor history.
+ *
+ * Events coming from the editor canvas are re-dispatched on the iframe
+ * element, so the real target is resolved through the frame's focused
+ * element.
+ *
+ * @param {KeyboardEvent} event Keyboard event.
+ *
+ * @return {boolean} Whether the element handles its own undo.
+ */
+function hasSelfContainedUndo( event ) {
+	let { target } = event;
+
+	while ( target?.nodeName === 'IFRAME' ) {
+		target = target.contentDocument?.activeElement;
+	}
+
+	return !! target?.closest?.( '[data-editor-undo="false"]' );
+}
+
+/**
  * Handles the keyboard shortcuts for the editor.
  *
  * It provides functionality for various keyboard shortcuts such as toggling editor mode,
@@ -61,11 +86,17 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
+		if ( hasSelfContainedUndo( event ) ) {
+			return;
+		}
 		undo();
 		event.preventDefault();
 	} );
 
 	useShortcut( 'core/editor/redo', ( event ) => {
+		if ( hasSelfContainedUndo( event ) ) {
+			return;
+		}
 		redo();
 		event.preventDefault();
 	} );
