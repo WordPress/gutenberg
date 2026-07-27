@@ -43,40 +43,39 @@ test.describe( 'Playlist block', () => {
 		editor,
 		page,
 	} ) => {
-		const uniqueId = 'playlist-selected-track';
-		const playlistAttributes = { currentTrack: uniqueId };
-		const trackAttributes = {
-			id: uploadedAudio.id,
-			uniqueId,
-			src: uploadedAudio.source_url,
-			title: 'Selected Track',
-			artist: 'Test Artist',
-			length: '0:12',
-		};
-		const playlistComment = `<!-- wp:playlist ${ JSON.stringify(
-			playlistAttributes
-		) } -->`;
-		const trackComment = `<!-- wp:playlist-track ${ JSON.stringify(
-			trackAttributes
-		) } /-->`;
+		await admin.createNewPost();
+		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+		await page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
 
-		await admin.createNewPost( {
-			content: [
-				playlistComment,
-				'<figure class="wp-block-playlist">',
-				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">',
-				trackComment,
-				'</ol></figure>',
-				'<!-- /wp:playlist -->',
-			].join( '' ),
-		} );
+		await page.evaluate( ( audio ) => {
+			const track = window.wp.blocks.createBlock( 'core/playlist-track', {
+				id: audio.id,
+				src: audio.source_url,
+				title: 'Selected Track',
+				artist: 'Test Artist',
+				length: '0:12',
+			} );
+			const playlist = window.wp.blocks.createBlock(
+				'core/playlist',
+				{},
+				[ track ]
+			);
 
-		const playlistTrack = editor.canvas
-			.locator( '[data-type="core/playlist-track"]' )
-			.first();
-		await expect( playlistTrack ).toBeVisible();
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.insertBlock( playlist );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.selectBlock( track.clientId );
+		}, uploadedAudio );
 
-		await editor.selectBlocks( playlistTrack );
+		await expect(
+			editor.canvas
+				.locator( '[data-type="core/playlist-track"].is-selected' )
+				.first()
+		).toBeVisible();
 		await editor.showBlockToolbar();
 
 		await expect(
