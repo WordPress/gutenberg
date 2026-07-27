@@ -1,6 +1,6 @@
 # Prepare the pull request
 
-Keep the change small and reviewable. Prefer one coherent topic over a release-wide grab bag.
+Keep the output proportionate to the release. Prefer a small number of coherent pull requests. Combine related findings, and create an additional pull request only when another important documentation gap is independently reviewable and would make an existing pull request unfocused. Do not create pull requests for marginal findings merely to cover everything.
 
 Before editing handbook documentation or a package README, read [the documentation contribution guide](../../../docs/contributors/documentation/README.md) and follow its Markdown, heading, link, code-fence, and callout conventions. Also inspect the destination file and any closer instructions for local patterns.
 
