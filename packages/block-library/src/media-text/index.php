@@ -141,10 +141,10 @@ add_action( 'init', 'register_block_core_media_text' );
 
 /**
  * Enqueues dynamic stacking styles for the Media & Text block.
- * 
+ *
  * @since 23.4.0
  */
-function enqueue_block_core_media_text_dynamic_styles() {
+function register_block_core_media_text_dynamic_styles() {
 	$tablet_breakpoint = wp_get_global_settings( array( 'viewport', 'tablet' ) );
 	$breakpoint        = $tablet_breakpoint ? $tablet_breakpoint : '600px';
 
@@ -167,4 +167,4 @@ function enqueue_block_core_media_text_dynamic_styles() {
 
 	wp_add_inline_style( 'wp-block-media-text', wp_strip_all_tags( $css ) );
 }
-add_action( 'enqueue_block_assets', 'enqueue_block_core_media_text_dynamic_styles' );
+add_action( 'enqueue_block_assets', 'register_block_core_media_text_dynamic_styles' );
