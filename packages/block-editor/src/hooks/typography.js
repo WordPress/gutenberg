@@ -182,11 +182,8 @@ export function TypographyPanel( {
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-	const { value: inheritedValue } = useResolvedStyle(
-		name,
-		className,
-		selectedState
-	);
+	const { value: inheritedValue, sources: inheritedSources } =
+		useResolvedStyle( name, className, selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
@@ -269,6 +266,7 @@ export function TypographyPanel( {
 			defaultControls={ defaultControls }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }

@@ -195,6 +195,7 @@ function BackgroundControlsPanel( {
 	hasImageValue,
 	onReset,
 	hasLocalOverride,
+	overrideSources,
 	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
@@ -247,7 +248,10 @@ function BackgroundControlsPanel( {
 								/>
 							) }
 							{ hasLocalOverride && (
-								<InheritanceOverrideIndicator className="block-editor-global-styles-background-panel__inheritance-override-indicator" />
+								<InheritanceOverrideIndicator
+									className="block-editor-global-styles-background-panel__inheritance-override-indicator"
+									overrideSources={ overrideSources }
+								/>
 							) }
 						</Stack>
 					</>
@@ -657,6 +661,7 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = true,
+	overrideSources,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -744,6 +749,7 @@ export default function BackgroundImagePanel( {
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
+					overrideSources={ overrideSources }
 					onReset={ localHasImageValue ? resetBackground : undefined }
 					containerRef={ containerRef }
 				>

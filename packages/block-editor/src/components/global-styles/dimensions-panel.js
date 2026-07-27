@@ -347,6 +347,7 @@ export default function DimensionsPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -384,6 +385,12 @@ export default function DimensionsPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	const showSpacingPresetsControl = hasSpacingPresets( settings );
 	const units = useCustomUnits( {
@@ -762,6 +769,9 @@ export default function DimensionsPanel( {
 							inheritedContentSizeValue !== undefined
 					) }
 					label={ __( 'Content width' ) }
+					overrideSources={ overrideSourcesFor(
+						'layout.contentSize'
+					) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={
@@ -808,6 +818,7 @@ export default function DimensionsPanel( {
 							inheritedWideSizeValue !== undefined
 					) }
 					label={ __( 'Wide width' ) }
+					overrideSources={ overrideSourcesFor( 'layout.wideSize' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={
@@ -847,6 +858,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
+					overrideSources={ overrideSourcesFor( 'spacing.padding' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
 						paddingSides,
 						showSpacingPresetsControl
@@ -901,6 +913,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
+					overrideSources={ overrideSourcesFor( 'spacing.margin' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
 						marginSides,
 						showSpacingPresetsControl
@@ -964,6 +977,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
+					overrideSources={ overrideSourcesFor( 'spacing.blockGap' ) }
 					hasInlineEndToggle={ isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
@@ -1045,6 +1059,9 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasMinHeightValue }
 					label={ __( 'Minimum height' ) }
+					overrideSources={ overrideSourcesFor(
+						'dimensions.minHeight'
+					) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={
 						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
@@ -1080,6 +1097,9 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasMinWidthValue }
 					label={ __( 'Minimum width' ) }
+					overrideSources={ overrideSourcesFor(
+						'dimensions.minWidth'
+					) }
 					onDeselect={ resetMinWidthValue }
 					isShownByDefault={
 						defaultControls.minWidth ?? DEFAULT_CONTROLS.minWidth
@@ -1113,6 +1133,9 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasHeightValue }
 					label={ __( 'Height' ) }
+					overrideSources={ overrideSourcesFor(
+						'dimensions.height'
+					) }
 					onDeselect={ resetHeightValue }
 					isShownByDefault={
 						defaultControls.height ?? DEFAULT_CONTROLS.height
@@ -1140,6 +1163,7 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasWidthValue }
 					label={ __( 'Width' ) }
+					overrideSources={ overrideSourcesFor( 'dimensions.width' ) }
 					onDeselect={ resetWidthValue }
 					isShownByDefault={
 						defaultControls.width ?? DEFAULT_CONTROLS.width
@@ -1163,6 +1187,9 @@ export default function DimensionsPanel( {
 					value={ aspectRatioValue }
 					onChange={ setAspectRatioValue }
 					panelId={ panelId }
+					overrideSources={ overrideSourcesFor(
+						'dimensions.aspectRatio'
+					) }
 					{ ...inheritanceProps(
 						isAspectRatioPlaceholder,
 						hasAspectRatioValue() &&

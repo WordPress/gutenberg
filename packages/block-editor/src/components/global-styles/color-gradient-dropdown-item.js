@@ -215,6 +215,7 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = true,
+	overrideSources,
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
@@ -279,7 +280,10 @@ export default function ColorGradientDropdownItem( {
 									/>
 								) }
 								{ hasValue() && hasLocalOverride && (
-									<InheritanceOverrideIndicator className="block-editor-panel-color-gradient-settings__inheritance-override-indicator" />
+									<InheritanceOverrideIndicator
+										className="block-editor-panel-color-gradient-settings__inheritance-override-indicator"
+										overrideSources={ overrideSources }
+									/>
 								) }
 								{ contrastWarning && (
 									// An icon-only warning that stays visible while a

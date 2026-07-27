@@ -130,7 +130,8 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 
 const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, hasLocalOverride, onReset, overrideSources } =
+			resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -171,7 +172,10 @@ const renderToggle = ( duotone, resetConfig ) =>
 						/>
 					) }
 					{ hasLocalOverride && (
-						<InheritanceOverrideIndicator className="block-editor-panel-duotone-settings__inheritance-override-indicator" />
+						<InheritanceOverrideIndicator
+							className="block-editor-panel-duotone-settings__inheritance-override-indicator"
+							overrideSources={ overrideSources }
+						/>
 					) }
 				</Stack>
 			</>
@@ -183,6 +187,7 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -198,6 +203,12 @@ export default function FiltersPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -271,6 +282,7 @@ export default function FiltersPanel( {
 							inheritedDuotone !== undefined
 					) }
 					label={ __( 'Duotone' ) }
+					overrideSources={ overrideSourcesFor( 'filter.duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
@@ -286,6 +298,8 @@ export default function FiltersPanel( {
 							hasLocalValue: hasDuotone(),
 							hasLocalOverride: hasDuotoneLocalOverride,
 							onReset: resetDuotone,
+							overrideSources:
+								overrideSourcesFor( 'filter.duotone' ),
 						} ) }
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">

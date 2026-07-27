@@ -13,9 +13,41 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
  */
 import {
 	getInheritanceProps,
+	getTranslatedBreadcrumb,
+	getOverrideTooltipText,
+	getCommonOverrideTooltipText,
 	InheritanceOverrideIndicator,
 	InheritanceToolsPanelItem,
 } from '../';
+
+// Source-map entries as produced by `resolveStyle`. Block titles are not
+// registered in this test, so `getBlockType` returns undefined and the block
+// title falls back to the slug.
+const ROOT_SOURCE = {
+	layer: 'root',
+	breadcrumb: [ 'styles' ],
+	blockName: null,
+	variation: null,
+};
+const BLOCK_SOURCE = {
+	layer: 'block',
+	breadcrumb: [ 'styles', 'blocks', 'blockName' ],
+	blockName: 'core/heading',
+	variation: null,
+};
+const VARIATION_SOURCE = {
+	layer: 'blockVariation',
+	breadcrumb: [
+		'styles',
+		'blocks',
+		'blockName',
+		'variations',
+		'variationName',
+	],
+	blockName: 'core/heading',
+	variation: 'plain',
+};
+const BLOCK_STYLES = [ { name: 'plain', label: 'Plain' } ];
 
 describe( 'InheritanceOverrideIndicator', () => {
 	test( 'renders a focus-reachable indicator labelled for the override', () => {
@@ -30,6 +62,89 @@ describe( 'InheritanceOverrideIndicator', () => {
 		expect(
 			screen.getByRole( 'img', { name: 'Overrides inherited styles' } )
 		).toHaveClass( 'my-slot-class' );
+	} );
+
+	test( 'labels the indicator with the breadcrumb when given sources', () => {
+		render(
+			<InheritanceOverrideIndicator
+				overrideSources={ [ BLOCK_SOURCE ] }
+			/>
+		);
+		expect(
+			screen.getByRole( 'img', {
+				name: 'Overrides inherited styles from Blocks › core/heading',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'falls back to the bare label for a root-sourced (default) override', () => {
+		render(
+			<InheritanceOverrideIndicator overrideSources={ [ ROOT_SOURCE ] } />
+		);
+		expect(
+			screen.getByRole( 'img', { name: 'Overrides inherited styles' } )
+		).toBeVisible();
+	} );
+
+	test( 'falls back to the bare label when no source resolves', () => {
+		render( <InheritanceOverrideIndicator overrideSources={ [] } /> );
+		expect(
+			screen.getByRole( 'img', { name: 'Overrides inherited styles' } )
+		).toBeVisible();
+	} );
+} );
+
+describe( 'override tooltip breadcrumb helpers', () => {
+	test( 'getTranslatedBreadcrumb drops the root Styles node and translates the rest', () => {
+		// Root-only resolves to no path (it is the global default).
+		expect( getTranslatedBreadcrumb( ROOT_SOURCE ) ).toBeUndefined();
+		expect( getTranslatedBreadcrumb( BLOCK_SOURCE ) ).toBe(
+			'Blocks › core/heading'
+		);
+		expect(
+			getTranslatedBreadcrumb( VARIATION_SOURCE, BLOCK_STYLES )
+		).toBe( 'Blocks › core/heading › Variations › Plain' );
+	} );
+
+	test( 'getTranslatedBreadcrumb falls back to the variation slug without blockStyles', () => {
+		expect( getTranslatedBreadcrumb( VARIATION_SOURCE ) ).toBe(
+			'Blocks › core/heading › Variations › plain'
+		);
+	} );
+
+	test( 'getTranslatedBreadcrumb returns undefined without a breadcrumb', () => {
+		expect( getTranslatedBreadcrumb( undefined ) ).toBeUndefined();
+		expect( getTranslatedBreadcrumb( { layer: 'root' } ) ).toBeUndefined();
+	} );
+
+	test( 'getOverrideTooltipText frames the breadcrumb with "from"', () => {
+		expect( getOverrideTooltipText( BLOCK_SOURCE ) ).toBe(
+			'Overrides inherited styles from Blocks › core/heading'
+		);
+	} );
+
+	test( 'getOverrideTooltipText returns undefined for a root-only source', () => {
+		expect( getOverrideTooltipText( ROOT_SOURCE ) ).toBeUndefined();
+	} );
+
+	test( 'getCommonOverrideTooltipText uses one breadcrumb when all sources match', () => {
+		expect(
+			getCommonOverrideTooltipText( [
+				BLOCK_SOURCE,
+				{ ...BLOCK_SOURCE },
+			] )
+		).toBe( 'Overrides inherited styles from Blocks › core/heading' );
+	} );
+
+	test( 'getCommonOverrideTooltipText summarizes mixed sources', () => {
+		expect(
+			getCommonOverrideTooltipText( [ BLOCK_SOURCE, VARIATION_SOURCE ] )
+		).toBe( 'Overrides inherited styles from multiple sources' );
+	} );
+
+	test( 'getCommonOverrideTooltipText returns undefined with no sources', () => {
+		expect( getCommonOverrideTooltipText( [] ) ).toBeUndefined();
+		expect( getCommonOverrideTooltipText( undefined ) ).toBeUndefined();
 	} );
 } );
 

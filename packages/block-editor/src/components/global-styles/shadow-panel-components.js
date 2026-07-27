@@ -131,6 +131,7 @@ export function ShadowPopover( {
 	className,
 	hasLocalValue = !! shadow,
 	hasLocalOverride = false,
+	overrideSources,
 	onReset,
 } ) {
 	const popoverProps = {
@@ -149,6 +150,7 @@ export function ShadowPopover( {
 			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
 				hasLocalValue,
 				hasLocalOverride,
+				overrideSources,
 				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
 			} ) }
 			renderContent={ () => (
@@ -165,7 +167,8 @@ export function ShadowPopover( {
 }
 
 function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
-	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+	const { hasLocalValue, hasLocalOverride, overrideSources, onReset } =
+		resetConfig;
 	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
@@ -213,7 +216,10 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 						/>
 					) }
 					{ hasLocalOverride && (
-						<InheritanceOverrideIndicator className="block-editor-global-styles__shadow-editor__inheritance-override-indicator" />
+						<InheritanceOverrideIndicator
+							overrideSources={ overrideSources }
+							className="block-editor-global-styles__shadow-editor__inheritance-override-indicator"
+						/>
 					) }
 				</Stack>
 			</>

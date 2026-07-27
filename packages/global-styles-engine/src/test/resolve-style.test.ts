@@ -207,6 +207,89 @@ describe( 'resolveStyle – merged output', () => {
 		} );
 	} );
 
+	describe( 'breadcrumb source metadata', () => {
+		const gs = {
+			styles: {
+				typography: { fontSize: '16px', lineHeight: '1.5' },
+				blocks: {
+					'core/heading': {
+						typography: { fontSize: '28px' },
+						elements: {
+							link: { color: { text: 'linkText' } },
+						},
+						variations: {
+							plain: { typography: { fontSize: '20px' } },
+						},
+					},
+				},
+			},
+		};
+
+		test( 'root-sourced leaf carries the Styles breadcrumb', () => {
+			const { sources } = resolveStyle( gs, {
+				blockName: 'core/paragraph',
+			} );
+			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
+				layer: 'root',
+				breadcrumb: [ 'styles' ],
+				blockName: null,
+				variation: null,
+			} );
+		} );
+
+		test( 'block-sourced leaf carries the block breadcrumb and slug', () => {
+			const { sources } = resolveStyle( gs, {
+				blockName: 'core/heading',
+			} );
+			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
+				layer: 'block',
+				breadcrumb: [ 'styles', 'blocks', 'blockName' ],
+				blockName: 'core/heading',
+			} );
+			// The un-overridden root leaf keeps the Styles breadcrumb.
+			expect( sources[ 'typography.lineHeight' ] ).toMatchObject( {
+				layer: 'root',
+				breadcrumb: [ 'styles' ],
+			} );
+		} );
+
+		test( 'variation-sourced leaf carries the variation breadcrumb and slug', () => {
+			const { sources } = resolveStyle( gs, {
+				blockName: 'core/heading',
+				variationName: 'plain',
+			} );
+			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
+				layer: 'blockVariation',
+				breadcrumb: [
+					'styles',
+					'blocks',
+					'blockName',
+					'variations',
+					'variationName',
+				],
+				blockName: 'core/heading',
+				variation: 'plain',
+			} );
+		} );
+
+		test( 'elements passthrough leaf appends the element to the breadcrumb', () => {
+			const { sources } = resolveStyle( gs, {
+				blockName: 'core/heading',
+			} );
+			expect( sources[ 'elements.link.color.text' ] ).toMatchObject( {
+				layer: 'block',
+				breadcrumb: [
+					'styles',
+					'blocks',
+					'blockName',
+					'elements',
+					'link',
+				],
+				blockName: 'core/heading',
+			} );
+		} );
+	} );
+
 	describe( 'state-aware inheritance (viewport + pseudoState)', () => {
 		const DEFAULT_STATE = { viewport: 'default', pseudoState: 'default' };
 		const HOVER_STATE = { viewport: 'default', pseudoState: ':hover' };

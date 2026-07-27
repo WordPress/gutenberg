@@ -116,7 +116,8 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 				: undefined,
 		[ clientId ]
 	);
-	const { value: inheritedValue } = useResolvedStyle( name, className );
+	const { value: inheritedValue, sources: inheritedSources } =
+		useResolvedStyle( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -168,6 +169,7 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 					} }
 					settings={ settings }
 					inheritedValue={ inheritedValue }
+					inheritedSources={ inheritedSources }
 				/>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>

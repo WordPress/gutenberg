@@ -11,8 +11,131 @@ import {
 	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Tooltip } from '@wordpress/ui';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Accessible name / tooltip shown when a control has no resolvable inherited
+ * source (defensive: a local override normally implies an inherited value).
+ *
+ * @type {string}
+ */
+const OVERRIDE_LABEL = __( 'Overrides inherited styles' );
+
+// Separator between breadcrumb parts (e.g. `Styles › Blocks › Group`).
+const BREADCRUMB_SEPARATOR = ' › ';
+
+// Fixed breadcrumb parts, translated. The root `styles` node is intentionally
+// omitted: it duplicates the "inherited styles" wording in the tooltip and adds
+// no locating information (see `getTranslatedBreadcrumb`). Block/variation
+// titles are resolved separately from the source's `blockName`/`variation`
+// slugs.
+const BREADCRUMB_LABELS = {
+	elements: __( 'Elements' ),
+	blocks: __( 'Blocks' ),
+	variations: __( 'Variations' ),
+};
+
+function getBlockTitle( blockName ) {
+	return getBlockType( blockName )?.title ?? blockName;
+}
+
+function getVariationTitle( variation, blockStyles ) {
+	return (
+		blockStyles?.find( ( style ) => style.name === variation )?.label ??
+		variation
+	);
+}
+
+/**
+ * Translates a source's raw breadcrumb part identifiers into a ` › `-joined
+ * title path (e.g. `Styles › Blocks › Group › Variations › Subtitle`).
+ *
+ * @param {?Object} source      Source-map entry (`{ breadcrumb, blockName, variation }`).
+ * @param {?Array}  blockStyles Registered styles for the block type (for variation titles).
+ * @return {string|undefined} The breadcrumb path, or undefined when there is no source.
+ */
+export function getTranslatedBreadcrumb( source, blockStyles ) {
+	const breadcrumb = source?.breadcrumb;
+	if ( ! Array.isArray( breadcrumb ) || breadcrumb.length === 0 ) {
+		return undefined;
+	}
+	const parts = breadcrumb
+		// Drop the root `styles` node — it duplicates "inherited styles" in the
+		// tooltip. A root-only source (just `[ 'styles' ]`) therefore yields no
+		// path, and the indicator falls back to the bare label.
+		.filter( ( part ) => part !== 'styles' )
+		.map( ( part ) => {
+			if ( part === 'blockName' ) {
+				return getBlockTitle( source.blockName );
+			}
+			if ( part === 'variationName' ) {
+				return getVariationTitle( source.variation, blockStyles );
+			}
+			return BREADCRUMB_LABELS[ part ] ?? part;
+		} )
+		.filter( Boolean );
+	if ( parts.length === 0 ) {
+		return undefined;
+	}
+	return parts.join( BREADCRUMB_SEPARATOR );
+}
+
+/**
+ * Builds the full override tooltip for a single source:
+ * `Overrides inherited styles from <breadcrumb>`.
+ *
+ * @param {?Object} source      Source-map entry.
+ * @param {?Array}  blockStyles Registered styles for the block type.
+ * @return {string|undefined} The tooltip text, or undefined when there is no source.
+ */
+export function getOverrideTooltipText( source, blockStyles ) {
+	const breadcrumb = getTranslatedBreadcrumb( source, blockStyles );
+	if ( ! breadcrumb ) {
+		return undefined;
+	}
+	return sprintf(
+		/* translators: %s: Global Styles breadcrumb path, e.g. "Styles › Blocks › Group". */
+		__( 'Overrides inherited styles from %s' ),
+		breadcrumb
+	);
+}
+
+// Identity key for a source's breadcrumb, so compound controls can tell whether
+// every contributing value resolves to the same Global Styles source.
+function getBreadcrumbKey( source ) {
+	return [
+		...( source?.breadcrumb ?? [] ),
+		source?.blockName ?? '',
+		source?.variation ?? '',
+	].join( '' );
+}
+
+/**
+ * Builds the override tooltip for a control backed by one or more source paths.
+ * A single shared breadcrumb is used when every contributing source matches;
+ * mixed sources fall back to a conservative summary.
+ *
+ * @param {?Array} sources     Source-map entries for the control's paths (may contain holes).
+ * @param {?Array} blockStyles Registered styles for the block type.
+ * @return {string|undefined} The tooltip text, or undefined when there is no source.
+ */
+export function getCommonOverrideTooltipText( sources, blockStyles ) {
+	const entries = ( sources ?? [] ).filter( Boolean );
+	if ( entries.length === 0 ) {
+		return undefined;
+	}
+	const firstKey = getBreadcrumbKey( entries[ 0 ] );
+	const allMatch = entries.every(
+		( source ) => getBreadcrumbKey( source ) === firstKey
+	);
+	if ( allMatch ) {
+		return getOverrideTooltipText( entries[ 0 ], blockStyles );
+	}
+	return __( 'Overrides inherited styles from multiple sources' );
+}
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`. Only a
@@ -46,13 +169,30 @@ export function getInheritanceProps(
  * Renders the small filled diamond that marks a control holding a local override
  * of an inherited Global Styles value.
  *
+ * When `overrideSources` (the source-map entries for the control's inherited
+ * paths) resolves to a breadcrumb, the tooltip reads
+ * `Overrides inherited styles from <path>`; otherwise it falls back to the bare
+ * `Overrides inherited styles`. Global Styles screens pass no sources, so no
+ * breadcrumb is shown there.
+ *
  * @param {Object} props
- * @param {string} [props.className] Optional className for slot positioning.
+ * @param {string} [props.className]       Optional className for slot positioning.
+ * @param {?Array} [props.overrideSources] Source-map entries for the control's inherited paths.
  *
  * @return {Element} The override indicator.
  */
-export function InheritanceOverrideIndicator( { className } ) {
-	const label = __( 'Overrides inherited styles' );
+export function InheritanceOverrideIndicator( { className, overrideSources } ) {
+	const blockName = overrideSources?.find( Boolean )?.blockName;
+	const blockStyles = useSelect(
+		( select ) =>
+			blockName
+				? select( blocksStore ).getBlockStyles( blockName )
+				: null,
+		[ blockName ]
+	);
+	const label =
+		getCommonOverrideTooltipText( overrideSources, blockStyles ) ??
+		OVERRIDE_LABEL;
 
 	return (
 		<Tooltip.Root>
@@ -110,6 +250,7 @@ export function InheritanceOverrideIndicator( { className } ) {
  * @param {?Function}                 props.onDeselect                        Reset handler wired to the `ToolsPanel` options menu.
  * @param {boolean}                   [props.showLocalOverrideActionsInLabel] Render the override indicator here (default true).
  * @param {boolean}                   [props.hasInlineEndToggle]              The control renders a 24x24 toggle at its inline-end; offset the indicator to sit just to its inline-start (default false).
+ * @param {?Array}                    [props.overrideSources]                 Source-map entries for the control's inherited paths, used to build the override tooltip breadcrumb.
  * @param {import('react').ReactNode} props.children                          The control.
  *
  * @return {Element} The panel item.
@@ -124,6 +265,7 @@ export function InheritanceToolsPanelItem( {
 	onDeselect,
 	showLocalOverrideActionsInLabel = true,
 	hasInlineEndToggle = false,
+	overrideSources,
 	children,
 	...rest
 } ) {
@@ -144,7 +286,9 @@ export function InheritanceToolsPanelItem( {
 							hasInlineEndToggle,
 					} ) }
 				>
-					<InheritanceOverrideIndicator />
+					<InheritanceOverrideIndicator
+						overrideSources={ overrideSources }
+					/>
 				</div>
 			) }
 		</ToolsPanelItem>

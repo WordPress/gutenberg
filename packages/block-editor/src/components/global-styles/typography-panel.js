@@ -247,6 +247,7 @@ export default function TypographyPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -264,6 +265,12 @@ export default function TypographyPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	// Text color. Writes to `color.text` (unchanged storage path). The
 	// control is rendered here instead of the Color panel because text
@@ -809,6 +816,7 @@ export default function TypographyPanel( {
 					resetValue={ resetTextColor }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
+					overrideSources={ overrideSourcesFor( 'color.text' ) }
 					contrastWarning={ contrastWarning }
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
@@ -851,6 +859,9 @@ export default function TypographyPanel( {
 						hasFontFamily() && inheritedFontFamily !== undefined
 					) }
 					label={ __( 'Font' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.fontFamily'
+					) }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
 					isShownByDefault={ defaultControls.fontFamily }
@@ -870,6 +881,9 @@ export default function TypographyPanel( {
 						hasFontSize() && rawInheritedFontSize !== undefined
 					) }
 					label={ __( 'Size' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.fontSize'
+					) }
 					hasValue={ hasFontSize }
 					hasInlineEndToggle
 					onDeselect={ resetFontSize }
@@ -896,6 +910,10 @@ export default function TypographyPanel( {
 								inheritedFontWeight !== undefined )
 					) }
 					label={ appearanceControlLabel }
+					overrideSources={ overrideSourcesFor( [
+						'typography.fontStyle',
+						'typography.fontWeight',
+					] ) }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
 					isShownByDefault={ defaultControls.fontAppearance }
@@ -921,6 +939,9 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Line height' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.lineHeight'
+					) }
 					hasValue={ hasLineHeight }
 					onDeselect={ resetLineHeight }
 					isShownByDefault={ defaultControls.lineHeight }
@@ -954,6 +975,9 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Letter spacing' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.letterSpacing'
+					) }
 					hasValue={ hasLetterSpacing }
 					onDeselect={ resetLetterSpacing }
 					isShownByDefault={ defaultControls.letterSpacing }
@@ -987,6 +1011,9 @@ export default function TypographyPanel( {
 						hasTextIndent() && inheritedTextIndent !== undefined
 					) }
 					label={ __( 'Line indent' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.textIndent'
+					) }
 					hasValue={ hasTextIndent }
 					onDeselect={ resetTextIndent }
 					isShownByDefault={ defaultControls.textIndent }
@@ -1028,6 +1055,9 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Columns' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.textColumns'
+					) }
 					hasValue={ hasTextColumns }
 					onDeselect={ resetTextColumns }
 					isShownByDefault={ defaultControls.textColumns }
@@ -1058,6 +1088,9 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Decoration' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.textDecoration'
+					) }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
 					isShownByDefault={ defaultControls.textDecoration }
@@ -1078,6 +1111,9 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Orientation' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.writingMode'
+					) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }
@@ -1097,6 +1133,9 @@ export default function TypographyPanel( {
 							inheritedTextTransform !== undefined
 					) }
 					label={ __( 'Letter case' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.textTransform'
+					) }
 					hasValue={ hasTextTransform }
 					onDeselect={ resetTextTransform }
 					isShownByDefault={ defaultControls.textTransform }
@@ -1117,6 +1156,9 @@ export default function TypographyPanel( {
 						hasTextAlign() && inheritedTextAlign !== undefined
 					) }
 					label={ __( 'Text alignment' ) }
+					overrideSources={ overrideSourcesFor(
+						'typography.textAlign'
+					) }
 					hasValue={ hasTextAlign }
 					onDeselect={ resetTextAlign }
 					isShownByDefault={ defaultControls.textAlign }

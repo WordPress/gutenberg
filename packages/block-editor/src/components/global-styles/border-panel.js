@@ -99,6 +99,7 @@ export default function BorderPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	name,
@@ -119,6 +120,12 @@ export default function BorderPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -395,6 +402,23 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
+					overrideSources={ overrideSourcesFor( [
+						'border.color',
+						'border.style',
+						'border.width',
+						'border.top.color',
+						'border.top.style',
+						'border.top.width',
+						'border.right.color',
+						'border.right.style',
+						'border.right.width',
+						'border.bottom.color',
+						'border.bottom.style',
+						'border.bottom.width',
+						'border.left.color',
+						'border.left.style',
+						'border.left.width',
+					] ) }
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -442,6 +466,7 @@ export default function BorderPanel( {
 					) }
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
+					overrideSources={ overrideSourcesFor( 'border.radius' ) }
 					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
@@ -482,6 +507,7 @@ export default function BorderPanel( {
 					<ShadowPopover
 						shadow={ shadow }
 						onShadowChange={ setShadowWithInheritedCommit }
+						overrideSources={ overrideSourcesFor( 'shadow' ) }
 						settings={ settings }
 						hasLocalValue={ hasShadow() }
 						hasLocalOverride={ hasShadowLocalOverride }
