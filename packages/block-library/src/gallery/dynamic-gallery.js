@@ -387,10 +387,6 @@ export function GalleryDynamicView( {
 							{ __( 'Detach' ) }
 						</ToolbarButton>
 					</BlockControls>
-					{ /*
-					 * Rendered outside `BlockControls` — that's a slot fill for
-					 * toolbar controls, and the dialog isn't one.
-					 */ }
 					{ isConfirmingDetach && (
 						<DetachGalleryDialog
 							onConfirm={ () => {
