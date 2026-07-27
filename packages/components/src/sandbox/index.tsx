@@ -262,10 +262,15 @@ function IsolatedSandBox( {
 	scripts = [],
 	onFocus,
 	tabIndex,
+	allowPopups = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
+
+	const sandbox = `allow-scripts allow-presentation${
+		allowPopups ? ' allow-popups' : ''
+	}`;
 
 	const srcDoc = useMemo(
 		() =>
@@ -351,7 +356,7 @@ function IsolatedSandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox="allow-scripts allow-presentation"
+			sandbox={ sandbox }
 			srcDoc={ srcDoc }
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
@@ -382,10 +387,15 @@ function SameOriginSandBox( {
 	scripts = [],
 	onFocus,
 	tabIndex,
+	allowPopups = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
+
+	const sandbox = `allow-scripts allow-same-origin allow-presentation${
+		allowPopups ? ' allow-popups' : ''
+	}`;
 
 	function isFrameAccessible() {
 		try {
@@ -510,7 +520,7 @@ function SameOriginSandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox="allow-scripts allow-same-origin allow-presentation"
+			sandbox={ sandbox }
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
 			height={ Math.ceil( height ) }
