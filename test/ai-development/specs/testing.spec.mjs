@@ -27,10 +27,12 @@ test.describe( 'testing skill', () => {
 			.join( '\n' );
 
 		// Discovery chain: the skill and its e2e reference, not the others.
-		expect.soft( transcript.reads ).toContain( 'skills/testing/SKILL.md' );
 		expect
-			.soft( transcript.reads )
-			.toContain( 'skills/testing/references/e2e.md' );
+			.soft( transcript.consulted( 'skills/testing/SKILL.md' ) )
+			.toBe( true );
+		expect
+			.soft( transcript.consulted( 'skills/testing/references/e2e.md' ) )
+			.toBe( true );
 		expect
 			.soft( transcript.reads )
 			.not.toContain( 'skills/testing/references/php.md' );
@@ -61,13 +63,17 @@ test.describe( 'testing skill', () => {
 		);
 
 		// The skill chain plus the canonical authoring guide it points to.
-		expect.soft( transcript.reads ).toContain( 'skills/testing/SKILL.md' );
 		expect
-			.soft( transcript.reads )
-			.toContain( 'skills/testing/references/e2e.md' );
+			.soft( transcript.consulted( 'skills/testing/SKILL.md' ) )
+			.toBe( true );
 		expect
-			.soft( transcript.reads )
-			.toContain( 'docs/contributors/code/e2e/README.md' );
+			.soft( transcript.consulted( 'skills/testing/references/e2e.md' ) )
+			.toBe( true );
+		expect
+			.soft(
+				transcript.consulted( 'docs/contributors/code/e2e/README.md' )
+			)
+			.toBe( true );
 		expect
 			.soft( transcript.reads )
 			.not.toContain( 'skills/testing/references/php.md' );
