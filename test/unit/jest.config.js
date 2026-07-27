@@ -36,6 +36,13 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
+		// Jest resolves dependencies from CommonJS and cannot select import-only
+		// package exports. Map Ariakit's ESM test helpers explicitly.
+		'^@ariakit/test$': '<rootDir>/node_modules/@ariakit/test/dist/index.js',
+		'^@ariakit/test/react$':
+			'<rootDir>/node_modules/@ariakit/test/dist/react.js',
+		'^@ariakit/utils$':
+			'<rootDir>/node_modules/@ariakit/utils/dist/index.js',
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
@@ -80,7 +87,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked|@ariakit/(test|utils))/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
