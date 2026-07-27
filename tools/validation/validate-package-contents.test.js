@@ -43,17 +43,21 @@ function createPackage( { files, packageJson } ) {
 	return root;
 }
 
-function runValidator( packageRoot ) {
-	return spawnSync( process.execPath, [ validatorPath, packageRoot ], {
-		encoding: 'utf8',
-		env: {
-			...process.env,
-			WORDPRESS_PACKAGE_NPM_CACHE: join(
-				tmpdir(),
-				'wordpress-package-npm-cache'
-			),
-		},
-	} );
+function runValidator( packageRoot, args = [] ) {
+	return spawnSync(
+		process.execPath,
+		[ validatorPath, packageRoot, ...args ],
+		{
+			encoding: 'utf8',
+			env: {
+				...process.env,
+				WORDPRESS_PACKAGE_NPM_CACHE: join(
+					tmpdir(),
+					'wordpress-package-npm-cache'
+				),
+			},
+		}
+	);
 }
 
 test( 'passes for a package with clean packed contents', () => {
@@ -105,6 +109,41 @@ test.each( [ 'index.test.js', 'index.story.js' ] )(
 		);
 	}
 );
+
+test( 'fails when packed contents include configured disallowed path', () => {
+	const packageRoot = createPackage( {
+		files: {
+			'src/index.js': "export const value = 'ok';\n",
+		},
+		packageJson: {
+			files: [ 'src' ],
+			exports: './src/index.js',
+		},
+	} );
+
+	const result = runValidator( packageRoot, [ '--disallow-path', 'src' ] );
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'The package tarball includes disallowed files:\n- src/index.js'
+	);
+} );
+
+test( 'does not overmatch a similarly named path', () => {
+	const packageRoot = createPackage( {
+		files: {
+			'src-other/index.js': "export const value = 'ok';\n",
+		},
+		packageJson: {
+			files: [ 'src-other' ],
+			exports: './src-other/index.js',
+		},
+	} );
+
+	const result = runValidator( packageRoot, [ '--disallow-path', 'src' ] );
+
+	expect( result.status ).toBe( 0 );
+} );
 
 test( 'fails when an exported target is missing from the package', () => {
 	const packageRoot = createPackage( {

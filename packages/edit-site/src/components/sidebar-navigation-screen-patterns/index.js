@@ -5,11 +5,11 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { getTemplatePartIcon } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useViewConfig } from '@wordpress/views';
 
 /**
@@ -30,6 +30,7 @@ import { unlock } from '../../lock-unlock';
 const VIEW_CONFIG_FIELDS = [ 'view_list' ];
 
 const { useLocation } = unlock( routerPrivateApis );
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 function CategoriesGroup( {
 	templatePartViews,

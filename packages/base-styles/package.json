@@ -28,7 +28,7 @@
 	"module": "index.js",
 	"exports": {
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/",
+		"./build-style/*": "./build-style/*",
 		"./_*.scss": "./_*.scss",
 		"./animations": "./_animations.scss",
 		"./breakpoints": "./_breakpoints.scss",

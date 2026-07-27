@@ -309,6 +309,21 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-singl
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`style-cache-group\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '05ab538fc7abc794bf3a', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`style-cache-group\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "import",
+    "request": "@wordpress/blob",
+    "userRequest": "@wordpress/blob",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`style-imports\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '92ea15aace211d977373', 'type' => 'module');
 "
@@ -735,6 +750,24 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-singl
     "request": "lodash",
     "userRequest": "lodash",
   },
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-cache-group\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-blob'), 'version' => 'fe584d4d3343f27d9d98');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-cache-group\` should produce expected output: External modules should match snapshot 1`] = `
+[
   {
     "externalType": "window",
     "request": [

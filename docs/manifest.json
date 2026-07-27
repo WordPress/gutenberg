@@ -312,6 +312,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Client-Side Media Processing",
+		"slug": "client-side-media",
+		"markdown_source": "../docs/how-to-guides/client-side-media.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Thunks in Core-Data",
 		"slug": "thunks",
 		"markdown_source": "../docs/how-to-guides/thunks.md",
@@ -3114,6 +3120,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Client-Side Media Processing",
+		"slug": "client-side-media-architecture",
+		"markdown_source": "../docs/explanations/architecture/client-side-media-architecture.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "The Dashboard Widget System",
 		"slug": "dashboard-widgets",
 		"markdown_source": "../docs/explanations/architecture/dashboard-widgets.md",
@@ -3213,6 +3225,12 @@
 		"title": "Workspace Development",
 		"slug": "workspace-development",
 		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
+		"title": "Agents and Skills",
+		"slug": "agents-and-skills",
+		"markdown_source": "../docs/contributors/code/agents-and-skills.md",
 		"parent": "code"
 	},
 	{

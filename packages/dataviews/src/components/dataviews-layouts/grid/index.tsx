@@ -15,6 +15,8 @@ import { Stack } from '@wordpress/ui';
  */
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -40,6 +42,22 @@ function ViewGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// The selection hook must see every selectable item in render order so a
+	// Shift+Click range can span groups and share a single anchor. Each
+	// CompositeGrid renders one group, so derive it here from the flattened
+	// group order rather than inside CompositeGrid.
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		selection,
+		onChangeSelection,
+		selectionMode: 'multi',
+		shouldSelectOnClick: false,
+	} );
 	if ( ! hasData ) {
 		return (
 			<div
@@ -66,6 +84,7 @@ function ViewGrid< Item >( {
 		renderItemLink,
 		getItemId,
 		actions,
+		getSelectionProps,
 	};
 	return (
 		<>

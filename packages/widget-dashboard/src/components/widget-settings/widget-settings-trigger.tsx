@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
+import { drawerRight } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
@@ -12,8 +11,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
-import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { useDashboardUIContext } from '../../context/ui-context';
+import { useWidgetSettingsToggle } from './use-widget-settings-toggle';
 import type { DashboardWidget } from '../../types';
 
 export interface WidgetSettingsTriggerProps {
@@ -30,12 +28,11 @@ export interface WidgetSettingsTriggerProps {
 }
 
 /**
- * Per-instance control that toggles the shared settings surface by writing the
- * instance `uuid` to the UI context; the single `WidgetSettings` at the root
- * reacts to it. Clicking the control of the instance whose settings surface is
- * already open closes it. Returns `null` when no attribute needs that surface
- * (none, or all already promoted to the prominent one), so chrome can mount it
- * unconditionally.
+ * Per-instance control that toggles the shared settings surface; the single
+ * `WidgetSettings` at the root reacts to it. Clicking the control of the
+ * instance whose settings surface is already open closes it. Returns `null`
+ * when no attribute needs that surface (none, or all already promoted to the
+ * prominent one), so chrome can mount it unconditionally.
  *
  * @param {WidgetSettingsTriggerProps} props Component props.
  */
@@ -43,30 +40,7 @@ export function WidgetSettingsTrigger( {
 	widget,
 	widgetType,
 }: WidgetSettingsTriggerProps ): React.ReactNode {
-	const { settingsWidgetUuid, setSettingsWidgetUuid } =
-		useDashboardUIContext();
-	const { cancel, flushAutoSave } = useDashboardInternalContext();
-
-	const toggle = useCallback( () => {
-		// Re-clicking the open instance's control closes the settings surface,
-		// discarding staged edits like any other non-Save exit.
-		if ( settingsWidgetUuid === widget.uuid ) {
-			cancel();
-			setSettingsWidgetUuid( null );
-			return;
-		}
-		// Persist any pending prominent-surface edit before opening, so the
-		// settings surface's edits stay isolated and its Cancel discards only
-		// its own changes.
-		flushAutoSave();
-		setSettingsWidgetUuid( widget.uuid );
-	}, [
-		cancel,
-		flushAutoSave,
-		settingsWidgetUuid,
-		setSettingsWidgetUuid,
-		widget.uuid,
-	] );
+	const { toggle } = useWidgetSettingsToggle( widget );
 
 	// Surface the settings UI only when there are attributes not already
 	// promoted inline; if every attribute is high-relevance, a second
@@ -80,7 +54,7 @@ export function WidgetSettingsTrigger( {
 
 	return (
 		<IconButton
-			icon={ moreVertical }
+			icon={ drawerRight }
 			label={ __( 'Widget settings' ) }
 			variant="minimal"
 			tone="neutral"

@@ -6,7 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
+import { VisuallyHidden } from '../visually-hidden';
 import type { ContentEditableControlProps } from './types';
 import styles from './style.module.scss';
 
@@ -31,25 +33,42 @@ function UnforwardedContentEditableControl(
 	}: WordPressComponentProps< ContentEditableControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
+	// The label is not passed through to `BaseControl`: it would render a
+	// `<label for>` pointing at the `contentEditable` `div`, which is not a
+	// labelable element, making the association invalid. The label is instead
+	// rendered here without `for` and wired up via `aria-labelledby`.
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		id,
 		className,
 		help,
-		hideLabelFromVision,
-		label,
 	} );
+
+	const labelId = `${ controlProps.id }__label`;
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRefs = useMergeRefs( [ editableRef, forwardedRef ] );
 
 	return (
 		<BaseControl { ...baseControlProps }>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden id={ labelId }>{ label }</VisuallyHidden>
+			) : (
+				<BaseControl.VisualLabel
+					id={ labelId }
+					// Focus the field on label click, like `<label for>` would.
+					onClick={ () => editableRef.current?.focus() }
+				>
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
 			<div
 				className={ styles.editable }
 				role="textbox"
 				aria-multiline
-				aria-label={ label }
+				aria-labelledby={ labelId }
 				aria-placeholder={ placeholder || undefined }
 				aria-disabled={ disabled || undefined }
 				aria-required={ required || undefined }
-				ref={ forwardedRef }
+				ref={ mergedRefs }
 				// A disabled field is not `contentEditable`, which also
 				// removes it from the tab order.
 				contentEditable={ ! disabled }

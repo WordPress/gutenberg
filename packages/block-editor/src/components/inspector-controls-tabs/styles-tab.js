@@ -29,7 +29,11 @@ import { BackgroundToolsPanel } from '../global-styles/background-panel';
 // - Typography: text color only (font controls disabled).
 // - Background: color + gradient only (image controls disabled).
 // - Elements: link/heading/button/caption colors (unchanged).
-function SectionStyleControls( { blockName, clientId, contentClientIds } ) {
+export function SectionStyleControls( {
+	blockName,
+	clientId,
+	contentClientIds,
+} ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 

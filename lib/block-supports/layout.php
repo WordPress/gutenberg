@@ -290,7 +290,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 function gutenberg_sanitize_block_gap_value( $gap_value ) {
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = ! is_scalar( $value ) || ( $value && preg_match( '%[\\\(&=}]|/\*%', (string) $value ) ) ? null : $value;
 		}
 		return $gap_value;
 	}
