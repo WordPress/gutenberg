@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Require Jest v30 or newer ([#72593](https://github.com/WordPress/gutenberg/issues/72593)).
+-   Require Jest v30 or newer ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 
 ## 7.51.0 (2026-07-14)
 

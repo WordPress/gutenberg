@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Upgrade the bundled Jest packages from v29 to v30 ([#72593](https://github.com/WordPress/gutenberg/issues/72593)).
+-   Upgrade the bundled Jest packages from v29 to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 
 ### Enhancements
 

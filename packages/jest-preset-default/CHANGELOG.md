@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Require Jest v30 or newer and expose the Jest preset from the package root ([#72593](https://github.com/WordPress/gutenberg/issues/72593)).
+-   Require Jest v30 or newer and expose the Jest preset from the package root ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 
 ## 12.51.0 (2026-07-14)
 
