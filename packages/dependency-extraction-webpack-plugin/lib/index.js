@@ -263,19 +263,47 @@ class DependencyExtractionWebpackPlugin {
 
 		const combinedAssetsData = {};
 
+		const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
 		// Accumulate all entrypoint chunks, some of them shared
 		const entrypointChunks = new Set();
+
+		/**
+		 * Track the files of each entrypoint's JS-less chunks, typically styles
+		 * extracted by a `style.css` cache group. Those chunks don't get an
+		 * asset file of their own, but their content must contribute to the
+		 * version hash of the entrypoint's entry chunk so that style-only
+		 * changes still produce a new version.
+		 *
+		 * @type {Map<webpack.Chunk, Set<string>>}
+		 */
+		const styleFilesByEntryChunk = new Map();
 		for ( const entrypoint of compilation.entrypoints.values() ) {
+			const entryChunk = entrypoint.getEntrypointChunk();
 			for ( const chunk of entrypoint.chunks ) {
 				entrypointChunks.add( chunk );
+
+				if (
+					chunk === entryChunk ||
+					Array.from( chunk.files ).some( ( f ) =>
+						jsExtensionRegExp.test( f )
+					)
+				) {
+					continue;
+				}
+
+				const styleFiles =
+					styleFilesByEntryChunk.get( entryChunk ) ?? new Set();
+				for ( const file of chunk.files ) {
+					styleFiles.add( file );
+				}
+				styleFilesByEntryChunk.set( entryChunk, styleFiles );
 			}
 		}
 
 		// Process each entrypoint chunk independently
 		for ( const chunk of entrypointChunks ) {
 			const chunkFiles = Array.from( chunk.files );
-
-			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
 
 			const chunkJSFile = chunkFiles.find( ( f ) =>
 				jsExtensionRegExp.test( f )
@@ -402,9 +430,19 @@ class DependencyExtractionWebpackPlugin {
 				}
 			};
 
+			// Include the files of the entrypoint's JS-less sibling chunks,
+			// typically extracted styles, in the version hash so that
+			// style-only changes still produce a new version.
+			const filesToHash = [
+				...new Set( [
+					...chunkFiles,
+					...( styleFilesByEntryChunk.get( chunk ) ?? [] ),
+				] ),
+			];
+
 			// Go through the assets to process the sources.
 			// This allows us to generate hashes, as well as look for magic comments.
-			chunkFiles.sort().forEach( ( filename ) => {
+			filesToHash.sort().forEach( ( filename ) => {
 				const asset = compilation.getAsset( filename );
 				const content = asset.source.buffer();
 
