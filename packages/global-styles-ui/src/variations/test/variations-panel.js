@@ -21,8 +21,8 @@ jest.mock( '@wordpress/components', () => ( {
 /**
  * Internal dependencies
  */
-import { useBlockVariations } from '../variations-panel';
 import { store as blocksStore } from '@wordpress/blocks';
+import { useBlockVariations } from '../variations-panel';
 
 describe( 'useBlockVariations', () => {
 	const mockUseStyle = require( '../../hooks' ).useStyle;

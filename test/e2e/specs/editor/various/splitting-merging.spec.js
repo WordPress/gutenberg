@@ -242,6 +242,41 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should place the caret in the next block on forward delete from an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const content of [ 'first', '', '', 'last' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.first()
+			.click();
+
+		// Forward delete removes the empty block; the caret must move to
+		// the start of the next block, not the end of the previous one,
+		// so repeated presses keep deleting forward.
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '|' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'first' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '|last' },
+			},
+		] );
+	} );
+
 	test( 'should remove empty paragraph block on backspace', async ( {
 		editor,
 		page,
