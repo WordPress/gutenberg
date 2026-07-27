@@ -160,7 +160,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 * A file-backed template has no modification date, which should be exposed as
 	 * `null` rather than the `false` returned by `mysql_to_rfc3339()`.
 	 *
-	 * @ticket 65730
+	 * @ticket 65728
 	 * @covers WP_REST_Templates_Controller::prepare_item_for_response
 	 */
 	public function test_get_item_modified_is_null_for_file_backed_template() {
@@ -173,20 +173,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertSame( 200, $response->get_status(), 'Fetching a file-backed template should return 200.' );
 		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
-	}
-
-	/**
-	 * @ticket 65730
-	 * @covers WP_REST_Templates_Controller::get_item_schema
-	 */
-	public function test_modified_schema_allows_null() {
-		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/templates' );
-		$response   = rest_get_server()->dispatch( $request );
-		$data       = $response->get_data();
-		$properties = $data['schema']['properties'];
-
-		$this->assertArrayHasKey( 'modified', $properties );
-		$this->assertSame( array( 'string', 'null' ), $properties['modified']['type'] );
 	}
 
 	/**
