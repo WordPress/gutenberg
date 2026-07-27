@@ -33,6 +33,10 @@ function gutenberg_register_position_support( $block_type ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_position_support( $block_content, $block ) {
+	if ( empty( $block['blockName'] ) ) {
+		return $block_content;
+	}
+
 	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$has_position_support = block_has_support( $block_type, array( 'position' ), false );
 

@@ -49,10 +49,14 @@ function gutenberg_apply_aria_label_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_aria_label = array_key_exists( 'ariaLabel', $block_attributes );
-	if ( ! $has_aria_label ) {
+	if (
+		! isset( $block_attributes['ariaLabel'] ) ||
+		! is_string( $block_attributes['ariaLabel'] ) ||
+		'' === trim( $block_attributes['ariaLabel'] )
+	) {
 		return array();
 	}
+
 	return array( 'aria-label' => $block_attributes['ariaLabel'] );
 }
 

@@ -94,7 +94,7 @@ add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file
 function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$handle = 'wp-block-library';
 	$script = $scripts->query( $handle, 'registered' );
-	if ( ! in_array( 'editor', $script->deps, true ) ) {
+	if ( $script && is_array( $script->deps ) && ! in_array( 'editor', $script->deps, true ) ) {
 		$script->deps[] = 'editor';
 	}
 }
@@ -126,24 +126,37 @@ function gutenberg_register_packages_styles( $styles ) {
 	$suffix  = SCRIPT_DEBUG ? '' : '.min';
 
 	// wp-components: add dashicons (icon font dependency) and design tokens.
-	$components_style         = $styles->query( 'wp-components', 'registered' );
-	$components_style->deps[] = 'dashicons';
-	$components_style->deps[] = 'wp-theme';
+	$components_style = $styles->query( 'wp-components', 'registered' );
+	if ( $components_style && is_array( $components_style->deps ) ) {
+		$components_style->deps[] = 'dashicons';
+		$components_style->deps[] = 'wp-theme';
+	}
 
 	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
-	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
+	$edit_post_style = $styles->query( 'wp-edit-post', 'registered' );
+	if ( $edit_post_style && is_array( $edit_post_style->deps ) ) {
+		$edit_post_style->deps[] = 'wp-edit-blocks';
+	}
 
 	// wp-edit-site: add core WP styles and custom handles
-	$edit_site_style         = $styles->query( 'wp-edit-site', 'registered' );
-	$edit_site_style->deps[] = 'common';
-	$edit_site_style->deps[] = 'forms';
-	$edit_site_style->deps[] = 'wp-block-library-editor';
+	$edit_site_style = $styles->query( 'wp-edit-site', 'registered' );
+	if ( $edit_site_style && is_array( $edit_site_style->deps ) ) {
+		$edit_site_style->deps[] = 'common';
+		$edit_site_style->deps[] = 'forms';
+		$edit_site_style->deps[] = 'wp-block-library-editor';
+	}
 
 	// wp-edit-widgets: add wp-edit-blocks (custom handle not auto-inferred)
-	$styles->query( 'wp-edit-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+	$edit_widgets_style = $styles->query( 'wp-edit-widgets', 'registered' );
+	if ( $edit_widgets_style && is_array( $edit_widgets_style->deps ) ) {
+		$edit_widgets_style->deps[] = 'wp-edit-blocks';
+	}
 
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
-	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+	$customize_widgets_style = $styles->query( 'wp-customize-widgets', 'registered' );
+	if ( $customize_widgets_style && is_array( $customize_widgets_style->deps ) ) {
+		$customize_widgets_style->deps[] = 'wp-edit-blocks';
+	}
 
 	gutenberg_override_style(
 		$styles,
@@ -167,7 +180,11 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
 	$styles->add_data( 'wp-base-styles', 'suffix', $suffix );
 	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes' . $suffix . '.css' );
-	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
+
+	$admin_style = $styles->query( 'wp-admin', 'registered' );
+	if ( $admin_style && is_array( $admin_style->deps ) ) {
+		$admin_style->deps[] = 'wp-base-styles';
+	}
 
 	gutenberg_override_style(
 		$styles,

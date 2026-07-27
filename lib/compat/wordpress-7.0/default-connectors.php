@@ -369,9 +369,9 @@ function _gutenberg_get_application_password_credentials( array $auth ): array {
  * @param string $key The API key to mask.
  * @return string The masked key, e.g. "************fj39".
  */
-function _gutenberg_mask_api_key( string $key ): string {
-	if ( strlen( $key ) <= 4 ) {
-		return $key;
+function _gutenberg_mask_api_key( ?string $key ): string {
+	if ( null === $key || strlen( $key ) <= 4 ) {
+		return (string) $key;
 	}
 
 	return str_repeat( "\u{2022}", min( strlen( $key ) - 4, 16 ) ) . substr( $key, -4 );

@@ -22,7 +22,7 @@ gutenberg_pre_init();
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_notice() {
-	echo '<div class="error"><p>';
+	echo '<div class="notice notice-error"><p>';
 	/* translators: %s: Minimum required version */
 	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), GUTENBERG_MINIMUM_WP_VERSION );
 	echo '</p></div>';
@@ -36,7 +36,7 @@ function gutenberg_wordpress_version_notice() {
  * @since 0.1.0
  */
 function gutenberg_build_files_notice() {
-	echo '<div class="error"><p>';
+	echo '<div class="notice notice-error"><p>';
 	_e( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/getting-started-with-code-contribution.md">contributing</a> file for more information.', 'gutenberg' );
 	echo '</p></div>';
 }

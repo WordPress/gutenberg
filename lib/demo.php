@@ -22,7 +22,7 @@ function gutenberg_demo_content() {
 	ob_start();
 	?>
 <!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","dimRatio":50,"align":"wide"} -->
-<div class="wp-block-cover alignwide is-light"><img class="wp-block-cover__image-background" src="https://cldup.com/Fz-ASbo2s3.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
+<div class="wp-block-cover alignwide is-light"><img class="wp-block-cover__image-background" src="https://cldup.com/Fz-ASbo2s3.jpg" alt="" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
 <p class="has-text-align-center has-white-color has-text-color has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
