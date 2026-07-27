@@ -157,6 +157,22 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * @covers WP_REST_Templates_Controller::prepare_item_for_response
+	 */
+	public function test_get_item_file_backed_template_has_null_dates() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//index' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status(), 'The file-backed template should be found.' );
+		$this->assertNull( $data['date'], 'A template with no post behind it has no publish date.' );
+		$this->assertNull( $data['modified'], 'A template with no post behind it has no modification date.' );
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_create_item() {
@@ -214,5 +230,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertArrayHasKey( 'original_source', $properties );
 		$this->assertArrayHasKey( 'plugin', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
+		$this->assertSame( array( 'string', 'null' ), $properties['date']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['modified']['type'] );
 	}
 }
