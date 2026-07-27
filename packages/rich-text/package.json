@@ -62,7 +62,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
 		"colord": "^2.9.3",
-		"memize": "^2.1.0"
+		"memize": "^2.1.1"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1"

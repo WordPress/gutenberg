@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `memize` to 2.1.1.
+
 ## 8.51.0 (2026-07-14)
 
 ### Enhancements
