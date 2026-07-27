@@ -653,6 +653,10 @@ function LinkControl( {
 			tabIndex={ -1 }
 			ref={ wrapperNode }
 			className="block-editor-link-control"
+			// The dialog holds local state that is only committed when the
+			// link is applied, so undo and redo within it must remain the
+			// browser's own.
+			data-editor-undo="false"
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
