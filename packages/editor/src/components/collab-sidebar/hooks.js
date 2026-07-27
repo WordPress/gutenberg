@@ -300,12 +300,14 @@ export function useNoteActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture inline selection *before* the async save: focus may shift
-			// during the round-trip and the editor's stored selection can
-			// collapse if the user clicks elsewhere. The selection drives the
-			// in-content marker written below, which is the note's only anchor.
+			// Capture the target block and inline selection *before* the async
+			// save: selection may shift during the round-trip, attaching the
+			// note to the wrong block or collapsing its inline anchor.
 			const inlineSelection = ! parent
 				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				: null;
+			const clientId = ! parent
+				? inlineSelection?.clientId || getSelectedBlockClientId()
 				: null;
 
 			const savedRecord = await saveEntityRecord(
@@ -329,12 +331,7 @@ export function useNoteActions() {
 			 * other id. Tracking issue:
 			 * https://github.com/WordPress/gutenberg/issues/74751.
 			 */
-			if ( ! parent && savedRecord?.id ) {
-				const clientId =
-					inlineSelection?.clientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return savedRecord;
-				}
+			if ( ! parent && savedRecord?.id && clientId ) {
 				const attributes = getBlockAttributes( clientId );
 				const metadata = attributes?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
