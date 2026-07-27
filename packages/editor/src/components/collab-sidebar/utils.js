@@ -492,7 +492,9 @@ export function calculateNotePositions( {
 	);
 	let anchorThread = anchorIndex >= 0 ? orderedThreads[ anchorIndex ] : null;
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		anchorIndex = orderedThreads.findIndex( ( t ) => !! blockRects[ t.id ] );
+		anchorIndex = orderedThreads.findIndex(
+			( t ) => !! blockRects[ t.id ]
+		);
 		if ( anchorIndex < 0 ) {
 			return { positions: {} };
 		}
