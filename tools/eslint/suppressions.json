@@ -656,11 +656,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/disabled/styles/disabled-styles.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
