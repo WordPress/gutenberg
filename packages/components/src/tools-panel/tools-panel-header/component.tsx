@@ -189,7 +189,12 @@ const ToolsPanelHeader = (
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
-			<Heading level={ headingLevel } className={ headingClassName }>
+			<Heading
+				level={ headingLevel }
+				size="inherit"
+				lineHeight="normal"
+				className={ headingClassName }
+			>
 				{ labelText }
 			</Heading>
 			{ hasMenuItems && (
