@@ -16,7 +16,7 @@
 
 ### Internal
 
--   Update `date-fns` to 4.4.0.
+-   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 
 ## 14.51.0 (2026-07-14)
 
