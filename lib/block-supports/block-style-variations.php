@@ -231,7 +231,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * @return string                Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
-	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
+	if ( empty( $block['attrs']['className'] ) ) {
 		return $block_content;
 	}
 
@@ -250,18 +250,77 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 		return $block_content;
 	}
 
-	$tags = new WP_HTML_Tag_Processor( $block_content );
+	$tags = $block_content ? new WP_HTML_Tag_Processor( $block_content ) : null;
 
-	if ( $tags->next_tag() ) {
+	if ( $tags && $tags->next_tag() ) {
 		/*
 		 * Ensure the variation instance class name set in the
 		 * `render_block_data` filter is applied in markup.
 		 * See `gutenberg_render_block_style_variation_support_styles`.
 		 */
 		$tags->add_class( $matches[0] );
+
+		return $tags->get_updated_html();
 	}
 
-	return $tags->get_updated_html();
+	/*
+	 * The block produced no markup, for example a dynamic block such as
+	 * `core/post-terms` that rendered nothing. The variation styles are
+	 * enqueued optimistically on the `render_block_data` filter, before the
+	 * block's render callback runs, so remove them now to avoid emitting CSS
+	 * for a block instance that isn't present in the markup.
+	 *
+	 * See https://github.com/WordPress/gutenberg/issues/80718.
+	 */
+	gutenberg_remove_block_style_variation_styles( $matches[0] );
+
+	return $block_content;
+}
+
+/**
+ * Removes previously enqueued inline styles for a block style variation instance.
+ *
+ * Block style variation styles are enqueued on the `render_block_data` filter,
+ * which runs before dynamic blocks render. When such a block produces no markup
+ * its styles must be removed so CSS isn't emitted for a block instance that
+ * isn't present on the page.
+ *
+ * Each variation instance's styles are scoped by its unique
+ * `.is-style-<instance>` selector, so only that instance's inline style is
+ * removed and the relative order of the remaining variation styles, on which
+ * descendant-over-ancestor priority depends, is preserved.
+ *
+ * @since 7.1.0
+ *
+ * @access private
+ *
+ * @see gutenberg_render_block_style_variation_support_styles
+ *
+ * @param string $instance_class_name Variation instance class name, e.g.
+ *                                    `is-style-my-variation--1`.
+ */
+function gutenberg_remove_block_style_variation_styles( $instance_class_name ) {
+	$styles = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+
+	if ( empty( $styles ) || ! is_array( $styles ) ) {
+		return;
+	}
+
+	/*
+	 * Match the variation's scope selector while avoiding a longer instance
+	 * number that merely shares the same prefix, for example `--1` vs `--10`.
+	 */
+	$pattern  = '/\.' . preg_quote( $instance_class_name, '/' ) . '(?![\w-])/';
+	$filtered = array();
+
+	foreach ( $styles as $style ) {
+		if ( is_string( $style ) && preg_match( $pattern, $style ) ) {
+			continue;
+		}
+		$filtered[] = $style;
+	}
+
+	wp_styles()->add_data( 'block-style-variation-styles', 'after', $filtered );
 }
 
 /**
