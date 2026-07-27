@@ -389,4 +389,190 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			gutenberg_render_block_style_variation_class_name( $block_content, $block )
 		);
 	}
+
+	/**
+	 * Tests that a block style variation's styles are removed when the block
+	 * renders no markup, for example a dynamic block such as `core/post-terms`
+	 * with nothing to output.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/80718
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
+	 * @covers ::gutenberg_remove_block_style_variation_styles
+	 */
+	public function test_block_style_variation_styles_removed_for_empty_block_markup() {
+		switch_theme( 'block-theme' );
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'empty-removal',
+				'style_data' => array(
+					'color' => array( 'background' => 'hotpink' ),
+				),
+			)
+		);
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/group',
+				'attrs'     => array(
+					'className' => 'wp-block-group is-style-empty-removal',
+				),
+			);
+
+			// The `render_block_data` filter enqueues the variation styles up front.
+			$parsed_block = gutenberg_render_block_style_variation_support_styles( $parsed_block );
+
+			$enqueued = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$this->assertNotEmpty(
+				$enqueued,
+				'Variation styles should be enqueued on the render_block_data filter.'
+			);
+
+			// The block renders no markup, so its styles should be removed.
+			$result = gutenberg_render_block_style_variation_class_name( '', $parsed_block );
+
+			$this->assertSame(
+				'',
+				$result,
+				'Empty block content should be returned unchanged.'
+			);
+
+			$after     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$remaining = is_array( $after ) ? implode( '', $after ) : (string) $after;
+
+			$this->assertStringNotContainsString(
+				'is-style-empty-removal--',
+				$remaining,
+				'Variation styles should be removed when the block renders no markup.'
+			);
+		} finally {
+			unregister_block_style( 'core/group', 'empty-removal' );
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that a block style variation's styles are retained, and the instance
+	 * class is applied to markup, when the block does render markup.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/80718
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
+	 */
+	public function test_block_style_variation_styles_retained_for_rendered_markup() {
+		switch_theme( 'block-theme' );
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'retained',
+				'style_data' => array(
+					'color' => array( 'background' => 'rebeccapurple' ),
+				),
+			)
+		);
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/group',
+				'attrs'     => array(
+					'className' => 'wp-block-group is-style-retained',
+				),
+			);
+
+			$parsed_block = gutenberg_render_block_style_variation_support_styles( $parsed_block );
+
+			$result = gutenberg_render_block_style_variation_class_name(
+				"<div class=\"wp-block-group\">Content</div>\n",
+				$parsed_block
+			);
+
+			$this->assertMatchesRegularExpression(
+				'/is-style-retained--\d+/',
+				$result,
+				'The variation instance class should be applied to the rendered markup.'
+			);
+
+			$after     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$remaining = is_array( $after ) ? implode( '', $after ) : (string) $after;
+
+			$this->assertStringContainsString(
+				'is-style-retained--',
+				$remaining,
+				'Variation styles should be retained when the block renders markup.'
+			);
+		} finally {
+			unregister_block_style( 'core/group', 'retained' );
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that removing one empty block instance's variation styles leaves a
+	 * sibling instance's styles intact, so unrelated variations aren't dropped.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/80718
+	 *
+	 * @covers ::gutenberg_remove_block_style_variation_styles
+	 */
+	public function test_block_style_variation_styles_removal_is_scoped_to_instance() {
+		switch_theme( 'block-theme' );
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'sibling',
+				'style_data' => array(
+					'color' => array( 'background' => 'seagreen' ),
+				),
+			)
+		);
+
+		try {
+			// First instance renders markup and should be retained.
+			$kept_block = gutenberg_render_block_style_variation_support_styles(
+				array(
+					'blockName' => 'core/group',
+					'attrs'     => array( 'className' => 'wp-block-group is-style-sibling' ),
+				)
+			);
+			gutenberg_render_block_style_variation_class_name(
+				"<div class=\"wp-block-group\">Kept</div>\n",
+				$kept_block
+			);
+			preg_match( '/is-style-(sibling--\d+)/', $kept_block['attrs']['className'], $kept_matches );
+
+			// Second instance renders nothing and should be removed.
+			$empty_block = gutenberg_render_block_style_variation_support_styles(
+				array(
+					'blockName' => 'core/group',
+					'attrs'     => array( 'className' => 'wp-block-group is-style-sibling' ),
+				)
+			);
+			gutenberg_render_block_style_variation_class_name( '', $empty_block );
+			preg_match( '/is-style-(sibling--\d+)/', $empty_block['attrs']['className'], $empty_matches );
+
+			$after     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$remaining = is_array( $after ) ? implode( '', $after ) : (string) $after;
+
+			$this->assertStringContainsString(
+				$kept_matches[1],
+				$remaining,
+				'Styles for the instance that rendered markup should be retained.'
+			);
+			$this->assertStringNotContainsString(
+				$empty_matches[1],
+				$remaining,
+				'Styles for the instance that rendered no markup should be removed.'
+			);
+		} finally {
+			unregister_block_style( 'core/group', 'sibling' );
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
 }
