@@ -4,7 +4,7 @@ This package contains UI components that are intended to be used anywhere in a g
 
 We are currently in the process of rewriting the global components to be in the new `@wordpress/ui` package. Refer to the [`use-recommended-components` ESLint rule](../eslint-plugin/rules/use-recommended-components.js) for guidance on which components to use.
 
-For components not explicitly listed in the `use-recommended-components` rule, locate the component's `*.stories.*` file under `packages/components/src/` and check its status documentation for up-to-date usage guidance. The component status given in the Storybook file should be considered the most accurate signal, above the `experimental` tag or component prefix.
+For components not explicitly listed in the `use-recommended-components` rule, locate the component's Storybook source within this package and use its status guidance. This guidance is more authoritative than the `experimental` tag or component prefix.
 
 ## Forms
 
