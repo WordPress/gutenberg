@@ -58,7 +58,7 @@
 		"@emotion/serialize": "^1.3.3",
 		"@emotion/styled": "^11.14.1",
 		"@emotion/utils": "^1.4.2",
-		"@floating-ui/react-dom": "^2.0.8",
+		"@floating-ui/react-dom": "^2.1.9",
 		"@types/gradient-parser": "^1.1.0",
 		"@types/highlight-words-core": "^1.2.1",
 		"@use-gesture/react": "^10.3.1",
