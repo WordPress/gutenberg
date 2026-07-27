@@ -98,7 +98,7 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
 			size="medium"
 		>
 			{ __(
-				'The gallery will keep the images it currently shows, but will no longer update when the images attached to the post change.'
+				'The gallery displays the images attached to the post. Detaching it will enable you to add, delete, or reorder images. However, newly attached images will no longer be added automatically.'
 			) }
 		</ConfirmDialog>
 	);
@@ -376,17 +376,6 @@ export function GalleryDynamicView( {
 				<>
 					<BlockControls group="other">
 						<ToolbarButton
-							// `label` matches the visible text so it stays the
-							// accessible name, while `description` carries the
-							// longer explanation — as the tooltip, and as the
-							// button's accessible description. A button with text
-							// children only shows a tooltip when `showTooltip` is
-							// set alongside a `label`.
-							label={ __( 'Detach' ) }
-							showTooltip
-							description={ __(
-								'Stop the gallery updating from the images attached to the post'
-							) }
 							onClick={ () => setIsConfirmingDetach( true ) }
 							// Same guard as the inspector's "Detach gallery": both end in
 							// `convertToStatic`, which would map over a
