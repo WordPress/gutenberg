@@ -21,7 +21,6 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { ENABLE_GLOBAL_STYLES_INHERITANCE } from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -143,13 +142,14 @@ export default function ColorPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	label,
 	children,
 	contrastWarning,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const {
 		colors,
@@ -168,6 +168,13 @@ export default function ColorPanel( {
 	// Fall back to its CSS custom property so the swatch still renders.
 	const decodeInheritedColor = ( rawValue ) =>
 		getCSSValueFromRawStyle( decodeValue( rawValue ) );
+
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	// Links
 	const showLinkPanel = useHasLinkPanel( settings );
@@ -315,6 +322,10 @@ export default function ColorPanel( {
 				( linkColor !== undefined || hoverLinkColor !== undefined ),
 			hasInheritedValue:
 				linkColor !== undefined || hoverLinkColor !== undefined,
+			overrideSources: overrideSourcesFor( [
+				'elements.link.color.text',
+				'elements.link.:hover.color.text',
+			] ),
 			contrastWarning,
 			tabs: [
 				{
@@ -476,6 +487,11 @@ export default function ColorPanel( {
 				: [ elementTextUserColor ?? elementTextColor ],
 			isPlaceholder: isElementPlaceholder,
 			hasInheritedValue: hasElementInheritedValue,
+			overrideSources: overrideSourcesFor( [
+				`elements.${ name }.color.text`,
+				`elements.${ name }.color.background`,
+				`elements.${ name }.color.gradient`,
+			] ),
 			tabs: [
 				hasSolidColors && {
 					key: 'text',

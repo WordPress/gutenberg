@@ -15,6 +15,15 @@ interface SelectedState {
 
 interface SourceDescriptor {
 	layer: string;
+	// Breadcrumb part identifiers describing the Global Styles path to this
+	// source (e.g. `[ 'styles', 'blocks', 'blockName' ]`). Kept as generic
+	// identifiers, not user-facing titles: the consumer (block-editor)
+	// translates them, so this resolver stays block-agnostic. `blockName` and
+	// `variation` carry the slugs the resolver already receives as context, so
+	// the consumer can resolve their titles.
+	breadcrumb: string[];
+	blockName?: string | null;
+	variation?: string | null;
 }
 
 interface ResolvedStyle {
@@ -79,21 +88,73 @@ const EMPTY_INHERITANCE: ResolvedStyle = Object.freeze( {
 	sources: {},
 } );
 
-// Source descriptors per inheritance layer. `layer` identifies which layer
-// supplied a leaf and drives inherited-value detection.
-const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
-	root: { layer: 'root' },
-	element: { layer: 'element' },
-	block: { layer: 'block' },
-	blockVariation: { layer: 'blockVariation' },
+// Breadcrumb part identifiers for each Global Styles inheritance layer,
+// translated to user-facing titles by the consumer.
+const SOURCE_BREADCRUMB_PARTS = {
+	styles: 'styles',
+	elements: 'elements',
+	blocks: 'blocks',
+	blockName: 'blockName',
+	variations: 'variations',
+	variationName: 'variationName',
 };
 
-function createSourceDescriptor( type: string ): SourceDescriptor | null {
+// Source descriptors per inheritance layer. `layer` identifies which layer
+// supplied a leaf and drives inherited-value detection; `breadcrumb` describes
+// the Global Styles path surfaced in the inspector override tooltip. The
+// `element` layer paints the block's own element styles, so it shares the
+// block breadcrumb (the specific element is not recoverable from a merged
+// root-level path).
+const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
+	root: {
+		layer: 'root',
+		breadcrumb: [ SOURCE_BREADCRUMB_PARTS.styles ],
+	},
+	element: {
+		layer: 'element',
+		breadcrumb: [
+			SOURCE_BREADCRUMB_PARTS.styles,
+			SOURCE_BREADCRUMB_PARTS.blocks,
+			SOURCE_BREADCRUMB_PARTS.blockName,
+		],
+	},
+	block: {
+		layer: 'block',
+		breadcrumb: [
+			SOURCE_BREADCRUMB_PARTS.styles,
+			SOURCE_BREADCRUMB_PARTS.blocks,
+			SOURCE_BREADCRUMB_PARTS.blockName,
+		],
+	},
+	blockVariation: {
+		layer: 'blockVariation',
+		breadcrumb: [
+			SOURCE_BREADCRUMB_PARTS.styles,
+			SOURCE_BREADCRUMB_PARTS.blocks,
+			SOURCE_BREADCRUMB_PARTS.blockName,
+			SOURCE_BREADCRUMB_PARTS.variations,
+			SOURCE_BREADCRUMB_PARTS.variationName,
+		],
+	},
+};
+
+function createSourceDescriptor(
+	type: string,
+	{
+		blockName,
+		variation,
+	}: { blockName?: string | null; variation?: string | null } = {}
+): SourceDescriptor | null {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
 		return null;
 	}
-	return { ...descriptor };
+	return {
+		...descriptor,
+		breadcrumb: [ ...descriptor.breadcrumb ],
+		blockName: blockName ?? null,
+		variation: variation ?? null,
+	};
 }
 
 interface Contribution {
@@ -115,9 +176,19 @@ function getPathKey( path: string[] ) {
 	return path.join( '.' );
 }
 
-// Clone the descriptor so each source-map entry is its own object.
-function getSourceForPath( source: SourceDescriptor ): SourceDescriptor {
-	return { ...source };
+// Clone the descriptor so each source-map entry is its own object. When the
+// leaf lives under the `elements.<name>` passthrough subtree, append
+// `[ elements, <name> ]` so the breadcrumb points at the specific element.
+function getSourceForPath(
+	source: SourceDescriptor,
+	path: string[]
+): SourceDescriptor {
+	const breadcrumb = [ ...( source.breadcrumb ?? [] ) ];
+	const [ maybeElementsKey, maybeElement ] = path;
+	if ( maybeElementsKey === 'elements' && maybeElement ) {
+		breadcrumb.push( SOURCE_BREADCRUMB_PARTS.elements, maybeElement );
+	}
+	return { ...source, breadcrumb };
 }
 
 // Explicit-empty values do not contribute at their layer, allowing
@@ -274,8 +345,10 @@ function deepMergeDroppingEmpties(
 					? { ...sourceValue }
 					: sourceValue;
 			if ( sourceMetadata && sources ) {
-				sources[ getPathKey( nextPath ) ] =
-					getSourceForPath( sourceMetadata );
+				sources[ getPathKey( nextPath ) ] = getSourceForPath(
+					sourceMetadata,
+					nextPath
+				);
 			}
 		}
 	}
@@ -454,19 +527,22 @@ function computeResolvedStyle(
 		...elementLayers.map( ( layer ) =>
 			createContribution(
 				pickLayerRootContribution( layer ),
-				createSourceDescriptor( 'element' )
+				createSourceDescriptor( 'element', { blockName } )
 			)
 		),
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
-					createSourceDescriptor( 'block' )
+					createSourceDescriptor( 'block', { blockName } )
 			  )
 			: null,
 		variation
 			? createContribution(
 					pickLayerRootContribution( variation ),
-					createSourceDescriptor( 'blockVariation' )
+					createSourceDescriptor( 'blockVariation', {
+						blockName,
+						variation: variationName,
+					} )
 			  )
 			: null,
 	];
@@ -489,7 +565,7 @@ function computeResolvedStyle(
 					pickLayerRootContribution(
 						getStateSlice( layer, selectedState )
 					),
-					createSourceDescriptor( 'element' )
+					createSourceDescriptor( 'element', { blockName } )
 				)
 			),
 			block
@@ -497,7 +573,7 @@ function computeResolvedStyle(
 						pickLayerRootContribution(
 							getStateSlice( block, selectedState )
 						),
-						createSourceDescriptor( 'block' )
+						createSourceDescriptor( 'block', { blockName } )
 				  )
 				: null,
 			variation
@@ -505,7 +581,10 @@ function computeResolvedStyle(
 						pickLayerRootContribution(
 							getStateSlice( variation, selectedState )
 						),
-						createSourceDescriptor( 'blockVariation' )
+						createSourceDescriptor( 'blockVariation', {
+							blockName,
+							variation: variationName,
+						} )
 				  )
 				: null
 		);

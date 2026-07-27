@@ -18,11 +18,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -164,13 +160,14 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const {
 		colors,
@@ -337,6 +334,12 @@ export default function BackgroundImagePanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	// The inherited value arrives already resolved (refs + theme-file pointers)
 	// with non-cascading root values dropped, so a presence check drives the
@@ -364,6 +367,9 @@ export default function BackgroundImagePanel( {
 						'block-editor-color-gradient-item'
 					) }
 					showLocalOverrideActionsInLabel={ false }
+					overrideSources={ overrideSourcesFor(
+						'background.backgroundImage'
+					) }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -380,6 +386,9 @@ export default function BackgroundImagePanel( {
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
+						overrideSources={ overrideSourcesFor(
+							'background.backgroundImage'
+						) }
 					/>
 				</InheritanceToolsPanelItem>
 			) }
@@ -390,6 +399,7 @@ export default function BackgroundImagePanel( {
 					resetValue={ resetBackgroundColor }
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
+					overrideSources={ overrideSourcesFor( 'color.background' ) }
 					contrastWarning={ contrastWarning }
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
@@ -437,6 +447,10 @@ export default function BackgroundImagePanel( {
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
+					overrideSources={ overrideSourcesFor( [
+						'background.gradient',
+						'color.gradient',
+					] ) }
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
@@ -484,6 +498,7 @@ export default function BackgroundImagePanel( {
 					indicators={ [
 						userLegacyColorGradient ?? legacyColorGradient,
 					] }
+					overrideSources={ overrideSourcesFor( 'color.gradient' ) }
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}

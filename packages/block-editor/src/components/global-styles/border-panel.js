@@ -21,11 +21,7 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
@@ -103,11 +99,12 @@ export default function BorderPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	name,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
@@ -123,6 +120,12 @@ export default function BorderPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -305,9 +308,9 @@ export default function BorderPanel( {
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );
 	// A local override exists when the user has set a shadow that shadows an
-	// inherited one. Only then does the toggle render the blue-dot reset
-	// affordance (mirroring the color/gradient controls); a merely-inherited
-	// value at rest shows no reset button.
+	// inherited one. Only then does the toggle render the override indicator
+	// (mirroring the color/gradient controls); a merely-inherited value at rest
+	// shows no indicator.
 	const hasShadowLocalOverride =
 		showInheritanceLabelIndicators &&
 		hasShadow() &&
@@ -399,6 +402,23 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
+					overrideSources={ overrideSourcesFor( [
+						'border.color',
+						'border.style',
+						'border.width',
+						'border.top.color',
+						'border.top.style',
+						'border.top.width',
+						'border.right.color',
+						'border.right.style',
+						'border.right.width',
+						'border.bottom.color',
+						'border.bottom.style',
+						'border.bottom.width',
+						'border.left.color',
+						'border.left.style',
+						'border.left.width',
+					] ) }
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -446,6 +466,7 @@ export default function BorderPanel( {
 					) }
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
+					overrideSources={ overrideSourcesFor( 'border.radius' ) }
 					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
@@ -470,10 +491,10 @@ export default function BorderPanel( {
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }
-					// The shadow toggle renders its own reset affordance (blue
-					// dot for a local override, default reset otherwise) inside
-					// the control, mirroring the color/gradient controls, so the
-					// panel item must not render a second sibling reset dot.
+					// The shadow toggle renders its own affordance (override
+					// indicator for a local override, default reset otherwise)
+					// inside the control, mirroring the color/gradient controls,
+					// so the panel item must not render a second sibling one.
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
@@ -486,6 +507,7 @@ export default function BorderPanel( {
 					<ShadowPopover
 						shadow={ shadow }
 						onShadowChange={ setShadowWithInheritedCommit }
+						overrideSources={ overrideSourcesFor( 'shadow' ) }
 						settings={ settings }
 						hasLocalValue={ hasShadow() }
 						hasLocalOverride={ hasShadowLocalOverride }

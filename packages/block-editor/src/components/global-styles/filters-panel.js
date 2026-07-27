@@ -17,9 +17,10 @@ import {
 	DuotoneSwatch,
 	Dropdown,
 	Flex,
-	FlexItem,
+	FlexBlock,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -33,8 +34,7 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	InheritanceOverrideIndicator,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -119,18 +119,19 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 				) }
 			</Flex>
 		</ZStack>
-		<FlexItem
+		<FlexBlock
 			className="block-editor-panel-duotone-settings__label"
 			title={ label }
 		>
 			{ label }
-		</FlexItem>
+		</FlexBlock>
 	</HStack>
 );
 
 const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, hasLocalOverride, onReset, overrideSources } =
+			resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -160,13 +161,8 @@ const renderToggle = ( duotone, resetConfig ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
+				<Stack className="block-editor-panel-duotone-settings__actions">
+					{ hasLocalValue && (
 						<Button
 							size="small"
 							icon={ resetIcon }
@@ -174,7 +170,14 @@ const renderToggle = ( duotone, resetConfig ) =>
 							className="block-editor-panel-duotone-settings__reset"
 							onClick={ handleReset }
 						/>
-					) ) }
+					) }
+					{ hasLocalOverride && (
+						<InheritanceOverrideIndicator
+							className="block-editor-panel-duotone-settings__inheritance-override-indicator"
+							overrideSources={ overrideSources }
+						/>
+					) }
+				</Stack>
 			</>
 		);
 	};
@@ -184,10 +187,11 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -199,6 +203,12 @@ export default function FiltersPanel( {
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
+	// Resolve the source-map entries for a control's inherited path(s), so its
+	// override indicator can show the breadcrumb of the value being overridden.
+	const overrideSourcesFor = ( paths ) =>
+		( Array.isArray( paths ) ? paths : [ paths ] )
+			.map( ( path ) => inheritedSources?.[ path ] )
+			.filter( Boolean );
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -241,7 +251,7 @@ export default function FiltersPanel( {
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
-	// Only a local value shadowing an inherited one shows the blue-dot reset.
+	// Only a local value shadowing an inherited one shows the override indicator.
 	const hasDuotoneLocalOverride =
 		showInheritanceLabelIndicators &&
 		hasDuotone() &&
@@ -272,11 +282,12 @@ export default function FiltersPanel( {
 							inheritedDuotone !== undefined
 					) }
 					label={ __( 'Duotone' ) }
+					overrideSources={ overrideSourcesFor( 'filter.duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
-					// Toggle renders its own reset dot, so the item must not
-					// add a second.
+					// Toggle renders its own override indicator, so the item
+					// must not add a second.
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
@@ -287,6 +298,8 @@ export default function FiltersPanel( {
 							hasLocalValue: hasDuotone(),
 							hasLocalOverride: hasDuotoneLocalOverride,
 							onReset: resetDuotone,
+							overrideSources:
+								overrideSourcesFor( 'filter.duotone' ),
 						} ) }
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">

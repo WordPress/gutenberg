@@ -56,19 +56,38 @@
 	}
 }
 
-.block-editor-global-styles__shadow-editor__remove-button {
+.block-editor-global-styles__shadow-dropdown-toggle {
+	// The actions are absolutely positioned, so reserve room on the right
+	// for as many of them as are rendered.
+	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(1)) {
+		padding-right: $grid-unit + $button-size-small;
+	}
+	&:has(+ .block-editor-global-styles__shadow-editor__actions > :nth-child(2)) {
+		padding-right: $grid-unit + ($button-size-small * 2);
+	}
+}
+
+.block-editor-global-styles__shadow-editor__label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: start;
+}
+
+.block-editor-global-styles__shadow-editor__actions {
 	position: absolute;
-	right: 0;
-	top: $grid-unit;
-	margin: auto $grid-unit auto;
+	right: $grid-unit;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.block-editor-global-styles__shadow-editor__remove-button {
 	opacity: 0;
 	@media not (prefers-reduced-motion) {
 		transition: opacity 0.1s ease-in-out;
 	}
 
-	.block-editor-global-styles__shadow-dropdown:hover &,
-	&:focus,
-	&:hover {
+	.block-editor-global-styles__shadow-dropdown:is(:hover, :focus-within) & {
 		opacity: 1;
 	}
 
@@ -125,19 +144,38 @@
 	}
 }
 
-.block-editor-panel-duotone-settings__reset {
+.block-editor-global-styles-filters-panel__dropdown-toggle {
+	// The actions are absolutely positioned, so reserve room on the right
+	// for as many of them as are rendered.
+	&:has(+ .block-editor-panel-duotone-settings__actions > :nth-child(1)) {
+		padding-right: $grid-unit + $button-size-small;
+	}
+	&:has(+ .block-editor-panel-duotone-settings__actions > :nth-child(2)) {
+		padding-right: $grid-unit + ($button-size-small * 2);
+	}
+}
+
+.block-editor-panel-duotone-settings__label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: start;
+}
+
+.block-editor-panel-duotone-settings__actions {
 	position: absolute;
-	right: 0;
-	top: $grid-unit;
-	margin: auto $grid-unit auto;
+	right: $grid-unit;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.block-editor-panel-duotone-settings__reset {
 	opacity: 0;
 	@media not (prefers-reduced-motion) {
 		transition: opacity 0.1s ease-in-out;
 	}
 
-	.block-editor-global-styles-filters-panel__dropdown:hover &,
-	&:focus,
-	&:hover {
+	.block-editor-global-styles-filters-panel__dropdown:is(:hover, :focus-within) & {
 		opacity: 1;
 	}
 

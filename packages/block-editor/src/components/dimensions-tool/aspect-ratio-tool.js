@@ -30,6 +30,7 @@ import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
  * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
  * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
  * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
+ * @property {?Array}                       [overrideSources]  Source-map entries for the control's inherited path, used to build the override tooltip breadcrumb.
  */
 
 export default function AspectRatioTool( {
@@ -43,6 +44,7 @@ export default function AspectRatioTool( {
 	className,
 	isInherited,
 	hasLocalOverride,
+	overrideSources,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
@@ -86,6 +88,7 @@ export default function AspectRatioTool( {
 			className={ className }
 			isInherited={ isInherited }
 			hasLocalOverride={ hasLocalOverride }
+			overrideSources={ overrideSources }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
