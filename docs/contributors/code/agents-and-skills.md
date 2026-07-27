@@ -74,7 +74,7 @@ Walking through how the live testing skill applies these conventions:
 1. Confirm the public docs can't cover it — improve them first if they can.
 2. Create `skills/<domain>/SKILL.md` following the conventions above.
 3. Add a routing entry to the root `AGENTS.md`.
-4. Add at least one eval scenario under `test/ai-development/scenarios/` (see [its README](https://github.com/WordPress/gutenberg/blob/trunk/test/ai-development/scenarios/README.md)) describing a task the skill covers and how to verify an agent followed it.
-5. Run your scenario and confirm it passes: `npm run test:ai-development -- -g "<your scenario name>"`.
+4. Add at least one behavioral test under `test/ai-development/specs/` (see [its README](https://github.com/WordPress/gutenberg/blob/trunk/test/ai-development/README.md)) running a task the skill covers and verifying the agent followed it.
+5. Run your test and confirm it passes: `npm run test:ai-development -- -g "<your test name>"`.
 6. Run the full suite to confirm nothing else regressed — including the negative control: `npm run test:ai-development`.
 7. Once everything passes, run `npm run lint:md:docs`.

@@ -16,6 +16,10 @@ export default defineConfig( {
 	workers: 1,
 	fullyParallel: false,
 	reporter: 'list',
-	// Individual tests set their own timeout from the scenario file.
-	timeout: 30 * 60 * 1000,
+	// Safety net only. Tests run the agent with spawnSync, which blocks the
+	// worker — Playwright can't interrupt a session in progress, so a hung
+	// session is actually killed by the session timeout in agent.mjs. Keep
+	// this value larger than that one: the session then dies first and the
+	// test fails with a saved transcript instead of a torn-down worker.
+	timeout: 12 * 60 * 1000,
 } );
