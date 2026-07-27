@@ -17,7 +17,7 @@
 ### Internal
 
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
--   Update `memize` to 2.1.1.
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 
 ## 14.51.0 (2026-07-14)
 

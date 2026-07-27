@@ -60,7 +60,7 @@ This package is now considered stable and production-ready. The API will follow 
 
 ### Internal
 
--   Update `memize` to 2.1.1.
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Add regression test coverage for the `ThemeProvider` wrapper's `display: contents` focus behavior ([#80056](https://github.com/WordPress/gutenberg/pull/80056)).
 
 ### Code Quality
