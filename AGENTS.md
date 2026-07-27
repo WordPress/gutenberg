@@ -33,6 +33,7 @@ Read only what your task needs, when it needs it:
 
 -   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
 -   **Task procedures (skills)**: before starting a matching task, read the relevant `skills/<domain>/SKILL.md` (e.g. `skills/testing/SKILL.md` for writing, running, or debugging tests).
+-   **Backporting to WordPress Core**: before creating a backport PR, backporting a Gutenberg PR to `wordpress-develop`, or adding a `backport-changelog` entry, read `skills/gutenberg-backport-pr/SKILL.md`.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
 ## Code quality

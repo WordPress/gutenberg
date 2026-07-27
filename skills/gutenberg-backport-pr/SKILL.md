@@ -1,15 +1,15 @@
 ---
 name: gutenberg-backport-pr
-description: This skill should be used when the user asks to "create a backport PR", "backport to wordpress-develop", "backport to WP core", "backport this Gutenberg PR", or "add a backport-changelog entry". Handles the workflow of mirroring PHP changes from a Gutenberg PR into WordPress/wordpress-develop.
+description: Use when creating a backport PR, backporting a Gutenberg PR to WordPress/wordpress-develop, backporting to WP Core, or adding a backport-changelog entry.
 ---
 
-# Gutenberg → WordPress Core backport PR
+# Gutenberg to WordPress Core backport PR
 
 Mirror the PHP changes from a merged Gutenberg PR into a `WordPress/wordpress-develop` pull request, then add the matching `backport-changelog` entry to the Gutenberg PR.
 
 ## Reference
 
-The full procedure lives at [`docs/contributors/code/back-merging-to-wp-core.md`](../../../docs/contributors/code/back-merging-to-wp-core.md). Read it before starting. It covers:
+The full procedure lives at [`docs/contributors/code/back-merging-to-wp-core.md`](../../docs/contributors/code/back-merging-to-wp-core.md). Read it before starting. It covers:
 
 - Which files require backporting and which are excluded
 - Path mapping rules (direct-sync, compat shims, class renames, aggregators, tests)
@@ -17,7 +17,7 @@ The full procedure lives at [`docs/contributors/code/back-merging-to-wp-core.md`
 - wordpress-develop PR conventions
 - How to add the `backport-changelog` entry
 
-The changelog file format is documented at [`backport-changelog/readme.md`](../../../backport-changelog/readme.md).
+The changelog file format is documented at [`backport-changelog/readme.md`](../../backport-changelog/readme.md).
 
 ## Before starting
 
