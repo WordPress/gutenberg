@@ -1,6 +1,6 @@
 # Collect and interpret evidence
 
-Keep collection deterministic and analysis interpretive. Read [people.md](people.md) completely before weighing contributors. Prefer the live `gutenberg-core` team list when access permits; use the snapshot as fallback.
+Keep collection deterministic and analysis interpretive. Focus the investigation on finding important documentation gaps, not ranking contributors or proving every claim exhaustively.
 
 ## Collect the discussion and implementation
 
@@ -13,18 +13,13 @@ For every shortlisted pull request, read:
 -   changed files and the final merged implementation;
 -   follow-up, revert, and compatibility work when relevant.
 
-## Weigh the evidence
+## Decide what matters
 
--   Weight project leaders above maintainers on questions of direction and rationale.
--   Weight `gutenberg-core` maintainers above contributors outside that team.
--   Use merged history and CODEOWNERS only as secondary signals.
--   Treat bots as near-zero-trust authors.
--   Do not turn comment volume, reactions, or a merge alone into proof of consensus.
--   Treat the merged code as evidence of shipped behavior, not automatic resolution of every concern raised in discussion.
-
-Record meaningful competing positions with their authors and trust tiers. If the discussion does not clearly resolve a disagreement, describe it neutrally rather than choosing a side. State what shipped separately from what remains uncertain.
-
-Only call a question resolved when the discussion, final implementation, or a later authoritative decision clearly settles it. Preserve caveats that affect compatibility, follow-up work, or the safe scope of the guidance.
+-   Prioritize gaps affecting public APIs, compatibility, recurring implementation mistakes, or behavior users and contributors need to understand.
+-   Verify a candidate against the merged implementation, current documentation, and obvious follow-up work. If its validity remains ambiguous, record the uncertainty and move on rather than expanding the investigation.
+-   Treat contributor roles as context about project direction, not proof that a claim is correct or agreed upon. Do not build trust tiers or reconstruct historical team membership.
+-   Do not infer consensus from authority, comment volume, reactions, or a merge alone. Preserve meaningful disagreement and distinguish what shipped from what remains undecided.
+-   Treat bot output as automation, not evidence of project intent unless it links to a human-authored decision.
 
 ## Verify against the repository
 

@@ -30,7 +30,7 @@ Include direct evidence links without turning the pull request body into the ful
 
 1. Query the target repository's current labels. Select the smallest set of existing labels that describes the proposed change, using labels from the source pull requests as evidence when they still fit. Never create a label just for the generated pull request.
 2. Tag the people whose substantive discussion, review, or authored rationale directly informed the proposal alongside the corresponding evidence links in the pull request body.
-3. Request reviews only from those named evidence participants. Exclude bots, reaction-only participants, passive requested reviewers, broad props lists, and people whose comments did not inform the proposal. Use the trust weighting in [evidence.md](evidence.md) to keep the list focused when several people support the same point.
+3. Request reviews only from those named evidence participants. Exclude bots, reaction-only participants, passive requested reviewers, broad props lists, and people whose comments did not inform the proposal. When several people support the same point, keep the list focused on those whose rationale most directly informed the proposal.
 4. Apply the selected labels and request the evidence-linked reviewers after opening the pull request.
 5. Verify the labels and review requests. If repository permissions or collaborator rules prevent either action, keep the relevant people tagged in the pull request body and report the intended labels or reviewers with the exact limitation.
 
