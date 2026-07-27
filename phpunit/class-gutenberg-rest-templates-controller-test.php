@@ -157,19 +157,36 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * A file-backed template has no modification date, which should be exposed as
+	 * `null` rather than the `false` returned by `mysql_to_rfc3339()`.
+	 *
+	 * @ticket 65730
 	 * @covers WP_REST_Templates_Controller::prepare_item_for_response
 	 */
-	public function test_get_item_file_backed_template_has_null_dates() {
+	public function test_get_item_modified_is_null_for_file_backed_template() {
 		wp_set_current_user( self::$admin_id );
 		switch_theme( 'block-theme' );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//index' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//page-home' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status(), 'The file-backed template should be found.' );
-		$this->assertNull( $data['date'], 'A template with no post behind it has no publish date.' );
-		$this->assertNull( $data['modified'], 'A template with no post behind it has no modification date.' );
+		$this->assertSame( 200, $response->get_status(), 'Fetching a file-backed template should return 200.' );
+		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
+	}
+
+	/**
+	 * @ticket 65730
+	 * @covers WP_REST_Templates_Controller::get_item_schema
+	 */
+	public function test_modified_schema_allows_null() {
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/templates' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$properties = $data['schema']['properties'];
+
+		$this->assertArrayHasKey( 'modified', $properties );
+		$this->assertSame( array( 'string', 'null' ), $properties['modified']['type'] );
 	}
 
 	/**
@@ -230,7 +247,5 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertArrayHasKey( 'original_source', $properties );
 		$this->assertArrayHasKey( 'plugin', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
-		$this->assertSame( array( 'string', 'null' ), $properties['date']['type'] );
-		$this->assertSame( array( 'string', 'null' ), $properties['modified']['type'] );
 	}
 }
