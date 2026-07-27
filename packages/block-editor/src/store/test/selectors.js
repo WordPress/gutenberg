@@ -1604,7 +1604,7 @@ describe( 'selectors', () => {
 			expect( getSelectedBlockCount( state ) ).toBe( 1 );
 		} );
 
-		it( 'should count the descendants of multi-selected blocks', () => {
+		it( 'should not count the descendants of multi-selected blocks', () => {
 			const state = {
 				blocks: {
 					order: new Map(
@@ -1630,7 +1630,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSelectedBlockCount( state ) ).toBe( 5 );
+			expect( getSelectedBlockCount( state ) ).toBe( 2 );
 		} );
 	} );
 
