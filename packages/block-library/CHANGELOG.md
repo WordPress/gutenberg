@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
+-   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery keeps its current images but stops following the post's attachments ([#80613](https://github.com/WordPress/gutenberg/issues/80613)).
 
 ### Bug Fixes
 
