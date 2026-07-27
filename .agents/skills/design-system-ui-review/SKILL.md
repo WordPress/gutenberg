@@ -1,6 +1,6 @@
 ---
 name: design-system-ui-review
-description: Perform a read-only review of any Gutenberg, plugin, or application UI/UX change for correct public WordPress Design System usage and user-facing behaviour. Use whenever a diff changes a component, control, visual styling, token, interaction, layout, overlay, or other user-facing interface, whether or not it already imports `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement a change or review Design System package source.
+description: Use when reviewing a Gutenberg, plugin, or application UI/UX change for correct public WordPress Design System usage and user-facing behaviour, including a component, control, visual styling, token, interaction, layout, overlay, or other user-facing interface; do not use to implement a change or review Design System package source.
 ---
 
 # Review a WordPress Design System interface

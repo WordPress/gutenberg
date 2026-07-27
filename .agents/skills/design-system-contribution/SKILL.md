@@ -1,6 +1,6 @@
 ---
 name: design-system-contribution
-description: Plan and implement a safe change to `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` in a local Gutenberg checkout. Use for package maintenance and public-contract work; do not use for consumer-only application changes or infer commit, push, or pull-request authority.
+description: Use when planning or implementing a safe `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` change in a local Gutenberg checkout; do not use for consumer-only application changes or infer commit, push, or pull-request authority.
 ---
 
 # Contribute to the WordPress Design System

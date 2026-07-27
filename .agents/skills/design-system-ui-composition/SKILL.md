@@ -1,6 +1,6 @@
 ---
 name: design-system-ui-composition
-description: Build or change any Gutenberg feature, plugin interface, or standalone application UI with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs when they fit the user need. Use for UI/UX implementation work, including when the code does not yet use the Design System; do not use to change package source or depend on package-private implementation details.
+description: Use when building or changing a Gutenberg feature, plugin interface, or standalone application UI with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs, including when the code does not yet use the Design System; do not use to change package source or depend on package-private implementation details.
 ---
 
 # Compose a WordPress Design System interface
@@ -33,13 +33,19 @@ current vocabulary and components. Then verify the recommendation against the
 target's public contract. The MCP result does not make an API available in an
 older checkout or package release.
 
-Read the relevant public documentation before coding:
+Read the target package documentation before coding:
 
-- [`@wordpress/components`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/README.md)
-- [`@wordpress/ui`](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md)
-- [`@wordpress/theme`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md)
-- [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)
-- [Working with WordPress Design System packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/design/design-system-packages.md)
+- [`@wordpress/components`](../../packages/components/README.md)
+- [`@wordpress/ui`](../../packages/ui/README.md)
+- [`@wordpress/theme`](../../packages/theme/README.md)
+- [Design Tokens Reference](../../packages/theme/docs/tokens.md)
+- [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
+
+When the target package is installed rather than checked out, read the
+corresponding documentation shipped with that package. Use the
+[Gutenberg `trunk` documentation](https://github.com/WordPress/gutenberg/tree/trunk/packages)
+only when the target documentation is unavailable, and do not infer that it
+describes APIs available to the target version.
 
 ## Choose and compose
 

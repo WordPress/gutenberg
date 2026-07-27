@@ -1,6 +1,6 @@
 ---
 name: design-system-code-review
-description: Perform a read-only, evidence-based review of a Gutenberg change to a WordPress Design System package or its public contract. Use for review requests affecting `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement the change or review a consumer-only application.
+description: Use when reviewing a Gutenberg change to a WordPress Design System package or its public contract, including `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement the change or review a consumer-only application.
 ---
 
 # Review a WordPress Design System contribution
