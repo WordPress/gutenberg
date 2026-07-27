@@ -41,11 +41,20 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord } = select( STORE_NAME );
+			const { getEditedEntityRecord, getEntityRecord } =
+				select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
+			let recordContent = editedRecord.content;
+
+			if ( kind === 'postType' && typeof recordContent !== 'string' ) {
+				recordContent = getEntityRecord( kind, name, id, {
+					context: 'edit',
+				} )?.content?.raw;
+			}
+
 			return {
 				editedBlocks: editedRecord.blocks,
-				content: editedRecord.content,
+				content: recordContent,
 				meta: editedRecord.meta,
 			};
 		},

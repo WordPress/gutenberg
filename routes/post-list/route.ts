@@ -73,7 +73,7 @@ export const route = {
 		const posts = await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			params.type,
-			{ ...query, per_page: 1 }
+			{ ...query, per_page: 1, _fields: 'id' }
 		);
 
 		// Return first post if available

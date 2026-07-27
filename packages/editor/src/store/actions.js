@@ -47,18 +47,21 @@ export const setupEditor =
 		dispatch.setEditedPost( post.type, post.id );
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
-		if ( isNewPost && template ) {
+		const hasPostContent = typeof post.content?.raw === 'string';
+		if ( ( isNewPost && template ) || hasPostContent ) {
 			// In order to ensure maximum of a single parse during setup, edits are
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( 'content' in edits ) {
+			if ( isNewPost && edits && 'content' in edits ) {
 				content = edits.content;
 			} else {
 				content = post.content.raw;
 			}
 			let blocks = parse( content );
-			blocks = synchronizeBlocksWithTemplate( blocks, template );
+			if ( isNewPost && template ) {
+				blocks = synchronizeBlocksWithTemplate( blocks, template );
+			}
 			dispatch.resetEditorBlocks( blocks, {
 				__unstableShouldCreateUndoLevel: false,
 			} );

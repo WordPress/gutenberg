@@ -12,6 +12,12 @@ export function useUserGlobalStyles( id: string ) {
 			const { getEntityRecord, getEditedEntityRecord, canUser } =
 				select( coreStore );
 
+			if ( ! id ) {
+				return {
+					userGlobalStyles: undefined,
+				};
+			}
+
 			/*
 			 * Ensure that the global styles ID request is complete by testing `_globalStylesId`,
 			 * before firing off the `canUser` OPTIONS request for user capabilities, otherwise it will
