@@ -37,38 +37,74 @@ jobs:
         outputs:
             relevant: ${{ steps.filter.outputs.relevant }}
         steps:
-            # Skips the comparison when every file in the diff belongs to a path that cannot
-            # change what the performance suites measure: documentation, unit tests, React
-            # Native sources, linting and build tooling. Anything else runs the suite, so an
-            # unrecognised path always errs towards measuring it.
+            # Lists the paths that cannot change what the performance suites measure:
+            # documentation, unit tests, React Native sources and linting tooling.
+            # `predicate-quantifier: every` makes the filter true as soon as one changed file
+            # matches none of these, so an unrecognised path always runs the comparison.
+            #
+            # Paths that feed the build (`tools/build-scripts` and its `@wordpress/build`,
+            # `@wordpress/scripts` and Babel dependencies) or the test harness
+            # (`@wordpress/env`) are deliberately absent. So is `.github/`, which keeps this
+            # workflow covered by its own comparison.
             - name: Check whether the diff can move a performance metric
               id: filter
               if: github.event_name == 'pull_request'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  PR_NUMBER: ${{ github.event.number }}
-                  REPO: ${{ github.repository }}
-              run: |
-                  # Anything that feeds the build (tools/build-scripts and its
-                  # @wordpress/build, @wordpress/scripts and Babel dependencies) or the test
-                  # harness (@wordpress/env) is deliberately absent from this list.
-                  INERT='^docs/|\.md$|(^|/)tests?/|\.native\.(js|jsx|ts|tsx|scss)$|^storybook/|^phpunit/|^schemas/|^typings/|^bin/|^backport-changelog/|^skills/|^\.github/|^(changelog|readme)\.txt$|^packages/(eslint-plugin|create-block|docgen|project-management-automation|e2e-tests|jest-[a-z-]+|prettier-config|stylelint-config|npm-package-json-lint-config)/|^tools/(docs|eslint|stylelint|validation)/|^(eslint|prettier|lint-staged|syncpack)\.config|^tsconfig|^(phpcs|phpunit)|^\.(gitignore|editorconfig|nvmrc|npmrc|prettierrc|stylelintrc|browserslistrc)'
-                  # Carve-outs for paths that match the list above but do change the measurement.
-                  RELEVANT='^test/performance/|^\.github/workflows/performance\.yml$'
-
-                  gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" --jq '.[].filename' > changed.txt || true
-
-                  # Counting rather than `grep -q` keeps the exit status unambiguous: `-q`
-                  # combined with `-v` is not portable across grep implementations.
-                  FORCED="$( grep -cE "$RELEVANT" changed.txt || true )"
-                  NOT_INERT="$( grep -cvE "$INERT" changed.txt || true )"
-
-                  if [ ! -s changed.txt ] || [ "$FORCED" -gt 0 ] || [ "$NOT_INERT" -gt 0 ]; then
-                    echo 'relevant=true' >> "$GITHUB_OUTPUT"
-                  else
-                    echo 'relevant=false' >> "$GITHUB_OUTPUT"
-                    echo 'Skipped the performance comparison: every changed file is documentation, tests or tooling.' >> "$GITHUB_STEP_SUMMARY"
-                  fi
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          - '**'
+                          - '!**/*.md'
+                          - '!**/*.native.*'
+                          - '!docs/**'
+                          - '!storybook/**'
+                          - '!phpunit/**'
+                          - '!schemas/**'
+                          - '!typings/**'
+                          - '!bin/**'
+                          - '!backport-changelog/**'
+                          - '!skills/**'
+                          - '!packages/**/test/**'
+                          - '!packages/**/tests/**'
+                          - '!tools/**/test/**'
+                          - '!test/e2e/**'
+                          - '!test/integration/**'
+                          - '!test/unit/**'
+                          - '!test/php/**'
+                          - '!test/native/**'
+                          - '!test/storybook-playwright/**'
+                          - '!test/emptytheme/**'
+                          - '!test/gutenberg-test-themes/**'
+                          - '!packages/eslint-plugin/**'
+                          - '!packages/create-block/**'
+                          - '!packages/docgen/**'
+                          - '!packages/project-management-automation/**'
+                          - '!packages/e2e-tests/**'
+                          - '!packages/jest-*/**'
+                          - '!packages/prettier-config/**'
+                          - '!packages/stylelint-config/**'
+                          - '!packages/npm-package-json-lint-config/**'
+                          - '!tools/docs/**'
+                          - '!tools/eslint/**'
+                          - '!tools/stylelint/**'
+                          - '!tools/validation/**'
+                          - '!eslint.config*'
+                          - '!prettier.config*'
+                          - '!lint-staged.config*'
+                          - '!syncpack.config*'
+                          - '!tsconfig*'
+                          - '!phpcs*'
+                          - '!phpunit*'
+                          - '!changelog.txt'
+                          - '!readme.txt'
+                          - '!.gitignore'
+                          - '!.editorconfig'
+                          - '!.nvmrc'
+                          - '!.npmrc'
+                          - '!.prettierrc*'
+                          - '!.stylelintrc*'
+                          - '!.browserslistrc'
 
     performance:
         timeout-minutes: 60
