@@ -28,13 +28,56 @@ concurrency:
 permissions: {}
 
 jobs:
-    performance:
-        timeout-minutes: 60
-        name: Run performance tests
+    changes:
+        timeout-minutes: 5
+        name: Detect performance-relevant changes
         runs-on: 'ubuntu-24.04'
         permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            # Skips the comparison when every file in the diff belongs to a path that cannot
+            # change what the performance suites measure: documentation, unit tests, React
+            # Native sources, linting and build tooling. Anything else runs the suite, so an
+            # unrecognised path always errs towards measuring it.
+            - name: Check whether the diff can move a performance metric
+              id: filter
+              if: github.event_name == 'pull_request'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PR_NUMBER: ${{ github.event.number }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  # Anything that feeds the build (tools/build-scripts and its
+                  # @wordpress/build, @wordpress/scripts and Babel dependencies) or the test
+                  # harness (@wordpress/env) is deliberately absent from this list.
+                  INERT='^docs/|\.md$|(^|/)tests?/|\.native\.(js|jsx|ts|tsx|scss)$|^storybook/|^phpunit/|^schemas/|^typings/|^bin/|^backport-changelog/|^skills/|^\.github/|^(changelog|readme)\.txt$|^packages/(eslint-plugin|create-block|docgen|project-management-automation|e2e-tests|jest-[a-z-]+|prettier-config|stylelint-config|npm-package-json-lint-config)/|^tools/(docs|eslint|stylelint|validation)/|^(eslint|prettier|lint-staged|syncpack)\.config|^tsconfig|^(phpcs|phpunit)|^\.(gitignore|editorconfig|nvmrc|npmrc|prettierrc|stylelintrc|browserslistrc)'
+                  # Carve-outs for paths that match the list above but do change the measurement.
+                  RELEVANT='^test/performance/|^\.github/workflows/performance\.yml$'
+
+                  gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" --jq '.[].filename' > changed.txt || true
+
+                  # Counting rather than `grep -q` keeps the exit status unambiguous: `-q`
+                  # combined with `-v` is not portable across grep implementations.
+                  FORCED="$( grep -cE "$RELEVANT" changed.txt || true )"
+                  NOT_INERT="$( grep -cvE "$INERT" changed.txt || true )"
+
+                  if [ ! -s changed.txt ] || [ "$FORCED" -gt 0 ] || [ "$NOT_INERT" -gt 0 ]; then
+                    echo 'relevant=true' >> "$GITHUB_OUTPUT"
+                  else
+                    echo 'relevant=false' >> "$GITHUB_OUTPUT"
+                    echo 'Skipped the performance comparison: every changed file is documentation, tests or tooling.' >> "$GITHUB_STEP_SUMMARY"
+                  fi
+
+    performance:
+        timeout-minutes: 60
+        name: Compare performance
+        runs-on: 'ubuntu-24.04'
+        needs: [changes]
+        permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
@@ -147,3 +190,18 @@ jobs:
                   name: failures-artifacts
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+
+    # `Run performance tests` is a required status check, so it has to report a conclusion on
+    # every pull request, including the ones where the comparison above is skipped. Jobs that
+    # were deliberately skipped pass; anything that failed or was cancelled fails.
+    performance-status:
+        timeout-minutes: 5
+        name: Run performance tests
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        needs: [changes, performance]
+        if: ${{ always() }}
+        steps:
+            - name: Fail the job if any of the jobs it depends on did not pass
+              if: ${{ contains( needs.*.result, 'failure' ) || contains( needs.*.result, 'cancelled' ) }}
+              run: exit 1
