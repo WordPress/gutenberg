@@ -48,13 +48,12 @@ import CustomGradientPicker from '../custom-gradient-picker';
 import { kebabCase } from '../utils/strings';
 import type {
 	Color,
+	Gradient,
 	ColorPickerPopoverProps,
 	NameInputProps,
 	OptionProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
-	PaletteEditColorVariation,
-	PaletteEditGradientVariation,
 	PaletteElement,
 } from './types';
 
@@ -356,10 +355,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 }
 
 const EMPTY_ARRAY: Color[] = [];
-const EMPTY_VARIATIONS: (
-	| PaletteEditColorVariation
-	| PaletteEditGradientVariation
-)[] = [];
+const EMPTY_VARIATIONS: never[] = [];
 
 /**
  * Allows editing a palette of colors or gradients.
@@ -397,10 +393,15 @@ export function PaletteEdit( {
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
-	const variations = paletteVariations.map( ( variation ) => ( {
-		...variation,
-		elements: isGradient ? variation.gradients : variation.colors,
-	} ) );
+	const variations = paletteVariations.map( ( variation ) => {
+		const variationElements = isGradient
+			? variation.gradients
+			: variation.colors;
+		return {
+			...variation,
+			elements: variationElements ?? EMPTY_ARRAY,
+		};
+	} );
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -663,9 +664,7 @@ export function PaletteEdit( {
 							</PaletteHeading>
 							<PaletteEditContents>
 								{ isEditing && (
-									<PaletteEditListView<
-										( typeof variation.elements )[ number ]
-									>
+									<PaletteEditListView< PaletteElement >
 										canOnlyChangeValues={
 											canOnlyChangeValues
 										}

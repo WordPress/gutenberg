@@ -13,7 +13,12 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import PaletteEdit from '..';
-import type { Color, Gradient } from '../types';
+import type {
+	Color,
+	Gradient,
+	PaletteEditColorVariation,
+	PaletteEditGradientVariation,
+} from '../types';
 
 const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
@@ -33,7 +38,7 @@ const meta: Meta< typeof PaletteEdit > = {
 export default meta;
 
 const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
-	const { colors, gradients, onChange, ...props } = args;
+	const { colors, gradients, onChange, paletteVariations, ...props } = args;
 	const [ value, setValue ] = useState( gradients || colors );
 
 	return (
@@ -41,6 +46,8 @@ const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
 			{ ...( gradients
 				? {
 						gradients: value as Gradient[],
+						paletteVariations:
+							paletteVariations as PaletteEditGradientVariation[],
 						onChange: ( newValue?: Gradient[] ) => {
 							setValue( newValue );
 							onChange( newValue );
@@ -48,6 +55,8 @@ const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
 				  }
 				: {
 						colors: value as Color[],
+						paletteVariations:
+							paletteVariations as PaletteEditColorVariation[],
 						onChange: ( newValue?: Color[] ) => {
 							setValue( newValue );
 							onChange( newValue );

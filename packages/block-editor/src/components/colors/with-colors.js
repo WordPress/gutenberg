@@ -16,6 +16,7 @@ import {
 } from './utils';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
+import useColorSchemePresets from '../colors-gradients/use-color-scheme-presets';
 
 const { kebabCase } = unlock( componentsPrivateApis );
 
@@ -62,13 +63,17 @@ const withEditorColorPalette = () =>
 						'color.palette.theme',
 						'color.palette.default'
 					);
+				const { presets: currentThemePalette } = useColorSchemePresets(
+					'palette',
+					themePalette
+				);
 				const allColors = useMemo(
 					() => [
 						...( userPalette || [] ),
-						...( themePalette || [] ),
+						...( currentThemePalette || [] ),
 						...( defaultPalette || [] ),
 					],
-					[ userPalette, themePalette, defaultPalette ]
+					[ userPalette, currentThemePalette, defaultPalette ]
 				);
 				return <WrappedComponent { ...props } colors={ allColors } />;
 			},

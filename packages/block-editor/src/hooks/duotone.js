@@ -42,6 +42,7 @@ import { useResolvedStyle } from '../components/global-styles/inherited-value-co
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
+import useColorSchemePresets from '../components/colors-gradients/use-color-scheme-presets';
 
 const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
 	unlock( globalStylesEnginePrivateApis );
@@ -68,13 +69,18 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 			`${ presetSetting }.theme`,
 			`${ presetSetting }.default`
 		);
+	const presetType = presetSetting.slice( 'color.'.length );
+	const { presets: currentThemePresets } = useColorSchemePresets(
+		presetType,
+		themePresets
+	);
 	return useMemo(
 		() => [
 			...( userPresets || EMPTY_ARRAY ),
-			...( themePresets || EMPTY_ARRAY ),
+			...( currentThemePresets || EMPTY_ARRAY ),
 			...( ( enableDefault && defaultPresets ) || EMPTY_ARRAY ),
 		],
-		[ enableDefault, userPresets, themePresets, defaultPresets ]
+		[ enableDefault, userPresets, currentThemePresets, defaultPresets ]
 	);
 }
 

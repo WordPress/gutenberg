@@ -7,6 +7,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
+import useColorSchemePresets from '../colors-gradients/use-color-scheme-presets';
 
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return function WithColorContext( props ) {
@@ -24,14 +25,18 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 			'color.custom',
 			'color.defaultPalette'
 		);
+		const { presets: currentThemeColors } = useColorSchemePresets(
+			'palette',
+			themeColors
+		);
 
 		const _colors = enableDefaultColors
 			? [
-					...( themeColors || [] ),
+					...( currentThemeColors || [] ),
 					...( defaultColors || [] ),
 					...( customColors || [] ),
 			  ]
-			: [ ...( themeColors || [] ), ...( customColors || [] ) ];
+			: [ ...( currentThemeColors || [] ), ...( customColors || [] ) ];
 
 		const { colors = _colors, disableCustomColors = ! enableCustomColors } =
 			props;

@@ -8,6 +8,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
+import useColorSchemePresets from './use-color-scheme-presets';
 
 /**
  * Retrieves color and gradient related settings.
@@ -46,17 +47,24 @@ export default function useMultipleOriginColorsAndGradients() {
 		disableCustomColors: ! enableCustomColors,
 		disableCustomGradients: ! enableCustomGradients,
 	};
+	const { presets: currentThemeColors, hasColorSchemes } =
+		useColorSchemePresets( 'palette', themeColors );
+	const { presets: currentThemeGradients } = useColorSchemePresets(
+		'gradients',
+		themeGradients
+	);
+	colorGradientSettings.hasColorSchemes = hasColorSchemes;
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
-		if ( themeColors && themeColors.length ) {
+		if ( currentThemeColors && currentThemeColors.length ) {
 			result.push( {
 				name: _x(
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
 				slug: 'theme',
-				colors: themeColors,
+				colors: currentThemeColors,
 			} );
 		}
 		if (
@@ -86,21 +94,21 @@ export default function useMultipleOriginColorsAndGradients() {
 		return result;
 	}, [
 		customColors,
-		themeColors,
+		currentThemeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
 	] );
 
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
-		if ( themeGradients && themeGradients.length ) {
+		if ( currentThemeGradients && currentThemeGradients.length ) {
 			result.push( {
 				name: _x(
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
 				slug: 'theme',
-				gradients: themeGradients,
+				gradients: currentThemeGradients,
 			} );
 		}
 		if (
@@ -130,7 +138,7 @@ export default function useMultipleOriginColorsAndGradients() {
 		return result;
 	}, [
 		customGradients,
-		themeGradients,
+		currentThemeGradients,
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );

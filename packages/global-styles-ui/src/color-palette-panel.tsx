@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import type { Color, ColorSchemePreset } from '@wordpress/global-styles-engine';
+import type {
+	Color,
+	ColorSchemeSettings,
+} from '@wordpress/global-styles-engine';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalPaletteEdit as PaletteEdit,
@@ -17,8 +20,7 @@ import { shuffle } from '@wordpress/icons';
 import { useSetting, useColorRandomizer } from './hooks';
 import ColorVariations from './variations/variations-color';
 import {
-	addBasePresetNames,
-	flattenSchemePresets,
+	normalizeColorSchemePresets,
 	SchemePaletteIcon,
 	type SchemePresetCollection,
 } from './color-scheme-palette';
@@ -52,29 +54,43 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 		'color.palette.custom',
 		name
 	);
+	const [ lightScheme ] = useSetting< ColorSchemeSettings >(
+		'color.light',
+		name
+	);
 	const [ lightColors, setLightColors ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Color > >
+		SchemePresetCollection< Color >
 	>( 'color.light.palette', name );
-	const [ userLightColors ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Color > >
-	>( 'color.light.palette', name, 'user' );
+	const [ userLightColors ] = useSetting< SchemePresetCollection< Color > >(
+		'color.light.palette',
+		name,
+		'user'
+	);
+	const [ darkScheme ] = useSetting< ColorSchemeSettings >(
+		'color.dark',
+		name
+	);
 	const [ darkColors, setDarkColors ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Color > >
+		SchemePresetCollection< Color >
 	>( 'color.dark.palette', name );
-	const [ userDarkColors ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Color > >
-	>( 'color.dark.palette', name, 'user' );
+	const [ userDarkColors ] = useSetting< SchemePresetCollection< Color > >(
+		'color.dark.palette',
+		name,
+		'user'
+	);
 
-	const namedLightColors = addBasePresetNames(
-		flattenSchemePresets( lightColors ),
-		themeColors
+	const normalizedLightColors = normalizeColorSchemePresets(
+		themeColors,
+		lightColors
 	);
-	const namedDarkColors = addBasePresetNames(
-		flattenSchemePresets( darkColors ),
-		themeColors
+	const normalizedDarkColors = normalizeColorSchemePresets(
+		themeColors,
+		darkColors
 	);
-	const hasLightColors = namedLightColors.length > 0;
-	const hasDarkColors = namedDarkColors.length > 0;
+	const hasLightColors =
+		lightScheme !== undefined && normalizedLightColors.length > 0;
+	const hasDarkColors =
+		darkScheme !== undefined && normalizedDarkColors.length > 0;
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultPalette',
@@ -103,7 +119,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 										{
 											canReset:
 												userLightColors !== undefined,
-											colors: namedLightColors,
+											colors: normalizedLightColors,
 											onChange: setLightColors,
 											paletteIcon: (
 												<SchemePaletteIcon scheme="light" />
@@ -117,7 +133,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 										{
 											canReset:
 												userDarkColors !== undefined,
-											colors: namedDarkColors,
+											colors: normalizedDarkColors,
 											onChange: setDarkColors,
 											paletteIcon: (
 												<SchemePaletteIcon scheme="dark" />

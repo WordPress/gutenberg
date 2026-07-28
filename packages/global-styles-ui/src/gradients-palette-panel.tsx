@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type {
-	ColorSchemePreset,
+	ColorSchemeSettings,
 	Gradient,
 } from '@wordpress/global-styles-engine';
 
@@ -17,8 +17,7 @@ import type {
  */
 import { useSetting } from './hooks';
 import {
-	addBasePresetNames,
-	flattenSchemePresets,
+	normalizeColorSchemePresets,
 	SchemePaletteIcon,
 	type SchemePresetCollection,
 } from './color-scheme-palette';
@@ -54,29 +53,39 @@ export default function GradientPalettePanel( {
 		'color.gradients.custom',
 		name
 	);
+	const [ lightScheme ] = useSetting< ColorSchemeSettings >(
+		'color.light',
+		name
+	);
 	const [ lightGradients, setLightGradients ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Gradient > >
+		SchemePresetCollection< Gradient >
 	>( 'color.light.gradients', name );
 	const [ userLightGradients ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Gradient > >
+		SchemePresetCollection< Gradient >
 	>( 'color.light.gradients', name, 'user' );
+	const [ darkScheme ] = useSetting< ColorSchemeSettings >(
+		'color.dark',
+		name
+	);
 	const [ darkGradients, setDarkGradients ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Gradient > >
+		SchemePresetCollection< Gradient >
 	>( 'color.dark.gradients', name );
 	const [ userDarkGradients ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Gradient > >
+		SchemePresetCollection< Gradient >
 	>( 'color.dark.gradients', name, 'user' );
 
-	const namedLightGradients = addBasePresetNames(
-		flattenSchemePresets( lightGradients ),
-		themeGradients
+	const normalizedLightGradients = normalizeColorSchemePresets(
+		themeGradients,
+		lightGradients
 	);
-	const namedDarkGradients = addBasePresetNames(
-		flattenSchemePresets( darkGradients ),
-		themeGradients
+	const normalizedDarkGradients = normalizeColorSchemePresets(
+		themeGradients,
+		darkGradients
 	);
-	const hasLightGradients = namedLightGradients.length > 0;
-	const hasDarkGradients = namedDarkGradients.length > 0;
+	const hasLightGradients =
+		lightScheme !== undefined && normalizedLightGradients.length > 0;
+	const hasDarkGradients =
+		darkScheme !== undefined && normalizedDarkGradients.length > 0;
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultGradients',
@@ -105,7 +114,7 @@ export default function GradientPalettePanel( {
 									{
 										canReset:
 											userLightGradients !== undefined,
-										gradients: namedLightGradients,
+										gradients: normalizedLightGradients,
 										onChange: setLightGradients,
 										paletteIcon: (
 											<SchemePaletteIcon scheme="light" />
@@ -119,7 +128,7 @@ export default function GradientPalettePanel( {
 									{
 										canReset:
 											userDarkGradients !== undefined,
-										gradients: namedDarkGradients,
+										gradients: normalizedDarkGradients,
 										onChange: setDarkGradients,
 										paletteIcon: (
 											<SchemePaletteIcon scheme="dark" />

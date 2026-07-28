@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
+import useColorSchemePresets from '../colors-gradients/use-color-scheme-presets';
 
 export function __experimentalGetGradientClass( gradientSlug ) {
 	if ( ! gradientSlug ) {
@@ -69,13 +70,21 @@ function useGradient( {
 		'color.gradients.theme',
 		'color.gradients.default'
 	);
+	const { presets: currentThemeGradientPalette } = useColorSchemePresets(
+		'gradients',
+		themeGradientPalette
+	);
 	const allGradients = useMemo(
 		() => [
 			...( userGradientPalette || [] ),
-			...( themeGradientPalette || [] ),
+			...( currentThemeGradientPalette || [] ),
 			...( defaultGradientPalette || [] ),
 		],
-		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
+		[
+			userGradientPalette,
+			currentThemeGradientPalette,
+			defaultGradientPalette,
+		]
 	);
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
@@ -108,7 +117,13 @@ function useGradient( {
 				[ customGradientAttribute ]: newGradientValue,
 			} );
 		},
-		[ allGradients, clientId, updateBlockAttributes ]
+		[
+			allGradients,
+			clientId,
+			customGradientAttribute,
+			gradientAttribute,
+			updateBlockAttributes,
+		]
 	);
 
 	const gradientClass = __experimentalGetGradientClass( gradient );

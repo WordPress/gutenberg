@@ -20,6 +20,7 @@ import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
+import { extractPresetSlug } from '../../utils/color-values';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
 	getInheritanceProps,
@@ -111,9 +112,23 @@ export default function BorderPanel( {
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
+	);
 	const decodeValue = useCallback(
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
+	);
+	const decodeColorValue = useCallback(
+		( rawValue ) => {
+			const slug = extractPresetSlug( rawValue, 'color' );
+			return (
+				allColors.find( ( color ) => color.slug === slug )?.color ??
+				decodeValue( rawValue )
+			);
+		},
+		[ allColors, decodeValue ]
 	);
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
@@ -124,9 +139,6 @@ export default function BorderPanel( {
 			className
 		);
 	const encodeColorValue = ( colorValue ) => {
-		const allColors = colors.flatMap(
-			( { colors: originColors } ) => originColors
-		);
 		const colorObject = allColors.find(
 			( { color } ) => color === colorValue
 		);
@@ -145,17 +157,19 @@ export default function BorderPanel( {
 				[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
 					out[ side ] = {
 						...out[ side ],
-						color: decodeValue( out[ side ]?.color ),
+						color: decodeColorValue( out[ side ]?.color ),
 					};
 				} );
 				return out;
 			}
 			return {
 				...source,
-				color: source.color ? decodeValue( source.color ) : undefined,
+				color: source.color
+					? decodeColorValue( source.color )
+					: undefined,
 			};
 		},
-		[ decodeValue ]
+		[ decodeColorValue ]
 	);
 	// Local-then-inherited: prefer the user's locally-set border (whether
 	// flat or split) when defined, otherwise fall back to the inherited

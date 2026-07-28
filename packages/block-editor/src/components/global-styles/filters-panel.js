@@ -22,8 +22,12 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
+import { useMediaQuery } from '@wordpress/compose';
 import { reset as resetIcon } from '@wordpress/icons';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import {
+	getValueFromVariable,
+	normalizeColorSchemePresets,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -49,13 +53,26 @@ function useMultiOriginColorPresets(
 		settings?.color?.[ presetSetting ]?.theme || EMPTY_ARRAY;
 	const defaultPresets =
 		settings?.color?.[ presetSetting ]?.default || EMPTY_ARRAY;
+	const lightPresets = settings?.color?.light?.[ presetSetting ];
+	const darkPresets = settings?.color?.dark?.[ presetSetting ];
+	const prefersLight = useMediaQuery( '(prefers-color-scheme: light)' );
+	const prefersDark = useMediaQuery( '(prefers-color-scheme: dark)' );
+	const currentThemePresets = useMemo( () => {
+		if ( prefersDark && darkPresets !== undefined ) {
+			return normalizeColorSchemePresets( themePresets, darkPresets );
+		}
+		if ( prefersLight && lightPresets !== undefined ) {
+			return normalizeColorSchemePresets( themePresets, lightPresets );
+		}
+		return themePresets;
+	}, [ darkPresets, lightPresets, prefersDark, prefersLight, themePresets ] );
 	return useMemo(
 		() => [
 			...userPresets,
-			...themePresets,
+			...currentThemePresets,
 			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
 		],
-		[ disableDefault, userPresets, themePresets, defaultPresets ]
+		[ currentThemePresets, defaultPresets, disableDefault, userPresets ]
 	);
 }
 
@@ -189,8 +206,19 @@ export default function FiltersPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const decodeValue = ( rawValue ) => {
+		const duotonePrefix = 'var:preset|duotone|';
+		if ( rawValue?.startsWith?.( duotonePrefix ) ) {
+			const slug = rawValue.slice( duotonePrefix.length );
+			const preset = duotonePalette.find(
+				( duotone ) => duotone.slug === slug
+			);
+			if ( preset ) {
+				return preset.colors;
+			}
+		}
+		return getValueFromVariable( { settings }, '', rawValue );
+	};
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>

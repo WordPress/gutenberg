@@ -21,6 +21,8 @@ import {
 	getGradientValueBySlug,
 } from '../components/gradients';
 import { useSettings } from '../components/use-settings';
+import useColorSchemePresets from '../components/colors-gradients/use-color-scheme-presets';
+import { getNamedPresetStyleValue } from '../utils/color-values';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -102,22 +104,28 @@ export function useColorProps( attributes ) {
 		'color.gradients.theme',
 		'color.gradients.default'
 	);
+	const { presets: currentThemePalette, hasColorSchemes } =
+		useColorSchemePresets( 'palette', themePalette );
+	const {
+		presets: currentThemeGradients,
+		hasColorSchemes: hasGradientColorSchemes,
+	} = useColorSchemePresets( 'gradients', themeGradients );
 
 	const colors = useMemo(
 		() => [
 			...( userPalette || [] ),
-			...( themePalette || [] ),
+			...( currentThemePalette || [] ),
 			...( defaultPalette || [] ),
 		],
-		[ userPalette, themePalette, defaultPalette ]
+		[ userPalette, currentThemePalette, defaultPalette ]
 	);
 	const gradients = useMemo(
 		() => [
 			...( userGradients || [] ),
-			...( themeGradients || [] ),
+			...( currentThemeGradients || [] ),
 			...( defaultGradients || [] ),
 		],
-		[ userGradients, themeGradients, defaultGradients ]
+		[ userGradients, currentThemeGradients, defaultGradients ]
 	);
 
 	const colorProps = getColorClassesAndStyles( attributes );
@@ -130,13 +138,20 @@ export function useColorProps( attributes ) {
 			backgroundColor
 		);
 
-		colorProps.style.backgroundColor = backgroundColorObject.color;
+		colorProps.style.backgroundColor = getNamedPresetStyleValue(
+			'color',
+			backgroundColor,
+			backgroundColorObject.color,
+			hasColorSchemes
+		);
 	}
 
 	if ( gradient ) {
-		colorProps.style.background = getGradientValueBySlug(
-			gradients,
-			gradient
+		colorProps.style.background = getNamedPresetStyleValue(
+			'gradient',
+			gradient,
+			getGradientValueBySlug( gradients, gradient ),
+			hasGradientColorSchemes
 		);
 	}
 
@@ -146,7 +161,12 @@ export function useColorProps( attributes ) {
 			textColor
 		);
 
-		colorProps.style.color = textColorObject.color;
+		colorProps.style.color = getNamedPresetStyleValue(
+			'color',
+			textColor,
+			textColorObject.color,
+			hasColorSchemes
+		);
 	}
 
 	return colorProps;

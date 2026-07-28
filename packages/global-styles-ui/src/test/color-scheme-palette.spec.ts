@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import {
-	addBasePresetNames,
 	flattenSchemePresets,
+	normalizeColorSchemePresets,
 } from '../color-scheme-palette';
 
 describe( 'flattenSchemePresets', () => {
@@ -26,22 +26,31 @@ describe( 'flattenSchemePresets', () => {
 	} );
 } );
 
-describe( 'addBasePresetNames', () => {
-	it( 'uses the matching base preset name when a scheme omits it', () => {
+describe( 'normalizeColorSchemePresets', () => {
+	it( 'creates a complete alternative palette in base order', () => {
 		expect(
-			addBasePresetNames(
-				[ { slug: 'base', color: '#111' } ],
-				[ { slug: 'base', name: 'Base', color: '#fff' } ]
+			normalizeColorSchemePresets(
+				[
+					{ slug: 'base', name: 'Base', color: '#fff' },
+					{ slug: 'accent', name: 'Accent', color: '#f00' },
+				],
+				[ { slug: 'base', color: '#111' } ]
 			)
-		).toEqual( [ { slug: 'base', name: 'Base', color: '#111' } ] );
+		).toEqual( [
+			{ slug: 'base', name: 'Base', color: '#111' },
+			{ slug: 'accent', name: 'Accent', color: '#f00' },
+		] );
 	} );
 
-	it( 'preserves a scheme-specific name', () => {
+	it( 'uses base identity and ignores unmatched alternative presets', () => {
 		expect(
-			addBasePresetNames(
-				[ { slug: 'base', name: 'Night base', color: '#111' } ],
-				[ { slug: 'base', name: 'Base', color: '#fff' } ]
+			normalizeColorSchemePresets(
+				[ { slug: 'base', name: 'Base', color: '#fff' } ],
+				[
+					{ slug: 'base', name: 'Night base', color: '#111' },
+					{ slug: 'unknown', color: '#f0f' },
+				]
 			)
-		).toEqual( [ { slug: 'base', name: 'Night base', color: '#111' } ] );
+		).toEqual( [ { slug: 'base', name: 'Base', color: '#111' } ] );
 	} );
 } );
