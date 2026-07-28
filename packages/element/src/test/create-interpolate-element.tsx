@@ -76,16 +76,12 @@ describe( 'createInterpolateElement', () => {
 	it( 'returns same string and warns when there is an unmatched closing tag', () => {
 		const testString = 'This is a </item> string';
 		const expectedElement = <>{ testString }</>;
-		const consoleWarn = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		expect(
 			createInterpolateElement( testString, { item: <em /> } )
 		).toEqual( expectedElement );
-		expect( consoleWarn ).toHaveBeenCalledWith(
-			expect.stringContaining( "Unmatched closing tag '</item>'" )
+		expect( console ).toHaveWarnedWith(
+			`Unmatched closing tag '</item>' found in string passed to createInterpolateElement. The string was returned without interpolation.`
 		);
-		consoleWarn.mockRestore();
 	} );
 	it( 'returns expected react element for non nested components', () => {
 		const testString = 'This is a string with <a>a link</a>.';
