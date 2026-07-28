@@ -185,7 +185,7 @@ function example_filter_page_view_config( $data ) {
 add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
 ```
 
-However, this code uses `replace` to substite the list of visible fields to just `date`:
+However, this code uses `replace` to substitute the list of visible fields to just `date`:
 
 ```php
 function example_filter_page_view_config( $data ) {
