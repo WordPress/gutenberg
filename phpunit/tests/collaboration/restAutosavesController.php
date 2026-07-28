@@ -32,6 +32,34 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		wp_set_current_user( self::$author_id );
 	}
 
+	public function test_does_not_override_autosaves_controller_when_collaboration_is_disabled() {
+		update_option( 'wp_collaboration_enabled', 0 );
+
+		$args = gutenberg_override_autosaves_rest_controller( array() );
+
+		$this->assertArrayNotHasKey( 'autosave_rest_controller_class', $args );
+	}
+
+	public function test_overrides_autosaves_controller_when_collaboration_is_enabled() {
+		$args = gutenberg_override_autosaves_rest_controller( array() );
+
+		$this->assertSame(
+			'Gutenberg_REST_Autosaves_Controller',
+			$args['autosave_rest_controller_class']
+		);
+	}
+
+	public function test_does_not_override_explicit_autosaves_controller() {
+		$args = gutenberg_override_autosaves_rest_controller(
+			array( 'autosave_rest_controller_class' => 'Custom_REST_Autosaves_Controller' )
+		);
+
+		$this->assertSame(
+			'Custom_REST_Autosaves_Controller',
+			$args['autosave_rest_controller_class']
+		);
+	}
+
 	/**
 	 * Creates an empty auto-draft post.
 	 *
@@ -69,7 +97,7 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Dispatches an autosave request for a post.
+	 * Handles an autosave request with the Gutenberg controller.
 	 *
 	 * @param int    $post_id Post ID.
 	 * @param string $title   Autosaved post title.
@@ -79,14 +107,32 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	 */
 	private function dispatch_autosave( int $post_id, string $title, string $content, array $meta = array() ): WP_REST_Response {
 		$request = new WP_REST_Request( 'POST', "/wp/v2/posts/{$post_id}/autosaves" );
-		$request->set_param( 'title', $title );
-		$request->set_param( 'content', $content );
-		$request->set_param( 'status', 'draft' );
+		$request->set_url_params( array( 'id' => $post_id ) );
+		$body_params = array(
+			'title'   => $title,
+			'content' => $content,
+			'status'  => 'draft',
+		);
 		if ( ! empty( $meta ) ) {
-			$request->set_param( 'meta', $meta );
+			$body_params['meta'] = $meta;
+		}
+		$request->set_body_params( $body_params );
+
+		/*
+		 * Individual tests toggle RTC after post types have been registered and
+		 * their autosave controller classes selected. Changing the option does
+		 * not update that selection, so REST dispatch may exercise the wrong
+		 * implementation for the test state. Invoke the Gutenberg controller
+		 * directly and normalize its response as the REST server would.
+		 */
+		$controller = new Gutenberg_REST_Autosaves_Controller( 'post' );
+		$response   = $controller->create_item( $request );
+
+		if ( is_wp_error( $response ) ) {
+			return rest_convert_error_to_response( $response );
 		}
 
-		return rest_get_server()->dispatch( $request );
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -282,38 +328,21 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_autosave_delegates_to_core_controller_without_collaboration() {
+	public function test_custom_controller_delegates_to_core_when_collaboration_is_disabled() {
 		update_option( 'wp_collaboration_enabled', 0 );
 
-		$title   = 'Published title';
-		$content = '<!-- wp:paragraph --><p>Published content</p><!-- /wp:paragraph -->';
-		$post_id = self::factory()->post->create(
-			array(
-				'post_author'  => self::$author_id,
-				'post_content' => $content,
-				'post_status'  => 'publish',
-				'post_title'   => $title,
-				'post_type'    => 'post',
-			)
-		);
-
-		$this->dispatch_autosave(
-			$post_id,
-			'Autosaved title',
-			'<!-- wp:paragraph --><p>Autosaved content</p><!-- /wp:paragraph -->'
-		);
-		$existing_autosave = wp_get_post_autosave( $post_id, self::$author_id );
-		$this->assertInstanceOf( WP_Post::class, $existing_autosave );
+		$post_id = $this->create_draft( 'Original title', 'Original content' );
+		$title   = 'Updated title';
+		$content = '<!-- wp:paragraph --><p>Updated content</p><!-- /wp:paragraph -->';
 
 		$response = $this->dispatch_autosave( $post_id, $title, $content );
 
-		/*
-		 * Core returns the existing autosave when the submitted content matches
-		 * the parent. Gutenberg's RTC-specific no-op handling would return the
-		 * parent post instead.
-		 */
 		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( $existing_autosave->ID, $response->get_data()['id'] );
+		$this->assertSame( $title, get_post( $post_id )->post_title );
+		$this->assertFalse(
+			wp_get_post_autosave( $post_id, self::$author_id ),
+			'Core should update the author draft directly instead of creating an RTC revision.'
+		);
 	}
 
 	public function test_autosave_compares_against_parent_when_parent_is_newer_than_latest_revision() {
