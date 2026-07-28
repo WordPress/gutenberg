@@ -63,8 +63,8 @@ export const WithHelpText: Story = {
 };
 
 /**
- * When adding a visual aid, prefer placing it on the opposite end of the toggle,
- * rather than directly preceding the label.
+ * When adding a visual aid, prefer placing it at the trailing end of the row,
+ * rather than placing it directly before the label, or moving the toggle to the trailing end.
  */
 export const WithVisual: Story = {
 	...Default,
