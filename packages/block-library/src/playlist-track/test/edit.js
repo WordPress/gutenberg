@@ -199,7 +199,7 @@ describe( 'PlaylistTrackEdit', () => {
 		const addTracks = jest.fn();
 		renderEdit( { addTracks } );
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
 
 		expect( addTracks ).toHaveBeenCalledWith( {} );
 	} );
@@ -216,7 +216,7 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
 				'button',
-				{ name: 'Add track' }
+				{ name: 'Add' }
 			)
 		).toBeInTheDocument();
 	} );

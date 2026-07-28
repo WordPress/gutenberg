@@ -152,7 +152,8 @@ function render_block_core_template_part( $attributes ) {
 	// Run through the actions that are typically taken on the_content.
 	$content = _wp_apply_block_content_filters( $content, "template_part_{$area}", $seen_ids, $template_part_id );
 
-	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
+	$tag_name = $attributes['tagName'] ?? null;
+	if ( empty( $tag_name ) || ! is_string( $tag_name ) || tag_escape( $tag_name ) !== $tag_name ) {
 		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];

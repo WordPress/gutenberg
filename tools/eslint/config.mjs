@@ -486,6 +486,20 @@ export default dedupePlugins( [
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
 		],
+		rules: {
+			...jestPlugin.configs[ 'flat/recommended' ].rules,
+			/*
+			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
+			 * so the docblock pragma is redundant.
+			 */
+			'no-warning-comments': [
+				'error',
+				{
+					terms: [ '@jest-environment jsdom' ],
+					location: 'anywhere',
+				},
+			],
+		},
 	},
 
 	// Override: E2E test files (non-Playwright).
@@ -639,10 +653,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [
-			'packages/components/src/utils/colors-values.js',
-			'packages/components/src/theme/**',
-		],
+		ignores: [ 'packages/components/src/utils/colors-values.js' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',

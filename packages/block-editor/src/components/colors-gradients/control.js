@@ -45,6 +45,7 @@ function ColorGradientControlInner( {
 	colorValue,
 	colorSlug,
 	gradientValue,
+	gradientSlug,
 	clearable,
 	showTitle = true,
 	enableAlpha,
@@ -102,13 +103,15 @@ function ColorGradientControlInner( {
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
 				value={ gradientValue }
+				selectedSlug={ gradientSlug }
 				onChange={
 					canChooseAColor
-						? ( newGradient ) => {
-								onGradientChange( newGradient );
+						? ( newGradient, _index, newSlug ) => {
+								onGradientChange( newGradient, newSlug );
 								onColorChange();
 						  }
-						: onGradientChange
+						: ( newGradient, _index, newSlug ) =>
+								onGradientChange( newGradient, newSlug )
 				}
 				{ ...{ gradients, disableCustomGradients } }
 				__experimentalIsRenderedInSidebar={
