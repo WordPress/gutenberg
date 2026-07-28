@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
+    -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
+-   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
+
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
+-   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
 
 ### Bug Fixes
 
@@ -28,6 +36,7 @@
 
 ### Internal
 
+-   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).

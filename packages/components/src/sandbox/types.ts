@@ -11,6 +11,17 @@ export type SandBoxProps = {
 	 */
 	allowSameOrigin?: boolean;
 	/**
+	 * Whether to include `allow-popups` in the iframe's sandbox attribute.
+	 * When true, content inside the iframe is allowed to open new browsing
+	 * contexts (e.g. links that open in a new tab, or `window.open`).
+	 *
+	 * Enable this for previews whose content includes links that should be
+	 * followable, such as embeds.
+	 *
+	 * @default false
+	 */
+	allowPopups?: boolean;
+	/**
 	 * The HTML to render in the body of the iframe document.
 	 *
 	 * @default ''
