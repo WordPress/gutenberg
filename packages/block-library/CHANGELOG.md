@@ -7,6 +7,7 @@
 -   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
 -   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
+-   Table of Contents: Render the editor preview on the server to match the front end.
 
 ### Bug Fixes
 
