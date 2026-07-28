@@ -124,10 +124,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		const suppressNativePopover = ( event: Event ) => {
 			event.preventDefault();
 
-			// Synthetic `invalid` events are dispatched programmatically to
-			// reveal error messages without interrupting the user, so they
-			// must not move focus. Only trusted events (a form submission or
-			// a `reportValidity()` call) mirror the native focus behavior.
+			// Only trusted `invalid` events (a form submission or a
+			// `reportValidity()` call) mirror the native focus behavior.
+			// Consumers may dispatch a synthetic `invalid` event to reveal
+			// this control's error message without disturbing the user's
+			// place in the form, so it must not move focus.
 			if ( ! event.isTrusted ) {
 				return;
 			}
