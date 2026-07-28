@@ -598,10 +598,7 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
  * The snapshot describes the document state the autosave captured. The editor
  * verifies its own shared document against it, and suppresses the "there is a
  * more recent autosave" notice when the shared document already contains
- * everything the autosave holds. The setting is omitted whenever no snapshot
- * was stored, so the editor falls back to showing the notice.
- *
- * @since 7.3.0
+ * everything the autosave holds.
  *
  * @param array                   $settings             Editor settings.
  * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
