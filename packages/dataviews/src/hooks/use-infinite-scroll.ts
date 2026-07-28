@@ -14,60 +14,6 @@ import { throttle } from '@wordpress/compose';
  */
 import type { View } from '../types';
 
-/**
- * Captures an anchor element for scroll position preservation.
- * Finds the element closest to the center of the viewport and stores its position.
- *
- * @param container        The scrollable container element.
- * @param anchorElementRef Ref to store the anchor element data.
- * @param direction        The scroll direction ('up' or 'down').
- * @return Whether an anchor element was successfully captured.
- */
-function captureAnchorElement(
-	container: HTMLElement,
-	anchorElementRef: React.MutableRefObject< {
-		posinset: number;
-		viewportOffset: number;
-		scrollTop: number;
-		direction: 'up' | 'down' | null;
-	} | null >,
-	direction: 'up' | 'down'
-): boolean {
-	// Find a visible element to use as anchor - prefer one in the middle of the viewport
-	const containerRect = container.getBoundingClientRect();
-	const centerY = containerRect.top + containerRect.height / 2;
-
-	// Query all items with aria-posinset and find the one closest to center
-	const items = Array.from( container.querySelectorAll( '[aria-posinset]' ) );
-
-	if ( items.length === 0 ) {
-		return false;
-	}
-
-	// Find the item closest to the center of the viewport
-	const bestAnchor = items.reduce( ( best, item ) => {
-		const itemRect = item.getBoundingClientRect();
-		const itemCenterY = itemRect.top + itemRect.height / 2;
-		const distance = Math.abs( itemCenterY - centerY );
-
-		const bestRect = best.getBoundingClientRect();
-		const bestCenterY = bestRect.top + bestRect.height / 2;
-		const bestDistance = Math.abs( bestCenterY - centerY );
-
-		return distance < bestDistance ? item : best;
-	} );
-
-	const posinset = Number( bestAnchor.getAttribute( 'aria-posinset' ) );
-	const anchorRect = bestAnchor.getBoundingClientRect();
-	anchorElementRef.current = {
-		posinset,
-		viewportOffset: anchorRect.top - containerRect.top,
-		scrollTop: container.scrollTop,
-		direction,
-	};
-	return true;
-}
-
 type UseInfiniteScrollProps = {
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -92,18 +38,13 @@ export function useInfiniteScroll( {
 	containerRef,
 	setVisibleEntries,
 }: UseInfiniteScrollProps ): UseInfiniteScrollResult {
-	// Track an anchor element for scroll position preservation
-	// This approach is robust even when items are added/removed from both ends simultaneously
-	const anchorElementRef = useRef< {
-		posinset: number;
-		viewportOffset: number;
-		scrollTop: number;
-		direction: 'up' | 'down' | null;
-	} | null >( null );
 	const viewRef = useRef( view );
 	const isLoadingRef = useRef( isLoading );
 	const onChangeViewRef = useRef( onChangeView );
 	const totalItemsRef = useRef( paginationInfo.totalItems );
+	// Position of the first rendered item when an earlier page is requested.
+	// Native scroll anchoring handles prepends except at scrollTop 0.
+	const prependAnchorRef = useRef< number | null >( null );
 
 	useLayoutEffect( () => {
 		viewRef.current = view;
@@ -152,47 +93,62 @@ export function useInfiniteScroll( {
 			[ setVisibleEntries ]
 		);
 
-	// Preserve scroll position when items are added or removed during infinite scroll
-	// Uses anchor element approach: find the same element after render and restore its viewport position
+	// The browser's native scroll anchoring preserves the viewport when pages
+	// load and the observer unloads offscreen items. Applying another
+	// JavaScript adjustment here would double-compensate those removals.
+	//
+	// Native anchoring is suppressed at scrollTop 0, so handle only the case
+	// where an earlier page is prepended while the user remains at the top.
 	useLayoutEffect( () => {
 		const container = containerRef.current;
-		const anchor = anchorElementRef.current;
+		const anchorPosinset = prependAnchorRef.current;
 
 		if (
 			! container ||
 			! view.infiniteScrollEnabled ||
-			! anchor ||
-			isLoading
+			isLoading ||
+			anchorPosinset === null
 		) {
 			return;
 		}
 
-		// Find the anchor element by its posinset
-		const anchorElement = container.querySelector(
-			`[aria-posinset="${ anchor.posinset }"]`
-		);
+		const firstItem = container.querySelector( '[aria-posinset]' );
+		const firstPosinset = firstItem
+			? Number( firstItem.getAttribute( 'aria-posinset' ) )
+			: null;
 
-		if ( anchorElement ) {
-			const containerRect = container.getBoundingClientRect();
-			const anchorRect = anchorElement.getBoundingClientRect();
-			const currentOffset = anchorRect.top - containerRect.top;
-
-			// Compensate only for the content shift, not for scrolling the user
-			// did during an async load. Adding back the scroll delta since capture
-			// keeps the list from snapping back to the capture-time position.
-			const scrollAdjustment =
-				currentOffset -
-				anchor.viewportOffset +
-				( container.scrollTop - anchor.scrollTop );
-
-			if ( Math.abs( scrollAdjustment ) > 1 ) {
-				container.scrollTop += scrollAdjustment;
-			}
+		// The prepended page has not rendered yet.
+		if ( firstPosinset === null || firstPosinset >= anchorPosinset ) {
+			return;
 		}
 
-		// Reset the anchor state now that we've adjusted
-		anchorElementRef.current = null;
-	}, [ containerRef, isLoading, view.infiniteScrollEnabled ] );
+		prependAnchorRef.current = null;
+
+		// Away from the top, native anchoring already compensated the prepend.
+		if ( container.scrollTop > 2 ) {
+			return;
+		}
+
+		const anchorElement = container.querySelector(
+			`[aria-posinset="${ anchorPosinset }"]`
+		);
+		if ( ! anchorElement ) {
+			return;
+		}
+
+		const prependedHeight =
+			anchorElement.getBoundingClientRect().top -
+			container.getBoundingClientRect().top;
+
+		if ( prependedHeight > 1 ) {
+			container.scrollTop += prependedHeight;
+		}
+	}, [
+		containerRef,
+		isLoading,
+		view.infiniteScrollEnabled,
+		view.startPosition,
+	] );
 
 	// Create and expose a shared IntersectionObserver for provider-level reuse.
 	const intersectionObserverRef = useRef< IntersectionObserver | null >(
@@ -264,9 +220,6 @@ export function useInfiniteScroll( {
 				if ( currentEndPosition < totalItems ) {
 					const newStartPosition = currentEndPosition;
 
-					// Capture anchor element for scroll position preservation
-					captureAnchorElement( target, anchorElementRef, 'down' );
-
 					onChangeViewRef.current( {
 						...currentView,
 						startPosition: newStartPosition,
@@ -286,8 +239,10 @@ export function useInfiniteScroll( {
 							? 1
 							: calculatedStartPosition;
 
-					// Capture anchor element for scroll position preservation
-					captureAnchorElement( target, anchorElementRef, 'up' );
+					const firstItem = target.querySelector( '[aria-posinset]' );
+					prependAnchorRef.current = firstItem
+						? Number( firstItem.getAttribute( 'aria-posinset' ) )
+						: null;
 
 					onChangeViewRef.current( {
 						...currentView,

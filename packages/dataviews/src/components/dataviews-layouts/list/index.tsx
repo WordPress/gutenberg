@@ -43,6 +43,7 @@ import type {
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import type { SelectionProps } from '../utils/use-selection-props';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -163,6 +164,7 @@ function ListItem< Item >( {
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
+	useIntersectionObserver( itemRef, posinset );
 
 	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -640,8 +642,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 				className={ listClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 			>
-				{ data.map( ( item, index ) => {
+				{ data.map( ( item ) => {
 					const id = generateCompositeItemIdPrefix( item );
+					const { position: posinset } = item as {
+						position?: number;
+					};
 					return (
 						<ListItem
 							key={ id }
@@ -660,11 +665,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 							onDropdownTriggerKeyDown={
 								onDropdownTriggerKeyDown
 							}
-							posinset={
-								view.infiniteScrollEnabled
-									? index + 1
-									: undefined
-							}
+							posinset={ isInfiniteScroll ? posinset : undefined }
 						/>
 					);
 				} ) }

@@ -18,6 +18,7 @@ import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -219,6 +220,10 @@ export const Default = ( {
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],

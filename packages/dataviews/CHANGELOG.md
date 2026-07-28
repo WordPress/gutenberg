@@ -6,9 +6,11 @@
 
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
+-   DataViews: Unload offscreen infinite-scroll items in the list, table, and activity layouts.
 
 ### Bug Fix
 
+-   DataViewsPicker: Prevent the activity layout from creating an outer scrollbar.
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)

@@ -13,6 +13,7 @@ import {
 	useContext,
 	useEffect,
 	useId,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -43,6 +44,7 @@ import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -64,6 +66,98 @@ interface TableColumnFieldProps< Item > {
 	column: string;
 	item: Item;
 	align?: 'start' | 'center' | 'end';
+}
+
+/**
+ * Table rows are not reliable native scroll anchors. Track the row closest to
+ * the viewport center on every scroll and restore it after observer-driven
+ * data changes.
+ *
+ * @param containerRef     The DataViews scroll container.
+ * @param data             The currently rendered table data.
+ * @param isInfiniteScroll Whether infinite scroll is active.
+ */
+function useTableScrollAnchor< Item >(
+	containerRef: React.RefObject< HTMLDivElement | null >,
+	data: Item[],
+	isInfiniteScroll: boolean
+) {
+	const anchorRef = useRef< {
+		posinset: number;
+		viewportOffset: number;
+	} | null >( null );
+
+	useEffect( () => {
+		const container = containerRef.current;
+		if ( ! container || ! isInfiniteScroll ) {
+			anchorRef.current = null;
+			return;
+		}
+
+		const captureAnchor = () => {
+			const containerRect = container.getBoundingClientRect();
+			const centerY = containerRect.top + containerRect.height / 2;
+			const items = Array.from(
+				container.querySelectorAll( '[aria-posinset]' )
+			).filter( ( item ) => {
+				const itemRect = item.getBoundingClientRect();
+				return (
+					itemRect.bottom > containerRect.top &&
+					itemRect.top < containerRect.bottom
+				);
+			} );
+
+			if ( ! items.length ) {
+				return;
+			}
+
+			const anchor = items.reduce( ( closest, item ) => {
+				const itemRect = item.getBoundingClientRect();
+				const closestRect = closest.getBoundingClientRect();
+				const distance = Math.abs(
+					itemRect.top + itemRect.height / 2 - centerY
+				);
+				const closestDistance = Math.abs(
+					closestRect.top + closestRect.height / 2 - centerY
+				);
+				return distance < closestDistance ? item : closest;
+			} );
+
+			anchorRef.current = {
+				posinset: Number( anchor.getAttribute( 'aria-posinset' ) ),
+				viewportOffset:
+					anchor.getBoundingClientRect().top - containerRect.top,
+			};
+		};
+
+		captureAnchor();
+		container.addEventListener( 'scroll', captureAnchor );
+		return () => container.removeEventListener( 'scroll', captureAnchor );
+	}, [ containerRef, isInfiniteScroll ] );
+
+	useLayoutEffect( () => {
+		const container = containerRef.current;
+		const anchor = anchorRef.current;
+		if ( ! container || ! isInfiniteScroll || ! anchor ) {
+			return;
+		}
+
+		const anchorElement = container.querySelector(
+			`[aria-posinset="${ anchor.posinset }"]`
+		);
+		if ( ! anchorElement ) {
+			return;
+		}
+
+		const currentOffset =
+			anchorElement.getBoundingClientRect().top -
+			container.getBoundingClientRect().top;
+		const scrollAdjustment = currentOffset - anchor.viewportOffset;
+
+		if ( Math.abs( scrollAdjustment ) > 1 ) {
+			container.scrollTop += scrollAdjustment;
+		}
+	}, [ containerRef, data, isInfiniteScroll ] );
 }
 
 interface TableRowProps< Item > {
@@ -148,6 +242,8 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
+	const rowRef = useRef< HTMLTableRowElement >( null );
+	useIntersectionObserver( rowRef, posinset );
 	const columns = view.fields ?? [];
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -156,6 +252,7 @@ function TableRow< Item >( {
 
 	return (
 		<tr
+			ref={ rowRef }
 			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -284,6 +381,8 @@ function ViewTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = !! view.infiniteScrollEnabled && ! dataByGroup;
+	useTableScrollAnchor( containerRef, data, isInfiniteScroll );
 	// When grouping is enabled the rendered order is by group rather than the
 	// order of `data`; ranges follow what the user sees.
 	const orderedData = dataByGroup
@@ -388,7 +487,6 @@ function ViewTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
 	if ( ! hasData ) {
 		return (
@@ -645,6 +743,9 @@ function ViewTable< Item >( {
 							data.map( ( item, index ) => {
 								const id =
 									getItemId( item ) || index.toString();
+								const { position: posinset } = item as {
+									position?: number;
+								};
 								return (
 									<TableRow
 										key={ getItemId( item ) }
@@ -675,7 +776,7 @@ function ViewTable< Item >( {
 										}
 										posinset={
 											isInfiniteScroll
-												? index + 1
+												? posinset
 												: undefined
 										}
 									/>
