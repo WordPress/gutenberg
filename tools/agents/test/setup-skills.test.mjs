@@ -20,6 +20,7 @@ const execFileAsync = promisify( execFile );
 const setupScript = fileURLToPath(
 	new URL( '../setup-skills.mjs', import.meta.url )
 );
+const targetSkillPath = path.join( '.claude', 'skills', 'testing' );
 
 async function createRepository() {
 	const repositoryRoot = await mkdtemp(
@@ -49,7 +50,7 @@ test( 'links each canonical skill into the Claude directory', async ( t ) => {
 	assert.deepEqual( result, {
 		conflicts: [],
 		copied: [],
-		linked: [ '.claude/skills/testing' ],
+		linked: [ targetSkillPath ],
 	} );
 	assert.equal(
 		await readFile(
@@ -68,7 +69,7 @@ test( 'runs the setup command when executed directly', async ( t ) => {
 		cwd: repositoryRoot,
 	} );
 
-	assert.equal( stdout, 'Linked: .claude/skills/testing\n' );
+	assert.equal( stdout, `Linked: ${ targetSkillPath }\n` );
 	assert.equal(
 		await readFile(
 			path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
@@ -107,7 +108,7 @@ test( 'replaces links generated from the former skills directory', async ( t ) =
 	await rm( oldSkillDirectory, { recursive: true, force: true } );
 	const result = await setupSkills( { repositoryRoot } );
 
-	assert.deepEqual( result.linked, [ '.claude/skills/testing' ] );
+	assert.deepEqual( result.linked, [ targetSkillPath ] );
 	assert.equal(
 		await readFile( path.join( target, 'SKILL.md' ), 'utf8' ),
 		'---\nname: testing\n'
@@ -127,7 +128,7 @@ test( 'copies when links are unavailable and refreshes only managed copies', asy
 		repositoryRoot,
 		createLink: unavailableLinks,
 	} );
-	assert.deepEqual( firstResult.copied, [ '.claude/skills/testing' ] );
+	assert.deepEqual( firstResult.copied, [ targetSkillPath ] );
 
 	await writeFile(
 		path.join( repositoryRoot, '.agents/skills/testing/SKILL.md' ),
@@ -138,7 +139,7 @@ test( 'copies when links are unavailable and refreshes only managed copies', asy
 		createLink: unavailableLinks,
 	} );
 
-	assert.deepEqual( refreshedResult.copied, [ '.claude/skills/testing' ] );
+	assert.deepEqual( refreshedResult.copied, [ targetSkillPath ] );
 	assert.equal(
 		await readFile(
 			path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
@@ -163,7 +164,7 @@ test( 'leaves an existing unmanaged skill untouched', async ( t ) => {
 	);
 	const result = await setupSkills( { repositoryRoot } );
 
-	assert.deepEqual( result.conflicts, [ '.claude/skills/testing' ] );
+	assert.deepEqual( result.conflicts, [ targetSkillPath ] );
 	assert.equal(
 		await readFile( path.join( unmanagedSkill, 'SKILL.md' ), 'utf8' ),
 		'personal skill\n'
