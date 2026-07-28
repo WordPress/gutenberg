@@ -1314,4 +1314,68 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'The child layout should be emitted inside the mobile media query.'
 		);
 	}
+
+	/**
+	 * Tests that a child layout under a breakpoint the theme does not define is
+	 * dropped, leaving the block content untouched.
+	 *
+	 * Child layouts are collected from the full set of possible style state
+	 * keys before global settings are known, so the ones the theme has no
+	 * breakpoint for have to be discarded once the settings arrive.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_drops_child_layout_for_an_undefined_breakpoint() {
+		switch_theme( 'default' );
+
+		// A theme that defines a tablet breakpoint but no mobile one.
+		add_filter(
+			'wp_theme_json_data_theme',
+			static function ( $theme_json ) {
+				return $theme_json->update_with(
+					array(
+						'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+						'settings' => array(
+							'viewport' => array( 'tablet' => '900px' ),
+						),
+					)
+				);
+			}
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		try {
+			$block_content = '<p>Grid child</p>';
+			$block         = array(
+				'blockName'    => 'core/paragraph',
+				'attrs'        => array(
+					'style' => array(
+						'@mobile' => array(
+							'layout' => array( 'columnSpan' => '2' ),
+						),
+					),
+				),
+				'parentLayout' => array(
+					'type'        => 'grid',
+					'columnCount' => 3,
+				),
+				'innerBlocks'  => array(),
+				'innerHTML'    => $block_content,
+				'innerContent' => array( $block_content ),
+			);
+
+			$this->assertSame(
+				$block_content,
+				gutenberg_render_layout_support_flag( $block_content, $block ),
+				'A child layout under a breakpoint the theme does not define should not add any markup.'
+			);
+			$this->assertStringNotContainsString(
+				'grid-column',
+				gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) ),
+				'A child layout under a breakpoint the theme does not define should not emit CSS.'
+			);
+		} finally {
+			_gutenberg_clean_theme_json_caches();
+		}
+	}
 }

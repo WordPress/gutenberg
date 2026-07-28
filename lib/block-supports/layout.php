@@ -965,31 +965,27 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$child_layout = $style_attr['layout'] ?? null;
 
 	/*
-	 * Responsive child layouts are nested under a style state key, which is
-	 * always prefixed with `@`, for example `@mobile`. Which of those keys map
-	 * to an active breakpoint depends on global settings, but whether any of
-	 * them carry a child layout does not, so this can be answered without
-	 * resolving settings.
+	 * Collect responsive viewport child layout overrides so that a block with
+	 * only responsive child layout (no base child layout) is still processed.
+	 *
+	 * Which breakpoints a theme actually defines comes from global settings,
+	 * but the style state keys those breakpoints can use do not, so the child
+	 * layouts are collected first and the media queries attached afterwards.
+	 * That ordering matters: resolving global settings queries the user's
+	 * `wp_global_styles` post, which fires `the_posts`, and a callback on that
+	 * hook that renders blocks re-enters this filter. The early return below is
+	 * what stops that recursion, so it has to come first.
 	 */
-	$has_state_child_layout = false;
-	foreach ( (array) $style_attr as $state => $state_styles ) {
-		if (
-			is_string( $state ) && str_starts_with( $state, '@' ) &&
-			is_array( $state_styles ) && ! empty( $state_styles['layout'] )
-		) {
-			$has_state_child_layout = true;
-			break;
+	$viewport_child_layouts = array();
+	foreach ( array_keys( WP_Theme_JSON_Gutenberg::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
+		$state          = '@' . $breakpoint;
+		$viewport_child = gutenberg_get_layout_child_values( $style_attr[ $state ]['layout'] ?? null );
+		if ( ! empty( $viewport_child ) ) {
+			$viewport_child_layouts[ $state ] = array( 'child_layout' => $viewport_child );
 		}
 	}
 
-	/*
-	 * Bail out before resolving global settings when the block cannot produce
-	 * layout output. Resolving settings is not read-only: on a cold cache it
-	 * queries the user's `wp_global_styles` post, which fires `the_posts`. A
-	 * callback on that hook that renders blocks would re-enter this filter and,
-	 * without this early return, recurse without a base case.
-	 */
-	if ( ! $block_supports_layout && ! $child_layout && ! $has_state_child_layout ) {
+	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
 		return $block_content;
 	}
 
@@ -997,21 +993,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$viewport_settings        = $global_settings['viewport'] ?? null;
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 
-	// Collect responsive viewport child layout overrides so that a block with
-	// only responsive child layout (no base child layout) is still processed.
-	$viewport_child_layouts = array();
-	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
-		$viewport_child = gutenberg_get_layout_child_values( $style_attr[ $breakpoint ]['layout'] ?? null );
-		if ( ! empty( $viewport_child ) ) {
-			$viewport_child_layouts[ $breakpoint ] = array(
-				'media_query'  => $media_query,
-				'child_layout' => $viewport_child,
-			);
+	// Drop child layouts whose breakpoint the theme does not define, and attach
+	// the media query to the rest.
+	foreach ( $viewport_child_layouts as $state => $viewport_data ) {
+		if ( isset( $responsive_media_queries[ $state ] ) ) {
+			$viewport_child_layouts[ $state ]['media_query'] = $responsive_media_queries[ $state ];
+		} else {
+			unset( $viewport_child_layouts[ $state ] );
 		}
-	}
-
-	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
-		return $block_content;
 	}
 
 	$outer_class_names = array();
