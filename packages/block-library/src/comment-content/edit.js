@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
@@ -29,7 +29,11 @@ export default function Edit( props ) {
 		return (
 			<>
 				<div { ...blockProps }>
-					<p>{ _x( 'Comment Content', 'block title' ) }</p>
+					<p>
+						{ __(
+							'This is the Comment Content block. It displays the text of user comments submitted on your site, ranging from short remarks to longer, multi-paragraph responses.'
+						) }
+					</p>
 				</div>
 			</>
 		);
