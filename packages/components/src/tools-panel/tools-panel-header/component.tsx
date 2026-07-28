@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -9,7 +8,7 @@ import type { ForwardedRef } from 'react';
  */
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
-import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -38,13 +37,7 @@ const DefaultControlsGroup = ( {
 	}
 
 	const resetSuffix = (
-		<span
-			aria-hidden
-			className={ clsx(
-				styles[ 'reset-label' ],
-				isRTL() && styles[ 'reset-label-rtl' ]
-			) }
-		>
+		<span aria-hidden className={ styles[ 'reset-label' ] }>
 			{ __( 'Reset' ) }
 		</span>
 	);

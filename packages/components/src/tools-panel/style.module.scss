@@ -48,7 +48,6 @@
 // Outrank Heading's base typography regardless of stylesheet insertion order.
 .tools-panel-heading.tools-panel-heading {
 	font-size: inherit;
-	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: normal;
 	margin: 0;
 }
@@ -94,16 +93,8 @@
 	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 1.4;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the physical-axis behavior of the previous Emotion `rtl()` styles. */
-	margin-left: $grid-unit-15;
+	margin-inline-start: $grid-unit-15;
 	text-transform: uppercase;
-}
-
-.reset-label-rtl {
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the physical-axis behavior of the previous Emotion `rtl()` styles. */
-	margin-left: 0;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the physical-axis behavior of the previous Emotion `rtl()` styles. */
-	margin-right: $grid-unit-15;
 }
 
 .default-controls-item {
