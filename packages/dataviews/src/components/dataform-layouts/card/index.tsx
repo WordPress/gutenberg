@@ -29,7 +29,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import getValidationMessage from '../get-validation-message';
 import { getSummaryFields } from '../get-summary-fields';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import ValidationBadge from '../validation-badge';
 
 function isSummaryFieldVisible< Item >(
@@ -231,7 +231,7 @@ export default function FormCardField< Item >( {
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// reveal the field-level errors.
-	const reportValidity = useReportValidity(
+	const revealValidity = useRevealValidity(
 		contentRef,
 		( isCollapsible ? isOpen : true ) && touched
 	);
@@ -260,12 +260,12 @@ export default function FormCardField< Item >( {
 		}
 		// The errors appear without moving focus, so announce them: their
 		// arrival is otherwise imperceptible to assistive technology.
-		const reportedCount = reportValidity();
+		const revealedCount = revealValidity();
 		const message = getValidationMessage( validity );
-		if ( reportedCount > 0 && message ) {
+		if ( revealedCount > 0 && message ) {
 			speak( message, 'polite' );
 		}
-	}, [ isCollapsible, isOpen, reportValidity, validity ] );
+	}, [ isCollapsible, isOpen, revealValidity, validity ] );
 
 	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 

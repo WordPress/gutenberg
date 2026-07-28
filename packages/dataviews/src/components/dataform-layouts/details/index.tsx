@@ -26,7 +26,7 @@ import DataFormContext from '../../dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import getValidationMessage from '../get-validation-message';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import ValidationBadge from '../validation-badge';
 
 export default function FormDetailsField< Item >( {
@@ -73,7 +73,7 @@ export default function FormDetailsField< Item >( {
 	}, [] );
 
 	// When expanded after being touched, reveal the field-level errors.
-	const reportValidity = useReportValidity( contentRef, isOpen && touched );
+	const revealValidity = useRevealValidity( contentRef, isOpen && touched );
 
 	const handleContentFocus = useCallback( () => {
 		hasFocusedContentRef.current = true;
@@ -101,12 +101,12 @@ export default function FormDetailsField< Item >( {
 		}
 		// The errors appear without moving focus, so announce them: their
 		// arrival is otherwise imperceptible to assistive technology.
-		const reportedCount = reportValidity();
+		const revealedCount = revealValidity();
 		const message = getValidationMessage( validity );
-		if ( reportedCount > 0 && message ) {
+		if ( revealedCount > 0 && message ) {
 			speak( message, 'polite' );
 		}
-	}, [ reportValidity, validity ] );
+	}, [ revealValidity, validity ] );
 
 	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 
