@@ -50,9 +50,6 @@ import { type UserCredentials } from './fixtures/collaboration-utils';
  *   read the menu entity (their navigation block renders "Navigation Menu
  *   has been deleted or is unavailable"), no navigation controller runs on
  *   their client, and undo keeps working.
- *
- * This test fails while the bug exists. Mark it with test.fixme() if it
- * needs to land before the fix.
  */
 
 const USER_A_FIRST_PARAGRAPH = 'First paragraph by user A';
