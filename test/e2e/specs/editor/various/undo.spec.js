@@ -650,6 +650,49 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
 		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
 	} );
+
+	test( 'should leave undo to the browser inside the Custom HTML dialog', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'a paragraph' );
+		await editor.insertBlock( {
+			name: 'core/html',
+			attributes: { content: '<p>markup</p>' },
+		} );
+		await editor.clickBlockToolbarButton( 'Edit code' );
+
+		const field = page.getByRole( 'dialog' ).getByRole( 'textbox' );
+		await field.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'EDIT' );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The dialog stays
+		// open and the content behind it is untouched.
+		await expect( field ).toHaveValue( '<p>markup</p>' );
+		await expect.poll( editor.getEditedPostContent )
+			.toBe( `<!-- wp:paragraph -->
+<p>a paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<p>markup</p>
+<!-- /wp:html -->` );
+
+		// Redo restores the typing. This distinguishes the browser's own
+		// undo from the editor history remounting the dialog: a remount
+		// resets the field to the same committed value, but destroys the
+		// browser's redo stack with it.
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+	} );
 } );
 
 class UndoUtils {
