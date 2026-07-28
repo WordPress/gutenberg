@@ -49,6 +49,27 @@ describe( 'SandBox', () => {
 		);
 	} );
 
+	it( 'should not include allow-popups by default', () => {
+		render( <SandBox html="<p>Hello</p>" title="No Popups" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'No Popups' );
+
+		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
+			'allow-popups'
+		);
+	} );
+
+	it( 'should include allow-popups when allowPopups is set', () => {
+		render( <SandBox html="<p>Hello</p>" title="Popups" allowPopups /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popups' );
+
+		expect( iframe ).toHaveAttribute(
+			'sandbox',
+			'allow-scripts allow-presentation allow-popups'
+		);
+	} );
+
 	it( 'should set srcdoc with the provided html content', () => {
 		render( <SandBox html="<p>Hello</p>" title="Test Title" /> );
 
