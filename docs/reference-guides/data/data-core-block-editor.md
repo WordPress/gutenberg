@@ -808,7 +808,7 @@ _Returns_
 
 ### getSelectedBlockCount
 
-Returns the number of blocks currently selected in the post. Descendants of the selected blocks are not counted.
+Returns the number of blocks currently selected in the post.
 
 _Parameters_
 

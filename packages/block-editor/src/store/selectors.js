@@ -482,8 +482,7 @@ export function getBlockSelectionEnd( state ) {
 }
 
 /**
- * Returns the number of blocks currently selected in the post. Descendants
- * of the selected blocks are not counted.
+ * Returns the number of blocks currently selected in the post.
  *
  * @param {Object} state Global application state.
  *

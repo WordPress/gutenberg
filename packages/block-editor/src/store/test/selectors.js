@@ -33,7 +33,6 @@ const {
 	getSelectedBlockClientIds,
 	getMultiSelectedBlockClientIds,
 	getMultiSelectedBlocks,
-	getSelectedBlockCount,
 	getMultiSelectedBlocksStartClientId,
 	getMultiSelectedBlocksEndClientId,
 	getBlockOrder,
@@ -1563,74 +1562,6 @@ describe( 'selectors', () => {
 				'8',
 				'7',
 			] );
-		} );
-	} );
-
-	describe( 'getSelectedBlockCount', () => {
-		it( 'should return 0 if there is no selection', () => {
-			const state = {
-				blocks: {
-					order: new Map(
-						Object.entries( {
-							'': [ '123', '23' ],
-						} )
-					),
-				},
-				selection: {
-					selectionStart: {},
-					selectionEnd: {},
-				},
-			};
-
-			expect( getSelectedBlockCount( state ) ).toBe( 0 );
-		} );
-
-		it( 'should return 1 for a single selection, not counting descendants', () => {
-			const state = {
-				blocks: {
-					order: new Map(
-						Object.entries( {
-							'': [ 'group', '123' ],
-							group: [ 'child' ],
-						} )
-					),
-				},
-				selection: {
-					selectionStart: { clientId: 'group' },
-					selectionEnd: { clientId: 'group' },
-				},
-			};
-
-			expect( getSelectedBlockCount( state ) ).toBe( 1 );
-		} );
-
-		it( 'should not count the descendants of multi-selected blocks', () => {
-			const state = {
-				blocks: {
-					order: new Map(
-						Object.entries( {
-							'': [ 'group', '123' ],
-							group: [ 'child', 'innerGroup' ],
-							innerGroup: [ 'grandchild' ],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							group: '',
-							123: '',
-							child: 'group',
-							innerGroup: 'group',
-							grandchild: 'innerGroup',
-						} )
-					),
-				},
-				selection: {
-					selectionStart: { clientId: 'group' },
-					selectionEnd: { clientId: '123' },
-				},
-			};
-
-			expect( getSelectedBlockCount( state ) ).toBe( 2 );
 		} );
 	} );
 
