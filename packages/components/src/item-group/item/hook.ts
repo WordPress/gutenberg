@@ -1,17 +1,22 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
+import styles from '../style.module.scss';
+
+const sizeClassName = {
+	small: styles[ 'size-small' ],
+	medium: styles[ 'size-medium' ],
+	large: styles[ 'size-large' ],
+};
 
 export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const {
@@ -29,22 +34,16 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 
 	const as = asProp || ( typeof onClick !== 'undefined' ? 'button' : 'div' );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				( as === 'button' || as === 'a' ) &&
-					styles.unstyledButton( as ),
-				styles.itemSizes[ size ] || styles.itemSizes.medium,
-				styles.item,
-				spacedAround && styles.spacedAround,
-				className
-			),
-		[ as, className, cx, size, spacedAround ]
+	const classes = clsx(
+		as === 'button' && styles[ 'unstyled-button' ],
+		as === 'a' && styles[ 'unstyled-link' ],
+		sizeClassName[ size ] || sizeClassName.medium,
+		styles.item,
+		spacedAround && styles[ 'spaced-around' ],
+		className
 	);
 
-	const wrapperClassName = cx( styles.itemWrapper );
+	const wrapperClassName = styles[ 'item-wrapper' ];
 
 	return {
 		as,
