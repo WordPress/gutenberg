@@ -54,17 +54,17 @@ const DataAdapterComponent = () => {
 		// for nested data based on the field id.
 		{
 			id: 'user.profile.name',
-			label: 'User Name',
+			label: 'User name',
 			type: 'text',
 		},
 		{
 			id: 'user.profile.email',
-			label: 'User Email',
+			label: 'User email',
 			type: 'email',
 		},
 		{
 			id: 'user.profile.tags',
-			label: 'User Tags',
+			label: 'User tags',
 			type: 'array',
 			placeholder: 'Enter comma-separated tags',
 			description:
@@ -101,13 +101,13 @@ const DataAdapterComponent = () => {
 		// Example of deriving data by leveraging setValue method.
 		{
 			id: 'revenue.total',
-			label: 'Total Revenue',
+			label: 'Total revenue',
 			type: 'integer',
 			readOnly: true,
 		},
 		{
 			id: 'revenue.pricePerUnit',
-			label: 'Price Per Unit',
+			label: 'Price per unit',
 			type: 'integer',
 			setValue: ( { item, value } ) => ( {
 				revenue: {
@@ -174,7 +174,7 @@ const DataAdapterComponent = () => {
 					fields: [
 						{
 							id: 'userProfile',
-							label: 'User Profile',
+							label: 'User profile',
 							children: [
 								'user.profile.name',
 								'user.profile.email',

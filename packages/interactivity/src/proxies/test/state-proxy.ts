@@ -1,4 +1,4 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -919,7 +919,7 @@ describe( 'Interactivity API', () => {
 						let tag = 'No scope';
 						try {
 							tag = getContext< any >().tag;
-						} catch ( e ) {}
+						} catch {}
 						return `${ tag }: ${ this.number }`;
 					},
 				} );

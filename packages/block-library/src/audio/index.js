@@ -42,19 +42,25 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'audio',
 			label: __( 'Audio' ),
 			type: 'media',
-			mapping: {
-				id: 'id',
-				url: 'src',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				allowedTypes: [ 'audio' ],
 				multiple: false,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.id,
+				url: item.src,
+			} ),
+			setValue: ( { value } ) => ( {
+				id: value.id,
+				src: value.url,
+			} ),
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

@@ -22,7 +22,7 @@ import {
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { grid, list, pencil, rss } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 
@@ -65,7 +65,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		event.preventDefault();
 
 		if ( feedURL ) {
-			setAttributes( { feedURL: prependHTTP( feedURL ) } );
+			setAttributes( { feedURL: prependHTTPS( feedURL ) } );
 			setIsEditing( false );
 		}
 	}
@@ -96,7 +96,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						className="wp-block-rss__placeholder-form"
 					>
 						<InputControl
-							__next40pxDefaultSize
 							label={ label }
 							type="url"
 							hideLabelFromVision
@@ -168,7 +167,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }
 							onChange={ ( value ) =>
@@ -235,7 +233,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__next40pxDefaultSize
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
 								onChange={ ( value ) =>
@@ -256,7 +253,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ columns }
 								onChange={ ( value ) =>
@@ -289,7 +285,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(

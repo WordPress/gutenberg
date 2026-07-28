@@ -16,6 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	icon: breadcrumbs,
+	example: {},
 	edit,
 };
 

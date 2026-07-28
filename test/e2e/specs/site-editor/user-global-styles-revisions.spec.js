@@ -16,6 +16,7 @@ test.use( {
 
 test.describe( 'Style Revisions', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
@@ -25,12 +26,12 @@ test.describe( 'Style Revisions', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should display revisions UI when there is 1 revision', async ( {
@@ -75,9 +76,9 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Colors' } ).click();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Background', exact: true } )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page
 			.getByRole( 'option', { name: 'Luminous vivid amber' } )

@@ -9,7 +9,7 @@ export const templatePartItemRoute = {
 	path: '/wp_template_part/*postId',
 	areas: {
 		sidebar: <SidebarNavigationScreenPatterns backPath="/" />,
-		mobile: <Editor />,
+		// Also rendered on mobile, where this route is only reached at canvas=edit.
 		preview: <Editor />,
 	},
 };

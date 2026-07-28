@@ -17,11 +17,7 @@ const UnforwardedValidatedRangeControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof RangeControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof RangeControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -34,11 +30,7 @@ const UnforwardedValidatedRangeControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<RangeControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<RangeControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -46,3 +38,4 @@ const UnforwardedValidatedRangeControl = (
 export const ValidatedRangeControl = forwardRef(
 	UnforwardedValidatedRangeControl
 );
+ValidatedRangeControl.displayName = 'ValidatedRangeControl';

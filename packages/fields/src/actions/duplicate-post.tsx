@@ -30,7 +30,7 @@ interface Action< Item > {
 	label: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
-	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
 }
 
 const duplicatePost: Action< BasePost > = {
@@ -153,7 +153,6 @@ const duplicatePost: Action< BasePost > = {
 						</div>
 					) }
 					<InputControl
-						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
 						value={ getItemTitle( item ) }

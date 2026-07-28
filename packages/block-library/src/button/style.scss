@@ -55,16 +55,41 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
+	&[class*="wp-block-button__width"] {
+		width:
+			calc(var(--wp--block-button--width) * 1% -
+			(
+				var(--wp--style--block-gap, #{$blocks-block__margin}) *
+				( 1 - var(--wp--block-button--width) / 100 )
+			));
+	}
+
+	// Legacy width classes for backwards compatibility.
 	&.wp-block-button__width-25 {
-		width: calc(25% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.75));
+		width:
+			calc(25% -
+			(
+				var(--wp--style--block-gap, #{$blocks-block__margin}) *
+				0.75
+			));
 	}
 
 	&.wp-block-button__width-50 {
-		width: calc(50% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5));
+		width:
+			calc(50% -
+			(
+				var(--wp--style--block-gap, #{$blocks-block__margin}) *
+				0.5
+			));
 	}
 
 	&.wp-block-button__width-75 {
-		width: calc(75% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.25));
+		width:
+			calc(75% -
+			(
+				var(--wp--style--block-gap, #{$blocks-block__margin}) *
+				0.25
+			));
 	}
 
 	&.wp-block-button__width-100 {
@@ -75,6 +100,11 @@ $blocks-block__margin: 0.5em;
 
 // For vertical buttons, gap is not factored into width calculations.
 .wp-block-buttons.is-vertical > .wp-block-button {
+	&[class*="wp-block-button__width"] {
+		width: calc(var(--wp--block-button--width) * 1%);
+	}
+
+	// Legacy width classes for backwards compatibility.
 	&.wp-block-button__width-25 {
 		width: 25%;
 	}
@@ -110,13 +140,25 @@ $blocks-block__margin: 0.5em;
 		padding: 0.667em 1.333em;
 	}
 
-	:where(.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color)),
-	:where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color)) {
+	:where(
+	.wp-block-button.is-style-outline
+	> .wp-block-button__link:not(.has-text-color)
+),
+	:where(
+	.wp-block-button
+	.wp-block-button__link.is-style-outline:not(.has-text-color)
+) {
 		color: currentColor;
 	}
 
-	:where(.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background)),
-	:where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background)) {
+	:where(
+	.wp-block-button.is-style-outline
+	> .wp-block-button__link:not(.has-background)
+),
+	:where(
+	.wp-block-button
+	.wp-block-button__link.is-style-outline:not(.has-background)
+) {
 		background-color: transparent;
 		// background-image is required to overwrite a gradient background
 		background-image: none;

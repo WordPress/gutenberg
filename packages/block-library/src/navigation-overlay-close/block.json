@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/navigation-overlay-close",
 	"title": "Navigation Overlay Close",
@@ -15,10 +14,7 @@
 			"default": "icon"
 		},
 		"text": {
-			"type": "rich-text",
-			"source": "rich-text",
-			"selector": "span",
-			"default": "Close"
+			"type": "string"
 		}
 	},
 	"supports": {

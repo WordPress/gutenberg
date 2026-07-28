@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import path from 'path';
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -20,14 +15,7 @@ test.describe( 'Managing reusable blocks', () => {
 		await page.click( 'role=button[name="Import from JSON"i]' );
 
 		// Select the file to upload.
-		const testReusableBlockFile = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'greeting-reusable-block.json'
-		);
+		const testReusableBlockFile = './assets/greeting-reusable-block.json';
 		await page.setInputFiles( 'input[type="file"]', testReusableBlockFile );
 
 		// Submit the form.

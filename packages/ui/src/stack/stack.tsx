@@ -1,7 +1,20 @@
 import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
+import type { GapSize } from '@wordpress/theme';
 import { type StackProps } from './types';
 import styles from './style.module.css';
+
+// Static map so that the build-time token fallback plugin can inject fallback
+// values into each `var()` call.
+const gapTokens: Record< GapSize, string > = {
+	xs: 'var(--wpds-dimension-gap-xs)',
+	sm: 'var(--wpds-dimension-gap-sm)',
+	md: 'var(--wpds-dimension-gap-md)',
+	lg: 'var(--wpds-dimension-gap-lg)',
+	xl: 'var(--wpds-dimension-gap-xl)',
+	'2xl': 'var(--wpds-dimension-gap-2xl)',
+	'3xl': 'var(--wpds-dimension-gap-3xl)',
+};
 
 /**
  * A flexible layout component using CSS Flexbox for consistent spacing and alignment.
@@ -12,7 +25,7 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
 	ref
 ) {
 	const style: React.CSSProperties = {
-		gap: gap && `var(--wpds-dimension-gap-${ gap })`,
+		gap: gap && gapTokens[ gap ],
 		alignItems: align,
 		justifyContent: justify,
 		flexDirection: direction,

@@ -544,7 +544,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/code' } ],
+			innerBlocks: [
+				{ name: 'core/paragraph' },
+				{ name: 'core/pullquote' },
+			],
 		} );
 
 		// Open List View.
@@ -558,13 +561,12 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Expand group block, then move to code block, and copy.
+		// Move down to group block, expand, and then move to the paragraph block.
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+c' );
-
-		// Move up to paragraph block and paste.
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
 
@@ -581,12 +583,12 @@ test.describe( 'List View', () => {
 					selected: true,
 					innerBlocks: [
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: true,
 						},
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
@@ -686,7 +688,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/code' }, { name: 'core/code' } ],
+			innerBlocks: [
+				{ name: 'core/pullquote' },
+				{ name: 'core/pullquote' },
+			],
 		} );
 
 		// Open List View.
@@ -728,12 +733,12 @@ test.describe( 'List View', () => {
 					focused: true,
 					innerBlocks: [
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
@@ -751,7 +756,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/pullquote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -879,7 +884,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/pullquote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -1389,6 +1394,54 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'The dropdown menu should also be visible'
 		).toBeVisible();
+	} );
+
+	test( 'should place the caret at the end of the block when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		// Insert a paragraph with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		// Open List View.
+		const listView = await listViewUtils.openListView();
+
+		// Click the first paragraph in List View to select it,
+		// then press Enter to activate it (transfer focus to canvas).
+		// Keyboard activation (Enter/Space) places the caret at the end
+		// of the block, while mouse click keeps focus in the list view.
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Enter' );
+
+		// Press Enter to split the block at the caret position.
+		// If the caret is at the end, this creates a new block after the first paragraph.
+		// If the caret is at the start, this creates a new block before the first paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		// Verify the block order: if the caret was at the end, the new empty
+		// block should be after the first paragraph, not before it.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
+		] );
 	} );
 } );
 

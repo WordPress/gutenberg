@@ -1,108 +1,46 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	withColors,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import StyleEngine from './style-engine';
-import Controls from './controls';
+import TabToolbarControls from './tab-toolbar-controls';
+import useTabListItemsSync from './use-tab-list-items-sync';
 
-const TABS_TEMPLATE = [ [ 'core/tab', {} ] ];
+/**
+ * Only the two structural child blocks are specified here — without inner
+ * block entries for core/tab-list or core/tab-panels.
+ *
+ * If inner blocks were included in this template, `synchronizeBlocksWithTemplate`
+ * (called whenever templateLock === 'all') would recurse into the containers and
+ * truncate them to the template count, causing data loss when a saved block with
+ * more than two tabs is re-opened in the editor.
+ *
+ * Initial tab/panel creation is delegated to the tab-panels template in
+ * tab-panels/edit.js (templateLock: false, applied only when empty).
+ */
+const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 
-const DEFAULT_BLOCK = {
-	name: 'core/tab',
-	attributesToCopy: [ 'className', 'fontFamily', 'fontSize' ],
-};
+function Edit( { clientId } ) {
+	useTabListItemsSync( clientId );
 
-function Edit( {
-	clientId,
-	attributes,
-	setAttributes,
-	tabInactiveColor,
-	setTabInactiveColor,
-	tabHoverColor,
-	setTabHoverColor,
-	tabActiveColor,
-	setTabActiveColor,
-	tabTextColor,
-	setTabTextColor,
-	tabActiveTextColor,
-	setTabActiveTextColor,
-	tabHoverTextColor,
-	setTabHoverTextColor,
-} ) {
-	const { style, orientation } = attributes;
+	const blockProps = useBlockProps();
 
-	/**
-	 * Block props for the tabs container.
-	 */
-	const blockProps = useBlockProps( {
-		className: clsx(
-			'vertical' === orientation ? 'is-vertical' : 'is-horizontal'
-		),
-		style: {
-			...style,
-		},
-	} );
-
-	/**
-	 * Innerblocks props for the tabs list.
-	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
-		directInsert: true,
 		__experimentalCaptureToolbars: true,
-		clientId,
-		orientation,
 		template: TABS_TEMPLATE,
-		renderAppender: false, // Appender is rendered by individual tab blocks.
+		templateLock: 'all',
+		renderAppender: false,
 	} );
 
 	return (
-		<>
-			<div { ...innerBlockProps }>
-				{ innerBlockProps.children }
-				<StyleEngine attributes={ attributes } clientId={ clientId } />
-				<Controls
-					{ ...{
-						clientId,
-						attributes,
-						setAttributes,
-						tabInactiveColor,
-						setTabInactiveColor,
-						tabHoverColor,
-						setTabHoverColor,
-						tabActiveColor,
-						setTabActiveColor,
-						tabTextColor,
-						setTabTextColor,
-						tabActiveTextColor,
-						setTabActiveTextColor,
-						tabHoverTextColor,
-						setTabHoverTextColor,
-					} }
-				/>
-			</div>
-		</>
+		<div { ...innerBlockProps }>
+			<TabToolbarControls tabsClientId={ clientId } />
+			{ innerBlockProps.children }
+		</div>
 	);
 }
 
-export default withColors(
-	'tabInactiveColor',
-	'tabHoverColor',
-	'tabActiveColor',
-	'tabTextColor',
-	'tabActiveTextColor',
-	'tabHoverTextColor'
-)( Edit );
+export default Edit;

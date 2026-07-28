@@ -51,19 +51,22 @@ export default ( ...fontSizeNames ) => {
 	return createHigherOrderComponent(
 		compose( [
 			createHigherOrderComponent(
-				( WrappedComponent ) => ( props ) => {
-					const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-					return (
-						<WrappedComponent
-							{ ...props }
-							fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
-						/>
-					);
-				},
+				( WrappedComponent ) =>
+					function WithFontSizesInner( props ) {
+						const [ fontSizes ] = useSettings(
+							'typography.fontSizes'
+						);
+						return (
+							<WrappedComponent
+								{ ...props }
+								fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
+							/>
+						);
+					},
 				'withFontSizes'
 			),
 			( WrappedComponent ) => {
-				return class extends Component {
+				return class WithFontSizes extends Component {
 					constructor( props ) {
 						super( props );
 

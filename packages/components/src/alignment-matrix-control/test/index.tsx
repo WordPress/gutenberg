@@ -18,7 +18,7 @@ const getCell = ( name: string ) => {
 };
 
 const renderAndInitCompositeStore = async (
-	jsx: JSX.Element,
+	jsx: React.JSX.Element,
 	focusedCell = 'center center'
 ) => {
 	const view = render( jsx );

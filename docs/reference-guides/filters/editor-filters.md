@@ -224,6 +224,64 @@ function example_filter_block_editor_rest_api_preload_paths_when_post_provided( 
 }
 ```
 
+## Client-side media processing
+
+Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly. The following filters and parameters control its behavior.
+
+For a full overview, see the [architecture explanation](/docs/explanations/architecture/client-side-media-architecture.md) and the [developer how-to guide](/docs/how-to-guides/client-side-media.md).
+
+### `wp_client_side_media_processing_enabled`
+
+This PHP filter controls whether client-side media processing is enabled. It defaults to `true`.
+
+```php
+// Disable client-side media processing entirely.
+add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+```
+
+You can also disable it conditionally:
+
+```php
+add_filter( 'wp_client_side_media_processing_enabled', 'example_disable_for_editors' );
+
+function example_disable_for_editors( $enabled ) {
+	if ( current_user_can( 'edit_posts' ) && ! current_user_can( 'manage_options' ) ) {
+		return false;
+	}
+	return $enabled;
+}
+```
+
+When disabled, all uploads revert to the traditional server-side processing pipeline.
+
+### Filters respected by client-side processing
+
+Client-side processing reads the following existing WordPress filters from the server via the REST API and applies them during browser-based image processing:
+
+-   **`big_image_size_threshold`** — Maximum image dimension before scaling. Images exceeding this threshold are scaled down client-side. Default: 2560px.
+-   **`image_editor_output_format`** — Maps input MIME types to output MIME types for automatic format conversion (e.g., JPEG → WebP). Applied during client-side transcoding.
+-   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
+-   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
+-   **`wp_editor_set_quality`** (and **`jpeg_quality`** for JPEG output) — Encode quality (1–100). The server resolves these filters per registered size and reports the result in the upload response's size-aware `image_quality` field, which the client applies during sub-size resize and transcode. There is no separate JavaScript quality filter.
+-   **`image_strip_meta`** — Controls whether metadata is stripped from generated images. Exported on the REST index; when `false`, the client keeps all metadata (EXIF, XMP, IPTC) instead of stripping everything but color profiles (and HDR gain maps).
+-   **`image_max_bit_depth`** — Caps the bit depth of generated images (relevant for high-bit-depth AVIF/HDR sources). Exported on the REST index and honored by the client encoder, snapped to the depths the AVIF encoder supports (8, 10, or 12 bits).
+
+> **Note:** Three server-side hooks never fire when client-side processing is active, because no server-side `WP_Image_Editor` is involved: `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit`. See [Server-side plugin compatibility](/docs/how-to-guides/client-side-media.md#server-side-plugin-compatibility) in the how-to guide for replacement signals.
+
+> **Note:** There is no filter for the set of MIME types eligible for client-side processing. The supported set is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`) in `packages/upload-media/src/store/constants.ts`. Files outside this set fall through to server-side processing or, for HEIC/HEIF, to a separate canvas-based decode path.
+
+### REST API parameters
+
+Client-side processing uses these additional REST API parameters when uploading media:
+
+-   **`generate_sub_sizes`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media`, the server skips thumbnail generation. Client-side processing sets this to `false` so it can generate and sideload thumbnails itself.
+-   **`convert_format`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media` or `POST /wp/v2/media/{id}/sideload`, the server skips format conversion via the `image_editor_output_format` filter. Used when the client has already performed the conversion.
+-   **`url`** (string) — When passed to `POST /wp/v2/media` instead of a file body, the server downloads the remote image and sideloads it. Used to import external images into the media library without a browser cross-origin fetch, which fails in the cross-origin-isolated editor.
+
+### Animated GIF to video conversion
+
+Opaque animated GIFs are converted client-side to a companion MP4/WebM video, and a "Display as video" control on the Image block lets the user switch it to a "GIF" variation of the Video block. There is no dedicated filter for this behavior — it is governed by the same `wp_client_side_media_processing_enabled` master toggle above, and falls back to uploading the original GIF when the browser lacks WebCodecs video encoding. See the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#animated-gif-to-video-conversion) and the [how-to guide](/docs/how-to-guides/client-side-media.md#animated-gif-to-video-conversion) for details.
+
 ## Logging errors
 
 A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.

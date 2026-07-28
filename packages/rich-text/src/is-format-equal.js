@@ -23,8 +23,17 @@ export function isFormatEqual( format1, format2 ) {
 		return false;
 	}
 
-	const attributes1 = format1.attributes;
-	const attributes2 = format2.attributes;
+	let attributes1 = format1.attributes;
+	let attributes2 = format2.attributes;
+
+	// Manually applied formats hold all attributes in `attributes`, while
+	// formats parsed from HTML split them between `attributes` (registered)
+	// and `unregisteredAttributes`. Compare the merged view so the two shapes
+	// are recognized as equal.
+	if ( format1.unregisteredAttributes || format2.unregisteredAttributes ) {
+		attributes1 = { ...attributes1, ...format1.unregisteredAttributes };
+		attributes2 = { ...attributes2, ...format2.unregisteredAttributes };
+	}
 
 	// Both not defined.
 	if ( attributes1 === attributes2 ) {

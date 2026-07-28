@@ -1,10 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import {
+	MenuItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
@@ -15,6 +19,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as reusableBlocksStore } from '../../store';
 
 function ReusableBlocksManageButton( { clientId } ) {
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
 	const { canRemove, isVisible, managePatternsUrl } = useSelect(
 		( select ) => {
 			const { getBlock, canRemoveBlock } = select( blockEditorStore );
@@ -56,15 +62,35 @@ function ReusableBlocksManageButton( { clientId } ) {
 		return null;
 	}
 
+	const handleDetach = () => {
+		convertBlockToStatic( clientId );
+		setShowConfirmDialog( false );
+	};
+
 	return (
 		<>
 			<MenuItem href={ managePatternsUrl }>
 				{ __( 'Manage patterns' ) }
 			</MenuItem>
 			{ canRemove && (
-				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-					{ __( 'Disconnect pattern' ) }
-				</MenuItem>
+				<>
+					<MenuItem onClick={ () => setShowConfirmDialog( true ) }>
+						{ __( 'Disconnect pattern' ) }
+					</MenuItem>
+					<ConfirmDialog
+						isOpen={ showConfirmDialog }
+						onConfirm={ handleDetach }
+						onCancel={ () => setShowConfirmDialog( false ) }
+						confirmButtonText={ __( 'Disconnect' ) }
+						size="medium"
+						title={ __( 'Disconnect pattern?' ) }
+						__experimentalHideHeader={ false }
+					>
+						{ __(
+							'Blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
+						) }
+					</ConfirmDialog>
+				</>
 			) }
 		</>
 	);

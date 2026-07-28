@@ -5,6 +5,9 @@
  * @package WordPress
  */
 
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+
 /**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
@@ -81,12 +84,18 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
+ * This function is no longer used internally and is kept only for backward
+ * compatibility with third-party code that may call it directly.
+ *
  * @since 5.9.0
+ * @deprecated 7.0.0
  *
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
 function block_core_navigation_link_build_css_font_sizes( $context ) {
+	_deprecated_function( __FUNCTION__, '7.0.0' );
+
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -118,11 +127,17 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
  * Returns the top-level submenu SVG chevron icon.
  *
  * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_render_submenu_icon() instead.
  *
  * @return string
  */
 function block_core_navigation_link_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+	_deprecated_function(
+		__FUNCTION__,
+		'7.0.0',
+		'block_core_shared_navigation_render_submenu_icon()'
+	);
+	return block_core_shared_navigation_render_submenu_icon();
 }
 
 /**
@@ -135,6 +150,10 @@ function block_core_navigation_link_render_submenu_icon() {
  * @return string $url Returns the decoded url.
  */
 function block_core_navigation_link_maybe_urldecode( $url ) {
+	if ( ! is_string( $url ) ) {
+		return '';
+	}
+
 	$is_url_encoded = false;
 	$query          = parse_url( $url, PHP_URL_QUERY );
 	$query_params   = wp_parse_args( $query );
@@ -170,31 +189,14 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
-	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
-	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
-	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
-
-	// Don't render the block's subtree if it is a draft or if the ID does not exist.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		/**
-		 * Filter allowed post_status for navigation link block to render.
-		 *
-		 * @since 6.8.0
-		 *
-		 * @param array $post_status
-		 * @param array $attributes
-		 * @param WP_Block $block
-		 */
-		$allowed_post_status = (array) apply_filters(
-			'render_block_core_navigation_link_allowed_post_status',
-			array( 'publish' ),
-			$attributes,
-			$block
-		);
-		if ( ! $post || ! in_array( $post->post_status, $allowed_post_status, true ) ) {
-			return '';
-		}
+	// Check if this navigation item should render based on post status.
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$should_render = gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block );
+	} else {
+		$should_render = block_core_shared_navigation_item_should_render( $attributes, $block );
+	}
+	if ( ! $should_render ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
@@ -202,14 +204,16 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$font_sizes      = block_core_navigation_link_build_css_font_sizes( $block->context );
-	$classes         = array_merge(
-		$font_sizes['css_classes']
-	);
-	$style_attribute = $font_sizes['inline_styles'];
+	$classes = array();
+
+	// Render inner blocks first to check if any menu items will actually display.
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
+	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
 	$css_classes = trim( implode( ' ', $classes ) );
-	$has_submenu = count( $block->inner_blocks ) > 0;
 	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
 	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
@@ -224,7 +228,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 				( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
@@ -278,15 +281,16 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
+		$html .= '<span class="wp-block-navigation__submenu-icon">';
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+		} else {
+			$html .= block_core_shared_navigation_render_submenu_icon();
+		}
+		$html .= '</span>';
 	}
 
 	if ( $has_submenu ) {
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
-		}
-
 		$html .= sprintf(
 			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
@@ -506,4 +510,4 @@ add_action( 'init', 'register_block_core_navigation_link' );
  * Creates all variations for post types / taxonomies dynamically (= each time when variations are requested).
  * Do not use variation_callback, to also account for unregistering post types/taxonomies later on.
  */
-add_action( 'get_block_type_variations', 'block_core_navigation_link_filter_variations', 10, 2 );
+add_filter( 'get_block_type_variations', 'block_core_navigation_link_filter_variations', 10, 2 );

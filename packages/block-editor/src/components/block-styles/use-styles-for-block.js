@@ -31,6 +31,7 @@ function useGenericPreviewBlock( block, type ) {
 			return getBlockFromExample( blockName, {
 				attributes: example.attributes,
 				innerBlocks: example.innerBlocks,
+				innerContent: example.innerContent,
 			} );
 		}
 

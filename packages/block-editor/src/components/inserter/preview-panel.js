@@ -28,6 +28,7 @@ function InserterPreviewPanel( { item } ) {
 				...initialAttributes,
 			},
 			innerBlocks: example.innerBlocks,
+			innerContent: example.innerContent,
 		} );
 	}, [ name, example, initialAttributes ] );
 	// Same as height of BlockPreviewPanel.

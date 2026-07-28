@@ -54,7 +54,14 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 
 	const onSelectItem = useCallback(
 		(
-			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			{
+				name,
+				initialAttributes,
+				innerBlocks,
+				innerContent,
+				syncStatus,
+				content,
+			},
 			shouldFocusBlock
 		) => {
 			const destinationClientId = getClosestAllowedInsertionPoint(
@@ -85,7 +92,8 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 					: createBlock(
 							name,
 							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks )
+							createBlocksFromInnerBlocksTemplate( innerBlocks ),
+							innerContent
 					  );
 			onInsert(
 				insertedBlock,

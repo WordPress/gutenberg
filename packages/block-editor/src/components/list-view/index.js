@@ -11,10 +11,8 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import {
-	__experimentalTreeGrid as TreeGrid,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -65,8 +63,8 @@ const expanded = ( state, action ) => {
 
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
-/** @typedef {import('react').ComponentType} ComponentType */
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.ComponentType} ComponentType */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Show a hierarchical list of blocks.

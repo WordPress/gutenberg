@@ -8,8 +8,10 @@ import type { ComponentType } from 'react';
  */
 import type { DataFormControlProps, Field, EditConfig } from '../../types';
 import checkbox from './checkbox';
+import combobox from './combobox';
 import datetime from './datetime';
 import date from './date';
+import adaptiveSelect from './adaptive-select';
 import email from './email';
 import telephone from './telephone';
 import url from './url';
@@ -20,6 +22,7 @@ import select from './select';
 import text from './text';
 import toggle from './toggle';
 import textarea from './textarea';
+import richtext from './richtext';
 import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
@@ -31,9 +34,11 @@ interface FormControls {
 }
 
 const FORM_CONTROLS: FormControls = {
+	adaptiveSelect,
 	array,
 	checkbox,
 	color,
+	combobox,
 	datetime,
 	date,
 	email,
@@ -47,6 +52,7 @@ const FORM_CONTROLS: FormControls = {
 	text,
 	toggle,
 	textarea,
+	richtext,
 	toggleGroup,
 };
 
@@ -87,7 +93,7 @@ export function getControl< Item >(
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {
-		return getControlByType( 'select' );
+		return getControlByType( 'adaptiveSelect' );
 	}
 
 	if ( fallback === null ) {

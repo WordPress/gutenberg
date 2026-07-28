@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
@@ -29,6 +30,11 @@ const meta: Meta< typeof CustomSelectControl > = {
 		controls: { expanded: true },
 		docs: {
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 	decorators: [
@@ -66,7 +72,6 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label',
 	options: [
 		{

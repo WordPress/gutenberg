@@ -6,11 +6,11 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
@@ -113,6 +113,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	const canInsert =
 		( canInsertLeft || canInsertRight ) && !! hiddenFields.length;
 
+	const isRtl = isRTL();
+
 	return (
 		<Menu>
 			<Menu.TriggerButton
@@ -179,7 +181,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					{ canAddFilter && (
 						<Menu.Group>
 							<Menu.Item
-								prefix={ <Icon icon={ funnel } /> }
+								prefix={ <WCIcon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
 									setIsShowingFilter( true );
@@ -207,22 +209,30 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowLeft } /> }
-									disabled={ index < 1 }
+									prefix={ <WCIcon icon={ arrowLeft } /> }
+									disabled={
+										isRtl
+											? index >=
+											  visibleFieldIds.length - 1
+											: index < 1
+									}
 									onClick={ () => {
+										// In RTL, moving left visually means moving right in the array
+										const targetIndex = isRtl
+											? index + 1
+											: index - 1;
+										const newFields = [
+											...visibleFieldIds,
+										];
+										newFields.splice( index, 1 );
+										newFields.splice(
+											targetIndex,
+											0,
+											fieldId
+										);
 										onChangeView( {
 											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index - 1
-												) ?? [] ),
-												fieldId,
-												visibleFieldIds[ index - 1 ],
-												...visibleFieldIds.slice(
-													index + 1
-												),
-											],
+											fields: newFields,
 										} );
 									} }
 								>
@@ -233,24 +243,30 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowRight } /> }
+									prefix={ <WCIcon icon={ arrowRight } /> }
 									disabled={
-										index >= visibleFieldIds.length - 1
+										isRtl
+											? index < 1
+											: index >=
+											  visibleFieldIds.length - 1
 									}
 									onClick={ () => {
+										// In RTL, moving right visually means moving left in the array
+										const targetIndex = isRtl
+											? index - 1
+											: index + 1;
+										const newFields = [
+											...visibleFieldIds,
+										];
+										newFields.splice( index, 1 );
+										newFields.splice(
+											targetIndex,
+											0,
+											fieldId
+										);
 										onChangeView( {
 											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index
-												) ?? [] ),
-												visibleFieldIds[ index + 1 ],
-												fieldId,
-												...visibleFieldIds.slice(
-													index + 2
-												),
-											],
+											fields: newFields,
 										} );
 									} }
 								>
@@ -267,30 +283,35 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index + 1
+												: index;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }
@@ -302,36 +323,41 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index + 1
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index + 1
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index
+												: index + 1;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }
 							{ isHidable && field && (
 								<Menu.Item
-									prefix={ <Icon icon={ unseen } /> }
+									prefix={ <WCIcon icon={ unseen } /> }
 									onClick={ () => {
 										onHide( field );
 										onChangeView( {

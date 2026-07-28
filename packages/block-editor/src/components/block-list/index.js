@@ -35,7 +35,6 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
-import { useTypingObserver } from '../observe-typing';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
@@ -48,23 +47,30 @@ const delayedBlockVisibilityDebounceOptions = {
 };
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				isTyping,
-				hasBlockSpotlight,
-				getEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode || hasBlockSpotlight(),
-				editedContentOnlySection: getEditedContentOnlySection(),
-			};
-		},
-		[]
-	);
+	const {
+		isOutlineMode,
+		isFocusMode,
+		isPreviewMode,
+		editedContentOnlySection,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			isTyping,
+			hasBlockSpotlight,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
+		const {
+			outlineMode,
+			focusMode,
+			isPreviewMode: _isPreviewMode,
+		} = getSettings();
+		return {
+			isOutlineMode: outlineMode && ! isTyping(),
+			isFocusMode: focusMode || hasBlockSpotlight(),
+			isPreviewMode: _isPreviewMode,
+			editedContentOnlySection: getEditedContentOnlySection(),
+		};
+	}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -106,11 +112,11 @@ function Root( { className, ...settings } ) {
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
-				useTypingObserver(),
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
+				'is-preview-mode': isPreviewMode,
 			} ),
 		},
 		settings

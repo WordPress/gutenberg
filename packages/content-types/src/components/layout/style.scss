@@ -1,0 +1,21 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+// Size the stage to the viewport so DataViews owns its own scroll and
+// the sticky footer stays visible. Note: when the wp-admin sidebar
+// (#adminmenu) is taller than the viewport, #wpwrap still grows to
+// fit it, so empty space may appear below DataViews.
+.boot-layout__stage:has(.content-types-page) {
+	height: calc(100vh - #{$admin-bar-height-big});
+
+	@include break-medium {
+		height: calc(100vh - #{$admin-bar-height});
+	}
+}
+
+.content-types-tabs-wrapper {
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	padding-block-start: var(--wpds-dimension-padding-lg);
+	border-bottom: 1px solid $gray-100;
+}

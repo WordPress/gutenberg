@@ -30,6 +30,9 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+import { setCanvasWidth } from './private-actions';
+import { getCanvasWidthByDeviceType } from '../utils/device-type';
+
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -189,10 +192,7 @@ export const savePost =
 		}
 
 		const content = select.getEditedPostContent();
-
-		if ( ! options.isAutosave ) {
-			dispatch.editPost( { content }, { undoIgnore: true } );
-		}
+		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
 		let edits = {
@@ -461,11 +461,6 @@ export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
 		const post = select.getCurrentPost();
-
-		// Currently template autosaving is not supported.
-		if ( post.type === 'wp_template' ) {
-			return;
-		}
 
 		if ( local ) {
 			const isPostNew = select.isEditedPostNew();
@@ -748,9 +743,7 @@ export const setRenderingMode =
 			select.__unstableIsEditorReady() &&
 			! select.getEditorSettings().isPreviewMode
 		) {
-			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
 		}
 
 		dispatch( {
@@ -767,9 +760,15 @@ export const setRenderingMode =
  * @return {Object} Action object.
  */
 export function setDeviceType( deviceType ) {
-	return {
-		type: 'SET_DEVICE_TYPE',
-		deviceType,
+	return ( { dispatch, registry } ) => {
+		const viewportSettings = unlock(
+			registry.select( blockEditorStore )
+		).getSettings().__experimentalFeatures?.viewport;
+		const width = getCanvasWidthByDeviceType(
+			deviceType,
+			viewportSettings
+		);
+		dispatch( setCanvasWidth( width ) );
 	};
 }
 

@@ -26,9 +26,15 @@ export default function CodeEdit( {
 				aria-label={ __( 'Code' ) }
 				preserveWhiteSpace
 				__unstablePastePlainText
-				__unstableOnSplitAtDoubleLineEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtDoubleLineEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
+				style={ { whiteSpace: 'break-spaces' } }
 			/>
 		</pre>
 	);

@@ -44,10 +44,16 @@ function InserterListItem( {
 			createBlock(
 				item.name,
 				item.initialAttributes,
-				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+				createBlocksFromInnerBlocksTemplate( item.innerBlocks ),
+				item.innerContent
 			),
 		],
-		[ item.name, item.initialAttributes, item.innerBlocks ]
+		[
+			item.name,
+			item.initialAttributes,
+			item.innerBlocks,
+			item.innerContent,
+		]
 	);
 
 	const isSynced =

@@ -16,23 +16,40 @@ import { parse } from '@wordpress/blocks';
 import { useAvailableTemplates, useEditedPostContext } from './hooks';
 import { searchTemplates } from '../../utils/search-templates';
 
-export default function SwapTemplateButton( { onClick } ) {
-	const [ showModal, setShowModal ] = useState( false );
+export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 	const { postType, postId } = useEditedPostContext();
-	const availableTemplates = useAvailableTemplates( postType );
 	const { editEntityRecord } = useDispatch( coreStore );
-
 	const onTemplateSelect = async ( template ) => {
 		editEntityRecord(
 			'postType',
 			postType,
 			postId,
-			{ template: template.name },
+			// Since we append the default template we need to properly
+			// update to an empty string.
+			{ template: template.isDefault ? '' : template.name },
 			{ undoIgnore: true }
 		);
-		setShowModal( false ); // Close the template suggestions modal first.
-		onClick();
+		onRequestClose();
+		onSelect?.();
 	};
+	return (
+		<Modal
+			title={ __( 'Choose a template' ) }
+			onRequestClose={ onRequestClose }
+			overlayClassName="editor-post-template__swap-template-modal"
+			isFullScreen
+		>
+			<div className="editor-post-template__swap-template-modal-content">
+				<TemplatesList onSelect={ onTemplateSelect } />
+			</div>
+		</Modal>
+	);
+}
+
+export default function SwapTemplateButton( { onClick } ) {
+	const [ showModal, setShowModal ] = useState( false );
+	const availableTemplates = useAvailableTemplates();
+
 	return (
 		<>
 			<MenuItem
@@ -43,27 +60,18 @@ export default function SwapTemplateButton( { onClick } ) {
 				{ __( 'Change template' ) }
 			</MenuItem>
 			{ showModal && (
-				<Modal
-					title={ __( 'Choose a template' ) }
+				<SwapTemplateModal
 					onRequestClose={ () => setShowModal( false ) }
-					overlayClassName="editor-post-template__swap-template-modal"
-					isFullScreen
-				>
-					<div className="editor-post-template__swap-template-modal-content">
-						<TemplatesList
-							postType={ postType }
-							onSelect={ onTemplateSelect }
-						/>
-					</div>
-				</Modal>
+					onSelect={ onClick }
+				/>
 			) }
 		</>
 	);
 }
 
-function TemplatesList( { postType, onSelect } ) {
+function TemplatesList( { onSelect } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const availableTemplates = useAvailableTemplates( postType );
+	const availableTemplates = useAvailableTemplates();
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => ( {
@@ -71,6 +79,7 @@ function TemplatesList( { postType, onSelect } ) {
 				blocks: parse( template.content.raw ),
 				title: decodeEntities( template.title.rendered ),
 				id: template.id,
+				isDefault: template.isDefault,
 			} ) ),
 		[ availableTemplates ]
 	);

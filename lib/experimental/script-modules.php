@@ -7,6 +7,7 @@
  *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
+ * @return array The filtered block settings.
  */
 function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
@@ -150,10 +151,7 @@ function gutenberg_register_view_module_ids_rest_field() {
 		array(
 			'get_callback' => function ( $item ) {
 				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
-				if ( isset( $block_type->view_script_module_ids ) ) {
-					return $block_type->view_script_module_ids;
-				}
-				return array();
+				return $block_type->view_script_module_ids ?? array();
 			},
 		)
 	);

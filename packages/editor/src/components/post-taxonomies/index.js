@@ -20,8 +20,7 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 			postType: select( editorStore ).getCurrentPostType(),
 			taxonomies: select( coreStore ).getEntityRecords(
 				'root',
-				'taxonomy',
-				{ per_page: -1 }
+				'taxonomy'
 			),
 		};
 	}, [] );

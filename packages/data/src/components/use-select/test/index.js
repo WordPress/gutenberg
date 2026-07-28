@@ -705,7 +705,12 @@ describe( 'useSelect', () => {
 				'count2:0'
 			);
 
-			act( () => screen.getByText( 'Open' ).click() );
+			act( () =>
+				screen
+					.getByText( 'Open' )
+					// eslint-disable-next-line testing-library/no-node-access
+					.click()
+			);
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );

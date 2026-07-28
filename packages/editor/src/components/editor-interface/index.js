@@ -7,23 +7,32 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { InlineNotices } from '@wordpress/notices';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import EditorNotices from '../editor-notices';
+import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
+import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
+import { CollaboratorsOverlay } from '../collaborators-overlay';
+import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -42,12 +51,29 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+function Notices() {
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
+
+	return (
+		<ThemeProvider cornerRadius="none">
+			<InlineNotices
+				className="editor-notices"
+				pinnedNoticesClassName="editor-notices__pinned"
+				dismissibleNoticesClassName="editor-notices__dismissible"
+			>
+				{ ! isValidTemplate && <TemplateValidationNotice /> }
+			</InlineNotices>
+		</ThemeProvider>
+	);
+}
+
 export default function EditorInterface( {
 	className,
 	children,
 	forceIsDirty,
 	contentRef,
-	disableIframe,
 	autoFocus,
 	customSaveButton,
 	customSavePanel,
@@ -56,6 +82,8 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
+		postId,
+		postType,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
@@ -64,12 +92,22 @@ export default function EditorInterface( {
 		postTypeLabel,
 		stylesPath,
 		showStylebook,
+		isRevisionsMode,
+		showDiff,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const {
+			getEditorSettings,
+			getPostTypeLabel,
+			getCurrentPostType,
+			getCurrentPostId,
+		} = select( editorStore );
+		const {
+			getStylesPath,
+			getShowStylebook,
+			isRevisionsMode: _isRevisionsMode,
+			isShowingRevisionDiff,
+		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
@@ -82,6 +120,8 @@ export default function EditorInterface( {
 
 		return {
 			mode: _mode,
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
@@ -90,14 +130,23 @@ export default function EditorInterface( {
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			isRevisionsMode: _isRevisionsMode(),
+			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );
+	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+
+	// Runs unconditionally so join/leave/save notifications are dispatched
+	// regardless of viewport width or whether the header centre area is visible.
+	useCollaboratorNotifications( postId, postType );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
 	const shouldShowStylesCanvas =
 		showStylebook || stylesPath?.startsWith( '/revisions' );
+	const shouldShowBlockEditor = ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -112,6 +161,24 @@ export default function EditorInterface( {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	// When in revisions mode, render the revisions interface.
+	if ( isRevisionsMode ) {
+		return (
+			<InterfaceSkeleton
+				className={ clsx( 'editor-editor-interface', className ) }
+				labels={ interfaceLabels }
+				header={
+					<RevisionsHeader
+						showDiff={ showDiff }
+						onToggleDiff={ () => setShowRevisionDiff( ! showDiff ) }
+					/>
+				}
+				content={ <RevisionsCanvas /> }
+				sidebar={ <ComplementaryArea.Slot scope="core" /> }
+			/>
+		);
+	}
 
 	return (
 		<InterfaceSkeleton
@@ -136,7 +203,7 @@ export default function EditorInterface( {
 					/>
 				)
 			}
-			editorNotices={ <EditorNotices /> }
+			editorNotices={ <Notices /> }
 			secondarySidebar={
 				! isPreviewMode &&
 				mode === 'visual' &&
@@ -149,13 +216,9 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && (
-						<EditorNotices />
-					) }
-
-					{ shouldShowStylesCanvas ? (
-						<StylesCanvas />
-					) : (
+					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
+					{ shouldShowStylesCanvas && <StylesCanvas /> }
+					{ shouldShowBlockEditor && (
 						<>
 							{ ! isPreviewMode && mode === 'text' && (
 								<TextEditor
@@ -172,7 +235,6 @@ export default function EditorInterface( {
 							{ ( isPreviewMode || mode === 'visual' ) && (
 								<VisualEditor
 									contentRef={ contentRef }
-									disableIframe={ disableIframe }
 									// We should auto-focus the canvas (title) on load.
 									// eslint-disable-next-line jsx-a11y/no-autofocus
 									autoFocus={ autoFocus }
@@ -180,6 +242,10 @@ export default function EditorInterface( {
 								/>
 							) }
 							{ children }
+							<CollaboratorsOverlay
+								postId={ postId }
+								postType={ postType }
+							/>
 						</>
 					) }
 				</>

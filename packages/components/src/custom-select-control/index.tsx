@@ -13,12 +13,11 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import _CustomSelect from '../custom-select-control-v2/custom-select';
+import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function useDeprecatedProps< T extends CustomSelectOption >( {
 	__experimentalShowSelectedHint,
@@ -52,12 +51,17 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 	return sprintf( __( 'Currently selected: %s' ), currentName );
 }
 
+/**
+ * `CustomSelectControl` is a dropdown for selecting a single option from a
+ * list, with support for custom styling. Use it instead of the `SelectControl`
+ * when options need richer markup (e.g. per-option styles or hints).
+ */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {
 	const {
-		__next40pxDefaultSize = false,
-		__shouldNotWarnDeprecated36pxSize,
+		// Prevent passing legacy props to internal component.
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		describedBy,
 		options,
 		onChange,
@@ -67,13 +71,6 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		showSelectedHint = false,
 		...restProps
 	} = useDeprecatedProps( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'CustomSelectControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
 
 	const descriptionId = useInstanceId(
 		CustomSelectControl,
@@ -174,25 +171,12 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		);
 	};
 
-	const translatedSize = ( () => {
-		if (
-			( __next40pxDefaultSize && size === 'default' ) ||
-			size === '__unstable-large'
-		) {
-			return 'default';
-		}
-		if ( ! __next40pxDefaultSize && size === 'default' ) {
-			return 'compact';
-		}
-		return size;
-	} )();
-
 	return (
 		<>
-			<_CustomSelect
+			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
-				size={ translatedSize }
+				size={ size }
 				store={ store }
 				className={ clsx(
 					// Keeping the classname for legacy reasons
@@ -203,7 +187,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 				{ ...restProps }
 			>
 				{ children }
-			</_CustomSelect>
+			</CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
 					{ getDescribedBy( selectedOption?.name, describedBy ) }

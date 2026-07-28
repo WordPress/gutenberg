@@ -113,8 +113,10 @@ export function focusListItem( focusClientId, treeGridElement ) {
 			resolve( null );
 		}, 3000 );
 	} ).then( ( element ) => {
-		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
-		focus.focusable.find( element )?.[ 0 ]?.focus();
+		if ( element && element.isConnected ) {
+			// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
+			focus.focusable.find( element )?.[ 0 ]?.focus();
+		}
 	} );
 }
 

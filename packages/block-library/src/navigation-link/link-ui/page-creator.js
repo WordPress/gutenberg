@@ -37,7 +37,7 @@ export function LinkUIPageCreator( {
 	initialTitle = '',
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
-	const [ shouldPublish, setShouldPublish ] = useState( false );
+	const [ shouldPublish, setShouldPublish ] = useState( true );
 
 	// Check if the title is valid for submission
 	const isTitleValid = title.trim().length > 0;
@@ -103,7 +103,7 @@ export function LinkUIPageCreator( {
 
 				onPageCreated( pageLink );
 			}
-		} catch ( error ) {
+		} catch {
 			// Show error notice
 			createErrorNotice(
 				__( 'Failed to create page. Please try again.' ),
@@ -128,7 +128,6 @@ export function LinkUIPageCreator( {
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }
@@ -136,9 +135,9 @@ export function LinkUIPageCreator( {
 						/>
 
 						<CheckboxControl
-							label={ __( 'Publish immediately' ) }
+							label={ __( 'Publish' ) }
 							help={ __(
-								'If unchecked, the page will be created as a draft.'
+								"Turn off to save as a draft. Drafts won't appear on your site until published."
 							) }
 							checked={ shouldPublish }
 							onChange={ setShouldPublish }

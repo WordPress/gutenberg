@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-import { useEffect, useContext } from '@wordpress/element';
+import { useEffect, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,15 +15,23 @@ import { useEffect, useContext } from '@wordpress/element';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
+	mayDisplayPatternEditingControlsKey,
+	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
+import {
+	scopeResetAllFilterToState,
+	useBlockStyleState,
+} from '../../hooks/block-style-state';
+import { ListViewContentFill } from './list-view-content-popover';
 
-export function PrivateInspectorControlsFill( {
+const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
+
+export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
 	resetAllFilter,
-	forceDisplayControls,
 } ) {
 	if ( __experimentalGroup ) {
 		deprecated(
@@ -38,12 +46,56 @@ export function PrivateInspectorControlsFill( {
 	}
 
 	const context = useBlockEditContext();
+
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! forceDisplayControls && ! context[ mayDisplayControlsKey ] ) {
+
+	// During pattern editing:
+	// - All blocks can show pattern editing groups (content, list).
+	// - Template parts can show any inspector group.
+	// - Other blocks cannot show a settings tab.
+	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
+		// Template parts have also historically supported
+		// any block inspector groups for extenders. The settings
+		// tab is also used by core for the 'Design' panel. Specifically
+		// for that block the restrictions on allowed groups are lessened.
+		const isTemplatePart = context.name === 'core/template-part';
+		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
+		const canShowGroup = isTemplatePart || isPatternEditingGroup;
+
+		if ( ! canShowGroup ) {
+			return null;
+		}
+	}
+
+	// Outside pattern editing, use the standard rules for displaying controls.
+	if (
+		! context[ mayDisplayPatternEditingControlsKey ] &&
+		! context[ mayDisplayControlsKey ]
+	) {
+		return null;
+	}
+
+	// When inside a section with a parent that has ListView block support,
+	// content controls are rendered as part of the ListView via a popover.
+	if (
+		group === 'content' &&
+		!! context[ isInListViewBlockSupportTreeKey ] &&
+		!! context[ mayDisplayPatternEditingControlsKey ]
+	) {
+		if ( context[ mayDisplayControlsKey ] ) {
+			return (
+				<StyleProvider document={ document }>
+					<ListViewContentFill>{ children }</ListViewContentFill>
+				</StyleProvider>
+			);
+		}
+
+		// When using the ListView fill, only render controls for the selected
+		// block. Other blocks return `null`.
 		return null;
 	}
 
@@ -64,38 +116,30 @@ export function PrivateInspectorControlsFill( {
 	);
 }
 
-export default function InspectorControlsFill( {
-	children,
-	group = 'default',
-	__experimentalGroup,
-	resetAllFilter,
-} ) {
-	return (
-		<PrivateInspectorControlsFill
-			group={ group }
-			__experimentalGroup={ __experimentalGroup }
-			resetAllFilter={ resetAllFilter }
-		>
-			{ children }
-		</PrivateInspectorControlsFill>
-	);
-}
-
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
+	const selectedState = useBlockStyleState();
+	const scopedResetAllFilter = useMemo(
+		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
+		[ resetAllFilter, selectedState ]
+	);
 	useEffect( () => {
 		if (
-			resetAllFilter &&
+			scopedResetAllFilter &&
 			registerResetAllFilter &&
 			deregisterResetAllFilter
 		) {
-			registerResetAllFilter( resetAllFilter );
+			registerResetAllFilter( scopedResetAllFilter );
 			return () => {
-				deregisterResetAllFilter( resetAllFilter );
+				deregisterResetAllFilter( scopedResetAllFilter );
 			};
 		}
-	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	}, [
+		scopedResetAllFilter,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+	] );
 	return children;
 }
 

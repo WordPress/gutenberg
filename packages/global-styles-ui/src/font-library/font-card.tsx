@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { _n, sprintf, isRTL } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	useNavigator,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 	Flex,
 	FlexItem,
@@ -22,11 +23,13 @@ function FontCard( {
 	onClick,
 	variantsText,
 	navigatorPath,
+	shouldFocus,
 }: {
 	font: FontFamily;
 	onClick: () => void;
 	variantsText?: string;
 	navigatorPath?: string;
+	shouldFocus?: boolean;
 } ) {
 	const variantsCount = font.fontFace?.length || 1;
 
@@ -35,9 +38,17 @@ function FontCard( {
 	};
 
 	const navigator = useNavigator();
+	const ref = useRef< HTMLButtonElement >( null );
+
+	useEffect( () => {
+		if ( shouldFocus ) {
+			ref.current?.focus();
+		}
+	}, [ shouldFocus ] );
 
 	return (
 		<Button
+			ref={ ref }
 			__next40pxDefaultSize
 			onClick={ () => {
 				onClick();
@@ -52,7 +63,7 @@ function FontCard( {
 				<FontDemo font={ font } />
 				<Flex justify="flex-end">
 					<FlexItem>
-						<Text className="font-library__font-card__count">
+						<WCText className="font-library__font-card__count">
 							{ variantsText ||
 								sprintf(
 									/* translators: %d: Number of font variants. */
@@ -63,7 +74,7 @@ function FontCard( {
 									),
 									variantsCount
 								) }
-						</Text>
+						</WCText>
 					</FlexItem>
 					<FlexItem>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />

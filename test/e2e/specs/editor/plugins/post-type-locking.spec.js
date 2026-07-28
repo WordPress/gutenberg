@@ -361,7 +361,8 @@ test.describe( 'Post-type locking', () => {
 				'Details',
 				'Group',
 				'Preformatted',
-				'Verse',
+				'Pullquote',
+				'Poetry',
 			] );
 		} );
 	} );

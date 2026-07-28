@@ -66,6 +66,7 @@ export function ItemClickWrapper< Item >( {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	className?: string;
+	title?: string;
 	children: ReactNode;
 } ) {
 	// Always render a wrapper element so layout and styling relying on the wrapper

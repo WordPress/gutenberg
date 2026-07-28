@@ -2,227 +2,208 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { WPUnitControlUnit } from './types';
 
-const isWeb = Platform.OS === 'web';
-
 const allUnits: Record< string, WPUnitControlUnit > = {
 	px: {
 		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		label: 'px',
 		a11yLabel: __( 'Pixels (px)' ),
 		step: 1,
 	},
 	'%': {
 		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		label: '%',
 		a11yLabel: __( 'Percent (%)' ),
 		step: 0.1,
 	},
 	em: {
 		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		label: 'em',
 		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
 		step: 0.01,
 	},
 	rem: {
 		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		label: 'rem',
 		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
 		step: 0.01,
 	},
 	vw: {
 		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		label: 'vw',
 		a11yLabel: __( 'Viewport width (vw)' ),
 		step: 0.1,
 	},
 	vh: {
 		value: 'vh',
-		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
+		label: 'vh',
 		a11yLabel: __( 'Viewport height (vh)' ),
 		step: 0.1,
 	},
 	vmin: {
 		value: 'vmin',
-		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
+		label: 'vmin',
 		a11yLabel: __( 'Viewport smallest dimension (vmin)' ),
 		step: 0.1,
 	},
 	vmax: {
 		value: 'vmax',
-		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
+		label: 'vmax',
 		a11yLabel: __( 'Viewport largest dimension (vmax)' ),
 		step: 0.1,
 	},
 	ch: {
 		value: 'ch',
-		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
+		label: 'ch',
 		a11yLabel: __( 'Width of the zero (0) character (ch)' ),
 		step: 0.01,
 	},
 	ex: {
 		value: 'ex',
-		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
+		label: 'ex',
 		a11yLabel: __( 'x-height of the font (ex)' ),
 		step: 0.01,
 	},
 	cm: {
 		value: 'cm',
-		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
+		label: 'cm',
 		a11yLabel: __( 'Centimeters (cm)' ),
 		step: 0.001,
 	},
 	mm: {
 		value: 'mm',
-		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
+		label: 'mm',
 		a11yLabel: __( 'Millimeters (mm)' ),
 		step: 0.1,
 	},
 	in: {
 		value: 'in',
-		label: isWeb ? 'in' : __( 'Inches (in)' ),
+		label: 'in',
 		a11yLabel: __( 'Inches (in)' ),
 		step: 0.001,
 	},
 	pc: {
 		value: 'pc',
-		label: isWeb ? 'pc' : __( 'Picas (pc)' ),
+		label: 'pc',
 		a11yLabel: __( 'Picas (pc)' ),
 		step: 1,
 	},
 	pt: {
 		value: 'pt',
-		label: isWeb ? 'pt' : __( 'Points (pt)' ),
+		label: 'pt',
 		a11yLabel: __( 'Points (pt)' ),
 		step: 1,
 	},
 	svw: {
 		value: 'svw',
-		label: isWeb ? 'svw' : __( 'Small viewport width (svw)' ),
+		label: 'svw',
 		a11yLabel: __( 'Small viewport width (svw)' ),
 		step: 0.1,
 	},
 	svh: {
 		value: 'svh',
-		label: isWeb ? 'svh' : __( 'Small viewport height (svh)' ),
+		label: 'svh',
 		a11yLabel: __( 'Small viewport height (svh)' ),
 		step: 0.1,
 	},
 	svi: {
 		value: 'svi',
-		label: isWeb
-			? 'svi'
-			: __( 'Viewport smallest size in the inline direction (svi)' ),
+		label: 'svi',
 		a11yLabel: __( 'Small viewport width or height (svi)' ),
 		step: 0.1,
 	},
 	svb: {
 		value: 'svb',
-		label: isWeb
-			? 'svb'
-			: __( 'Viewport smallest size in the block direction (svb)' ),
+		label: 'svb',
 		a11yLabel: __( 'Small viewport width or height (svb)' ),
 		step: 0.1,
 	},
 	svmin: {
 		value: 'svmin',
-		label: isWeb
-			? 'svmin'
-			: __( 'Small viewport smallest dimension (svmin)' ),
+		label: 'svmin',
 		a11yLabel: __( 'Small viewport smallest dimension (svmin)' ),
 		step: 0.1,
 	},
 	lvw: {
 		value: 'lvw',
-		label: isWeb ? 'lvw' : __( 'Large viewport width (lvw)' ),
+		label: 'lvw',
 		a11yLabel: __( 'Large viewport width (lvw)' ),
 		step: 0.1,
 	},
 	lvh: {
 		value: 'lvh',
-		label: isWeb ? 'lvh' : __( 'Large viewport height (lvh)' ),
+		label: 'lvh',
 		a11yLabel: __( 'Large viewport height (lvh)' ),
 		step: 0.1,
 	},
 	lvi: {
 		value: 'lvi',
-		label: isWeb ? 'lvi' : __( 'Large viewport width or height (lvi)' ),
+		label: 'lvi',
 		a11yLabel: __( 'Large viewport width or height (lvi)' ),
 		step: 0.1,
 	},
 	lvb: {
 		value: 'lvb',
-		label: isWeb ? 'lvb' : __( 'Large viewport width or height (lvb)' ),
+		label: 'lvb',
 		a11yLabel: __( 'Large viewport width or height (lvb)' ),
 		step: 0.1,
 	},
 	lvmin: {
 		value: 'lvmin',
-		label: isWeb
-			? 'lvmin'
-			: __( 'Large viewport smallest dimension (lvmin)' ),
+		label: 'lvmin',
 		a11yLabel: __( 'Large viewport smallest dimension (lvmin)' ),
 		step: 0.1,
 	},
 	dvw: {
 		value: 'dvw',
-		label: isWeb ? 'dvw' : __( 'Dynamic viewport width (dvw)' ),
+		label: 'dvw',
 		a11yLabel: __( 'Dynamic viewport width (dvw)' ),
 		step: 0.1,
 	},
 	dvh: {
 		value: 'dvh',
-		label: isWeb ? 'dvh' : __( 'Dynamic viewport height (dvh)' ),
+		label: 'dvh',
 		a11yLabel: __( 'Dynamic viewport height (dvh)' ),
 		step: 0.1,
 	},
 	dvi: {
 		value: 'dvi',
-		label: isWeb ? 'dvi' : __( 'Dynamic viewport width or height (dvi)' ),
+		label: 'dvi',
 		a11yLabel: __( 'Dynamic viewport width or height (dvi)' ),
 		step: 0.1,
 	},
 	dvb: {
 		value: 'dvb',
-		label: isWeb ? 'dvb' : __( 'Dynamic viewport width or height (dvb)' ),
+		label: 'dvb',
 		a11yLabel: __( 'Dynamic viewport width or height (dvb)' ),
 		step: 0.1,
 	},
 	dvmin: {
 		value: 'dvmin',
-		label: isWeb
-			? 'dvmin'
-			: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+		label: 'dvmin',
 		a11yLabel: __( 'Dynamic viewport smallest dimension (dvmin)' ),
 		step: 0.1,
 	},
 	dvmax: {
 		value: 'dvmax',
-		label: isWeb
-			? 'dvmax'
-			: __( 'Dynamic viewport largest dimension (dvmax)' ),
+		label: 'dvmax',
 		a11yLabel: __( 'Dynamic viewport largest dimension (dvmax)' ),
 		step: 0.1,
 	},
 	svmax: {
 		value: 'svmax',
-		label: isWeb
-			? 'svmax'
-			: __( 'Small viewport largest dimension (svmax)' ),
+		label: 'svmax',
 		a11yLabel: __( 'Small viewport largest dimension (svmax)' ),
 		step: 0.1,
 	},
 	lvmax: {
 		value: 'lvmax',
-		label: isWeb
-			? 'lvmax'
-			: __( 'Large viewport largest dimension (lvmax)' ),
+		label: 'lvmax',
 		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
 		step: 0.1,
 	},

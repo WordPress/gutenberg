@@ -10,6 +10,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -29,6 +30,8 @@ export default function GlobalStylesSidebar() {
 		showListViewByDefault,
 		hasRevisions,
 		activeComplementaryArea,
+		editorSettings,
+		styleStateViewport,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -60,6 +63,10 @@ export default function GlobalStylesSidebar() {
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
+			editorSettings: select( editorStore ).getEditorSettings(),
+			styleStateViewport: unlock(
+				select( blockEditorStore )
+			).getStyleStateViewport(),
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
@@ -169,6 +176,9 @@ export default function GlobalStylesSidebar() {
 				<GlobalStylesUI
 					path={ stylesPath }
 					onPathChange={ setStylesPath }
+					settings={ editorSettings }
+					selectedViewport={ styleStateViewport }
+					showResponsiveStateControls={ false }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { ATTACHMENT_POST_TYPE } from '../constants';
+
+/**
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
@@ -31,6 +36,10 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	// Always should a notice, which will be spoken for accessibility.
 	if ( willTrash ) {
 		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( post.type === ATTACHMENT_POST_TYPE ) {
+		// Attachments should always show a simple updated message because they don't have a draft state.
+		noticeMessage = __( 'Media updated.' );
 		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.

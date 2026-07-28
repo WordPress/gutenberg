@@ -29,6 +29,7 @@ describe( 'Blocks raw handling', () => {
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
+			apiVersion: 3,
 			title: 'Test Gallery',
 			category: 'text',
 			attributes: {
@@ -62,6 +63,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		registerBlockType( 'test/non-inline-block', {
+			apiVersion: 3,
 			title: 'Test Non Inline Block',
 			category: 'text',
 			supports: {
@@ -88,6 +90,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		registerBlockType( 'test/transform-to-multiple-blocks', {
+			apiVersion: 3,
 			title: 'Test Transform to Multiple Blocks',
 			category: 'text',
 			transforms: {
@@ -355,6 +358,7 @@ describe( 'Blocks raw handling', () => {
 				} )
 			)
 		).toBe( block );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should handle transforms that return an array of blocks', () => {
@@ -410,6 +414,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
+			'google-docs-link-spacing',
 			'ms-word',
 			'ms-word-list',
 			'ms-word-styled',
@@ -493,6 +498,7 @@ describe( 'Blocks raw handling', () => {
 				path.join( __dirname, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
 		} );
 
 		it( 'should strip HTML formatting space from inline text', () => {

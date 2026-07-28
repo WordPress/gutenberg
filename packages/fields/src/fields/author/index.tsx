@@ -28,6 +28,9 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 				'user',
 				{
 					per_page: -1,
+					who: 'authors',
+					_fields: 'id,name',
+					context: 'view',
 				}
 			) ) ?? [];
 		return authors.map( ( { id, name } ) => ( {
@@ -45,7 +48,6 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 			? nameA.localeCompare( nameB )
 			: nameB.localeCompare( nameA );
 	},
-
 	filterBy: {
 		operators: [ 'isAny', 'isNone' ],
 	},

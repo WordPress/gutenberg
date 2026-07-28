@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react-webpack5';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
 
@@ -54,6 +54,11 @@ const meta: Meta< typeof Menu > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
 		},
 	},
 };
@@ -508,7 +513,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup
@@ -666,7 +671,10 @@ export const InsideModal: StoryObj< typeof Menu > = {
 								</Menu>
 							</Menu.Popover>
 						</Menu>
-						<Button onClick={ () => setModalOpen( false ) }>
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => setModalOpen( false ) }
+						>
 							Close modal
 						</Button>
 					</Modal>

@@ -50,7 +50,7 @@ const withDeprecatedKeys =
 	};
 
 /**
- * Returns a boolean indicating whether a prefer is active for a particular
+ * Returns a boolean indicating whether a preference is active for a particular
  * scope.
  *
  * @param {StoreState} state The store state.

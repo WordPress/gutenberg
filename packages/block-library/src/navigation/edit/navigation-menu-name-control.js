@@ -14,7 +14,6 @@ export default function NavigationMenuNameControl() {
 
 	return (
 		<TextControl
-			__next40pxDefaultSize
 			label={ __( 'Menu name' ) }
 			value={ title }
 			onChange={ updateTitle }

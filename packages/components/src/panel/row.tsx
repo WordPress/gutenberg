@@ -33,5 +33,6 @@ function UnforwardedPanelRow(
  * It is a flex container with a top margin for spacing.
  */
 export const PanelRow = forwardRef( UnforwardedPanelRow );
+PanelRow.displayName = 'PanelRow';
 
 export default PanelRow;

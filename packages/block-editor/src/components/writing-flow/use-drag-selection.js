@@ -8,20 +8,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
-	// Firefox doesn't automatically move focus.
-	if ( value ) {
-		node.focus();
-	}
-}
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Sets a multi-selection based on the native selection across blocks.
@@ -30,6 +17,7 @@ export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
 	const {
+		getSettings,
 		isSelectionEnabled,
 		hasSelectedBlock,
 		isDraggingBlocks,
@@ -123,7 +111,12 @@ export default function useDragSelection() {
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
 				// multi selecting when the mouse leaves the wrapper.
-				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
+				// In preview mode, allow drag selection from blocks since they
+				// are not contenteditable.
+				if (
+					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					! getSettings().isPreviewMode
+				) {
 					return;
 				}
 

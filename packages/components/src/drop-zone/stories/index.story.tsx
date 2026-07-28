@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import DropZone from '..';
 const ICONS = { upload, media };
 
 const meta: Meta< typeof DropZone > = {
+	tags: [ 'manifest' ],
 	component: DropZone,
 	id: 'components-dropzone',
 	title: 'Components/Selection & Input/File Upload/DropZone',
@@ -35,6 +36,10 @@ const meta: Meta< typeof DropZone > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

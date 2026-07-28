@@ -333,6 +333,43 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that CSS rules with different declaration options are not combined.
+	 *
+	 * @covers ::get_css
+	 */
+	public function test_should_not_combine_css_rules_with_different_declaration_options() {
+		$important_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$important_declarations->add_declaration(
+			'color',
+			'red',
+			array(
+				'important' => true,
+			)
+		);
+
+		$important_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.important-rule', $important_declarations );
+		$regular_rule   = new WP_Style_Engine_CSS_Rule_Gutenberg(
+			'.regular-rule',
+			array(
+				'color' => 'red',
+			)
+		);
+
+		$processor = new WP_Style_Engine_Processor_Gutenberg();
+		$processor->add_rules( array( $important_rule, $regular_rule ) );
+
+		$this->assertSame(
+			'.important-rule{color:red !important;}.regular-rule{color:red;}',
+			$processor->get_css(
+				array(
+					'prettify' => false,
+					'optimize' => true,
+				)
+			)
+		);
+	}
+
+	/**
 	 * Tests that incoming CSS rules are optimized and merged with existing CSS rules.
 	 *
 	 * @ticket 58811

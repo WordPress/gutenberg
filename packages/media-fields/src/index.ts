@@ -1,5 +1,6 @@
 export { default as altTextField } from './alt_text';
 export { default as attachedToField } from './attached_to';
+export { default as authorField } from './author';
 export { default as captionField } from './caption';
 export { default as dateAddedField } from './date_added';
 export { default as dateModifiedField } from './date_modified';

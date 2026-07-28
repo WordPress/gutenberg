@@ -51,7 +51,10 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 					: true
 			}
 			{ ...props }
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ clsx(
+				'block-editor-color-gradient-item',
+				'block-editor-tools-panel-color-gradient-settings__item'
+			) }
 			panelId={ panelId }
 			// Pass resetAllFilter if supplied due to rendering via SlotFill
 			// into parent ToolsPanel.
@@ -80,9 +83,8 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle =
-	( settings ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( settings ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const {
 			clearable,
 			colorValue,

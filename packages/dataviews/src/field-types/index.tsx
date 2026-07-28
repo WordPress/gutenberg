@@ -28,6 +28,7 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
+import getFilter from './utils/get-filter';
 import getFormat from './utils/get-format';
 
 /**
@@ -95,6 +96,10 @@ export default function normalizeFields< Item >(
 			getElements: field.getElements,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
+			isDisabled:
+				typeof field.isDisabled === 'function'
+					? field.isDisabled
+					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
 			// The type provides defaults for the following props
@@ -111,6 +116,7 @@ export default function normalizeFields< Item >(
 				fieldType.defaultOperators,
 				fieldType.validOperators
 			),
+			filter: getFilter( fieldType ),
 			format: getFormat( field, fieldType ),
 			getValueFormatted:
 				field.getValueFormatted ?? fieldType.getValueFormatted,

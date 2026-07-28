@@ -173,18 +173,25 @@ export default function StartTemplateOptions() {
 				select( editorStore );
 			const _postType = getCurrentPostType();
 			const _postId = getCurrentPostId();
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+			const { getEditedEntityRecord, getEntityRecordNonTransientEdits } =
 				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
 				_postType,
 				_postId
 			);
-			const hasEdits = hasEditsForEntityRecord(
-				'postType',
-				_postType,
-				_postId
-			);
+			// Read non-transient edits directly. `isEditedPostDirty` /
+			// `hasEditsForEntityRecord` also return true while the CRDT
+			// sync manager's phantom save (fired off `receiveEntityRecords`
+			// at boot) is in flight, which would suppress the modal.
+			const hasEdits =
+				Object.keys(
+					getEntityRecordNonTransientEdits(
+						'postType',
+						_postType,
+						_postId
+					) ?? {}
+				).length > 0;
 
 			return {
 				shouldOpenModal:

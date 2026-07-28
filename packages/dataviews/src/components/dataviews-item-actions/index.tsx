@@ -171,9 +171,6 @@ export function ActionsMenuGroup< Item >( {
 	return (
 		<Menu.Group>
 			{ renderActionGroup( primaryActions ) }
-			{ primaryActions.length > 0 && regularActions.length > 0 && (
-				<Menu.Separator />
-			) }
 			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);
@@ -199,6 +196,8 @@ export default function ItemActions< Item >( {
 			eligibleActions: _eligibleActions,
 		};
 	}, [ actions, item ] );
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	if ( isCompact ) {
 		return (
@@ -226,7 +225,10 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			{ primaryActions.length < eligibleActions.length && (
+			{ ( primaryActions.length < eligibleActions.length ||
+				// Since we hide primary actions on mobile, we need to show the menu
+				// there if there are any actions at all.
+				isMobileViewport ) && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }

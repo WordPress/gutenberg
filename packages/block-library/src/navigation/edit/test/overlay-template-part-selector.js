@@ -28,9 +28,10 @@ jest.mock( '../use-create-overlay', () => ( {
 	default: jest.fn(),
 } ) );
 
-// Mock useDispatch specifically to avoid needing to set up full data store
+// Mock useDispatch and useSelect specifically to avoid needing to set up full data store
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
+	useSelect: jest.fn(),
 	createSelector: jest.fn( ( fn ) => fn ),
 	createRegistrySelector: jest.fn( ( fn ) => fn ),
 	createReduxStore: jest.fn( () => ( {} ) ),
@@ -42,6 +43,7 @@ jest.mock( '@wordpress/data', () => ( {
 		return newState;
 	} ),
 	register: jest.fn(),
+	keyedReducer: jest.fn( () => ( reducer ) => reducer ),
 } ) );
 
 const mockSetAttributes = jest.fn();
@@ -83,15 +85,10 @@ const templatePartOtherArea = {
 	area: 'header',
 };
 
-const allTemplateParts = [
-	templatePart1,
-	templatePart2,
-	templatePartOtherArea,
-];
-
 describe( 'OverlayTemplatePartSelector', () => {
 	const mockCreateOverlayTemplatePart = jest.fn();
 	const mockCreateErrorNotice = jest.fn();
+	const { useSelect } = require( '@wordpress/data' );
 
 	beforeEach( () => {
 		jest.clearAllMocks();
@@ -107,6 +104,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 		useDispatch.mockReturnValue( {
 			createErrorNotice: mockCreateErrorNotice,
 		} );
+		// Mock useSelect to return current theme
+		// The component calls: select( coreStore ).getCurrentTheme()?.stylesheet
+		useSelect.mockReturnValue( 'twentytwentyfive' );
 	} );
 
 	describe( 'Loading state', () => {
@@ -127,9 +127,61 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Overlay selection', () => {
-		it( 'should show selector with "None (default)" option when no overlays are available', () => {
+		it( 'should show Create Overlay button when no overlays exist', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create overlay',
+			} );
+			expect( createButton ).toBeInTheDocument();
+			expect(
+				screen.getByText(
+					'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
+				)
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Overlay template' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should show dropdown selector when theme overlays exist', () => {
+			// Theme overlays have a theme property
+			const themeOverlay = {
+				...templatePart1,
+				theme: 'twentytwentyfive',
+			};
+
+			useEntityRecords.mockReturnValue( {
+				records: [ themeOverlay, templatePartOtherArea ],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Create new overlay template',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should show dropdown selector when any overlays exist', () => {
+			useEntityRecords.mockReturnValue( {
+				records: [
+					templatePart1,
+					templatePart2,
+					templatePartOtherArea,
+				],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -140,30 +192,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 			expect( select ).toBeInTheDocument();
-			expect( select ).toHaveValue( '' );
 
-			// Check for "None (default)" option
-			expect(
-				screen.getByRole( 'option', { name: 'None (default)' } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'should only show overlay (template parts) in the selector', () => {
-			useEntityRecords.mockReturnValue( {
-				records: allTemplateParts,
-				isResolving: false,
-				hasResolved: true,
-			} );
-
-			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
-
-			screen.getByRole( 'combobox', {
-				name: 'Overlay template',
-			} );
-
-			// Should have None + 2 overlays (not the header one)
+			// Should have Default + 2 overlays (not the header one)
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 3 ); // None + 2 overlay parts
+			expect( options ).toHaveLength( 3 );
 
 			expect(
 				screen.getByRole( 'option', { name: 'My Overlay' } )
@@ -174,6 +206,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect(
 				screen.queryByRole( 'option', { name: 'Header Part' } )
 			).not.toBeInTheDocument();
+
+			// Should show "Default" option (not "None (default)")
+			expect(
+				screen.getByRole( 'option', { name: 'Default' } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should display overlay slug when title is missing', () => {
@@ -195,7 +232,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should call set the overlay attribute when an overlay is selected', async () => {
+		it( 'should store slug only when an overlay is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -210,14 +247,14 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			await user.selectOptions( select, 'twentytwentyfive//my-overlay' );
+			await user.selectOptions( select, 'my-overlay' );
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlay: 'twentytwentyfive//my-overlay',
+				overlay: 'my-overlay',
 			} );
 		} );
 
-		it( 'unsets custom overlay when "None (default)" is selected', async () => {
+		it( 'unsets overlay when "Default" is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -229,7 +266,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -244,7 +281,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should display selected overlay', () => {
+		it( 'should display selected overlay by slug', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -254,7 +291,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -262,7 +299,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			expect( select ).toHaveValue( 'twentytwentyfive//my-overlay' );
+			expect( select ).toHaveValue( 'my-overlay' );
 		} );
 	} );
 
@@ -293,7 +330,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -322,7 +359,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -345,7 +382,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -359,7 +396,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should navigate to focused overlay editor when edit button is clicked', async () => {
+		it( 'should navigate to focused overlay editor with full ID when edit button is clicked', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -371,7 +408,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -382,6 +419,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			await user.click( editButton );
 
+			// Should construct full ID from theme and slug
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
 				postType: 'wp_template_part',
@@ -400,7 +438,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -421,7 +459,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Help text', () => {
-		it( 'should show help text when no overlays are available', () => {
+		it( 'should show prominent create button with help text when no overlays exist', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
 				isResolving: false,
@@ -430,17 +468,22 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			expect(
-				screen.getByText( 'No overlays found.' )
-			).toBeInTheDocument();
+			// Should show prominent create button
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Create new overlay template',
+					name: 'Create overlay',
 				} )
+			).toBeInTheDocument();
+
+			// Should show help text explaining overlays
+			expect(
+				screen.getByText(
+					'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
+				)
 			).toBeInTheDocument();
 		} );
 
-		it( 'should show default help text when overlays are available', () => {
+		it( 'should show dropdown with help text when overlays are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -449,9 +492,17 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
+			// Should show dropdown selector
+			expect(
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
+			).toBeInTheDocument();
+
+			// Should show default help text
 			expect(
 				screen.getByText( 'Select an overlay for navigation.' )
 			).toBeInTheDocument();
+
+			// Should also show small create button
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Create new overlay template',
@@ -461,7 +512,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Create overlay', () => {
-		it( 'should call createOverlayTemplatePart when create button is clicked', async () => {
+		it( 'should store slug only and navigate with full ID when creating overlay via prominent button', async () => {
 			const user = userEvent.setup();
 			const newOverlay = {
 				id: 'twentytwentyfive//overlay',
@@ -483,16 +534,19 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
+			// Click prominent create button (shown when no custom overlays)
 			const createButton = screen.getByRole( 'button', {
-				name: 'Create new overlay template',
+				name: 'Create overlay',
 			} );
 
 			await user.click( createButton );
 
 			expect( mockCreateOverlayTemplatePart ).toHaveBeenCalled();
+			// Should store slug only
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlay: 'twentytwentyfive//overlay',
+				overlay: 'overlay',
 			} );
+			// Should navigate with full ID constructed from theme and slug
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//overlay',
 				postType: 'wp_template_part',
@@ -516,7 +570,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const createButton = screen.getByRole( 'button', {
-				name: 'Create new overlay template',
+				name: 'Create overlay',
 			} );
 
 			await user.click( createButton );
@@ -541,6 +595,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
+			// When resolving, show dropdown interface with small create button
 			const createButton = screen.getByRole( 'button', {
 				name: 'Create new overlay template',
 			} );

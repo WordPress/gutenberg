@@ -5,6 +5,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -24,6 +25,14 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 		};
 	}, [] );
 
+	const settings = useMemo( () => {
+		return {
+			...storedSettings,
+			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+				fetchLinkSuggestions( search, searchOptions, storedSettings ),
+		};
+	}, [ storedSettings ] );
+
 	const blocks = useMemo( () => {
 		if ( ! navigationMenuId ) {
 			return [];
@@ -38,7 +47,7 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ storedSettings }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }

@@ -21,14 +21,14 @@ test.describe( 'DataViews Pagination', () => {
 		);
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deleteAllPages();
-	} );
-
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllPages();
 	} );
 
 	test( 'navigates forward, backward, and forward again correctly', async ( {

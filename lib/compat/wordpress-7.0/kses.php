@@ -13,10 +13,6 @@
  * @return array Modified list of allowed CSS attributes.
  */
 function gutenberg_add_display_to_safe_style_css( $attr ) {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) ) {
-		return $attr;
-	}
-
 	if ( ! in_array( 'display', $attr, true ) ) {
 		$attr[] = 'display';
 	}

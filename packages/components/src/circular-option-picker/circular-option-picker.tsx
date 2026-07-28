@@ -192,4 +192,6 @@ CircularOptionPicker.OptionGroup = OptionGroup;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
 
+CircularOptionPicker.displayName = 'CircularOptionPicker';
+
 export default CircularOptionPicker;

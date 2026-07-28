@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import CONFIG from '../package-styles/config';
+import { useSharedStyle } from './utils/use-shared-style';
 
 export const WithRTL = ( Story, context ) => {
 	const [ rerenderKey, setRerenderKey ] = useState( 0 );
@@ -41,21 +37,15 @@ export const WithRTL = ( Story, context ) => {
 		return () => removeFilter( 'i18n.gettext_with_context', 'storybook' );
 	}, [ context.globals.direction ] );
 
-	useLayoutEffect( () => {
-		const stylesToUse = [];
+	const stylesToUse = [];
 
-		CONFIG.forEach( ( item ) => {
-			if ( item.componentIdMatcher.test( context.componentId ) ) {
-				stylesToUse.push( ...item[ context.globals.direction ] );
-			}
-		} );
+	CONFIG.forEach( ( item ) => {
+		if ( item.componentIdMatcher.test( context.componentId ) ) {
+			stylesToUse.push( ...item[ context.globals.direction ] );
+		}
+	} );
 
-		stylesToUse.forEach( ( style ) => style.use() );
-
-		return () => {
-			stylesToUse.forEach( ( style ) => style.unuse() );
-		};
-	}, [ context.componentId, context.globals.direction ] );
+	useSharedStyle( stylesToUse.join( '\n' ) );
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>

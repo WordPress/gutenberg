@@ -50,6 +50,10 @@ export const settings = {
 			return customName || summary;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasSummary
 				? __( 'Details. Empty.' )
@@ -70,7 +74,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'summary',
 			label: __( 'Summary' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

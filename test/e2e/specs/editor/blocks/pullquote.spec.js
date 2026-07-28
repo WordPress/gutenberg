@@ -3,26 +3,57 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Pullquote', () => {
+test.describe( 'Quote', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test( 'can be converted to a Quote block', async ( { editor, page } ) => {
-		// Insert a Pullquote block.
-		await editor.insertBlock( { name: 'core/pullquote' } );
+	test( 'can be created by converting a quote and converted back to quote', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
-		// Add multiple lines of text.
-		await page.keyboard.type( 'First line.' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Second line.' );
-
-		// Add a citation.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.type( 'Awesome Citation' );
-
+		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { value: '' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'test' },
+					},
+				],
+			},
+		] );
+
+		await editor.transformBlockTo( 'core/pullquote' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/pullquote',
+				attributes: { value: 'test' },
+				innerBlocks: [],
+			},
+		] );
+		await editor.transformBlockTo( 'core/quote' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { value: '' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'test' },
+					},
+				],
+			},
+		] );
 	} );
 } );

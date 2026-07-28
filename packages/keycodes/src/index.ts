@@ -221,7 +221,7 @@ export const modifiers: WPModifierHandler< WPModifier > = {
 /**
  * An object that contains functions to get raw shortcuts.
  *
- * These are intended for user with the KeyboardShortcuts.
+ * These are intended for use with the KeyboardShortcuts.
  *
  * @example
  * ```js

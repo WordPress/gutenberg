@@ -29,7 +29,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		isAdaptiveWidth,
 		label,
 		onChange: onChangeProp,
-		size,
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
@@ -85,7 +84,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				radio.getState().activeId !== radio.first(),
 			baseId,
 			isBlock: ! isAdaptiveWidth,
-			size,
 			// @ts-expect-error - This is wrong and we should fix it.
 			value: selectedValue,
 			// @ts-expect-error - This is wrong and we should fix it.
@@ -99,7 +97,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			selectedValue,
 			setSelectedElement,
 			setValue,
-			size,
 		]
 	);
 
@@ -122,3 +119,4 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 export const ToggleGroupControlAsRadioGroup = forwardRef(
 	UnforwardedToggleGroupControlAsRadioGroup
 );
+ToggleGroupControlAsRadioGroup.displayName = 'ToggleGroupControlAsRadioGroup';

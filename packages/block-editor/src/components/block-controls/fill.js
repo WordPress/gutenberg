@@ -34,6 +34,7 @@ export default function BlockControlsFill( {
 
 	return (
 		<StyleProvider document={ document }>
+			{ /* eslint-disable-next-line react-hooks/static-components */ }
 			<Fill>
 				{ ( fillProps ) => {
 					// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,

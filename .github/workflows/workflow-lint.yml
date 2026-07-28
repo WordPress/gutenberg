@@ -7,12 +7,16 @@ on:
         paths:
             # Only run when changes are made to workflow files.
             - '.github/workflows/**'
+            - '.github/setup-node/action.yml'
+            - 'packages/**/action.yml'
     pull_request:
         branches:
             - trunk
         paths:
             # Only run when changes are made to workflow files.
             - '.github/workflows/**'
+            - '.github/setup-node/action.yml'
+            - 'packages/**/action.yml'
     workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.

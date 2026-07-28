@@ -51,9 +51,9 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {import('react').CSSProperties} ltrStyles
+ * @param {React.CSSProperties} ltrStyles
  *
- * @return {import('react').CSSProperties} Converted ltr -> rtl styles
+ * @return {React.CSSProperties} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
 	return Object.fromEntries(
@@ -67,8 +67,8 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+ * @param {React.CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {React.CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
  *
  * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
  */

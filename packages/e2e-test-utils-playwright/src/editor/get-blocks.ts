@@ -12,7 +12,6 @@ type Block = {
 /**
  * Returns the edited blocks.
  *
- * @param this
  * @param options
  * @param options.clientId Limit the results to be only under a partial tree of the specified clientId.
  * @param options.full     Whether to return the full block data or just the name and attributes.

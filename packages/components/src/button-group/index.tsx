@@ -53,5 +53,6 @@ function UnforwardedButtonGroup(
  * ```
  */
 export const ButtonGroup = forwardRef( UnforwardedButtonGroup );
+ButtonGroup.displayName = 'ButtonGroup';
 
 export default ButtonGroup;

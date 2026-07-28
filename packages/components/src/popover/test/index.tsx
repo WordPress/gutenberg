@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, getByText } from '@testing-library/react';
+import {
+	act,
+	render,
+	screen,
+	waitFor,
+	getByText,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CSSProperties } from 'react';
 
@@ -662,5 +668,136 @@ describe( 'Popover', () => {
 				expect( onParentFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
+	} );
+
+	describe( 'wp compat overlay slot', () => {
+		function createOverlaySlot() {
+			const slot = document.createElement( 'div' );
+			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
+			const slotButton = document.createElement( 'button' );
+			slotButton.textContent = 'Slotted item';
+			slot.appendChild( slotButton );
+			document.body.appendChild( slot );
+			return { slot, slotButton };
+		}
+
+		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+			const { slot, slotButton } = createOverlaySlot();
+
+			render(
+				<Popover onFocusOutside={ onFocusOutside }>
+					<button>Inside popover</button>
+				</Popover>
+			);
+
+			await user.click( screen.getByText( 'Inside popover' ) );
+			await user.click( slotButton );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
+		it( 'should not call onFocusOutside when focus returns from the slot to a popover descendant', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+			const { slot, slotButton } = createOverlaySlot();
+
+			render(
+				<Popover onFocusOutside={ onFocusOutside }>
+					<button>Inside popover</button>
+				</Popover>
+			);
+
+			const insideButton = screen.getByText( 'Inside popover' );
+			await user.click( insideButton );
+			await user.click( slotButton );
+			insideButton.focus();
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
+		it( 'should not call onFocusOutside when focus is restored to a popover descendant by the time the blur check runs', async () => {
+			// Mimics the base-ui `Select` backdrop dismissal: focus drops
+			// to `body` (so the captured `relatedTarget` is `null`), then
+			// is synchronously restored to the popover before the blur
+			// check runs.
+			const onFocusOutside = jest.fn();
+			const { slot, slotButton } = createOverlaySlot();
+
+			render(
+				<Popover
+					data-testid="popover"
+					onFocusOutside={ onFocusOutside }
+				>
+					<button>Trigger</button>
+				</Popover>
+			);
+
+			const trigger = screen.getByText( 'Trigger' );
+			const floating = screen.getByTestId( 'popover' );
+
+			await act( async () => {
+				slotButton.focus();
+				floating.dispatchEvent(
+					new FocusEvent( 'blur', {
+						bubbles: true,
+						relatedTarget: null,
+					} )
+				);
+				trigger.focus();
+				await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			} );
+
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
+		it( 'should still call onFocusOutside when focus moves to a sibling outside the slot', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+
+			render(
+				<>
+					<Popover onFocusOutside={ onFocusOutside }>
+						<button>Inside popover</button>
+					</Popover>
+					<button>Outside</button>
+				</>
+			);
+
+			await user.click( screen.getByText( 'Inside popover' ) );
+			await user.click( screen.getByText( 'Outside' ) );
+
+			await waitFor( () => {
+				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+		} );
+	} );
+
+	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const onKeyDown = jest.fn();
+
+		render(
+			<Popover onClose={ onClose } onKeyDown={ onKeyDown }>
+				<button>Inside popover</button>
+			</Popover>
+		);
+
+		await user.click( screen.getByText( 'Inside popover' ) );
+		await user.keyboard( '[Escape]' );
+
+		expect( onKeyDown ).toHaveBeenCalled();
+		expect( onKeyDown.mock.calls[ 0 ][ 0 ].key ).toBe( 'Escape' );
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

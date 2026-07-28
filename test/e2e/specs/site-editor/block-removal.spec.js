@@ -8,16 +8,16 @@ test.describe( 'Site editor block removal prompt', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should appear when attempting to remove Query Block', async ( {
@@ -70,6 +70,52 @@ test.describe( 'Site editor block removal prompt', () => {
 				'Some of the deleted blocks will stop your post or page content from displaying on this template. It is not recommended.'
 			)
 		).toBeVisible();
+	} );
+
+	test( 'should show confirmation checkbox and disabled Delete button when removing Post Content block', async ( {
+		admin,
+		page,
+	} ) => {
+		// Navigate to the singular template which contains a Post Content block.
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//singular',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		// Open and focus List View.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+
+		// The singular template has Post Content at the top level.
+		const listView = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await listView.getByRole( 'link', { name: 'Content' } ).click();
+		await page.keyboard.press( 'Backspace' );
+
+		// Verify the modal appears with the confirmation checkbox.
+		const dialog = page.getByRole( 'dialog' );
+		await expect( dialog ).toBeVisible();
+
+		const checkbox = dialog.getByRole( 'checkbox', {
+			name: 'I understand the consequences',
+		} );
+		await expect( checkbox ).toBeVisible();
+
+		// The Delete button should be disabled before the checkbox is checked.
+		const deleteButton = dialog.getByRole( 'button', {
+			name: 'Delete',
+		} );
+		await expect( deleteButton ).toBeDisabled();
+
+		// Check the confirmation checkbox.
+		await checkbox.click();
+
+		// The Delete button should now be enabled.
+		await expect( deleteButton ).toBeEnabled();
 	} );
 
 	test( 'should not appear when attempting to remove something else', async ( {

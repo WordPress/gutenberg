@@ -92,7 +92,7 @@ export const getMediaColor = memoize( async ( url ) => {
 			crossOrigin: imgCrossOrigin,
 		} );
 		return color.hex;
-	} catch ( error ) {
+	} catch {
 		// If there's an error return the fallback color.
 		return DEFAULT_BACKGROUND_COLOR;
 	}

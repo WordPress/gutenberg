@@ -171,7 +171,7 @@ function Example() {
 	const backgroundColor = 'blue';
 
 	return (
-		<View css={ { backgroundColor } }>
+		<View style={ { backgroundColor } }>
 			<Text optimizeReadabilityFor={ backgroundColor }>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 			</Text>

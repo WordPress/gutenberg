@@ -5,7 +5,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	BaseControl,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -30,9 +30,9 @@ function FieldItem( {
 } ) {
 	return (
 		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
-			<Stack direction="row" gap="xs" justify="flex-start" align="center">
+			<Stack direction="row" gap="sm" justify="flex-start" align="center">
 				<div style={ { height: 24, width: 24 } }>
-					{ isVisible && <Icon icon={ check } /> }
+					{ isVisible && <WCIcon icon={ check } /> }
 				</div>
 				<span className="dataviews-view-config__label">
 					{ field.label }

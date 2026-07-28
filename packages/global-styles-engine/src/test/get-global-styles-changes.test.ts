@@ -194,6 +194,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/test-fiori-di-zucca', {
+			apiVersion: 3,
 			save: () => {},
 			category: 'text',
 			title: 'Test pumpkin flowers',

@@ -18,7 +18,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import { View } from '../../view';
-import SlotFillContext from './slot-fill-context';
+import SlotFillContext from '../context';
 import type { WordPressComponentProps } from '../../context';
 import type { SlotComponentProps } from '../types';
 
@@ -40,25 +40,32 @@ function Slot(
 	} = props;
 
 	const registry = useContext( SlotFillContext );
-
+	const instanceRef = useRef( {} );
 	const ref = useRef< HTMLElement >( null );
 
-	// We don't want to unregister and register the slot whenever
-	// `fillProps` change, which would cause the fill to be re-mounted. Instead,
-	// we can just update the slot (see hook below).
-	// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
 	const fillPropsRef = useRef( fillProps );
 	useLayoutEffect( () => {
 		fillPropsRef.current = fillProps;
 	}, [ fillProps ] );
 
 	useLayoutEffect( () => {
-		registry.registerSlot( name, ref, fillPropsRef.current );
-		return () => registry.unregisterSlot( name, ref );
+		const instance = instanceRef.current;
+		registry.registerSlot( name, {
+			type: 'portal',
+			instance,
+			ref,
+			fillProps: fillPropsRef.current,
+		} );
+		return () => registry.unregisterSlot( name, instance );
 	}, [ registry, name ] );
 
 	useLayoutEffect( () => {
-		registry.updateSlot( name, ref, fillPropsRef.current );
+		registry.updateSlot( name, {
+			type: 'portal',
+			instance: instanceRef.current,
+			ref,
+			fillProps: fillPropsRef.current,
+		} );
 	} );
 
 	return (

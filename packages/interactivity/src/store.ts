@@ -329,7 +329,3 @@ export const populateServerData = ( data?: {
 		);
 	}
 };
-
-// Parse and populate the initial state and config.
-const data = parseServerData();
-populateServerData( data );

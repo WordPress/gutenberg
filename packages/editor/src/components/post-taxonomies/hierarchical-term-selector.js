@@ -417,7 +417,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		<Flex direction="column" gap="4">
 			{ showFilter && ! loading && (
 				<SearchControl
-					__next40pxDefaultSize
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }
@@ -462,7 +461,6 @@ export function HierarchicalTermSelector( { slug } ) {
 				<form onSubmit={ onAddTerm }>
 					<Flex direction="column" gap="4">
 						<TextControl
-							__next40pxDefaultSize
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
 							value={ formName }
@@ -471,7 +469,6 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
-								__next40pxDefaultSize
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }

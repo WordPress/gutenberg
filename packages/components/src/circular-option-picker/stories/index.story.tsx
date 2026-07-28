@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
@@ -37,6 +37,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
 		},
 	},
 	decorators: [

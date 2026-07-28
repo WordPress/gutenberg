@@ -1,14 +1,25 @@
 /**
+ * External dependencies
+ */
+import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { NormalizedFilter, Operator, Option } from '../types';
+import type {
+	FilterOperator,
+	NormalizedFilter,
+	Operator,
+	Option,
+} from '../types';
 import {
 	OPERATOR_AFTER,
 	OPERATOR_AFTER_INC,
@@ -39,6 +50,62 @@ const filterTextWrappers = {
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
 
+/**
+ * Calculates a date offset from now.
+ *
+ * @param value Number of units to offset.
+ * @param unit  Unit of time to offset (days, weeks, months, years).
+ * @return      Date offset from now.
+ */
+function getRelativeDate( value: number, unit: string ): Date {
+	switch ( unit ) {
+		case 'days':
+			return subDays( new Date(), value );
+		case 'weeks':
+			return subWeeks( new Date(), value );
+		case 'months':
+			return subMonths( new Date(), value );
+		case 'years':
+			return subYears( new Date(), value );
+		default:
+			return new Date();
+	}
+}
+
+// Shared operator definition for IS_NONE and IS_NOT_ALL (deprecated).
+const isNoneOperatorDefinition = {
+	/* translators: DataViews operator name */
+	label: __( 'Is none of' ),
+	filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+		createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
+				__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+				filter.name,
+				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		),
+	filter: ( ( item, field, filterValue ) => {
+		if ( ! filterValue?.length ) {
+			return true;
+		}
+
+		const fieldValue = field.getValue( { item } );
+
+		if ( Array.isArray( fieldValue ) ) {
+			return ! filterValue.some( ( fv: any ) =>
+				fieldValue.includes( fv )
+			);
+		} else if ( typeof fieldValue === 'string' ) {
+			return ! filterValue.includes( fieldValue );
+		}
+
+		return false;
+	} ) as FilterOperator< any >,
+	selection: 'multi' as const,
+};
+
 const OPERATORS: {
 	name: Operator;
 	label: string;
@@ -46,6 +113,7 @@ const OPERATORS: {
 		filter: NormalizedFilter,
 		activeElements: Option[]
 	) => ReactElement;
+	filter?: FilterOperator< any >;
 	selection: 'single' | 'multi' | 'custom';
 }[] = [
 	{
@@ -64,25 +132,27 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( ! filterValue?.length ) {
+				return true;
+			}
+			const fieldValue = field.getValue( { item } );
+
+			if ( Array.isArray( fieldValue ) ) {
+				return filterValue.some( ( fv: any ) =>
+					fieldValue.includes( fv )
+				);
+			} else if ( typeof fieldValue === 'string' ) {
+				return filterValue.includes( fieldValue );
+			}
+
+			return false;
+		},
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NONE,
-		/* translators: DataViews operator name */
-		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
-			createInterpolateElement(
-				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
-					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
-					filter.name,
-					activeElements
-						.map( ( element ) => element.label )
-						.join( ', ' )
-				),
-				filterTextWrappers
-			),
-		selection: 'multi',
+		...isNoneOperatorDefinition,
 	},
 	{
 		name: OPERATOR_IS_ALL,
@@ -100,25 +170,20 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( ! filterValue?.length ) {
+				return true;
+			}
+
+			return filterValue.every( ( value: any ) => {
+				return field.getValue( { item } )?.includes( value );
+			} );
+		},
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NOT_ALL,
-		/* translators: DataViews operator name */
-		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
-			createInterpolateElement(
-				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
-					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
-					filter.name,
-					activeElements
-						.map( ( element ) => element.label )
-						.join( ', ' )
-				),
-				filterTextWrappers
-			),
-		selection: 'multi',
+		...isNoneOperatorDefinition,
 	},
 	{
 		name: OPERATOR_BETWEEN,
@@ -137,6 +202,31 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				! Array.isArray( filterValue ) ||
+				filterValue.length !== 2 ||
+				filterValue[ 0 ] === undefined ||
+				filterValue[ 1 ] === undefined
+			) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			if (
+				typeof fieldValue === 'number' ||
+				fieldValue instanceof Date ||
+				typeof fieldValue === 'string'
+			) {
+				return (
+					fieldValue >= filterValue[ 0 ] &&
+					fieldValue <= filterValue[ 1 ]
+				);
+			}
+
+			return false;
+		},
 		selection: 'custom',
 	},
 	{
@@ -155,6 +245,22 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				filterValue?.value === undefined ||
+				filterValue?.unit === undefined
+			) {
+				return true;
+			}
+
+			const targetDate = getRelativeDate(
+				filterValue.value,
+				filterValue.unit
+			);
+			const fieldValue = getDate( field.getValue( { item } ) );
+
+			return fieldValue >= targetDate && fieldValue <= new Date();
+		},
 		selection: 'custom',
 	},
 	{
@@ -171,6 +277,22 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				filterValue?.value === undefined ||
+				filterValue?.unit === undefined
+			) {
+				return true;
+			}
+
+			const targetDate = getRelativeDate(
+				filterValue.value,
+				filterValue.unit
+			);
+			const fieldValue = getDate( field.getValue( { item } ) );
+
+			return fieldValue < targetDate;
+		},
 		selection: 'custom',
 	},
 	{
@@ -187,6 +309,12 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			return (
+				filterValue === field.getValue( { item } ) ||
+				filterValue === undefined
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -203,6 +331,9 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			return filterValue !== field.getValue( { item } );
+		},
 		selection: 'single',
 	},
 	{
@@ -219,6 +350,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue < filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -237,6 +377,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue > filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -255,6 +404,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue <= filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -273,6 +431,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue >= filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -289,6 +456,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return fieldDate < filterDate;
+		},
 		selection: 'single',
 	},
 	{
@@ -305,6 +482,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return fieldDate > filterDate;
+		},
 		selection: 'single',
 	},
 	{
@@ -323,6 +510,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return fieldDate <= filterDate;
+		},
 		selection: 'single',
 	},
 	{
@@ -341,6 +538,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return fieldDate >= filterDate;
+		},
 		selection: 'single',
 	},
 	{
@@ -357,6 +564,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				fieldValue
+					.toLowerCase()
+					.includes( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -375,6 +597,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				! fieldValue
+					.toLowerCase()
+					.includes( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -391,6 +628,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				fieldValue
+					.toLowerCase()
+					.startsWith( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -407,6 +659,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return filterDate.getTime() === fieldDate.getTime();
+		},
 		selection: 'single',
 	},
 	{
@@ -423,6 +685,16 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const filterDate = getDate( filterValue );
+			const fieldDate = getDate( field.getValue( { item } ) );
+
+			return filterDate.getTime() !== fieldDate.getTime();
+		},
 		selection: 'single',
 	},
 ];
