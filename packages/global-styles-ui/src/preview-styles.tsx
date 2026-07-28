@@ -15,6 +15,7 @@ import { useStylesPreviewColors } from './preview-hooks';
 import TypographyExample from './typography-example';
 import HighlightedColors from './highlighted-colors';
 import PreviewWrapper from './preview-wrapper';
+import SchemePreviewIndicator from './scheme-preview-indicator';
 
 const firstFrameVariants = {
 	start: {
@@ -188,6 +189,9 @@ function PreviewStyles( {
 						) }
 					</VStack>
 				</motion.div>
+			) }
+			{ ( { ratio, key } ) => (
+				<SchemePreviewIndicator key={ key } ratio={ ratio } />
 			) }
 		</PreviewWrapper>
 	);
