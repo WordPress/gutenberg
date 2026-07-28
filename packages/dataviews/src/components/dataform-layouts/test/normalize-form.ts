@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createElement } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import normalizeForm from '../normalize-form';
@@ -53,12 +58,18 @@ describe( 'normalizeFormFields', () => {
 		} );
 
 		it( 'handles mixed string and object field specifications', () => {
+			const description = createElement(
+				'a',
+				{ href: '/docs' },
+				'Documentation'
+			);
 			const form: Form = {
 				fields: [
 					'field1',
 					{
 						id: 'field2',
 						label: 'Field 2',
+						description,
 					},
 				],
 			};
@@ -76,6 +87,7 @@ describe( 'normalizeFormFields', () => {
 					{
 						id: 'field2',
 						label: 'Field 2',
+						description,
 						layout: {
 							type: 'regular',
 							labelPosition: 'top',

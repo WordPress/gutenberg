@@ -44,6 +44,12 @@ export const LayoutCard = {
 		withSummary: true,
 		isCollapsible: true,
 	},
+	parameters: {
+		docs: {
+			// Dynamic source generation cannot serialize React elements nested in the form configuration.
+			source: { type: 'code' },
+		},
+	},
 };
 
 export const LayoutDetails = {

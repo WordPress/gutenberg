@@ -3,6 +3,7 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -185,8 +186,13 @@ const LayoutCardComponent = ( {
 						isOpened,
 					} ),
 					label: 'Customer',
-					description:
-						'Enter your contact details, plan type, and addresses to complete your customer information.',
+					description: (
+						<>
+							Enter your contact details, plan type, and addresses
+							to complete your customer information. See the{ ' ' }
+							<Link href="#">customer information guide</Link>.
+						</>
+					),
 					children: [
 						{
 							id: 'customerContact',
