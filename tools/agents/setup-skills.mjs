@@ -226,10 +226,7 @@ function formatResult( result ) {
 	return lines.join( '\n' );
 }
 
-if (
-	process.argv[ 1 ] &&
-	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
-) {
+async function runSetupSkills() {
 	const result = await setupSkills( {
 		repositoryRoot: process.cwd(),
 	} );
@@ -239,4 +236,11 @@ if (
 	if ( result.conflicts.length ) {
 		process.exitCode = 1;
 	}
+}
+
+if (
+	process.argv[ 1 ] &&
+	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
+) {
+	runSetupSkills();
 }
