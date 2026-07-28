@@ -14,6 +14,9 @@
 		}
 
 		.input {
+			--_gcd-input-padding: var(--wpds-dimension-padding-md);
+			--_gcd-input-min-height: var(--wpds-dimension-size-lg);
+
 			border: none;
 			outline: none;
 			min-height: var(--wpds-dimension-size-lg);
