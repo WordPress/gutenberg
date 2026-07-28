@@ -290,3 +290,14 @@
 .global-styles-ui-duotone-palette-panel {
 	padding: variables.$grid-unit-20;
 }
+
+.global-styles-ui-duotone-palette-panel .global-styles-ui-subtitle {
+	align-items: center;
+	display: flex;
+	gap: variables.$grid-unit-05;
+	line-height: variables.$grid-unit-30;
+}
+
+.global-styles-ui-duotone-palette-panel .components-circular-option-picker > .components-spacer {
+	display: none;
+}

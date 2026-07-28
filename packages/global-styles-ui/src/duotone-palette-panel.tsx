@@ -107,7 +107,7 @@ export default function DuotonePalettePanel( {
 	return (
 		<Stack
 			direction="column"
-			gap="2xl"
+			gap="lg"
 			className="global-styles-ui-duotone-palette-panel"
 		>
 			{ duotonePalette.length > 0 && (
