@@ -13,6 +13,9 @@ import { Grid } from '../../grid';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type { ToolsPanelProps } from '../types';
+import { space } from '../../utils/space';
+
+const TOOLS_PANEL_GAP = space( 4 );
 
 const UnconnectedToolsPanel = (
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
@@ -30,7 +33,15 @@ const UnconnectedToolsPanel = (
 	} = useToolsPanel( props );
 
 	return (
-		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
+		<Grid
+			{ ...toolsPanelProps }
+			columns={ 2 }
+			gap={ 4 }
+			columnGap={ TOOLS_PANEL_GAP }
+			rowGap={ TOOLS_PANEL_GAP }
+			templateColumns="repeat( 2, minmax(0, 1fr) )"
+			ref={ forwardedRef }
+		>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }
