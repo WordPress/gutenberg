@@ -52,12 +52,11 @@ const DURATION_TOKENS = [
 ];
 
 const DURATION_OPTIONS = [
-	{ label: 'xs', value: 'var(--wpds-motion-duration-xs)' },
-	{ label: 'sm', value: 'var(--wpds-motion-duration-sm)' },
-	{ label: 'md', value: 'var(--wpds-motion-duration-md)' },
-	{ label: 'lg', value: 'var(--wpds-motion-duration-lg)' },
-	{ label: 'xl', value: 'var(--wpds-motion-duration-xl)' },
-	{ label: 'Custom', value: 'custom' },
+	...DURATION_TOKENS.map( ( token ) => ( {
+		label: token.name,
+		value: token.variable,
+	} ) ),
+	{ label: 'custom', value: 'custom' },
 ];
 
 const DEFAULT_DURATION_OPTION = DURATION_OPTIONS[ 4 ];
@@ -169,6 +168,7 @@ function MotionDemo() {
 							label="Duration"
 							items={ DURATION_OPTIONS }
 							defaultValue={ DEFAULT_DURATION_OPTION }
+							triggerContent={ ( item ) => item.value }
 							onValueChange={ ( item ) => {
 								if (
 									! item ||
