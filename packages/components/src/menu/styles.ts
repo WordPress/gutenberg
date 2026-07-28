@@ -76,12 +76,34 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
  * item opens a Modal).
  */
 export const MenuMotionRoot = styled.div`
+	/*
+	 * Transition properties are always present so Ariakit detects non-zero
+	 * duration and waits before unmounting the popover on close. Without
+	 * this, the popover is removed synchronously and focus restoration
+	 * races against other components (e.g. a Modal) that manage focus
+	 * during the same render cycle.
+	 *
+	 * For users who prefer reduced motion: the menu is hidden immediately
+	 * via visibility so no visual "stickiness" occurs during Ariakit's wait.
+	 */
+	transition-property: transform, opacity;
+	transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+		${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+	transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+		${ DROPDOWN_MOTION_CSS.FADE_EASING };
+
+	/* Hide during exit (data-leave is set while Ariakit waits for timeout). */
+	/* For users with prefers-reduced-motion this prevents visual stickiness. */
+	&[data-leave] {
+		visibility: hidden;
+	}
+
 	@media not ( prefers-reduced-motion ) {
-		transition-property: transform, opacity;
-		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
-			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
-			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+		/* Keep visible during exit animation */
+		&[data-leave] {
+			visibility: visible;
+		}
+
 		will-change: transform, opacity;
 
 		&:not( [data-submenu] ) {
