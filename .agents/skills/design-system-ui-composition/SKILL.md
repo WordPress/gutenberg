@@ -5,80 +5,57 @@ description: Use when building or changing a Gutenberg feature, plugin interface
 
 # Compose a WordPress Design System interface
 
-## Authority and scope
+## Classify before searching
 
-- Use this skill for application UI/UX work, including code that does not yet
-  consume `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`.
-- Prefer public Design System composition when it meets the concrete user need;
-  retain custom UI when the public surface is unsuitable and state why.
-- Keep the target checkout or installed package version as the compatibility
-  boundary. Do not infer package-change, commit, push, or pull-request
-  authority.
-- In a local Gutenberg checkout, route a missing public component, token, or
-  API to `design-system-contribution`. Otherwise, document the gap for an
-  upstream Design System request rather than importing package internals.
+1. State the user-visible behaviour, target package version, rendering owner,
+   and runtime document.
+2. Inspect the changed surface and its nearest same-surface precedent once.
+3. Choose the narrowest path:
+   - **Lightweight:** keep an existing supported component when behaviour,
+     styling, and document setup do not change.
+   - **Standard:** select or compose a public component or token.
+   - **Deep:** handle custom UI, a package migration, or another rendering
+     document such as an iframe, popup, or portal.
 
-## Start with the target
+Do not reopen component selection on the lightweight path. Verify the existing
+contract, make the narrow change, and stop.
 
-Identify the target checkout or installed package versions, the runtime
-(standard WordPress screen, separate application, iframe, or portal), and the
-user-facing behaviour. Treat that local target as the compatibility boundary.
+## Select for the behaviour
 
-Before selecting a component, identify the actual rendering owner and parent
-surface, runtime document, providers and styles present in that subtree, and
-nearest same-surface precedent. Do not infer the UI boundary from the package
-folder alone.
+When selection is material, write the required interaction contract before
+choosing a component. Follow the maintained recommendation sources and
+target-version checks in
+[Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component),
+then verify the selected public API in the target checkout or installed
+version.
 
-Before writing custom UI, determine whether an existing public component, token,
-or composition already meets the need. The absence of an existing Design System
-import does not establish that a custom control is necessary.
+Choose the smallest public composition that owns exactly the required
+behaviour. Do not turn a trigger into a menu, dialog, or state owner merely
+because a nearby precedent does. Stop searching when one recommended option
+satisfies the behaviour and setup.
 
-Follow the current recommendation sources and target-version checks in
-[Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component).
-When the target packages are installed rather than checked out, use the
-corresponding version of their shipped documentation. Trunk documentation and
-MCP results can identify possibilities, but do not establish availability in an
-older release.
+## Apply conditional setup
 
-## Choose and compose
+- For custom UI, first establish why public composition is insufficient.
+- For a migration, preserve observable interaction, styling, accessibility,
+  and compatibility.
+- For a separate document, read the
+  [`@wordpress/theme` “Across documents” guidance](../../packages/theme/README.md#across-documents-iframes-and-other-portals)
+  and the linked package setup before editing. Record where static styles,
+  runtime-injected styles, root theming, and overlays are owned; mark each
+  requirement verified or blocked.
 
-1. Look for an existing public component and compose it before creating an
-   application-local control.
-2. Use the package and import selected by the current recommendation sources;
-   do not infer the choice from package age.
-3. Use semantic `--wpds-*` tokens from the generated reference. Do not copy
-   token inventories, package-private CSS modules, Base UI details, or source
-   paths into application code.
-4. Apply the
-   [document-specific setup](../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document).
-   For an iframe, popup, or other document, read
-   [`@wordpress/theme`'s “Across documents” section](../../packages/theme/README.md#across-documents-iframes-and-other-portals)
-   and the linked target-package setup before editing.
-5. Preserve existing behaviour during a package migration. Establish visual,
-   interaction, accessibility, and compatibility parity before replacing a
-   working component.
+Use the linked public documentation for API and setup facts. Do not copy its
+component mappings, token inventory, or implementation recipes into this
+skill.
 
-Stop searching when one recommended public option satisfies the required
-behaviour and target setup. Search outside the target surface only when local
-evidence is absent, unsuitable, or migration compatibility is in scope.
+## Finish
 
-## Verify
+Exercise the changed interaction and run focused checks. Before declaring
+completion, recheck the behaviour contract and every rendering document.
+Report unresolved setup or parity evidence as blocked rather than silently
+omitting it.
 
-Run the application's relevant checks and manually verify the changed UI:
-
-- semantic structure, keyboard and focus behaviour, visible states, and
-  responsive behaviour;
-- stylesheet and token availability in every document that renders the UI;
-- portals, overlays, and mixed-package behaviour where applicable.
-
-Before declaring completion, recheck each rendering document and exercise the
-changed interaction in its real context.
-
-## Escalate a design-system gap
-
-When public components or tokens cannot meet the need, do not use internal
-implementation details as a workaround. Record the user need, attempted
-composition, proposed public behaviour, target versions, and affected
-consumers. In a local Gutenberg checkout, route the request to
-`design-system-contribution`; otherwise, use that record to request an
-upstream Design System change.
+If no public API meets the need, document the unmet behaviour and affected
+consumers. Route package work to `design-system-contribution` in a local
+Gutenberg checkout; otherwise request an upstream Design System change.

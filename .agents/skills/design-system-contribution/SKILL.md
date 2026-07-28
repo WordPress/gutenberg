@@ -5,21 +5,13 @@ description: Use when planning or implementing a safe `@wordpress/components`, `
 
 # Contribute to the WordPress Design System
 
-## Authority and scope
+## Decide whether a package change is needed
 
-- Use this skill only in a local Gutenberg checkout when changing
-  `packages/components`, `packages/ui`, or `packages/theme`.
-- Follow the target repository's package conventions and release policy. A
-  change request does not authorize commits, pushes, or pull-request writes.
-- Keep package internals distinct from the published contract and assess
-  external consumers as well as Gutenberg call sites.
-
-## Establish the problem and public boundary
-
-Before implementation, audit affected consumers and similar components or
-tokens. Explain the missing public behaviour, why existing composition is
-insufficient, and whether the change is an internal implementation detail or a
-new or changed public contract.
+1. State the missing behaviour and affected consumers.
+2. Audit existing public composition and similar components or tokens.
+3. If supported behaviour already meets the need, recommend it and stop unless
+   the request establishes a distinct contract.
+4. Classify the remaining change as internal or public.
 
 Read the cross-package guide and the package-specific source guidance that
 matches the change:
@@ -32,23 +24,23 @@ matches the change:
 Use an available WordPress Design System MCP server to learn current direction
 when useful, but verify implementation and compatibility against this checkout.
 
-## Implement deliberately
+## Scale work to the contract
 
-Follow the relevant package's current source precedents for component/API
-design, compatibility, CSS architecture, token sources, exports, stories, and
-tests. Keep package internals separate from the published contract. For a
-public change, make an explicit decision about compatibility, migration,
-documentation, and generated output.
+- For an internal change, preserve the public contract and run focused checks.
+- For a public change, define the contract and assess external consumers,
+  compatibility, migration, documentation, and generated output.
+- For a replacement or rename, compare observable old and new values, states,
+  and interaction—not only types or class names.
 
-## Verify
+Follow current package precedents only where they apply. Do not add stories,
+documentation, release work, or compatibility machinery to an unchanged public
+capability.
 
-Run focused tests, lint/type checks, and required generation or build checks.
-Inspect consumers in Gutenberg and assess downstream consumers separately.
-Manually verify interaction or CSS behaviour when a module-level test cannot
-prove it.
+## Finish
 
-## Escalate decisions
+Run focused tests and required lint, type, generation, or build checks. Verify
+interaction or CSS behaviour where source-level tests cannot establish it.
 
 Stop for product or design-system agreement when a public component, token, or
-API decision lacks a clear accepted behaviour. Include the consumer evidence,
-alternatives considered, compatibility impact, and proposed public contract.
+API lacks accepted behaviour. Include consumer evidence, alternatives,
+compatibility impact, and the proposed contract.

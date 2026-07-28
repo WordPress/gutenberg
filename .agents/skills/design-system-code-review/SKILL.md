@@ -5,46 +5,43 @@ description: Use when reviewing a Gutenberg change to a WordPress Design System 
 
 # Review a WordPress Design System contribution
 
-## Authority and scope
+## Establish the review boundary
 
-- Keep the review read-only. Do not modify source or generated files, commit,
-  push, post review comments to GitHub, or update pull-request metadata.
-  Deliver findings in the review response.
-- Review a diff that changes `packages/components`, `packages/ui`, or
-  `packages/theme`. Require the target Gutenberg checkout or a complete diff.
-- Treat the target checkout's code, package documentation, and compatibility
-  policy as authoritative. Do not apply package-private conventions to an
-  external consumer.
-
-## Review method
-
-1. Define the changed public surface and the user-visible behaviour in scope.
-2. Inspect the diff, package source, exports, types, tests, stories, generated
-   output, and meaningful Gutenberg and external consumers.
+1. Define the changed public surface and observable behaviour.
+2. Scan the complete diff once, then classify it as:
+   - **Internal:** no public contract or observable behaviour changes.
+   - **Public:** adds, removes, renames, or changes supported behaviour.
 3. Read [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
    and the applicable package contribution guide.
-4. Use an available MCP server only as supplementary current-design context;
-   verify the target branch's contract from the checkout.
-5. Resolve uncertainty through source, consumers, browser behaviour, and tests
-   before reporting it.
+4. Verify the target branch from source. Use MCP only as supplementary
+   current-design context.
 
-## Assess the change
+## Review proportionally
 
-Check the concrete behaviour and contract rather than applying a static source
-checklist. Cover, as applicable:
+For an internal change, verify contract preservation and focused coverage, then
+stop. For a public change:
 
-- existing consumers and external package consumers separately;
-- public API, type, token, and theming compatibility;
-- semantics, keyboard/focus behaviour, visible states, motion, and styling
-  behaviour in a real browser when source-order or geometry matters;
-- package conventions, tests, stories, documentation, generated output, and
-  release impact.
+- assess Gutenberg and external package consumers separately;
+- verify compatibility and migration rather than treating repository migration
+  as sufficient;
+- compare observable old and new values, states, interaction, and styling;
+- inspect tests, stories, documentation, generated output, and release work
+  only where the contract requires them.
+
+Use browser evidence when source or class assertions cannot establish visual,
+focus, motion, or layout parity.
+
+## Finding evidence gate
+
+Before reporting a finding, identify the exact changed line, affected public
+contract or behaviour, target-source or consumer evidence, and concrete impact.
+Treat incomplete diff context as a verification gap unless the complete patch
+proves the defect. Apply the same evidence and precision standard even when
+another valid defect already exists.
 
 ## Output contract
 
-Start with a short scope assessment. For each material finding, state the
-affected contract or behaviour, target-source or consumer evidence, concrete
-impact, and smallest coherent direction. Keep severity proportional to the
-demonstrated risk. Separate verification gaps from findings, distinguish a
-required change from an optional precedent or follow-up, and report no findings
+Recheck every finding against the complete diff and source. Separate defects,
+verification gaps, and optional follow-ups. Report material findings with
+proportional severity and the smallest coherent direction; report no findings
 when the evidence exposes none.
