@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFile } from 'node:child_process';
 import {
 	mkdtemp,
 	mkdir,
@@ -10,8 +11,15 @@ import {
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 import { setupSkills } from '../setup-skills.mjs';
+
+const execFileAsync = promisify( execFile );
+const setupScript = fileURLToPath(
+	new URL( '../setup-skills.mjs', import.meta.url )
+);
 
 async function createRepository() {
 	const repositoryRoot = await mkdtemp(
@@ -52,6 +60,24 @@ test( 'links each canonical skill into the Claude directory', async ( t ) => {
 	);
 } );
 
+test( 'runs the setup command when executed directly', async ( t ) => {
+	const repositoryRoot = await createRepository();
+	t.after( () => rm( repositoryRoot, { recursive: true, force: true } ) );
+
+	const { stdout } = await execFileAsync( process.execPath, [ setupScript ], {
+		cwd: repositoryRoot,
+	} );
+
+	assert.equal( stdout, 'Linked: .claude/skills/testing\n' );
+	assert.equal(
+		await readFile(
+			path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
+			'utf8'
+		),
+		'---\nname: testing\n'
+	);
+} );
+
 test( 'uses junctions on Windows', async ( t ) => {
 	const repositoryRoot = await createRepository();
 	t.after( () => rm( repositoryRoot, { recursive: true, force: true } ) );
@@ -62,7 +88,7 @@ test( 'uses junctions on Windows', async ( t ) => {
 		platform: 'win32',
 		createLink: async ( source, target, type ) => {
 			linkTypes.push( type );
-			await symlink( source, target, 'dir' );
+			await symlink( source, target, type );
 		},
 	} );
 

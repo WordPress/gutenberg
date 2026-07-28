@@ -11,6 +11,7 @@ import {
 	writeFile,
 } from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const MANAGED_COPY_MARKER = '.gutenberg-agent-skills-source';
 const SOURCE_SKILLS_DIRECTORY = '.agents/skills';
@@ -225,7 +226,7 @@ function formatResult( result ) {
 	return lines.join( '\n' );
 }
 
-if ( import.meta.url === `file://${ process.argv[ 1 ] }` ) {
+if ( import.meta.url === pathToFileURL( process.argv[ 1 ] ).href ) {
 	const result = await setupSkills( {
 		repositoryRoot: process.cwd(),
 	} );

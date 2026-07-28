@@ -100,6 +100,9 @@ jobs:
               # `--prune-suppressions` ensures `suppressions.json` stays in sync.
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
+            - name: Test agent skill setup
+              run: npm run test:agents:setup
+
             - name: Lint Styles
               if: ${{ matrix.annotations }}
               # Stylelint has no separate prune flag. Run lint first so new violations fail,
