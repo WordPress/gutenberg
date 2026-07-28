@@ -1491,10 +1491,6 @@ _Parameters_
 -   _postType_ `string`: Post Type.
 -   _postId_ `string`: Post ID.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### setIsInserterOpened
 
 Returns an action object used to open/close the inserter.

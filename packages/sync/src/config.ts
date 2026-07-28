@@ -50,6 +50,13 @@ export const LOCAL_EDITOR_ORIGIN = 'gutenberg';
 export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
 
 /**
+ * Undo scope used until an editor sets one of its own. Undo levels are
+ * captured in, and undone from, the history of the active scope, so that
+ * undoing in one editing context can't revert changes made in another one.
+ */
+export const DEFAULT_UNDO_SCOPE = 'default';
+
+/**
  * Origin string for CRDT document changes that should be synced but not
  * recorded in the undo history (e.g. status changes during publish).
  *

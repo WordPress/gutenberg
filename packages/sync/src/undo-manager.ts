@@ -11,7 +11,7 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { LOCAL_EDITOR_ORIGIN } from './config';
+import { DEFAULT_UNDO_SCOPE, LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
 import type {
 	ObjectData,
@@ -41,19 +41,16 @@ interface StackItemEvent {
  */
 export function createUndoManager(): SyncUndoManager {
 	const undoMetaHandlers = new Map< Y.Doc, UndoMetaHandlers >();
-	const yUndoManager = new YMultiDocUndoManager( [], {
-		// Throttle undo/redo captures after 500ms of inactivity.
-		// 500 was selected from subjective local UX testing, shorter timeouts
-		// may cause mid-word undo stack items.
-		captureTimeout: 500,
-		// Ensure that we only scope the undo/redo to the current editor.
-		// The yjs document's clientID is added once it's available.
-		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
-	} );
+	// Every editing scope gets its own undo manager, but they all track the
+	// same CRDT documents. Documents loaded later are added to the scope of
+	// every manager, including the ones that are currently inactive.
+	const scopedTypes = new Set< Y.Map< any > >();
+	const scopedUndoManagers = new Map< string, YMultiDocUndoManager >();
+	let activeScope = DEFAULT_UNDO_SCOPE;
 
 	const getUndoStackState = (): SyncUndoStackState => ( {
-		hasRedo: yUndoManager.canRedo(),
-		hasUndo: yUndoManager.canUndo(),
+		hasRedo: getActiveUndoManager().canRedo(),
+		hasUndo: getActiveUndoManager().canUndo(),
 	} );
 
 	const notifyUndoStackChange = ( ydoc: Y.Doc ): void => {
@@ -62,37 +59,109 @@ export function createUndoManager(): SyncUndoManager {
 			?.onUndoStackChange?.( getUndoStackState() );
 	};
 
-	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-		const handlers = undoMetaHandlers.get( event.ydoc );
-		if ( ! handlers ) {
-			return;
-		}
-
-		handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
-		notifyUndoStackChange( event.ydoc );
-	} );
-
-	yUndoManager.on( 'stack-item-updated', ( event: StackItemEvent ) => {
-		notifyUndoStackChange( event.ydoc );
-	} );
-
-	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-		const handlers = undoMetaHandlers.get( event.ydoc );
-		if ( ! handlers ) {
-			return;
-		}
-
-		handlers.restoreUndoMeta( event.ydoc, event.stackItem.meta );
-		notifyUndoStackChange( event.ydoc );
-	} );
-
-	yUndoManager.on( 'stack-cleared', () => {
+	const notifyAllUndoStackChanges = (): void => {
 		undoMetaHandlers.forEach( ( handlers ) => {
 			handlers.onUndoStackChange?.( getUndoStackState() );
 		} );
-	} );
+	};
+
+	const createScopedUndoManager = (): YMultiDocUndoManager => {
+		const yUndoManager = new YMultiDocUndoManager( [], {
+			// Throttle undo/redo captures after 500ms of inactivity.
+			// 500 was selected from subjective local UX testing, shorter timeouts
+			// may cause mid-word undo stack items.
+			captureTimeout: 500,
+			// Ensure that we only scope the undo/redo to the current editor.
+			// The editor origin is only tracked while this is the active scope,
+			// so that editing in one editing context can't be undone from
+			// another one. The yjs document's clientID is added once it's
+			// available.
+			trackedOrigins: new Set(),
+		} );
+
+		yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+			const handlers = undoMetaHandlers.get( event.ydoc );
+			if ( ! handlers ) {
+				return;
+			}
+
+			handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
+			notifyUndoStackChange( event.ydoc );
+		} );
+
+		yUndoManager.on( 'stack-item-updated', ( event: StackItemEvent ) => {
+			notifyUndoStackChange( event.ydoc );
+		} );
+
+		yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+			const handlers = undoMetaHandlers.get( event.ydoc );
+			if ( ! handlers ) {
+				return;
+			}
+
+			handlers.restoreUndoMeta( event.ydoc, event.stackItem.meta );
+			notifyUndoStackChange( event.ydoc );
+		} );
+
+		yUndoManager.on( 'stack-cleared', () => {
+			notifyAllUndoStackChanges();
+		} );
+
+		scopedTypes.forEach( ( ytype ) => yUndoManager.addToScope( ytype ) );
+
+		return yUndoManager;
+	};
+
+	const getScopedUndoManager = ( scope: string ): YMultiDocUndoManager => {
+		let yUndoManager = scopedUndoManagers.get( scope );
+
+		if ( ! yUndoManager ) {
+			yUndoManager = createScopedUndoManager();
+			scopedUndoManagers.set( scope, yUndoManager );
+		}
+
+		return yUndoManager;
+	};
+
+	function getActiveUndoManager(): YMultiDocUndoManager {
+		return getScopedUndoManager( activeScope );
+	}
+
+	getActiveUndoManager().addTrackedOrigin( LOCAL_EDITOR_ORIGIN );
 
 	return {
+		/**
+		 * Set the editing scope that undo levels are captured in and undone
+		 * from. Each scope keeps its own history, so returning to a scope that
+		 * was active before restores its undo and redo stacks.
+		 *
+		 * @param scope Scope identifier.
+		 */
+		setScope( scope: string = DEFAULT_UNDO_SCOPE ): void {
+			if ( scope === activeScope ) {
+				return;
+			}
+
+			// Only the manager of the active scope captures undo levels.
+			const previousUndoManager = getActiveUndoManager();
+			previousUndoManager.removeTrackedOrigin( LOCAL_EDITOR_ORIGIN );
+
+			// Don't keep managers around for scopes that were merely visited,
+			// they'd observe every document for as long as this manager lives.
+			if (
+				! previousUndoManager.canUndo() &&
+				! previousUndoManager.canRedo()
+			) {
+				scopedUndoManagers.delete( activeScope );
+				previousUndoManager.destroy();
+			}
+
+			activeScope = scope;
+			getActiveUndoManager().addTrackedOrigin( LOCAL_EDITOR_ORIGIN );
+
+			notifyAllUndoStackChanges();
+		},
+
 		/**
 		 * Record changes into the history.
 		 * Since Yjs automatically tracks changes, this method translates the WordPress
@@ -125,10 +194,20 @@ export function createUndoManager(): SyncUndoManager {
 			}
 
 			const ydoc = ymap.doc;
-			yUndoManager.addToScope( ymap );
+			scopedTypes.add( ymap );
+			scopedUndoManagers.forEach( ( yUndoManager ) =>
+				yUndoManager.addToScope( ymap )
+			);
 
 			if ( ! undoMetaHandlers.has( ydoc ) ) {
-				ydoc.on( 'destroy', () => undoMetaHandlers.delete( ydoc ) );
+				ydoc.on( 'destroy', () => {
+					undoMetaHandlers.delete( ydoc );
+					scopedTypes.forEach( ( ytype ) => {
+						if ( ytype.doc === ydoc ) {
+							scopedTypes.delete( ytype );
+						}
+					} );
+				} );
 			}
 			undoMetaHandlers.set( ydoc, handlers );
 		},
@@ -138,6 +217,8 @@ export function createUndoManager(): SyncUndoManager {
 		 *
 		 */
 		undo(): HistoryRecord< ObjectData > | undefined {
+			const yUndoManager = getActiveUndoManager();
+
 			if ( ! yUndoManager.canUndo() ) {
 				return;
 			}
@@ -154,6 +235,8 @@ export function createUndoManager(): SyncUndoManager {
 		 * Redo the last undone changes.
 		 */
 		redo(): HistoryRecord< ObjectData > | undefined {
+			const yUndoManager = getActiveUndoManager();
+
 			if ( ! yUndoManager.canRedo() ) {
 				return;
 			}
@@ -172,7 +255,7 @@ export function createUndoManager(): SyncUndoManager {
 		 * @return {boolean} Whether there are changes to undo.
 		 */
 		hasUndo(): boolean {
-			return yUndoManager.canUndo();
+			return getActiveUndoManager().canUndo();
 		},
 
 		/**
@@ -181,7 +264,7 @@ export function createUndoManager(): SyncUndoManager {
 		 * @return {boolean} Whether there are changes to redo.
 		 */
 		hasRedo(): boolean {
-			return yUndoManager.canRedo();
+			return getActiveUndoManager().canRedo();
 		},
 
 		/**
@@ -189,7 +272,7 @@ export function createUndoManager(): SyncUndoManager {
 		 * The next change will create a new undo item.
 		 */
 		stopCapturing(): void {
-			yUndoManager.stopCapturing();
+			getActiveUndoManager().stopCapturing();
 		},
 	};
 }

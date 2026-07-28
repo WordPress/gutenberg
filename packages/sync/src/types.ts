@@ -185,6 +185,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
+	setUndoScope: ( scope?: string ) => void;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
@@ -206,5 +207,6 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
 		>
 	) => void;
+	setScope: ( scope?: string ) => void;
 	stopCapturing: () => void;
 }
