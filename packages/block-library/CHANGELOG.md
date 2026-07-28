@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
+
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
