@@ -952,9 +952,15 @@ Ensures that the text selection keeps the same vertical distance from the viewpo
 
 ### URLInput
 
+Text field for entering a URL, with an autocomplete list of matching posts, pages and other link suggestions.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
 
 ### URLInputButton
 
