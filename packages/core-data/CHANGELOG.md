@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep a separate undo history per editing context, so that undoing in an editor can no longer revert changes made in another one, for instance after opening an entity in a focused editor ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
+
 ## 7.51.0 (2026-07-14)
 
 ### Enhancements

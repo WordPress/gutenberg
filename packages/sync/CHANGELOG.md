@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Undo manager: Capture undo levels in, and undo them from, the history of the active editing scope ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
+
 ## 1.51.0 (2026-07-14)
 
 ## 1.50.0 (2026-07-01)
