@@ -40,7 +40,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 

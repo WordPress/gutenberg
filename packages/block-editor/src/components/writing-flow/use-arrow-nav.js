@@ -176,11 +176,15 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getNextBlockClientId,
+		getPreviousBlockClientId,
+		getSelectedBlockClientId,
+		getSelectionStart,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -244,6 +248,32 @@ export default function useArrowNav() {
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
 				if ( shiftKey ) {
+					// A fully selected multi-selection has no native
+					// selection to extend (use-multi-selection cleared it),
+					// so grow or shrink it by one block at the focus end.
+					// Only without a usable native selection: a selection
+					// that is fully selected because it resolves to a
+					// nesting ancestor keeps its native selection, which
+					// the browser extends natively (and the observer
+					// promotes to the common level).
+					const selection = defaultView.getSelection();
+					if (
+						__unstableIsFullySelected() &&
+						( ! selection.rangeCount || selection.isCollapsed )
+					) {
+						const anchorClientId =
+							getMultiSelectedBlocksStartClientId();
+						const focusClientId =
+							getMultiSelectedBlocksEndClientId();
+						const nextClientId = isReverse
+							? getPreviousBlockClientId( focusClientId )
+							: getNextBlockClientId( focusClientId );
+
+						if ( nextClientId ) {
+							multiSelect( anchorClientId, nextClientId );
+							event.preventDefault();
+						}
+					}
 					return;
 				}
 
@@ -261,6 +291,26 @@ export default function useArrowNav() {
 					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
 				}
 
+				return;
+			}
+
+			// A block selected without a text selection within it (e.g. an
+			// image or spacer) has no native selection to extend: start a
+			// block multi-selection with the adjacent block.
+			if (
+				shiftKey &&
+				getSelectedBlockClientId() &&
+				! getSelectionStart().attributeKey
+			) {
+				const selectedClientId = getSelectedBlockClientId();
+				const nextClientId = isReverse
+					? getPreviousBlockClientId( selectedClientId )
+					: getNextBlockClientId( selectedClientId );
+
+				if ( nextClientId ) {
+					multiSelect( selectedClientId, nextClientId );
+					event.preventDefault();
+				}
 				return;
 			}
 

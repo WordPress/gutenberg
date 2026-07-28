@@ -62,7 +62,7 @@ const webpackConfig = {
 
 ### Behavior with scripts
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
 The asset file name mirrors the emitted JavaScript file name, replacing the `.js` (or `.mjs`) extension with `.asset.php` (or `.asset.json` when `outputFormat` is `json`). Because it follows the webpack `output.filename` setting, a single unnamed entry produces `main.asset.php` by default, and an output such as `index.min.js` produces `index.min.asset.php`.
 
@@ -131,7 +131,7 @@ const webpackConfig = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
 For example, for an entry named `entrypoint`:
 
