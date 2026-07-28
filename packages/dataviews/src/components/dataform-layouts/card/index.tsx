@@ -251,16 +251,21 @@ export default function FormCardField< Item >( {
 			return;
 		}
 		setTouched( true );
+		// A collapsed card reveals nothing: its content is hidden but still
+		// in the DOM, so the reveal would count the invalid fields and
+		// announce them. The header badge already conveys them, and expanding
+		// the card reveals the errors through the effect above.
+		if ( isCollapsible && ! isOpen ) {
+			return;
+		}
 		// The errors appear without moving focus, so announce them: their
-		// arrival is otherwise imperceptible to assistive technology. A
-		// collapsed card reveals nothing, and its header already describes
-		// the badge, so it stays silent.
+		// arrival is otherwise imperceptible to assistive technology.
 		const reportedCount = reportValidity();
 		const message = getValidationMessage( validity );
 		if ( reportedCount > 0 && message ) {
 			speak( message, 'polite' );
 		}
-	}, [ reportValidity, validity ] );
+	}, [ isCollapsible, isOpen, reportValidity, validity ] );
 
 	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 

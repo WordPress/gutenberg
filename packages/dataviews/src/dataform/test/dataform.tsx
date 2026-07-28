@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -748,6 +748,47 @@ describe( 'DataForm component', () => {
 			);
 		} );
 
+		it( 'should not announce when focus leaves the card while it is collapsed', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formCardMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							mainCard: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Focus a field inside the card, then collapse it. The toggle is
+			// inside the card, so focus hasn't left it yet.
+			await user.click( fieldsSelector.order.edit() );
+			await user.click(
+				screen.getByRole( 'button', { name: /main card/i } )
+			);
+			jest.mocked( speak ).mockClear();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should show errors for invalid fields after the card is collapsed and expanded', async () => {
 			const user = userEvent.setup();
 			render(
@@ -825,6 +866,57 @@ describe( 'DataForm component', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Outside' } )
 			).toHaveFocus();
+		} );
+
+		it( 'should not announce when focus leaves it while collapsed', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formDetailsMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							moreDetails: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Expand the disclosure and focus a field inside it.
+			const summary = screen.getByText( 'More details' );
+			await user.click( summary );
+			await waitFor( () =>
+				expect( fieldsSelector.order.edit() ).toBeVisible()
+			);
+			await user.click( fieldsSelector.order.edit() );
+
+			// Close it while focus is still inside, as when the summary is
+			// clicked in a browser, where it receives focus. jsdom leaves
+			// focus where it was, so close programmatically instead.
+			// eslint-disable-next-line testing-library/no-node-access
+			const details = summary.closest( 'details' );
+			await act( async () => {
+				details!.open = false;
+			} );
+			jest.mocked( speak ).mockClear();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

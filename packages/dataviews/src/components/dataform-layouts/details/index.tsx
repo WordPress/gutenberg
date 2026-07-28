@@ -90,9 +90,17 @@ export default function FormDetailsField< Item >( {
 			return;
 		}
 		setTouched( true );
+		// A closed details element reveals nothing: its content is hidden but
+		// still in the DOM, so the reveal would count the invalid fields and
+		// announce them. The summary badge already conveys them, and
+		// reopening the element reveals the errors through the effect above.
+		// The DOM is read directly because the `isOpen` state trails it while
+		// the `toggle` event is still in flight.
+		if ( ! detailsRef.current?.open ) {
+			return;
+		}
 		// The errors appear without moving focus, so announce them: their
-		// arrival is otherwise imperceptible to assistive technology. A
-		// collapsed element reveals nothing, so it stays silent.
+		// arrival is otherwise imperceptible to assistive technology.
 		const reportedCount = reportValidity();
 		const message = getValidationMessage( validity );
 		if ( reportedCount > 0 && message ) {
