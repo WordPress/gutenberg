@@ -43,9 +43,11 @@ jobs:
             # matches none of these, so an unrecognised path always runs the comparison.
             #
             # Paths that feed the build (`tools/build-scripts` and its `@wordpress/build`,
-            # `@wordpress/scripts` and Babel dependencies) or the test harness
-            # (`@wordpress/env`) are deliberately absent. `.github/` is listed, except for
-            # this workflow, so that a change to it is still covered by its own comparison.
+            # `@wordpress/scripts`, Babel and browserslist configuration) or the test harness
+            # (`@wordpress/env`, plus the themes and plugins mapped into wp-env by
+            # `tools/release/commands/performance.js`) are deliberately absent. `.github/` is
+            # listed, except for this workflow and the `setup-node` action it calls, so that a
+            # change to either is still covered by its own comparison.
             - name: Check whether the diff can move a performance metric
               id: filter
               if: github.event_name == 'pull_request'
@@ -58,15 +60,17 @@ jobs:
                           - '!**/*.md'
                           - '!**/*.native.*'
                           - '!{backport-changelog,bin,docs,phpunit,schemas,skills,storybook,typings}/**'
-                          - '!test/{e2e,emptytheme,gutenberg-test-themes,integration,native,php,storybook-playwright,unit}/**'
+                          - '!test/{integration,native,php,storybook-playwright,unit}/**'
+                          - '!test/e2e/{*,!(assets)/**}'
                           - '!{packages,tools}/**/{test,tests}/**'
-                          - '!packages/{create-block,docgen,e2e-tests,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
                           - '!tools/{docs,eslint,stylelint,validation}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
-                          - '!{phpcs,phpunit,tsconfig}*'
+                          - '!{phpcs,phpunit}*'
                           - '!{changelog,readme}.txt'
-                          - '!.{browserslistrc,editorconfig,gitignore,npmrc,nvmrc,prettierrc*,stylelintrc*}'
-                          - '!.github/{*,!(workflows)/**,workflows/!(performance.yml)}'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(performance.yml)}'
 
     performance:
         timeout-minutes: 60
