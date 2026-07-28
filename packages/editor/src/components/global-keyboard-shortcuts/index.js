@@ -28,7 +28,7 @@ import { store as editorStore } from '../../store';
 function usesNativeUndo( event ) {
 	let { target } = event;
 
-	while ( target?.nodeName === 'IFRAME' ) {
+	if ( target?.nodeName === 'IFRAME' ) {
 		target = target.contentDocument?.activeElement;
 	}
 
