@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Key, MouseEventHandler } from 'react';
+import type { Key, MouseEventHandler, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -47,6 +47,10 @@ export type BasePaletteEdit = {
 	 * A heading label for the palette.
 	 */
 	paletteLabel: string;
+	/**
+	 * An optional icon displayed before the palette label.
+	 */
+	paletteIcon?: ReactNode;
 	/**
 	 * The label's heading level.
 	 *

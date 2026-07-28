@@ -51,6 +51,16 @@ export interface Duotone extends BasePreset {
 	colors: string[];
 }
 
+export type ColorSchemePreset< T extends BasePreset > = Omit< T, 'name' > & {
+	name?: string;
+};
+
+export interface ColorSchemeSettings {
+	palette?: ColorSchemePreset< Color >[];
+	gradients?: ColorSchemePreset< Gradient >[];
+	duotone?: ColorSchemePreset< Duotone >[];
+}
+
 /**
  * Palette collection for a specific origin (theme, custom, default)
  */
@@ -225,6 +235,8 @@ export interface GlobalStylesSettings {
 		defaultPalette?: boolean;
 		defaultGradients?: boolean;
 		defaultDuotone?: boolean;
+		light?: ColorSchemeSettings;
+		dark?: ColorSchemeSettings;
 	};
 	custom?: Record<
 		string,

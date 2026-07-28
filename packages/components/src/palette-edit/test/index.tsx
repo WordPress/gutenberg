@@ -183,6 +183,24 @@ describe( 'PaletteEdit', () => {
 		expect( paletteLabel ).toBeVisible();
 	} );
 
+	it( 'shows an icon before the heading label', () => {
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				paletteIcon={ <span data-testid="palette-icon" /> }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'heading', {
+				level: 2,
+				name: 'Test label',
+			} )
+		).toBeVisible();
+		expect( screen.getByTestId( 'palette-icon' ) ).toBeVisible();
+	} );
+
 	it( 'shows heading label with custom heading level', () => {
 		render(
 			<PaletteEdit

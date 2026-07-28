@@ -379,6 +379,7 @@ export function PaletteEdit( {
 	colors = EMPTY_ARRAY,
 	onChange,
 	paletteLabel,
+	paletteIcon,
 	paletteLabelHeadingLevel = 2,
 	emptyMessage,
 	canOnlyChangeValues,
@@ -426,6 +427,7 @@ export function PaletteEdit( {
 		<PaletteEditStyles>
 			<HStack>
 				<PaletteHeading level={ paletteLabelHeadingLevel }>
+					{ paletteIcon }
 					{ paletteLabel }
 				</PaletteHeading>
 				<PaletteActionsContainer>
