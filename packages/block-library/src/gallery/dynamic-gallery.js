@@ -90,7 +90,7 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
 	return (
 		<ConfirmDialog
 			isOpen
-			title={ __( 'Detach gallery?' ) }
+			title={ __( 'Detach Gallery' ) }
 			__experimentalHideHeader={ false }
 			confirmButtonText={ __( 'Detach' ) }
 			onConfirm={ onConfirm }
@@ -98,7 +98,7 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
 			size="medium"
 		>
 			{ __(
-				'The gallery displays the images attached to the post. Detaching it will enable you to add, delete, or reorder images. However, newly attached images will no longer be added automatically.'
+				'The gallery displays the images attached to the post. Detaching will enable you to add, delete, or reorder images. However, new attachments will no longer be added automatically.'
 			) }
 		</ConfirmDialog>
 	);
@@ -175,7 +175,7 @@ export function GallerySourcePanel( {
 							disabled={ isResolvingDynamic }
 							accessibleWhenDisabled
 						>
-							{ __( 'Detach gallery' ) }
+							{ __( 'Detach Gallery' ) }
 						</Button>
 					</div>
 					{ hasMoreImagesThanCap && (
@@ -377,7 +377,7 @@ export function GalleryDynamicView( {
 					<BlockControls group="other">
 						<ToolbarButton
 							onClick={ () => setIsConfirmingDetach( true ) }
-							// Same guard as the inspector's "Detach gallery": both end in
+							// Same guard as the inspector's "Detach Gallery": both end in
 							// `convertToStatic`, which would map over a
 							// still-resolving (or empty) media list.
 							// (`ToolbarButton` stays focusable when disabled by
