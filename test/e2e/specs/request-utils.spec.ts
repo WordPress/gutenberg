@@ -32,21 +32,24 @@ test( 'RequestUtils does not reuse HTTP connections when closeConnections is ena
 		server.listen( 0, '127.0.0.1', resolve );
 	} );
 
-	const { port } = server.address() as AddressInfo;
-	const requestUtils = await RequestUtils.setup( {
-		baseURL: `http://127.0.0.1:${ port }`,
-		closeConnections: true,
-	} );
-
 	try {
-		await requestUtils.request.get( '/' );
-		await requestUtils.request.get( '/' );
+		const { port } = server.address() as AddressInfo;
+		const requestUtils = await RequestUtils.setup( {
+			baseURL: `http://127.0.0.1:${ port }`,
+			closeConnections: true,
+		} );
 
-		expect( connectionHeaders ).toEqual( [ 'close', 'close' ] );
-		expect( connections ).toHaveLength( 2 );
-		expect( connections[ 0 ] ).not.toBe( connections[ 1 ] );
+		try {
+			await requestUtils.request.get( '/' );
+			await requestUtils.request.get( '/' );
+
+			expect( connectionHeaders ).toEqual( [ 'close', 'close' ] );
+			expect( connections ).toHaveLength( 2 );
+			expect( connections[ 0 ] ).not.toBe( connections[ 1 ] );
+		} finally {
+			await requestUtils.request.dispose();
+		}
 	} finally {
-		await requestUtils.request.dispose();
 		await new Promise< void >( ( resolve, reject ) => {
 			server.close( ( error ) => {
 				if ( error ) {
