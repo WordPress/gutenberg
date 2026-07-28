@@ -177,7 +177,7 @@ function block_core_table_of_contents_normalize_heading_context( $content, $cont
 		$context,
 		array(
 			'current_page'              => 1,
-			'is_paginated'              => false !== strpos( $content, '<!--nextpage-->' ),
+			'is_paginated'              => str_contains( $content, '<!--nextpage-->' ),
 			'only_include_current_page' => false,
 			'permalink'                 => '',
 			'target_page'               => 1,

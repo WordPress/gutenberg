@@ -133,10 +133,13 @@ export default function PostTermsEdit( {
 							setAttributes( { suffix: value } )
 						}
 						tagName="span"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock( getDefaultBlockName() )
+										)
+								: undefined
 						}
 					/>
 				) }

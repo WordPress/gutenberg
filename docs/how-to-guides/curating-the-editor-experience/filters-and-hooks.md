@@ -81,79 +81,164 @@ The filter receives an instance of the `WP_Theme_JSON_Data class` with the data 
 
 ## Server-side view configuration filter
 
-DataViews-powered screens (such as the Pages list and its Quick Edit form) build their configuration on the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
+DataViews-powered screens (such as the Pages list and its Quick Edit form) take their configuration from the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
 
-The configuration has four keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
+Right now, the filter is in use by the following Site Editor screens:
 
-The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. Each method merges a partial change (a patch) into one part of the configuration, and patches follow three shared rules: an associative array merges key by key, a numerically indexed array replaces the current value wholesale, and `null` deletes what it names.
+| Page | Filter name |
+| --- | --- |
+| Pages | `get_entity_view_config_postType_page` |
+| Templates | `get_entity_view_config_postType_wp_template` |
+| Parts | `get_entity_view_config_postType_wp_template_part` |
+| Patterns | `get_entity_view_config_postType_wp_block` |
 
--   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and the `form` properties other than its `fields`. Passing `null` for a whole top-level key resets it to its default.
--   `update_view_list_items( $items, $version )` adds, updates, or removes views in the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
--   `update_form_fields( $fields, $version )` adds, updates, or removes `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. Within a field patch, `children` follows the shared rules: an associative array merges into the group's children by `id` (unknown ids append to the group), a numerically indexed array replaces the children wholesale, and `null` deletes the key.
+There are four aspects to configure for each entity (and screen):
 
-For form fields, the id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()` — not `array( 'my_field' )`, which is a numerically indexed array and would replace the group's children with just that field. Patch entries apply in order and `null` removes every occurrence of an id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
+- `default_view`: the default DataViews configuration (e.g., what fields are visible, what is the default sort order, etc.)
+- `default_layouts`: the default DataViews layouts (e.g., what layouts are available for the user to choose from)
+- `view_list`: the preconfigured views displayed in the sidebar (e.g. "All", "Published", "Drafts", etc.)
+- `form`: the DataForm configuration used for the Quick Edit form (e.g. which fields are displayed in the form and their order)
 
-The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
+Each filter callback receives a `Gutenberg_View_Config_Data` object with the config for the given entity, which it can change by calling its methods (see below) and **return the object**.
 
-In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
+For example, update the view config for the Pages screen by hooking into this filter:
 
 ```php
 function example_filter_page_view_config( $data ) {
-    // Patch the view list by slug: add a saved view, retitle the existing
-    // Drafts view — only the given keys change — and remove the Trash view
-    // with null.
-    $data->update_view_list_items(
-        array(
-            'my-drafts' => array(
-                'title' => __( 'My drafts', 'example' ),
-                'view'  => array(
-                    'filters' => array(
-                        array(
-                            'field'    => 'status',
-                            'operator' => 'isAny',
-                            'value'    => 'draft',
-                            'isLocked' => true,
-                        ),
-                    ),
-                ),
-            ),
-            'drafts'    => array(
-                'title' => __( 'In progress', 'example' ),
-            ),
-            'trash'     => null,
-        ),
-        1
-    );
+	// Modify the configuration...
 
-    // Patch form fields by id, wherever they live in the form: update the
-    // label position of the post content info field, remove the slug and
-    // author fields with null, and append a new field to the discussion
-    // group's children ( array() carries no overrides ).
-    $data->update_form_fields(
-        array(
-            'post-content-info' => array(
-                'layout' => array( 'labelPosition' => 'side' ),
-            ),
-            'slug'              => null,
-            'author'            => null,
-            'discussion'        => array(
-                'children' => array( 'my_field' => array() ),
-            ),
-        ),
-        1
-    );
+	return $data;
+}
+add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+```
 
-    // Unset a nested value with null: drop the grid layout option. Form
-    // properties other than `fields` also merge here.
-    $data->update_properties(
-        array(
-            'default_layouts' => array( 'grid' => null ),
-            'form'            => array( 'layout' => array( 'type' => 'regular' ) ),
-        ),
-        1
-    );
+### Update entries with `merge`
 
-    return $data;
+Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the current view config for the entity. To update the given configuration, call its `merge( $patch, $version )` method where:
+
+- `$patch`, an array containing the new data to be merged into the existing configuration.
+- `$version`, an integer, is the version of the data being merged. It should be `1` for now.
+
+For example, the following filter callback is applied to the _Pages_ screen. It makes the default view type a grid, sorts the grid by ascending title, and makes the `date` field visible (in addition to the existing fields). It also appends `my_custom_field` to the Quick Edit `form`, keeping the form's existing fields (note that registering a field from the server is not yet possible).
+
+```php
+function example_filter_page_view_config( $data ) {
+	$patch = array(
+		'default_view' => array(
+			'type'   => 'grid',
+			'sort'   => array(
+				'field'     => 'title',
+				'direction' => 'asc',
+			),
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'my_custom_field' ),
+		),
+	);
+	$data->merge( $patch, 1 );
+
+	return $data;
+}
+add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+```
+
+### Remove entries with `remove`
+
+The `Gutenberg_View_Config_Data` object has a `remove( $spec, $version )` method that allows you to remove entries from the configuration.
+
+- `$spec`, an array that specifies which entries to remove.
+- `$version`, an integer, the version of the data being modified. It should be `1` for now.
+
+The following filter callback applies to the _Pages_ screen. It removes the `status` field from the list of visible fields in DataViews, and the `format` field from the Quick Edit form:
+
+```php
+function example_page_view_config_remove( $data ) {
+	$spec = array(
+		'default_view' => array(
+			'fields' => array( 'status' ),
+		),
+		'form'         => array(
+			'fields' => array( 'format' ),
+		),
+	);
+	$data->remove( $spec, 1 );
+
+	return $data;
+}
+add_filter( 'get_entity_view_config_postType_page', 'example_page_view_config_remove' );
+```
+
+### Update entries with `replace`
+
+There's also a `replace( $patch, $version )` method. It works similar to  `merge` except for one difference: how they treat numerical indexed arrays (e.g., `fields => array( 'date', 'author' )`). Where `merge` will add new items to the indexed array, `replace` will substitute the entire list.
+
+For example, this code uses `merge` to add `date` to the list of visible fields and append `my_custom_field` to the Quick Edit form, keeping the current entries in both:
+
+```php
+function example_filter_page_view_config( $data ) {
+	$patch = array(
+		'default_view' => array(
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'my_custom_field' ),
+		),
+	);
+	$data->merge( $patch, 1 );
+
+	return $data;
+}
+add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+```
+
+However, this code uses `replace` to substitute the list of visible fields with just `date`, and the Quick Edit form's entire field list with `date` and `my_custom_field`:
+
+```php
+function example_filter_page_view_config( $data ) {
+	$patch = array(
+		'default_view' => array(
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'date', 'my_custom_field' ),
+		),
+	);
+	$data->replace( $patch, 1 );
+
+	return $data;
+}
+add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+```
+
+### Set entries with `set`
+
+There's also a `set( $patch, $version )` method:
+
+- `$patch`, an array containing the new values for the top-level keys it names.
+- `$version`, an integer, the version of the data being modified. It should be `1` for now.
+
+Like `merge` and `replace`, `set` only touches the top-level keys the patch names. The difference is depth. Where `merge` and `replace` merge a named key's value into the current one key by key, `set` swaps the whole value in wholesale, dropping whatever the key held before.
+
+Use it when a callback owns a key and wants to pin it to an exact shape, without the inherited default leaking through a key-by-key merge.
+
+For example, this code applied to the _Pages_ screen makes `default_view` and `form` exactly the given configurations, discarding any other properties they had (`default_view`'s page size, filters, etc., and the form's default fields and layout):
+
+```php
+function example_filter_page_view_config( $data ) {
+	$patch = array(
+		'default_view' => array(
+			'type'   => 'grid',
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'layout' => array( 'type' => 'panel' ),
+			'fields' => array( 'excerpt', 'date', 'my_custom_field' ),
+		),
+	);
+	$data->set( $patch, 1 );
+
+	return $data;
 }
 add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
 ```

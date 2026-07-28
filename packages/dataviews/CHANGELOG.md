@@ -5,15 +5,19 @@
 ### Enhancements
 
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
+-   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
 
 ### Bug Fix
 
+-   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 -   DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
+-   DataViews: Give the search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes. [#80315](https://github.com/WordPress/gutenberg/pull/80315)
 
 ### Internal
 
+-   DataViews: Model `useSelectionProps` with orthogonal semantic props (`selectionMode`, `shouldSelectOnClick`, and a caller-supplied `isItemSelectable`) instead of a picker-specific flag, and route the `list` layout's selection through the shared hook. `selectionMode` distinguishes multi-selection from the two single-selection semantics (`'single-required'` keeps an item selected on re-click, `'single-clearable'` allows clearing it), so the `list` layout keeps its always-selected behavior while single-select pickers stay clearable. No behavior change. [#80677](https://github.com/WordPress/gutenberg/pull/80677)
 -   DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of document-level focus bookkeeping, and drop the field-owned `Popover.Slot` so format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 

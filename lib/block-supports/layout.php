@@ -290,7 +290,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 function gutenberg_sanitize_block_gap_value( $gap_value ) {
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = ! is_scalar( $value ) || ( $value && preg_match( '%[\\\(&=}]|/\*%', (string) $value ) ) ? null : $value;
 		}
 		return $gap_value;
 	}
@@ -955,12 +955,27 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	static $global_styles = null;
 
-	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout    = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr               = gutenberg_resolve_style_state_aliases(
+	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$style_attr            = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block['blockName']
 	);
+	/*
+	 * A block with no layout support and no style attribute at all cannot
+	 * produce layout output, so return before resolving global settings.
+	 *
+	 * Resolving settings is not read-only: on a cold cache it queries the
+	 * user's `wp_global_styles` post, which fires `the_posts`. A callback on
+	 * that hook that renders blocks re-enters this filter, and the content it
+	 * renders at that point is the global styles post itself, which parses to a
+	 * single block with no name and no attributes. Without this return that
+	 * block resolves settings again and the recursion has no base case.
+	 */
+	if ( ! $block_supports_layout && empty( $style_attr ) ) {
+		return $block_content;
+	}
+
 	$global_settings          = gutenberg_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );

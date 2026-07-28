@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -15,14 +14,7 @@ import { useEffect } from '@wordpress/element';
  */
 import Controls from './controls';
 
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			placeholder: __( 'Type / to choose a block' ),
-		},
-	],
-];
+const TEMPLATE = [ [ 'core/paragraph' ] ];
 
 export default function Edit( { clientId, isSelected } ) {
 	const {

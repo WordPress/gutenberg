@@ -4,11 +4,10 @@
 
 ```bash
 # Setup
+nvm use                    # Use the required node version
 npm install && composer install
 npm run wp-env status      # Always check status first.
 npm run wp-env start       # Only start if not already running.
-npm run wp-env-test status # Status of test environment. Always check first.
-npm run wp-env-test start  # Start the test env, only start if not already running.
 
 # Development
 npm start     # Development with watch
@@ -28,28 +27,17 @@ npm run build # Production build
     -   `/docs/how-to-guides/` - Implementation tutorials
     -   `/docs/reference-guides/` - API documentation
 
-## Testing instructions
+## Progressive discovery
 
-> **Note**: PHP/E2E tests require `wp-env-test` running.
+Read only what your task needs, when it needs it:
+
+-   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
+-   **Task procedures (skills)**: before starting a matching task, read the relevant `skills/<domain>/SKILL.md` (e.g. `skills/testing/SKILL.md` for writing, running, or debugging tests).
+-   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
+
+## Code quality
 
 ```bash
-# JavaScript
-npm test                   # All JS tests
-npm run test:unit         # Unit tests
-npm run test:unit -- --testNamePattern="<TestName>"  # Specific test
-npm run test:unit <path_to_test_directory>
-
-# PHP (requires wp-env-test)
-composer test             # All PHP tests
-vendor/bin/phpunit <path_to_test_file.php>  # Specific file
-vendor/bin/phpunit <path_to_test_directory>/              # Directory
-
-# E2E (requires wp-env-test)
-npm run test:e2e
-npm run test:e2e -- <path_to_test_file.spec.js>  # Specific test file
-npm run test:e2e -- --headed                   # Run with browser visible
-
-# Code Quality
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
 vendor/bin/phpcbf        # Fix PHP standards
@@ -72,12 +60,14 @@ For full architecture details, see `docs/explanations/architecture/`.
 ## Common pitfalls
 
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
--   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+-   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
 -   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
+-   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
+-   Production code changes in a package require an entry in that package's `CHANGELOG.md`. See `docs/contributors/code/managing-packages.md`.
 
 ## PR instructions
 

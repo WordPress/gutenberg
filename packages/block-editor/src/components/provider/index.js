@@ -102,7 +102,7 @@ function shouldEnableClientSideMediaProcessing() {
  *
  * Returns true when:
  * 1. Full client-side processing is NOT available (otherwise it handles HEIC already)
- * 2. The server has set the __heicUploadSupport flag
+ * 2. The server has set the __clientSideMediaProcessing flag
  * 3. The browser supports createImageBitmap + OffscreenCanvas (e.g. Safari)
  *
  * @return {boolean} Whether HEIC-only canvas processing should be enabled.
@@ -118,7 +118,7 @@ function shouldEnableHeicCanvasProcessing() {
 		return false;
 	}
 
-	if ( ! window.__heicUploadSupport ) {
+	if ( ! window.__clientSideMediaProcessing ) {
 		isHeicCanvasEnabledCache = false;
 		return false;
 	}
