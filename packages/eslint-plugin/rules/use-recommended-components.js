@@ -79,7 +79,6 @@ const DENYLIST = {
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
-		Theme: 'Use `ThemeProvider` from `@wordpress/theme` instead.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
