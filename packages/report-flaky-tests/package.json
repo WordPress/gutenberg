@@ -35,14 +35,14 @@
 	"dependencies": {
 		"@actions/core": "^1.9.1",
 		"@actions/github": "^5.0.1",
-		"@jest/test-result": "^29.6.2",
+		"@jest/test-result": "^30.4.1",
 		"@octokit/types": "^6.34.0",
 		"@octokit/webhooks-types": "^5.8.0",
 		"@playwright/test": "^1.61.1",
-		"jest-message-util": "^29.6.2"
+		"jest-message-util": "^30.4.1"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.14"
+		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

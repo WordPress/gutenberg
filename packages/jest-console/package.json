@@ -41,15 +41,15 @@
 	},
 	"types": "declarations.d.ts",
 	"dependencies": {
-		"jest-matcher-utils": "^29.6.2",
-		"jest-mock": "^29.6.2"
+		"jest-matcher-utils": "^30.4.1",
+		"jest-mock": "^30.4.1"
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^6.9.1",
-		"@types/jest": "^29.5.14"
+		"@types/jest": "^30.0.0"
 	},
 	"peerDependencies": {
-		"jest": ">=29"
+		"jest": ">=30"
 	},
 	"publishConfig": {
 		"access": "public"
