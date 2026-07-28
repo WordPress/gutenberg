@@ -8,8 +8,9 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
 	component: SearchableChipSelect,
 	subcomponents: {
-		Item: SearchableChipSelect.Item,
-		ChipWithRemove: SearchableChipSelect.ChipWithRemove,
+		'SearchableChipSelect.Item': SearchableChipSelect.Item,
+		'SearchableChipSelect.ChipWithRemove':
+			SearchableChipSelect.ChipWithRemove,
 	},
 	argTypes: {
 		onValueChange: { action: fn() },
