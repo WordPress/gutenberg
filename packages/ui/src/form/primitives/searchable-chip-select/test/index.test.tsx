@@ -1,31 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { createRef, useId } from '@wordpress/element';
+import { createRef } from '@wordpress/element';
 import { SearchableChipSelect } from '../index';
-
-function SearchableChipSelectWithDescription() {
-	const descriptionId = useId();
-
-	return (
-		<>
-			<SearchableChipSelect
-				aria-label="My label"
-				aria-describedby={ descriptionId }
-			/>
-			<p id={ descriptionId }>My description</p>
-		</>
-	);
-}
-
-function SearchableChipSelectWithLabel() {
-	const labelId = useId();
-
-	return (
-		<>
-			<p id={ labelId }>My label</p>
-			<SearchableChipSelect aria-labelledby={ labelId } />
-		</>
-	);
-}
 
 describe( 'SearchableChipSelect', () => {
 	it( 'forwards ref', () => {
@@ -37,7 +12,16 @@ describe( 'SearchableChipSelect', () => {
 	} );
 
 	it( 'passes aria-label and aria-describedby props to the appropriate components', () => {
-		render( <SearchableChipSelectWithDescription /> );
+		render(
+			<>
+				<SearchableChipSelect
+					aria-label="My label"
+					aria-describedby="searchable-chip-select-description"
+				/>
+				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
+				<p id="searchable-chip-select-description">My description</p>
+			</>
+		);
 
 		expect(
 			screen.getByRole( 'combobox', {
@@ -48,7 +32,13 @@ describe( 'SearchableChipSelect', () => {
 	} );
 
 	it( 'passes aria-labelledby prop to the appropriate component', () => {
-		render( <SearchableChipSelectWithLabel /> );
+		render(
+			<>
+				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
+				<p id="searchable-chip-select-label">My label</p>
+				<SearchableChipSelect aria-labelledby="searchable-chip-select-label" />
+			</>
+		);
 
 		expect(
 			screen.getByRole( 'combobox', {
