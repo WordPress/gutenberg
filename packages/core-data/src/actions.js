@@ -762,6 +762,20 @@ export const saveEntityRecord =
 									: undefined,
 						}
 					);
+					// Capture the CRDT snapshot in the same tick as the payload
+					// so it describes exactly the content being autosaved.
+					if ( entityConfig.syncConfig ) {
+						const crdtSnapshot =
+							getSyncManager()?.getEntitySnapshot(
+								`${ kind }/${ name }`,
+								recordId
+							);
+
+						if ( crdtSnapshot ) {
+							data.crdt_snapshot = crdtSnapshot;
+						}
+					}
+
 					updatedRecord = await __unstableFetch( {
 						path: `${ path }/autosaves`,
 						method: 'POST',
@@ -818,34 +832,6 @@ export const saveEntityRecord =
 							persistedRecord.id,
 							updatedRecord
 						);
-
-						// Record the successful autosave in the CRDT document
-						// so that other sessions can tell that the autosave
-						// revision's content is already part of the shared
-						// document. Skipped when the server processed the
-						// autosave as a regular save or a no-op (handled by
-						// the branch above, where the response ID matches the
-						// parent post).
-						if (
-							entityConfig.syncConfig &&
-							updatedRecord.author &&
-							updatedRecord.modified_gmt
-						) {
-							// `modified_gmt` has no timezone suffix; it is UTC.
-							const autosavedAt = Math.floor(
-								Date.parse( updatedRecord.modified_gmt + 'Z' ) /
-									1000
-							);
-
-							if ( Number.isFinite( autosavedAt ) ) {
-								getSyncManager()?.markEntityAutosaved(
-									`${ kind }/${ name }`,
-									recordId,
-									updatedRecord.author,
-									autosavedAt
-								);
-							}
-						}
 					}
 				} else {
 					// `saveEntityRecord` can be called directly, bypassing
