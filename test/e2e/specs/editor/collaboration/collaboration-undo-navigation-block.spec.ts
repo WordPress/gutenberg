@@ -49,9 +49,7 @@ import { type UserCredentials } from './fixtures/collaboration-utils';
  *   edit_theme_options capability, so an editor-role collaborator cannot
  *   read the menu entity (their navigation block renders "Navigation Menu
  *   has been deleted or is unavailable"), no navigation controller runs on
- *   their client, and undo keeps working. That control result, and a
- *   pre-existing-menu variant that fails the same way as this one, are
- *   documented in a-investigation/undo-self-updates.md.
+ *   their client, and undo keeps working.
  *
  * This test fails while the bug exists. Mark it with test.fixme() if it
  * needs to land before the fix.
