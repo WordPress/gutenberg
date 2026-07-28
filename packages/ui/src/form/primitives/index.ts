@@ -7,3 +7,4 @@ export { Input } from './input';
 export { InputLayout } from './input-layout';
 export * as Select from './select';
 export { Textarea } from './textarea';
+export { Radio } from './radio';
