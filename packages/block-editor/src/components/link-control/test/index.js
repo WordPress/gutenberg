@@ -222,9 +222,6 @@ describe( 'Basic rendering', () => {
 			fauxEntitySuggestions.length
 		);
 
-		// Step down into the search results, highlighting the first result item.
-		triggerArrowDown( searchInput );
-
 		const firstSearchSuggestion = searchResultElements[ 0 ];
 		const secondSearchSuggestion = searchResultElements[ 1 ];
 
@@ -232,7 +229,7 @@ describe( 'Basic rendering', () => {
 			selected: true,
 		} );
 
-		// We should have highlighted the first item using the keyboard.
+		// The first item should be highlighted by default.
 		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
 
 		// Check the aria-selected attribute is set only on the highlighted item.
@@ -250,7 +247,7 @@ describe( 'Basic rendering', () => {
 			selected: true,
 		} );
 
-		// We should have highlighted the first item using the keyboard.
+		// We should have highlighted the second item using the keyboard.
 		expect( selectedSearchResultElement ).toEqual( secondSearchSuggestion );
 
 		// Check the aria-selected attribute is omitted on non-highlighted items.
@@ -1745,9 +1742,6 @@ describe( 'Selecting links', () => {
 					name: /Search results for.*/,
 				} );
 
-				// Step down into the search results, highlighting the first result item.
-				triggerArrowDown( searchInput );
-
 				const searchResultElements =
 					within( searchResults ).getAllByRole( 'option' );
 
@@ -1758,7 +1752,7 @@ describe( 'Selecting links', () => {
 					selected: true,
 				} );
 
-				// We should have highlighted the first item using the keyboard.
+				// The first item should be highlighted by default.
 				expect( selectedSearchResultElement ).toBe(
 					firstSearchSuggestion
 				);
@@ -1772,7 +1766,7 @@ describe( 'Selecting links', () => {
 						selected: true,
 					} );
 
-					// We should have highlighted the first item using the keyboard
+					// We should have highlighted the second item using the keyboard
 					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toBe(
 						secondSearchSuggestion
@@ -1828,9 +1822,6 @@ describe( 'Selecting links', () => {
 				name: 'Search or type URL',
 			} );
 
-			// Step down into the search results, highlighting the first result item.
-			triggerArrowDown( searchInput );
-
 			const searchResultElements = within(
 				screen.getByRole( 'listbox', {
 					name: 'Suggestions',
@@ -1844,7 +1835,7 @@ describe( 'Selecting links', () => {
 				selected: true,
 			} );
 
-			// We should have highlighted the first item using the keyboard.
+			// The first item should be highlighted by default.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
 			);
@@ -1856,7 +1847,7 @@ describe( 'Selecting links', () => {
 				selected: true,
 			} );
 
-			// We should have highlighted the first item using the keyboard.
+			// We should have highlighted the second item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
 				secondSearchSuggestion
 			);

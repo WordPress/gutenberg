@@ -196,6 +196,11 @@ class URLInput extends Component {
 					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
+					selectedSuggestion:
+						this.state.selectedSuggestion === null &&
+						suggestions.length > 0
+							? 0
+							: this.state.selectedSuggestion,
 				} );
 
 				if ( !! suggestions.length ) {
