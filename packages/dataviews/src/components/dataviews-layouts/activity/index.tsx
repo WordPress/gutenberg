@@ -91,11 +91,14 @@ export default function ViewActivity< Item >(
 		<>
 			<div
 				className={ wrapperClassName }
-				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
+				role={ isInfiniteScroll ? 'feed' : undefined }
 				// @ts-ignore
 				inert={ isInert ? 'true' : undefined }
 			>
-				<ActivityItems< Item > { ...props } />
+				<ActivityItems< Item >
+					{ ...props }
+					isInfiniteScroll={ isInfiniteScroll }
+				/>
 			</div>
 			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">

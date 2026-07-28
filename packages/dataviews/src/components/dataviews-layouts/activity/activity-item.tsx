@@ -17,6 +17,7 @@ import { Stack, VisuallyHidden } from '@wordpress/ui';
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 import type { NormalizedField, ViewActivityProps } from '../../../types';
 
 function ActivityItem< Item >(
@@ -51,6 +52,7 @@ function ActivityItem< Item >(
 	const itemRef = useRef< HTMLDivElement >( null );
 	const registry = useRegistry();
 	const { paginationInfo } = useContext( DataViewsContext );
+	useIntersectionObserver( itemRef, posinset );
 
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need

@@ -4,14 +4,18 @@
 import ActivityItem from './activity-item';
 import type { ViewActivityProps } from '../../../types';
 
+type ActivityItemsProps< Item > = ViewActivityProps< Item > & {
+	isInfiniteScroll?: boolean;
+};
+
 function isDefined< T >( item: T | undefined ): item is T {
 	return !! item;
 }
 
 export default function ActivityItems< Item >(
-	props: ViewActivityProps< Item >
+	props: ActivityItemsProps< Item >
 ) {
-	const { data, fields, getItemId, view } = props;
+	const { data, fields, getItemId, isInfiniteScroll, view } = props;
 
 	// Determine which fields to display based on view configuration
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
@@ -23,7 +27,8 @@ export default function ActivityItems< Item >(
 		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
 		.filter( isDefined );
 
-	return data.map( ( item, index ) => {
+	return data.map( ( item ) => {
+		const { position: posinset } = item as { position?: number };
 		return (
 			<ActivityItem
 				{ ...props }
@@ -33,7 +38,7 @@ export default function ActivityItems< Item >(
 				titleField={ titleField }
 				descriptionField={ descriptionField }
 				otherFields={ otherFields }
-				posinset={ view.infiniteScrollEnabled ? index + 1 : undefined }
+				posinset={ isInfiniteScroll ? posinset : undefined }
 			/>
 		);
 	} );

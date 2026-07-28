@@ -1,6 +1,7 @@
 @use "../../../dataviews/style" as *;
 
 .dataviews-view-activity {
+	position: relative;
 	margin: 0 0 auto;
 	padding: 0 var(--wpds-dimension-padding-2xl);
 

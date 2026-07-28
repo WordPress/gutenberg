@@ -1,23 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import DataViews from '../index';
+import DataViewsPicker from '../index';
 import {
-	LAYOUT_ACTIVITY,
-	LAYOUT_GRID,
-	LAYOUT_LIST,
-	LAYOUT_TABLE,
+	LAYOUT_PICKER_ACTIVITY,
+	LAYOUT_PICKER_GRID,
+	LAYOUT_PICKER_TABLE,
 } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-import type { View } from '../../types';
-import { actions, data as fixtureData, fields } from './fixtures';
+import type { ActionButton, View } from '../../types';
+import { data as fixtureData, fields, type SpaceObject } from './fixtures';
 
-// The fixtures only contain ~50 rows; repeat them (with unique ids) so there
+// The fixtures only contain 37 rows; repeat them (with unique ids) so there
 // are enough rows to page through several times.
 const data = Array.from( { length: 8 }, ( _, batch ) =>
 	fixtureData.map( ( item ) => ( {
@@ -34,14 +33,28 @@ const PAGE = 20;
 // Simulated per-page network latency.
 const LOAD_DELAY_MS = 800;
 
+const actions: ActionButton< SpaceObject >[] = [
+	{
+		id: 'cancel',
+		label: 'Cancel',
+		callback() {},
+	},
+	{
+		id: 'confirm',
+		label: 'Confirm',
+		isPrimary: true,
+		callback() {},
+	},
+];
+
 /**
- * A realistic network-backed infinite-scroll consumer: the hook advances
+ * A realistic network-backed infinite-scroll picker: the hook advances
  * `view.startPosition`, and the consumer fetches that window asynchronously
  * (toggling `isLoading`) while reporting the true server total.
  */
 const AsyncInfiniteScroll = () => {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_LIST,
+		type: LAYOUT_PICKER_GRID,
 		search: '',
 		startPosition: 1,
 		perPage: PAGE,
@@ -52,6 +65,7 @@ const AsyncInfiniteScroll = () => {
 		mediaField: 'image',
 		infiniteScrollEnabled: true,
 	} );
+	const [ selection, setSelection ] = useState< string[] >( [] );
 
 	// The "server": how many rows have been delivered so far, and whether a
 	// request for the current window is in flight.
@@ -91,14 +105,17 @@ const AsyncInfiniteScroll = () => {
 	);
 
 	return (
-		<div style={ { height: '100%' } }>
+		<>
 			<style>{ `
-			.dataviews-wrapper {
-				height: 100%;
-				overflow: auto;
-			}
-		` }</style>
-			<DataViews
+				.dataviews-picker-wrapper {
+					height: calc(100vh - 2rem);
+					overflow: auto;
+				}
+			` }</style>
+			<DataViewsPicker
+				actions={ actions }
+				selection={ selection }
+				onChangeSelection={ setSelection }
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ serverPaginationInfo }
 				data={ shownData }
@@ -106,15 +123,14 @@ const AsyncInfiniteScroll = () => {
 				fields={ fields }
 				onChangeView={ setView }
 				isLoading={ isLoading }
-				actions={ actions }
 				defaultLayouts={ {
-					[ LAYOUT_TABLE ]: true,
-					[ LAYOUT_GRID ]: true,
-					[ LAYOUT_LIST ]: true,
-					[ LAYOUT_ACTIVITY ]: true,
+					[ LAYOUT_PICKER_GRID ]: true,
+					[ LAYOUT_PICKER_TABLE ]: true,
+					[ LAYOUT_PICKER_ACTIVITY ]: true,
 				} }
+				itemListLabel="Galactic Bodies"
 			/>
-		</div>
+		</>
 	);
 };
 
