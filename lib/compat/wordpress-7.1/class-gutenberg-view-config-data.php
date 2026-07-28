@@ -161,10 +161,12 @@ class Gutenberg_View_Config_Data {
 		 *   individual list members.
 		 *
 		 * A change that declares an unsupported schema version is rejected and does
-		 * not alter anything. Callbacks mutate the container in place, so there is no
-		 * need to return it; any returned value is ignored. Callbacks must not replace
-		 * the container with a different value, as later callbacks receive whatever the
-		 * previous one returned.
+		 * not alter anything. As with any filter, each callback's return value is
+		 * passed to the next callback as `$data`, so callbacks must return the
+		 * container they received: a callback that returns nothing, or any other
+		 * value, hands that result to every callback hooked at a later priority
+		 * instead of the container. Since the write methods return the container,
+		 * a callback can end with `return $data->merge( $patch, $version );`.
 		 *
 		 * @param Gutenberg_View_Config_Data $data   The view configuration container
 		 *                                           for the entity, exposing the

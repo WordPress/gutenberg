@@ -1193,4 +1193,66 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'Layout support should render the expected markup when className is not a string'
 		);
 	}
+
+	/**
+	 * Tests that layout support returns early, without resolving global settings,
+	 * for a block that cannot produce any layout output.
+	 *
+	 * Resolving global settings reads the user's `wp_global_styles` post with a
+	 * `WP_Query`, which fires `the_posts`. A callback on that hook that renders
+	 * blocks re-enters this filter, so the bail-out has to happen before the
+	 * lookup or the recursion has no base case.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_returns_early_before_resolving_global_settings() {
+		$user_data_resolutions = 0;
+		add_filter(
+			'wp_theme_json_data_user',
+			static function ( $theme_json ) use ( &$user_data_resolutions ) {
+				++$user_data_resolutions;
+				return $theme_json;
+			}
+		);
+
+		// A block with no layout support and no child layout, as produced by
+		// parsing content that has no block delimiters.
+		$block_content = '<p>Not a block.</p>';
+		$block         = array(
+			'blockName' => null,
+			'attrs'     => array(),
+		);
+
+		// Start from a cold cache, as on a front-end request.
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Block content should be returned unchanged when the block has no layout support.'
+		);
+		$this->assertSame(
+			0,
+			$user_data_resolutions,
+			'Global settings should not be resolved for a block that cannot produce layout output.'
+		);
+
+		// A block that does support layout still resolves global settings, which
+		// confirms the assertion above is not passing because of a warm cache.
+		_gutenberg_clean_theme_json_caches();
+
+		gutenberg_render_layout_support_flag(
+			'<div class="wp-block-group"></div>',
+			array(
+				'blockName' => 'core/group',
+				'attrs'     => array( 'layout' => array( 'type' => 'constrained' ) ),
+			)
+		);
+
+		$this->assertGreaterThan(
+			0,
+			$user_data_resolutions,
+			'Global settings should still be resolved for a block that supports layout.'
+		);
+	}
 }

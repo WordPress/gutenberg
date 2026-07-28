@@ -73,6 +73,38 @@ describe( 'createInterpolateElement', () => {
 			createInterpolateElement( testString, { 'spaced token': <em /> } )
 		).toEqual( expectedElement );
 	} );
+	it( 'warns and stops interpolating when there is an unmatched closing tag', () => {
+		const testString = 'This is a </item> string';
+		const expectedElement = <>{ testString }</>;
+		expect(
+			createInterpolateElement( testString, { item: <em /> } )
+		).toEqual( expectedElement );
+		expect( console ).toHaveWarnedWith(
+			`Unmatched closing tag '</item>' in createInterpolateElement. The rest of the string was not interpolated.`
+		);
+
+		// Tags matched before the unmatched closing tag stay interpolated, so
+		// only the remainder of the string is returned as text.
+		const partialString = 'This is a <em>styled</em> and </strong> string';
+		const partialExpectedElement = createElement(
+			Fragment,
+			null,
+			'This is a ',
+			createElement( 'em', null, 'styled' ),
+			' and </strong> string'
+		);
+		expect(
+			JSON.stringify(
+				createInterpolateElement( partialString, {
+					em: <em />,
+					strong: <strong />,
+				} )
+			)
+		).toEqual( JSON.stringify( partialExpectedElement ) );
+		expect( console ).toHaveWarnedWith(
+			`Unmatched closing tag '</strong>' in createInterpolateElement. The rest of the string was not interpolated.`
+		);
+	} );
 	it( 'returns expected react element for non nested components', () => {
 		const testString = 'This is a string with <a>a link</a>.';
 		const expectedElement = createElement(

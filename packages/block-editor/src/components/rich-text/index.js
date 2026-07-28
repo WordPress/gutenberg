@@ -430,7 +430,7 @@ export function RichTextWrapper(
 	if ( ! shouldDisableEditing ) {
 		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
 			tabIndex = props.tabIndex ?? 0;
-		} else if ( hasEditableRoot && props.tabIndex === 0 ) {
+		} else if ( props.tabIndex === 0 ) {
 			tabIndex = null;
 		}
 	}
