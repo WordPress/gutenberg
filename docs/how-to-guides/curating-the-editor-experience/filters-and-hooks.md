@@ -143,12 +143,12 @@ add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_co
 
 ### Remove entries with `remove`
 
-The `Gutenberg_View_Config_Data` object has a `remove( $patch, $version )` method that allows you to remove entries from the configuration.
+The `Gutenberg_View_Config_Data` object has a `remove( $spec, $version )` method that allows you to remove entries from the configuration.
 
-- `$patch`, an array that specifies which entries to remove.
+- `$spec`, an array that specifies which entries to remove.
 - `$version`, an integer, the version of the data being modified. It should be `1` for now.
 
-The following patch is applied to the _Pages_ screen and removes the `status` field from the list of visible fields:
+The following filter callback applies to the _Pages_ screen and removes the `status` field from the list of visible fields:
 
 ```php
 function example_page_view_config_remove( $data ) {
