@@ -27,6 +27,7 @@ jobs:
             contents: read
             id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 45
         strategy:
             fail-fast: false
             matrix:
@@ -82,6 +83,7 @@ jobs:
             contents: read
             id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 45
 
         steps:
             - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -139,6 +141,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+        timeout-minutes: 10
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
@@ -195,6 +198,7 @@ jobs:
             contents: read
             issues: write
             pull-requests: write
+        timeout-minutes: 10
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
