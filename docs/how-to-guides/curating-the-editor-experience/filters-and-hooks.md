@@ -114,7 +114,7 @@ add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_co
 
 ### Update entries with `merge`
 
-Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the current view config for the entity. To update the given configuration, call its `merge( $path, $version )` method where:
+Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the current view config for the entity. To update the given configuration, call its `merge( $patch, $version )` method where:
 
 - `$patch`, an array containing the new data to be merged into the existing configuration.
 - `$version`, an integer, is the version of the data being merged. It should be `1` for now.
