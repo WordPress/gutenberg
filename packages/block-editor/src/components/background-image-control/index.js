@@ -24,7 +24,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -39,7 +39,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import { InheritanceResetButton } from '../global-styles/inheritance';
+import { InheritanceOverrideIndicator } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -227,21 +227,8 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
-							( hasLocalOverride ? (
-								<InheritanceResetButton
-									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) : (
+						<Stack className="block-editor-global-styles-background-panel__actions">
+							{ onReset && (
 								<Button
 									__next40pxDefaultSize
 									label={ __( 'Reset' ) }
@@ -258,7 +245,11 @@ function BackgroundControlsPanel( {
 										focusToggleButton( containerRef );
 									} }
 								/>
-							) ) }
+							) }
+							{ hasLocalOverride && (
+								<InheritanceOverrideIndicator className="block-editor-global-styles-background-panel__inheritance-override-indicator" />
+							) }
+						</Stack>
 					</>
 				);
 			} }
@@ -714,10 +705,8 @@ export default function BackgroundImagePanel( {
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
-	// The blue-dot local-override affordance is part of the inherited-value
-	// treatment. When that treatment is disabled (e.g. in the Global Styles
-	// panel, where the edited value *is* the global style rather than a local
-	// override of it), fall back to the plain reset control.
+	// Gated on the inherited-value treatment: in the Global Styles panel the
+	// edited value *is* the global style, so there is no override to mark.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators &&
 		localHasImageValue &&

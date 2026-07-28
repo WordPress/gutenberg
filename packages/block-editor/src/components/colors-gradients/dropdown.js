@@ -10,13 +10,14 @@ import {
 	Button,
 	ColorIndicator,
 	Dropdown,
-	FlexItem,
+	FlexBlock,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -71,12 +72,12 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem
+		<FlexBlock
 			className="block-editor-panel-color-gradient-settings__color-name"
 			title={ label }
 		>
 			{ label }
-		</FlexItem>
+		</FlexBlock>
 	</HStack>
 );
 
@@ -123,23 +124,25 @@ const renderToggle = ( settings ) =>
 						label={ label }
 					/>
 				</Button>
-				{ clearable && value && (
-					<Button
-						__next40pxDefaultSize
-						label={ __( 'Reset' ) }
-						className="block-editor-panel-color-gradient-settings__reset"
-						size="small"
-						icon={ resetIcon }
-						onClick={ () => {
-							clearValue();
-							if ( isOpen ) {
-								onToggle();
-							}
-							// Return focus to parent button
-							colorButtonRef.current?.focus();
-						} }
-					/>
-				) }
+				<Stack className="block-editor-panel-color-gradient-settings__actions">
+					{ clearable && value && (
+						<Button
+							__next40pxDefaultSize
+							label={ __( 'Reset' ) }
+							className="block-editor-panel-color-gradient-settings__reset"
+							size="small"
+							icon={ resetIcon }
+							onClick={ () => {
+								clearValue();
+								if ( isOpen ) {
+									onToggle();
+								}
+								// Return focus to parent button
+								colorButtonRef.current?.focus();
+							} }
+						/>
+					) }
+				</Stack>
 			</>
 		);
 	};

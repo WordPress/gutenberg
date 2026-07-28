@@ -21,11 +21,7 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
@@ -107,7 +103,7 @@ export default function BorderPanel( {
 	panelId,
 	name,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
@@ -305,9 +301,9 @@ export default function BorderPanel( {
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );
 	// A local override exists when the user has set a shadow that shadows an
-	// inherited one. Only then does the toggle render the blue-dot reset
-	// affordance (mirroring the color/gradient controls); a merely-inherited
-	// value at rest shows no reset button.
+	// inherited one. Only then does the toggle render the override indicator
+	// (mirroring the color/gradient controls); a merely-inherited value at rest
+	// shows no indicator.
 	const hasShadowLocalOverride =
 		showInheritanceLabelIndicators &&
 		hasShadow() &&
@@ -470,10 +466,10 @@ export default function BorderPanel( {
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }
-					// The shadow toggle renders its own reset affordance (blue
-					// dot for a local override, default reset otherwise) inside
-					// the control, mirroring the color/gradient controls, so the
-					// panel item must not render a second sibling reset dot.
+					// The shadow toggle renders its own affordance (override
+					// indicator for a local override, default reset otherwise)
+					// inside the control, mirroring the color/gradient controls,
+					// so the panel item must not render a second sibling one.
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>

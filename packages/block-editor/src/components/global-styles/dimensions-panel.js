@@ -33,17 +33,13 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
 /**
  * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
- * renders its linked/unlink toggle button, which the local-override reset dot
+ * renders its linked/unlink toggle button, which the local-override indicator
  * offsets itself against.
  *
  * @param {string[]|undefined} sides            Configurable sides for the control.
@@ -359,7 +355,7 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const { dimensions, spacing } = settings;
 

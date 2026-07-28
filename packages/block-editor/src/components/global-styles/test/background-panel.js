@@ -240,8 +240,8 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
+				screen.getAllByRole( 'img', {
+					name: /overrides inherited styles/i,
 				} ).length
 			).toBeGreaterThanOrEqual( 1 );
 		} );
@@ -304,8 +304,8 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
+				screen.getByRole( 'img', {
+					name: /overrides inherited styles/i,
 				} )
 			).toBeInTheDocument();
 		} );
