@@ -120,6 +120,7 @@
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ### Breaking Changes
 
@@ -129,6 +130,8 @@
     -   `DropdownContentWrapper` ([#80750](https://github.com/WordPress/gutenberg/pull/80750))
 
 >>>>>>> ec0e04aa491 (Added Changelog Entry)
+=======
+>>>>>>> b47ed13f1b9 (Update CHANGELOG.md for recent component changes)
 ### Internal
 
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
