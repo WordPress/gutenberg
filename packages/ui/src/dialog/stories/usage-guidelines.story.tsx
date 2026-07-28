@@ -11,7 +11,7 @@ const meta: Meta = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
 };
 export default meta;
 
