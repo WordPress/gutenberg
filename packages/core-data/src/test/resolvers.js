@@ -1600,7 +1600,7 @@ describe( 'getAutosave', () => {
 		);
 	} );
 
-	it( 'does not fetch when the author is unknown', async () => {
+	it( 'does not fetch when the author is unknown, but still finishes resolution', async () => {
 		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
 
 		await getAutosave(
@@ -1610,10 +1610,15 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		expect( dispatch.finishResolution ).not.toHaveBeenCalled();
+		// Bailing without reporting would leave autosaving disabled for the
+		// session if the current user id never arrives.
+		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
+			'getAutosaves',
+			[ postType, postId ]
+		);
 	} );
 
-	it( 'does not fetch when the post type does not support autosaves', async () => {
+	it( 'does not fetch when the post type does not support autosaves, but still finishes resolution', async () => {
 		const { dispatch } = setUp( SUCCESSFUL_RESPONSE );
 		const resolveSelect = Object.assign( jest.fn(), {
 			getPostType: jest.fn( () => ( {
@@ -1629,7 +1634,33 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		expect( dispatch.finishResolution ).not.toHaveBeenCalled();
+		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
+			'getAutosaves',
+			[ postType, postId ]
+		);
+	} );
+
+	it( 'finishes resolution even when the request fails', async () => {
+		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+		triggerFetch.mockImplementation( () => {
+			throw new Error( 'Network error' );
+		} );
+
+		await expect(
+			getAutosave(
+				postType,
+				postId,
+				AUTHOR_ID
+			)( { dispatch, resolveSelect } )
+		).rejects.toThrow( 'Network error' );
+
+		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
+		// A failed fetch previously still counted as fetched, because
+		// hasFinishedResolution treats an errored resolution as complete.
+		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
+			'getAutosaves',
+			[ postType, postId ]
+		);
 	} );
 
 	it( 'leaves the getAutosaves resolver behavior unchanged', async () => {

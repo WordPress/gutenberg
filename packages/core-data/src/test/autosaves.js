@@ -124,6 +124,58 @@ describe( 'autosaves', () => {
 		} );
 	} );
 
+	it( 'reports hasFetchedAutosaves after a failed request', async () => {
+		const registry = createTestRegistry();
+		triggerFetch.mockImplementation( ( { path, parse } ) => {
+			if ( path.startsWith( '/wp/v2/types' ) ) {
+				const postType = {
+					slug: 'post',
+					rest_base: 'posts',
+					rest_namespace: 'wp/v2',
+					supports: { autosave: true },
+				};
+
+				if ( parse === false ) {
+					return {
+						json: async () => postType,
+						headers: { get: () => '' },
+					};
+				}
+
+				return postType;
+			}
+
+			throw new Error( 'Network error' );
+		} );
+
+		await registry
+			.resolveSelect( coreDataStore )
+			.getAutosave( 'post', POST_ID, AUTHOR_ID )
+			.catch( () => {} );
+
+		// Autosaving must not stay disabled for the session after one failure.
+		expect(
+			registry
+				.select( coreDataStore )
+				.hasFetchedAutosaves( 'post', POST_ID )
+		).toBe( true );
+	} );
+
+	it( 'reports hasFetchedAutosaves when the author is not yet known', async () => {
+		const registry = createTestRegistry();
+		mockFetch( [ AUTOSAVE ] );
+
+		await registry
+			.resolveSelect( coreDataStore )
+			.getAutosave( 'post', POST_ID, undefined );
+
+		expect(
+			registry
+				.select( coreDataStore )
+				.hasFetchedAutosaves( 'post', POST_ID )
+		).toBe( true );
+	} );
+
 	it( 'does not return another author’s autosave', async () => {
 		const registry = createTestRegistry();
 		mockFetch( [ { id: 100, author: 999, parent: POST_ID } ] );

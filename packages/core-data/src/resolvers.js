@@ -817,11 +817,23 @@ export const getAutosaves =
  * long-lived post with many editors, the difference is the entire collection
  * versus one row.
  *
- * `getAutosaves` is intentionally left alone rather than being narrowed, so
- * calling it directly still returns the full collection. Its resolution is
- * marked finished here because `hasFetchedAutosaves` reports on it, and
- * `isEditedPostAutosaveable` in @wordpress/editor treats an unfinished
- * resolution as "not yet known" — without this, autosaving would never enable.
+ * The `getAutosaves` resolver itself is left unchanged. This one reports
+ * completion against the `getAutosaves` resolution key because that is what
+ * `hasFetchedAutosaves` reads, and the editor package's
+ * `isEditedPostAutosaveable` treats an unfinished resolution as "not yet
+ * known" — without it, autosaving would never enable.
+ *
+ * That report happens in a `finally` so it covers every exit path. The previous
+ * delegation to `getAutosaves` completed its resolution unconditionally, and a
+ * failed request still counted as finished (`hasFinishedResolution` treats
+ * `error` as complete). Reporting only on the success path would leave
+ * autosaving disabled for the rest of the session after a single early return
+ * or network failure.
+ *
+ * Note that reporting against `getAutosaves` also suppresses that resolver for
+ * the post: `hasStartedResolution` becomes true, so a later direct call to the
+ * `getAutosaves` selector returns whatever this resolver stored rather than
+ * refetching the full collection.
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
@@ -830,36 +842,38 @@ export const getAutosaves =
 export const getAutosave =
 	( postType, postId, authorId ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		if ( authorId === undefined ) {
-			return;
+		try {
+			if ( authorId === undefined ) {
+				return;
+			}
+
+			const {
+				rest_base: restBase,
+				rest_namespace: restNamespace = 'wp/v2',
+				supports,
+			} = await resolveSelect.getPostType( postType );
+
+			if ( ! supports?.autosave ) {
+				return;
+			}
+
+			const autosaves = await apiFetch( {
+				path: addQueryArgs(
+					`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
+					{
+						context: 'edit',
+						per_page: 1,
+						author: authorId,
+					}
+				),
+			} );
+
+			if ( autosaves && autosaves.length ) {
+				dispatch.receiveAutosaves( postId, autosaves );
+			}
+		} finally {
+			dispatch.finishResolution( 'getAutosaves', [ postType, postId ] );
 		}
-
-		const {
-			rest_base: restBase,
-			rest_namespace: restNamespace = 'wp/v2',
-			supports,
-		} = await resolveSelect.getPostType( postType );
-
-		if ( ! supports?.autosave ) {
-			return;
-		}
-
-		const autosaves = await apiFetch( {
-			path: addQueryArgs(
-				`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
-				{
-					context: 'edit',
-					per_page: 1,
-					author: authorId,
-				}
-			),
-		} );
-
-		if ( autosaves && autosaves.length ) {
-			dispatch.receiveAutosaves( postId, autosaves );
-		}
-
-		dispatch.finishResolution( 'getAutosaves', [ postType, postId ] );
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =
