@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, useCallback, useId } from '@wordpress/element';
-import { Button, Field, InputControl, Select, Stack } from '@wordpress/ui';
+import { useState, useCallback } from '@wordpress/element';
+import { Button, InputControl, SelectControl, Stack } from '@wordpress/ui';
 
 const EASING_TOKENS = [
 	{
@@ -138,7 +138,6 @@ function AnimationRow( {
 }
 
 function MotionDemo() {
-	const durationSelectId = useId();
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
 	const [ selectedDuration, setSelectedDuration ] = useState(
@@ -163,33 +162,25 @@ function MotionDemo() {
 			<Stack direction="column" gap="lg">
 				<h3>Easing curves</h3>
 				<Stack align="end" gap="md" wrap="wrap">
-					<Field.Root style={ { minWidth: '180px' } }>
-						<Field.Label htmlFor={ durationSelectId }>
-							Duration
-						</Field.Label>
-						<Select.Root
-							value={ selectedDuration }
-							onValueChange={ ( value ) => {
-								if ( typeof value !== 'string' ) {
+					<div style={ { minWidth: '180px' } }>
+						<SelectControl
+							label="Duration"
+							items={ DURATION_OPTIONS }
+							value={ DURATION_OPTIONS.find(
+								( opt ) => opt.value === selectedDuration
+							) }
+							onValueChange={ ( item ) => {
+								if (
+									! item ||
+									typeof item.value !== 'string'
+								) {
 									return;
 								}
-								setSelectedDuration( value );
+								setSelectedDuration( item.value );
 								setAnimKey( ( k ) => k + 1 );
 							} }
-						>
-							<Select.Trigger id={ durationSelectId } />
-							<Select.Popup>
-								{ DURATION_OPTIONS.map( ( opt ) => (
-									<Select.Item
-										key={ opt.value }
-										value={ opt.value }
-									>
-										{ opt.label }
-									</Select.Item>
-								) ) }
-							</Select.Popup>
-						</Select.Root>
-					</Field.Root>
+						/>
+					</div>
 					{ selectedDuration === 'custom' && (
 						<InputControl
 							label="Value (ms)"
