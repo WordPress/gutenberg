@@ -150,6 +150,10 @@ export const VariantStates: StoryFn< typeof Button > = (
 						disabled: true,
 					} }
 				/>
+				<VariantsRow
+					name="with icon"
+					buttonProps={ { icon: wordpress } }
+				/>
 			</tbody>
 		</table>
 	);

@@ -1,4 +1,5 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { wordpress } from '@wordpress/icons';
 import { Button } from '../..';
 import type { ButtonProps } from '../../types';
 
@@ -120,6 +121,15 @@ export const VariantStates: StoryFn< typeof Button > = (
 						tone: 'neutral',
 						'aria-pressed': true,
 						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="with icon"
+					buttonProps={ {
+						children: [
+							<Button.Icon icon={ wordpress } key="icon" />,
+							'Code is poetry',
+						],
 					} }
 				/>
 			</tbody>
