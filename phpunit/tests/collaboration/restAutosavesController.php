@@ -282,6 +282,40 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_autosave_delegates_to_core_controller_without_collaboration() {
+		update_option( 'wp_collaboration_enabled', 0 );
+
+		$title   = 'Published title';
+		$content = '<!-- wp:paragraph --><p>Published content</p><!-- /wp:paragraph -->';
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$author_id,
+				'post_content' => $content,
+				'post_status'  => 'publish',
+				'post_title'   => $title,
+				'post_type'    => 'post',
+			)
+		);
+
+		$this->dispatch_autosave(
+			$post_id,
+			'Autosaved title',
+			'<!-- wp:paragraph --><p>Autosaved content</p><!-- /wp:paragraph -->'
+		);
+		$existing_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $existing_autosave );
+
+		$response = $this->dispatch_autosave( $post_id, $title, $content );
+
+		/*
+		 * Core returns the existing autosave when the submitted content matches
+		 * the parent. Gutenberg's RTC-specific no-op handling would return the
+		 * parent post instead.
+		 */
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $existing_autosave->ID, $response->get_data()['id'] );
+	}
+
 	public function test_autosave_compares_against_parent_when_parent_is_newer_than_latest_revision() {
 		$original_title   = 'Newer parent draft title';
 		$original_content = '<!-- wp:paragraph --><p>Newer parent draft content</p><!-- /wp:paragraph -->';
