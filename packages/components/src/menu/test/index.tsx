@@ -235,6 +235,82 @@ describe( 'Menu', () => {
 			);
 		} );
 
+		// See: https://github.com/WordPress/gutenberg/issues/80734
+		it( 'should return focus to the trigger button after closing a modal opened from a menu item', async () => {
+			const FocusRestorationTest = () => {
+				const [ isModalOpen, setIsModalOpen ] = useState( false );
+				return (
+					<>
+						<Menu>
+							<Menu.TriggerButton
+								render={ <Button __next40pxDefaultSize /> }
+							>
+								Open dropdown
+							</Menu.TriggerButton>
+							<Menu.Popover>
+								<Menu.Item
+									onClick={ () => setIsModalOpen( true ) }
+								>
+									Open modal
+								</Menu.Item>
+							</Menu.Popover>
+						</Menu>
+						{ isModalOpen && (
+							<Modal
+								onRequestClose={ () => setIsModalOpen( false ) }
+							>
+								<p>Modal content</p>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									onClick={ () => setIsModalOpen( false ) }
+								>
+									Close modal
+								</Button>
+							</Modal>
+						) }
+					</>
+				);
+			};
+
+			render( <FocusRestorationTest /> );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Open dropdown',
+			} );
+
+			// Open the menu
+			await user.click( trigger );
+			await waitForFocusedMenu();
+
+			// Click the menu item to open the modal.
+			// `hideOnClick` is `true` by default, so the menu will close.
+			await user.click(
+				screen.getByRole( 'menuitem', { name: 'Open modal' } )
+			);
+
+			// Menu should be closed
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
+
+			// Modal should be open
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+
+			// Close the modal
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close modal' } )
+			);
+
+			// Modal should be closed
+			await waitFor( () =>
+				expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+			);
+
+			// Focus should be back on the trigger button
+			await waitFor( () => expect( trigger ).toHaveFocus() );
+		} );
+
 		it( 'should close when clicking outside of the content', async () => {
 			render(
 				<Menu defaultOpen>
@@ -1055,83 +1131,6 @@ describe( 'Menu', () => {
 					name: 'Checkbox item one Checkbox suffix',
 				} )
 			).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'focus restoration', () => {
-		it( 'should return focus to the trigger button after closing a modal opened from a menu item', async () => {
-			const FocusRestorationTest = () => {
-				const [ isModalOpen, setIsModalOpen ] = useState( false );
-				return (
-					<>
-						<Menu>
-							<Menu.TriggerButton
-								render={ <Button __next40pxDefaultSize /> }
-							>
-								Open dropdown
-							</Menu.TriggerButton>
-							<Menu.Popover>
-								<Menu.Item
-									onClick={ () => setIsModalOpen( true ) }
-								>
-									Open modal
-								</Menu.Item>
-							</Menu.Popover>
-						</Menu>
-						{ isModalOpen && (
-							<Modal
-								onRequestClose={ () => setIsModalOpen( false ) }
-							>
-								<p>Modal content</p>
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									onClick={ () => setIsModalOpen( false ) }
-								>
-									Close modal
-								</Button>
-							</Modal>
-						) }
-					</>
-				);
-			};
-
-			render( <FocusRestorationTest /> );
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			// Open the menu
-			await user.click( trigger );
-			await waitForFocusedMenu();
-
-			// Click the menu item to open the modal.
-			// `hideOnClick` is `true` by default, so the menu will close.
-			await user.click(
-				screen.getByRole( 'menuitem', { name: 'Open modal' } )
-			);
-
-			// Menu should be closed
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
-			);
-
-			// Modal should be open
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-
-			// Close the modal
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close modal' } )
-			);
-
-			// Modal should be closed
-			await waitFor( () =>
-				expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
-			);
-
-			// Focus should be back on the trigger button
-			await waitFor( () => expect( trigger ).toHaveFocus() );
 		} );
 	} );
 
