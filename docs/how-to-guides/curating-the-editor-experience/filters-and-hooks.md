@@ -95,7 +95,7 @@ Right now, the filter is in use by the following Site Editor screens:
 There are four aspects to configure for each entity (and screen):
 
 - `default_view`: the default DataViews configuration (e.g., what fields are visible, what is the default sort order, etc.)
-- `default_layouts`: the default DataViews layouts (e.g., what layouts are available for the user to chose from)
+- `default_layouts`: the default DataViews layouts (e.g., what layouts are available for the user to choose from)
 - `view_list`: the preconfigured views displayed in the sidebar (e.g. "All", "Published", "Drafts", etc.)
 - `form`: the DataForm configuration used for the Quick Edit form (e.g. which fields are displayed in the form and their order)
 
