@@ -24,12 +24,14 @@
 
 ### TypeScript
 
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
 
 ### Internal
 
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
