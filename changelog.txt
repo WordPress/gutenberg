@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.6.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Layout
+- Block supports: Return from layout support before resolving global settings. ([80771](https://github.com/WordPress/gutenberg/pull/80771))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ramonjd
+
+
 = 23.6.0 =
 
 ## Changelog
