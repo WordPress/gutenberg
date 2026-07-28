@@ -105,8 +105,8 @@ export function Actions(): React.ReactNode {
 					gap="sm"
 					className={
 						isExitingEditActions
-							? styles.editActionsExit
-							: styles.editActionsEnter
+							? styles[ 'edit-actions-exit' ]
+							: styles[ 'edit-actions-enter' ]
 					}
 				>
 					<Button
@@ -120,7 +120,7 @@ export function Actions(): React.ReactNode {
 					</Button>
 
 					<div
-						className={ styles.editActionsDivider }
+						className={ styles[ 'edit-actions-divider' ] }
 						aria-hidden="true"
 					/>
 

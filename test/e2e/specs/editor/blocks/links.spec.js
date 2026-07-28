@@ -969,12 +969,16 @@ test.describe( 'Links', () => {
 
 			await richTextLink.click();
 
-			// Check focus remains in the RichText.
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			).toBeFocused();
+			// Check the selection remains in the RichText.
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			// Type to modify the link text.
 			await page.keyboard.type( ' is awesome' );

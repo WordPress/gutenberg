@@ -150,23 +150,29 @@ const getTransformCommands = () =>
 
 const getQuickActionsCommands = () =>
 	function useQuickActionsCommands() {
-		const { clientIds, isUngroupable, isGroupable } = useSelect(
-			( select ) => {
-				const {
-					getSelectedBlockClientIds,
-					isUngroupable: _isUngroupable,
-					isGroupable: _isGroupable,
-				} = select( blockEditorStore );
-				const selectedBlockClientIds = getSelectedBlockClientIds();
+		const {
+			clientIds,
+			isUngroupable,
+			isGroupable,
+			blockVisibilitySetting,
+		} = useSelect( ( select ) => {
+			const {
+				getSelectedBlockClientIds,
+				getSettings,
+				isUngroupable: _isUngroupable,
+				isGroupable: _isGroupable,
+			} = select( blockEditorStore );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
 
-				return {
-					clientIds: selectedBlockClientIds,
-					isUngroupable: _isUngroupable(),
-					isGroupable: _isGroupable(),
-				};
-			},
-			[]
-		);
+			return {
+				clientIds: selectedBlockClientIds,
+				isUngroupable: _isUngroupable(),
+				isGroupable: _isGroupable(),
+				blockVisibilitySetting:
+					getSettings().__experimentalFeatures?.blockVisibility
+						?.allowEditing,
+			};
+		}, [] );
 		const {
 			canInsertBlockType,
 			getBlockRootClientId,
@@ -310,7 +316,11 @@ const getQuickActionsCommands = () =>
 			( id ) => getBlockEditingMode( id ) === 'default'
 		);
 
-		if ( supportsVisibility && allBlocksDefaultMode ) {
+		if (
+			supportsVisibility &&
+			allBlocksDefaultMode &&
+			blockVisibilitySetting !== false
+		) {
 			const hasHiddenBlock = clientIds.some( ( id ) =>
 				isBlockHiddenAnywhere( id )
 			);

@@ -13,6 +13,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
+import { Skeleton } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -101,6 +102,15 @@ function PreviewWrapper( {
 			<div style={ { position: 'relative' } }>
 				{ containerResizeListener }
 			</div>
+			{ ! isReady && (
+				// Match the preview aspect ratio so layout doesn't jump once width is measured.
+				<Skeleton
+					className="global-styles-ui-preview__wrapper"
+					style={ {
+						aspectRatio: normalizedWidth / normalizedHeight,
+					} }
+				/>
+			) }
 			{ isReady && (
 				<div
 					className={ clsx( 'global-styles-ui-preview__wrapper', {

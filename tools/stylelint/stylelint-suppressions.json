@@ -34,11 +34,6 @@
 			"count": 5
 		}
 	},
-	"widgets/events/components/location-picker/location-picker.module.css": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.module.css": {
 		"selector-class-pattern": {
 			"count": 5
@@ -57,46 +52,6 @@
 	"widgets/welcome/components/feature-highlight/feature-highlight.module.css": {
 		"selector-class-pattern": {
 			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/actions/actions.module.css": {
-		"selector-class-pattern": {
-			"count": 7
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-chrome/widget-chrome.module.css": {
-		"selector-class-pattern": {
-			"count": 3
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-frame/widget-frame.module.css": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-header/widget-header.module.css": {
-		"selector-class-pattern": {
-			"count": 2
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-toolbar/widget-toolbar.module.css": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css": {
-		"selector-class-pattern": {
-			"count": 21
-		}
-	},
-	"packages/widget-dashboard/src/components/widgets/widgets.module.css": {
-		"selector-class-pattern": {
-			"count": 4
-		}
-	},
-	"packages/widget-dashboard/src/components/layout-settings/layout-model-edit-field/style.module.css": {
-		"selector-class-pattern": {
-			"count": 3
 		}
 	},
 	"routes/template-list/add-new-template/style.scss": {

@@ -241,7 +241,7 @@ To use Prettier with Visual Studio Code, you should install the [Prettier - Code
 },
 ```
 
-This will use the `.prettierrc.js` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package.
+This will use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package.
 
 If you only want to use this configuration with the Gutenberg project, create a directory called `.vscode` at the top-level of Gutenberg (if it doesn't exist yet), and place your settings in a `settings.json` there. Visual Studio Code refers to this as Workspace Settings, and only apply to the project.
 

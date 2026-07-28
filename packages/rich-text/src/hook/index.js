@@ -13,6 +13,7 @@ import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
+import { ownsSelection } from '../owns-selection';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
@@ -168,10 +169,11 @@ function useRichTextBase( {
 			typeof value === 'string' &&
 			previousValue.length !== value.length;
 
-		// Check if focus is on this element
-		const hasFocus = ref.current?.contains(
-			ref.current.ownerDocument.activeElement
-		);
+		// Check if focus is on this element, or if the element owns the
+		// selection through a focused editing host.
+		const hasFocus =
+			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
+			ownsSelection( ref.current );
 
 		// Skip re-applying the selection state when content changed from external source
 		// (e.g., typing in sidebar input changes canvas text)
@@ -196,7 +198,13 @@ function useRichTextBase( {
 			return;
 		}
 
-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+		// Do not steal focus from a focused editing host that contains the
+		// selection (the editable block editor canvas wrapper); the record
+		// can be applied while the host keeps focus.
+		if (
+			ref.current.ownerDocument.activeElement !== ref.current &&
+			! ownsSelection( ref.current )
+		) {
 			ref.current.focus();
 		}
 

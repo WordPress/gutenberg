@@ -82,7 +82,8 @@ export const InsideIframeWithCompatSlot = () => {
 											background: '#f0b849',
 											borderRadius: 4,
 											color: '#1e1e1e',
-											fontWeight: 600,
+											fontWeight:
+												'var(--wpds-typography-font-weight-emphasis)',
 											padding: '8px 12px',
 										} }
 									>
@@ -102,7 +103,8 @@ export const InsideIframeWithCompatSlot = () => {
 											color: 'white',
 											cursor: 'grab',
 											display: 'inline-flex',
-											fontWeight: 600,
+											fontWeight:
+												'var(--wpds-typography-font-weight-emphasis)',
 											height: 56,
 											justifyContent: 'center',
 											padding: '0 16px',

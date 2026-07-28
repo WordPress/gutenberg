@@ -103,6 +103,7 @@ export default function PostTemplateEdit( {
 			parents,
 			pages,
 			format,
+			excludeCurrent,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -112,6 +113,7 @@ export default function PostTemplateEdit( {
 		} = {},
 		templateSlug,
 		previewPostType,
+		postId,
 	},
 	attributes: { layout },
 	__unstableLayoutClassNames,
@@ -202,6 +204,13 @@ export default function PostTemplateEdit( {
 			}
 			if ( format?.length ) {
 				query.format = format;
+			}
+			if ( excludeCurrent && postId ) {
+				if ( query.exclude ) {
+					query.exclude = [ ...query.exclude, postId ];
+				} else {
+					query.exclude = [ postId ];
+				}
 			}
 
 			/*

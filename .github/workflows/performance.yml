@@ -61,13 +61,32 @@ jobs:
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
               env:
-                  PLUGIN_VERSION: ${{ github.event.release.name }}
+                  RELEASE_TAG: ${{ github.event.release.tag_name }}
               shell: bash
               run: |
+                  PLUGIN_VERSION="${RELEASE_TAG#v}"
+                  if [[ ! "$PLUGIN_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
+                    echo "::error::Release tag '$RELEASE_TAG' does not resolve to a valid Gutenberg plugin version."
+                    exit 1
+                  fi
+
                   IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
                   CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
                   PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
                   PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
+                  if ! git ls-remote --exit-code --tags origin "$RELEASE_TAG" > /dev/null; then
+                    echo "::error::Expected release tag '$RELEASE_TAG' to exist in the Gutenberg repository."
+                    exit 1
+                  fi
+                  if ! git ls-remote --exit-code --heads origin "$CURRENT_RELEASE_BRANCH" > /dev/null; then
+                    echo "::error::Expected current release branch '$CURRENT_RELEASE_BRANCH' to exist in the Gutenberg repository."
+                    exit 1
+                  fi
+                  if ! git ls-remote --exit-code --heads origin "$PREVIOUS_RELEASE_BRANCH" > /dev/null; then
+                    echo "::error::Expected previous release branch '$PREVIOUS_RELEASE_BRANCH' to exist in the Gutenberg repository."
+                    exit 1
+                  fi
+
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"

@@ -95,7 +95,7 @@
 			box-shadow:
 				inset 0 0 0 1px $white,
 				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				var(--wpds-color-stroke-focus);
 		}
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
@@ -272,7 +272,7 @@
 			border-radius: inherit;
 			box-shadow:
 				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				var(--wpds-color-stroke-focus);
 			z-index: 2;
 			pointer-events: none;
 		}
@@ -283,11 +283,10 @@
 		right: 0;
 	}
 
-	&.is-nesting .block-editor-list-view__menu,
-	.block-editor-list-view-block__menu:focus {
+	&.is-nesting .block-editor-list-view__menu {
 		box-shadow:
 			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
+			var(--wpds-color-stroke-focus);
 		z-index: 1;
 	}
 

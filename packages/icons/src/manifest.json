@@ -1136,6 +1136,11 @@
 		"filePath": "library/play.svg"
 	},
 	{
+		"slug": "playlist",
+		"label": "Playlist",
+		"filePath": "library/playlist.svg"
+	},
+	{
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
@@ -1488,6 +1493,11 @@
 		"slug": "site-logo",
 		"label": "Site Logo",
 		"filePath": "library/site-logo.svg"
+	},
+	{
+		"slug": "sites",
+		"label": "Sites",
+		"filePath": "library/sites.svg"
 	},
 	{
 		"slug": "square",

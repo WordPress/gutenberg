@@ -50,8 +50,7 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	fontSizeXSmall: 'calc(0.75 * 13px)',
 	fontLineHeightBase: '1.4',
 	fontWeight: 'normal',
-	fontWeightMedium: '499', // ensures fallback to 400 (instead of 600)
-	fontWeightHeading: '600',
+	fontWeightEmphasis: '600',
 	gridBase: '4px',
 	elevationXSmall: `0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)`,
 	elevationSmall: `0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)`,

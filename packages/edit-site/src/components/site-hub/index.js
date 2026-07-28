@@ -1,17 +1,12 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { memo, forwardRef, useContext } from '@wordpress/element';
-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -23,7 +18,7 @@ import { SidebarNavigationContext } from '../sidebar';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export const SiteHubMobile = memo(
-	forwardRef( ( { isTransparent }, ref ) => {
+	forwardRef( ( props, ref ) => {
 		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
@@ -81,32 +76,13 @@ export const SiteHubMobile = memo(
 
 		return (
 			<div className="edit-site-site-hub">
-				<HStack justify="flex-start" spacing="0">
-					<div
-						className={ clsx(
-							'edit-site-site-hub__view-mode-toggle-container',
-							{
-								'has-transparent-background': isTransparent,
-							}
-						) }
-					>
-						<Button
-							__next40pxDefaultSize
-							ref={ ref }
-							className="edit-site-layout__view-mode-toggle"
-							style={ {
-								transform: 'scale(0.5)',
-								borderRadius: 4,
-							} }
-							{ ...backButtonProps }
-						>
-							<Icon
-								icon={ isRTL() ? chevronRight : chevronLeft }
-								size={ 48 }
-							/>
-						</Button>
-					</div>
-				</HStack>
+				<Button
+					size="compact"
+					ref={ ref }
+					className="edit-site-site-hub__back-button"
+					icon={ isRTL() ? chevronRight : chevronLeft }
+					{ ...backButtonProps }
+				/>
 			</div>
 		);
 	} )

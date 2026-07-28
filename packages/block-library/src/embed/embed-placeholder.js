@@ -31,7 +31,6 @@ export default function EmbedPlaceholder( {
 		>
 			<form onSubmit={ onSubmit }>
 				<InputControl
-					__next40pxDefaultSize
 					type="url"
 					value={ value || '' }
 					className="wp-block-embed__placeholder-input"
@@ -71,13 +70,15 @@ export default function EmbedPlaceholder( {
 						>
 							{ _x( 'Try again', 'button label' ) }
 						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ fallback }
-						>
-							{ _x( 'Convert to link', 'button label' ) }
-						</Button>
+						{ fallback && (
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								onClick={ fallback }
+							>
+								{ _x( 'Convert to link', 'button label' ) }
+							</Button>
+						) }
 					</Stack>
 				</Stack>
 			) }

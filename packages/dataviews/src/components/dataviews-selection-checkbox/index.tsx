@@ -10,6 +10,9 @@ import { __ } from '@wordpress/i18n';
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 
+// This class is also used elsewhere to detect the selection checkbox.
+export const SELECTION_CHECKBOX_CLASS = 'dataviews-selection-checkbox';
+
 interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
@@ -39,7 +42,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 
 	return (
 		<CheckboxControl
-			className="dataviews-selection-checkbox"
+			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }

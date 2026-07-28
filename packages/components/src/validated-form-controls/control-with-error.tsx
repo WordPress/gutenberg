@@ -310,7 +310,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ visibleMessage }</div>
+			{ visibleMessage }
 		</div>
 	);
 }

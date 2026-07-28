@@ -70,10 +70,7 @@ export type UnitSelectControlProps = {
 
 export type UnitControlProps = Pick< InputControlProps, 'size' > &
 	Omit< UnitSelectControlProps, 'size' | 'unit' > &
-	Omit<
-		NumberControlProps,
-		'spinControls' | 'suffix' | 'type' | '__next40pxDefaultSize'
-	> & {
+	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
@@ -110,18 +107,4 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 		 * Callback when either the quantity or the unit inputs gains focus.
 		 */
 		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
-		/**
-		 * Do not throw a warning for the deprecated 36px default size.
-		 * For internal components of other components that already throw the warning.
-		 *
-		 * @ignore
-		 */
-		__shouldNotWarnDeprecated36pxSize?: boolean;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-		 * @ignore
-		 */
-		__next40pxDefaultSize?: boolean;
 	};

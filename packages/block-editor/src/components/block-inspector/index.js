@@ -30,6 +30,7 @@ import { ListViewContentPopover } from '../inspector-controls/list-view-content-
 import InspectorControls from '../inspector-controls';
 import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
+import { SectionStyleControls } from '../inspector-controls-tabs/styles-tab';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
@@ -41,6 +42,7 @@ import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
 import {
+	BlockStyleStateProvider,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
@@ -95,43 +97,67 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
+function StyleStateInspectorSlots( {
+	blockName,
+	clientId,
+	contentClientIds,
+	isSectionBlock,
+	selectedBlockStyleState,
+} ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	const showLayoutControls =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
+	const showSectionStyleControls =
+		isSectionBlock && blockName !== 'core/template-part';
 	return (
 		<>
-			<InspectorControls.Slot
-				group="typography"
-				label={ __( 'Typography' ) }
-			/>
-			<InspectorControls.Slot
-				group="color"
-				label={ __( 'Color' ) }
-				className="color-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				group="background"
-				label={ __( 'Background' ) }
-				className="background-block-support-panel__inner-wrapper"
-			/>
-			{ showLayoutControls && (
-				<InspectorControls.Slot
-					group="layout"
-					label={ __( 'Layout' ) }
-				/>
+			{ showSectionStyleControls && (
+				<BlockStyleStateProvider value={ selectedBlockStyleState }>
+					<SectionStyleControls
+						blockName={ blockName }
+						clientId={ clientId }
+						contentClientIds={ contentClientIds }
+					/>
+				</BlockStyleStateProvider>
 			) }
-			<InspectorControls.Slot
-				group="dimensions"
-				label={ __( 'Dimensions' ) }
-			/>
-			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
-			<InspectorControls.Slot
-				group="elements"
-				label={ __( 'Elements' ) }
-				className="elements-block-support-panel__inner-wrapper"
-			/>
+			{ ! showSectionStyleControls && (
+				<>
+					<InspectorControls.Slot
+						group="typography"
+						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						group="color"
+						label={ __( 'Color' ) }
+						className="color-block-support-panel__inner-wrapper"
+					/>
+					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background' ) }
+						className="background-block-support-panel__inner-wrapper"
+					/>
+					{ showLayoutControls && (
+						<InspectorControls.Slot
+							group="layout"
+							label={ __( 'Layout' ) }
+						/>
+					) }
+					<InspectorControls.Slot
+						group="dimensions"
+						label={ __( 'Dimensions' ) }
+					/>
+					<InspectorControls.Slot
+						group="border"
+						label={ borderPanelLabel }
+					/>
+					<InspectorControls.Slot
+						group="elements"
+						label={ __( 'Elements' ) }
+						className="elements-block-support-panel__inner-wrapper"
+					/>
+				</>
+			) }
 		</>
 	);
 }
@@ -474,9 +500,12 @@ const BlockInspectorSingleBlock = ( {
 				/>
 			) }
 			<BlockInspectorPreTabsSlot />
-			{ isEditingStyleState && ! isSectionBlock && (
+			{ isEditingStyleState && (
 				<StyleStateInspectorSlots
 					blockName={ blockName }
+					clientId={ renderedBlockClientId }
+					contentClientIds={ contentClientIds }
+					isSectionBlock={ isSectionBlock }
 					selectedBlockStyleState={ selectedBlockStyleState }
 				/>
 			) }

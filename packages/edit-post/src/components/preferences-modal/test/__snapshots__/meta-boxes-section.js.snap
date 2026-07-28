@@ -2,7 +2,7 @@
 
 exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -81,7 +81,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 
 exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -248,7 +248,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 
 exports[`MetaBoxesSection renders meta box options 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }

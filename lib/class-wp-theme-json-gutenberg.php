@@ -403,6 +403,9 @@ class WP_Theme_JSON_Gutenberg {
 			'backgroundSize'  => null,
 			'gradient'        => null,
 		),
+		'blockVisibility'               => array(
+			'allowEditing' => true,
+		),
 		'border'                        => array(
 			'color'       => null,
 			'radius'      => null,
@@ -1305,7 +1308,9 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
+			// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
 			unset( $schema_settings_blocks[ $block ]['viewport'] );
+			unset( $schema_settings_blocks[ $block ]['blockVisibility'] );
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
@@ -1465,7 +1470,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
@@ -1514,7 +1519,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
@@ -1560,8 +1565,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     // Comments stay with the selector they follow.
 	 *     array( '.a /* a, the first *\/', '.b' ) === self::split_selector_list( '.a /* a, the first *\/,.b' );
 	 *
-	 * @see https://www.w3.org/TR/selectors/#parse-selector
-	 * @see https://www.w3.org/TR/css-syntax-3/
+	 * @link https://www.w3.org/TR/selectors/#parse-selector
+	 * @link https://www.w3.org/TR/css-syntax-3/
 	 *
 	 * @param string $selector CSS selector list.
 	 * @return string[] Selectors.
@@ -1666,8 +1671,8 @@ class WP_Theme_JSON_Gutenberg {
 				 * > not included in this definition, as they are converted
 				 * > to U+000A LINE FEED during preprocessing.
 				 *
-				 * @see https://www.w3.org/TR/css-syntax/#whitespace
-				 * @see https://www.w3.org/TR/css-syntax/#newline
+				 * @link https://www.w3.org/TR/css-syntax/#whitespace
+				 * @link https://www.w3.org/TR/css-syntax/#newline
 				 */
 				$selectors[] = trim( substr( $selector, $was_at, $next_at - $was_at ), " \t\n" );
 				$at          = $next_at + 1;
@@ -2420,7 +2425,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *     background: value;
 	 *   }
 	 *
-	 *   p.has-value-gradient-background {
+	 *   :where(p).has-value-gradient-background {
 	 *     background: value;
 	 *   }
 	 *
@@ -2623,8 +2628,16 @@ class WP_Theme_JSON_Gutenberg {
 					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
 					$class_name = static::replace_slug_in_string( $class, $slug );
 
-					// $selector is often empty, so we can save ourselves the `append_to_selector()` call then.
-					$new_selector = '' === $selector ? $class_name : static::append_to_selector( $selector, $class_name );
+					/*
+					 * $selector is often empty (root-level presets), in which case the
+					 * bare class is used. For block-level presets the block selector is
+					 * wrapped in `:where()` so the class keeps the same 0-1-0 specificity
+					 * as a root-level preset. Without this, block-level palette rules
+					 * (e.g. `p.has-x-color`) out-rank equally-important rules that also
+					 * target the same property at 0-1-0, such as per-instance responsive
+					 * state styles.
+					 */
+					$new_selector = '' === $selector ? $class_name : ':where(' . $selector . ')' . $class_name;
 					$stylesheet  .= static::to_ruleset(
 						$new_selector,
 						array(

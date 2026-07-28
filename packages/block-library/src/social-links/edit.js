@@ -30,6 +30,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const sizeOptions = [
@@ -60,17 +61,23 @@ export function SocialLinksEdit( props ) {
 		size,
 	} = attributes;
 
-	const { hasSocialIcons, hasSelectedChild } = useSelect(
-		( select ) => {
-			const { getBlockCount, hasSelectedInnerBlock } =
-				select( blockEditorStore );
-			return {
-				hasSocialIcons: getBlockCount( clientId ) > 0,
-				hasSelectedChild: hasSelectedInnerBlock( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const { hasSocialIcons, hasSelectedChild, hasSelectedStyleState } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockCount,
+					hasSelectedInnerBlock,
+					hasSelectedStyleState: hasSelectedBlockStyleState,
+				} = unlock( select( blockEditorStore ) );
+				return {
+					hasSocialIcons: getBlockCount( clientId ) > 0,
+					hasSelectedChild: hasSelectedInnerBlock( clientId ),
+					hasSelectedStyleState:
+						hasSelectedBlockStyleState( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const hasAnySelected = isSelected || hasSelectedChild;
 
@@ -157,6 +164,8 @@ export function SocialLinksEdit( props ) {
 	}
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const showColorControls =
+		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
 
 	return (
 		<>
@@ -227,7 +236,7 @@ export function SocialLinksEdit( props ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
+			{ showColorControls && (
 				<InspectorControls group="color">
 					{ colorSettings.map(
 						( { onChange, label, value, resetAllFilter } ) => (

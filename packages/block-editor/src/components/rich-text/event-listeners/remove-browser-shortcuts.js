@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 /**
  * Hook to prevent default behaviors for key combinations otherwise handled
@@ -25,5 +26,5 @@ export default () => ( node ) => {
 			event.preventDefault();
 		}
 	}
-	return subscribeDelegatedListener( node, 'keydown', onKeydown, true );
+	return subscribeOwnedListener( node, 'keydown', onKeydown, true );
 };

@@ -712,6 +712,11 @@
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"type": "boolean",
 					"default": false
+				},
+				"editableRoot": {
+					"description": "This property indicates that the block works when an ancestor element (the editor canvas) is the contenteditable editing host, with focus and native selection residing there instead of on the block's own elements. It enables native partial selection across blocks.",
+					"type": "boolean",
+					"default": false
 				}
 			},
 			"additionalProperties": true

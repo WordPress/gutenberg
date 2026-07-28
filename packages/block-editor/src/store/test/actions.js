@@ -1379,7 +1379,7 @@ describe( 'actions', () => {
 					fetch: 'c',
 				} )( {} );
 				expect( console ).toHaveErroredWith(
-					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`.'
 				);
 			} );
 			it( 'has unique name', () => {

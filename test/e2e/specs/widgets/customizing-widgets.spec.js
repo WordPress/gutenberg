@@ -235,6 +235,7 @@ test.describe( 'Widgets Customizer', () => {
 
 	test( 'should move focus to the block', async ( {
 		page,
+		editor,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -267,12 +268,16 @@ test.describe( 'Widgets Customizer', () => {
 		const firstParagraphBlock = page.locator(
 			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		// Expect to focus on a already focused widget.
 		await paragraphWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editParagraphWidget.click();
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		const headingWidget = previewFrame.locator(
 			'.widget:has-text("First Heading")'
@@ -505,7 +510,9 @@ test.describe( 'Widgets Customizer', () => {
 			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
-		await expect( movedParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( movedParagraphBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should not render Block Settings sections', async ( {

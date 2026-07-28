@@ -12,11 +12,8 @@ import { Icon, Link, Stack, EmptyState } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import {
-	EventsList,
-	type EventsWidgetAttributes,
-	type WPEvent,
-} from './components';
+import { EventsList, type WPEvent } from './components';
+import type { EventsWidgetAttributes } from './types';
 import styles from './style.module.css';
 
 interface WPEventsResponse {

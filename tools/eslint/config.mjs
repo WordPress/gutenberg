@@ -193,6 +193,7 @@ const restrictedSyntax = [
 		'FontSizePicker',
 		'FormFileUpload',
 		'FormTokenField',
+		'InputControl',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'NumberControl',
@@ -485,6 +486,20 @@ export default dedupePlugins( [
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
 		],
+		rules: {
+			...jestPlugin.configs[ 'flat/recommended' ].rules,
+			/*
+			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
+			 * so the docblock pragma is redundant.
+			 */
+			'no-warning-comments': [
+				'error',
+				{
+					terms: [ '@jest-environment jsdom' ],
+					location: 'anywhere',
+				},
+			],
+		},
 	},
 
 	// Override: E2E test files (non-Playwright).
