@@ -74,10 +74,10 @@ export const VariantStates: StoryFn< typeof Button > = (
 			<tbody>
 				<VariantsRow name="(default)" />
 				<VariantsRow
-					name="isCompact"
+					name="compact"
 					buttonProps={ { size: 'compact' } }
 				/>
-				<VariantsRow name="isSmall" buttonProps={ { size: 'small' } } />
+				<VariantsRow name="small" buttonProps={ { size: 'small' } } />
 				<VariantsRow
 					name="disabled"
 					buttonProps={ { disabled: true } }
