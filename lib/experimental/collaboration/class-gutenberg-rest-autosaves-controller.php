@@ -19,7 +19,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 *
 	 * @var string
 	 */
-	private const CRDT_SNAPSHOT_META_KEY = '_crdt_autosave_snapshot';
+	public const CRDT_SNAPSHOT_META_KEY = '_crdt_autosave_snapshot';
 
 	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
