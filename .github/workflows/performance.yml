@@ -44,8 +44,8 @@ jobs:
             #
             # Paths that feed the build (`tools/build-scripts` and its `@wordpress/build`,
             # `@wordpress/scripts` and Babel dependencies) or the test harness
-            # (`@wordpress/env`) are deliberately absent. So is `.github/`, which keeps this
-            # workflow covered by its own comparison.
+            # (`@wordpress/env`) are deliberately absent. `.github/` is listed, except for
+            # this workflow, so that a change to it is still covered by its own comparison.
             - name: Check whether the diff can move a performance metric
               id: filter
               if: github.event_name == 'pull_request'
@@ -66,6 +66,7 @@ jobs:
                           - '!{phpcs,phpunit,tsconfig}*'
                           - '!{changelog,readme}.txt'
                           - '!.{browserslistrc,editorconfig,gitignore,npmrc,nvmrc,prettierrc*,stylelintrc*}'
+                          - '!.github/{*,!(workflows)/**,workflows/!(performance.yml)}'
 
     performance:
         timeout-minutes: 60
