@@ -6,6 +6,7 @@
 
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into
     the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Add the `.hide-if-js` class to `page-wp-admin.php.template` to not hide the notice when JS is disabled ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
 
 ### Bug Fixes
 
