@@ -51,7 +51,13 @@ export const VariantStates: StoryFn< typeof Button > = (
 					{ name }
 				</th>
 				{ variants.map( ( variant ) => (
-					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
+					<td
+						key={ variant ?? 'undefined' }
+						style={ {
+							padding: 4,
+							textAlign: 'center',
+						} }
+					>
 						<Button
 							__next40pxDefaultSize
 							{ ...props }
@@ -86,6 +92,11 @@ export const VariantStates: StoryFn< typeof Button > = (
 			</thead>
 			<tbody>
 				<VariantsRow name="(default)" />
+				<VariantsRow
+					name="isCompact"
+					buttonProps={ { size: 'compact' } }
+				/>
+				<VariantsRow name="isSmall" buttonProps={ { size: 'small' } } />
 				<VariantsRow
 					name="disabled"
 					buttonProps={ { disabled: true } }
