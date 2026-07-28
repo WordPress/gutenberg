@@ -10,10 +10,25 @@ import DuotonePalettePanel from '../duotone-palette-panel';
 import { GlobalStylesProvider } from '../provider';
 
 describe( 'DuotonePalettePanel', () => {
-	it( 'shows only theme-provided scheme palettes as editable controls', () => {
+	it( 'shows theme and scheme duotones with the same read-only controls', () => {
 		render(
 			<GlobalStylesProvider
-				value={ { settings: {}, styles: {} } }
+				value={ {
+					settings: {
+						color: {
+							dark: {
+								duotone: [
+									{
+										slug: 'portrait',
+										name: 'Portrait',
+										colors: [ '#222', '#ddd' ],
+									},
+								],
+							},
+						},
+					},
+					styles: {},
+				} }
 				baseValue={ {
 					settings: {
 						color: {
@@ -54,10 +69,23 @@ describe( 'DuotonePalettePanel', () => {
 			</GlobalStylesProvider>
 		);
 
-		expect( screen.getByText( 'Dark duotone' ) ).toBeVisible();
+		expect( screen.getByText( 'Theme' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: 'Theme duotone palette',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: 'Dark duotone palette',
+			} )
+		).toBeVisible();
 		expect( screen.queryByText( 'Light duotone' ) ).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Edit Portrait' } )
-		).toBeVisible();
+			screen.queryByRole( 'button', { name: 'Edit Portrait' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Reset Dark duotone' } )
+		).not.toBeInTheDocument();
 	} );
 } );
