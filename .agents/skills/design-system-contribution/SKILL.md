@@ -5,13 +5,16 @@ description: Use when planning or implementing a safe `@wordpress/components`, `
 
 # Contribute to the WordPress Design System
 
-## Decide whether a package change is needed
+## Classify the change
 
-1. State the missing behaviour and affected consumers.
-2. Audit existing public composition and similar components or tokens.
-3. If supported behaviour already meets the need, recommend it and stop unless
-   the request establishes a distinct contract.
-4. Classify the remaining change as internal or public.
+1. State the requested outcome and relevant package or consumers.
+2. Classify the change as internal or public:
+   - **Internal:** preserves the public contract and observable behaviour.
+   - **Public:** adds or changes supported behaviour.
+3. For a public change, state the missing behaviour and audit existing public
+   composition and similar components or tokens.
+4. If supported behaviour already meets the public need, recommend it and stop
+   unless the request establishes a distinct contract.
 
 Read the cross-package guide and the package-specific source guidance that
 matches the change:
@@ -32,9 +35,10 @@ when useful, but verify implementation and compatibility against this checkout.
 - For a replacement or rename, compare observable old and new values, states,
   and interaction—not only types or class names.
 
-Follow current package precedents only where they apply. Do not add stories,
-documentation, release work, or compatibility machinery to an unchanged public
-capability.
+Follow current package precedents only where they apply. Do not add optional
+stories, public documentation, release notes, or compatibility machinery for
+an unchanged public capability. Still follow the repository's required package
+changelog policy for production code changes.
 
 ## Finish
 
