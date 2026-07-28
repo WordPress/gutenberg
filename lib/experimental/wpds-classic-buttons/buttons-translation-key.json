@@ -25,6 +25,10 @@
 			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary):not(.button-small):not(.button-compact)",
 			"value": "var(--wpds-dimension-size-lg)",
 			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule. Excludes small (24px) and compact (32px) so those keep their own heights, and excludes link (auto height)."
+		},
+		"focusBoxShadowReset": {
+			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary, .button-link):focus",
+			"why": "The per-scheme `colors` stylesheet (still enqueued for admin chrome) paints a LEGACY box-shadow focus ring on buttons. We adopt React's outline/outline-offset focus, so neutralise the box-shadow to avoid a double ring. Our stylesheet loads after `colors`, so `box-shadow: none` wins by source order."
 		}
 	},
 

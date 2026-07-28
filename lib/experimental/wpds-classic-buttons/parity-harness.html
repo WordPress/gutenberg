@@ -953,6 +953,12 @@
 	min-height: var(--wpds-dimension-size-lg);
 }
 
+/* Remove the legacy box-shadow focus ring (colors stylesheet); we use outline. */
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary, .button-link):focus {
+	box-shadow: none;
+}
+
 /* --- Harness chrome (uniquely prefixed to avoid collisions) --- */
 body { --wp-admin-theme-color: #3858e9; --wp-admin-theme-color--rgb: 56, 88, 233; --wp-admin-theme-color-darker-10: rgb(33, 69, 230); --wp-admin-theme-color-darker-20: rgb(24, 58, 214); margin: 0; padding: 24px; background: #f0f0f1; font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; color: #1e1e1e; }
 h1 { font-size: 20px; margin: 0 0 4px; }
