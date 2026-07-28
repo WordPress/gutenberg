@@ -1,0 +1,60 @@
+{
+	"about": {
+		"purpose": "Selector map that re-scopes the React Button's OWN compiled CSS onto the legacy classic-admin button classes, so classic wp-admin renders identically to the React component. This is the single source of the generation step (generate.mjs).",
+		"source": "packages/components/build-style/style.css — every rule whose selector starts with `.components-button` is extracted and its selector rewritten via the map below. Declarations are taken verbatim (already token-based), so classic gets React's exact implementation, including the transparent-border + outline/outline-offset focus construction.",
+		"contract": "Legacy selectors and markup (.button, .button-primary, .wp-core-ui, get_submit_button() output) are preserved; only React's declarations are re-pointed onto them.",
+		"britishEnglish": true
+	},
+
+	"variantMap": {
+		"(base — no variant class)": ":is(.button, .button-primary, .button-secondary)",
+		"is-primary": ".button-primary",
+		"is-secondary": ":is(.button-secondary, .button:not(.button-primary))",
+		"is-link": ".button-link"
+	},
+
+	"sizeMap": {
+		"is-small": ".button-small",
+		"is-compact": ".button-compact"
+	},
+
+	"scopePrefix": ".wp-core-ui",
+
+	"forced": {
+		"height": {
+			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary)",
+			"value": "var(--wpds-dimension-size-lg)",
+			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule."
+		}
+	},
+
+	"dropped": {
+		"note": "React selectors with no classic equivalent are dropped; where dropped, classic keeps Core's own buttons.css rule for that case (our stylesheet overrides only what it emits).",
+		"selectors": [
+			{
+				"match": "is-tertiary",
+				"reason": "No classic tertiary button class."
+			},
+			{
+				"match": "is-destructive",
+				"reason": "Classic uses `.button-link-delete`; kept from Core's buttons.css."
+			},
+			{
+				"match": "is-busy",
+				"reason": "React-only busy animation class; classic markup has no `.is-busy`."
+			},
+			{
+				"match": "is-pressed",
+				"reason": "React-only toggle class; classic uses `.button.active`."
+			},
+			{
+				"match": "has-icon / has-text",
+				"reason": "React icon-slot layout; classic `<input type=submit>` cannot host icon children. Icon buttons handled separately."
+			},
+			{
+				"match": ".components-button .dashicon",
+				"reason": "React uses `.dashicon`; classic uses `.dashicons` (plural). Different class; left to Core."
+			}
+		]
+	}
+}

@@ -141,6 +141,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-wpds-classic-buttons',
+					'label'       => __( 'Design System classic buttons', 'gutenberg' ),
+					'description' => __( 'Restyles classic wp-admin buttons from the WordPress Design System tokens, keeping the legacy button classes intact. (Proof of concept: generates the button stylesheet from the shared token source.)', 'gutenberg' ),
+				),
 			),
 		),
 	);

@@ -1,0 +1,227 @@
+/* stylelint-disable -- Generated build artifact, not hand-authored source. It is the React Button's COMPILED CSS re-scoped onto legacy selectors, so it legitimately carries compiled-output traits that source rules reject: baked-in token fallbacks, --wp-components-color-* bridge vars, and duplicate selectors from SCSS nesting. */
+/*
+* WordPress Design System — classic button styles.
+*
+* GENERATED FILE — DO NOT EDIT BY HAND.
+* Regenerate: node lib/experimental/wpds-classic-buttons/generate.mjs
+*
+* Derived from the React Button's compiled CSS
+* (packages/components/build-style/style.css): each `.components-button`
+* rule is re-scoped onto the legacy classic classes per
+* buttons-translation-key.json. Declarations are React's, verbatim, so
+* classic renders the same implementation (incl. outline focus ring).
+*
+* NOTE (finding): the compiled output references --wp-components-color-*
+* bridge variables that are components-package-internal. They resolve in
+* classic admin only via their baked-in fallback chain down to
+* --wp-admin-theme-color. A Core-native version should author against
+* --wpds-* / --wp-admin-* directly and drop the components bridge layer.
+*/
+
+
+.wp-core-ui .button-group {
+	display: inline-block;
+}
+
+.wp-core-ui .button-group .button {
+	border-radius: 0;
+	display: inline-flex;
+	color: #1e1e1e;
+	border-color: #1e1e1e;
+}
+
+.wp-core-ui .button-group .button + .button {
+	margin-left: -1px;
+}
+
+.wp-core-ui .button-group .button:first-child {
+	border-radius: 2px 0 0 2px;
+}
+
+.wp-core-ui .button-group .button:last-child {
+	border-radius: 0 2px 2px 0;
+}
+
+.wp-core-ui .button-group .button:focus,
+.wp-core-ui .button-group .button.is-primary {
+	position: relative;
+	z-index: 1;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary):focus:is(a) {
+	box-shadow: none;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary):focus:not(:active) {
+	--focus-color: var(--wpds-color-stroke-focus, var(--wp-admin-theme-color, #3858e9));
+	outline: var(--wpds-border-width-focus, var(--wp-admin-border-width-focus, 2px)) solid var(--focus-color);
+	outline-offset: var(--wpds-border-width-focus, var(--wp-admin-border-width-focus, 2px));
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary) {
+	display: inline-flex;
+	text-decoration: none;
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: var(--wpds-typography-font-weight-emphasis, 600);
+	margin: 0;
+	cursor: var(--wpds-cursor-control, pointer);
+	-webkit-appearance: none;
+		-moz-appearance: none;
+					appearance: none;
+	background: none;
+	height: 36px;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 4px 12px;
+	border-radius: 2px;
+	color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+	border: 1px solid transparent;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary)[aria-expanded="true"],
+.wp-core-ui :is(.button, .button-primary, .button-secondary):hover:not(:disabled, [aria-disabled="true"]) {
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+}
+
+.wp-core-ui .button-primary {
+	white-space: nowrap;
+	background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	color: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong, #fff));
+	text-decoration: none;
+	text-shadow: none;
+}
+
+.wp-core-ui .button-primary:hover:not(:disabled) {
+	background: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+	color: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong, #fff));
+}
+
+.wp-core-ui .button-primary:active:not(:disabled) {
+	background: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
+	color: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong, #fff));
+}
+
+.wp-core-ui .button-primary:disabled,
+.wp-core-ui .button-primary:disabled:active:enabled,
+.wp-core-ui .button-primary[aria-disabled="true"],
+.wp-core-ui .button-primary[aria-disabled="true"]:enabled,
+.wp-core-ui .button-primary[aria-disabled="true"]:active:enabled {
+	color: rgba(255, 255, 255, 0.4);
+	background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+}
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)):disabled,
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary))[aria-disabled="true"],
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary))[aria-disabled="true"]:hover {
+	color: #949494;
+	background: transparent;
+	transform: none;
+}
+
+@media not (prefers-reduced-motion) {
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)) {
+		transition: border-color 0.1s linear;
+	}
+}
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)) {
+	border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	white-space: nowrap;
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	background: transparent;
+}
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)):active:not(:disabled) {
+	border-color: transparent;
+}
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)):focus:not(:active) {
+	border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+}
+
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary)):disabled:not(:focus),
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary))[aria-disabled="true"]:not(:focus),
+.wp-core-ui :is(.button-secondary, .button:not(.button-primary))[aria-disabled="true"]:hover:not(:focus) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled, #dbdbdb);
+}
+
+.wp-core-ui .button-link {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	outline: none;
+	text-align: left;
+	font-weight: var(--wpds-typography-font-weight-default, 400);
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: from-font;
+}
+
+@media not (prefers-reduced-motion) {
+
+.wp-core-ui .button-link {
+		transition-property: border, background, color;
+		transition-duration: 0.05s;
+		transition-timing-function: ease-in-out;
+	}
+}
+
+.wp-core-ui .button-link {
+	height: auto;
+}
+
+.wp-core-ui .button-link:focus:not(:active) {
+	border-radius: 2px;
+	text-decoration: none;
+}
+
+.wp-core-ui .button-link:disabled,
+.wp-core-ui .button-link[aria-disabled="true"] {
+	color: #949494;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary):not(:disabled, [aria-disabled="true"]):active {
+	color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary):disabled,
+.wp-core-ui :is(.button, .button-primary, .button-secondary)[aria-disabled="true"] {
+	cursor: default;
+	color: #949494;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary) {
+	height: 32px;
+}
+
+.wp-core-ui .button-small {
+	height: var(--wpds-dimension-size-sm, 24px);
+	line-height: 22px;
+	padding: 0 8px;
+	font-size: 11px;
+}
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary) svg {
+	fill: currentColor;
+	outline: none;
+	flex-shrink: 0;
+}
+
+@media (forced-colors: active) {
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary) svg {
+		fill: CanvasText;
+	}
+}
+
+/* 40px is always the default button size (see translation key). */
+
+.wp-core-ui :is(.button, .button-primary, .button-secondary) {
+	height: var(--wpds-dimension-size-lg);
+	min-height: var(--wpds-dimension-size-lg);
+}
