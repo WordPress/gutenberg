@@ -119,19 +119,21 @@ Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the 
 - `$patch`, an array containing the new data to be merged into the existing configuration.
 - `$version`, an integer, is the version of the data being merged. It should be `1` for now.
 
-For example, the following filter callback is applied to the _Pages_ screen. It makes the default view type a grid, sorts the grid by ascending title, and makes the `date` field visible (in addition to the existing fields).
+For example, the following filter callback is applied to the _Pages_ screen. It makes the default view type a grid, sorts the grid by ascending title, and makes the `date` field visible (in addition to the existing fields). It also appends `my_custom_field` to the Quick Edit `form`, keeping the form's existing fields (note that registering a field from the server is not yet possible).
 
 ```php
 function example_filter_page_view_config( $data ) {
 	$patch = array(
 		'default_view' => array(
-			array(
-				'type'  => 'grid',
-				'sort' => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				),
-				'fields' => array( 'date' ),
+			'type'   => 'grid',
+			'sort'   => array(
+				'field'     => 'title',
+				'direction' => 'asc',
+			),
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'my_custom_field' ),
 		),
 	);
 	$data->merge( $patch, 1 );
@@ -148,16 +150,19 @@ The `Gutenberg_View_Config_Data` object has a `remove( $spec, $version )` method
 - `$spec`, an array that specifies which entries to remove.
 - `$version`, an integer, the version of the data being modified. It should be `1` for now.
 
-The following filter callback applies to the _Pages_ screen and removes the `status` field from the list of visible fields:
+The following filter callback applies to the _Pages_ screen. It removes the `status` field from the list of visible fields in DataViews, and the `format` field from the Quick Edit form:
 
 ```php
 function example_page_view_config_remove( $data ) {
-  $patch = array(
+	$spec = array(
 		'default_view' => array(
 			'fields' => array( 'status' ),
 		),
+		'form'         => array(
+			'fields' => array( 'format' ),
+		),
 	);
-	$data->remove( $patch, 1 );
+	$data->remove( $spec, 1 );
 
 	return $data;
 }
@@ -168,14 +173,16 @@ add_filter( 'get_entity_view_config_postType_page', 'example_page_view_config_re
 
 There's also a `replace( $patch, $version )` method. It works similar to  `merge` except for one difference: how they treat numerical indexed arrays (e.g., `fields => array( 'date', 'author' )`). Where `merge` will add new items to the indexed array, `replace` will substitute the entire list.
 
-For example, this code uses `merge` to add `date` to the list of visible fields, but keeping the current ones:
+For example, this code uses `merge` to add `date` to the list of visible fields and append `my_custom_field` to the Quick Edit form, keeping the current entries in both:
 
 ```php
 function example_filter_page_view_config( $data ) {
 	$patch = array(
 		'default_view' => array(
-			array(
-				'fields' => array( 'date' ),
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'my_custom_field' ),
 		),
 	);
 	$data->merge( $patch, 1 );
@@ -185,14 +192,16 @@ function example_filter_page_view_config( $data ) {
 add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
 ```
 
-However, this code uses `replace` to substitute the list of visible fields to just `date`:
+However, this code uses `replace` to substitute the list of visible fields with just `date`, and the Quick Edit form's entire field list with `date` and `my_custom_field`:
 
 ```php
 function example_filter_page_view_config( $data ) {
 	$patch = array(
 		'default_view' => array(
-			array(
-				'fields' => array( 'date' ),
+			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'fields' => array( 'date', 'my_custom_field' ),
 		),
 	);
 	$data->replace( $patch, 1 );
@@ -213,7 +222,7 @@ Like `merge` and `replace`, `set` only touches the top-level keys the patch name
 
 Use it when a callback owns a key and wants to pin it to an exact shape, without the inherited default leaking through a key-by-key merge.
 
-For example, this code applied to the _Pages_ screen makes `default_view` exactly the given configuration, discarding any other properties it had (page size, filters, etc.):
+For example, this code applied to the _Pages_ screen makes `default_view` and `form` exactly the given configurations, discarding any other properties they had (`default_view`'s page size, filters, etc., and the form's default fields and layout):
 
 ```php
 function example_filter_page_view_config( $data ) {
@@ -221,6 +230,10 @@ function example_filter_page_view_config( $data ) {
 		'default_view' => array(
 			'type'   => 'grid',
 			'fields' => array( 'date' ),
+		),
+		'form'         => array(
+			'layout' => array( 'type' => 'panel' ),
+			'fields' => array( 'excerpt', 'date', 'my_custom_field' ),
 		),
 	);
 	$data->set( $patch, 1 );
