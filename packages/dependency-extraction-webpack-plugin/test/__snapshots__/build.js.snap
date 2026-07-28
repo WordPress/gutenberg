@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`combine-assets\` should produce expected output: Asset file 'assets.php' should match snapshot 1`] = `
 "<?php return array('fileA.mjs' => array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '5202d062e624638839cf', 'type' => 'module'), 'fileB.mjs' => array('dependencies' => array('@wordpress/token-list'), 'version' => '610e232865e99068a0be', 'type' => 'module'));

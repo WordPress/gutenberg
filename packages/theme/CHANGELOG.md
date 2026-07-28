@@ -10,8 +10,14 @@
 
 -   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
 
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ### Code Quality
 
+-   Update `colorjs.io` to 0.7.1 ([#80762](https://github.com/WordPress/gutenberg/pull/80762)).
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
 -   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
 -   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
