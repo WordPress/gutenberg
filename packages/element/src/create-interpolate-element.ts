@@ -252,13 +252,6 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 			return true;
 
 		case 'closer':
-			// If we're not nesting then this is easy - close the block.
-			if ( 1 === stackDepth ) {
-				closeOuterElement( startOffset );
-				offset = startOffset + tokenLength;
-				return true;
-			}
-
 			// A closing tag with no matching opening tag on the stack is
 			// invalid. Warn and bail, keeping anything interpolated so far.
 			if ( 0 === stackDepth ) {
@@ -268,6 +261,13 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 				);
 				addText();
 				return false;
+			}
+
+			// If we're not nesting then this is easy - close the block.
+			if ( 1 === stackDepth ) {
+				closeOuterElement( startOffset );
+				offset = startOffset + tokenLength;
+				return true;
 			}
 
 			// Otherwise we're nested and we have to close out the current
