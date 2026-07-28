@@ -36,7 +36,7 @@ export default function useIndentListItem( clientId ) {
 		if ( ! newListItem.innerBlocks?.length ) {
 			newListItem.innerBlocks = [
 				createBlock( 'core/list', {
-					ordered: parentListAttributes?.ordered,
+					ordered: parentListAttributes.ordered,
 				} ),
 			];
 		}
