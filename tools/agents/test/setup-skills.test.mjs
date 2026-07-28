@@ -11,7 +11,7 @@ import {
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 
 import { setupSkills } from '../setup-skills.mjs';
@@ -77,6 +77,16 @@ test( 'runs the setup command when executed directly', async ( t ) => {
 		),
 		'---\nname: testing\n'
 	);
+} );
+
+test( 'can be imported from an eval entrypoint', async () => {
+	await execFileAsync( process.execPath, [
+		'--input-type=module',
+		'--eval',
+		`await import( ${ JSON.stringify(
+			pathToFileURL( setupScript ).href
+		) } );`,
+	] );
 } );
 
 test( 'uses junctions on Windows', async ( t ) => {

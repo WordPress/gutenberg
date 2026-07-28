@@ -226,7 +226,10 @@ function formatResult( result ) {
 	return lines.join( '\n' );
 }
 
-if ( import.meta.url === pathToFileURL( process.argv[ 1 ] ).href ) {
+if (
+	process.argv[ 1 ] &&
+	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
+) {
 	const result = await setupSkills( {
 		repositoryRoot: process.cwd(),
 	} );
