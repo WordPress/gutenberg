@@ -43,6 +43,15 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
+## Context
+
+_Defined via the [`usesContext` and `providesContext`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/) properties in block.json._
+
+**Uses context:**
+
+- `postId`
+- `postType`
+
 ## Block Markup
 
 This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.
