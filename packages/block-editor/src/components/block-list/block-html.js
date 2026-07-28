@@ -85,7 +85,7 @@ function BlockHTML( { clientId } ) {
 			onChange={ ( event ) => setHtml( event.target.value ) }
 			// The edits are local state until committed on blur, so undo
 			// and redo must remain the browser's own within the field.
-			data-editor-undo="false"
+			data-wp-native-undo
 		/>
 	);
 }

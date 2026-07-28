@@ -12,11 +12,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 
 /**
- * Returns true when the event originates from an element that handles undo
- * and redo itself, marked with `data-editor-undo="false"`. Such elements hold
- * local state that is not yet committed to the editor (a dialog input, an
- * HTML editing field), so the browser's own undo must be left to act on them
- * instead of the editor history.
+ * Returns true when the event originates from an element marked with
+ * `data-wp-native-undo`: the browser's own undo acts on its content (a
+ * dialog input, an HTML editing field, a search field), so the editor
+ * history must not.
  *
  * Events coming from the editor canvas are re-dispatched on the iframe
  * element, so the real target is resolved through the frame's focused
@@ -24,16 +23,16 @@ import { store as editorStore } from '../../store';
  *
  * @param {KeyboardEvent} event Keyboard event.
  *
- * @return {boolean} Whether the element handles its own undo.
+ * @return {boolean} Whether the element relies on the browser's own undo.
  */
-function hasSelfContainedUndo( event ) {
+function usesNativeUndo( event ) {
 	let { target } = event;
 
 	while ( target?.nodeName === 'IFRAME' ) {
 		target = target.contentDocument?.activeElement;
 	}
 
-	return !! target?.closest?.( '[data-editor-undo="false"]' );
+	return !! target?.closest?.( '[data-wp-native-undo]' );
 }
 
 /**
@@ -86,7 +85,7 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
-		if ( hasSelfContainedUndo( event ) ) {
+		if ( usesNativeUndo( event ) ) {
 			return;
 		}
 		undo();
@@ -94,7 +93,7 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/redo', ( event ) => {
-		if ( hasSelfContainedUndo( event ) ) {
+		if ( usesNativeUndo( event ) ) {
 			return;
 		}
 		redo();
