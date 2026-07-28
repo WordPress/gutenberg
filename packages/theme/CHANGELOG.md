@@ -10,6 +10,10 @@
 
 -   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
 
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ### Code Quality
 
 -   Update `colorjs.io` to 0.7.1 ([#80762](https://github.com/WordPress/gutenberg/pull/80762)).
