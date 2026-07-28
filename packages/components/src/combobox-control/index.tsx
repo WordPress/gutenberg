@@ -32,9 +32,7 @@ import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 import Spinner from '../spinner';
 
 const noop = () => {};
@@ -94,7 +92,6 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
- * 			__next40pxDefaultSize
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -115,7 +112,6 @@ const getIndexOfMatchingSuggestion = (
  */
 function ComboboxControl( props: ComboboxControlProps ) {
 	const {
-		__next40pxDefaultSize = false,
 		value: valueProp,
 		label,
 		options,
@@ -132,7 +128,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		__experimentalRenderItem,
 		expandOnFocus = true,
 		placeholder,
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
@@ -315,12 +311,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'ComboboxControl',
-		__next40pxDefaultSize,
-		size: undefined,
-	} );
-
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
 	// TODO: Refactor click detection to use blur to stop propagation.
@@ -339,9 +329,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
-					<InputWrapperFlex
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-					>
+					<InputWrapperFlex>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -358,6 +346,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 									matchingSuggestions
 								) }
 								onChange={ onInputChange }
+								aria-describedby={
+									help
+										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
+										  `components-form-token-input-${ instanceId }__help`
+										: undefined
+								}
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }

@@ -135,7 +135,19 @@ export default function filterSortAndPaginate< Item >(
 	// Handle pagination.
 	let totalItems = filteredData.length;
 	let totalPages = 1;
-	if ( view.page !== undefined && view.perPage !== undefined ) {
+
+	// Use position-based pagination for infinite scroll
+	if (
+		view.infiniteScrollEnabled &&
+		view.startPosition !== undefined &&
+		view.perPage !== undefined
+	) {
+		// Convert 1-indexed positions to 0-indexed array indices
+		const start = view.startPosition - 1;
+		const end = Math.min( start + view.perPage, totalItems );
+		filteredData = filteredData?.slice( start, end );
+	} else if ( view.page !== undefined && view.perPage !== undefined ) {
+		// Use traditional page-based pagination
 		const start = ( view.page - 1 ) * view.perPage;
 		totalItems = filteredData?.length || 0;
 		totalPages = Math.ceil( totalItems / view.perPage );

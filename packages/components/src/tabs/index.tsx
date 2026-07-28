@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -83,31 +83,6 @@ export const Tabs = Object.assign(
 			activeId: externalToInternalTabId( activeTabId, instanceId ),
 			rtl: isRTL(),
 		} );
-
-		const { items, activeId } = Ariakit.useStoreState( store );
-		const { setActiveId } = store;
-
-		useEffect( () => {
-			requestAnimationFrame( () => {
-				const focusedElement =
-					items?.[ 0 ]?.element?.ownerDocument.activeElement;
-
-				if (
-					! focusedElement ||
-					! items.some( ( item ) => focusedElement === item.element )
-				) {
-					return; // Return early if no tabs are focused.
-				}
-
-				// If, after ariakit re-computes the active tab, that tab doesn't match
-				// the currently focused tab, then we force an update to ariakit to avoid
-				// any mismatches, especially when navigating to previous/next tab with
-				// arrow keys.
-				if ( activeId !== focusedElement.id ) {
-					setActiveId( focusedElement.id );
-				}
-			} );
-		}, [ activeId, items, setActiveId ] );
 
 		const contextValue = useMemo(
 			() => ( {

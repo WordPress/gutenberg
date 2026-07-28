@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../no-unguarded-get-range-at';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );

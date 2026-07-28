@@ -34,7 +34,7 @@ const meta: Meta< typeof Placeholder > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},
@@ -48,7 +48,6 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
 		<Placeholder { ...args }>
 			<div>
 				<TextControl
-					__next40pxDefaultSize
 					label="Sample Field"
 					placeholder="Enter something here"
 					value={ value }

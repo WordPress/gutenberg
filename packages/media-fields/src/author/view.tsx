@@ -9,7 +9,10 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+} from '@wordpress/components';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 
 /**
@@ -67,7 +70,7 @@ export default function AuthorView( {
 			) }
 			{ ! imageUrl && (
 				<div className="media-author-field__icon">
-					<Icon icon={ authorIcon } />
+					<WCIcon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="media-author-field__name">{ text }</span>

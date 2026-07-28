@@ -46,7 +46,6 @@ const InsertFromURLPopover = ( {
 			onSubmit={ onSubmit }
 		>
 			<InputControl
-				__next40pxDefaultSize
 				label={ __( 'URL' ) }
 				type="text" // Use text instead of URL to allow relative paths (e.g., /image/image.jpg)
 				hideLabelFromVision

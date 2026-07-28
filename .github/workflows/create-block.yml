@@ -41,7 +41,7 @@ jobs:
                       os: 'windows-2025'
 
         steps:
-            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -52,5 +52,4 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Create block
-              shell: bash
-              run: bash ./bin/test-create-block.sh
+              run: npm run test:create-block

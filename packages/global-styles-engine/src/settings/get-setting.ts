@@ -11,6 +11,7 @@ const VALID_SETTINGS = [
 	'background.backgroundRepeat',
 	'background.backgroundSize',
 	'background.backgroundPosition',
+	'background.gradient',
 	'border.color',
 	'border.radius',
 	'border.radiusSizes',
@@ -37,6 +38,7 @@ const VALID_SETTINGS = [
 	'dimensions.aspectRatio',
 	'dimensions.height',
 	'dimensions.minHeight',
+	'dimensions.minWidth',
 	'dimensions.width',
 	'dimensions.dimensionSizes',
 	'layout.contentSize',
@@ -70,6 +72,8 @@ const VALID_SETTINGS = [
 	'typography.textIndent',
 	'typography.textTransform',
 	'typography.writingMode',
+	'viewport.mobile',
+	'viewport.tablet',
 ];
 
 export function getSetting< T = any >(

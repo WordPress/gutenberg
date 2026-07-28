@@ -24,29 +24,6 @@ const TestButton = forwardRef(
 );
 
 describe( 'TreeGrid', () => {
-	const originalGetClientRects = window.Element.prototype.getClientRects;
-
-	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
-	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
-	const mockedGetClientRects = jest.fn( () => [
-		{
-			x: 0,
-			y: 0,
-			width: 100,
-			height: 100,
-		},
-	] );
-
-	beforeAll( () => {
-		// @ts-expect-error - This is just a mock
-		window.Element.prototype.getClientRects =
-			jest.fn( mockedGetClientRects );
-	} );
-
-	afterAll( () => {
-		window.Element.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	describe( 'simple rendering', () => {
 		it( 'renders a table, tbody and any child elements', () => {
 			const { container } = render(

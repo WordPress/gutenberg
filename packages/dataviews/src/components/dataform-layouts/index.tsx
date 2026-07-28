@@ -34,7 +34,7 @@ const FORM_FIELD_LAYOUTS = [
 			<Stack
 				direction="column"
 				className="dataforms-layouts__wrapper"
-				gap="sm"
+				gap="md"
 			>
 				{ children }
 			</Stack>

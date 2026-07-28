@@ -40,7 +40,7 @@ export default function inputFieldHasUncollapsedSelection( element ) {
 			// when not null, compare the two points
 			selectionStart !== selectionEnd
 		);
-	} catch ( error ) {
+	} catch {
 		// This is Safari's way of saying that the input type doesn't implement
 		// selection, so we default to true.
 		return true;

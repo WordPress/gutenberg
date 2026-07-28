@@ -366,7 +366,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
@@ -500,6 +499,7 @@ function MediaTextEdit( {
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
 							value={ verticalAlignment }
+							label={ __( 'Align media and text vertically' ) }
 						/>
 						<ToolbarButton
 							icon={ pullLeft }

@@ -190,7 +190,6 @@ export default function TableOfContentsEdit( {
 					isShownByDefault
 				>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Include headings down to level' ) }
 						value={ maxLevel || '' }
 						options={ [

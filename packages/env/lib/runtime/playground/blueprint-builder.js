@@ -117,34 +117,34 @@ function getMountArgs( config ) {
 	}
 
 	// Mount custom mappings
+	// All source types (local, git, zip) can be mounted after downloading/extraction
 	for ( const [ wpDir, source ] of Object.entries(
 		envConfig.mappings || {}
 	) ) {
-		if ( source.type === 'local' || source.type === 'git' ) {
-			args.push( '--mount-dir', source.path, `/wordpress/${ wpDir }` );
-		} else {
-			throw new Error(
-				`Mapping source "${ source.path }" for "${ wpDir }" of type "${ source.type }" ` +
-					`is not supported with Playground runtime. Only local and git mappings are supported.`
-			);
-		}
+		args.push( '--mount-dir', source.path, `/wordpress/${ wpDir }` );
 	}
 
-	// Mount core source if specified
+	// Translate core source to Playground's --wp flag or mount it.
 	if ( envConfig.coreSource ) {
-		if (
-			envConfig.coreSource.type === 'local' ||
-			envConfig.coreSource.type === 'git'
-		) {
+		if ( envConfig.coreSource.type === 'zip' && envConfig.coreSource.url ) {
+			// For zip URLs, let Playground download WordPress natively.
+			args.push( '--wp', envConfig.coreSource.url );
+		} else if ( envConfig.coreSource.type === 'git' ) {
+			// For git sources, pass the version ref to Playground's --wp flag.
+			// e.g., WordPress/WordPress#6.5 → --wp 6.5
+			// WordPress/WordPress (no ref) → default "latest", no flag needed.
+			if ( envConfig.coreSource.ref ) {
+				args.push( '--wp', envConfig.coreSource.ref );
+			}
+		} else {
+			// For local sources, mount the directory and tell Playground to
+			// use the existing files instead of downloading its own copy.
 			args.push(
 				'--mount-dir-before-install',
 				envConfig.coreSource.path,
-				'/wordpress'
-			);
-		} else {
-			throw new Error(
-				`Core source of type "${ envConfig.coreSource.type }" is not supported ` +
-					`with Playground runtime. Only local and git core sources are supported.`
+				'/wordpress',
+				'--wordpress-install-mode',
+				'install-from-existing-files-if-needed'
 			);
 		}
 	}

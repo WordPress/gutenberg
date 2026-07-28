@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -19,7 +18,6 @@ export default function Gallery( props ) {
 		attributes,
 		isSelected,
 		setAttributes,
-		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
 		__unstableLayoutClassNames: layoutClassNames,
@@ -45,11 +43,6 @@ export default function Gallery( props ) {
 			) }
 		>
 			{ blockProps.children }
-			{ isSelected && ! blockProps.children && (
-				<View className="blocks-gallery-media-placeholder-wrapper">
-					{ mediaPlaceholder }
-				</View>
-			) }
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }

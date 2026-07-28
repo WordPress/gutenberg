@@ -10,10 +10,9 @@ import type { Modifiers, BaseProps } from '../types';
 
 function isLocaleRTL( localeCode: string ) {
 	const localeObj = new Intl.Locale( localeCode );
-	if ( 'getTextInfo' in localeObj ) {
-		// @ts-expect-error - getTextInfo is not typed yet
-		// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getTextInfo
-		return localeObj.getTextInfo().direction === 'rtl';
+	const direction = localeObj.getTextInfo?.().direction;
+	if ( direction ) {
+		return direction === 'rtl';
 	}
 	return [
 		'ar', // Arabic

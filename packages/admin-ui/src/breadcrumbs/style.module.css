@@ -1,0 +1,31 @@
+.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+/*
+ * Preceding items keep their intrinsic width; only the last (current) item
+ * is allowed to shrink so that the truncation styles on `.current` engage.
+ */
+.list > li {
+	flex-shrink: 0;
+}
+
+.list > li:last-child {
+	flex-shrink: 1;
+	min-width: 0;
+}
+
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
+.current {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.separator {
+	color: var(--wpds-color-stroke-surface-neutral);
+	margin: 0 var(--wpds-dimension-gap-sm);
+	user-select: none;
+}

@@ -205,4 +205,8 @@ const DEFAULT_BLOCK = { name: 'core/paragraph', attributes: { content: 'Lorem ip
 ### `directInsert`
 
 - **Type:** `Boolean`
-- **Default:** - `undefined`. Determines whether the default block should be inserted directly into the InnerBlocks area by the block appender.
+- **Default:** `undefined`.
+
+When `true`, the appender inserts `defaultBlock` directly and skips the inserter dropdown, **including any registered inserter variations** of that block type. Use this to opt out of the variation picker; otherwise leave unset.
+
+Note: redundant when `allowedBlocks` resolves to a single block type with no variations, the appender already inserts directly.

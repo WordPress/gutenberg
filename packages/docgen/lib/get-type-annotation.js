@@ -598,7 +598,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
-	} catch ( e ) {
+	} catch {
 		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }

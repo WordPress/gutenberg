@@ -108,21 +108,40 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				rel: value.rel,
 				linkTarget: value.linkTarget,
 			} ),
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
 			type: 'text',
 			Edit: 'rich-text', // TODO: replace with custom component
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'alt',
 			label: __( 'Alt text' ),
 			type: 'text',
+			isVisible: ( item ) => ! item.isDecorative,
+		},
+		{
+			id: 'isDecorative',
+			label: __( 'Mark as decorative' ),
+			type: 'boolean',
+			setValue: ( { value } ) => ( {
+				isDecorative: value || undefined,
+				...( value && {
+					alt: '',
+					caption: undefined,
+					href: undefined,
+					linkDestination: undefined,
+					linkTarget: undefined,
+					rel: undefined,
+				} ),
+			} ),
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'image', 'link', 'caption', 'alt' ],
+		fields: [ 'image', 'link', 'caption', 'alt', 'isDecorative' ],
 	};
 }
 

@@ -41,6 +41,7 @@ export default function EditorKeyboardShortcuts() {
 		isPostSavingLocked,
 		isListViewOpened,
 		getEditorMode,
+		isSavingNonPostEntityChanges,
 	} = useSelect( editorStore );
 
 	useShortcut(
@@ -75,7 +76,7 @@ export default function EditorKeyboardShortcuts() {
 		/**
 		 * Do not save the post if post saving is locked.
 		 */
-		if ( isPostSavingLocked() ) {
+		if ( isPostSavingLocked() || isSavingNonPostEntityChanges() ) {
 			return;
 		}
 

@@ -41,7 +41,11 @@ module.exports = function downloadSources( config, spinner ) {
 		}
 	};
 
-	for ( const env of Object.values( config.env ) ) {
+	for ( const envName of Object.keys( config.env ) ) {
+		if ( envName === 'tests' && config.testsEnvironment === false ) {
+			continue;
+		}
+		const env = config.env[ envName ];
 		env.pluginSources.forEach( addSource );
 		env.themeSources.forEach( addSource );
 		Object.values( env.mappings ).forEach( addSource );

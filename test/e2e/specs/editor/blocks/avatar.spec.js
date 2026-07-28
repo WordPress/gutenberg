@@ -68,8 +68,10 @@ test.describe( 'Avatar', () => {
 		await newUser.click();
 
 		const updatedAvatarImage = avatarBlock.locator( 'img' );
-		const newSrc = await updatedAvatarImage.getAttribute( 'src' );
 
-		expect( newSrc ).not.toBe( originalSrc );
+		await expect( updatedAvatarImage ).not.toHaveAttribute(
+			'src',
+			originalSrc
+		);
 	} );
 } );

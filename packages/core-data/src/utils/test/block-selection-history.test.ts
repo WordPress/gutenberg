@@ -38,6 +38,15 @@ function createTestDoc() {
 	block2.set( 'clientId', 'block-2' );
 	const block2Attrs = new Y.Map();
 	block2Attrs.set( 'content', new Y.Text( 'Second block' ) );
+	const body = new Y.Array();
+	const row = new Y.Map();
+	const cells = new Y.Array();
+	const cell = new Y.Map();
+	cell.set( 'content', new Y.Text( 'Cell text' ) );
+	cells.push( [ cell ] );
+	row.set( 'cells', cells );
+	body.push( [ row ] );
+	block2Attrs.set( 'body', body );
 	block2.set( 'attributes', block2Attrs );
 	block2.set( 'innerBlocks', new Y.Array() );
 	blocks.push( [ block2 ] );
@@ -209,6 +218,39 @@ describe( 'BlockSelectionHistory', () => {
 			);
 			const endPosition = fullSelection.end as YRelativeSelection;
 			expect( endPosition.offset ).toBe( 0 );
+		} );
+
+		test( 'should convert nested rich-text attribute paths to relative positions', () => {
+			const selection = createSelection( {
+				clientId: 'block-2',
+				attributeKey: 'body.0.cells.0.content',
+				offset: 4,
+			} );
+
+			history.updateSelection( selection );
+
+			const selectionHistory = history.getSelectionHistory();
+			expect( selectionHistory.length ).toBe( 1 );
+
+			const fullSelection = selectionHistory[ 0 ];
+			expect( fullSelection.start.type ).toBe(
+				YSelectionType.RelativeSelection
+			);
+			expect( fullSelection.end.type ).toBe(
+				YSelectionType.RelativeSelection
+			);
+
+			const startPosition = fullSelection.start as YRelativeSelection;
+			const endPosition = fullSelection.end as YRelativeSelection;
+
+			expect( startPosition.attributeKey ).toBe(
+				'body.0.cells.0.content'
+			);
+			expect( startPosition.offset ).toBe( 4 );
+			expect( startPosition.relativePosition ).toBeDefined();
+			expect( endPosition.attributeKey ).toBe( 'body.0.cells.0.content' );
+			expect( endPosition.offset ).toBe( 4 );
+			expect( endPosition.relativePosition ).toBeDefined();
 		} );
 	} );
 

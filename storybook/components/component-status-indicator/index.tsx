@@ -15,7 +15,8 @@ export function ComponentStatusIndicator() {
 		return null;
 	}
 
-	const statusInfo = statuses[ componentStatus.status ];
+	const statusInfo =
+		statuses[ componentStatus.status as keyof typeof statuses ];
 
 	if ( ! statusInfo ) {
 		return null;

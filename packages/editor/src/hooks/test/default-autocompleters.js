@@ -7,11 +7,11 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import '../default-autocompleters';
-import { userAutocompleter } from '../../components';
+import { linkAutocompleter, userAutocompleter } from '../../components';
 
 describe( 'default-autocompleters', () => {
 	const BLOCK_NAME = 'core/foo';
-	const defaultAutocompleters = [ userAutocompleter ];
+	const defaultAutocompleters = [ linkAutocompleter, userAutocompleter ];
 
 	it( 'provides default completers if none are provided', () => {
 		const result = applyFilters(

@@ -88,16 +88,34 @@ test.describe( 'Navigation colors', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
-		// In the sidebar inspector we add a link color and link hover color to the group block.
+		// In the sidebar inspector we add text and background colors to the group block.
+		// Text and background color controls now live in the Typography and
+		// Background panels respectively, so no separate "Styles" tab is shown.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Text' } ).click();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const textColorToggle = editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await textColorToggle.click();
 		await page
 			.getByRole( 'option', { name: 'White' } )
 			.click( { force: true } );
+		// Close the text color popover before opening the background one so the
+		// two option pickers don't overlap (each palette contains a "Black"
+		// swatch, which would otherwise be ambiguous).
+		await textColorToggle.click();
 
-		await page
-			.getByRole( 'button', { name: 'Background', exact: true } )
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page
 			.getByRole( 'option', { name: 'Black' } )
@@ -141,14 +159,16 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		// In the sidebar inspector we add a link color and link hover color to the group block.
+		// Link/element colors now live in the Elements panel.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Color options' } ).click();
+		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
 			.click();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Link', exact: true } )
+			.click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
 			.getByRole( 'option', { name: 'Vivid red' } )

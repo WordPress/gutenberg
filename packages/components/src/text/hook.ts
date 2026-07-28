@@ -3,6 +3,7 @@
  */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
+import type React from 'react';
 
 /**
  * WordPress dependencies
@@ -23,7 +24,6 @@ import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
 import { useCx } from '../utils/hooks/use-cx';
 import type { Props } from './types';
-import type React from 'react';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
@@ -79,14 +79,12 @@ export default function useText(
 	const cx = useCx();
 
 	const classes = useMemo( () => {
-		const sx: Record< string, SerializedStyles | null > = {};
-
 		const lineHeight = getLineHeight(
 			adjustLineHeightForInnerControls,
 			lineHeightProp
 		);
 
-		sx.Base = css( {
+		const base = css( {
 			color,
 			display,
 			fontSize: getFontSize( size ),
@@ -96,32 +94,33 @@ export default function useText(
 			textAlign: align,
 		} );
 
-		sx.upperCase = css( { textTransform: 'uppercase' } );
+		const upperCaseStyles = css( { textTransform: 'uppercase' } );
 
-		sx.optimalTextColor = null;
+		let optimalTextColor: SerializedStyles | null = null;
 
 		if ( optimizeReadabilityFor ) {
 			const isOptimalTextColorDark =
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			// Should not use theme colors
-			sx.optimalTextColor = isOptimalTextColorDark
+			optimalTextColor = isOptimalTextColorDark
 				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );
 		}
 
-		return cx(
+		const textStyles = css(
 			styles.Text,
-			sx.Base,
-			sx.optimalTextColor,
+			base,
+			optimalTextColor,
 			isDestructive && styles.destructive,
 			!! isHighlighter && styles.highlighterText,
 			isBlock && styles.block,
 			isCaption && styles.muted,
 			variant && styles[ variant ],
-			upperCase && sx.upperCase,
-			className
+			upperCase && upperCaseStyles
 		);
+
+		return cx( textStyles, className );
 	}, [
 		adjustLineHeightForInnerControls,
 		align,

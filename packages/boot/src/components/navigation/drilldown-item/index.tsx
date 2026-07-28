@@ -12,7 +12,7 @@ import {
 	__experimentalItem as Item,
 	// @ts-ignore
 	__experimentalHStack as HStack,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall } from '@wordpress/icons';
@@ -81,7 +81,9 @@ export default function DrilldownItem( {
 			>
 				{ wrapIcon( icon, shouldShowPlaceholder ) }
 				<FlexBlock>{ children }</FlexBlock>
-				<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
+				<WCIcon
+					icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
+				/>
 			</HStack>
 		</Item>
 	);

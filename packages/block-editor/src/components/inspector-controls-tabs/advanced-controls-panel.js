@@ -16,7 +16,7 @@ import {
 } from '../inspector-controls';
 import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
 
-const AdvancedControls = () => {
+const AdvancedControls = ( { initialOpen = false } ) => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
 	const privateFills = useSlotFills(
 		PrivateInspectorControlsAllowedBlocks.name
@@ -32,7 +32,7 @@ const AdvancedControls = () => {
 		<PanelBody
 			className="block-editor-block-inspector__advanced"
 			title={ __( 'Advanced' ) }
-			initialOpen={ false }
+			initialOpen={ initialOpen }
 		>
 			<InspectorControls.Slot group="advanced" />
 			<PrivateInspectorControlsAllowedBlocks.Slot />

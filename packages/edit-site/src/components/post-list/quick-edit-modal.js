@@ -12,52 +12,26 @@ import {
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import usePatternSettings from '../page-patterns/use-pattern-settings';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-export function QuickEditModal( { postType, postId, closeModal } ) {
-	// Before calling the onRequestClose callback, the modal introduces a animation delay
-	// that produces a visual glitch, see https://github.com/WordPress/gutenberg/pull/75173#pullrequestreview-3755585506
-	// Handling the ESC key and click-outside ourselves fixes it.
-	useEffect( () => {
-		const handleKeyDown = ( event ) => {
-			if ( event.key === 'Escape' || event.code === 'Escape' ) {
-				event.preventDefault();
-				event.stopPropagation();
-				closeModal?.();
-			}
-		};
-
-		const handleClickOutside = ( event ) => {
-			if (
-				event.target.classList.contains(
-					'dataviews-action-modal__quick-edit'
-				)
-			) {
-				closeModal?.();
-			}
-		};
-		document.addEventListener( 'keydown', handleKeyDown );
-		document.addEventListener( 'mousedown', handleClickOutside );
-		return () => {
-			document.removeEventListener( 'keydown', handleKeyDown );
-			document.removeEventListener( 'mousedown', handleClickOutside );
-		};
-	}, [ closeModal ] );
-
+export function QuickEditModal( {
+	postType,
+	postId,
+	closeModal,
+	quickEditForm,
+} ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
-	const { record, hasFinishedResolution } = useSelect(
+	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -72,12 +46,25 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			}
 
 			const args = [ 'postType', postType, postId[ 0 ] ];
+
+			const { getHomePage, getPostsPageId } = unlock(
+				select( coreDataStore )
+			);
+			const singlePostId = String( postId[ 0 ] );
+			const isPostsPage =
+				singlePostId !== undefined && getPostsPageId() === singlePostId;
+			const isFrontPage =
+				singlePostId !== undefined &&
+				postType === 'page' &&
+				getHomePage()?.postId === singlePostId;
+
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
+				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -97,57 +84,35 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						),
 					};
 				}
+
+				if ( field.id === 'template' ) {
+					return {
+						...field,
+						readOnly: ! canSwitchTemplate,
+					};
+				}
+
 				return field;
 			} ),
-		[ _fields ]
+		[ _fields, canSwitchTemplate ]
 	);
 
 	const form = useMemo( () => {
-		const allFields = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'status',
-				label: __( 'Status & Visibility' ),
-				children: [ 'status', 'password' ],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				children: [ 'comment_status', 'ping_status' ],
-			},
-			{
-				label: __( 'Template' ),
-				id: 'template',
-				layout: {
-					type: 'regular',
-					labelPosition: 'side',
-				},
-			},
-		];
-
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel',
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits ) => {
 		const currentData = { ...record, ...localEdits };
@@ -191,44 +156,17 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 		closeModal?.();
 	};
 
-	const { ExperimentalBlockEditorProvider } = unlock(
-		blockEditorPrivateApis
-	);
-	const settings = usePatternSettings();
-
-	/**
-	 * The template field depends on the block editor settings.
-	 * This is a workaround to ensure that the block editor settings are available.
-	 * For more information, see: https://github.com/WordPress/gutenberg/issues/67521
-	 */
-	const fieldsWithDependency = useMemo( () => {
-		return fields.map( ( field ) => {
-			if ( field.id === 'template' ) {
-				return {
-					...field,
-					Edit: ( data ) => (
-						<ExperimentalBlockEditorProvider settings={ settings }>
-							<field.Edit { ...data } />
-						</ExperimentalBlockEditorProvider>
-					),
-				};
-			}
-			return field;
-		} );
-	}, [ fields, settings ] );
-
 	return (
 		<Modal
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
-			shouldCloseOnEsc={ false }
-			shouldCloseOnClickOutside={ false }
+			onRequestClose={ closeModal }
+			focusOnMount="firstElement"
 		>
 			<div className="dataviews-action-modal__quick-edit-header">
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
-					onClose={ closeModal }
 					hideActions
 				/>
 			</div>
@@ -236,7 +174,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
-						fields={ fieldsWithDependency }
+						fields={ fields }
 						form={ form }
 						onChange={ onChange }
 					/>

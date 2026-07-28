@@ -23,7 +23,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -622,6 +622,7 @@ function BlockListBlockProvider( props ) {
 			const blockVisibility = attributes?.metadata?.blockVisibility;
 			const deviceType =
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+			const viewportSettings = settings?.__experimentalFeatures?.viewport;
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -645,6 +646,7 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -736,10 +738,46 @@ function BlockListBlockProvider( props ) {
 					: false,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
+
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
+
+	// Use block visibility hook with data from existing useSelect to avoid extra subscription
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility: selectedProps?.blockVisibility,
+		deviceType: selectedProps?.deviceType,
+		viewportSettings: selectedProps?.viewportSettings,
+		view: defaultViewRef.current,
+	} );
+
+	// Users of the editor.BlockListBlock filter used to be able to
+	// access the block prop.
+	// Ideally these blocks would rely on the clientId prop only.
+	// This is kept for backward compatibility reasons.
+	const block = useMemo(
+		() => ( {
+			...selectedProps?.blockWithoutAttributes,
+			attributes: selectedProps?.attributes,
+		} ),
+		[ selectedProps?.blockWithoutAttributes, selectedProps?.attributes ]
+	);
+
+	// Block is sometimes not mounted at the right time, causing it be
+	// undefined see issue for more info
+	// https://github.com/WordPress/gutenberg/issues/17013
+	if ( ! selectedProps ) {
+		return null;
+	}
 
 	const {
 		isPreviewMode,
@@ -750,7 +788,6 @@ function BlockListBlockProvider( props ) {
 		isLocked = false,
 		canRemove = false,
 		canMove = false,
-		blockWithoutAttributes,
 		name,
 		attributes,
 		isValid,
@@ -784,29 +821,8 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = selectedProps;
-
-	// Use block visibility hook with data from existing useSelect to avoid extra subscription
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
-		blockVisibility,
-		deviceType,
-	} );
-
-	// Users of the editor.BlockListBlock filter used to be able to
-	// access the block prop.
-	// Ideally these blocks would rely on the clientId prop only.
-	// This is kept for backward compatibility reasons.
-	const block = useMemo(
-		() => ( { ...blockWithoutAttributes, attributes } ),
-		[ blockWithoutAttributes, attributes ]
-	);
-
-	// Block is sometimes not mounted at the right time, causing it be
-	// undefined see issue for more info
-	// https://github.com/WordPress/gutenberg/issues/17013
-	if ( ! selectedProps ) {
-		return null;
-	}
 
 	const privateContext = {
 		isPreviewMode,
@@ -845,6 +861,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	};
 
 	if (

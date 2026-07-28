@@ -91,7 +91,9 @@ export default function useInnerBlockTemplateSync(
 			);
 
 			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
-				__unstableMarkNextChangeAsNotPersistent();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,

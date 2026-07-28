@@ -25,18 +25,20 @@ import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../lock-unlock';
 import CreateNewTemplate from './create-new-template';
 
-export default function BlockThemeControl( { id } ) {
+export default function BlockThemeControl() {
 	const {
 		isTemplateHidden,
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
 		hasSpecificTemplate,
+		id,
 	} = useSelect( ( select ) => {
 		const {
 			getRenderingMode,
 			getEditorSettings: _getEditorSettings,
 			getCurrentPost,
+			getCurrentTemplateId,
 		} = unlock( select( editorStore ) );
 		const editorSettings = _getEditorSettings();
 		const currentPost = getCurrentPost();
@@ -48,6 +50,7 @@ export default function BlockThemeControl( { id } ) {
 				'onNavigateToPreviousEntityRecord'
 			),
 			hasSpecificTemplate: !! currentPost.template,
+			id: getCurrentTemplateId(),
 		};
 	}, [] );
 

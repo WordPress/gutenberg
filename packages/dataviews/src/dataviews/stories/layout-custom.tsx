@@ -55,7 +55,8 @@ function PosterGrid( { items }: { items: typeof data } ) {
 							style={ {
 								margin: '0 0 4px',
 								fontSize: '18px',
-								fontWeight: 600,
+								fontWeight:
+									'var(--wpds-typography-font-weight-emphasis)',
 								textShadow: '0 1px 2px rgba(0,0,0,0.5)',
 							} }
 						>
@@ -104,7 +105,11 @@ function PosterGrid( { items }: { items: typeof data } ) {
  * - Render a completely custom layout (poster grid) instead of `<DataViews.Layout />`
  * - Still leverage DataViews sub-components for search and pagination
  */
-export const LayoutCustomComponent = () => {
+export const LayoutCustomComponent = ( {
+	containerHeight,
+}: {
+	containerHeight: string;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
@@ -126,13 +131,13 @@ export const LayoutCustomComponent = () => {
 			view={ view }
 			fields={ fields }
 			onChangeView={ setView }
-			defaultLayouts={ { table: {} } }
+			defaultLayouts={ { table: true } }
 		>
-			<div style={ { padding: '2px' } }>
+			<div style={ { padding: '2px', height: containerHeight } }>
 				<DataViews.Search />
 				<PosterGrid items={ processedData } />
-				<DataViews.Pagination />
 			</div>
+			<DataViews.Pagination />
 		</DataViews>
 	);
 };

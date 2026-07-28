@@ -5,12 +5,18 @@ import { Icon } from '../index';
 const meta: Meta< typeof Icon > = {
 	title: 'Design System/Components/Icon',
 	component: Icon,
+	tags: [ 'manifest' ],
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Icon { ...args } />,
 	decorators: [
 		( Story ) => {
 			return (
 				<div
 					style={ {
-						color: 'var( --wpds-color-fg-content-neutral )',
+						color: 'var( --wpds-color-foreground-content-neutral )',
 					} }
 				>
 					<Story />
@@ -18,6 +24,13 @@ const meta: Meta< typeof Icon > = {
 			);
 		},
 	],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Prefer this component over the `Icon` component from `@wordpress/components` or `@wordpress/icons`.',
+		},
+	},
 };
 export default meta;
 
@@ -26,22 +39,5 @@ type Story = StoryObj< typeof Icon >;
 export const Default: Story = {
 	args: {
 		icon: wordpress,
-	},
-};
-
-/**
- * Explicit `fill` colors in the icon will be preserved.
- */
-export const WithIntrinsicFillColor: Story = {
-	args: {
-		icon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				fill="blue"
-			>
-				<rect x="0" y="0" width="24" height="24" />
-			</svg>
-		),
 	},
 };

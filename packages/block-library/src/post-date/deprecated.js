@@ -7,6 +7,84 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import migrateTextAlign from '../utils/migrate-text-align';
+
+const v4 = {
+	attributes: {
+		datetime: {
+			type: 'string',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		format: {
+			type: 'string',
+		},
+		isLink: {
+			type: 'boolean',
+			default: false,
+			role: 'content',
+		},
+	},
+	supports: {
+		anchor: true,
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	save() {
+		return null;
+	},
+	migrate: migrateTextAlign,
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
+	},
+};
 
 const v3 = {
 	attributes: {
@@ -87,7 +165,7 @@ const v3 = {
 		...otherAttributes
 	} ) {
 		// Change the block bindings source argument name from "key" to "field".
-		return {
+		return migrateTextAlign( {
 			metadata: {
 				bindings: {
 					datetime: {
@@ -99,7 +177,7 @@ const v3 = {
 				...otherMetadata,
 			},
 			...otherAttributes,
-		};
+		} );
 	},
 	isEligible( attributes ) {
 		return (
@@ -184,7 +262,7 @@ const v2 = {
 				);
 			}
 
-			return {
+			return migrateTextAlign( {
 				...otherAttributes,
 				className,
 				metadata: {
@@ -196,7 +274,7 @@ const v2 = {
 						},
 					},
 				},
-			};
+			} );
 		}
 	},
 	isEligible( attributes ) {
@@ -240,7 +318,9 @@ const v1 = {
 	save() {
 		return null;
 	},
-	migrate: migrateFontFamily,
+	migrate( attributes ) {
+		return migrateTextAlign( migrateFontFamily( attributes ) );
+	},
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
@@ -254,4 +334,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v3, v2, v1 ];
+export default [ v4, v3, v2, v1 ];

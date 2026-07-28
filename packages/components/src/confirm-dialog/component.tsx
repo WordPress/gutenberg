@@ -15,8 +15,7 @@ import { Flex } from '../flex';
 import Button from '../button';
 import { Text } from '../text';
 import { VStack } from '../v-stack';
-import * as styles from './styles';
-import { useCx } from '../utils/hooks/use-cx';
+import styles from './style.module.scss';
 
 const UnconnectedConfirmDialog = (
 	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
@@ -33,10 +32,9 @@ const UnconnectedConfirmDialog = (
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
-	const cx = useCx();
-	const wrapperClassName = cx( styles.wrapper );
-	const cancelButtonRef = useRef();
-	const confirmButtonRef = useRef();
+	const wrapperClassName = styles.wrapper;
+	const cancelButtonRef = useRef< HTMLButtonElement >( null );
+	const confirmButtonRef = useRef< HTMLButtonElement >( null );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();

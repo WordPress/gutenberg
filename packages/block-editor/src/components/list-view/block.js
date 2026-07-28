@@ -25,7 +25,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -54,9 +54,7 @@ import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
-import { deviceTypeKey } from '../../store/private-keys';
-import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -83,8 +81,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -101,6 +97,8 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
+		showViewportModal,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -128,51 +126,42 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, selectedDeviceType } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } = unlock(
-					select( blockEditorStore )
-				);
+	const {
+		block,
+		blockName,
+		blockEditingMode,
+		allowRightClickOverrides,
+		editedSection,
+		viewportSettings,
+		blockVisibilitySetting,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlock,
+				getBlockName,
+				getBlockEditingMode: getBlockEditingModeForClientId,
+				getSettings,
+				getEditedContentOnlySection,
+			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					selectedDeviceType:
-						getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-						BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				blockEditingMode: getBlockEditingModeForClientId( clientId ),
+				allowRightClickOverrides: settings.allowRightClickOverrides,
+				editedSection: getEditedContentOnlySection(),
+				viewportSettings: settings.__experimentalFeatures?.viewport,
+				blockVisibilitySetting:
+					settings.__experimentalFeatures?.blockVisibility
+						?.allowEditing,
+			};
+		},
+		[ clientId ]
+	);
+
+	const isDisabled = blockEditingMode === 'disabled';
 	const { canRename } = useBlockRename( blockName );
-	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
-	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
-		blockVisibility: block?.attributes?.metadata?.blockVisibility,
-		deviceType: selectedDeviceType,
-	} );
-
-	// Determine label based on whether block or parent is hidden
-	const blockVisibilityDescription = useMemo( () => {
-		if ( isBlockCurrentlyHidden ) {
-			if ( block?.attributes?.metadata?.blockVisibility === false ) {
-				return __( 'Block is hidden' );
-			}
-			return sprintf(
-				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
-					currentViewport
-			);
-		}
-		return null;
-	}, [
-		isBlockCurrentlyHidden,
-		block?.attributes?.metadata?.blockVisibility,
-		currentViewport,
-	] );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -231,6 +220,13 @@ function ListViewBlock( {
 		// Do not handle events if it comes from modals;
 		// retain the default behavior for these keys.
 		if ( event.target.closest( '[role=dialog]' ) ) {
+			return;
+		}
+
+		if ( editedSection && isMatch( 'core/block-editor/unselect', event ) ) {
+			event.stopPropagation();
+			event.preventDefault();
+			stopEditingContentOnlySection();
 			return;
 		}
 
@@ -402,6 +398,9 @@ function ListViewBlock( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
@@ -413,8 +412,18 @@ function ListViewBlock( {
 				return;
 			}
 
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
 			// Open the visibility breakpoints modal.
-			setVisibilityModalClientIds( blocksToUpdate );
+			showViewportModal( blocksToUpdate );
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
@@ -437,7 +446,12 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( event, clientId );
+			// For keyboard activation (Enter/Space on a link), transfer focus
+			// to the canvas with the caret at the end of the block.
+			// For mouse clicks, keep focus in the list view so that subsequent
+			// keyboard operations (arrow navigation, copy/paste) still work.
+			const isKeyboardActivation = event?.detail === 0;
+			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
@@ -550,8 +564,15 @@ function ListViewBlock( {
 		isLocked
 	);
 
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = getBlockVisibilityLabel(
+		block?.attributes?.metadata?.blockVisibility,
+		viewportSettings
+	);
+
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const canShowBlockActions = showBlockActions && ! isDisabled;
+	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -565,7 +586,7 @@ function ListViewBlock( {
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
-	} else if ( ! showBlockActions ) {
+	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
 	}
 
@@ -578,12 +599,13 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMoveBlock,
+		'is-draggable': canMoveBlock && ! isDisabled,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
+		'is-disabled': isDisabled,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -594,19 +616,28 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
-	const currentlyEditingBlockInCanvas =
-		isSelected && selectedClientIds.length === 1;
+	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
+		if ( isDisabled ) {
+			return -1;
+		}
+
+		// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+		if ( isSelected && selectedClientIds.length === 1 ) {
+			return 0;
+		}
+
+		return rovingTabIndex;
+	};
 
 	return (
 		<ListViewLeaf
 			className={ classes }
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onMouseEnter={ isDisabled ? undefined : onMouseEnter }
+			onMouseLeave={ isDisabled ? undefined : onMouseLeave }
+			onFocus={ isDisabled ? undefined : onMouseEnter }
+			onBlur={ isDisabled ? undefined : onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -627,21 +658,25 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
-							onContextMenu={ onContextMenu }
+							onContextMenu={
+								isDisabled ? undefined : onContextMenu
+							}
 							onMouseDown={ onMouseDown }
-							onToggleExpanded={ toggleExpanded }
+							onToggleExpanded={
+								isDisabled ? undefined : toggleExpanded
+							}
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={
-								currentlyEditingBlockInCanvas ? 0 : tabIndex
-							}
+							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
+							visibilityLabel={ blockVisibilityDescription }
+							isDisabled={ isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
@@ -687,7 +722,7 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && BlockSettingsMenu && (
+			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
@@ -717,15 +752,14 @@ function ListViewBlock( {
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
+							isContentOnlyListView={
+								!! rootClientId &&
+								getBlockEditingMode( rootClientId ) ===
+									'contentOnly'
+							}
 						/>
 					) }
 				</TreeGridCell>
-			) }
-			{ visibilityModalClientIds && (
-				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
-				/>
 			) }
 			{ isRenameModalOpen && (
 				<BlockRenameModal

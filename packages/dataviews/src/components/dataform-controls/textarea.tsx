@@ -23,6 +23,7 @@ export default function Textarea< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
@@ -43,13 +44,13 @@ export default function Textarea< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			rows={ rows }
+			disabled={ disabled }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined
 			}
 			maxLength={
 				isValid.maxLength ? isValid.maxLength.constraint : undefined
 			}
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);

@@ -22,6 +22,13 @@ function formatTestResult( testResult: TestResult ): FormattedTestResult {
 	return result;
 }
 
+// An optional label identifying the run profile (e.g. a specific provider).
+// When set, it's appended to the reported title and baked into the report
+// filename so that reports from separate jobs running the same test titles
+// don't collide when their artifacts are merged. Left unset by the default
+// suite, which keeps its existing behavior unchanged.
+const reportLabel = process.env.FLAKY_TESTS_REPORT_LABEL;
+
 class FlakyTestsReporter implements Reporter {
 	failingTestCaseResults = new Map< string, FormattedTestResult[] >();
 
@@ -55,12 +62,16 @@ class FlakyTestsReporter implements Reporter {
 				break;
 			}
 			case 'flaky': {
+				const reportedTitle = reportLabel
+					? `${ testTitle } (${ reportLabel })`
+					: testTitle;
+
 				fs.writeFileSync(
-					`flaky-tests/${ filenamify( testTitle ) }.json`,
+					`flaky-tests/${ filenamify( reportedTitle ) }.json`,
 					JSON.stringify( {
 						version: 1,
 						runner: '@playwright/test',
-						title: testTitle,
+						title: reportedTitle,
 						path: testPath,
 						results: this.failingTestCaseResults.get( testTitle ),
 					} ),

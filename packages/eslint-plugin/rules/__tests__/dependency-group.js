@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../dependency-group';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},

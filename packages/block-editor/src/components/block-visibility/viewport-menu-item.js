@@ -3,19 +3,18 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
-import { BlockVisibilityModal } from './';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { areBlocksHiddenAnywhere, shortcut } = useSelect(
 		( select ) => {
 			const { isBlockHiddenAnywhere } = unlock(
@@ -34,20 +33,20 @@ export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 		},
 		[ clientIds ]
 	);
+	const dispatch = useDispatch( blockEditorStore );
+
+	if ( blockVisibility === false ) {
+		return null;
+	}
+
+	const { showViewportModal } = unlock( dispatch );
+
 	return (
-		<>
-			<MenuItem
-				onClick={ () => setIsModalOpen( true ) }
-				shortcut={ shortcut }
-			>
-				{ areBlocksHiddenAnywhere ? __( 'Show' ) : __( 'Hide' ) }
-			</MenuItem>
-			{ isModalOpen && (
-				<BlockVisibilityModal
-					clientIds={ clientIds }
-					onClose={ () => setIsModalOpen( false ) }
-				/>
-			) }
-		</>
+		<MenuItem
+			onClick={ () => showViewportModal( clientIds ) }
+			shortcut={ shortcut }
+		>
+			{ areBlocksHiddenAnywhere ? __( 'Show' ) : __( 'Hide' ) }
+		</MenuItem>
 	);
 }

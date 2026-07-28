@@ -18,6 +18,7 @@ import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
@@ -30,9 +31,9 @@ const meta: Meta< typeof Notice > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Notice` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Notice`](?path=/docs/design-system-components-notice--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

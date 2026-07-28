@@ -15,4 +15,5 @@ export const visuallyHidden: CSSProperties = {
 	position: 'absolute',
 	width: '1px',
 	wordWrap: 'normal',
+	wordBreak: 'normal',
 };

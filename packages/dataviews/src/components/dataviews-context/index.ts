@@ -15,7 +15,7 @@ import type {
 	View,
 	Action,
 	NormalizedField,
-	SupportedLayouts,
+	NormalizedSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
 import type { SetSelection } from '../../types/private';
@@ -50,15 +50,16 @@ type DataViewsContextType< Item > = {
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
-	hasInfiniteScrollHandler: boolean;
+	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;
+	intersectionObserver?: IntersectionObserver | null;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -84,10 +85,11 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
-	hasInfiniteScrollHandler: false,
+	hasInitiallyLoaded: false,
 	config: {
 		perPageSizes: [],
 	},
+	intersectionObserver: null,
 } );
 
 DataViewsContext.displayName = 'DataViewsContext';

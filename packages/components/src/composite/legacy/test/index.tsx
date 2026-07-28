@@ -341,7 +341,7 @@ describe.each( [
 ] )( '%s', ( _when, rtl ) => {
 	const { previous, next, first, last } = getKeys( rtl );
 
-	async function useOneDimensionalTest( initialState?: InitialState ) {
+	async function renderOneDimensionalTest( initialState?: InitialState ) {
 		const Test = () => (
 			<OneDimensionalTest
 				state={ useCompositeState( { rtl, ...initialState } ) }
@@ -351,7 +351,7 @@ describe.each( [
 		return getOneDimensionalItems();
 	}
 
-	async function useTwoDimensionalTest( initialState?: InitialState ) {
+	async function renderTwoDimensionalTest( initialState?: InitialState ) {
 		const Test = () => (
 			<TwoDimensionalTest
 				state={ useCompositeState( { rtl, ...initialState } ) }
@@ -361,7 +361,7 @@ describe.each( [
 		return getTwoDimensionalItems();
 	}
 
-	async function useShiftTest( shift: boolean ) {
+	async function renderShiftTest( shift: boolean ) {
 		const Test = () => (
 			<ShiftTest state={ useCompositeState( { rtl, shift } ) } />
 		);
@@ -371,7 +371,7 @@ describe.each( [
 
 	describe( 'In one dimension', () => {
 		test( 'All directions work with no orientation', async () => {
-			const { item1, item2, item3 } = await useOneDimensionalTest();
+			const { item1, item2, item3 } = await renderOneDimensionalTest();
 
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
@@ -406,7 +406,7 @@ describe.each( [
 		} );
 
 		test( 'Only left/right work with horizontal orientation', async () => {
-			const { item1, item2, item3 } = await useOneDimensionalTest( {
+			const { item1, item2, item3 } = await renderOneDimensionalTest( {
 				orientation: 'horizontal',
 			} );
 
@@ -435,7 +435,7 @@ describe.each( [
 		} );
 
 		test( 'Only up/down work with vertical orientation', async () => {
-			const { item1, item2, item3 } = await useOneDimensionalTest( {
+			const { item1, item2, item3 } = await renderOneDimensionalTest( {
 				orientation: 'vertical',
 			} );
 
@@ -464,7 +464,7 @@ describe.each( [
 		} );
 
 		test( 'Focus wraps with loop enabled', async () => {
-			const { item1, item2, item3 } = await useOneDimensionalTest( {
+			const { item1, item2, item3 } = await renderOneDimensionalTest( {
 				loop: true,
 			} );
 
@@ -488,7 +488,7 @@ describe.each( [
 	describe( 'In two dimensions', () => {
 		test( 'All directions work as standard', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
-				await useTwoDimensionalTest();
+				await renderTwoDimensionalTest();
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -524,7 +524,7 @@ describe.each( [
 
 		test( 'Focus wraps around rows/columns with loop enabled', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
-				await useTwoDimensionalTest( { loop: true } );
+				await renderTwoDimensionalTest( { loop: true } );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -548,7 +548,7 @@ describe.each( [
 
 		test( 'Focus moves between rows/columns with wrap enabled', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
-				await useTwoDimensionalTest( { wrap: true } );
+				await renderTwoDimensionalTest( { wrap: true } );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -577,7 +577,7 @@ describe.each( [
 		} );
 
 		test( 'Focus wraps around start/end with loop and wrap enabled', async () => {
-			const { itemA1, itemC3 } = await useTwoDimensionalTest( {
+			const { itemA1, itemC3 } = await renderTwoDimensionalTest( {
 				loop: true,
 				wrap: true,
 			} );
@@ -596,7 +596,7 @@ describe.each( [
 
 		test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
 			const { itemA1, itemB1, itemB2, itemC1 } =
-				await useShiftTest( true );
+				await renderShiftTest( true );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -617,7 +617,7 @@ describe.each( [
 		} );
 
 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
-			const { itemA1, itemB1, itemB2 } = await useShiftTest( false );
+			const { itemA1, itemB1, itemB2 } = await renderShiftTest( false );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();

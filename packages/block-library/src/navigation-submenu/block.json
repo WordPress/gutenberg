@@ -40,7 +40,14 @@
 		},
 		"isTopLevelItem": {
 			"type": "boolean"
+		},
+		"isParentSubmenu": {
+			"type": "boolean",
+			"default": true
 		}
+	},
+	"providesContext": {
+		"core/isInsideSubmenu": "isParentSubmenu"
 	},
 	"usesContext": [
 		"textColor",
@@ -55,6 +62,7 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"maxNestingLevel",
+		"openSubmenusOnClick",
 		"submenuVisibility",
 		"style"
 	],

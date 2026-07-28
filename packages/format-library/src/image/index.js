@@ -6,12 +6,10 @@ import {
 	SVG,
 	Popover,
 	Button,
-	ExternalLink,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl,
 } from '@wordpress/components';
+import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
@@ -100,9 +98,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<VStack spacing={ 4 }>
+				<Stack direction="column" gap="lg">
 					<NumberControl
-						__next40pxDefaultSize
 						label={ __( 'Width' ) }
 						value={ editedWidth }
 						min={ 1 }
@@ -118,7 +115,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						} }
 						help={
 							<>
-								<ExternalLink
+								<Link
+									openInNewTab
 									href={
 										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 										__(
@@ -129,13 +127,13 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 									{ __(
 										'Describe the purpose of the image.'
 									) }
-								</ExternalLink>
+								</Link>
 								<br />
 								{ __( 'Leave empty if decorative.' ) }
 							</>
 						}
 					/>
-					<HStack justify="right">
+					<Stack justify="right">
 						<Button
 							disabled={ ! hasChanged }
 							accessibleWhenDisabled
@@ -145,8 +143,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			</form>
 		</Popover>
 	);

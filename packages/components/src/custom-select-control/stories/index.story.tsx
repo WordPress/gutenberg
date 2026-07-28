@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
@@ -31,9 +32,9 @@ const meta: Meta< typeof CustomSelectControl > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 	decorators: [
@@ -62,7 +63,6 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ onChange }
 			value={ value }
@@ -72,7 +72,6 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label',
 	options: [
 		{

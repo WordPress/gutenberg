@@ -18,7 +18,7 @@ import {
 	CheckboxControl,
 	Flex,
 	FlexItem,
-	Icon,
+	Icon as WCIcon,
 	Modal,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -28,17 +28,14 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import {
-	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
-	BLOCK_VISIBILITY_VIEWPORTS,
-} from './constants';
+import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import {
+	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from './utils';
-import './style.scss';
 
 const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
 	[ BLOCK_VISIBILITY_VIEWPORTS.mobile.key ]: false,
@@ -58,7 +55,7 @@ const EMPTY_BLOCKS = [];
  * @param {Object}   props           Component props.
  * @param {Array}    props.clientIds The client IDs of the blocks to hide.
  * @param {Function} props.onClose   Callback function invoked when the modal is closed.
- * @return {JSX.Element} The modal component.
+ * @return {React.JSX.Element} The modal component.
  */
 export default function BlockVisibilityModal( { clientIds, onClose } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -75,6 +72,16 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			'core/editor/toggle-list-view'
 		);
 	}, [] );
+	const viewportSettings = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.viewport,
+		[]
+	);
+	const viewportEntries = useMemo(
+		() => getBlockVisibilityViewportEntries( viewportSettings ),
+		[ viewportSettings ]
+	);
 
 	const initialViewportValues = useMemo( () => {
 		if ( blocks?.length === 0 ) {
@@ -86,7 +93,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 
 		const viewportValues = {};
 
-		BLOCK_VISIBILITY_VIEWPORT_ENTRIES.forEach( ( [ , { key } ] ) => {
+		viewportEntries.forEach( ( [ , { key } ] ) => {
 			viewportValues[ key ] = getViewportCheckboxState( blocks, key );
 		} );
 
@@ -94,7 +101,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			hideEverywhere: getHideEverywhereCheckboxState( blocks ),
 			viewportChecked: viewportValues,
 		};
-	}, [ blocks ] );
+	}, [ blocks, viewportEntries ] );
 
 	const [ viewportChecked, setViewportChecked ] = useState(
 		initialViewportValues?.viewportChecked ?? {}
@@ -146,6 +153,22 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		[ viewportChecked ]
 	);
 
+	const isDirty = useMemo( () => {
+		if ( hideEverywhere !== initialViewportValues.hideEverywhere ) {
+			return true;
+		}
+		return viewportEntries.some(
+			( [ , { key } ] ) =>
+				viewportChecked[ key ] !==
+				initialViewportValues.viewportChecked[ key ]
+		);
+	}, [
+		hideEverywhere,
+		viewportChecked,
+		initialViewportValues,
+		viewportEntries,
+	] );
+
 	const hasIndeterminateValues = useMemo( () => {
 		if ( hideEverywhere === null ) {
 			return true;
@@ -161,7 +184,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			const newVisibility = hideEverywhere
 				? false
 				: {
-						viewport: BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
+						viewport: viewportEntries.reduce(
 							( acc, [ , { key } ] ) => {
 								if ( viewportChecked[ key ] ) {
 									// Values are inverted to hide the block on the selected viewport.
@@ -205,6 +228,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			noticeMessage,
 			onClose,
 			updateBlockAttributes,
+			viewportEntries,
 			viewportChecked,
 		]
 	);
@@ -248,7 +272,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 							/>
 							{ hideEverywhere !== true && (
 								<ul className="block-editor-block-visibility-modal__sub-options">
-									{ BLOCK_VISIBILITY_VIEWPORT_ENTRIES.map(
+									{ viewportEntries.map(
 										( [ , { label, icon, key } ] ) => (
 											<li
 												key={ key }
@@ -277,7 +301,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 														)
 													}
 												/>
-												<Icon
+												<WCIcon
 													icon={ icon }
 													className={ clsx( {
 														'block-editor-block-visibility-modal__options-icon--checked':
@@ -348,6 +372,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 						<Button
 							variant="primary"
 							type="submit"
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
 							__next40pxDefaultSize
 						>
 							{ __( 'Apply' ) }

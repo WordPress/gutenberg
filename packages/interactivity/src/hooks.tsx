@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
 /**
@@ -10,9 +10,10 @@ import {
 	createContext,
 	cloneElement,
 	type ComponentChildren,
+	type VNode,
+	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context } from 'preact';
 
 /**
  * Internal dependencies

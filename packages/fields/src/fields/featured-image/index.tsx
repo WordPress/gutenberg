@@ -15,7 +15,8 @@ const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	id: 'featured_media',
 	type: 'media',
 	label: __( 'Featured Image' ),
-	Edit: MediaEdit,
+	placeholder: __( 'Set featured image' ),
+	Edit: ( props ) => <MediaEdit { ...props } isExpanded />,
 	render: FeaturedImageView,
 	setValue: ( { value } ) => ( {
 		featured_media: value ?? 0,

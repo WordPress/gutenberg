@@ -242,6 +242,41 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should place the caret in the next block on forward delete from an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const content of [ 'first', '', '', 'last' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.first()
+			.click();
+
+		// Forward delete removes the empty block; the caret must move to
+		// the start of the next block, not the end of the previous one,
+		// so repeated presses keep deleting forward.
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '|' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'first' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '|last' },
+			},
+		] );
+	} );
+
 	test( 'should remove empty paragraph block on backspace', async ( {
 		editor,
 		page,
@@ -319,10 +354,16 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		// But the effective saved content is still empty:
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 
-		// And focus is retained:
-		await expect(
-			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
-		).toBeFocused();
+		// And the selection is retained:
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator(
+						'role=document[name=/Empty block/i]'
+					)
+				)
+			)
+			.toBe( true );
 	} );
 
 	test( 'should undo split in one go', async ( {
@@ -545,7 +586,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 			await page.keyboard.press( 'Delete' );
 
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );
@@ -578,5 +619,96 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			// Check the content.
 			expect( await editor.getBlocks() ).toMatchObject( snap2 );
 		} );
+	} );
+
+	test( 'should not split the parent block when the parent block type is not allowed at the grandparent level', async ( {
+		editor,
+		page,
+	} ) => {
+		// Set up a Group with allowedBlocks restricted to only paragraphs,
+		// containing an inner Group with 3 paragraphs.
+		// When pressing Enter twice on "Second" (creating an empty paragraph,
+		// then pressing Enter again), the inner Group should NOT be split
+		// because core/group is not in the outer Group's allowedBlocks.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				allowedBlocks: [ 'core/paragraph' ],
+				layout: { type: 'constrained' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/group',
+					attributes: {
+						layout: { type: 'constrained' },
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'First' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Second' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Third' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Click at the end of the "Second" paragraph.
+		const secondParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.filter( { hasText: 'Second' } );
+		await secondParagraph.click();
+		await page.keyboard.press( 'End' );
+
+		// First Enter: splits the paragraph, creating an empty one after "Second".
+		await page.keyboard.press( 'Enter' );
+		// Second Enter: on the now-empty paragraph, should NOT split the
+		// inner Group because core/group is not in the outer Group's allowedBlocks.
+		await page.keyboard.press( 'Enter' );
+
+		// The outer Group should still contain exactly one inner Group.
+		// The inner Group should have the original paragraphs plus the
+		// empty ones created by the Enter presses.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/group',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'First' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Second' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Third' },
+							},
+						],
+					},
+				],
+			},
+		] );
 	} );
 } );

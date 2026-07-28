@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,27 +14,29 @@ import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+import BlockContext from '../components/block-context';
 import { generateFieldsFromAttributes } from './generate-fields-from-attributes';
 
 /**
  * Checks if a block has any attributes marked for auto-generated inspector controls.
  *
  * @param {Object} blockTypeAttributes - The block type's attributes object.
- * @return {boolean} True if any attribute has __experimentalAutoInspectorControl marker.
+ * @return {boolean} True if any attribute has autoGenerateControl marker.
  */
-function hasAutoInspectorControlAttributes( blockTypeAttributes ) {
+function hasAutoGenerateControl( blockTypeAttributes ) {
 	if ( ! blockTypeAttributes ) {
 		return false;
 	}
 	return Object.values( blockTypeAttributes ).some(
-		( attr ) => attr?.__experimentalAutoInspectorControl
+		( attr ) => attr?.autoGenerateControl
 	);
 }
 
 /**
  * Renders DataForm-based inspector controls for auto-registered PHP-only blocks.
  *
- * Fields are generated on-the-fly from attributes marked with `__experimentalAutoInspectorControl`
+ * Fields are generated on-the-fly from attributes marked with `autoGenerateControl`
  * during PHP registration.
  *
  * @param {Object}   props               Component props.
@@ -45,15 +47,40 @@ function hasAutoInspectorControlAttributes( blockTypeAttributes ) {
 function AutoRegisterControls( { name, clientId, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
+	const blockContext = useContext( BlockContext );
+
 	const attributes = useSelect(
-		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
-		[ clientId ]
+		( select ) => {
+			const _attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			if ( ! _attributes?.metadata?.bindings ) {
+				return _attributes;
+			}
+
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			return Object.entries( _attributes.metadata.bindings ).reduce(
+				( acc, [ attribute, binding ] ) => {
+					const source = getBlockBindingsSource( binding.source );
+					if ( ! source ) {
+						return acc;
+					}
+					const values = source.getValues( {
+						select,
+						context: blockContext,
+						bindings: { [ attribute ]: binding },
+					} );
+					return { ...acc, ...values };
+				},
+				_attributes
+			);
+		},
+		[ blockContext, clientId ]
 	);
 
 	const blockType = getBlockType( name );
 
 	// Generate fields from user-defined attributes marked by PHP.
-	// The __experimentalAutoInspectorControl marker excludes block support attributes
+	// The autoGenerateControl marker excludes block support attributes
 	// (which have their own UI) and internal state (role: 'local').
 	// Memoized since blockType.attributes don't change after registration.
 	const { fields, form } = useMemo( () => {
@@ -90,6 +117,6 @@ export default {
 	attributeKeys: [],
 	hasSupport( name ) {
 		const blockType = getBlockType( name );
-		return hasAutoInspectorControlAttributes( blockType?.attributes );
+		return hasAutoGenerateControl( blockType?.attributes );
 	},
 };

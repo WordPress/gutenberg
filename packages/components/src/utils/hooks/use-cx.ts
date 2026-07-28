@@ -24,6 +24,10 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  * `cx` normally knows how to handle. It also hooks into the Emotion
  * Cache, allowing `css` calls to work inside iframes.
  *
+ * Passing multiple `SerializedStyles` arguments emits multiple classes. When
+ * fragments rely on source-order overrides, compose them in a single `css()`
+ * call before passing them to `cx`.
+ *
  * ```jsx
  * import { css } from '@emotion/react';
  *

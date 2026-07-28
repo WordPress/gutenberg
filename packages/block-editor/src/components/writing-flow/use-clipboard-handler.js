@@ -20,7 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { setClipboardBlocks } from './utils';
+import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 
 export default function useClipboardHandler() {
@@ -130,7 +130,10 @@ export default function useClipboardHandler() {
 				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
-					event.target.ownerDocument.activeElement.contentEditable = false;
+					setContentEditableWrapper(
+						event.target.ownerDocument.activeElement,
+						false
+					);
 					__unstableDeleteSelection();
 				}
 			} else if ( event.type === 'paste' ) {

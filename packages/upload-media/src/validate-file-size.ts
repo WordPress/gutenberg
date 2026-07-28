@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { UploadError } from './upload-error';
+import { ErrorCode, UploadError } from './upload-error';
 
 /**
  * Verifies whether the file is within the file upload size limits for the site.
@@ -18,7 +18,7 @@ export function validateFileSize( file: File, maxUploadFileSize?: number ) {
 	// Don't allow empty files to be uploaded.
 	if ( file.size <= 0 ) {
 		throw new UploadError( {
-			code: 'EMPTY_FILE',
+			code: ErrorCode.EMPTY_FILE,
 			message: sprintf(
 				// translators: %s: file name.
 				__( '%s: This file is empty.' ),
@@ -30,7 +30,7 @@ export function validateFileSize( file: File, maxUploadFileSize?: number ) {
 
 	if ( maxUploadFileSize && file.size > maxUploadFileSize ) {
 		throw new UploadError( {
-			code: 'SIZE_ABOVE_LIMIT',
+			code: ErrorCode.SIZE_ABOVE_LIMIT,
 			message: sprintf(
 				// translators: %s: file name.
 				__(

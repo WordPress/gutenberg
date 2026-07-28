@@ -38,13 +38,21 @@ export async function loadView( config: ViewConfig ) {
 	const page = queryParams?.page ?? 1;
 	const search = queryParams?.search ?? '';
 
+	const rawDefaults =
+		config.defaultLayouts?.[
+			baseView?.type as keyof typeof config.defaultLayouts
+		];
+	const layoutTypeDefaults =
+		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
+	const combinedOverrides = { ...layoutTypeDefaults, ...activeViewOverrides };
+
 	return mergeActiveViewOverrides(
 		{
 			...baseView,
 			page,
 			search,
 		},
-		activeViewOverrides,
+		combinedOverrides,
 		defaultView
 	);
 }

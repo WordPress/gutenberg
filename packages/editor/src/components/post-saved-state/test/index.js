@@ -71,6 +71,24 @@ describe( 'PostSavedState', () => {
 		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
 	} );
 
+	it( 'returns a disabled button while a non-post entity is being saved', () => {
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			isSavingNonPostEntityChanges: true,
+			postStatus: 'draft',
+		} ) );
+
+		render( <PostSavedState /> );
+
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+	} );
+
 	it( 'should return Saved text if not new and not dirty', () => {
 		useSelect.mockImplementation( () => ( {
 			isDirty: false,

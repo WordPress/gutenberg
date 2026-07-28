@@ -49,7 +49,7 @@ describe( 'useEntityRecord', () => {
 			editedRecord: false,
 			hasEdits: false,
 			edits: {},
-			record: undefined,
+			record: null,
 			save: expect.any( Function ),
 			hasResolved: false,
 			hasStarted: false,
@@ -158,6 +158,10 @@ describe( 'useEntityRecord', () => {
 			edits: {},
 			record: null,
 			save: expect.any( Function ),
+			hasResolved: false,
+			hasStarted: false,
+			isResolving: false,
+			status: 'IDLE',
 		} );
 
 		// The same delay.

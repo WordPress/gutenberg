@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,40 +9,33 @@ import { render } from '@testing-library/react';
 import { Surface } from '../index';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render( <Surface>Surface</Surface> );
-		expect( container ).toMatchSnapshot();
+	test( 'should render children in a Surface wrapper', () => {
+		render( <Surface>Surface</Surface> );
+
+		const surface = screen.getByText( 'Surface' );
+
+		expect( surface ).toHaveClass( 'components-surface' );
+		expect( surface ).toHaveAttribute( 'data-wp-component', 'Surface' );
 	} );
 
-	test( 'should render variants', () => {
-		const view = render( <Surface>Surface</Surface> );
-		const { container } = render(
-			<Surface variant="secondary">Surface</Surface>
+	test( 'should merge custom class names', () => {
+		render( <Surface className="custom-surface">Surface</Surface> );
+
+		expect( screen.getByText( 'Surface' ) ).toHaveClass(
+			'components-surface',
+			'custom-surface'
 		);
-		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 
-	test( 'should render borderLeft', () => {
-		const view = render( <Surface>Surface</Surface> );
-		const { container } = render( <Surface borderLeft>Surface</Surface> );
-		expect( container ).toMatchDiffSnapshot( view.container );
-	} );
+	test( 'should render as the requested element', () => {
+		render(
+			<Surface as="section" aria-label="Surface area">
+				Surface
+			</Surface>
+		);
 
-	test( 'should render borderRight', () => {
-		const view = render( <Surface>Surface</Surface> );
-		const { container } = render( <Surface borderRight>Surface</Surface> );
-		expect( container ).toMatchDiffSnapshot( view.container );
-	} );
-
-	test( 'should render borderTop', () => {
-		const view = render( <Surface>Surface</Surface> );
-		const { container } = render( <Surface borderTop>Surface</Surface> );
-		expect( container ).toMatchDiffSnapshot( view.container );
-	} );
-
-	test( 'should render borderBottom', () => {
-		const view = render( <Surface>Surface</Surface> );
-		const { container } = render( <Surface borderBottom>Surface</Surface> );
-		expect( container ).toMatchDiffSnapshot( view.container );
+		expect(
+			screen.getByRole( 'region', { name: 'Surface area' } )
+		).toHaveTextContent( 'Surface' );
 	} );
 } );

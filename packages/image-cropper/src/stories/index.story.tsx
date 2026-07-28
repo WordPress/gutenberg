@@ -55,7 +55,7 @@ const WithControlsComponent = ( args: ImageCropperProps ) => {
 
 const WithControlsContent = ( args: ImageCropperProps ) => {
 	const { cropperState, setCropperState } = useImageCropper();
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >( null );
 	const { containerStyle, handleOnload } = useHandleOnload( containerRef );
 	const handleRotateLeft = useCallback( () => {
 		setCropperState( { rotation: cropperState.rotation - 90 } );
@@ -198,7 +198,6 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 						value={ cropperState.aspectRatio.toString() }
 						options={ aspectRatioOptions }
 						onChange={ handleAspectRatioChange }
-						__next40pxDefaultSize
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>
@@ -238,7 +237,9 @@ export const WithControls = {
  * @param containerRef - The ref to the container element.
  * @return The container style and the handleOnload function.
  */
-function useHandleOnload( containerRef: React.RefObject< HTMLDivElement > ) {
+function useHandleOnload(
+	containerRef: React.RefObject< HTMLDivElement | null >
+) {
 	const [ containerStyle, setContainerStyle ] = useState< {
 		minHeight?: string;
 		minWidth?: string;

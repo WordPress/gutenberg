@@ -23,21 +23,8 @@ export abstract class BaseAwarenessState<
 	 * Set the current collaborator info in the local state.
 	 */
 	private async setCurrentCollaboratorInfo(): Promise< void > {
-		const states = this.getStates();
-		const otherCollaboratorColors = Array.from( states.entries() )
-			.filter(
-				( [ clientId, state ] ) =>
-					state.collaboratorInfo && clientId !== this.clientID
-			)
-			.map( ( [ , state ] ) => state.collaboratorInfo.color )
-			.filter( Boolean );
-
-		// Get current user info and set it in local state.
 		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
-		const collaboratorInfo = generateCollaboratorInfo(
-			currentUser,
-			otherCollaboratorColors
-		);
+		const collaboratorInfo = generateCollaboratorInfo( currentUser );
 		this.setLocalStateField( 'collaboratorInfo', collaboratorInfo );
 	}
 }

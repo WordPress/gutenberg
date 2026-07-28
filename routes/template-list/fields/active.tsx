@@ -3,13 +3,9 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 export const activeField = {
 	label: __( 'Status' ),
@@ -23,9 +19,9 @@ export const activeField = {
 		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
-			<Badge intent={ isActive ? activeIntent : 'default' }>
+			<WCBadge intent={ isActive ? activeIntent : 'default' }>
 				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
-			</Badge>
+			</WCBadge>
 		);
 	},
 };

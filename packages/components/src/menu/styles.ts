@@ -22,7 +22,9 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - border color and divider color are different from COLORS.theme variables
 // - lighter text color is not defined in COLORS.theme, should it be?
 // - lighter background color is not defined in COLORS.theme, should it be?
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
+// TODO: should use the `stroke-surface-neutral-weak` WPDS token when refactored to SCSS modules
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
@@ -32,12 +34,17 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
+export const Menu = styled( Ariakit.Menu )`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
+`;
+
+export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 	display: grid;
 	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	grid-template-rows: auto;
@@ -59,11 +66,16 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 			? TOOLBAR_VARIANT_BOX_SHADOW
 			: DEFAULT_BOX_SHADOW };
 	` }
+`;
 
-	/* Only visible in Windows High Contrast mode */
-	outline: 2px solid transparent !important;
-
-	/* Open/close animation */
+/**
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
+ * this element wraps the inner surface that receives all merged menu props
+ * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
+ * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
+ * surface via `:has(> …)`.
+ */
+export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
 		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
@@ -72,40 +84,40 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 
-		&:not( [data-submenu] ) {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ) {
 			/* Regardless of the side, fade in and out. */
 			opacity: 0;
-			&[data-enter] {
+			&:has( > ${ MenuSurface }[data-enter] ) {
 				opacity: 1;
 			}
 
 			/* Slide in the direction the menu is opening. */
-			&[data-side='bottom'] {
+			&:has( > ${ MenuSurface }[data-side='bottom'] ) {
 				transform: translateY(
 					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&[data-side='top'] {
+			&:has( > ${ MenuSurface }[data-side='top'] ) {
 				transform: translateY(
 					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&[data-side='left'] {
+			&:has( > ${ MenuSurface }[data-side='left'] ) {
 				transform: translateX(
 					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&[data-side='right'] {
+			&:has( > ${ MenuSurface }[data-side='right'] ) {
 				transform: translateX(
 					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
 				);
 			}
-			&[data-enter][data-side='bottom'],
-			&[data-enter][data-side='top'] {
+			&:has( > ${ MenuSurface }[data-enter][data-side='bottom'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='top'] ) {
 				transform: translateY( 0 );
 			}
-			&[data-enter][data-side='left'],
-			&[data-enter][data-side='right'] {
+			&:has( > ${ MenuSurface }[data-enter][data-side='left'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='right'] ) {
 				transform: translateX( 0 );
 			}
 		}
@@ -114,6 +126,7 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 
 const baseItem = css`
 	all: unset;
+	cursor: pointer;
 
 	position: relative;
 	min-height: ${ space( 8 ) };
@@ -157,7 +170,6 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
 	}
 
 	/* Active item (including hover) */

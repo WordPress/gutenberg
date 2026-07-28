@@ -150,24 +150,10 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	// Run through the actions that are typically taken on the_content.
-	$content                       = shortcode_unautop( $content );
-	$content                       = do_shortcode( $content );
-	$seen_ids[ $template_part_id ] = true;
-	$content                       = do_blocks( $content );
-	unset( $seen_ids[ $template_part_id ] );
-	$content = wptexturize( $content );
-	$content = convert_smilies( $content );
-	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
+	$content = _wp_apply_block_content_filters( $content, "template_part_{$area}", $seen_ids, $template_part_id );
 
-	/**
-	 * Handle embeds for block template parts.
-	 *
-	 * @global WP_Embed $wp_embed WordPress Embed object.
-	 */
-	global $wp_embed;
-	$content = $wp_embed->autoembed( $content );
-
-	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
+	$tag_name = $attributes['tagName'] ?? null;
+	if ( empty( $tag_name ) || ! is_string( $tag_name ) || tag_escape( $tag_name ) !== $tag_name ) {
 		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];
@@ -195,7 +181,7 @@ function build_template_part_block_area_variations( $instance_variations ) {
 	$defined_areas = get_allowed_block_template_part_areas();
 
 	foreach ( $defined_areas as $area ) {
-		if ( 'uncategorized' !== $area['area'] ) {
+		if ( 'uncategorized' !== $area['area'] && 'navigation-overlay' !== $area['area'] ) {
 			$has_instance_for_area = false;
 			foreach ( $instance_variations as $variation ) {
 				if ( $variation['attributes']['area'] === $area['area'] ) {
@@ -250,6 +236,13 @@ function build_template_part_block_instance_variations() {
 	$icon_by_area  = array_combine( array_column( $defined_areas, 'area' ), array_column( $defined_areas, 'icon' ) );
 
 	foreach ( $template_parts as $template_part ) {
+		// Navigation overlay template parts should not appear in the
+		// general inserter. They are managed through the Navigation
+		// block's overlay template part selector.
+		$scope = ( 'navigation-overlay' === $template_part->area )
+			? array()
+			: array( 'inserter' );
+
 		$variations[] = array(
 			'name'        => 'instance_' . sanitize_title( $template_part->slug ),
 			'title'       => $template_part->title,
@@ -263,7 +256,7 @@ function build_template_part_block_instance_variations() {
 				'theme' => $template_part->theme,
 				'area'  => $template_part->area,
 			),
-			'scope'       => array( 'inserter' ),
+			'scope'       => $scope,
 			'icon'        => $icon_by_area[ $template_part->area ] ?? null,
 			'example'     => array(
 				'attributes' => array(

@@ -12,10 +12,6 @@
 		"parentPageID": {
 			"type": "integer",
 			"default": 0
-		},
-		"isNested": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"usesContext": [
@@ -31,7 +27,9 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick"
+		"openSubmenusOnClick",
+		"submenuVisibility",
+		"core/isInsideSubmenu"
 	],
 	"supports": {
 		"anchor": true,

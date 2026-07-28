@@ -1,28 +1,32 @@
 # FocalPointPicker
 
-Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image. This component addresses a specific problem: with large background images it is common to see undesirable crops, especially when viewing on smaller viewports such as mobile phones. This component allows the selection of the point with the most important visual information and returns it as a pair of numbers between 0 and 1. This value can be easily converted into the CSS `background-position` attribute, and will ensure that the focal point is never cropped out, regardless of viewport.
+Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
 
-- Example focal point picker value: `{ x: 0.5, y: 0.1 }`
-- Corresponding CSS: `background-position: 50% 10%;`
+It addresses two common issues when displaying images in cropped containers. First, large background images can be cropped in undesirable ways, especially on smaller viewports such as mobile devices. Second, the CSS aspect-ratio property can inadvertently crop out the area of highest visual interest. This component allows the selection of the point with the most important visual information and returns it as a pair of numbers between 0 and 1. The output value can be applied to either CSS `background-position` (for elements with `background-image`) or `object-position` (for `<img>` / `<video>` elements rendered with `object-fit: cover`).
+
+-   Example focal point picker value: `{ x: 0.5, y: 0.1 }`;
+-   Corresponding CSS: `object-position: 50% 10%`;
 
 ## Usage
 
 ```jsx
-import { useState } from 'react';
 import { FocalPointPicker } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ focalPoint, setFocalPoint ] = useState( {
 		x: 0.5,
-		y: 0.5,
+		y: 0.1,
 	} );
 
 	const url = '/path/to/image';
 
 	/* Example function to render the CSS styles based on Focal Point Picker value */
 	const style = {
-		backgroundImage: `url(${ url })`,
-		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
+		width: '100%',
+		aspectRatio: '16 / 9',
+		objectFit: 'cover',
+		objectPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
 	};
 
 	return (
@@ -34,7 +38,7 @@ const Example = () => {
 				onDrag={ setFocalPoint }
 				onChange={ setFocalPoint }
 			/>
-			<div style={ style } />
+			<img src={ url } alt="" style={ style } />
 		</>
 	);
 };

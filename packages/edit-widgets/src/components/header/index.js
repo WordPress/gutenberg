@@ -5,10 +5,11 @@ import { BlockToolbar } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Popover, VisuallyHidden } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -41,8 +42,8 @@ function Header() {
 					) }
 					{ ! isLargeViewport && (
 						<VisuallyHidden
-							as="h1"
 							className="edit-widgets-header__title"
+							render={ <h1 /> }
 						>
 							{ __( 'Widgets' ) }
 						</VisuallyHidden>

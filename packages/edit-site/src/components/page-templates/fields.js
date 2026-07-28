@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -34,7 +34,7 @@ import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
 
@@ -125,7 +125,7 @@ function AuthorField( { item } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ imageUrl && (
 				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
+					className={ clsx( 'fields-controls__author-avatar', {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
@@ -137,11 +137,11 @@ function AuthorField( { item } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
-					<Icon icon={ icon } />
+				<div className="fields-controls__author-icon">
+					<WCIcon icon={ icon } />
 				</div>
 			) }
-			<span className="page-templates-author-field__name">{ text }</span>
+			<span className="fields-controls__author-name">{ text }</span>
 		</HStack>
 	);
 }
@@ -165,9 +165,9 @@ export const activeField = {
 		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
-			<Badge intent={ isActive ? activeIntent : 'default' }>
+			<WCBadge intent={ isActive ? activeIntent : 'default' }>
 				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
-			</Badge>
+			</WCBadge>
 		);
 	},
 };
@@ -183,9 +183,9 @@ export const useThemeField = () => {
 			getValue: ( { item } ) => item.theme,
 			render: function Render( { item } ) {
 				if ( item.theme === activeTheme.stylesheet ) {
-					return <Badge intent="success">{ item.theme }</Badge>;
+					return <WCBadge intent="success">{ item.theme }</WCBadge>;
 				}
-				return <Badge intent="error">{ item.theme }</Badge>;
+				return <WCBadge intent="error">{ item.theme }</WCBadge>;
 			},
 		} ),
 		[ activeTheme ]

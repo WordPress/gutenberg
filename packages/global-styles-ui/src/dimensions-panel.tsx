@@ -22,6 +22,7 @@ const DEFAULT_CONTROLS = {
 	blockGap: true,
 	height: true,
 	minHeight: true,
+	minWidth: true,
 	width: true,
 	childLayout: false,
 };
@@ -82,6 +83,7 @@ export default function DimensionsPanel() {
 			settings={ settings }
 			includeLayoutControls
 			defaultControls={ DEFAULT_CONTROLS }
+			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }

@@ -114,7 +114,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [
@@ -139,7 +138,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
 							onChange={ ( value ) =>

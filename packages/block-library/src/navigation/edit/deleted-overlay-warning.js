@@ -12,7 +12,7 @@ import { createInterpolateElement } from '@wordpress/element';
  * @param {Function} props.onClear    Callback to clear the overlay selection.
  * @param {Function} props.onCreate   Callback to create a new overlay.
  * @param {boolean}  props.isCreating Whether a new overlay is being created.
- * @return {JSX.Element} The deleted overlay warning component.
+ * @return {React.JSX.Element} The deleted overlay warning component.
  */
 function DeletedOverlayWarning( { onClear, onCreate, isCreating = false } ) {
 	const message = createInterpolateElement(

@@ -22,7 +22,7 @@ export function getAllRoutes( rootDir ) {
 		return readdirSync( routesPath, { withFileTypes: true } )
 			.filter( ( dirent ) => dirent.isDirectory() )
 			.map( ( dirent ) => dirent.name );
-	} catch ( error ) {
+	} catch {
 		// Routes directory doesn't exist, return empty array
 		return [];
 	}

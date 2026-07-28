@@ -175,16 +175,14 @@ store( 'myFruitPlugin', {
 
 The derived state, regardless of whether it derives from the global state, local context, or both, can also be processed on the server by the Server Directive Processing.
 
-_Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
+_Please, visit the [Understanding global state, local context, derived state and config](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md) guide to learn more about how derived state works in the Interactivity API._
 
 ### Derived state that can be defined statically
 
 Let's imagine adding a button that can delete all fruits:
 
 ```html
-<button data-wp-on--click="actions.deleteFruits">
-	Delete all fruits
-</button>
+<button data-wp-on--click="actions.deleteFruits">Delete all fruits</button>
 ```
 
 ```javascript
@@ -322,6 +320,7 @@ wp_interactivity_state( 'myFruitPlugin', array(
   'fruits'         => array( __( 'Apple' ), __( 'Banana' ), __( 'Cherry' ) ),
   'shoppingList'   => array( __( 'Apple' ), __( 'Cherry' ) ),
   // ...
+) );
 ?>
 
 <div data-wp-interactive="myFruitPlugin">
@@ -405,7 +404,7 @@ const { state } = store( 'myFruitPlugin', {
       const context = getContext();
       return state.translatedFruits[ context.item ];
     }
-  }
+  },
   actions: {
     addMango() {
       state.fruits.push( 'mango' );
@@ -420,24 +419,28 @@ const { state } = store( 'myFruitPlugin', {
 </template>
 ```
 
-Serializing information from the server can also be useful in other scenarios, such as passing Ajax/REST-API URLs and nonces.
+Passing non-reactive, static data from the server—such as Ajax/REST-API URLs and nonces—is also a common need. Because these values never change at runtime, they belong in the **config** rather than the global state. Use `wp_interactivity_config()` on the server and `getConfig()` on the client.
 
 ```php
-wp_interactivity_state( 'myPlugin', array(
+wp_interactivity_config( 'myPlugin', array(
   'ajaxUrl' => admin_url( 'admin-ajax.php' ),
   'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
 ));
 ```
 
 ```js
-const { state } = store( 'myPlugin', {
+import { store, getConfig } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
 	actions: {
 		*doSomething() {
+			const { ajaxUrl, nonce } = getConfig();
+
 			const formData = new FormData();
 			formData.append( 'action', 'do_something' );
-			formData.append( '_ajax_nonce', state.nonce );
+			formData.append( '_ajax_nonce', nonce );
 
-			const data = yield fetch( state.ajaxUrl, {
+			const data = yield fetch( ajaxUrl, {
 				method: 'POST',
 				body: formData,
 			} ).then( ( response ) => response.json() );

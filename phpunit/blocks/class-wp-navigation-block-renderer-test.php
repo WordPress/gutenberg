@@ -27,12 +27,20 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
-		$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		$this->assertEquals( $expected, $result );
+		if ( is_wp_version_compatible( '7.0' ) ) {
+			$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		} else {
+			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
+			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
+			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+			$this->assertEquals( $expected, $result );
+		}
 	}
 
 	/**
@@ -55,7 +63,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
@@ -93,7 +103,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -147,7 +159,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -169,7 +183,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$attributes = array( 'ref' => 0 );
 
 		$actual   = $method->invoke( $reflection, $attributes );
@@ -254,6 +270,98 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns true when HTML contains the close button element.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_true_when_close_button_present() {
+		$html   = '<div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button">Close</button></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns false when HTML does not contain the close button.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_false_when_absent() {
+		$html   = '<div class="wp-block-group"><p>No close button here</p></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block returns false when class string appears only in text content.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_gutenberg_block_core_navigation_overlay_html_has_close_block_returns_false_when_class_in_text_only() {
+		$html   = '<p>Use the wp-block-navigation-overlay-close button to close</p>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block finds nested close button.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_block_core_navigation_overlay_html_has_close_block_finds_nested_close_button() {
+		$html   = '<div class="wp-block-group"><div class="wp-block-group"><button class="wp-block-navigation-overlay-close" type="button" aria-label="Close"><svg>...</svg></button></div></div>';
+		$result = gutenberg_block_core_navigation_overlay_html_has_close_block( $html );
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_overlay_html_has_close_block detects close block when overlay content is a pattern.
+	 *
+	 * Simulates the bug scenario: template part contains wp:pattern, pattern renders its content including the close block.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_overlay_html_has_close_block
+	 */
+	public function test_block_core_navigation_overlay_html_has_close_block_detects_close_in_pattern_output() {
+		register_block_pattern(
+			'test/navigation-overlay-pattern',
+			array(
+				'title'       => 'Navigation Overlay Pattern',
+				'content'     => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation-overlay-close /--></div><!-- /wp:group -->',
+				'description' => 'Pattern containing navigation-overlay-close (simulates overlay template part using pattern).',
+				'categories'  => array( 'navigation' ),
+			)
+		);
+
+		try {
+			// Simulate overlay template part content: just a pattern block (unresolved in block tree).
+			$parsed_blocks = parse_blocks( '<!-- wp:pattern {"slug":"test/navigation-overlay-pattern"} /-->' );
+			$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+			// Render blocks (pattern block's render_callback outputs pattern content).
+			$html = '';
+			foreach ( $blocks as $block ) {
+				$html .= $block->render();
+			}
+
+			$this->assertTrue(
+				gutenberg_block_core_navigation_overlay_html_has_close_block( $html ),
+				'Close block should be detected in rendered pattern output (fixes #76567).'
+			);
+		} finally {
+			unregister_block_pattern( 'test/navigation-overlay-pattern' );
+		}
+	}
+
+	/**
 	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type skips searching inside specified block types.
 	 *
 	 * @group navigation-renderer
@@ -278,5 +386,49 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that shortcodes inside a Navigation Overlay template part are expanded
+	 * rather than output as raw shortcode tokens.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/77510
+	 */
+	public function test_shortcode_block_in_navigation_overlay_is_rendered() {
+		add_shortcode(
+			'gb_test_overlay_shortcode',
+			static function () {
+				return 'Hello, World!';
+			}
+		);
+
+		$current_theme = get_stylesheet();
+		$slug          = 'test-overlay-with-shortcode';
+
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay With Shortcode',
+				'post_name'    => $slug,
+				'post_content' => '<!-- wp:shortcode -->[gb_test_overlay_shortcode]<!-- /wp:shortcode -->',
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'
+		);
+
+		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
+		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -14,24 +14,30 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 
 export default function NavigationBlockEditingMode() {
+	const registry = useRegistry();
 	// In the navigation block editor,
 	// the navigation block is the only root block.
 	const blockClientId = useSelect(
 		( select ) => select( blockEditorStore ).getBlockOrder()?.[ 0 ],
 		[]
 	);
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! blockClientId ) {
 			return;
 		}
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
+		__unstableMarkNextChangeAsNotPersistent();
 		setBlockEditingMode( blockClientId, 'contentOnly' );
 
 		return () => {
+			__unstableMarkNextChangeAsNotPersistent();
 			unsetBlockEditingMode( blockClientId );
 		};
-	}, [ blockClientId, unsetBlockEditingMode, setBlockEditingMode ] );
+	}, [ registry, blockClientId ] );
 }

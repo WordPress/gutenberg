@@ -28,23 +28,7 @@ const getNavigableMenuFocusables = () => [
 	screen.getByRole( 'link', { name: 'Item 4' } ),
 ];
 
-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-
 describe( 'NavigableMenu', () => {
-	beforeAll( () => {
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
 		const user = userEvent.setup();
 
@@ -213,6 +197,30 @@ describe( 'NavigableMenu', () => {
 
 		await user.keyboard( '[Escape]' );
 		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should keep forwarded callback refs stable across rerenders', () => {
+		const refSpy = jest.fn();
+
+		const { rerender } = render(
+			<NavigableMenu ref={ refSpy }>
+				<button>Item 1</button>
+			</NavigableMenu>
+		);
+
+		expect( refSpy ).toHaveBeenCalledTimes( 1 );
+		expect( refSpy ).toHaveBeenCalledWith( expect.any( HTMLElement ) );
+
+		rerender(
+			<NavigableMenu ref={ refSpy }>
+				<button>Item 1</button>
+			</NavigableMenu>
+		);
+
+		// With a stable merged ref (useMergeRefs), the callback ref should
+		// not be called again on rerender. Previously, an inline ref callback
+		// would cause React to detach (null) and reattach on every render.
+		expect( refSpy ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'skips its internal logic when the tab key is pressed', async () => {

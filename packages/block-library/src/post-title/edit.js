@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -34,7 +28,7 @@ import { createInterpolateElement } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	attributes: { level, levelOptions, textAlign, isLink, rel, linkTarget },
+	attributes: { level, levelOptions, isLink, rel, linkTarget, placeholder },
 	setAttributes,
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
@@ -69,18 +63,18 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const onSplitAtEnd = () => {
-		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
-	};
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const onSplitAtEnd = insertBlocksAfter
+		? () => {
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+		  }
+		: undefined;
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
+	let titleElement = (
+		<TagName { ...blockProps }>{ placeholder || __( 'Title' ) }</TagName>
+	);
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (
@@ -147,12 +141,6 @@ export default function PostTitleEdit( {
 								setAttributes( { level: newLevel } )
 							}
 						/>
-						<AlignmentControl
-							value={ textAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { textAlign: nextAlign } );
-							} }
-						/>
 					</BlockControls>
 					<InspectorControls>
 						<ToolsPanel
@@ -217,7 +205,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
 											label={ __( 'Link relation' ) }
 											help={ createInterpolateElement(
 												__(

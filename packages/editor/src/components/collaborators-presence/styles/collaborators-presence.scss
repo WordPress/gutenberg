@@ -4,21 +4,28 @@
 .editor-collaborators-presence {
 	display: flex;
 	align-items: center;
+	flex-shrink: 0;
 	height: $button-size-compact;
-	min-width: 0;
 	background: $gray-100;
 	border-radius: $grid-unit-05;
-	margin-right: $grid-unit-10;
 
 	&:hover {
 		background-color: $gray-200;
 	}
+
+	&:has(.is-pressed) {
+		background-color: $gray-200;
+	}
+}
+
+.editor-header__center .editor-collaborators-presence {
+	margin-right: $grid-unit-10;
 }
 
 .editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
 	display: flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	position: relative;
 	padding: $grid-unit-05;
 	border-radius: $grid-unit-05;
@@ -33,10 +40,10 @@
 		color: $gray-800;
 	}
 
-	// Override pressed state - keep it like document bar style
+	// Override pressed state - let the container handle the background
 	&.is-pressed,
 	&.is-pressed:hover {
-		background: $gray-300;
+		background: transparent;
 		color: $gray-800;
 	}
 
@@ -44,40 +51,5 @@
 	&:focus:not(:active) {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #007cba);
 		outline: none;
-	}
-
-	// Avatar remaining count
-	.editor-collaborators-presence__remaining {
-		margin-right: $grid-unit-05 + 2;
-	}
-
-	// Avatar styles
-	.editor-collaborators-presence__avatar {
-		margin-left: -16px;
-		flex-shrink: 0;
-		border-color: $gray-100;
-
-		&:nth-child(1) {
-			margin-left: 0;
-			z-index: 3;
-		}
-
-		&:nth-child(2) {
-			z-index: 2;
-		}
-
-		&:nth-child(3) {
-			z-index: 1;
-		}
-	}
-
-	// Avatar hover state
-	.editor-collaborators-presence:hover & .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
-	}
-
-	// Avatar pressed state
-	&.is-pressed .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
 	}
 }

@@ -6,11 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { VisuallyHidden } from '@wordpress/components';
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -162,8 +161,8 @@ function ActivityItem< Item >(
 								className="dataviews-view-activity__item-field"
 							>
 								<VisuallyHidden
-									as="span"
 									className="dataviews-view-activity__item-field-label"
+									render={ <span /> }
 								>
 									{ field.label }
 								</VisuallyHidden>
