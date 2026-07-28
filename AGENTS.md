@@ -17,7 +17,7 @@ npm run build # Production build
 
 ### Key Directories
 
--   `/packages/` - JavaScript packages (each has README.md and CHANGELOG.md)
+-   `/packages/` - JavaScript packages (each has a `README.md` and `CHANGELOG.md`). Production package changes that affect external consumers require an entry in that package’s `CHANGELOG.md`. Consumer-visible changes include public API additions, removals, or behavior changes; changes observable through supported components or APIs; compatibility fixes; and changes to published package output. Do not add entries for tests, refactors, private APIs, or other internal implementation changes that have no effect on package consumers.
 -   `/lib/` - PHP code
 -   `/lib/compat/wordpress-X.Y/` - Version-specific features (new PHP features usually go here)
 -   `/phpunit/` - PHP tests

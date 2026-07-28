@@ -257,7 +257,7 @@ It's very important to have a good plan for what a new package will include. All
 
 When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
 
-For each pull request, you should always include relevant changes under an "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
+For each pull request with consumer-visible package changes, include the relevant changes under the “Unreleased” heading. Consumer-visible changes include public API additions, removals, or behavior changes; changes observable through supported components or APIs; compatibility fixes; and changes to published package output. Omit changelog entries for tests, refactors, private APIs, and other internal-only changes that do not affect package consumers.
 
 _Example:_
 
