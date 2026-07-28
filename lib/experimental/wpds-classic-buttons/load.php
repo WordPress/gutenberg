@@ -54,16 +54,29 @@ function gutenberg_wpds_classic_buttons_enqueue() {
 		$token_deps[] = 'gutenberg-wpds-tokens';
 	}
 
-	// 2. Best-effort dequeue of the classic handle (effective only where it was
-	//    enqueued standalone rather than pulled in as a `colors` dependency).
+	// 2. Actually remove Core's classic `buttons` stylesheet. It is registered as
+	//    a hard dependency of the `colors` handle, so `wp_dequeue_style( 'buttons' )`
+	//    alone is ignored — the dependency resolver re-adds it. So first strip
+	//    `buttons` from every registered handle's dependency list, then dequeue it.
+	//    Our regenerated stylesheet is the replacement. (A real Core rollout would
+	//    make this unnecessary by re-authoring buttons.css from tokens directly;
+	//    doing it from a plugin requires this dependency-graph surgery.)
+	$styles = wp_styles();
+	foreach ( $styles->registered as $handle_data ) {
+		$index = array_search( 'buttons', $handle_data->deps, true );
+		if ( false !== $index ) {
+			unset( $handle_data->deps[ $index ] );
+			$handle_data->deps = array_values( $handle_data->deps );
+		}
+	}
 	wp_dequeue_style( 'buttons' );
 
-	// 3. Enqueue the token-based regeneration, ordered after `buttons`/`colors`
-	//    so it reliably overrides them.
+	// 3. Enqueue the token-based regeneration, ordered after `colors` and the
+	//    tokens so it lands late in the cascade.
 	wp_enqueue_style(
 		'gutenberg-wpds-classic-buttons',
 		$base_url . 'buttons.css',
-		array_merge( array( 'buttons', 'colors' ), $token_deps ),
+		array_merge( array( 'colors' ), $token_deps ),
 		$version
 	);
 }

@@ -7,7 +7,7 @@
 	},
 
 	"variantMap": {
-		"(base — no variant class)": ":is(.button, .button-primary, .button-secondary)",
+		"(base — no variant class)": ":is(.button, .button-primary, .button-secondary, .button-link)",
 		"is-primary": ".button-primary",
 		"is-secondary": ":is(.button-secondary, .button:not(.button-primary))",
 		"is-link": ".button-link"
@@ -22,9 +22,9 @@
 
 	"forced": {
 		"height": {
-			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary)",
+			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary):not(.button-small):not(.button-compact)",
 			"value": "var(--wpds-dimension-size-lg)",
-			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule."
+			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule. Excludes small (24px) and compact (32px) so those keep their own heights, and excludes link (auto height)."
 		}
 	},
 
