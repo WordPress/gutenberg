@@ -38,10 +38,34 @@ Use the package documentation as the source of durable facts:
 ## Build with public packages
 
 Choose an existing public component and composition before introducing an
-application-local custom control. `@wordpress/components` remains part of the
-supported design-system surface. Do not migrate to `@wordpress/ui` merely
-because it is newer; preserve behavioural, styling, accessibility, and
-compatibility parity for an intentional migration.
+application-local custom control.
+
+### Choose a recommended component
+
+`@wordpress/ui` is intended to supersede the global components in
+`@wordpress/components`, but the transition happens component by component.
+Package age alone does not determine which component to use.
+
+For the current package versions, use the maintained recommendation sources
+instead of copying component mappings into documentation or agent instructions:
+
+1. When available, query the WordPress Design System MCP server with
+   `get_components`, then use `get_component_details` for the relevant
+   component. Its component catalog is generated from the curated Storybook
+   manifest and returns the currently recommended package and import.
+2. Otherwise, follow the
+   [`use-recommended-components` ESLint rule](/packages/eslint-plugin/docs/rules/use-recommended-components.md).
+   It lists explicit replacements and the `@wordpress/ui` components currently
+   recommended for WordPress environments.
+3. When the rule does not cover a component, consult its
+   [Storybook documentation](https://wordpress.github.io/gutenberg/)
+   `componentStatus` and notes. That status is more authoritative than an
+   `experimental` tag or component prefix.
+
+For an application on older package versions, use the corresponding version of
+those sources and verify the choice against its installed exports, types, and
+documentation. Preserve behavioural, styling, accessibility, and compatibility
+parity when migrating an existing component.
 
 Use semantic `--wpds-*` custom properties from the generated reference. Token
 names and values change over time, so do not copy a token inventory into a

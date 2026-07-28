@@ -24,52 +24,43 @@ Identify the target checkout or installed package versions, the runtime
 (standard WordPress screen, separate application, iframe, or portal), and the
 user-facing behaviour. Treat that local target as the compatibility boundary.
 
+Before selecting a component, identify the actual rendering owner and parent
+surface, runtime document, providers and styles present in that subtree, and
+nearest same-surface precedent. Do not infer the UI boundary from the package
+folder alone.
+
 Before writing custom UI, determine whether an existing public component, token,
 or composition already meets the need. The absence of an existing Design System
 import does not establish that a custom control is necessary.
 
-If a WordPress Design System MCP server is available, use it to discover the
-current vocabulary and components. Then verify the recommendation against the
-target's public contract. The MCP result does not make an API available in an
-older checkout or package release.
-
-Read the target package documentation before coding. In a local Gutenberg
-checkout, use:
-
-- [`@wordpress/components`](../../packages/components/README.md)
-- [`@wordpress/ui`](../../packages/ui/README.md)
-- [`@wordpress/theme`](../../packages/theme/README.md)
-- [Design Tokens Reference](../../packages/theme/docs/tokens.md)
-- [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
-
-When the target package is installed rather than checked out, read the
-corresponding documentation shipped with that package. When target
-documentation is unavailable, use these portable fallback links only to
-discover possibilities, not to establish target-version availability:
-
-- [`@wordpress/components`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/README.md)
-- [`@wordpress/ui`](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md)
-- [`@wordpress/theme`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md)
-- [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)
-- [Working with WordPress Design System packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/design/design-system-packages.md)
+Follow the current recommendation sources and target-version checks in
+[Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component).
+When the target packages are installed rather than checked out, use the
+corresponding version of their shipped documentation. Trunk documentation and
+MCP results can identify possibilities, but do not establish availability in an
+older release.
 
 ## Choose and compose
 
 1. Look for an existing public component and compose it before creating an
    application-local control.
-2. Use the package whose documented public API and setup match the target.
-   `@wordpress/components` remains supported; do not mechanically replace it
-   with `@wordpress/ui`.
+2. Use the package and import selected by the current recommendation sources;
+   do not infer the choice from package age.
 3. Use semantic `--wpds-*` tokens from the generated reference. Do not copy
    token inventories, package-private CSS modules, Base UI details, or source
    paths into application code.
-4. Apply the documented setup for the target document. In particular, check
-   stylesheets and theme delivery for a separate document, iframe, or portal.
-   When directly bundling both UI packages, use their documented overlay
-   compatibility path.
+4. Apply the
+   [document-specific setup](../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document).
+   For an iframe, popup, or other document, read
+   [`@wordpress/theme`'s “Across documents” section](../../packages/theme/README.md#across-documents-iframes-and-other-portals)
+   and the linked target-package setup before editing.
 5. Preserve existing behaviour during a package migration. Establish visual,
    interaction, accessibility, and compatibility parity before replacing a
    working component.
+
+Stop searching when one recommended public option satisfies the required
+behaviour and target setup. Search outside the target surface only when local
+evidence is absent, unsuitable, or migration compatibility is in scope.
 
 ## Verify
 
@@ -79,6 +70,9 @@ Run the application's relevant checks and manually verify the changed UI:
   responsive behaviour;
 - stylesheet and token availability in every document that renders the UI;
 - portals, overlays, and mixed-package behaviour where applicable.
+
+Before declaring completion, recheck each rendering document and exercise the
+changed interaction in its real context.
 
 ## Escalate a design-system gap
 
