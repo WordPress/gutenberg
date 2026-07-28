@@ -104,7 +104,11 @@ test( 'replaces links generated from the former skills directory', async ( t ) =
 
 	await mkdir( oldSkillDirectory, { recursive: true } );
 	await mkdir( path.dirname( target ), { recursive: true } );
-	await symlink( oldSkillDirectory, target, 'dir' );
+	await symlink(
+		oldSkillDirectory,
+		target,
+		process.platform === 'win32' ? 'junction' : 'dir'
+	);
 	await rm( oldSkillDirectory, { recursive: true, force: true } );
 	const result = await setupSkills( { repositoryRoot } );
 
