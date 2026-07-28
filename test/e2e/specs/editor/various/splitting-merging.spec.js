@@ -293,6 +293,24 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
 			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+
 		await page.keyboard.press( 'Delete' );
 		await page.keyboard.type( '|' );
 
