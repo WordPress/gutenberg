@@ -20,9 +20,11 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { useNativeUndo } from '../../utils/native-undo';
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
+	const nativeUndoRef = useNativeUndo();
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -85,7 +87,7 @@ function BlockHTML( { clientId } ) {
 			onChange={ ( event ) => setHtml( event.target.value ) }
 			// The edits are local state until committed on blur, so undo
 			// and redo must remain the browser's own within the field.
-			data-wp-native-undo
+			ref={ nativeUndoRef }
 		/>
 	);
 }

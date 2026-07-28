@@ -4,36 +4,18 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-/**
- * Returns true when the event originates from an element marked with
- * `data-wp-native-undo`: the browser's own undo acts on its content (a
- * dialog input, an HTML editing field, a search field), so the editor
- * history must not.
- *
- * Events coming from the editor canvas are re-dispatched on the iframe
- * element, so the real target is resolved through the frame's focused
- * element.
- *
- * @param {KeyboardEvent} event Keyboard event.
- *
- * @return {boolean} Whether the element relies on the browser's own undo.
- */
-function usesNativeUndo( event ) {
-	let { target } = event;
-
-	if ( target?.nodeName === 'IFRAME' ) {
-		target = target.contentDocument?.activeElement;
-	}
-
-	return !! target?.closest?.( '[data-wp-native-undo]' );
-}
+const { usesNativeUndo } = unlock( blockEditorPrivateApis );
 
 /**
  * Handles the keyboard shortcuts for the editor.
