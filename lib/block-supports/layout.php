@@ -965,14 +965,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$child_layout = $style_attr['layout'] ?? null;
 
 	/*
-	 * Responsive child layouts are nested under a style state key such as
-	 * `@mobile`. Which of those keys are active depends on the breakpoints in
-	 * global settings, but whether any of them exist at all does not, so this
-	 * can be answered without resolving settings.
+	 * Responsive child layouts are nested under a style state key, which is
+	 * always prefixed with `@`, for example `@mobile`. Which of those keys map
+	 * to an active breakpoint depends on global settings, but whether any of
+	 * them carry a child layout does not, so this can be answered without
+	 * resolving settings.
 	 */
 	$has_state_child_layout = false;
-	foreach ( (array) $style_attr as $state_styles ) {
-		if ( is_array( $state_styles ) && ! empty( $state_styles['layout'] ) ) {
+	foreach ( (array) $style_attr as $state => $state_styles ) {
+		if (
+			is_string( $state ) && str_starts_with( $state, '@' ) &&
+			is_array( $state_styles ) && ! empty( $state_styles['layout'] )
+		) {
 			$has_state_child_layout = true;
 			break;
 		}

@@ -1255,4 +1255,63 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'Global settings should still be resolved for a block that supports layout.'
 		);
 	}
+
+	/**
+	 * Tests that a child layout carried only by a style state, with no base
+	 * `style.layout`, still gets its container class and media query rule.
+	 *
+	 * The block deliberately has no layout support of its own, so the only
+	 * thing keeping it from hitting the early return is the style state scan.
+	 * That scan runs before the active breakpoints are known, so it has to
+	 * decide from the style attribute alone.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_renders_child_layout_from_style_state_only() {
+		switch_theme( 'default' );
+
+		$block_content = '<p>Grid child</p>';
+		$block         = array(
+			'blockName'    => 'core/paragraph',
+			'attrs'        => array(
+				'style' => array(
+					'@mobile' => array(
+						'layout' => array( 'columnSpan' => '2' ),
+					),
+				),
+			),
+			'parentLayout' => array(
+				'type'        => 'grid',
+				'columnCount' => 3,
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => $block_content,
+			'innerContent' => array( $block_content ),
+		);
+
+		$output = gutenberg_render_layout_support_flag( $block_content, $block );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$processor->next_tag();
+
+		$container_content_class = '';
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_starts_with( $class_name, 'wp-container-content-' ) ) {
+				$container_content_class = $class_name;
+				break;
+			}
+		}
+
+		$this->assertNotSame(
+			'',
+			$container_content_class,
+			'A block with no layout support whose only child layout sits under `@mobile` should still get a container content class.'
+		);
+
+		$this->assertStringContainsString(
+			"@media (width <= 480px){.$container_content_class{grid-column:span 2;}}",
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) ),
+			'The child layout should be emitted inside the mobile media query.'
+		);
+	}
 }
