@@ -3,6 +3,7 @@
  */
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
+import * as buffer from 'lib0/buffer';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -858,8 +859,8 @@ describe( 'SyncManager', () => {
 		} );
 	} );
 
-	describe( 'autosave markers', () => {
-		it( 'records and reads an author-keyed autosave marker', async () => {
+	describe( 'autosave snapshots', () => {
+		async function loadEntityCapturingDoc() {
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
 				capturedDoc = ydoc;
@@ -876,32 +877,75 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			manager.markEntityAutosaved( 'post', '123', 42, 1000 );
+			return { manager, ydoc: capturedDoc as unknown as Y.Doc };
+		}
 
-			expect( manager.getEntityAutosavedAt( 'post', '123', 42 ) ).toBe(
-				1000
-			);
+		it( 'encodes a snapshot the same document satisfies', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+
+			const stateVectorBefore = Y.encodeStateVector( ydoc );
+
+			const snapshot = manager.getEntitySnapshot( 'post', '123' );
+
+			expect( typeof snapshot ).toBe( 'string' );
 			expect(
-				manager.getEntityAutosavedAt( 'post', '123', 7 )
-			).toBeUndefined();
+				manager.entityContainsSnapshot( 'post', '123', snapshot ?? '' )
+			).toBe( true );
 
-			// The marker lives in the state map, not the record map, so it
-			// does not touch the entity data or the undo scope.
-			const ydoc = capturedDoc as unknown as Y.Doc;
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( `autosavedAt:42` ) ).toBe( 1000 );
+			// Neither call writes to the document, so the state vector is
+			// unchanged and nothing enters the undo scope.
+			expect( Y.encodeStateVector( ydoc ) ).toEqual( stateVectorBefore );
 			expect( manager.undoManager?.hasUndo() ).toBe( false );
 		} );
 
-		it( 'no-ops for entities that are not loaded', async () => {
+		it( 'still matches after the document moves ahead of the snapshot', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+			const snapshot = manager.getEntitySnapshot( 'post', '123' ) ?? '';
+
+			ydoc.getText( 'later' ).insert( 0, 'more content' );
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', snapshot )
+			).toBe( true );
+		} );
+
+		it( 'does not match a snapshot describing content the document lacks', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			// A snapshot from an unrelated document, i.e. content this
+			// document never received.
+			const otherDoc = new Y.Doc();
+			otherDoc.getText( 'text' ).insert( 0, 'content from elsewhere' );
+			const otherSnapshot = buffer.toBase64(
+				Y.encodeSnapshotV2( Y.snapshot( otherDoc ) )
+			);
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', otherSnapshot )
+			).toBe( false );
+		} );
+
+		it( 'fails open for an undecodable snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			expect(
+				manager.entityContainsSnapshot(
+					'post',
+					'123',
+					'not a snapshot!'
+				)
+			).toBe( false );
+		} );
+
+		it( 'fails open for entities that are not loaded', async () => {
 			const manager = createSyncManager();
 
-			expect( () =>
-				manager.markEntityAutosaved( 'post', '456', 42, 1000 )
-			).not.toThrow();
 			expect(
-				manager.getEntityAutosavedAt( 'post', '456', 42 )
+				manager.getEntitySnapshot( 'post', '456' )
 			).toBeUndefined();
+			expect(
+				manager.entityContainsSnapshot( 'post', '456', 'anything' )
+			).toBe( false );
 		} );
 	} );
 

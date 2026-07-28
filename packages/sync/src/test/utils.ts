@@ -11,16 +11,13 @@ import { describe, expect, it, beforeEach } from '@jest/globals';
 import {
 	createYjsDoc,
 	initializeYjsDoc,
-	markEntityAsAutosaved,
 	markEntityAsSaved,
-	readAutosaveMarker,
 	serializeCrdtDoc,
 	deserializeCrdtDoc,
 } from '../utils';
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
-	CRDT_STATE_MAP_AUTOSAVED_AT_KEY_PREFIX as AUTOSAVED_AT_KEY_PREFIX,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
@@ -126,64 +123,6 @@ describe( 'utils', () => {
 			const secondSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
 
 			expect( secondSavedAt ).toBeGreaterThanOrEqual( firstSavedAt );
-		} );
-	} );
-
-	describe( 'markEntityAsAutosaved', () => {
-		it( 'sets an author-keyed autosave timestamp in the state map', () => {
-			const ydoc = createYjsDoc();
-
-			markEntityAsAutosaved( ydoc, 42, 1000 );
-
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
-			expect( stateMap.get( `${ AUTOSAVED_AT_KEY_PREFIX }42` ) ).toBe(
-				1000
-			);
-		} );
-
-		it( 'tracks separate markers per author', () => {
-			const ydoc = createYjsDoc();
-
-			markEntityAsAutosaved( ydoc, 42, 1000 );
-			markEntityAsAutosaved( ydoc, 7, 2000 );
-
-			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 1000 );
-			expect( readAutosaveMarker( ydoc, 7 ) ).toBe( 2000 );
-		} );
-
-		it( 'moves the marker forward for newer autosaves', () => {
-			const ydoc = createYjsDoc();
-
-			markEntityAsAutosaved( ydoc, 42, 1000 );
-			markEntityAsAutosaved( ydoc, 42, 2000 );
-
-			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 2000 );
-		} );
-
-		it( 'never moves the marker backwards', () => {
-			const ydoc = createYjsDoc();
-
-			markEntityAsAutosaved( ydoc, 42, 2000 );
-			markEntityAsAutosaved( ydoc, 42, 1000 );
-
-			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 2000 );
-		} );
-	} );
-
-	describe( 'readAutosaveMarker', () => {
-		it( 'returns undefined when no marker exists', () => {
-			const ydoc = createYjsDoc();
-
-			expect( readAutosaveMarker( ydoc, 42 ) ).toBeUndefined();
-		} );
-
-		it( 'returns undefined for non-numeric marker values', () => {
-			const ydoc = createYjsDoc();
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			stateMap.set( `${ AUTOSAVED_AT_KEY_PREFIX }42`, 'not-a-number' );
-
-			expect( readAutosaveMarker( ydoc, 42 ) ).toBeUndefined();
 		} );
 	} );
 

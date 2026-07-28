@@ -1634,7 +1634,7 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( postType );
 	} );
 
-	describe( 'autosave CRDT markers', () => {
+	describe( 'autosave CRDT snapshots', () => {
 		const persistedRecord = {
 			id: 10,
 			title: 'Test post',
@@ -1650,10 +1650,16 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => persistedRecord,
 			};
 			syncManager = {
-				markEntityAutosaved: jest.fn(),
+				getEntitySnapshot: jest.fn( () => 'ENCODED_SNAPSHOT' ),
 				update: jest.fn(),
 			};
 			getSyncManager.mockReturnValue( syncManager );
+			apiFetch.mockImplementation( () => ( {
+				id: 20,
+				parent: 10,
+				author: 2,
+				modified_gmt: '2026-07-21T10:00:00',
+			} ) );
 		} );
 
 		afterEach( () => {
@@ -1666,7 +1672,11 @@ describe( 'saveEntityRecord', () => {
 			};
 		}
 
-		it( 'records an author-keyed autosave marker after an autosave revision is created', async () => {
+		function getAutosaveRequestData() {
+			return apiFetch.mock.calls[ 0 ][ 0 ].data;
+		}
+
+		it( 'sends the current CRDT snapshot with the autosave request', async () => {
 			resolveSelect = makeResolveSelect( {
 				name: 'post',
 				kind: 'postType',
@@ -1674,31 +1684,58 @@ describe( 'saveEntityRecord', () => {
 				syncConfig: {},
 			} );
 
-			const autosaveResponse = {
-				id: 20,
-				parent: 10,
-				author: 2,
-				modified_gmt: '2026-07-21T10:00:00',
-			};
-			apiFetch.mockImplementation( () => autosaveResponse );
-
 			await saveEntityRecord( 'postType', 'post', persistedRecord, {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
-				10,
-				autosaveResponse
-			);
-			expect( syncManager.markEntityAutosaved ).toHaveBeenCalledWith(
+			expect( syncManager.getEntitySnapshot ).toHaveBeenCalledWith(
 				'postType/post',
-				10,
-				2,
-				Date.parse( '2026-07-21T10:00:00Z' ) / 1000
+				10
+			);
+			expect( getAutosaveRequestData() ).toEqual(
+				expect.objectContaining( {
+					crdt_snapshot: 'ENCODED_SNAPSHOT',
+				} )
 			);
 		} );
 
-		it( 'does not record a marker when the server processed the autosave as a regular save', async () => {
+		it( 'omits the snapshot for entities without a sync config', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+			} );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.getEntitySnapshot ).not.toHaveBeenCalled();
+			expect( getAutosaveRequestData() ).not.toHaveProperty(
+				'crdt_snapshot'
+			);
+			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
+		} );
+
+		it( 'omits the snapshot when the entity is not loaded in the sync manager', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+			syncManager.getEntitySnapshot.mockReturnValue( undefined );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( getAutosaveRequestData() ).not.toHaveProperty(
+				'crdt_snapshot'
+			);
+		} );
+
+		it( 'captures the snapshot before the request is sent', async () => {
 			resolveSelect = makeResolveSelect( {
 				name: 'post',
 				kind: 'postType',
@@ -1706,43 +1743,24 @@ describe( 'saveEntityRecord', () => {
 				syncConfig: {},
 			} );
 
-			// Same ID as the parent post, e.g. a promoted draft or a
-			// redundant no-op autosave.
-			const autosaveResponse = {
-				id: 10,
-				author: 2,
-				modified_gmt: '2026-07-21T10:00:00',
-			};
-			apiFetch.mockImplementation( () => autosaveResponse );
-
-			await saveEntityRecord( 'postType', 'post', persistedRecord, {
-				isAutosave: true,
-			} )( { select, dispatch, resolveSelect } );
-
-			expect( syncManager.markEntityAutosaved ).not.toHaveBeenCalled();
-		} );
-
-		it( 'does not record a marker for entities without a sync config', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
+			// A snapshot captured after the request would describe content
+			// the autosave did not include, which could wrongly suppress the
+			// notice. Assert the ordering directly.
+			const callOrder = [];
+			syncManager.getEntitySnapshot.mockImplementation( () => {
+				callOrder.push( 'snapshot' );
+				return 'ENCODED_SNAPSHOT';
+			} );
+			apiFetch.mockImplementation( () => {
+				callOrder.push( 'fetch' );
+				return { id: 20, parent: 10 };
 			} );
 
-			const autosaveResponse = {
-				id: 20,
-				parent: 10,
-				author: 2,
-				modified_gmt: '2026-07-21T10:00:00',
-			};
-			apiFetch.mockImplementation( () => autosaveResponse );
-
 			await saveEntityRecord( 'postType', 'post', persistedRecord, {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
-			expect( syncManager.markEntityAutosaved ).not.toHaveBeenCalled();
+			expect( callOrder ).toEqual( [ 'snapshot', 'fetch' ] );
 		} );
 	} );
 } );

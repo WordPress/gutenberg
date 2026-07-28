@@ -39,11 +39,12 @@ function isAutosaveResponse( response: Response, postId: number ): boolean {
 test.describe( 'Collaboration - autosave notice suppression', () => {
 	// In RTC, autosaves are stored as per-user revisions and the parent post
 	// stays stale, so WordPress core flags "a more recent autosave" on nearly
-	// every load. When the autosaving client is synced, it records an
-	// author-keyed marker in the shared CRDT document, which lets a later load
-	// verify that the autosaved content is already part of the shared
-	// document and skip the recovery notice. When no marker made it to the
-	// sync backend, the notice must still appear, because the autosave may be
+	// every load. The autosaving client sends a CRDT snapshot describing the
+	// document it captured, which is stored alongside the autosave revision. A
+	// later load verifies its own shared document against that snapshot and
+	// skips the recovery notice when the document already holds everything the
+	// autosave did. When no snapshot was stored, or the document does not
+	// contain it, the notice must still appear, because the autosave may be
 	// the only copy of the content.
 	test( 'does not show the notice when the autosave content is already in the shared document', async ( {
 		collaborationUtils,
@@ -68,7 +69,7 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 
 		// Open a two-user session. The sync update queue is paused in solo
 		// sessions, so a second collaborator is required for the autosaved
-		// content (and its marker) to reach the sync backend.
+		// content to reach the sync backend and be there on reload.
 		await collaborationUtils.openCollaborativeSession( post.id );
 		await collaborationUtils.waitForEntityReady( page, {
 			timeout: 30_000,
@@ -103,7 +104,7 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		);
 
 		// An autosave revision now exists and out-dates the parent post.
-		// Without marker-based suppression, the next load would show the
+		// Without snapshot-based suppression, the next load would show the
 		// recovery notice.
 		const autosaves = await requestUtils.rest< RestPost[] >( {
 			path: `/wp/v2/posts/${ postId }/autosaves`,
@@ -111,13 +112,13 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		} );
 		expect( autosaves.length ).toBeGreaterThan( 0 );
 
-		// Let the autosave marker propagate to the sync backend.
+		// Let the autosaved content propagate to the sync backend.
 		await collaborationUtils.waitForSyncCycle( page, 3, {
 			timeout: 30_000,
 		} );
 
-		// Reload. The shared document contains the autosaved content and the
-		// author's marker, so the notice must not appear.
+		// Reload. The shared document contains everything the autosave
+		// captured, so the notice must not appear.
 		await page.reload();
 		await collaborationUtils.waitForCollaborationReady( page, {
 			timeout: 30_000,
@@ -183,9 +184,11 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		} );
 
 		// Create a newer autosave revision directly via REST, without an
-		// editor client. No marker for it exists in the shared document, so
-		// the editor must fall back to showing the recovery notice. This
-		// guards against regressing into a blanket suppression under RTC.
+		// editor client. No snapshot is stored for it, so the editor has no
+		// evidence the content is in the shared document and must fall back to
+		// showing the recovery notice. This also covers autosaves made outside
+		// the block editor, and guards against regressing into a blanket
+		// suppression under RTC.
 		await requestUtils.rest( {
 			method: 'POST',
 			path: `/wp/v2/posts/${ post.id }/autosaves`,
