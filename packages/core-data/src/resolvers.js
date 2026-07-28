@@ -786,10 +786,9 @@ export const canUserEditEntityRecord =
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
- * @param {number} perPage  The number of autosaves to retrieve. Optional.
  */
 export const getAutosaves =
-	( postType, postId, perPage ) =>
+	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
 		const {
 			rest_base: restBase,
@@ -799,13 +798,9 @@ export const getAutosaves =
 		if ( ! supports?.autosave ) {
 			return;
 		}
-		let path = `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`;
-		if ( perPage ) {
-			path = path + `&per_page=${ perPage }`;
-		}
 
 		const autosaves = await apiFetch( {
-			path,
+			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
 
 		if ( autosaves && autosaves.length ) {
@@ -814,18 +809,57 @@ export const getAutosaves =
 	};
 
 /**
- * Request autosave data from the REST API.
+ * Requests a single author's autosave from the REST API.
  *
- * This resolver exists to ensure the underlying autosaves are fetched via
- * `getAutosaves` when a call to the `getAutosave` selector is made.
+ * WordPress stores at most one autosave per author, and the `getAutosave`
+ * selector only ever returns the one belonging to the given author, so this
+ * requests that single record instead of every autosave for the post. On a
+ * long-lived post with many editors, the difference is the entire collection
+ * versus one row.
+ *
+ * `getAutosaves` is intentionally left alone rather than being narrowed, so
+ * calling it directly still returns the full collection. Its resolution is
+ * marked finished here because `hasFetchedAutosaves` reports on it, and
+ * `isEditedPostAutosaveable` in @wordpress/editor treats an unfinished
+ * resolution as "not yet known" — without this, autosaving would never enable.
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
+ * @param {number} authorId The id of the autosave author.
  */
 export const getAutosave =
-	( postType, postId ) =>
-	async ( { resolveSelect } ) => {
-		await resolveSelect.getAutosaves( postType, postId, 1 );
+	( postType, postId, authorId ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		if ( authorId === undefined ) {
+			return;
+		}
+
+		const {
+			rest_base: restBase,
+			rest_namespace: restNamespace = 'wp/v2',
+			supports,
+		} = await resolveSelect.getPostType( postType );
+
+		if ( ! supports?.autosave ) {
+			return;
+		}
+
+		const autosaves = await apiFetch( {
+			path: addQueryArgs(
+				`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
+				{
+					context: 'edit',
+					per_page: 1,
+					author: authorId,
+				}
+			),
+		} );
+
+		if ( autosaves && autosaves.length ) {
+			dispatch.receiveAutosaves( postId, autosaves );
+		}
+
+		dispatch.finishResolution( 'getAutosaves', [ postType, postId ] );
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =

@@ -23,6 +23,7 @@ import {
 	getEmbedPreview,
 	canUser,
 	getAutosaves,
+	getAutosave,
 	getCurrentUser,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
@@ -1484,7 +1485,7 @@ describe( 'getAutosaves', () => {
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1`,
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
 		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
 			1,
@@ -1511,9 +1512,134 @@ describe( 'getAutosaves', () => {
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1`,
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
 		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'getAutosave', () => {
+	const AUTHOR_ID = 7;
+	const SUCCESSFUL_RESPONSE = [
+		{
+			title: 'test title',
+			excerpt: 'test excerpt',
+			content: 'test content',
+			author: AUTHOR_ID,
+		},
+	];
+
+	const postType = 'post';
+	const postId = 1;
+	const restBase = 'posts';
+
+	const setUp = ( response ) => {
+		triggerFetch.mockReset();
+		triggerFetch.mockImplementation( () => response );
+
+		return {
+			dispatch: Object.assign( jest.fn(), {
+				receiveAutosaves: jest.fn(),
+				finishResolution: jest.fn(),
+			} ),
+			resolveSelect: Object.assign( jest.fn(), {
+				getPostType: jest.fn( () => ( {
+					rest_base: restBase,
+					supports: { autosave: true },
+				} ) ),
+			} ),
+		};
+	};
+
+	it( 'requests a single autosave scoped to the given author', async () => {
+		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+
+		await getAutosave(
+			postType,
+			postId,
+			AUTHOR_ID
+		)( { dispatch, resolveSelect } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1&author=${ AUTHOR_ID }`,
+		} );
+		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
+			postId,
+			SUCCESSFUL_RESPONSE
+		);
+	} );
+
+	it( 'marks getAutosaves resolution as finished so hasFetchedAutosaves reports true', async () => {
+		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+
+		await getAutosave(
+			postType,
+			postId,
+			AUTHOR_ID
+		)( { dispatch, resolveSelect } );
+
+		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
+			'getAutosaves',
+			[ postType, postId ]
+		);
+	} );
+
+	it( 'finishes getAutosaves resolution even when the author has no autosave', async () => {
+		const { dispatch, resolveSelect } = setUp( [] );
+
+		await getAutosave(
+			postType,
+			postId,
+			AUTHOR_ID
+		)( { dispatch, resolveSelect } );
+
+		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
+		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
+			'getAutosaves',
+			[ postType, postId ]
+		);
+	} );
+
+	it( 'does not fetch when the author is unknown', async () => {
+		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+
+		await getAutosave(
+			postType,
+			postId,
+			undefined
+		)( { dispatch, resolveSelect } );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
+		expect( dispatch.finishResolution ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not fetch when the post type does not support autosaves', async () => {
+		const { dispatch } = setUp( SUCCESSFUL_RESPONSE );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getPostType: jest.fn( () => ( {
+				rest_base: restBase,
+				supports: { autosave: false },
+			} ) ),
+		} );
+
+		await getAutosave(
+			postType,
+			postId,
+			AUTHOR_ID
+		)( { dispatch, resolveSelect } );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
+		expect( dispatch.finishResolution ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves the getAutosaves resolver behavior unchanged', async () => {
+		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+
+		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+		} );
 	} );
 } );
 
