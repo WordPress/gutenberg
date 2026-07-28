@@ -60,6 +60,8 @@ const DURATION_OPTIONS = [
 	{ label: 'Custom', value: 'custom' },
 ];
 
+const DEFAULT_DURATION_OPTION = DURATION_OPTIONS[ 4 ];
+
 const labelStyle = {
 	fontFamily: 'var(--wpds-typography-font-family-mono)',
 	fontSize: 'var(--wpds-typography-font-size-sm)',
@@ -141,7 +143,7 @@ function MotionDemo() {
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
 	const [ selectedDuration, setSelectedDuration ] = useState(
-		'var(--wpds-motion-duration-xl)'
+		DEFAULT_DURATION_OPTION.value
 	);
 	const [ customDuration, setCustomDuration ] = useState( '600' );
 
@@ -166,9 +168,7 @@ function MotionDemo() {
 						<SelectControl
 							label="Duration"
 							items={ DURATION_OPTIONS }
-							value={ DURATION_OPTIONS.find(
-								( opt ) => opt.value === selectedDuration
-							) }
+							defaultValue={ DEFAULT_DURATION_OPTION }
 							onValueChange={ ( item ) => {
 								if (
 									! item ||
