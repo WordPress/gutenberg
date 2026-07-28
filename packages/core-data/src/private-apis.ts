@@ -12,7 +12,7 @@ import {
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 import {
-	getEntityAutosavedAt,
+	entityContainsSnapshot,
 	retrySyncConnection,
 	subscribeHasInitialSync,
 } from './sync';
@@ -24,7 +24,7 @@ import {
 const lockedApis = {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
-	getEntityAutosavedAt,
+	entityContainsSnapshot,
 	subscribeHasInitialSync,
 	retrySyncConnection,
 	useActiveCollaborators,

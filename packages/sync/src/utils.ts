@@ -10,7 +10,6 @@ import * as buffer from 'lib0/buffer';
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
-	CRDT_STATE_MAP_AUTOSAVED_AT_KEY_PREFIX as AUTOSAVED_AT_KEY_PREFIX,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
@@ -62,63 +61,6 @@ export function markEntityAsSaved( ydoc: CRDTDoc ): void {
 	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
 	recordMeta.set( SAVED_AT_KEY, Date.now() );
 	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
-}
-
-/**
- * Record that a user successfully autosaved the entity. Keyed by WordPress
- * user ID because autosave revisions are stored per user.
- *
- * The marker is written after the autosaved content entered the author's
- * document, so a copy of the document that contains the marker also contains
- * everything the autosave captured. This relies on two properties:
- *
- * 1. Yjs delivers a single client's updates in causal order, which covers
- *    the content authored by the marker's author.
- * 2. Content by other users can only have reached the author through the
- *    sync backend, so any copy that received the marker from the backend
- *    already contains that content too.
- *
- * @param {CRDTDoc} ydoc        CRDT document.
- * @param {number}  authorId    WordPress user ID of the autosave author.
- * @param {number}  autosavedAt Autosave modified time as epoch seconds (UTC).
- */
-export function markEntityAsAutosaved(
-	ydoc: CRDTDoc,
-	authorId: number,
-	autosavedAt: number
-): void {
-	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-	const key = `${ AUTOSAVED_AT_KEY_PREFIX }${ authorId }`;
-	const existing = stateMap.get( key );
-
-	// Never move the marker backwards, e.g. from a stale response.
-	if ( 'number' === typeof existing && existing >= autosavedAt ) {
-		return;
-	}
-
-	stateMap.set( key, autosavedAt );
-}
-
-/**
- * Read a user's autosave marker written by `markEntityAsAutosaved`, if any.
- *
- * @param {CRDTDoc} ydoc     CRDT document.
- * @param {number}  authorId WordPress user ID of the autosave author.
- * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
- */
-export function readAutosaveMarker(
-	ydoc: CRDTDoc,
-	authorId: number
-): number | undefined {
-	const value = ydoc
-		.getMap( CRDT_STATE_MAP_KEY )
-		.get( `${ AUTOSAVED_AT_KEY_PREFIX }${ authorId }` );
-
-	if ( 'number' === typeof value ) {
-		return value;
-	}
-
-	return undefined;
 }
 
 function pseudoRandomID(): number {

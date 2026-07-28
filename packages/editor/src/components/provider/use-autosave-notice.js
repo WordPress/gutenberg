@@ -22,7 +22,7 @@ import { getQueryArg } from '@wordpress/url';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { getEntityAutosavedAt, subscribeHasInitialSync } =
+const { entityContainsSnapshot, subscribeHasInitialSync } =
 	unlock( coreDataPrivateApis );
 
 /**
@@ -93,13 +93,12 @@ function showAutosaveExistsNotice( {
  * Under real-time collaboration, the autosave content is usually already
  * part of the shared document, making the notice redundant. The decision is
  * deferred and made at most once. It is resolved when the shared document
- * syncs (via `subscribeHasInitialSync`). The author's autosave marker is read
- * from the CRDT document, and because the initial sync is applied atomically,
- * a missing marker at that point is definitive. The notice is suppressed when
- * the marker confirms the autosave content is part of the shared document,
- * and shown (fail open) when the marker is absent after sync, collaboration is
- * disabled, the connection fails, or a backstop wait expires, because the
- * autosave may then be the only copy of the content.
+ * syncs (via `subscribeHasInitialSync`).
+ *
+ * The autosave records a Yjs snapshot of the document it captured, which the
+ * server returns in `settings.autosave.crdtSnapshot`. The shared document is
+ * checked against it. A positive result proves this document holds everything
+ * the autosave did, so the notice is not necessary.
  *
  * IMPORTANT: Call this hook after the mount effect that dispatches
  * `setupEditor`, so that the collaboration check can read the current post.
@@ -132,7 +131,7 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 	// The effect reads fresh store values when it runs.
 	const { autosaveSyncStatus, isCollaborationEnabledForPost } = useSelect(
 		( select ) => {
-			if ( ! settings.autosave?.authorId ) {
+			if ( ! settings.autosave?.crdtSnapshot ) {
 				return {
 					autosaveSyncStatus: undefined,
 					isCollaborationEnabledForPost: false,
@@ -150,7 +149,7 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 				).isCollaborationEnabledForCurrentPost(),
 			};
 		},
-		[ post.type, post.id, settings.autosave?.authorId ]
+		[ post.type, post.id, settings.autosave?.crdtSnapshot ]
 	);
 
 	useLayoutEffect( () => {
@@ -160,8 +159,7 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 		}
 
 		const canDeferAutosaveNotice =
-			settings.autosave.authorId &&
-			settings.autosave.modified &&
+			settings.autosave.crdtSnapshot &&
 			unlock(
 				registry.select( editorStore )
 			).isCollaborationEnabledForCurrentPost();
@@ -216,14 +214,12 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 			return;
 		}
 
-		const autosavedAt = getEntityAutosavedAt(
+		const isAutosaveInSharedDocument = entityContainsSnapshot(
 			'postType',
 			post.type,
 			post.id,
-			settings.autosave.authorId
+			settings.autosave.crdtSnapshot
 		);
-		const isAutosaveInSharedDocument =
-			!! autosavedAt && autosavedAt >= settings.autosave.modified;
 
 		const isCollaborationEnabled = unlock(
 			registry.select( editorStore )
@@ -245,9 +241,9 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 			// shared document may be missing the autosaved content.
 			shouldShowNotice = true;
 		} else if ( isDocumentSynced ) {
-			// The shared document received the server state (the initial
-			// sync is applied atomically), yet contains no marker: the
-			// autosave content is definitively not part of the document.
+			// The shared document received the server state but still does
+			// not contain everything the autosave captured, so the autosave
+			// may hold content that exists nowhere else.
 			shouldShowNotice = true;
 		} else if ( hasAutosaveNoticeWaitExpired ) {
 			// The document did not sync in time. Treat the autosave as

@@ -179,11 +179,15 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID | null
 	) => State | undefined;
-	getEntityAutosavedAt: (
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
 		objectType: ObjectType,
 		objectId: ObjectID,
-		authorId: number
-	) => number | undefined;
+		encodedSnapshot: string
+	) => boolean;
 	subscribeHasInitialSync: (
 		objectType: ObjectType,
 		objectId: ObjectID,
@@ -201,12 +205,6 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
-	markEntityAutosaved: (
-		objectType: ObjectType,
-		objectId: ObjectID,
-		authorId: number,
-		autosavedAt: number
-	) => void;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;

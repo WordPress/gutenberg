@@ -54,30 +54,56 @@ export function hasSyncManager(): boolean {
 }
 
 /**
- * Read the last recorded autosave time for a user from a synced entity's
- * CRDT document. Returns undefined when the entity is not being synced or
- * no marker exists.
+ * Encode a synced entity's current CRDT state as a snapshot. Returns undefined
+ * when the entity is not being synced.
  *
  * @param {string}        kind     Entity kind.
  * @param {string}        name     Entity name.
  * @param {string|number} recordId Record ID.
- * @param {number}        authorId WordPress user ID of the autosave author.
- * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
+ * @return {string|undefined} Base64-encoded snapshot.
  */
-export function getEntityAutosavedAt(
+export function getEntitySnapshot(
 	kind: string,
 	name: string,
-	recordId: string | number,
-	authorId: number
-): number | undefined {
+	recordId: string | number
+): string | undefined {
 	if ( ! hasSyncManager() ) {
 		return undefined;
 	}
 
-	return getSyncManager()?.getEntityAutosavedAt(
+	return getSyncManager()?.getEntitySnapshot(
 		`${ kind }/${ name }`,
-		`${ recordId }`,
-		authorId
+		`${ recordId }`
+	);
+}
+
+/**
+ * Determine whether a synced entity's CRDT document contains everything the
+ * given snapshot describes. Returns false when the entity is not being synced
+ * or the snapshot cannot be decoded, so callers fail open.
+ *
+ * @param {string}        kind            Entity kind.
+ * @param {string}        name            Entity name.
+ * @param {string|number} recordId        Record ID.
+ * @param {string}        encodedSnapshot Base64-encoded snapshot.
+ * @return {boolean} Whether the document contains the snapshotted state.
+ */
+export function entityContainsSnapshot(
+	kind: string,
+	name: string,
+	recordId: string | number,
+	encodedSnapshot: string
+): boolean {
+	if ( ! hasSyncManager() ) {
+		return false;
+	}
+
+	return (
+		getSyncManager()?.entityContainsSnapshot(
+			`${ kind }/${ name }`,
+			`${ recordId }`,
+			encodedSnapshot
+		) ?? false
 	);
 }
 

@@ -35,13 +35,12 @@ import type {
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
+import { docContainsSnapshot, encodeDocSnapshot } from './crdt-snapshot';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
 	initializeYjsDoc,
-	markEntityAsAutosaved,
 	markEntityAsSaved,
-	readAutosaveMarker,
 	serializeCrdtDoc,
 } from './utils';
 
@@ -730,60 +729,57 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	/**
-	 * Record a successful autosave by a user in the entity's CRDT document.
+	 * Encode the current state of an entity's CRDT document as a snapshot.
 	 *
-	 * @param {ObjectType} objectType  Object type.
-	 * @param {ObjectID}   objectId    Object ID.
-	 * @param {number}     authorId    WordPress user ID of the autosave author.
-	 * @param {number}     autosavedAt Autosave modified time as epoch seconds (UTC).
-	 */
-	function markEntityAutosaved(
-		objectType: ObjectType,
-		objectId: ObjectID,
-		authorId: number,
-		autosavedAt: number
-	): void {
-		const entityId = getEntityId( objectType, objectId );
-		const entityState = entityStates.get( entityId );
-
-		if ( ! entityState ) {
-			log( 'markEntityAutosaved', 'no entity state', entityId );
-			return;
-		}
-
-		const { ydoc } = entityState;
-
-		// This runs once per autosave, not on the typing hot path, so a
-		// synchronous transaction is fine and guarantees the marker is
-		// captured by `createPersistedCRDTDoc` and the provider update
-		// queue. The state map is not in the undo scope.
-		ydoc.transact( () => {
-			markEntityAsAutosaved( ydoc, authorId, autosavedAt );
-		}, LOCAL_SYNC_MANAGER_ORIGIN );
-	}
-
-	/**
-	 * Get the last recorded autosave time for a user from the entity's CRDT
-	 * document, if the entity is loaded and a marker exists.
+	 * The result describes what the document holds right now without including
+	 * any content. It is recorded alongside an autosave so another session can
+	 * later verify its own document contains everything the autosave captured.
 	 *
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
-	 * @param {number}     authorId   WordPress user ID of the autosave author.
-	 * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
+	 * @return {string|undefined} Base64-encoded snapshot, or undefined when the
+	 *                            entity is not loaded.
 	 */
-	function getEntityAutosavedAt(
+	function getEntitySnapshot(
 		objectType: ObjectType,
-		objectId: ObjectID,
-		authorId: number
-	): number | undefined {
+		objectId: ObjectID
+	): string | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState ) {
+			log( 'getEntitySnapshot', 'no entity state', entityId );
 			return undefined;
 		}
 
-		return readAutosaveMarker( entityState.ydoc, authorId );
+		return encodeDocSnapshot( entityState.ydoc );
+	}
+
+	/**
+	 * Determine whether an entity's CRDT document contains everything a
+	 * snapshot describes.
+	 *
+	 * Returns `false` when the entity is not loaded or the snapshot cannot be
+	 * decoded, so callers fail open and surface the autosave.
+	 *
+	 * @param {ObjectType} objectType      Object type.
+	 * @param {ObjectID}   objectId        Object ID.
+	 * @param {string}     encodedSnapshot Base64-encoded snapshot.
+	 * @return {boolean} Whether the document contains the snapshotted state.
+	 */
+	function entityContainsSnapshot(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	): boolean {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return false;
+		}
+
+		return docContainsSnapshot( entityState.ydoc, encodedSnapshot );
 	}
 
 	/**
@@ -924,11 +920,11 @@ export function createSyncManager( debug = false ): SyncManager {
 	// Wrap and return the public API.
 	return {
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
+		entityContainsSnapshot,
 		getAwareness,
-		getEntityAutosavedAt,
+		getEntitySnapshot: debugWrap( getEntitySnapshot ),
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
-		markEntityAutosaved: debugWrap( markEntityAutosaved ),
 		subscribeHasInitialSync,
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
