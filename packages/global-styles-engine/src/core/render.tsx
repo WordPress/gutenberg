@@ -64,6 +64,8 @@ interface PresetsByOrigin {
 	[ origin: string ]: any[];
 }
 
+type ColorScheme = 'light' | 'dark';
+
 /**
  * CSS class configuration
  */
@@ -301,17 +303,36 @@ function getPresetsSvgFilters(
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		return [ 'default', 'theme' ]
+		const basePresets = [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
-			.flatMap( ( origin ) =>
-				presetByOrigin[ origin ].map( ( preset: any ) =>
-					getDuotoneFilter(
-						`wp-duotone-${ preset.slug }`,
-						preset.colors
-					)
-				)
+			.flatMap( ( origin ) => presetByOrigin[ origin ] );
+		const baseSlugs = new Set(
+			basePresets.map( ( preset: any ) => preset.slug )
+		);
+		const baseFilters = basePresets
+			.map( ( preset: any ) =>
+				getDuotoneFilter( `wp-duotone-${ preset.slug }`, preset.colors )
 			)
 			.join( '' );
+		const schemeFilters = ( [ 'light', 'dark' ] as ColorScheme[] )
+			.flatMap( ( scheme ) =>
+				getMergedPresetCollection(
+					getValueFromObjectPath(
+						blockPresets,
+						[ 'color', scheme, 'duotone' ],
+						[]
+					)
+				)
+					.filter( ( preset: any ) => baseSlugs.has( preset.slug ) )
+					.map( ( preset: any ) =>
+						getDuotoneFilter(
+							`wp-duotone-${ preset.slug }--${ scheme }`,
+							preset.colors
+						)
+					)
+			)
+			.join( '' );
+		return baseFilters + schemeFilters;
 	} );
 }
 
@@ -1367,6 +1388,16 @@ export const getNodesWithSettings = (
 				presets = setImmutably( presets, path, value );
 			}
 		} );
+		( [ 'light', 'dark' ] as ColorScheme[] ).forEach( ( scheme ) => {
+			const value = getValueFromObjectPath(
+				treeToPickFrom,
+				[ 'color', scheme ],
+				false
+			);
+			if ( value !== false ) {
+				presets = setImmutably( presets, [ 'color', scheme ], value );
+			}
+		} );
 		return presets;
 	};
 
@@ -1485,6 +1516,76 @@ function getPresetVarDeclarations(
 	return declarations;
 }
 
+function getMergedPresetCollection( collection: any ): any[] {
+	if ( Array.isArray( collection ) ) {
+		return collection;
+	}
+	if ( ! collection || typeof collection !== 'object' ) {
+		return [];
+	}
+
+	const presetsBySlug = new Map< string, any >();
+	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+		for ( const preset of collection[ origin ] ?? [] ) {
+			presetsBySlug.set( preset.slug, preset );
+		}
+	}
+	return Array.from( presetsBySlug.values() );
+}
+
+function getSchemePresetVarDeclarations(
+	presets: Record< string, any >,
+	scheme: ColorScheme,
+	{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata,
+	mergedSettings: GlobalStylesConfig[ 'settings' ]
+): string[] {
+	if ( path[ 0 ] !== 'color' ) {
+		return [];
+	}
+
+	const presetType = path.at( -1 );
+	if ( ! presetType ) {
+		return [];
+	}
+
+	const basePresets = getMergedPresetCollection(
+		getValueFromObjectPath( presets, path, [] )
+	);
+	const baseSlugs = new Set(
+		basePresets.map( ( preset: any ) => preset.slug )
+	);
+	const schemePresets = getMergedPresetCollection(
+		getValueFromObjectPath( presets, [ 'color', scheme, presetType ], [] )
+	);
+
+	return schemePresets
+		.filter( ( preset: any ) => baseSlugs.has( preset.slug ) )
+		.map( ( preset: any ) => {
+			const slug = kebabCase( preset.slug );
+			let value: string | number | null | undefined;
+			if ( presetType === 'duotone' ) {
+				value = `url( '#wp-duotone-${ slug }--${ scheme }' )`;
+			} else if ( valueKey && ! valueFunc ) {
+				value = preset[ valueKey ];
+			} else if ( valueFunc ) {
+				value = valueFunc( preset, mergedSettings );
+			}
+			return `--wp--preset--${ cssVarInfix }--${ slug }: ${ value }`;
+		} );
+}
+
+function getSchemeScopedSelector(
+	selector: string,
+	condition: string
+): string {
+	if ( selector.startsWith( ROOT_CSS_PROPERTIES_SELECTOR ) ) {
+		return `${ ROOT_CSS_PROPERTIES_SELECTOR }${ condition }${ selector.slice(
+			ROOT_CSS_PROPERTIES_SELECTOR.length
+		) }`;
+	}
+	return `html${ condition } ${ selector }`;
+}
+
 export const generateCustomProperties = (
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
@@ -1538,6 +1639,47 @@ export const generateCustomProperties = (
 		) ) {
 			if ( declarations.length > 0 ) {
 				ruleset += `${ ruleSelector }{${ declarations.join( ';' ) };}`;
+			}
+		}
+
+		for ( const scheme of [ 'light', 'dark' ] as ColorScheme[] ) {
+			const opposite = scheme === 'dark' ? 'light' : 'dark';
+			const schemeVarsBySelector: Record< string, string[] > = {};
+
+			for ( const metadata of PRESET_METADATA ) {
+				const declarations = getSchemePresetVarDeclarations(
+					presets,
+					scheme,
+					metadata,
+					tree.settings
+				);
+				if ( declarations.length === 0 ) {
+					continue;
+				}
+
+				const target = resolveFeatureSelector(
+					featureSelectors,
+					metadata.path[ 0 ],
+					defaultSelector
+				);
+				schemeVarsBySelector[ target ] ??= [];
+				schemeVarsBySelector[ target ].push( ...declarations );
+			}
+
+			for ( const [ ruleSelector, declarations ] of Object.entries(
+				schemeVarsBySelector
+			) ) {
+				const declarationList = `${ declarations.join( ';' ) };`;
+				const automaticSelector = getSchemeScopedSelector(
+					ruleSelector,
+					`:not([data-scheme="${ opposite }"])`
+				);
+				const forcedSelector = getSchemeScopedSelector(
+					ruleSelector,
+					`[data-scheme="${ scheme }"]`
+				);
+				ruleset += `@media (prefers-color-scheme: ${ scheme }){${ automaticSelector }{${ declarationList }}}`;
+				ruleset += `${ forcedSelector }{${ declarationList }}`;
 			}
 		}
 	}

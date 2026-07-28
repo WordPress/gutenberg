@@ -201,6 +201,94 @@ describe( 'PaletteEdit', () => {
 		expect( screen.getByTestId( 'palette-icon' ) ).toBeVisible();
 	} );
 
+	it( 'edits related palette variations from the same options menu', async () => {
+		const variationColors = [
+			{ color: '#ffffff', name: 'Primary', slug: 'primary' },
+		];
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				canOnlyChangeValues
+				paletteVariations={ [
+					{
+						colors: variationColors,
+						onChange: noop,
+						paletteLabel: 'Dark palette',
+					},
+				] }
+			/>
+		);
+
+		expect(
+			screen.getAllByRole( 'button', { name: 'Color options' } )
+		).toHaveLength( 1 );
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Color options',
+			} )
+		);
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Show details',
+			} )
+		);
+
+		expect(
+			screen.getByRole( 'heading', {
+				level: 2,
+				name: 'Dark palette',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getAllByRole( 'button', { name: 'Edit: Primary' } )
+		).toHaveLength( 2 );
+	} );
+
+	it( 'resets the base palette and its variations together', async () => {
+		const onChange = jest.fn();
+		const onVariationChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+				canReset
+				paletteVariations={ [
+					{
+						canReset: true,
+						colors: [
+							{
+								color: '#ffffff',
+								name: 'Primary',
+								slug: 'primary',
+							},
+						],
+						onChange: onVariationChange,
+						paletteLabel: 'Dark palette',
+					},
+				] }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Color options',
+			} )
+		);
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Reset colors',
+			} )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith();
+		expect( onVariationChange ).toHaveBeenCalledWith();
+	} );
+
 	it( 'shows heading label with custom heading level', () => {
 		render(
 			<PaletteEdit

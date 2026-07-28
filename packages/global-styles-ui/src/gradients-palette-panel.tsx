@@ -99,30 +99,36 @@ export default function GradientPalettePanel( {
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
-					popoverProps={ popoverProps }
-				/>
-			) }
-			{ hasLightGradients && (
-				<PaletteEdit
-					canReset={ userLightGradients !== undefined }
-					canOnlyChangeValues
-					gradients={ namedLightGradients }
-					onChange={ setLightGradients }
-					paletteLabel={ __( 'Light gradients' ) }
-					paletteIcon={ <SchemePaletteIcon scheme="light" /> }
-					paletteLabelHeadingLevel={ 3 }
-					popoverProps={ popoverProps }
-				/>
-			) }
-			{ hasDarkGradients && (
-				<PaletteEdit
-					canReset={ userDarkGradients !== undefined }
-					canOnlyChangeValues
-					gradients={ namedDarkGradients }
-					onChange={ setDarkGradients }
-					paletteLabel={ __( 'Dark gradients' ) }
-					paletteIcon={ <SchemePaletteIcon scheme="dark" /> }
-					paletteLabelHeadingLevel={ 3 }
+					paletteVariations={ [
+						...( hasLightGradients
+							? [
+									{
+										canReset:
+											userLightGradients !== undefined,
+										gradients: namedLightGradients,
+										onChange: setLightGradients,
+										paletteIcon: (
+											<SchemePaletteIcon scheme="light" />
+										),
+										paletteLabel: __( 'Light gradients' ),
+									},
+							  ]
+							: [] ),
+						...( hasDarkGradients
+							? [
+									{
+										canReset:
+											userDarkGradients !== undefined,
+										gradients: namedDarkGradients,
+										onChange: setDarkGradients,
+										paletteIcon: (
+											<SchemePaletteIcon scheme="dark" />
+										),
+										paletteLabel: __( 'Dark gradients' ),
+									},
+							  ]
+							: [] ),
+					] }
 					popoverProps={ popoverProps }
 				/>
 			) }

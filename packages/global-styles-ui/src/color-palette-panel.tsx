@@ -97,30 +97,36 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						onChange={ setThemeColors }
 						paletteLabel={ __( 'Theme' ) }
 						paletteLabelHeadingLevel={ 3 }
-						popoverProps={ popoverProps }
-					/>
-				) }
-				{ hasLightColors && (
-					<PaletteEdit
-						canReset={ userLightColors !== undefined }
-						canOnlyChangeValues
-						colors={ namedLightColors }
-						onChange={ setLightColors }
-						paletteLabel={ __( 'Light palette' ) }
-						paletteIcon={ <SchemePaletteIcon scheme="light" /> }
-						paletteLabelHeadingLevel={ 3 }
-						popoverProps={ popoverProps }
-					/>
-				) }
-				{ hasDarkColors && (
-					<PaletteEdit
-						canReset={ userDarkColors !== undefined }
-						canOnlyChangeValues
-						colors={ namedDarkColors }
-						onChange={ setDarkColors }
-						paletteLabel={ __( 'Dark palette' ) }
-						paletteIcon={ <SchemePaletteIcon scheme="dark" /> }
-						paletteLabelHeadingLevel={ 3 }
+						paletteVariations={ [
+							...( hasLightColors
+								? [
+										{
+											canReset:
+												userLightColors !== undefined,
+											colors: namedLightColors,
+											onChange: setLightColors,
+											paletteIcon: (
+												<SchemePaletteIcon scheme="light" />
+											),
+											paletteLabel: __( 'Light palette' ),
+										},
+								  ]
+								: [] ),
+							...( hasDarkColors
+								? [
+										{
+											canReset:
+												userDarkColors !== undefined,
+											colors: namedDarkColors,
+											onChange: setDarkColors,
+											paletteIcon: (
+												<SchemePaletteIcon scheme="dark" />
+											),
+											paletteLabel: __( 'Dark palette' ),
+										},
+								  ]
+								: [] ),
+						] }
 						popoverProps={ popoverProps }
 					/>
 				) }

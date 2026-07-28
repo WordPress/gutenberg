@@ -50,9 +50,15 @@ export const NameContainer = styled.div`
 `;
 
 export const PaletteHeading = styled( Heading )`
+	align-items: center;
+	display: flex;
+	gap: ${ space( 1 ) };
 	text-transform: uppercase;
 	line-height: ${ space( 6 ) };
 	font-weight: ${ CONFIG.fontWeightEmphasis };
+	svg {
+		flex-shrink: 0;
+	}
 	&&& {
 		font-size: 11px;
 		margin-bottom: 0;
@@ -66,6 +72,10 @@ export const PaletteActionsContainer = styled( View )`
 
 export const PaletteEditContents = styled( View )`
 	margin-top: ${ space( 2 ) };
+`;
+
+export const PaletteVariation = styled( View )`
+	margin-top: ${ space( 4 ) };
 `;
 
 export const PaletteEditStyles = styled( View )`
