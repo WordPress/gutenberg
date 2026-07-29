@@ -800,6 +800,32 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should keep the list type when indenting an ordered list item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			attributes: { ordered: true },
+		} );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await editor.clickBlockToolbarButton( 'Indent' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>one<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->`
+		);
+	} );
+
 	test( 'should indent and outdent level 2', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );

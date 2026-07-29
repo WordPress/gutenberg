@@ -29,7 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -39,7 +43,6 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
-import { useHasEditableRoot } from '../writing-flow/use-editable-root';
 import { unlock } from '../../lock-unlock';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
@@ -101,6 +104,7 @@ export function RichTextWrapper(
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -243,13 +247,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	const hasEditableRoot = useHasEditableRoot();
-	const hasDefaultEditingMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-			'default',
-		[ clientId ]
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
+		( select ) => {
+			if (
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
+			) {
+				return false;
+			}
+
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
+		},
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
 	);
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -365,7 +383,7 @@ export function RichTextWrapper(
 		'aria-activedescendant': ariaActiveDescendant,
 	} = autocompleteProps;
 	useEffect( () => {
-		if ( ! hasEditableRoot || ! isSelected ) {
+		if ( ! isSelected ) {
 			return;
 		}
 
@@ -399,7 +417,6 @@ export function RichTextWrapper(
 			}
 		};
 	}, [
-		hasEditableRoot,
 		isSelected,
 		ariaAutocomplete,
 		ariaHasPopup,
@@ -427,12 +444,10 @@ export function RichTextWrapper(
 	// focusable areas on their own, so an explicit tabIndex restores their
 	// focusability.
 	let tabIndex = props.tabIndex;
-	if ( ! shouldDisableEditing ) {
-		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
-			tabIndex = props.tabIndex ?? 0;
-		} else if ( props.tabIndex === 0 ) {
-			tabIndex = null;
-		}
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
 	}
 
 	const TagName = tagName;
