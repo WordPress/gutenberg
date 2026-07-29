@@ -14,14 +14,6 @@ type PolymorphicIntrinsicProps = Omit<
 	'as' | 'children'
 >;
 
-/**
- * Compatible with Emotion/`styled` `as` props and React's `ElementType`, without
- * using the default `React.ElementType` mapped type helper directly.
- */
-type PolymorphicAs =
-	| keyof React.JSX.IntrinsicElements
-	| React.JSXElementConstructor< any >;
-
 // Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
 	/** Prop types. */
@@ -43,7 +35,10 @@ export type WordPressComponentProps<
 	( IsPolymorphic extends true
 		? {
 				/** The HTML element or React component to render the component as. */
-				as?: T | PolymorphicAs;
+				as?:
+					| T
+					| keyof React.JSX.IntrinsicElements
+					| React.JSXElementConstructor< any >;
 		  }
 		: {} );
 

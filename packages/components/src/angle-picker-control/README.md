@@ -28,7 +28,7 @@ function Example() {
 
 ### `as`
 
- - Type: `PolymorphicAs`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

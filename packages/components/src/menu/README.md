@@ -466,7 +466,7 @@ Renders a menu item's label text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `PolymorphicAs`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -480,7 +480,7 @@ Renders a menu item's help text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `PolymorphicAs`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
