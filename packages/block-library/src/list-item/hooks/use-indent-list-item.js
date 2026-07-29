@@ -16,6 +16,8 @@ export default function useIndentListItem( clientId ) {
 		getSelectionEnd,
 		hasMultiSelection,
 		getMultiSelectedBlockClientIds,
+		getBlockRootClientId,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	return useCallback( () => {
 		const _hasMultiSelection = hasMultiSelection();
@@ -27,9 +29,16 @@ export default function useIndentListItem( clientId ) {
 		);
 		const previousSiblingId = getPreviousBlockClientId( clientId );
 		const newListItem = cloneBlock( getBlock( previousSiblingId ) );
+		// Get the parent list's attributes to inherit the ordered property
+		const parentListId = getBlockRootClientId( clientId );
+		const parentListAttributes = getBlockAttributes( parentListId );
 		// If the sibling has no innerBlocks, create a new `list` block.
 		if ( ! newListItem.innerBlocks?.length ) {
-			newListItem.innerBlocks = [ createBlock( 'core/list' ) ];
+			newListItem.innerBlocks = [
+				createBlock( 'core/list', {
+					ordered: parentListAttributes.ordered,
+				} ),
+			];
 		}
 		// A list item usually has one `list`, but it's possible to have
 		// more. So we need to preserve the previous `list` blocks and
