@@ -10,10 +10,13 @@ import { click, render as renderAriakit } from '@ariakit/test/react';
 import TypographyPanel from '../typography-panel';
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
-// experiment off, which is what WordPress Core gets. Set explicitly rather than
-// left unset, so the tests below state which path they are exercising.
+// experiment off, which is what WordPress Core gets. Deleted rather than set to
+// `false`, because an experiment that was never turned on leaves the global
+// unset, and `undefined` is the value that fires a receiving component's own
+// default parameter. Setting `false` here would test a state that does not
+// occur.
 beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = false;
+	delete window.__experimentalGlobalStylesInheritanceUI;
 } );
 
 afterEach( () => {
