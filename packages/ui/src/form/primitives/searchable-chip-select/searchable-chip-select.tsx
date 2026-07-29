@@ -43,67 +43,71 @@ export const SearchableChipSelect = forwardRef<
 			disabled={ disabled }
 			{ ...restProps }
 		>
-			<Combobox.Chips
-				render={
-					<InputLayout
-						className={ clsx(
-							focusStyles[ 'outset-ring--focus-within' ],
-							styles[ 'input-layout' ]
-						) }
-						visuallyDisabled={ disabled }
-					/>
-				}
-				ref={ ref }
-			>
-				<Combobox.Value>
-					{ ( value: Item[] ) => (
-						<>
-							{ value.length > 0 && (
-								<Stack
-									align="start"
-									className={ styles[ 'chips-edit-area' ] }
-								>
-									<Stack
-										gap="xs"
-										wrap="wrap"
-										className={ styles[ 'chips-list' ] }
-									>
-										{ chipsContent
-											? chipsContent( value )
-											: value.map( ( item ) => (
-													<Combobox.ChipWithRemove
-														key={ item.value }
-													>
-														{ item.label }
-													</Combobox.ChipWithRemove>
-											  ) ) }
-									</Stack>
-									{ showClearButton && (
-										<Combobox.Clear
-											aria-label={ clearButtonLabel }
-										/>
-									) }
-								</Stack>
-							) }
-						</>
-					) }
-				</Combobox.Value>
-
-				<Combobox.Input
+			<Combobox.InputGroup>
+				<Combobox.Chips
 					render={
-						<input
+						<InputLayout
 							className={ clsx(
-								defenseStyles.input,
-								styles.input
+								focusStyles[ 'outset-ring--focus-within' ],
+								styles[ 'input-layout' ]
 							) }
+							visuallyDisabled={ disabled }
 						/>
 					}
-					placeholder={ searchPlaceholder }
-					aria-label={ ariaLabel }
-					aria-labelledby={ ariaLabelledby }
-					aria-describedby={ ariaDescribedby }
-				/>
-			</Combobox.Chips>
+					ref={ ref }
+				>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.length > 0 && (
+									<Stack
+										align="start"
+										className={
+											styles[ 'chips-edit-area' ]
+										}
+									>
+										<Stack
+											gap="xs"
+											wrap="wrap"
+											className={ styles[ 'chips-list' ] }
+										>
+											{ chipsContent
+												? chipsContent( value )
+												: value.map( ( item ) => (
+														<Combobox.ChipWithRemove
+															key={ item.value }
+														>
+															{ item.label }
+														</Combobox.ChipWithRemove>
+												  ) ) }
+										</Stack>
+										{ showClearButton && (
+											<Combobox.Clear
+												aria-label={ clearButtonLabel }
+											/>
+										) }
+									</Stack>
+								) }
+							</>
+						) }
+					</Combobox.Value>
+
+					<Combobox.Input
+						render={
+							<input
+								className={ clsx(
+									defenseStyles.input,
+									styles.input
+								) }
+							/>
+						}
+						placeholder={ searchPlaceholder }
+						aria-label={ ariaLabel }
+						aria-labelledby={ ariaLabelledby }
+						aria-describedby={ ariaDescribedby }
+					/>
+				</Combobox.Chips>
+			</Combobox.InputGroup>
 
 			<Combobox.Popup>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
