@@ -1133,7 +1133,6 @@ test.describe( 'Copy/cut/paste', () => {
 
 	test( 'should wrap a pasted block in its required parent', async ( {
 		editor,
-		page,
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( {
@@ -1150,10 +1149,10 @@ test.describe( 'Copy/cut/paste', () => {
 		// Select and copy only the inner button, which serializes as a
 		// standalone button that can only be inserted within a buttons
 		// block.
+		// Copying with a collapsed caret copies the whole block.
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Button text' } )
 			.click();
-		await page.keyboard.press( 'Escape' );
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// The clipboard holds the button in a buttons wrapper so the
