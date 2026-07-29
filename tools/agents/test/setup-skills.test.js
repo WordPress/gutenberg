@@ -44,6 +44,20 @@ async function createSkill( repositoryRoot, skillName ) {
 	);
 }
 
+async function createFloatingSkill( repositoryRoot, skillName ) {
+	const skillDirectory = path.join(
+		repositoryRoot,
+		'.claude/skills',
+		skillName
+	);
+
+	await mkdir( skillDirectory, { recursive: true } );
+	await writeFile(
+		path.join( skillDirectory, 'SKILL.md' ),
+		`---\nname: ${ skillName }\n`
+	);
+}
+
 describe( 'setupSkills', () => {
 	test( 'copies every canonical skill into the Claude directory', async () => {
 		const repositoryRoot = await createRepository( [
@@ -69,6 +83,7 @@ describe( 'setupSkills', () => {
 
 	test( 'replaces the generated directory when the skill catalog changes', async () => {
 		const repositoryRoot = await createRepository();
+		const confirmedEntries = [];
 
 		await setupSkills( { repositoryRoot } );
 		await rm( path.join( repositoryRoot, '.agents/skills/testing' ), {
@@ -76,8 +91,15 @@ describe( 'setupSkills', () => {
 			force: true,
 		} );
 		await createSkill( repositoryRoot, 'release' );
-		await setupSkills( { repositoryRoot } );
+		await setupSkills( {
+			repositoryRoot,
+			confirm: async ( entries ) => {
+				confirmedEntries.push( ...entries );
+				return true;
+			},
+		} );
 
+		expect( confirmedEntries ).toEqual( [ 'testing' ] );
 		await expect(
 			readFile(
 				path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
@@ -92,6 +114,27 @@ describe( 'setupSkills', () => {
 		).resolves.toBe( '---\nname: release\n' );
 	} );
 
+	test( 'leaves unmatched skills untouched when replacement is declined', async () => {
+		const repositoryRoot = await createRepository();
+		await createFloatingSkill( repositoryRoot, 'private' );
+
+		const generated = await setupSkills( {
+			repositoryRoot,
+			confirm: async ( entries ) => {
+				expect( entries ).toEqual( [ 'private' ] );
+				return false;
+			},
+		} );
+
+		expect( generated ).toBe( false );
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/private/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: private\n' );
+	} );
+
 	test( 'runs the setup command when executed directly', async () => {
 		const repositoryRoot = await createRepository();
 
@@ -102,6 +145,26 @@ describe( 'setupSkills', () => {
 		);
 
 		expect( stdout ).toBe( 'Generated: .claude/skills\n' );
+	} );
+
+	test( 'fails safely when unmatched skills need non-interactive confirmation', async () => {
+		const repositoryRoot = await createRepository();
+		await createFloatingSkill( repositoryRoot, 'private' );
+
+		await expect(
+			execFileAsync( process.execPath, [ setupScript ], {
+				cwd: repositoryRoot,
+			} )
+		).rejects.toMatchObject( {
+			code: 1,
+			stderr: expect.stringContaining( 'Cannot replace .claude/skills' ),
+		} );
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/private/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: private\n' );
 	} );
 
 	test( 'can be imported from an eval entrypoint', async () => {

@@ -16,13 +16,17 @@ Agent instructions follow **progressive discovery** — an agent reads only what
 -   **Directory `AGENTS.md`** files (for example [`packages/components/AGENTS.md`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/AGENTS.md)) are loaded when an agent works with files in that directory. They hold rules scoped to that directory only.
 -   **Skills** ([`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills)) are thin, task-scoped guidance — procedures, checklists, or decision trees. Native skill discovery uses each skill's frontmatter description to choose one when its task matches.
 -   **Linked docs and references** are read only when a procedure step points to them — they carry no cost until then, so depth belongs there.
--   `CLAUDE.md` files are one-line `@AGENTS.md` redirects for tools that look for that filename; the content always lives in `AGENTS.md`.
+-   **Compatibility instruction files** (for example, `CLAUDE.md`) are one-line `@AGENTS.md` redirects; the content always lives in `AGENTS.md`.
 
 This structure controls context bloat. The root `AGENTS.md` is a fixed cost in every session, so keep it lean. Skill bodies are read when relevant, so keep them thin and procedural. Everything linked one hop away is effectively free.
 
+## Supported agents
+
+Codex discovers the repository skill catalog natively. Claude Code uses the generated compatibility view maintained by `npm run agents:setup`. No other agent-specific view is currently configured.
+
 ## Creating skills
 
-Create repository skills in [`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills), following the shared Agent Skills format described below. When using Claude Code, run `npm run agents:setup` after installing dependencies or changing the skill catalog; it replaces `.claude/skills` with a generated copy. Start a new session so Claude Code discovers it.
+Create repository skills in [`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills), following the shared Agent Skills format described below. After adding, removing, or changing a skill, run `npm run agents:setup` to apply the catalog to all supported agents. It asks before replacing unmatched generated skill entries; then start a new agent session so it discovers the updated catalog.
 
 ## Where does new guidance belong?
 
