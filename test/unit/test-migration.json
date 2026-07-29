@@ -5,7 +5,13 @@
 	},
 	"vitest": {
 		"files": [ "packages/html-entities/src/test/entities.ts" ],
-		"directories": []
+		"directories": [
+			"packages/escape-html",
+			"packages/is-shallow-equal",
+			"packages/shortcode",
+			"packages/token-list",
+			"packages/wordcount"
+		]
 	},
 	"retired": [],
 	"added": {
