@@ -281,27 +281,26 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				// If every pasted block requires the same single type of
-				// parent block, wrap them all in one. A copied
-				// multi-selection is always a set of same-parent siblings,
-				// so this covers any copied selection of parent-restricted
-				// blocks: columns paste as one columns block, list items as
-				// one list, a button as a buttons block.
-				const requiredParent = getBlockType( blocks[ 0 ]?.name )
-					?.parent?.[ 0 ];
+				// If every pasted block requires a parent block, wrap them
+				// all in one. A copied multi-selection is always a set of
+				// same-parent siblings, so this covers any copied selection
+				// of parent-restricted blocks: columns paste as one columns
+				// block, list items as one list, a button as a buttons
+				// block. The first insertable parent allowed by every block
+				// serves as the default when a block allows several.
+				const requiredParent =
+					! canInsertBlockType( blocks[ 0 ]?.name, rootClientId ) &&
+					getBlockType( blocks[ 0 ].name )?.parent?.find(
+						( parentName ) =>
+							canInsertBlockType( parentName, rootClientId ) &&
+							blocks.every( ( block ) =>
+								getBlockType( block.name )?.parent?.includes(
+									parentName
+								)
+							)
+					);
 
-				if (
-					requiredParent &&
-					! canInsertBlockType( blocks[ 0 ].name, rootClientId ) &&
-					canInsertBlockType( requiredParent, rootClientId ) &&
-					blocks.every( ( block ) => {
-						const { parent } = getBlockType( block.name );
-						return (
-							parent?.length === 1 &&
-							parent[ 0 ] === requiredParent
-						);
-					} )
-				) {
+				if ( requiredParent ) {
 					__unstableSplitSelection( [
 						createBlock( requiredParent, {}, blocks ),
 					] );
