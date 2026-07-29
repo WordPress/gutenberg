@@ -211,7 +211,8 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ inputRefs, isValid, validity ] );
 
-	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	// Listen for 'invalid' events (e.g., dispatched by layouts when a card
+	// re-expands or loses focus).
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const handleInvalid = ( event: Event ) => {

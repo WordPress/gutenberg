@@ -7,15 +7,18 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
+    -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
 -   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
+-   Validated form controls: Only move focus to the invalid control for trusted `invalid` events (form submission, `reportValidity()`). Consumers can now dispatch a synthetic `invalid` event to reveal a control's error message without disturbing the user's place in the form ([#80685](https://github.com/WordPress/gutenberg/pull/80685)).
 
 ### Bug Fixes
 
+-   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `Autocomplete`: Omit `aria-activedescendant` while no suggestion is highlighted, instead of returning `null` for it ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
@@ -24,11 +27,14 @@
 
 ### TypeScript
 
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
 
 ### Internal
 
+-   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
