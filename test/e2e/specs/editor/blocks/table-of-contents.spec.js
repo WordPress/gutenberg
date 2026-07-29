@@ -197,7 +197,7 @@ test.describe( 'Table of Contents', () => {
 			] );
 		} );
 
-		test( 'newly published posts show the same nested heading list to editors and readers without keeping a stale saved copy', async ( {
+		test( 'shows the same nested heading list in the editor and after publish', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -439,7 +439,7 @@ test.describe( 'Table of Contents', () => {
 	} );
 
 	test.describe( 'Legacy content compatibility', () => {
-		test( 'readers still see the saved table of contents on an old published post that has not been edited', async ( {
+		test( 'readers still see the saved table of contents when the block has saved markup', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -475,7 +475,7 @@ test.describe( 'Table of Contents', () => {
 			).toHaveCount( 0 );
 		} );
 
-		test( 'editing an old post lets readers see a table of contents based on the current headings after saving', async ( {
+		test( 'editing a post with saved table of contents markup lets readers see current headings after saving', async ( {
 			admin,
 			editor,
 			page,
