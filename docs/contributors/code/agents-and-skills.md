@@ -33,10 +33,6 @@ Work down this list and stop at the first match:
 3. **A directory `AGENTS.md`** — for rules an agent must know when working in one specific directory.
 4. **A skill** — for guidance scoped to a kind of task rather than a location: a procedure, checklist, or decision tree an agent should follow when doing that work (running tests, releasing a package, scaffolding a block).
 
-## Package-scoped guidance
-
-Create reusable package workflows in `.agents/skills/<package>-<task>/SKILL.md`. Use `packages/<package>/AGENTS.md` only for rules that apply whenever working in that package, and do not create `packages/<package>/.agents/skills/` directories.
-
 ## Skill conventions
 
 These conventions use the shared Agent Skills format:
