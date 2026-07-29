@@ -47,12 +47,15 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            # Credentials should only persist when required to perform Git operations, such as within private mirrors.
+            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
+            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
+            # All other jobs only require a depth of 1.
             - name: Checkout repository
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: ${{ github.repository_owner != 'WordPress' && github.event.repository.private }}
+                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
+                  persist-credentials: false
 
             - name: Use desired version of Node.js
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -84,11 +87,7 @@ jobs:
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-              # Fetch just the base commit so the check can read its
-              # package.json without a costly full-history checkout.
-              run: |
-                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
-                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+              run: npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
 
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
