@@ -138,8 +138,6 @@ const DEFAULT_CONTROLS = {
 	caption: true,
 };
 
-const EMPTY_ARRAY = [];
-
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
 	value,
@@ -151,7 +149,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
-	additionalElements = EMPTY_ARRAY,
+	additionalElements,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
@@ -269,10 +267,10 @@ export default function ColorPanel( {
 				label: __( 'H6' ),
 				showPanel: showHeadingPanel,
 			},
-			...additionalElements.map( ( element ) => ( {
+			...( additionalElements?.map( ( element ) => ( {
 				...element,
 				showPanel: hasSolidColors || hasGradientColors,
-			} ) ),
+			} ) ) ?? [] ),
 		],
 		[
 			additionalElements,
