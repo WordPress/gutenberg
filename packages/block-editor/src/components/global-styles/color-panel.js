@@ -149,6 +149,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
+	additionalElements = [],
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
@@ -266,8 +267,19 @@ export default function ColorPanel( {
 				label: __( 'H6' ),
 				showPanel: showHeadingPanel,
 			},
+			...additionalElements.map( ( element ) => ( {
+				...element,
+				showPanel: hasSolidColors || hasGradientColors,
+			} ) ),
 		],
-		[ showCaptionPanel, showButtonPanel, showHeadingPanel ]
+		[
+			additionalElements,
+			hasGradientColors,
+			hasSolidColors,
+			showCaptionPanel,
+			showButtonPanel,
+			showHeadingPanel,
+		]
 	);
 
 	const resetAllFilter = useCallback(
