@@ -8,6 +8,7 @@
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [ "core/accordion-open-by-default" ],
 	"supports": {
+		"__experimentalOnEnter": true,
 		"html": false,
 		"color": {
 			"background": true,

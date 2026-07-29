@@ -7,7 +7,7 @@ import { useStyleOverride } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { getAvatarBorderColor } from './utils';
+import { getAvatarBorderColor, getNoteMarkerSelector } from './utils';
 
 // Hex alpha suffixes for the rest / active states. Kept low so the marker
 // reads as a soft tint at rest and gets noticeably stronger when focused or
@@ -38,11 +38,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
 		const color = getAvatarBorderColor( thread.author ?? 0 );
 		// The `core/note` format serializes the id into `data-id`, so the marker
 		// can be targeted directly without a separate annotation layer.
-		// `thread.id` is a server comment ID (always a positive integer), but
-		// escape `"`/`\` defensively since it composes a quoted attribute value
-		// from stored data.
-		const escapedId = String( thread.id ).replace( /["\\]/g, '\\$&' );
-		const sel = `mark.wp-note[data-id="${ escapedId }"]`;
+		const sel = getNoteMarkerSelector( thread.id );
 		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
 		rules.push(
 			`${ sel }:hover,${ sel }:focus-within{background-color:${ color }${ ACTIVE_ALPHA };}`

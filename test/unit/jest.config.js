@@ -47,7 +47,7 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
-			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+			'<rootDir>/packages/theme/prebuilt/js/design-tokens.mjs',
 		'@wordpress/block-library/build-module/(.*).mjs':
 			'<rootDir>/packages/block-library/src/$1.js',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
@@ -66,14 +66,14 @@ module.exports = {
 	},
 	testLocationInResults: true,
 	testPathIgnorePatterns: [
-		'/.git/',
+		'/\\.git($|/)',
 		'/node_modules/',
 		'/packages/e2e-tests',
-		'/packages/e2e-test-utils-playwright/src/test.ts',
+		'/packages/e2e-test-utils-playwright/src/test\\.ts$',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
-		'<rootDir>/.+.d.ts$',
+		'<rootDir>/.+\\.d\\.ts$',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
@@ -98,9 +98,15 @@ module.exports = {
 	reporters: [
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
-		process.env.CI
+		/*
+		 * Only interact with flakiness.io for the official WordPress/Gutenberg
+		 * repository. Forks and private mirrors should behave the same as
+		 * running the tests outside a CI environment.
+		 */
+		process.env.CI &&
+		process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
 			? [
-					'@flakiness/jest',
+					require.resolve( '@flakiness/jest' ),
 					{
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',

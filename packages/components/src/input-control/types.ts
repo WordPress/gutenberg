@@ -23,7 +23,7 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
-export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
+export type Size = 'default' | 'small' | 'compact';
 
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
@@ -199,13 +199,6 @@ export interface InputControlProps
 	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
-	 * @ignore
-	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }
 

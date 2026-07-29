@@ -1,17 +1,34 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
 
-/**
- * WordPress dependencies
- */
-import { createContext, useContext } from '@wordpress/element';
+import {
+	createContext,
+	createPortal,
+	useContext,
+	useState,
+} from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
+import { Spacer } from '../../spacer';
+
+function IframePortal( { children }: { children: ReactNode } ) {
+	const [ bodyNode, setBodyNode ] = useState< HTMLElement | null >( null );
+
+	return (
+		<iframe
+			title="Cross-document SlotFill styles"
+			srcDoc="<!doctype html><html><body></body></html>"
+			onLoad={ ( event ) => {
+				setBodyNode(
+					event.currentTarget.contentDocument?.body ?? null
+				);
+			} }
+			style={ { border: 0, height: 160, width: '100%' } }
+		>
+			{ bodyNode && createPortal( children, bodyNode ) }
+		</iframe>
+	);
+}
 
 const meta: Meta< typeof Slot > = {
 	tags: [ 'manifest' ],
@@ -142,4 +159,29 @@ export const WithContext: StoryFn< typeof Slot > = ( props ) => {
 };
 WithContext.args = {
 	...Default.args,
+};
+
+export const CrossDocumentStyles: StoryFn< typeof Slot > = () => {
+	return (
+		<SlotFillProvider>
+			<p>
+				The content below should have 32px of padding inside its
+				outline.
+			</p>
+			<IframePortal>
+				<Slot name="cross-document-styles" bubblesVirtually />
+			</IframePortal>
+			<Fill name="cross-document-styles">
+				<Spacer
+					padding={ 8 }
+					style={ {
+						display: 'inline-block',
+						outline: '2px solid currentColor',
+					} }
+				>
+					SCSS module styles rendered in another document
+				</Spacer>
+			</Fill>
+		</SlotFillProvider>
+	);
 };

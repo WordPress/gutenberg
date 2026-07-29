@@ -18,7 +18,7 @@ import { Suspense, useId, useMemo, useState } from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
 /* eslint-disable @wordpress/use-recommended-components */
-import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
+import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -27,6 +27,7 @@ import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import type {
+	WidgetAction,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	WidgetType,
@@ -742,6 +743,100 @@ The attribute references a **field type** by name instead of carrying a control:
 3. The host resolves the schema (hosts get this through \`useWidgetTypes\`; the story calls the resolver itself) and promotes the field to the prominent surface, where the registered control renders.
 
 An unregistered name would degrade silently, exactly like an unknown type in DataViews. See the **Field Types** doc for the full pipeline.
+`,
+			},
+		},
+	},
+};
+
+const actionsWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	actions: [
+		{
+			id: 'open-docs',
+			label: 'Open docs',
+			href: 'https://developer.wordpress.org/',
+			openInNewTab: true,
+		},
+		{
+			id: 'export-greeting',
+			label: 'Export greeting',
+			href: new URL( './greeting.txt', import.meta.url ).href,
+			download: 'greeting.txt',
+		},
+	] satisfies WidgetAction[],
+};
+
+function WidgetWithActions() {
+	const titleId = useId();
+	const actions = actionsWidgetType.actions ?? [];
+	const [ attributes ] = useState< DemoAttributes >( {
+		...actionsWidgetType.example?.attributes,
+	} );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ actionsWidgetType.icon && (
+							<span aria-hidden="true">
+								<Icon icon={ actionsWidgetType.icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ actionsWidgetType.title }
+						</Card.Title>
+
+						{ /* The host materializes the declared actions; here, as links. */ }
+						<Stack direction="row" align="center" gap="md">
+							{ actions.map( ( action ) => (
+								<Link
+									key={ action.id }
+									href={ action.href }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+								>
+									{ action.label }
+								</Link>
+							) ) }
+						</Stack>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ actionsWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithActions: StoryObj = {
+	render: () => <WidgetWithActions />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`, and a link \`href\`); the host decides where to put it and materializes it.
+
+**In this demo**
+
+- The widget declares two actions: an external link (\`Open docs\`) and a download (\`Export greeting\`).
+- The host renders them as links beside the title. Another host could surface them in a menu, a footer, or a command palette.
+
+**Takeaway**
+
+The widget names the intent and a link target; navigation and download are the browser's, so the widget never knows its surface.
 `,
 			},
 		},

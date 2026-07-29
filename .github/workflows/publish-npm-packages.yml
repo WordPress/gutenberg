@@ -92,6 +92,11 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
+
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |

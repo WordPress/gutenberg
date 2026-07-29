@@ -43,7 +43,7 @@ function resolveGridSettings(
 }
 
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
-	import( /* webpackIgnore: true */ moduleId );
+	import( /* webpackIgnore: true */ /* @vite-ignore */ moduleId );
 
 /**
  * Inline widget-instance edits stage live, then publish once the user pauses.

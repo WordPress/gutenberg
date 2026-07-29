@@ -157,7 +157,6 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 		default: '13px',
 		small: '11px',
 		compact: '13px',
-		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -199,13 +198,6 @@ export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
 			minHeight: 32,
 			paddingLeft: CONFIG.controlPaddingXSmall,
 			paddingRight: CONFIG.controlPaddingXSmall,
-		},
-		'__unstable-large': {
-			height: 40,
-			lineHeight: 1,
-			minHeight: 40,
-			paddingLeft: CONFIG.controlPaddingX,
-			paddingRight: CONFIG.controlPaddingX,
 		},
 	};
 

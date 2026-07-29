@@ -2,19 +2,148 @@
  * Internal dependencies
  */
 import {
+	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	prepareNpmRelease,
 	publishPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackagesRelease,
 	verifyRemotePackageTags,
 } from '../packages';
+
+describe( 'prepareNpmRelease', () => {
+	it.each( [
+		[ 'latest', 'release/23.5' ],
+		[ 'next', 'trunk' ],
+		[ 'bugfix', undefined ],
+		[ 'wp', undefined ],
+	] )(
+		'prepares a %s release',
+		async ( releaseType, expectedPluginReleaseBranch ) => {
+			const config = {
+				gitWorkingDirectoryPath: '/repo',
+				releaseType,
+			};
+			const checkoutNpmReleaseBranchFn = jest.fn();
+			const findPluginReleaseBranchNameFn = jest
+				.fn()
+				.mockResolvedValue( 'release/23.5' );
+			const runNpmReleaseBranchSyncStepFn = jest.fn();
+			const updatePackagesFn = jest
+				.fn()
+				.mockResolvedValue( 'changelog-sha' );
+
+			await expect(
+				prepareNpmRelease( config, {
+					checkoutNpmReleaseBranchFn,
+					findPluginReleaseBranchNameFn,
+					runNpmReleaseBranchSyncStepFn,
+					updatePackagesFn,
+				} )
+			).resolves.toEqual( {
+				changelogCommit: 'changelog-sha',
+				pluginReleaseBranch: expectedPluginReleaseBranch,
+			} );
+			expect( findPluginReleaseBranchNameFn.mock.calls ).toEqual(
+				releaseType === 'latest' ? [ [ '/repo' ] ] : []
+			);
+			expect( checkoutNpmReleaseBranchFn.mock.calls ).toEqual(
+				[ 'bugfix', 'wp' ].includes( releaseType ) ? [ [ config ] ] : []
+			);
+			expect( runNpmReleaseBranchSyncStepFn.mock.calls ).toEqual(
+				expectedPluginReleaseBranch
+					? [ [ expectedPluginReleaseBranch, config ] ]
+					: []
+			);
+			expect( updatePackagesFn ).toHaveBeenCalledTimes( 1 );
+			expect( updatePackagesFn ).toHaveBeenCalledWith( config );
+		}
+	);
+} );
+
+describe( 'finalizePreparedNpmRelease', () => {
+	it.each( [
+		[ 'latest', 'release/23.5', [ 'trunk', 'release/23.5' ] ],
+		[ 'bugfix', undefined, [ 'trunk' ] ],
+		[ 'next', undefined, [] ],
+		[ 'wp', undefined, [] ],
+	] )(
+		'finalizes a %s release',
+		async ( releaseType, pluginReleaseBranch, expectedBranches ) => {
+			const config = { releaseType };
+			const backportCommitsToBranchFn = jest.fn();
+			const commits = [ 'changelog-sha', 'publish-sha' ];
+
+			await finalizePreparedNpmRelease(
+				config,
+				{
+					changelogCommit: commits[ 0 ],
+					pluginReleaseBranch,
+					publishCommit: commits[ 1 ],
+				},
+				{ backportCommitsToBranchFn }
+			);
+
+			expect( backportCommitsToBranchFn.mock.calls ).toEqual(
+				expectedBranches.map( ( branch ) => [
+					branch,
+					commits,
+					config,
+				] )
+			);
+		}
+	);
+} );
+
+describe( 'runPackagesRelease', () => {
+	it( 'runs the release lifecycle in order', async () => {
+		const config = {
+			gitWorkingDirectoryPath: '/repo',
+			interactive: false,
+		};
+		const releaseState = { changelogCommit: 'changelog-sha' };
+		const prepareNpmReleaseFn = jest.fn().mockResolvedValue( releaseState );
+		const publishPreparedPackagesToNpmFn = jest
+			.fn()
+			.mockResolvedValue( 'publish-sha' );
+		const finalizePreparedNpmReleaseFn = jest.fn();
+
+		await runPackagesRelease( config, [], {
+			finalizePreparedNpmReleaseFn,
+			prepareNpmReleaseFn,
+			publishPreparedPackagesToNpmFn,
+		} );
+
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledWith( config );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledTimes( 1 );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledWith( config );
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith( config, {
+			changelogCommit: 'changelog-sha',
+			publishCommit: 'publish-sha',
+		} );
+		expect(
+			prepareNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			finalizePreparedNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+} );
 
 describe( 'getNpmReleasePackages', () => {
 	it( 'returns public packages tagged at HEAD', async () => {

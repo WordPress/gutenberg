@@ -103,7 +103,6 @@
 		"deepmerge": "^4.3.1",
 		"diff": "^8.0.3",
 		"fast-deep-equal": "^3.1.3",
-		"memize": "^2.1.0",
 		"parsel-js": "^1.1.2",
 		"postcss": "^8.4.38",
 		"postcss-prefix-selector": "^1.16.0",

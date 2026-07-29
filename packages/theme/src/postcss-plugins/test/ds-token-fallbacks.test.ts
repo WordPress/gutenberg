@@ -1,4 +1,4 @@
-import { addFallbackToVar } from '../ds-token-fallbacks.mjs';
+import { addFallbackToVar } from '../../../postcss-plugins/ds-token-fallbacks.mjs';
 
 describe( 'addFallbackToVar', () => {
 	it( 'injects a fallback for a known token', () => {

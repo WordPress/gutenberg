@@ -3,14 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -29,18 +28,10 @@ import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
-import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
-	useEffect( () => {
-		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-		return () => {
-			unregisterFormatType( NOTE_FORMAT_NAME );
-		};
-	}, [] );
-
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(

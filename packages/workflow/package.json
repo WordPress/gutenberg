@@ -40,7 +40,7 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"wpScriptModuleExports": {
 		".": "./build-module/index.mjs"

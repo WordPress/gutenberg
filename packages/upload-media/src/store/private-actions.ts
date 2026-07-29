@@ -30,7 +30,7 @@ import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
-import { measure } from './utils/debug-logger';
+import { debug, measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -42,6 +42,8 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	isConversionTimeoutError,
+	isSizeLimitConversionError,
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
@@ -441,6 +443,10 @@ export function processItem( id: QueueItemId ) {
 			id,
 			operation,
 		} );
+
+		debug(
+			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+		);
 
 		switch ( operation ) {
 			case OperationType.Prepare:
@@ -1034,6 +1040,11 @@ export function uploadItem( id: QueueItemId ) {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			// The queue's own items drive upload progress UI and save
+			// locking; without this, consumers that track uploads themselves
+			// (e.g. the editor's progress snackbar) would count this file a
+			// second time.
+			isTransportOnly: true,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					finishUpload( attachment );
@@ -1135,16 +1146,24 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix,
-				args.quality
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1302,13 +1321,21 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1386,7 +1413,11 @@ export function transcodeGifItem(
 			const file = await convertGifToVideo(
 				item.id,
 				gifFile,
-				outputMimeType
+				outputMimeType,
+				{
+					timeout: args?.timeout,
+					maxTotalPixels: args?.maxTotalPixels,
+				}
 			);
 
 			// Hand the transcoded video to the next Upload op as the
@@ -1434,9 +1465,41 @@ export function transcodeGifItem(
 			// create an `animated_video` meta entry pointing at the GIF
 			// itself — meaningless.
 			if ( isUnsupportedConversionError( error ) ) {
+				/*
+				 * A GIF skipped for exceeding the total-pixel budget is a
+				 * graceful outcome like any other unsupported conversion,
+				 * but worth a SCRIPT_DEBUG diagnostic so developers testing
+				 * large GIFs understand why no companion video was produced.
+				 */
+				if ( isSizeLimitConversionError( error ) ) {
+					debug(
+						`Skipping GIF to video conversion: ${
+							error instanceof Error ? error.message : error
+						}`
+					);
+				}
 				dispatch.cancelItem(
 					id,
 					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
+				return;
+			}
+			/*
+			 * The conversion ran past the allowed time and was abandoned:
+			 * the GIF attachment stands alone, which is exactly what the
+			 * user uploaded. SCRIPT_DEBUG diagnostic only, no user-facing
+			 * error.
+			 */
+			if ( isConversionTimeoutError( error ) ) {
+				debug(
+					`GIF to video conversion timed out; keeping the original GIF only: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion timed out' ),
 					true
 				);
 				return;

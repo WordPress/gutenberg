@@ -26,6 +26,7 @@ function useServerData( settings ) {
 	const __experimentalDiscussionSettings =
 		settings?.__experimentalDiscussionSettings;
 	const fontLibraryEnabled = settings?.fontLibraryEnabled ?? true;
+	const responsiveEditingEnabled = settings?.responsiveEditingEnabled ?? true;
 
 	const mediaUploadHandler = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
@@ -72,13 +73,20 @@ function useServerData( settings ) {
 		mediaUploadHandler,
 	] );
 
-	return { serverCSS, serverSettings, fontLibraryEnabled };
+	return {
+		serverCSS,
+		serverSettings,
+		fontLibraryEnabled,
+		responsiveEditingEnabled,
+	};
 }
 
 export default function GlobalStylesUIWrapper( {
 	path,
 	onPathChange,
 	settings,
+	selectedViewport,
+	showResponsiveStateControls = true,
 } ) {
 	const {
 		user: userConfig,
@@ -86,8 +94,12 @@ export default function GlobalStylesUIWrapper( {
 		setUser: setUserConfig,
 		isReady,
 	} = useGlobalStyles();
-	const { serverCSS, serverSettings, fontLibraryEnabled } =
-		useServerData( settings );
+	const {
+		serverCSS,
+		serverSettings,
+		fontLibraryEnabled,
+		responsiveEditingEnabled,
+	} = useServerData( settings );
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {
@@ -105,6 +117,10 @@ export default function GlobalStylesUIWrapper( {
 				fontLibraryEnabled={ fontLibraryEnabled }
 				serverCSS={ serverCSS }
 				serverSettings={ serverSettings }
+				selectedViewport={ selectedViewport }
+				showResponsiveStateControls={
+					showResponsiveStateControls && responsiveEditingEnabled
+				}
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

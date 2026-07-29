@@ -125,8 +125,10 @@ function gutenberg_register_packages_styles( $styles ) {
 	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 	$suffix  = SCRIPT_DEBUG ? '' : '.min';
 
-	// wp-components: add dashicons (icon font dependency)
-	$styles->query( 'wp-components', 'registered' )->deps[] = 'dashicons';
+	// wp-components: add dashicons (icon font dependency) and design tokens.
+	$components_style         = $styles->query( 'wp-components', 'registered' );
+	$components_style->deps[] = 'dashicons';
+	$components_style->deps[] = 'wp-theme';
 
 	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
@@ -143,10 +145,6 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
-	// Register wp-theme (Design System tokens from @wordpress/theme) as a
-	// dependency of wp-base-styles so its `:root` token block loads
-	// everywhere wp-base-styles does, including the editor iframe via
-	// $wp_edit_blocks_dependencies below.
 	gutenberg_override_style(
 		$styles,
 		'wp-theme',
@@ -163,7 +161,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-base-styles',
 		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
-		array( 'wp-theme' ),
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
@@ -488,12 +486,4 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 function gutenberg_enqueue_video_conversion_loader() {
 	wp_enqueue_script_module( '@wordpress/video-conversion/loader' );
-}
-
-/**
- * Enqueues the core abilities script module in the admin screens.
- */
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
-function gutenberg_enqueue_core_abilities() {
-	wp_enqueue_script_module( '@wordpress/core-abilities' );
 }

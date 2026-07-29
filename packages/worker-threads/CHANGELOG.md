@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `expose`: Normalize thrown values that are not `Error` instances (or have an empty message), such as `WebAssembly.Exception`, so they reach the main thread as promise rejections instead of being mistaken for a successful `undefined` result ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+-   Reject pending RPC calls when the worker fails (`error` / `messageerror` events) or is terminated via `terminate()`, instead of leaving the promises pending forever ([#79955](https://github.com/WordPress/gutenberg/pull/79955)).
+
 ## 1.11.0 (2026-07-14)
 
 ## 1.10.0 (2026-07-01)

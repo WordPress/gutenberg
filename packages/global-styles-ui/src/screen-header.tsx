@@ -33,6 +33,7 @@ interface ScreenHeaderProps {
 	selectedPseudoState?: string;
 	onChangeViewport?: ( value: string ) => void;
 	onChangePseudoState?: ( value: string ) => void;
+	showResponsiveStateControls?: boolean;
 }
 
 export function ScreenHeader( {
@@ -45,6 +46,7 @@ export function ScreenHeader( {
 	selectedPseudoState = 'default',
 	onChangeViewport,
 	onChangePseudoState,
+	showResponsiveStateControls = true,
 }: ScreenHeaderProps ) {
 	return (
 		<VStack spacing={ 0 }>
@@ -69,7 +71,11 @@ export function ScreenHeader( {
 									</Heading>
 									<VStack spacing={ 2 } alignment="right">
 										<StateControl
-											viewportStates={ viewportStates }
+											viewportStates={
+												showResponsiveStateControls
+													? viewportStates
+													: []
+											}
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
 											pseudoStateValue={

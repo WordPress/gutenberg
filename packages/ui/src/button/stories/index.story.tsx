@@ -1,7 +1,15 @@
-import { Fragment } from '@wordpress/element';
+import { Fragment, useId } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
+import {
+	displayShortcut,
+	shortcutAriaLabel,
+	ariaKeyShortcut,
+} from '@wordpress/keycodes';
+
 import { Button } from '../index';
+import * as Tooltip from '../../tooltip';
+import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
@@ -156,12 +164,7 @@ export const WithIcon: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Button.Icon icon={ wordpress } />
-				Button
-			</>
-		),
+		children: [ <Button.Icon icon={ wordpress } key="icon" />, 'Button' ],
 	},
 };
 
@@ -185,5 +188,52 @@ export const Pressed: Story = {
 		tone: 'neutral',
 		variant: 'minimal',
 		'aria-pressed': true,
+	},
+};
+
+/**
+ * `Button` has no dedicated `shortcut` prop, so keyboard shortcuts must be
+ * composed manually: a visual hint in the tooltip, `aria-keyshortcuts` for
+ * assistive technology, and a visually hidden description. Consumers remain
+ * responsible for registering the shortcut and handling the corresponding
+ * keyboard event.
+ */
+export const WithKeyboardShortcut: Story = {
+	args: {
+		children: 'Save',
+		'aria-keyshortcuts': ariaKeyShortcut.primary( 's' ),
+	},
+	render: ( {
+		children,
+		'aria-describedby': consumerDescribedBy,
+		...args
+	} ) => {
+		const descriptionId = useId();
+
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={ <Button { ...args } /> }
+					aria-describedby={ [ consumerDescribedBy, descriptionId ]
+						.filter( Boolean )
+						.join( ' ' ) }
+				>
+					{ children }
+					<VisuallyHidden
+						id={ descriptionId }
+						aria-hidden="true"
+						render={ <span /> }
+					>
+						Keyboard shortcut: { shortcutAriaLabel.primary( 's' ) }
+					</VisuallyHidden>
+				</Tooltip.Trigger>
+				<Tooltip.Popup>
+					{ children }{ ' ' }
+					<span aria-hidden="true" dir="ltr">
+						{ displayShortcut.primary( 's' ) }
+					</span>
+				</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	},
 };

@@ -246,6 +246,11 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
+
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
@@ -563,6 +568,11 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |

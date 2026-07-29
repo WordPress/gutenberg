@@ -59,16 +59,24 @@ describe( 'SearchControl', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Reset search' } )
 			).not.toBeInTheDocument();
+			const paddingInlineEndWithoutSuffix =
+				getComputedStyle( searchInput ).paddingInlineEnd;
 
 			await type( 'test', searchInput );
 			const resetButton = screen.getByRole( 'button', {
 				name: 'Reset search',
 			} );
 			expect( resetButton ).toBeVisible();
+			expect( getComputedStyle( searchInput ).paddingInlineEnd ).not.toBe(
+				paddingInlineEndWithoutSuffix
+			);
 
 			await click( resetButton );
 			expect( searchInput ).toHaveValue( '' );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '' );
+			expect( getComputedStyle( searchInput ).paddingInlineEnd ).toBe(
+				paddingInlineEndWithoutSuffix
+			);
 		} );
 
 		it( 'should render a Close button (instead of Reset) when onClose function is provided', async () => {
