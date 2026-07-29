@@ -267,26 +267,26 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 	<style>
 		/* Critical styles to prevent layout shifts - inlined for immediate application */
 
-		#wpwrap {
+		body.js #wpwrap {
 			overflow-y: auto;
 		}
-		body {
+		body.js {
 			background: #fff;
 		}
 
 		/* Reset wp-admin padding */
-		#wpcontent {
+		body.js #wpcontent {
 			padding-inline-start: 0;
 		}
-		#wpbody-content {
+		body.js #wpbody-content {
 			padding-bottom: 0;
 		}
 
 		/* Hide legacy admin elements */
-		#wpbody-content > div:not(.boot-layout-container):not(#screen-meta):not(.hide-if-js) {
+		body.js #wpbody-content > div:not(.boot-layout-container):not(#screen-meta):not(.hide-if-js) {
 			display: none;
 		}
-		#wpfooter {
+		body.js #wpfooter {
 			display: none;
 		}
 
