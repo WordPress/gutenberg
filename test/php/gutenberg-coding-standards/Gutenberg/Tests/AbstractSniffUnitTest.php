@@ -29,7 +29,7 @@ abstract class AbstractSniffUnitTest extends BaseAbstractSniffUnitTest {
 	 * This method resets the 'Gutenberg' ruleset in the $GLOBALS['PHP_CODESNIFFER_RULESETS']
 	 * to its original state.
 	 */
-	public static function tearDownAfterClass() {
+	public static function tearDownAfterClass(): void {
 		parent::tearDownAfterClass();
 
 		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = static::$original_ruleset;
