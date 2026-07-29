@@ -5,6 +5,9 @@ import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
 export type ActiveViewOverrides = {
 	// scalar values
+	type?: View[ 'type' ];
+	perPage?: View[ 'perPage' ];
+	fields?: View[ 'fields' ];
 	titleField?: View[ 'titleField' ];
 	showTitle?: View[ 'showTitle' ];
 	mediaField?: View[ 'mediaField' ];
@@ -13,6 +16,10 @@ export type ActiveViewOverrides = {
 	showDescription?: View[ 'showDescription' ];
 	showLevels?: View[ 'showLevels' ];
 	infiniteScrollEnabled?: View[ 'infiniteScrollEnabled' ];
+	// URL-derived values (page, search); used as a tab-specific fallback,
+	// lower priority than the current URL query params.
+	page?: View[ 'page' ];
+	search?: View[ 'search' ];
 	// array & object values
 	filters?: View[ 'filters' ];
 	sort?: View[ 'sort' ];
