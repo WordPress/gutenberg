@@ -1,18 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useLayoutEffect } from '@wordpress/element';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import {
-	store as coreStore,
-	privateApis as coreDataPrivateApis,
-} from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { getQueryArg } from '@wordpress/url';
 
@@ -21,17 +12,7 @@ import { getQueryArg } from '@wordpress/url';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-const { entityContainsSnapshot } = unlock( coreDataPrivateApis );
-
-/**
- * How long the deferred autosave notice waits for the shared document to
- * sync before failing open and showing the notice. The decision can resolve
- * earlier when the document proves it contains the autosave or the
- * connection fails; once this deadline expires, the autosave is treated as
- * missing from the shared document.
- */
-const AUTOSAVE_NOTICE_SYNC_WAIT_MS = 3000;
+import useEntityContainsSnapshot from './use-entity-contains-snapshot';
 
 /**
  * Creates the warning notice about a more recent autosave.
@@ -90,15 +71,12 @@ function showAutosaveExistsNotice( {
  * mount whenever the server flagged an autosave (`settings.autosave`).
  *
  * Under real-time collaboration, the autosave content is usually already
- * part of the shared document, making the notice redundant. The decision is
- * deferred and made at most once: it resolves when the shared document
- * proves it contains the autosave or sync fails, and otherwise fails open
- * after a short wait (`AUTOSAVE_NOTICE_SYNC_WAIT_MS`).
- *
- * The autosave records a Yjs snapshot of the document it captured, which the
- * server returns in `settings.autosave.crdtSnapshot`. The shared document is
- * checked against it. A positive result proves this document holds everything
- * the autosave did, so the notice is not necessary.
+ * part of the shared document, making the notice redundant. The autosave
+ * records a Yjs snapshot of the document it captured, which the server
+ * returns in `settings.autosave.crdtSnapshot`. The notice decision is
+ * deferred until the shared document is checked against that snapshot (see
+ * `useEntityContainsSnapshot`): a positive result proves this document
+ * holds everything the autosave did, so the notice is not necessary.
  *
  * IMPORTANT: Call this hook after the mount effect that dispatches
  * `setupEditor`, so that the collaboration check can read the current post.
@@ -113,140 +91,40 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 	const { createWarningNotice } = useDispatch( noticesStore );
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
-	// Whether the notice decision is pending a signal from the shared
-	// document. Only set for collaborative posts.
-	const isAutosaveNoticeDeferredRef = useRef( false );
-
-	// Whether the deferred notice has waited long enough for the shared
-	// document to sync.
-	const [ hasAutosaveNoticeWaitExpired, setHasAutosaveNoticeWaitExpired ] =
-		useState( false );
-
-	// Selected values used to re-run the deferred decision effect below.
-	// The effect reads fresh store values when it runs.
-	const { autosaveSyncStatus, isCollaborationEnabledForPost } = useSelect(
-		( select ) => {
-			if ( ! settings.autosave?.crdtSnapshot ) {
-				return {
-					autosaveSyncStatus: undefined,
-					isCollaborationEnabledForPost: false,
-				};
-			}
-
-			const connectionStatus = unlock(
-				select( coreStore )
-			).getEntitySyncConnectionStatus( 'postType', post.type, post.id );
-
-			return {
-				autosaveSyncStatus: connectionStatus?.status,
-				isCollaborationEnabledForPost: unlock(
-					select( editorStore )
-				).isCollaborationEnabledForCurrentPost(),
-			};
-		},
-		[ post.type, post.id, settings.autosave?.crdtSnapshot ]
-	);
+	// Assume the notice is not needed in the case of an error recovery.
+	// Passing no snapshot resolves the snapshot status immediately.
+	const snapshotStatus = useEntityContainsSnapshot( {
+		postType: post.type,
+		postId: post.id,
+		snapshot: recovery ? undefined : settings.autosave?.crdtSnapshot,
+	} );
 
 	useLayoutEffect( () => {
-		// Assume the notice is not needed in the case of an error recovery.
 		if ( recovery || ! settings.autosave ) {
 			return;
 		}
 
-		const canDeferAutosaveNotice =
-			settings.autosave.crdtSnapshot &&
-			unlock(
-				registry.select( editorStore )
-			).isCollaborationEnabledForCurrentPost();
-
-		// Outside real-time collaboration, keep the original behavior and
-		// create the notice immediately.
-		if ( ! canDeferAutosaveNotice ) {
-			showAutosaveExistsNotice( {
-				autosave: settings.autosave,
-				createWarningNotice,
-				registry,
-				setCurrentRevisionId,
-			} );
+		// The shared document already accounts for the autosaved content,
+		// so the notice is redundant.
+		if ( 'present' === snapshotStatus ) {
 			return;
 		}
 
-		// Defer the decision until the shared document confirms the
-		// autosave, sync fails, or the wait deadline below expires (see
-		// the decision effect below).
-		isAutosaveNoticeDeferredRef.current = true;
+		// Keep waiting for the snapshot status to resolve.
+		if ( 'pending' === snapshotStatus ) {
+			return;
+		}
 
-		const timeoutId = setTimeout( () => {
-			setHasAutosaveNoticeWaitExpired( true );
-		}, AUTOSAVE_NOTICE_SYNC_WAIT_MS );
+		showAutosaveExistsNotice( {
+			autosave: settings.autosave,
+			createWarningNotice,
+			registry,
+			setCurrentRevisionId,
+		} );
 
-		return () => clearTimeout( timeoutId );
-
-		// The notice decision is initiated once, on mount.
+		// The snapshot status settles at most once, so the notice is
+		// created at most once. `settings.autosave` and the notice actions
+		// are stable for the lifetime of the provider.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
-	// Deferred autosave notice decision for collaborative posts. See the
-	// hook docblock for the full decision rules.
-	useEffect( () => {
-		if ( ! isAutosaveNoticeDeferredRef.current ) {
-			return;
-		}
-
-		const isAutosaveInSharedDocument = entityContainsSnapshot(
-			'postType',
-			post.type,
-			post.id,
-			settings.autosave.crdtSnapshot
-		);
-
-		const isCollaborationEnabled = unlock(
-			registry.select( editorStore )
-		).isCollaborationEnabledForCurrentPost();
-		const connectionStatus = unlock(
-			registry.select( coreStore )
-		).getEntitySyncConnectionStatus( 'postType', post.type, post.id );
-
-		let shouldShowNotice;
-
-		if ( isAutosaveInSharedDocument ) {
-			shouldShowNotice = false;
-		} else if ( ! isCollaborationEnabled ) {
-			// Collaboration was disabled after mount (e.g. incompatible
-			// metaboxes were detected). Sync will never connect.
-			shouldShowNotice = true;
-		} else if ( 'disconnected' === connectionStatus?.status ) {
-			// The connection failed before it was established, so the
-			// shared document may be missing the autosaved content.
-			shouldShowNotice = true;
-		} else if ( hasAutosaveNoticeWaitExpired ) {
-			// The document did not confirm the autosave in time. Treat the
-			// autosave as missing from the shared document.
-			shouldShowNotice = true;
-		} else {
-			// Keep waiting for a definitive signal.
-			return;
-		}
-
-		isAutosaveNoticeDeferredRef.current = false;
-
-		if ( shouldShowNotice ) {
-			showAutosaveExistsNotice( {
-				autosave: settings.autosave,
-				createWarningNotice,
-				registry,
-				setCurrentRevisionId,
-			} );
-		}
-		// The decision must run at most once. `settings.autosave` and the
-		// notice actions are stable for the lifetime of the provider; the
-		// values below only trigger re-evaluation.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		autosaveSyncStatus,
-		hasAutosaveNoticeWaitExpired,
-		isCollaborationEnabledForPost,
-		post.type,
-		post.id,
-	] );
+	}, [ snapshotStatus ] );
 }

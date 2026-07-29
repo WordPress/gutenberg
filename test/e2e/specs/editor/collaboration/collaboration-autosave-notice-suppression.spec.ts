@@ -155,7 +155,7 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		} );
 
 		// Outwait the notice's fail-open deadline
-		// (AUTOSAVE_NOTICE_SYNC_WAIT_MS in the editor provider) so that
+		// (SNAPSHOT_STATUS_SYNC_WAIT_MS in the editor provider) so that
 		// asserting absence below is meaningful. Without this, the assertion
 		// could pass before a wrongly triggered fail-open shows the notice.
 		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
