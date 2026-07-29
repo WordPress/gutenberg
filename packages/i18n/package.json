@@ -51,7 +51,8 @@
 		"tannin": "^1.2.0"
 	},
 	"devDependencies": {
-		"benchmark": "^2.1.4"
+		"benchmark": "^2.1.4",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -6,10 +6,19 @@
 	"vitest": {
 		"files": [ "packages/html-entities/src/test/entities.ts" ],
 		"directories": [
+			"packages/annotations",
+			"packages/connectors",
+			"packages/core-commands",
+			"packages/edit-site",
 			"packages/escape-html",
+			"packages/fields",
+			"packages/i18n",
 			"packages/is-shallow-equal",
+			"packages/server-side-render",
 			"packages/shortcode",
+			"packages/style-engine",
 			"packages/token-list",
+			"packages/undo-manager",
 			"packages/wordcount"
 		]
 	},

@@ -1,6 +1,11 @@
 /* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
 
 /**
+ * External dependencies
+ */
+import { describe, expect, it, test } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { createHooks } from '@wordpress/hooks';
