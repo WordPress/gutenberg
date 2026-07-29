@@ -932,6 +932,112 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should wrap pasted legacy markup in its required parent', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		// Legacy button markup predating the buttons wrapper block. It
+		// parses to a valid standalone button, which can only be inserted
+		// within a buttons block.
+		pageUtils.setClipboardData( {
+			html: `<!-- wp:button {"align":"center"} -->
+<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>
+<!-- /wp:button -->`,
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Help build Gutenberg',
+							url: 'https://github.com/WordPress/gutenberg',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should paste copied list items as siblings into another list', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'one' } },
+				{ name: 'core/list-item', attributes: { content: 'two' } },
+			],
+		} );
+
+		// Multi-select the two whole list items and copy them. The
+		// clipboard holds them in a list wrapper so the markup is valid on
+		// its own.
+		await editor.canvas.getByText( 'one' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getMultiSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// Create a second list by typing, and paste in a fresh empty item.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( '* alpha' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The wrapper is dropped and the items are inserted as siblings,
+		// not as a nested list.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'alpha' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should wrap multiple pasted blocks in one required parent', async ( {
 		editor,
 		page,
