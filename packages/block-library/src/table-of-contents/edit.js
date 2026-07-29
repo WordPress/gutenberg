@@ -41,6 +41,70 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
+function TableOfContentsToolbar( {
+	clientId,
+	headingTree,
+	ordered,
+	setAttributes,
+} ) {
+	const canInsertList = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return canInsertBlockType( 'core/list', rootClientId );
+		},
+		[ clientId ]
+	);
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	return (
+		<>
+			<ToolbarGroup>
+				<ToolbarButton
+					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+					title={ __( 'Unordered' ) }
+					description={ __( 'Convert to unordered list' ) }
+					onClick={ () => setAttributes( { ordered: false } ) }
+					isActive={ ordered === false }
+				/>
+				<ToolbarButton
+					icon={
+						isRTL() ? formatListNumberedRTL : formatListNumbered
+					}
+					title={ __( 'Ordered' ) }
+					description={ __( 'Convert to ordered list' ) }
+					onClick={ () => setAttributes( { ordered: true } ) }
+					isActive={ ordered === true }
+				/>
+			</ToolbarGroup>
+			{ canInsertList && (
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () =>
+							replaceBlocks(
+								clientId,
+								createBlock( 'core/list', {
+									ordered,
+									values: renderToString(
+										<TableOfContentsList
+											nestedHeadingList={ headingTree }
+											ordered={ ordered }
+										/>
+									),
+								} )
+							)
+						}
+					>
+						{ __( 'Convert to static list' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			) }
+		</>
+	);
+}
+
 /**
  * Table of Contents block edit component.
  *
@@ -83,63 +147,17 @@ export default function TableOfContentsEdit( {
 		} );
 	};
 
-	const canInsertList = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType } =
-				select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-
-			return canInsertBlockType( 'core/list', rootClientId );
-		},
-		[ clientId ]
-	);
-
-	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
 	const toolbarControls = (
 		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
-					title={ __( 'Unordered' ) }
-					description={ __( 'Convert to unordered list' ) }
-					onClick={ () => setAttributes( { ordered: false } ) }
-					isActive={ ordered === false }
-				/>
-				<ToolbarButton
-					icon={
-						isRTL() ? formatListNumberedRTL : formatListNumbered
-					}
-					title={ __( 'Ordered' ) }
-					description={ __( 'Convert to ordered list' ) }
-					onClick={ () => setAttributes( { ordered: true } ) }
-					isActive={ ordered === true }
-				/>
-			</ToolbarGroup>
-			{ canInsertList && (
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ () =>
-							replaceBlocks(
-								clientId,
-								createBlock( 'core/list', {
-									ordered,
-									values: renderToString(
-										<TableOfContentsList
-											nestedHeadingList={ headingTree }
-											ordered={ ordered }
-										/>
-									),
-								} )
-							)
-						}
-					>
-						{ __( 'Convert to static list' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			) }
+			<TableOfContentsToolbar
+				clientId={ clientId }
+				headingTree={ headingTree }
+				ordered={ ordered }
+				setAttributes={ setAttributes }
+			/>
 		</BlockControls>
 	);
 
