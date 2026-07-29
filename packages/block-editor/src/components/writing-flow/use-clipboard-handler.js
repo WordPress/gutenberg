@@ -282,6 +282,7 @@ export default function useClipboardHandler() {
 				);
 
 				const newBlocks = [];
+				const wrappers = new WeakSet();
 
 				for ( const block of blocks ) {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
@@ -297,9 +298,24 @@ export default function useClipboardHandler() {
 							parent?.length === 1 &&
 							canInsertBlockType( parent[ 0 ], rootClientId )
 						) {
-							newBlocks.push(
-								createBlock( parent[ 0 ], {}, [ block ] )
-							);
+							// Consecutive blocks requiring the same parent
+							// share one wrapper, so pasting multiple copied
+							// columns produces a single columns block.
+							const previous = newBlocks[ newBlocks.length - 1 ];
+
+							if (
+								previous?.name === parent[ 0 ] &&
+								wrappers.has( previous )
+							) {
+								previous.innerBlocks.push( block );
+								continue;
+							}
+
+							const wrapper = createBlock( parent[ 0 ], {}, [
+								block,
+							] );
+							wrappers.add( wrapper );
+							newBlocks.push( wrapper );
 							continue;
 						}
 
