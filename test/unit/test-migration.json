@@ -12,6 +12,8 @@
 		"jest": [],
 		"vitest": [
 			"test/unit/config/console.vitest.test.js",
+			"test/unit/config/emotion-serializer.vitest.test.jsx",
+			"test/unit/config/matchers/test/to-match-diff-snapshot.vitest.test.js",
 			"test/unit/config/setup.vitest.test.jsx"
 		]
 	}
