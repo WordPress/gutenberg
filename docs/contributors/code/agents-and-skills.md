@@ -35,15 +35,7 @@ Work down this list and stop at the first match:
 
 ## Package-scoped guidance
 
-Keep package-specific workflows in the repository skill catalog so agents can discover them from their frontmatter. Keep rules that apply whenever an agent works in a package in that package's `AGENTS.md` instead.
-
-| Guidance                                          | Location                                              | Example                                  |
-| ------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------- |
-| A reusable workflow for one package               | `.agents/skills/<package>-<task>/SKILL.md`            | `.agents/skills/components-api/SKILL.md` |
-| Rules that always apply while editing one package | `packages/<package>/AGENTS.md`                        | `packages/components/AGENTS.md`          |
-| Supporting material                               | The relevant package, linked by the skill when needed | `packages/components/README.md`          |
-
-Do not create skills in `packages/<package>/.agents/skills/` or nest them below `.agents/skills/`. The repository catalog is the supported discovery entry point; package-local files should provide scoped guidance or reference material instead.
+Create reusable package workflows in `.agents/skills/<package>-<task>/SKILL.md`. Use `packages/<package>/AGENTS.md` only for rules that apply whenever working in that package, and do not create `packages/<package>/.agents/skills/` directories.
 
 ## Skill conventions
 
