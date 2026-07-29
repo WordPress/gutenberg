@@ -35,6 +35,27 @@ const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
+const reporters = [ 'default' ];
+
+if ( process.env.GITHUB_ACTIONS === 'true' ) {
+	reporters.push( 'github-actions' );
+}
+if (
+	process.env.CI &&
+	process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
+) {
+	reporters.push( [
+		/*
+		 * Resolve to an absolute path so Vitest can load the reporter regardless
+		 * of hoisting layout.
+		 */
+		createRequire( import.meta.url ).resolve( '@flakiness/vitest' ),
+		{
+			duplicates: 'rename',
+			flakinessProject: 'WordPress/gutenberg',
+		},
+	] );
+}
 
 // Preserve Jest's repository-root configuration discovery and default timezone.
 process.chdir( ROOT_DIR );
@@ -135,7 +156,13 @@ export default defineConfig( {
 					environment: 'node',
 					pool: 'threads',
 					include: vitestTests.node,
-					setupFiles: [ gutenbergEnvSetupFile ],
+					setupFiles: [
+						gutenbergEnvSetupFile,
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+					],
 				},
 			},
 			{
@@ -165,6 +192,10 @@ export default defineConfig( {
 						gutenbergEnvSetupFile,
 						path.join(
 							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
 					],
@@ -175,6 +206,12 @@ export default defineConfig( {
 				test: {
 					name: 'browser',
 					include: vitestTests.browser,
+					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+					],
 					browser: {
 						enabled: true,
 						headless: true,
@@ -187,27 +224,7 @@ export default defineConfig( {
 		globals: false,
 		includeTaskLocation: true,
 		passWithNoTests: false,
-		reporters:
-			process.env.CI &&
-			process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
-				? [
-						'default',
-						'github-actions',
-						[
-							/*
-							 * Resolve to an absolute path so Vitest can load
-							 * the reporter regardless of hoisting layout.
-							 */
-							createRequire( import.meta.url ).resolve(
-								'@flakiness/vitest'
-							),
-							{
-								duplicates: 'rename',
-								flakinessProject: 'WordPress/gutenberg',
-							},
-						],
-				  ]
-				: [ 'default' ],
+		reporters,
 		sequence: {
 			hooks: 'list',
 			setupFiles: 'list',
