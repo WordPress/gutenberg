@@ -20,15 +20,9 @@ Agent instructions follow **progressive discovery** — an agent reads only what
 
 This structure controls context bloat. The root `AGENTS.md` is a fixed cost in every session, so keep it lean. Skill bodies are read when relevant, so keep them thin and procedural. Everything linked one hop away is effectively free.
 
-## Native skill discovery
+## Creating skills
 
-The committed [`.agents/skills/`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills) directory is the source of truth. Run the following after installing dependencies to make those skills available to Claude Code:
-
-```bash
-npm run agents:setup
-```
-
-The command exposes each repository skill in `.claude/skills/`. It prefers directory links (Windows junctions on Windows) and falls back to a managed copy when creating a link is not permitted. It never replaces an existing unmanaged skill; resolve that conflict manually before rerunning the command. Generated views are ignored by Git. Start a new Claude Code session after running the command so it refreshes skill discovery.
+Create repository skills in [`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills), following the shared Agent Skills format described below. When using Claude Code, run `npm run agents:setup` after installing dependencies, then start a new session so it discovers the generated skill view.
 
 ## Where does new guidance belong?
 
