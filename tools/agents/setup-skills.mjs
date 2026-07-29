@@ -1,4 +1,4 @@
-import { cp, lstat, mkdir, readdir, rm } from 'node:fs/promises';
+import { cp, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
@@ -12,22 +12,21 @@ const TARGET_SKILLS_DIRECTORY = '.claude/skills';
  * @param {Object}   options                Setup options.
  * @param {string}   options.repositoryRoot Repository root directory.
  * @param {Function} [options.confirm]      Confirms removing unmatched skill entries.
- * @param {boolean}  [options.ifMissing]    Generates skills only when absent.
+ * @param {boolean}  [options.ifSafe]       Replaces skills only without unmatched entries.
  * @return {Promise<boolean>} Whether the skill directory was generated.
  */
 export async function setupSkills( {
 	repositoryRoot,
 	confirm = () => true,
-	ifMissing = false,
+	ifSafe = false,
 } ) {
 	const target = path.join( repositoryRoot, TARGET_SKILLS_DIRECTORY );
-
-	if ( ifMissing && ( await pathExists( target ) ) ) {
-		return false;
-	}
-
 	const source = path.join( repositoryRoot, SOURCE_SKILLS_DIRECTORY );
 	const unmatchedEntries = await getUnmatchedEntries( source, target );
+
+	if ( ifSafe && unmatchedEntries.length ) {
+		return false;
+	}
 
 	if ( unmatchedEntries.length && ! ( await confirm( unmatchedEntries ) ) ) {
 		return false;
@@ -38,20 +37,6 @@ export async function setupSkills( {
 	await cp( source, target, { recursive: true } );
 	return true;
 }
-
-async function pathExists( target ) {
-	try {
-		await lstat( target );
-		return true;
-	} catch ( error ) {
-		if ( error.code === 'ENOENT' ) {
-			return false;
-		}
-
-		throw error;
-	}
-}
-
 async function getUnmatchedEntries( source, target ) {
 	const sourceEntries = await readdir( source );
 	let targetEntries;
@@ -98,16 +83,16 @@ async function confirmReplacement( unmatchedEntries ) {
 }
 
 async function runSetupSkills() {
-	const ifMissing = process.argv.includes( '--if-missing' );
+	const ifSafe = process.argv.includes( '--if-safe' );
 	const generated = await setupSkills( {
 		repositoryRoot: process.cwd(),
 		confirm: confirmReplacement,
-		ifMissing,
+		ifSafe,
 	} );
 	if ( ! generated ) {
-		if ( ifMissing ) {
+		if ( ifSafe ) {
 			console.log(
-				`Skipped: ${ TARGET_SKILLS_DIRECTORY } already exists. Run npm run agents:setup to apply skill catalog changes.`
+				`Skipped: ${ TARGET_SKILLS_DIRECTORY } contains entries that are not in ${ SOURCE_SKILLS_DIRECTORY }. Run npm run agents:setup to apply skill catalog changes.`
 			);
 			return;
 		}

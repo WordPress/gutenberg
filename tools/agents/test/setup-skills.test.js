@@ -86,7 +86,7 @@ describe( 'setupSkills', () => {
 
 		const generated = await setupSkills( {
 			repositoryRoot,
-			ifMissing: true,
+			ifSafe: true,
 		} );
 
 		expect( generated ).toBe( true );
@@ -98,15 +98,48 @@ describe( 'setupSkills', () => {
 		).resolves.toBe( '---\nname: testing\n' );
 	} );
 
-	test( 'leaves the Claude directory untouched when it already exists', async () => {
+	test( 'updates the Claude directory when it has only canonical skills', async () => {
 		const repositoryRoot = await createRepository();
+		await setupSkills( { repositoryRoot } );
+		await writeFile(
+			path.join( repositoryRoot, '.agents/skills/testing/SKILL.md' ),
+			'---\nname: updated testing\n'
+		);
+		await createSkill( repositoryRoot, 'release' );
+
+		const confirm = jest.fn();
+		const generated = await setupSkills( {
+			repositoryRoot,
+			confirm,
+			ifSafe: true,
+		} );
+
+		expect( generated ).toBe( true );
+		expect( confirm ).not.toHaveBeenCalled();
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: updated testing\n' );
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/release/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: release\n' );
+	} );
+
+	test( 'leaves the Claude directory untouched when it has unmatched skills', async () => {
+		const repositoryRoot = await createRepository();
+		await setupSkills( { repositoryRoot } );
 		await createFloatingSkill( repositoryRoot, 'private' );
 		const confirm = jest.fn();
 
 		const generated = await setupSkills( {
 			repositoryRoot,
 			confirm,
-			ifMissing: true,
+			ifSafe: true,
 		} );
 
 		expect( generated ).toBe( false );
@@ -185,18 +218,18 @@ describe( 'setupSkills', () => {
 		expect( stdout ).toBe( 'Generated: .claude/skills\n' );
 	} );
 
-	test( 'skips existing Claude skills when run with --if-missing', async () => {
+	test( 'skips unmatched Claude skills when run with --if-safe', async () => {
 		const repositoryRoot = await createRepository();
 		await createFloatingSkill( repositoryRoot, 'private' );
 
 		const { stdout } = await execFileAsync(
 			process.execPath,
-			[ setupScript, '--if-missing' ],
+			[ setupScript, '--if-safe' ],
 			{ cwd: repositoryRoot }
 		);
 
 		expect( stdout ).toBe(
-			'Skipped: .claude/skills already exists. Run npm run agents:setup to apply skill catalog changes.\n'
+			'Skipped: .claude/skills contains entries that are not in .agents/skills. Run npm run agents:setup to apply skill catalog changes.\n'
 		);
 		await expect(
 			readFile(
