@@ -18,8 +18,6 @@ import {
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
-export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
-
 /**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
@@ -38,7 +36,11 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			.select( blocksStore )
 			.getBlockType( firstBlock.name );
 
-		if ( firstBlockType[ requiresWrapperOnCopy ] ) {
+		// A block restricted to specific parent block types cannot stand
+		// alone, so serialize the wrapper along with the blocks. A copied
+		// multi-selection is always a set of same-parent siblings, so the
+		// first block's wrapper is everyone's wrapper.
+		if ( firstBlockType?.parent?.length ) {
 			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
 				registry.select( blockEditorStore );
 			const wrapperBlockClientId = getBlockRootClientId(

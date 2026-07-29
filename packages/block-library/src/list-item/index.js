@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { listItem as icon } from '@wordpress/icons';
-import { privateApis } from '@wordpress/block-editor';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
@@ -33,7 +32,6 @@ export const settings = {
 		};
 	},
 	transforms,
-	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
 	__experimentalLabel( attributes, { context } ) {
 		const { content } = attributes;
 
