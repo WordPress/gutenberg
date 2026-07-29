@@ -288,7 +288,8 @@ export default function useClipboardHandler() {
 						newBlocks.push( block );
 					} else {
 						// If the block requires exactly one type of parent
-						// block, wrap it. Example: a standalone button (from
+						// block, wrap it, preferring the parent's own
+						// transform. Example: a standalone button (from
 						// markup predating the buttons block) can only be
 						// inserted within a buttons block.
 						const parent = getBlockType( block.name )?.parent;
@@ -298,7 +299,12 @@ export default function useClipboardHandler() {
 							canInsertBlockType( parent[ 0 ], rootClientId )
 						) {
 							newBlocks.push(
-								createBlock( parent[ 0 ], {}, [ block ] )
+								...( switchToBlockType(
+									block,
+									parent[ 0 ]
+								) ?? [
+									createBlock( parent[ 0 ], {}, [ block ] ),
+								] )
 							);
 							continue;
 						}
