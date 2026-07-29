@@ -949,15 +949,10 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.canvas.getByText( 'one' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+a' );
-		await expect
-			.poll( () =>
-				page.evaluate( () => {
-					const { getSelectedBlockClientIds, getBlockName } =
-						window.wp.data.select( 'core/block-editor' );
-					return getSelectedBlockClientIds().map( getBlockName );
-				} )
-			)
-			.toEqual( [ 'core/list-item', 'core/list-item' ] );
+		await expect.poll( editor.getSelectedBlocks ).toMatchObject( [
+			{ name: 'core/list-item', attributes: { content: 'one' } },
+			{ name: 'core/list-item', attributes: { content: 'two' } },
+		] );
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// The clipboard holds the items in a list wrapper so the markup is
@@ -1055,14 +1050,11 @@ test.describe( 'Copy/cut/paste', () => {
 			.getByText( 'col two' )
 			.click( { modifiers: [ 'Shift' ] } );
 		await expect
-			.poll( () =>
-				page.evaluate( () => {
-					const { getSelectedBlockClientIds, getBlockName } =
-						window.wp.data.select( 'core/block-editor' );
-					return getSelectedBlockClientIds().map( getBlockName );
-				} )
-			)
-			.toEqual( [ 'core/column', 'core/column' ] );
+			.poll( editor.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/column' },
+				{ name: 'core/column' },
+			] );
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// The clipboard holds the columns in their wrapper so the markup

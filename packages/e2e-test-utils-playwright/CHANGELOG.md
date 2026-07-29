@@ -5,6 +5,7 @@
 ### New Features
 
 -   `PageUtils`: Add `getClipboardData` for asserting the contents of the emulated clipboard, the counterpart of `setClipboardData` ([#80853](https://github.com/WordPress/gutenberg/pull/80853)).
+-   `Editor`: Add `getSelectedBlocks`, returning the selected blocks in the same shape as `getBlocks` ([#80853](https://github.com/WordPress/gutenberg/pull/80853)).
 
 ### Bug Fixes
 
