@@ -44,10 +44,21 @@ export function localAutosaveSet(
 		backup.crdt_snapshot = crdtSnapshot;
 	}
 
-	window.sessionStorage.setItem(
-		postKey( postId, isPostNew ),
-		JSON.stringify( backup )
-	);
+	const key = postKey( postId, isPostNew );
+
+	try {
+		window.sessionStorage.setItem( key, JSON.stringify( backup ) );
+	} catch ( error ) {
+		if ( ! backup.crdt_snapshot ) {
+			throw error;
+		}
+
+		// In the unlikely event that the snapshot is too large for storage,
+		// ensure we still store content without a snapshot. At worst, this results
+		// in a notice that locally-saved content is available that isn't necessary.
+		delete backup.crdt_snapshot;
+		window.sessionStorage.setItem( key, JSON.stringify( backup ) );
+	}
 }
 
 export function localAutosaveClear( postId, isPostNew ) {
