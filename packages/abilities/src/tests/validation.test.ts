@@ -3,6 +3,11 @@
  */
 
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { validateValueFromSchema } from '../validation';
@@ -137,9 +142,9 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'edge cases', () => {
 		it( 'should pass validation when empty schema provided', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
 			expect( consoleSpy ).toHaveBeenCalledWith(
@@ -150,9 +155,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should warn when type is missing but still pass validation', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const schema = { properties: { name: { type: 'string' } } };
 			const result = validateValueFromSchema( { name: 'test' }, schema );
 
@@ -165,9 +170,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should include param name in warning when provided', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const schema = { format: 'email' }; // Schema without type
 			const result = validateValueFromSchema(
 				'test@example.com',
@@ -453,9 +458,9 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'schema edge cases and errors', () => {
 		it( 'should handle empty schema object as valid but warn about missing type', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			// Empty object schema triggers warning about missing type
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
@@ -467,9 +472,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should warn for invalid schema types but still pass validation', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			// Testing edge cases where schema is not a valid object
 			expect(
@@ -510,9 +515,9 @@ describe( 'validateValueFromSchema', () => {
 		it( 'should handle schema compilation errors', () => {
 			// Pass an invalid schema that will cause compilation error
 			const invalidSchema = { type: 'invalid-type' };
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const result = validateValueFromSchema( 'test', invalidSchema );
 
@@ -570,9 +575,9 @@ describe( 'validateValueFromSchema', () => {
 						},
 					},
 				};
-				const consoleErrorSpy = jest
+				const consoleErrorSpy = vi
 					.spyOn( console, 'error' )
-					.mockImplementation();
+					.mockImplementation( () => {} );
 
 				expect(
 					validateValueFromSchema( { name: 'hello' }, schema )
@@ -591,9 +596,9 @@ describe( 'validateValueFromSchema', () => {
 				type: 'string',
 				sanitize_callback: 'sanitize_text_field',
 			};
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
 				'Invalid schema provided for validation.'

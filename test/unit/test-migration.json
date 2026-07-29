@@ -6,6 +6,7 @@
 	"vitest": {
 		"files": [ "packages/html-entities/src/test/entities.ts" ],
 		"directories": [
+			"packages/abilities",
 			"packages/annotations",
 			"packages/blob",
 			"packages/connectors",

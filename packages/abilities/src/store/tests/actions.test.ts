@@ -3,6 +3,11 @@
  */
 
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import {
@@ -26,10 +31,10 @@ import type {
 describe( 'Store Actions', () => {
 	describe( 'registerAbility', () => {
 		let mockSelect: any;
-		let mockDispatch: jest.Mock;
+		let mockDispatch: Mock;
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			const defaultCategories = [
 				{
 					slug: 'test-category',
@@ -44,11 +49,11 @@ describe( 'Store Actions', () => {
 			];
 
 			mockSelect = {
-				getAbility: jest.fn().mockReturnValue( null ),
-				getAbilityCategories: jest
+				getAbility: vi.fn().mockReturnValue( null ),
+				getAbilityCategories: vi
 					.fn()
 					.mockReturnValue( defaultCategories ),
-				getAbilityCategory: jest.fn().mockImplementation( ( slug ) => {
+				getAbilityCategory: vi.fn().mockImplementation( ( slug ) => {
 					const categories: Record< string, any > = {
 						'test-category': {
 							slug: 'test-category',
@@ -64,7 +69,7 @@ describe( 'Store Actions', () => {
 					return categories[ slug ] || null;
 				} ),
 			};
-			mockDispatch = jest.fn();
+			mockDispatch = vi.fn();
 		} );
 
 		it( 'should register a valid client ability', () => {
@@ -85,7 +90,7 @@ describe( 'Store Actions', () => {
 						success: { type: 'boolean' },
 					},
 				},
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -128,7 +133,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: 'test-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -155,7 +160,7 @@ describe( 'Store Actions', () => {
 					label: 'Test Ability',
 					description: 'Test description',
 					category: 'test-category',
-					callback: jest.fn(),
+					callback: vi.fn(),
 				};
 
 				const action = registerAbility( ability );
@@ -184,7 +189,7 @@ describe( 'Store Actions', () => {
 					label: 'Test Ability',
 					description: 'Test description',
 					category: 'test-category',
-					callback: jest.fn(),
+					callback: vi.fn(),
 				};
 
 				mockSelect.getAbility.mockReturnValue( null );
@@ -209,7 +214,7 @@ describe( 'Store Actions', () => {
 				label: '',
 				description: 'Test description',
 				category: 'test-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -226,7 +231,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: '',
 				category: 'test-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -243,7 +248,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: '',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -271,7 +276,7 @@ describe( 'Store Actions', () => {
 					label: 'Test Ability',
 					description: 'Test description',
 					category: invalidCategory,
-					callback: jest.fn(),
+					callback: vi.fn(),
 				};
 
 				const action = registerAbility( ability );
@@ -300,7 +305,7 @@ describe( 'Store Actions', () => {
 					label: 'Test Ability',
 					description: 'Test description',
 					category: validCategory,
-					callback: jest.fn(),
+					callback: vi.fn(),
 				};
 
 				const categoriesForTest = [
@@ -361,7 +366,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: 'non-existent-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -397,7 +402,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: 'data-retrieval',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -437,7 +442,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test ability with custom scope',
 				category: 'test-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 				meta: {
 					scope: 'editor',
 					customProperty: 'customValue',
@@ -475,7 +480,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: 'test-category',
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const action = registerAbility( ability );
@@ -511,15 +516,15 @@ describe( 'Store Actions', () => {
 
 	describe( 'registerAbilityCategory', () => {
 		let mockSelect: any;
-		let mockDispatch: jest.Mock;
+		let mockDispatch: Mock;
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			mockSelect = {
-				getAbilityCategory: jest.fn().mockReturnValue( null ),
-				getAbilityCategories: jest.fn().mockReturnValue( [] ),
+				getAbilityCategory: vi.fn().mockReturnValue( null ),
+				getAbilityCategories: vi.fn().mockReturnValue( [] ),
 			};
-			mockDispatch = jest.fn();
+			mockDispatch = vi.fn();
 		} );
 
 		it( 'should register a valid category', () => {
@@ -812,10 +817,10 @@ describe( 'Store Actions', () => {
 					description: categoryArgs.description,
 				},
 			];
-			mockSelect.getAbilityCategories = jest
+			mockSelect.getAbilityCategories = vi
 				.fn()
 				.mockReturnValue( categoriesWithNew );
-			mockSelect.getAbility = jest.fn().mockReturnValue( null );
+			mockSelect.getAbility = vi.fn().mockReturnValue( null );
 			mockDispatch.mockClear();
 
 			// Register an ability using the new category
@@ -824,7 +829,7 @@ describe( 'Store Actions', () => {
 				label: 'Test Ability',
 				description: 'Test description',
 				category: categorySlug,
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			const abilityAction = registerAbility( ability );
