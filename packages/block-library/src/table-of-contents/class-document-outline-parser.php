@@ -1,19 +1,19 @@
 <?php
 /**
- * WP_Table_Of_Contents class.
+ * Document_Outline_Parser class.
  *
  * @package WordPress
  */
 
 /**
- * Internal utility class for the Table of Contents block.
+ * Internal document outline parser.
  *
  * This class is for internal Core usage and is not supposed to be used by
  * extenders (plugins and/or themes).
  *
  * @access private
  */
-final class WP_Table_Of_Contents {
+final class Document_Outline_Parser {
 
 	/**
 	 * The Heading block's default level when no `level` attribute is saved.
@@ -23,20 +23,20 @@ final class WP_Table_Of_Contents {
 	private const DEFAULT_HEADING_LEVEL = 2;
 
 	/**
-	 * Utility class.
+	 * Parser class.
 	 */
 	private function __construct() {
 	}
 
 	/**
-	 * Gets heading data for the Table of Contents block from a post.
+	 * Gets the document outline from a post.
 	 *
 	 * @param WP_Post $post       Post to scan.
 	 * @param array   $attributes Attributes of the block being rendered.
 	 *
-	 * @return array Heading data.
+	 * @return array Nested heading data.
 	 */
-	public static function get_headings_from_post( $post, $attributes ) {
+	public static function get_outline_from_post( $post, $attributes ) {
 		if ( ! $post instanceof WP_Post ) {
 			return array();
 		}
@@ -54,7 +54,9 @@ final class WP_Table_Of_Contents {
 			)
 		);
 
-		return self::get_headings_from_content( $post->post_content, $max_level, $context );
+		return self::build_outline(
+			self::get_headings_from_content( $post->post_content, $max_level, $context )
+		);
 	}
 
 	/**
@@ -263,6 +265,61 @@ final class WP_Table_Of_Contents {
 		}
 
 		return $headings;
+	}
+
+	/**
+	 * Converts a flat list of headings into a document outline.
+	 *
+	 * @param array $headings Flat heading data.
+	 *
+	 * @return array Nested heading data.
+	 */
+	private static function build_outline( $headings ) {
+		$outline = array();
+
+		foreach ( $headings as $index => $heading ) {
+			if (
+				'' === $heading['content'] ||
+				$heading['level'] !== $headings[0]['level']
+			) {
+				continue;
+			}
+
+			if (
+				isset( $headings[ $index + 1 ] ) &&
+				$headings[ $index + 1 ]['level'] > $heading['level']
+			) {
+				// The following headings are children until another heading at
+				// the current level appears. Slice that child run for recursion
+				// so nested nodes are not duplicated as top-level siblings.
+				$end_of_slice = count( $headings );
+				for ( $i = $index + 1; $i < count( $headings ); $i++ ) {
+					if ( $headings[ $i ]['level'] === $heading['level'] ) {
+						$end_of_slice = $i;
+						break;
+					}
+				}
+
+				// The child slice starts after the current heading, so each
+				// recursive call receives fewer headings than its caller.
+				$child_headings = array_slice(
+					$headings,
+					$index + 1,
+					$end_of_slice - $index - 1
+				);
+				$outline[]      = array(
+					'heading'  => $heading,
+					'children' => self::build_outline( $child_headings ),
+				);
+			} else {
+				$outline[] = array(
+					'heading'  => $heading,
+					'children' => null,
+				);
+			}
+		}
+
+		return $outline;
 	}
 
 	/**

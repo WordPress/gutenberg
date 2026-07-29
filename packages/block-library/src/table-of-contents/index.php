@@ -5,13 +5,13 @@
  * @package WordPress
  */
 
-require_once __DIR__ . '/table-of-contents/class-wp-table-of-contents.php';
+require_once __DIR__ . '/table-of-contents/class-document-outline-parser.php';
 
 /**
  * Adds an aria-label to the table of contents block content.
  *
  * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param string $content    Content of the block being rendered.
  *
  * @return string The content of the block being rendered.
  */
@@ -33,72 +33,17 @@ function block_core_table_of_contents_add_aria_label( $attributes, $content ) {
 }
 
 /**
- * Converts a flat list of headings to a nested list.
- *
- * @param array $headings Flat heading data.
- *
- * @return array Nested heading data.
- */
-function block_core_table_of_contents_linear_to_nested_heading_list( $headings ) {
-	$nested_headings = array();
-
-	foreach ( $headings as $index => $heading ) {
-		if (
-			'' === $heading['content'] ||
-			$heading['level'] !== $headings[0]['level']
-		) {
-			continue;
-		}
-
-		if (
-			isset( $headings[ $index + 1 ] ) &&
-			$headings[ $index + 1 ]['level'] > $heading['level']
-		) {
-			// The following headings are children until another heading at
-			// the current level appears. Slice that child run for recursion
-			// so nested nodes are not duplicated as top-level siblings.
-			$end_of_slice = count( $headings );
-			for ( $i = $index + 1; $i < count( $headings ); $i++ ) {
-				if ( $headings[ $i ]['level'] === $heading['level'] ) {
-					$end_of_slice = $i;
-					break;
-				}
-			}
-
-			// The child slice starts after the current heading, so each
-			// recursive call receives fewer headings than its caller.
-			$child_headings    = array_slice(
-				$headings,
-				$index + 1,
-				$end_of_slice - $index - 1
-			);
-			$nested_headings[] = array(
-				'heading'  => $heading,
-				'children' => block_core_table_of_contents_linear_to_nested_heading_list( $child_headings ),
-			);
-		} else {
-			$nested_headings[] = array(
-				'heading'  => $heading,
-				'children' => null,
-			);
-		}
-	}
-
-	return $nested_headings;
-}
-
-/**
  * Builds the table of contents list items.
  *
- * @param array  $nested_headings Nested heading data.
- * @param string $list_tag        List tag name.
+ * @param array  $outline  Nested heading data.
+ * @param string $list_tag List tag name.
  *
  * @return string List item markup.
  */
-function block_core_table_of_contents_build_list_items( $nested_headings, $list_tag ) {
+function block_core_table_of_contents_build_list_items( $outline, $list_tag ) {
 	$list = '';
 
-	foreach ( $nested_headings as $node ) {
+	foreach ( $outline as $node ) {
 		$heading = $node['heading'];
 		$content = esc_html( $heading['content'] );
 
@@ -151,9 +96,9 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$headings = WP_Table_Of_Contents::get_headings_from_post( $post, $attributes );
+	$outline = Document_Outline_Parser::get_outline_from_post( $post, $attributes );
 
-	if ( empty( $headings ) ) {
+	if ( empty( $outline ) ) {
 		return '';
 	}
 
@@ -167,7 +112,7 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		$wrapper_attributes,
 		$list_tag,
 		block_core_table_of_contents_build_list_items(
-			block_core_table_of_contents_linear_to_nested_heading_list( $headings ),
+			$outline,
 			$list_tag
 		)
 	);

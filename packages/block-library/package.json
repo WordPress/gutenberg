@@ -78,7 +78,7 @@
 				],
 				"suffixClasses": [
 					"WP_Navigation_Block_Renderer",
-					"WP_Table_Of_Contents"
+					"Document_Outline_Parser"
 				],
 				"addActionPriority": 20,
 				"flattenIndexFiles": true
