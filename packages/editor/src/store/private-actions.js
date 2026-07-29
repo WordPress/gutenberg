@@ -11,6 +11,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -630,18 +631,20 @@ export const restoreRevision =
 		// autosave notice is stale.
 		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
-		// Show success notice.
-		registry.dispatch( noticesStore ).createSuccessNotice(
-			sprintf(
-				/* translators: %s: Date and time of the revision. */
-				__( 'Restored to revision from %s.' ),
-				dateI18n( getDateSettings().formats.datetime, revision.date )
-			),
-			{
-				type: 'snackbar',
-				id: 'editor-revision-restored',
-			}
+		const message = sprintf(
+			/* translators: %s: Date and time of the revision. */
+			__( 'Restored to revision from %s.' ),
+			dateI18n( getDateSettings().formats.datetime, revision.date )
 		);
+
+		speak( message, 'assertive' );
+
+		// Show success notice.
+		registry.dispatch( noticesStore ).createSuccessNotice( message, {
+			type: 'snackbar',
+			id: 'editor-revision-restored',
+			speak: false,
+		} );
 	};
 
 /**
