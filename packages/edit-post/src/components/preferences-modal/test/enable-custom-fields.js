@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -17,7 +18,10 @@ import {
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 function setupUseSelectMock( areCustomFieldsEnabled ) {
 	useSelect.mockImplementation( () => {
@@ -66,9 +70,9 @@ describe( 'EnableCustomFieldsOption', () => {
 describe( 'CustomFieldsConfirmation', () => {
 	it( 'submits the toggle-custom-fields-form', async () => {
 		const user = userEvent.setup();
-		const submit = jest.fn();
-		const setAttribute = jest.fn();
-		const getElementById = jest
+		const submit = vi.fn();
+		const setAttribute = vi.fn();
+		const getElementById = vi
 			.spyOn( document, 'getElementById' )
 			.mockImplementation( () => ( {
 				submit,

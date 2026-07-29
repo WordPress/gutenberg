@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -15,27 +16,28 @@ import { useMetaBoxInitialization } from '../use-meta-box-initialization';
 import { STORE_NAME } from '../../../store/constants';
 
 // Mock unlock to be an identity function so private actions are directly accessible.
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '../../../lock-unlock' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	unlock: ( value ) => value,
 } ) );
 
 const storeConfig = {
 	actions: {
-		forceUpdate: jest.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
+		forceUpdate: vi.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
 	},
 	reducer: ( state = {}, action ) =>
 		action.type === 'FORCE_UPDATE' ? { ...state } : state,
 };
 
-const setCollaborationSupported = jest.fn( () => ( {
+const setCollaborationSupported = vi.fn( () => ( {
 	type: 'SET_COLLABORATION_SUPPORTED',
 } ) );
 
-const initializeMetaBoxes = jest.fn( () => ( {
+const initializeMetaBoxes = vi.fn( () => ( {
 	type: 'META_BOXES_INITIALIZED',
 } ) );
 
-const updateEditorSettings = jest.fn( () => ( {
+const updateEditorSettings = vi.fn( () => ( {
 	type: 'UPDATE_EDITOR_SETTINGS',
 } ) );
 
@@ -52,8 +54,8 @@ function createMockStores( {
 				updateEditorSettings,
 			},
 			selectors: {
-				__unstableIsEditorReady: jest.fn( () => isEditorReady ),
-				isCollaborationEnabledForCurrentPost: jest.fn(
+				__unstableIsEditorReady: vi.fn( () => isEditorReady ),
+				isCollaborationEnabledForCurrentPost: vi.fn(
 					() => isCollaborationEnabled
 				),
 			},
@@ -72,9 +74,9 @@ function createMockStores( {
 				initializeMetaBoxes,
 			},
 			selectors: {
-				getAllMetaBoxes: jest.fn( () => metaBoxes ),
-				hasMetaBoxes: jest.fn( () => metaBoxes.length > 0 ),
-				getActiveMetaBoxLocations: jest.fn( () =>
+				getAllMetaBoxes: vi.fn( () => metaBoxes ),
+				hasMetaBoxes: vi.fn( () => metaBoxes.length > 0 ),
+				getActiveMetaBoxLocations: vi.fn( () =>
 					metaBoxes.length > 0 ? [ 'normal' ] : []
 				),
 			},

@@ -2,6 +2,15 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 
 /**
  * WordPress dependencies
@@ -13,7 +22,10 @@ import { useSelect } from '@wordpress/data';
  */
 import { default as BrowserURL, getPostEditURL } from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 function setupUseSelectMock( { postId, postStatus } ) {
 	useSelect.mockImplementation( () => {
@@ -36,7 +48,7 @@ describe( 'BrowserURL', () => {
 	let replaceStateSpy;
 
 	beforeAll( () => {
-		replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
+		replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
 	} );
 
 	beforeEach( () => {

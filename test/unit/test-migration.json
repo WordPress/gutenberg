@@ -13,6 +13,7 @@
 			"packages/core-commands",
 			"packages/date",
 			"packages/dom-ready",
+			"packages/edit-post",
 			"packages/edit-site",
 			"packages/escape-html",
 			"packages/fields",

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+exports[`MetaBoxesSection > renders a Custom Fields option 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -79,7 +79,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 </fieldset>
 `;
 
-exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
+exports[`MetaBoxesSection > renders a Custom Fields option and meta box options 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -246,7 +246,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 </fieldset>
 `;
 
-exports[`MetaBoxesSection renders meta box options 1`] = `
+exports[`MetaBoxesSection > renders meta box options 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;

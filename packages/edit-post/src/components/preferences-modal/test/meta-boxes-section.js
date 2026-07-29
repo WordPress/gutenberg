@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -15,7 +16,10 @@ import { store as editorStore } from '@wordpress/editor';
 import { MetaBoxesSection } from '../meta-boxes-section';
 import { store as editPostStore } from '../../../store';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 // Override only the selectors the section reads, while delegating the rest
 // (used by the rendered child options) to the real registry.

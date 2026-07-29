@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
+exports[`EnableCustomFieldsOption > renders a checked checkbox and a confirmation message when toggled on 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -73,7 +73,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 </div>
 `;
 
-exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
+exports[`EnableCustomFieldsOption > renders a checked checkbox when custom fields are enabled 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -136,7 +136,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 </div>
 `;
 
-exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
+exports[`EnableCustomFieldsOption > renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -210,7 +210,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 </div>
 `;
 
-exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
+exports[`EnableCustomFieldsOption > renders an unchecked checkbox when custom fields are disabled 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
