@@ -16,6 +16,18 @@ import { BlockContextProvider } from '../../block-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';
 
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the resolving path. The off path lives in
+// `inherited-value-context-core.js`.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 	useDispatch: jest.fn( () => ( {} ) ),

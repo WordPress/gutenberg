@@ -10,7 +10,7 @@
 
 ### Internal
 
--   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#80555](https://github.com/WordPress/gutenberg/pull/80555)).
+-   Gate the inherited Global Styles treatment in the block inspector on the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances until the experiment is turned on ([#80555](https://github.com/WordPress/gutenberg/pull/80555), [#80815](https://github.com/WordPress/gutenberg/pull/80815)).
 -   `URLInput`: Convert the class component to a function component with hooks, replacing the `compose( withSafeTimeout, withSpokenMessages, withInstanceId, withSelect )` wrapper. The unused `setTimeout` prop injected by `withSafeTimeout` is dropped, and the block editor settings are now read on demand rather than subscribed to ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 
 ### Bug Fixes
