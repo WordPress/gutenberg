@@ -47,6 +47,28 @@ function tableOfContentsBlock( {
 	return `<!-- wp:table-of-contents${ attrsStr } /-->`;
 }
 
+function legacyTableOfContentsBlock( {
+	savedHeadingContent,
+	savedHeadingAnchor,
+	currentSettings = {},
+} ) {
+	const listTag = currentSettings.ordered === false ? 'ul' : 'ol';
+	const attributes = {
+		headings: [
+			{
+				content: savedHeadingContent,
+				level: 2,
+				link: `#${ savedHeadingAnchor }`,
+			},
+		],
+		...currentSettings,
+	};
+
+	return `<!-- wp:table-of-contents ${ JSON.stringify( attributes ) } -->
+<nav class="wp-block-table-of-contents"><${ listTag }><li><a class="wp-block-table-of-contents__entry" href="#${ savedHeadingAnchor }">${ savedHeadingContent }</a></li></${ listTag }></nav>
+<!-- /wp:table-of-contents -->`;
+}
+
 function postContentWithTocAndHeadings( headings, extraBlocks = '' ) {
 	return [
 		'<!-- wp:table-of-contents /-->',
@@ -69,6 +91,17 @@ async function createPostWithContent( requestUtils, title, content ) {
 		content,
 		status: 'publish',
 	} );
+}
+
+async function getSavedPostContent( requestUtils, postId ) {
+	const savedPost = await requestUtils.rest( {
+		path: `/wp/v2/posts/${ postId }`,
+		params: {
+			context: 'edit',
+		},
+	} );
+
+	return savedPost.content.raw;
 }
 
 async function updatePostContent( requestUtils, postId, content ) {
@@ -164,9 +197,10 @@ test.describe( 'Table of Contents', () => {
 			] );
 		} );
 
-		test( 'shows the same nested heading list in the editor and after publish', async ( {
+		test( 'newly published posts show the same nested heading list to editors and readers without keeping a stale saved copy', async ( {
 			editor,
 			page,
+			requestUtils,
 		} ) => {
 			await editor.setContent(
 				postContentWithTocAndHeadings( [
@@ -194,6 +228,18 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 
 			const postId = await editor.publishPost();
+			const savedContent = await getSavedPostContent(
+				requestUtils,
+				postId
+			);
+			expect( savedContent ).toContain(
+				'<!-- wp:table-of-contents /-->'
+			);
+			expect( savedContent ).not.toContain( '"headings"' );
+			expect( savedContent ).not.toContain(
+				'wp-block-table-of-contents__entry'
+			);
+
 			await openPostOnFrontend( page, postId );
 
 			const frontendToc = page.getByRole( 'navigation', {
@@ -388,6 +434,125 @@ test.describe( 'Table of Contents', () => {
 			await openPostOnFrontend( page, postId );
 			await expect(
 				page.getByRole( 'navigation', { name: 'Table of Contents' } )
+			).toHaveCount( 0 );
+		} );
+	} );
+
+	test.describe( 'Legacy content compatibility', () => {
+		test( 'readers still see the saved table of contents on an old published post that has not been edited', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const post = await createPostWithContent(
+				requestUtils,
+				'Unedited legacy table of contents',
+				[
+					legacyTableOfContentsBlock( {
+						savedHeadingContent: 'Saved legacy section',
+						savedHeadingAnchor: 'saved-legacy-section',
+					} ),
+					headingBlock( {
+						content: 'Current dynamic section',
+						anchor: 'current-dynamic-section',
+					} ),
+				].join( '\n\n' )
+			);
+
+			await openPostOnFrontend( page, post.id );
+
+			const tableOfContents = page.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Saved legacy section',
+				} )
+			).toBeVisible();
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Current dynamic section',
+				} )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'editing an old post lets readers see a table of contents based on the current headings after saving', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await createPostWithContent(
+				requestUtils,
+				'Edited legacy table of contents',
+				[
+					legacyTableOfContentsBlock( {
+						savedHeadingContent: 'Saved legacy section',
+						savedHeadingAnchor: 'saved-legacy-section',
+						currentSettings: { ordered: false },
+					} ),
+					headingBlock( {
+						content: 'Current dynamic section',
+						anchor: 'current-dynamic-section',
+					} ),
+				].join( '\n\n' )
+			);
+
+			await admin.editPost( post.id );
+
+			const editorTableOfContents =
+				getTableOfContentsEditorBlock( editor );
+			await expect(
+				editorTableOfContents.getByRole( 'link', {
+					name: 'Current dynamic section',
+				} )
+			).toBeVisible();
+			await expect(
+				editorTableOfContents.getByRole( 'link', {
+					name: 'Saved legacy section',
+				} )
+			).toHaveCount( 0 );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A small update to the post.',
+				},
+			} );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save', exact: true } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'updated' } )
+				.waitFor();
+
+			const savedContent = await getSavedPostContent(
+				requestUtils,
+				post.id
+			);
+			expect( savedContent ).toContain(
+				'<!-- wp:table-of-contents {"ordered":false} /-->'
+			);
+			expect( savedContent ).not.toContain( '"headings"' );
+			expect( savedContent ).not.toContain(
+				'wp-block-table-of-contents__entry'
+			);
+
+			await openPostOnFrontend( page, post.id );
+
+			const frontendTableOfContents = page.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				frontendTableOfContents.getByRole( 'link', {
+					name: 'Current dynamic section',
+				} )
+			).toBeVisible();
+			await expect(
+				frontendTableOfContents.getByRole( 'link', {
+					name: 'Saved legacy section',
+				} )
 			).toHaveCount( 0 );
 		} );
 	} );

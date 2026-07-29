@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: Continue rendering saved legacy content until the post is edited and resaved.
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 
 ### Internal
