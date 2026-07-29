@@ -104,7 +104,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertArrayHasKey( '/wp-sync/v1/updates', $routes );
 	}
 
-	public function test_does_not_register_polling_route_when_experiment_is_disabled() {
+	public function test_does_not_register_collaboration_routes_when_experiment_is_disabled() {
 		global $wp_rest_server;
 
 		$original_rest_server = $wp_rest_server;
@@ -117,7 +117,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 			$routes = rest_get_server()->get_routes();
 			$this->assertArrayNotHasKey( '/wp-sync/v1/updates', $routes );
-			$this->assertArrayHasKey( '/wp-sync/v1/save', $routes );
+			$this->assertArrayNotHasKey( '/wp-sync/v1/save', $routes );
 		} finally {
 			$wp_rest_server = $original_rest_server;
 			remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );

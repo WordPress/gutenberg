@@ -26,7 +26,6 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function set_up() {
-		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 		parent::set_up();
 		wp_set_current_user( self::$author_id );
 	}

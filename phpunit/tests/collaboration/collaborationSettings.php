@@ -9,6 +9,8 @@
  */
 
 class Tests_Collaboration_Settings extends WP_UnitTestCase {
+	private const CRDT_DOC_META_KEY = '_crdt_document';
+
 	private $block_editor_was_registered;
 	private $original_block_editor_inline_scripts;
 	private $original_pagenow;
@@ -65,6 +67,34 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 
 		$this->assertFalse( wp_is_collaboration_enabled() );
+	}
+
+	public function test_disabled_experiment_does_not_register_sync_storage_post_type() {
+		unregister_post_type( 'wp_sync_storage' );
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+
+		try {
+			gutenberg_register_sync_storage_post_type();
+
+			$this->assertFalse( post_type_exists( 'wp_sync_storage' ) );
+		} finally {
+			remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+			gutenberg_register_sync_storage_post_type();
+		}
+	}
+
+	public function test_disabled_experiment_does_not_register_crdt_post_meta() {
+		unregister_meta_key( 'post', self::CRDT_DOC_META_KEY );
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+
+		try {
+			gutenberg_rest_api_crdt_post_meta();
+
+			$this->assertFalse( registered_meta_key_exists( 'post', self::CRDT_DOC_META_KEY ) );
+		} finally {
+			remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+			gutenberg_rest_api_crdt_post_meta();
+		}
 	}
 
 	public function test_experiment_injects_collaboration_flag() {

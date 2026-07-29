@@ -2,11 +2,11 @@
 
 A Yjs provider for Gutenberg that enables real-time synchronization via HTTP polling. Since PHP has no native Yjs library, this implementation uses a relay approach where the server stores and forwards messages while clients handle all CRDT operations.
 
-The provider is disabled by default. In the Gutenberg plugin, enable **Real-Time Collaboration** in **Settings > Gutenberg Experiments** to use it as the default sync provider and expose its REST API endpoint. Plugins can replace it through the `sync.providers` filter.
+When the **Real-Time Collaboration** experiment is enabled, HTTP polling is enabled as the default sync provider. Plugins can replace it through the `sync.providers` filter.
 
 ## Architecture
 
-```
+```text
 ┌─────────────────┐                              ┌─────────────────┐
 │    Client A     │                              │    Client B     │
 │  ┌───────────┐  │                              │  ┌───────────┐  │

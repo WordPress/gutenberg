@@ -18,6 +18,10 @@ if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	 * Registers the custom post type for sync storage.
 	 */
 	function gutenberg_register_sync_storage_post_type() {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
 		register_post_type(
 			'wp_sync_storage',
 			array(
@@ -58,11 +62,13 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		if ( wp_is_collaboration_enabled() ) {
-			$sync_storage = new WP_Sync_Post_Meta_Storage();
-			$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-			$sync_server->register_routes();
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
 		}
+
+		$sync_storage = new WP_Sync_Post_Meta_Storage();
+		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();
@@ -75,6 +81,10 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	 * Registers post meta for persisting CRDT documents.
 	 */
 	function gutenberg_rest_api_crdt_post_meta() {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
 		// This string must match POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/core-data.
 		$persisted_crdt_post_meta_key = '_crdt_document';
 
