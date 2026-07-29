@@ -281,44 +281,40 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
+				// If every pasted block requires the same single type of
+				// parent block, wrap them all in one. A copied
+				// multi-selection is always a set of same-parent siblings,
+				// so this covers any copied selection of parent-restricted
+				// blocks: columns paste as one columns block, list items as
+				// one list, a button as a buttons block.
+				const requiredParent = getBlockType( blocks[ 0 ]?.name )
+					?.parent?.[ 0 ];
+
+				if (
+					requiredParent &&
+					! canInsertBlockType( blocks[ 0 ].name, rootClientId ) &&
+					canInsertBlockType( requiredParent, rootClientId ) &&
+					blocks.every( ( block ) => {
+						const { parent } = getBlockType( block.name );
+						return (
+							parent?.length === 1 &&
+							parent[ 0 ] === requiredParent
+						);
+					} )
+				) {
+					__unstableSplitSelection( [
+						createBlock( requiredParent, {}, blocks ),
+					] );
+					event.preventDefault();
+					return;
+				}
+
 				const newBlocks = [];
-				const wrappers = new WeakSet();
 
 				for ( const block of blocks ) {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
 						newBlocks.push( block );
 					} else {
-						// If the block requires exactly one type of parent
-						// block, wrap it. Example: a standalone button (from
-						// markup predating the buttons block) can only be
-						// inserted within a buttons block.
-						const parent = getBlockType( block.name )?.parent;
-
-						if (
-							parent?.length === 1 &&
-							canInsertBlockType( parent[ 0 ], rootClientId )
-						) {
-							// Consecutive blocks requiring the same parent
-							// share one wrapper, so pasting multiple copied
-							// columns produces a single columns block.
-							const previous = newBlocks[ newBlocks.length - 1 ];
-
-							if (
-								previous?.name === parent[ 0 ] &&
-								wrappers.has( previous )
-							) {
-								previous.innerBlocks.push( block );
-								continue;
-							}
-
-							const wrapper = createBlock( parent[ 0 ], {}, [
-								block,
-							] );
-							wrappers.add( wrapper );
-							newBlocks.push( wrapper );
-							continue;
-						}
-
 						// If a block cannot be inserted in a root block, try
 						// converting it to that root block type and insert the
 						// inner blocks.
