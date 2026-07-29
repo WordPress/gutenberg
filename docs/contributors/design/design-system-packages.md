@@ -35,6 +35,16 @@ Use the package documentation as the source of durable facts:
 - [`@wordpress/theme` README](/packages/theme/README.md)
 - [Design Tokens Reference](/packages/theme/docs/tokens.md)
 
+Use evidence for the state it actually describes:
+
+- The target checkout or installed package is authoritative for available
+  exports, types, styles, and runtime behaviour.
+- In a review, the supplied diff describes the proposed post-change state;
+  use the checkout as its baseline and supporting context. Do not reject a
+  change merely because the diff has not been applied to that checkout.
+- The Design System MCP server and current Storybook describe current
+  recommendations. They do not prove that an older target exports an API.
+
 ## Build with public packages
 
 Choose an existing public component and composition before introducing an
@@ -75,8 +85,15 @@ guide, application convention, or skill.
 
 Standard WordPress editor screens manage shared styles centrally. A separate
 application, iframe, popup window, or portal can require its own stylesheet
-and theming setup. Follow the target package README for that document rather
-than copying setup recipes.
+and theming setup. Inventory which public packages render in each document,
+then follow the applicable package setup guidance:
+
+- [`@wordpress/components`](/packages/components/README.md)
+- [`@wordpress/ui`](/packages/ui/README.md#setup)
+- [`@wordpress/theme`](/packages/theme/README.md#across-documents-iframes-and-other-portals)
+
+Apply setup only for packages that render there rather than copying a combined
+recipe into every document.
 
 When an application directly bundles `@wordpress/components` and
 `@wordpress/ui`, follow the `@wordpress/ui` README’s documented overlay
@@ -97,6 +114,13 @@ Keep implementation details distinct from public API. For public changes,
 decide and document compatibility, migration, release, generated-output, and
 consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
+
+Before declaring package work complete, follow the applicable package
+contribution guide and account for each relevant contract surface: public
+exports and types; semantics, states, interaction, and refs; compatibility and
+migration; focused tests and stories; public documentation and recommendation
+metadata; generated output; and the required changelog. Mark a surface not
+applicable rather than silently skipping it.
 
 ## Review checklist
 

@@ -11,9 +11,10 @@ description: Use when reviewing a Gutenberg change to a WordPress Design System 
 2. Scan the complete diff once, then classify it as:
    - **Internal:** no public contract or observable behaviour changes.
    - **Public:** adds, removes, renames, or changes supported behaviour.
-3. Read [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
+3. Read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md)
    and the applicable package contribution guide.
-4. Verify the target branch from source. Use MCP only as supplementary
+4. Apply the public guide's evidence precedence: the diff is the proposed
+   post-change state, target source is its baseline, and MCP is supplementary
    current-design context.
 
 ## Review proportionally
@@ -24,9 +25,13 @@ stop. For a public change:
 - assess Gutenberg and external package consumers separately;
 - verify compatibility and migration rather than treating repository migration
   as sufficient;
-- compare observable old and new values, states, interaction, and styling;
-- inspect tests, stories, documentation, generated output, and release work
-  only where the contract requires them.
+- before drafting findings for a removal, replacement, or rename, compare the
+  old and new accepted values, semantics, states, interaction, and styling in
+  a compact contract table; complete the comparison even after finding one
+  valid defect;
+- use the public guide's
+  [package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
+  and inspect only the surfaces applicable to the changed contract.
 
 Use browser evidence when source or class assertions cannot establish visual,
 focus, motion, or layout parity.

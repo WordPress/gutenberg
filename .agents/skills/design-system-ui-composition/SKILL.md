@@ -25,7 +25,7 @@ contract, make the narrow change, and stop.
 When selection is material, write the required interaction contract before
 choosing a component. Follow the maintained recommendation sources and
 target-version checks in
-[Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component),
+[Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component),
 then verify the selected public API in the target checkout or installed
 version.
 
@@ -40,10 +40,17 @@ satisfies the behaviour and setup.
 - For a migration, preserve observable interaction, styling, accessibility,
   and compatibility.
 - For a separate document, read the
-  [`@wordpress/theme` “Across documents” guidance](../../packages/theme/README.md#across-documents-iframes-and-other-portals)
-  and the linked package setup before editing. Record where static styles,
-  runtime-injected styles, root theming, and overlays are owned; mark each
-  requirement verified or blocked.
+  [cross-package document setup guidance](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document)
+  before editing. Make a short per-document ledger for the packages actually
+  used: static styles, runtime-injected styles, root theming, and overlays.
+  Mark each applicable requirement verified or blocked; do not add setup for a
+  package that does not render there.
+
+For a planning task with no concrete host file or state owner, keep the plan
+actionable under explicit assumptions. When the request names a target, inspect
+that exact target; do not silently plan against another package or active
+equivalent. Treat missing context as a verification gap; block only when it
+prevents a safe behaviour or API decision.
 
 Use the linked public documentation for API and setup facts. Do not copy its
 component mappings, token inventory, or implementation recipes into this

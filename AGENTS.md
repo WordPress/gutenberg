@@ -36,6 +36,7 @@ Read only what your task needs, when it needs it:
 -   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
 -   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
+-   **Target fidelity**: treat a user-specified path, package, or API as the task boundary. Inspect that exact target; do not silently substitute a nearby or newer alternative. Create a missing target only when the request clearly asks for it, otherwise report the mismatch.
 
 ## Code quality
 

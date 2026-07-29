@@ -28,15 +28,21 @@ without evidence that the existing component is unsuitable.
 ## Deepen only material questions
 
 Use the recommendation sources in
-[Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component)
+[Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component)
 only when component, package, prop, token, or setup selection is material.
-Verify the result against the target version.
+Apply that guide's evidence precedence: treat the supplied diff as the proposed
+post-change state, verify availability against the target version, and use MCP
+as current-direction context rather than target-version proof.
 
 For standard and deep reviews, investigate only the dimensions made material
 by the first pass. Judge custom UI by demonstrated user, accessibility,
 consistency, or maintenance impact—not by the mere existence of a public
 alternative. For separate documents, verify the applicable package setup in
 the document that renders the interface.
+
+When custom UI has a material defect, explicitly decide whether the smallest
+coherent fix is to repair it or replace it with a verified public component.
+Do not leave the implementation direction implicit.
 
 ## Finding evidence gate
 

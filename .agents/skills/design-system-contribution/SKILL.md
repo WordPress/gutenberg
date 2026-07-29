@@ -19,10 +19,10 @@ description: Use when planning or implementing a safe `@wordpress/components`, `
 Read the cross-package guide and the package-specific source guidance that
 matches the change:
 
-- [`docs/contributors/design/design-system-packages.md`](../../docs/contributors/design/design-system-packages.md)
-- [`packages/components/CONTRIBUTING.md`](../../packages/components/CONTRIBUTING.md)
-- [`packages/ui/CONTRIBUTING.md`](../../packages/ui/CONTRIBUTING.md)
-- [`packages/theme/tokens/README.md`](../../packages/theme/tokens/README.md)
+- [`docs/contributors/design/design-system-packages.md`](../../../docs/contributors/design/design-system-packages.md)
+- [`packages/components/CONTRIBUTING.md`](../../../packages/components/CONTRIBUTING.md)
+- [`packages/ui/CONTRIBUTING.md`](../../../packages/ui/CONTRIBUTING.md)
+- [`packages/theme/tokens/README.md`](../../../packages/theme/tokens/README.md)
 
 Use an available WordPress Design System MCP server to learn current direction
 when useful, but verify implementation and compatibility against this checkout.
@@ -41,6 +41,11 @@ an unchanged public capability. Still follow the repository's required package
 changelog policy for production code changes.
 
 ## Finish
+
+Use the public guide's
+[package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
+with the applicable package contribution guide. Mark each relevant contract
+surface complete, not applicable, or blocked.
 
 Run focused tests and required lint, type, generation, or build checks. Verify
 interaction or CSS behaviour where source-level tests cannot establish it.
