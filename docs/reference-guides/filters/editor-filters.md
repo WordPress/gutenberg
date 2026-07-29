@@ -61,6 +61,19 @@ Similar to the `codeEditingEnabled` setting, `richEditingEnabled` allows you to 
 
 The setting defaults to the returned value of the [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/) function. It checks whether the user can access the visual editor and whether the user's browser supports it.
 
+### Restrict responsive editing
+
+The `responsiveEditingEnabled` setting, which defaults to `true`, controls whether the "Responsive styles" option is available in the Editor's View menu. When it is `false`, the option is not rendered, and the viewport state control in Global Styles is hidden as well, so users cannot target style changes at a single viewport. Pseudo states such as hover remain available. Responsive styles already defined in the theme or in Global Styles are unaffected.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
+
+function example_disable_responsive_editing( $settings ) {
+	$settings['responsiveEditingEnabled'] = false;
+	return $settings;
+}
+```
+
 ### Set a default image size
 
 Images are set to the `large` image size by default in the Editor. You can modify this using the `imageDefaultSize` setting, which is especially useful if you have configured your own custom image sizes. The following example changes the default image size to `medium`.
