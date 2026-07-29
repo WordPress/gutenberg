@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,6 +39,9 @@ import {
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
 import reducer from '../reducer';
+import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -2560,7 +2567,7 @@ describe( 'private selectors', () => {
 				save: () => null,
 				category: 'text',
 				title: 'Editable root',
-				supports: { editableRoot: true },
+				[ editableRootKey ]: true,
 			} );
 			registerBlockType( 'core/test-plain', {
 				apiVersion: 3,
