@@ -121,8 +121,11 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			return;
 		}
 
-		// Make sure the other blocks move under the selected block(s).
-		const zIndex = isPartOfSelection ? '1' : '';
+		// Make sure the other blocks move under the selected block(s). This has to
+		// clear the in-block UI of the blocks being moved past (z-index 1 and 2),
+		// which a plain `1` ties with and loses to on DOM order. Matches
+		// `.block-editor-block-list__block.is-selected`.
+		const zIndex = isPartOfSelection ? '20' : '';
 
 		const controller = new Controller( {
 			x: 0,
@@ -140,7 +143,10 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 				ref.current.style.transform = finishedMoving
 					? null // Set to `null` to explicitly remove the transform.
 					: `translate3d(${ x }px,${ y }px,0)`;
-				ref.current.style.zIndex = zIndex;
+				// Only needed while moving. Left behind, it makes the block a
+				// stacking context and clamps overflowing UI inside it, e.g. a
+				// Navigation submenu flyout renders behind its siblings.
+				ref.current.style.zIndex = finishedMoving ? null : zIndex;
 				preserveScrollPosition();
 			},
 		} );
