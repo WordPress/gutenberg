@@ -18,9 +18,10 @@ runs:
               BROWSERS: ${{ inputs.browsers }}
           run: |
               VERSION="$(node -p "require('playwright-core/package.json').version")"
-              echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-              echo "BROWSERS_KEY=$(echo "${BROWSERS:-all}" | tr ' ' '-')" >> "$GITHUB_OUTPUT"
-              echo "IMAGE=${ImageOS:-unknown}-${ImageVersion:-unknown}" >> "$GITHUB_OUTPUT"
+              BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
+              # The cached packages must match the versions in the runner image's apt lists.
+              IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
+              echo "PREFIX=playwright-apt-${RUNNER_OS}-${RUNNER_ARCH}-${IMAGE}-${VERSION}-${BROWSERS_KEY}-" >> "$GITHUB_OUTPUT"
 
               if [ -z "$BROWSERS" ] || [ "${BROWSERS#*webkit}" != "$BROWSERS" ]; then
                   echo "CACHE_DEPS=true" >> "$GITHUB_OUTPUT"
@@ -32,18 +33,28 @@ runs:
               mkdir -p "$HOME/apt-cache"
           shell: bash
 
-        - name: Cache Playwright system dependencies
+        # The key carries a fingerprint of the packages, so a cache entry is
+        # never stale: when apt fetches a newer package the fingerprint changes
+        # and the save step writes a new entry. Cache entries are immutable, so
+        # refreshing one is not an option.
+        - name: Restore the cached packages
           if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' }}
-          uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
               path: ~/apt-cache
-              # The cached packages must match the versions in the runner image's apt lists.
-              key: playwright-apt-${{ runner.os }}-${{ runner.arch }}-${{ steps.prepare.outputs.IMAGE }}-${{ steps.prepare.outputs.VERSION }}-${{ steps.prepare.outputs.BROWSERS_KEY }}
+              key: ${{ steps.prepare.outputs.PREFIX }}
+              restore-keys: ${{ steps.prepare.outputs.PREFIX }}
 
         - name: Install Playwright browsers and system dependencies
+          id: install
           env:
               BROWSERS: ${{ inputs.browsers }}
           run: |
+              fingerprint() {
+                  find "$HOME/apt-cache" -maxdepth 1 -name '*.deb' -printf '%f\n' | sort | sha256sum | cut -c1-16
+              }
+              BEFORE="$(fingerprint)"
+
               # `--update=none` needs coreutils 9.3+, so ubuntu-24.04 or newer.
               sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
 
@@ -52,4 +63,19 @@ runs:
 
               sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
               sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
+
+              AFTER="$(fingerprint)"
+              echo "FINGERPRINT=$AFTER" >> "$GITHUB_OUTPUT"
+              if [ "$BEFORE" != "$AFTER" ]; then
+                  echo "CHANGED=true" >> "$GITHUB_OUTPUT"
+              else
+                  echo "CHANGED=false" >> "$GITHUB_OUTPUT"
+              fi
           shell: bash
+
+        - name: Save the packages
+          if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' && steps.install.outputs.CHANGED == 'true' }}
+          uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ~/apt-cache
+              key: ${{ steps.prepare.outputs.PREFIX }}${{ steps.install.outputs.FINGERPRINT }}
