@@ -19,7 +19,7 @@ runs:
           run: |
               VERSION="$(node -p "require('playwright-core/package.json').version")"
               BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
-              # The cached packages must match the versions in the runner image's apt lists.
+              # Packages cached under another runner image mostly miss.
               IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
               echo "PREFIX=playwright-apt-${RUNNER_OS}-${RUNNER_ARCH}-${IMAGE}-${VERSION}-${BROWSERS_KEY}-" >> "$GITHUB_OUTPUT"
 
