@@ -10,6 +10,9 @@
 	"retired": [],
 	"added": {
 		"jest": [],
-		"vitest": [ "test/unit/config/setup.vitest.test.jsx" ]
+		"vitest": [
+			"test/unit/config/console.vitest.test.js",
+			"test/unit/config/setup.vitest.test.jsx"
+		]
 	}
 }
