@@ -5,6 +5,17 @@
  */
 import { registerBlockType } from '@wordpress/blocks';
 
+{{#isCssVariant}}
+/**
+ * Lets webpack process CSS files referenced in JavaScript files.
+ * All files containing `style` keyword are bundled together. The code used
+ * gets applied both to the front of your site and to the editor.
+ *
+ * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
+ */
+import './style.css';
+{{/isCssVariant}}
+{{^isCssVariant}}
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
  * All files containing `style` keyword are bundled together. The code used
@@ -13,6 +24,7 @@ import { registerBlockType } from '@wordpress/blocks';
  * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
  */
 import './style.scss';
+{{/isCssVariant}}
 
 /**
  * Internal dependencies
