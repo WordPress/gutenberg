@@ -55,7 +55,19 @@ export function isHomepage( url, homeUrl ) {
 		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
 		const homePath = homeParsed.pathname.replace( /\/$/, '' );
 
-		return urlPath === homePath;
+		// Check paths match
+		if ( urlPath !== homePath ) {
+			return false;
+		}
+
+		// URLs with query params (e.g. ?p=123 for drafts, ?page_id=2 for pages)
+		// are not the homepage. We cannot distinguish homepage from other pages
+		// when pretty permalinks are off, so we exclude all to avoid false positives.
+		if ( urlParsed.search ) {
+			return false;
+		}
+
+		return true;
 	} catch {
 		return false;
 	}
