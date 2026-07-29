@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -29,8 +30,8 @@ import type { DashboardWidget } from '../types';
  */
 const mockObserved = new Map< Element, ( entries: unknown[] ) => void >();
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
 		return ( element: Element | null ) => {
 			if ( element ) {

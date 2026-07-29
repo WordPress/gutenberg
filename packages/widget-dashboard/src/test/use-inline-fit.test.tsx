@@ -3,6 +3,7 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Internal dependencies
@@ -12,8 +13,8 @@ import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/w
 
 let notifyResize: ( entries: unknown[] ) => void = () => {};
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
 		notifyResize = callback;
 		return () => {};

@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { act, render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -89,7 +90,7 @@ function Harness( {
 
 describe( 'WidgetDashboard staging layer', () => {
 	it( 'keeps mutations in staging without firing onLayoutChange', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -117,7 +118,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'fires onLayoutChange with the staged layout on commit', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -151,7 +152,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'restores staging to the committed layout on cancel', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -178,7 +179,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'reports no uncommitted changes after a swap-and-revert when the visible order is restored', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -206,7 +207,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'commits a canonicalized layout, sorted by order with order stripped', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -265,7 +266,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'forces edit mode when the layout becomes empty', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		const { rerender } = render(
 			<Harness
 				layout={ initialLayout }
@@ -280,7 +281,7 @@ describe( 'WidgetDashboard staging layer', () => {
 	} );
 
 	it( 'stays in edit mode when commit passes exitEditMode: false', () => {
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				layout={ initialLayout }
@@ -307,15 +308,15 @@ describe( 'WidgetDashboard staging layer', () => {
 		];
 
 		beforeEach( () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'publishes a scheduled edit once the debounce elapses, staying in normal mode', () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			render(
 				<Harness
 					layout={ initialLayout }
@@ -332,7 +333,7 @@ describe( 'WidgetDashboard staging layer', () => {
 			expect( onLayoutChange ).not.toHaveBeenCalled();
 
 			act( () => {
-				jest.runOnlyPendingTimers();
+				vi.runOnlyPendingTimers();
 			} );
 
 			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
@@ -345,7 +346,7 @@ describe( 'WidgetDashboard staging layer', () => {
 		} );
 
 		it( 'publishes a pending edit immediately on flushAutoSave', () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			render(
 				<Harness
 					layout={ initialLayout }
@@ -367,7 +368,7 @@ describe( 'WidgetDashboard staging layer', () => {
 		} );
 
 		it( 'flushes a pending edit on unmount instead of dropping it', () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			const { unmount } = render(
 				<Harness
 					layout={ initialLayout }
@@ -394,7 +395,7 @@ describe( 'WidgetDashboard staging layer', () => {
 		} );
 
 		it( 'does not publish unscheduled staging on unmount', () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			const { unmount } = render(
 				<Harness
 					layout={ initialLayout }

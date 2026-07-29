@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -100,7 +101,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'inserts the selected widget type into the layout on Done', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
@@ -141,7 +142,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'inserts multiple widgets via multi-select in a single layout change', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
@@ -173,7 +174,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'preserves existing widgets when appending new ones', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		const existing: DashboardWidget = {
 			uuid: 'existing-1',
 			type: 'wordpress/welcome',

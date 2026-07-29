@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -102,7 +103,7 @@ describe( 'WidgetDashboard widget settings', () => {
 
 	it( 'stages attribute edits behind the drawer and publishes them on Save', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 		await screen.findByTestId( 'greeting' );
 
@@ -146,7 +147,7 @@ describe( 'WidgetDashboard widget settings', () => {
 
 	it( 'discards staged edits when the drawer is dismissed', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 		await screen.findByTestId( 'greeting' );
 

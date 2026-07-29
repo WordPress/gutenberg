@@ -25,6 +25,7 @@
 			"packages/sync",
 			"packages/token-list",
 			"packages/undo-manager",
+			"packages/widget-dashboard",
 			"packages/wordcount"
 		]
 	},

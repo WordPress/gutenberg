@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ function CaptureWidgetContext( {
 
 describe( 'useWidgetContext', () => {
 	it( 'returns null outside a widget render subtree', () => {
-		const handler = jest.fn();
+		const handler = vi.fn();
 		render( <CaptureWidgetContext onRender={ handler } /> );
 		expect( handler ).toHaveBeenCalledWith( null );
 	} );

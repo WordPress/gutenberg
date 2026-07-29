@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -23,11 +24,15 @@ import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
-jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
-	useInlineFit: jest.fn(),
-} ) );
+vi.mock(
+	import( '../components/widget-attributes/use-inline-fit' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useInlineFit: vi.fn(),
+	} )
+);
 
-const mockedUseInlineFit = jest.mocked( useInlineFit );
+const mockedUseInlineFit = vi.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,
