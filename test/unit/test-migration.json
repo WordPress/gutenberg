@@ -4,7 +4,7 @@
 		"sha256": "72316673c4f35ec4d55ec15ba4dbf3435dd2f57b3b54dc5258d9c75b340ad243"
 	},
 	"vitest": {
-		"files": [],
+		"files": [ "packages/html-entities/src/test/entities.ts" ],
 		"directories": []
 	},
 	"retired": [],

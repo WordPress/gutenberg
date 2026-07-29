@@ -42,6 +42,9 @@
 	},
 	"wpScript": true,
 	"types": "build-types",
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

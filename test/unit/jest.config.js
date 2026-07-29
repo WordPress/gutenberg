@@ -8,6 +8,18 @@ const glob = require( 'glob' ).sync;
  * Path to root project directory.
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
+const testMigration = require( './test-migration.json' );
+
+const escapeRegExp = ( value ) =>
+	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+const vitestTestPathIgnorePatterns = [
+	...testMigration.vitest.files.map(
+		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
+	),
+	...testMigration.vitest.directories.map(
+		( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
+	),
+];
 
 // Ensure Babel config resolution works from the repo root,
 // even when Jest runs from the workspace directory.
@@ -106,6 +118,7 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+\\.d\\.ts$',
+		...vitestTestPathIgnorePatterns,
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
