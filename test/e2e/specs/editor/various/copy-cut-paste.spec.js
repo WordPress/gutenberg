@@ -932,6 +932,100 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should wrap multiple pasted blocks in one required parent', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col one' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col two' },
+						},
+					],
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Shift+click across the columns multi-selects the two column
+		// blocks; copying them puts two standalone columns on the
+		// clipboard.
+		await editor.canvas.getByText( 'col one' ).click();
+		await editor.canvas
+			.getByText( 'col two' )
+			.click( { modifiers: [ 'Shift' ] } );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getMultiSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlock, hasMultiSelection } =
+						window.wp.data.select( 'core/block-editor' );
+					return (
+						! hasMultiSelection() &&
+						getSelectedBlock()?.name === 'core/paragraph'
+					);
+				} )
+			)
+			.toBe( true );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const columns = {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col one' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col two' },
+						},
+					],
+				},
+			],
+		};
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ columns, columns ] );
+	} );
+
 	test( 'should wrap a pasted block in its required parent', async ( {
 		editor,
 		page,
