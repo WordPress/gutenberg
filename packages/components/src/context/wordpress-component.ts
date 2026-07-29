@@ -10,7 +10,7 @@ import type * as React from 'react';
  * contributed to high memory usage and slow compilation times.
  */
 type PolymorphicIntrinsicProps = Omit<
-	React.AllHTMLAttributes< any > & React.SVGAttributes< any >,
+	React.AllHTMLAttributes< Element > & React.SVGAttributes< Element >,
 	'as' | 'children'
 >;
 
