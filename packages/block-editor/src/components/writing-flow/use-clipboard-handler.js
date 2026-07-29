@@ -2,11 +2,9 @@
  * WordPress dependencies
  */
 import {
-	createBlock,
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
-	getBlockType,
 	hasBlockSupport,
 	switchToBlockType,
 } from '@wordpress/blocks';
@@ -280,39 +278,6 @@ export default function useClipboardHandler() {
 				const rootClientId = getBlockRootClientId(
 					firstSelectedClientId
 				);
-
-				// Blocks that cannot be pasted directly may declare parent
-				// block types they must be inserted in, so wrap them in the
-				// first insertable type they all accept, if any. A copied
-				// multi-selection is always a set of same-parent siblings,
-				// so one wrapper fits all, e.g. copied columns paste as one
-				// columns block.
-				if (
-					blocks.length &&
-					! canInsertBlockType( blocks[ 0 ].name, rootClientId )
-				) {
-					const wrapperName = blocks
-						.map(
-							( block ) =>
-								getBlockType( block.name )?.parent ?? []
-						)
-						.reduce( ( common, parents ) =>
-							common.filter( ( name ) =>
-								parents.includes( name )
-							)
-						)
-						.find( ( name ) =>
-							canInsertBlockType( name, rootClientId )
-						);
-
-					if ( wrapperName ) {
-						__unstableSplitSelection( [
-							createBlock( wrapperName, {}, blocks ),
-						] );
-						event.preventDefault();
-						return;
-					}
-				}
 
 				const newBlocks = [];
 

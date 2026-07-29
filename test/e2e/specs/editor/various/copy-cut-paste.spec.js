@@ -932,39 +932,6 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
-	test( 'should wrap pasted legacy markup in its required parent', async ( {
-		editor,
-		pageUtils,
-	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
-		// Legacy button markup predating the buttons wrapper block. It
-		// parses to a valid standalone button, which can only be inserted
-		// within a buttons block.
-		pageUtils.setClipboardData( {
-			html: `<!-- wp:button {"align":"center"} -->
-<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>
-<!-- /wp:button -->`,
-		} );
-		await pageUtils.pressKeys( 'primary+v' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/buttons',
-				innerBlocks: [
-					{
-						name: 'core/button',
-						attributes: {
-							text: 'Help build Gutenberg',
-							url: 'https://github.com/WordPress/gutenberg',
-						},
-					},
-				],
-			},
-		] );
-	} );
-
 	test( 'should paste copied list items as siblings into another list', async ( {
 		editor,
 		page,
