@@ -24,14 +24,10 @@ export interface ProviderOptions {
 
 /**
  * Event types for HttpPollingProvider. ObservableV2 expects event handlers as
- * functions. `status` mirrors the generic `ProviderEventMap`; `hasInitialSync`
- * is a provider-internal, payload-less signal exposed to the sync manager via
- * the `onInitialSync` method on the created result (see below), not through
- * the generic `on` forwarder.
+ * functions. `status` mirrors the generic `ProviderEventMap`.
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
-	hasInitialSync: () => void;
 };
 
 /**
@@ -41,7 +37,6 @@ type HttpPollingEvents = {
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
 	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
-	protected hasInitialSync = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
@@ -63,7 +58,6 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			awareness: this.awareness,
 			log: this.log,
 			onStatusChange: this.emitStatus,
-			onInitialSync: this.handleInitialSync,
 		} );
 	}
 
@@ -138,20 +132,6 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			...debug,
 		} );
 	};
-
-	/**
-	 * Handle the initial sync signal from the polling manager, sent once the
-	 * first successful poll has delivered the server's document state. Fires
-	 * the one-shot `hasInitialSync` event so the sync manager can mark the
-	 * entity synced even when that sync produced no document change.
-	 */
-	protected handleInitialSync = (): void => {
-		if ( ! this.hasInitialSync ) {
-			this.hasInitialSync = true;
-			this.log( 'Initial sync' );
-			this.emit( 'hasInitialSync', [] );
-		}
-	};
 }
 
 /**
@@ -179,9 +159,6 @@ export function createHttpPollingProvider(): ProviderCreator {
 			// The callback receives data as the first parameter
 			on: ( event, callback ) => {
 				provider.on( event, callback );
-			},
-			onInitialSync: ( callback ) => {
-				provider.on( 'hasInitialSync', callback );
 			},
 		};
 	};

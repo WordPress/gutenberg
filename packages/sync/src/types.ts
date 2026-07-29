@@ -58,12 +58,6 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
-
-	/**
-	 * Subscribe to the provider's one-shot initial-sync signal, fired once the
-	 * provider has applied its initial document state from the sync backend.
-	 */
-	onInitialSync?: ( callback: () => void ) => void;
 }
 
 /**
@@ -188,11 +182,6 @@ export interface SyncManager {
 		objectId: ObjectID,
 		encodedSnapshot: string
 	) => boolean;
-	subscribeHasInitialSync: (
-		objectType: ObjectType,
-		objectId: ObjectID,
-		callback: () => void
-	) => () => void;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

@@ -74,7 +74,6 @@ interface RegisterRoomOptions {
 	awareness: Awareness;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	onInitialSync: () => void;
 }
 
 interface RoomState {
@@ -85,7 +84,6 @@ interface RoomState {
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	onInitialSync: () => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	room: string;
@@ -785,14 +783,6 @@ function poll(): void {
 						)
 					);
 				}
-
-				// A successful poll has delivered the server's authoritative
-				// state for this room (all updates after the initial cursor),
-				// so the initial sync is complete, even if it applied no
-				// document change or no sync step 2 was exchanged (e.g. a solo
-				// session whose outgoing queue, including sync step 1, is
-				// paused). onInitialSync is one-shot at the provider.
-				roomState.onInitialSync();
 			} );
 
 			// Recalculate polling interval.
@@ -956,7 +946,6 @@ function registerRoom( {
 	doc,
 	awareness,
 	log,
-	onInitialSync,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
@@ -1054,7 +1043,6 @@ function registerRoom( {
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
-		onInitialSync,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
