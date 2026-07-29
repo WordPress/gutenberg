@@ -13,6 +13,7 @@ const meta: Meta< typeof SearchableChipSelect > = {
 			SearchableChipSelect.ChipWithRemove,
 	},
 	argTypes: {
+		items: { control: false },
 		onValueChange: { action: fn() },
 	},
 	parameters: {
