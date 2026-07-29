@@ -9,8 +9,8 @@
 
 ### Enhancements
 
--   Widget chrome: preserve its flex-column layout when host styles reset
-    semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
+-   Widget chrome and picker preview chrome: preserve their flex-column layout
+    when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
 -   Widget settings: use the `drawerRight` icon for the per-tile settings
     trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Widget toolbar: when the tile header lacks room for the inline attribute
