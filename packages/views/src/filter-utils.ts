@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { dequal } from 'dequal';
+
+/**
  * WordPress dependencies
  */
 import type { View, Filter } from '@wordpress/dataviews';
@@ -19,10 +24,16 @@ const SCALAR_VALUES = [
 	'infiniteScrollEnabled',
 ] as const;
 
+// Values that act as developer-provided defaults: the override applies only
+// while the view still matches the default view, so an explicit user
+// modification wins over the override (and gets persisted).
+const DEFAULT_BOUND_VALUES = [ 'type', 'perPage', 'fields' ] as const;
+
 /**
  * Merges activeViewOverrides into a view.
  * Filters: Active filters take precedence; same-field filters are replaced.
- * Sort: Active sort is applied only if current sort matches the default.
+ * Sort, type, perPage, fields: Applied only if the current value matches the
+ * default, so user modifications win.
  *
  * @param view                The view to merge overrides into.
  * @param activeViewOverrides The tab-specific overrides to apply.
@@ -44,6 +55,21 @@ export function mergeActiveViewOverrides(
 	for ( const key of SCALAR_VALUES ) {
 		if ( key in activeViewOverrides ) {
 			result = { ...result, [ key ]: activeViewOverrides[ key ] };
+		}
+	}
+
+	// Merge default-bound overrides — applied only while the view still
+	// matches the default, so explicit user modifications win.
+	for ( const key of DEFAULT_BOUND_VALUES ) {
+		if (
+			key in activeViewOverrides &&
+			defaultView &&
+			dequal( view[ key ], defaultView[ key ] )
+		) {
+			result = {
+				...result,
+				[ key ]: activeViewOverrides[ key ],
+			} as View;
 		}
 	}
 
@@ -104,7 +130,8 @@ export function mergeActiveViewOverrides(
 /**
  * Strips overrides before persisting.
  * Filters: Removes filters on fields managed by activeViewOverrides.
- * Sort: If sort matches the override, restores the default sort.
+ * Sort, type, perPage, fields: If the value matches the override, restores
+ * the default value.
  *
  * @param view                The view to strip overrides from.
  * @param activeViewOverrides The tab-specific override definitions.
@@ -127,6 +154,20 @@ export function stripActiveViewOverrides(
 		if ( key in activeViewOverrides ) {
 			const { [ key ]: _, ...rest } = result;
 			result = rest as View;
+		}
+	}
+
+	// Strip default-bound values: an unmodified override value is restored
+	// to the default view's value; a user-modified value is persisted as is.
+	for ( const key of DEFAULT_BOUND_VALUES ) {
+		if (
+			key in activeViewOverrides &&
+			dequal( view[ key ], activeViewOverrides[ key ] )
+		) {
+			result = {
+				...result,
+				[ key ]: defaultView?.[ key ],
+			} as View;
 		}
 	}
 

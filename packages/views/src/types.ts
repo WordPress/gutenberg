@@ -4,7 +4,7 @@
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
 export type ActiveViewOverrides = {
-	// scalar values
+	// scalar values — always win over the persisted view
 	titleField?: View[ 'titleField' ];
 	showTitle?: View[ 'showTitle' ];
 	mediaField?: View[ 'mediaField' ];
@@ -13,6 +13,11 @@ export type ActiveViewOverrides = {
 	showDescription?: View[ 'showDescription' ];
 	showLevels?: View[ 'showLevels' ];
 	infiniteScrollEnabled?: View[ 'infiniteScrollEnabled' ];
+	// default-bound values — applied only while the view still matches the
+	// default view, so explicit user modifications win and get persisted
+	type?: View[ 'type' ];
+	perPage?: View[ 'perPage' ];
+	fields?: View[ 'fields' ];
 	// array & object values
 	filters?: View[ 'filters' ];
 	sort?: View[ 'sort' ];

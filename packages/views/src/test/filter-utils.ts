@@ -112,6 +112,73 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 	} );
 
+	describe( 'default-bound overrides (type, perPage, fields)', () => {
+		it( 'should apply type override when current type matches the default', () => {
+			const result = mergeActiveViewOverrides(
+				baseView,
+				{ type: 'grid' },
+				defaultView
+			);
+			expect( result.type ).toBe( 'grid' );
+		} );
+
+		it( 'should not apply type override when the user has changed the type', () => {
+			const userView: View = { ...baseView, type: 'list' };
+			const result = mergeActiveViewOverrides(
+				userView,
+				{ type: 'grid' },
+				defaultView
+			);
+			expect( result.type ).toBe( 'list' );
+		} );
+
+		it( 'should not apply type override when no default view is provided', () => {
+			const result = mergeActiveViewOverrides( baseView, {
+				type: 'grid',
+			} );
+			expect( result.type ).toBe( 'table' );
+		} );
+
+		it( 'should apply perPage override when current perPage matches the default', () => {
+			const result = mergeActiveViewOverrides(
+				baseView,
+				{ perPage: 10 },
+				{ ...defaultView, perPage: 25 }
+			);
+			expect( result.perPage ).toBe( 10 );
+		} );
+
+		it( 'should not apply perPage override when the user has changed perPage', () => {
+			const userView: View = { ...baseView, perPage: 50 };
+			const result = mergeActiveViewOverrides(
+				userView,
+				{ perPage: 10 },
+				{ ...defaultView, perPage: 25 }
+			);
+			expect( result.perPage ).toBe( 50 );
+		} );
+
+		it( 'should apply fields override when current fields match the default', () => {
+			const view: View = { ...baseView, fields: [ 'author' ] };
+			const result = mergeActiveViewOverrides(
+				view,
+				{ fields: [ 'date' ] },
+				{ ...defaultView, fields: [ 'author' ] }
+			);
+			expect( result.fields ).toEqual( [ 'date' ] );
+		} );
+
+		it( 'should not apply fields override when the user has changed fields', () => {
+			const view: View = { ...baseView, fields: [ 'author', 'status' ] };
+			const result = mergeActiveViewOverrides(
+				view,
+				{ fields: [ 'date' ] },
+				{ ...defaultView, fields: [ 'author' ] }
+			);
+			expect( result.fields ).toEqual( [ 'author', 'status' ] );
+		} );
+	} );
+
 	describe( 'filter overrides', () => {
 		it( 'should add override filters', () => {
 			const result = mergeActiveViewOverrides( baseView, {
@@ -327,6 +394,68 @@ describe( 'stripActiveViewOverrides', () => {
 			} );
 			expect( result ).not.toHaveProperty( 'titleField' );
 			expect( result.descriptionField ).toBe( 'excerpt' );
+		} );
+	} );
+
+	describe( 'default-bound stripping (type, perPage, fields)', () => {
+		it( 'should restore the default type when current matches the override', () => {
+			const view: View = { ...baseView, type: 'grid' };
+			const result = stripActiveViewOverrides(
+				view,
+				{ type: 'grid' },
+				defaultView
+			);
+			expect( result.type ).toBe( 'table' );
+		} );
+
+		it( 'should keep a user-modified type that differs from the override', () => {
+			const view: View = { ...baseView, type: 'list' };
+			const result = stripActiveViewOverrides(
+				view,
+				{ type: 'grid' },
+				defaultView
+			);
+			expect( result.type ).toBe( 'list' );
+		} );
+
+		it( 'should restore the default perPage when current matches the override', () => {
+			const view: View = { ...baseView, perPage: 10 };
+			const result = stripActiveViewOverrides(
+				view,
+				{ perPage: 10 },
+				{ ...defaultView, perPage: 25 }
+			);
+			expect( result.perPage ).toBe( 25 );
+		} );
+
+		it( 'should keep a user-modified perPage that differs from the override', () => {
+			const view: View = { ...baseView, perPage: 50 };
+			const result = stripActiveViewOverrides(
+				view,
+				{ perPage: 10 },
+				{ ...defaultView, perPage: 25 }
+			);
+			expect( result.perPage ).toBe( 50 );
+		} );
+
+		it( 'should restore the default fields when current matches the override', () => {
+			const view: View = { ...baseView, fields: [ 'date' ] };
+			const result = stripActiveViewOverrides(
+				view,
+				{ fields: [ 'date' ] },
+				{ ...defaultView, fields: [ 'author' ] }
+			);
+			expect( result.fields ).toEqual( [ 'author' ] );
+		} );
+
+		it( 'should keep user-modified fields that differ from the override', () => {
+			const view: View = { ...baseView, fields: [ 'author', 'status' ] };
+			const result = stripActiveViewOverrides(
+				view,
+				{ fields: [ 'date' ] },
+				{ ...defaultView, fields: [ 'author' ] }
+			);
+			expect( result.fields ).toEqual( [ 'author', 'status' ] );
 		} );
 	} );
 
