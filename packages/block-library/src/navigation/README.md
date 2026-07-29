@@ -63,6 +63,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `overlayTextColor` | `string` | — | — |
 | `customOverlayTextColor` | `string` | — | — |
 | `maxNestingLevel` | `number` | `5` | — |
+| `depth` | `number` | `5` | — |
 | `templateLock` | `string \| boolean` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `all`, `insert`, `contentOnly`, `false` |
 
 ## Supports
@@ -111,6 +112,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `openSubmenusOnClick` → attribute `openSubmenusOnClick`
 - `style` → attribute `style`
 - `maxNestingLevel` → attribute `maxNestingLevel`
+- `depth` → attribute `depth`
 
 ## Block Markup
 

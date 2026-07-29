@@ -85,7 +85,12 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
+	const {
+		showSubmenuIcon,
+		maxNestingLevel,
+		submenuVisibility,
+		depth: displayDepth,
+	} = context;
 	const blockEditingMode = useBlockEditingMode();
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
@@ -263,12 +268,14 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	const allowedBlocks =
-		parentCount >= maxNestingLevel
-			? ALLOWED_BLOCKS.filter(
-					( blockName ) => blockName !== 'core/navigation-submenu'
-			  )
-			: ALLOWED_BLOCKS;
+	const isSubmenuAllowed =
+		parentCount < maxNestingLevel && parentCount < displayDepth;
+
+	const allowedBlocks = isSubmenuAllowed
+		? ALLOWED_BLOCKS
+		: ALLOWED_BLOCKS.filter(
+				( blockName ) => blockName !== 'core/navigation-submenu'
+		  );
 
 	const navigationChildBlockProps =
 		getNavigationChildBlockProps( innerBlocksColors );
