@@ -40,13 +40,6 @@ const ListViewBlockContents = forwardRef(
 
 		return (
 			<>
-				{ AdditionalBlockContent && (
-					<AdditionalBlockContent
-						block={ block }
-						insertedBlock={ insertedBlock }
-						setInsertedBlock={ setInsertedBlock }
-					/>
-				) }
 				<BlockDraggable
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
@@ -71,6 +64,13 @@ const ListViewBlockContents = forwardRef(
 						/>
 					) }
 				</BlockDraggable>
+				{ AdditionalBlockContent && (
+					<AdditionalBlockContent
+						block={ block }
+						insertedBlock={ insertedBlock }
+						setInsertedBlock={ setInsertedBlock }
+					/>
+				) }
 			</>
 		);
 	}
