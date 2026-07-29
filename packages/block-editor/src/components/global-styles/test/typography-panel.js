@@ -18,6 +18,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 /**
  * Render helper that flushes async state effects from Ariakit-based
  * controls (CustomSelectControl, FontAppearanceControl, FontFamily) so

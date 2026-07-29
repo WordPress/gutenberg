@@ -24,6 +24,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 	useDispatch: jest.fn( () => ( {} ) ),

@@ -16,6 +16,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 /**
  * Tests for the inherited Global Styles label treatment in `BorderPanel`.
  * The visual treatment lands on the parent `ToolsPanelItem` via the

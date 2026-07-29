@@ -24,6 +24,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
 		palette: {

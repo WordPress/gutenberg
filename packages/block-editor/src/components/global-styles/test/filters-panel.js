@@ -16,6 +16,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 /**
  * Tests for the inherited Global Styles label treatment in `FiltersPanel`.
  * The panel hosts a single duotone slot rendered as a `Dropdown` whose toggle

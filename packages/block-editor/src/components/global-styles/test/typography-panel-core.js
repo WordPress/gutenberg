@@ -16,6 +16,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = false;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 const baseSettings = {
 	typography: {
 		lineHeight: true,

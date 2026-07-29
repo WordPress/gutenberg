@@ -21,6 +21,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = false;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 // Only `useSelect` is called by the hook. The other four are needed at import
 // time by the store modules this file pulls in transitively.
 jest.mock( '@wordpress/data', () => ( {

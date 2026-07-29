@@ -17,6 +17,10 @@ beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
 
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 // `AspectRatioTool` reads its option list from the block-editor data
 // store via `useSettings`. Mock that hook so the tests can render the
 // full set of inherited and selectable ratios without spinning up a
