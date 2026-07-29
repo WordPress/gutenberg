@@ -15,18 +15,6 @@ import { reset as resetIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Whether the inspector surfaces inherited Global Styles values.
- *
- * Set by the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment,
- * so the treatment is off unless someone opts in on the Experiments screen.
- * With it off, the panels show locally-set values alone.
- *
- * @type {boolean}
- */
-export const ENABLE_GLOBAL_STYLES_INHERITANCE =
-	!! window.__experimentalGlobalStylesInheritanceUI;
-
-/**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
  * so its descendant label picks up the inherited-from-Global-Styles
  * visual treatment.

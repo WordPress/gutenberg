@@ -9,6 +9,13 @@ import userEvent from '@testing-library/user-event';
  */
 import FiltersPanel from '../filters-panel';
 
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
 /**
  * Tests for the inherited Global Styles label treatment in `FiltersPanel`.
  * The panel hosts a single duotone slot rendered as a `Dropdown` whose toggle

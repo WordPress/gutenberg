@@ -38,11 +38,7 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -255,7 +251,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = window.__experimentalGlobalStylesInheritanceUI,
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
@@ -283,8 +279,9 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// Core keeps the pre-inheritance comparison on `inheritedValue`.
-		const syncLinkColor = ENABLE_GLOBAL_STYLES_INHERITANCE
+		// With the experiment off, keep the pre-inheritance comparison on
+		// `inheritedValue`.
+		const syncLinkColor = window.__experimentalGlobalStylesInheritanceUI
 			? shouldSyncLinkColor( value, inheritedValue )
 			: inheritedValue?.color?.text ===
 			  inheritedValue?.elements?.link?.color?.text;

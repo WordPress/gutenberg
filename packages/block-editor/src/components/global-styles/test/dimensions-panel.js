@@ -10,6 +10,13 @@ import userEvent from '@testing-library/user-event';
  */
 import DimensionsPanel from '../dimensions-panel';
 
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
 // `AspectRatioTool` reads its option list from the block-editor data
 // store via `useSettings`. Mock that hook so the tests can render the
 // full set of inherited and selectable ratios without spinning up a
