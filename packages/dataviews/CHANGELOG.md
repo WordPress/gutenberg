@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   DataViews: Add a `time` field type and DataForm control.
+-   DataViews: Add a `time` field type and DataForm control. [#80831](https://github.com/WordPress/gutenberg/pull/80831)
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
 
