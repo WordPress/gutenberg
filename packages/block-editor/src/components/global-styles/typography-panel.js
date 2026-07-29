@@ -41,7 +41,7 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -255,7 +255,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
@@ -283,8 +283,9 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// Core keeps the pre-inheritance comparison on `inheritedValue`.
-		const syncLinkColor = ENABLE_GLOBAL_STYLES_INHERITANCE
+		// With the experiment off, keep the pre-inheritance comparison on
+		// `inheritedValue`.
+		const syncLinkColor = isGlobalStylesInheritanceEnabled()
 			? shouldSyncLinkColor( value, inheritedValue )
 			: inheritedValue?.color?.text ===
 			  inheritedValue?.elements?.link?.color?.text;

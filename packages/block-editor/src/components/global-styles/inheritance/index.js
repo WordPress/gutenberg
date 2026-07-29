@@ -16,13 +16,21 @@ import { __ } from '@wordpress/i18n';
 
 /**
  * Whether the inspector surfaces inherited Global Styles values.
- * Plugin-only, so Core builds show locally-set values alone.
  *
- * @type {boolean}
+ * Behind the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment,
+ * so the treatment is off unless someone opts in on the Experiments screen.
+ * With it off, the panels show locally-set values alone.
+ *
+ * Evaluated per call rather than once at module scope, so tests can toggle
+ * the experiment and so a later move to a store-backed setting only has to
+ * change this one place. Always returns a boolean: callers pass the result
+ * down as a prop, and `undefined` would trigger a receiving component's own
+ * default parameter.
+ *
+ * @return {boolean} Whether the inherited-value treatment is enabled.
  */
-export const ENABLE_GLOBAL_STYLES_INHERITANCE = globalThis.IS_GUTENBERG_PLUGIN
-	? true
-	: false;
+export const isGlobalStylesInheritanceEnabled = () =>
+	!! window.__experimentalGlobalStylesInheritanceUI;
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
