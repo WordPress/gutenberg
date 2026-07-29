@@ -439,7 +439,7 @@ test.describe( 'Table of Contents', () => {
 	} );
 
 	test.describe( 'Legacy content compatibility', () => {
-		test( 'readers still see the saved table of contents when the block has saved markup', async ( {
+		test( 'on the front of site, readers see the saved table of contents when the block has saved markup', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -475,7 +475,7 @@ test.describe( 'Table of Contents', () => {
 			).toHaveCount( 0 );
 		} );
 
-		test( 'editing a post with saved table of contents markup lets readers see current headings after saving', async ( {
+		test( 'in the editor, saved table of contents markup shows current headings and readers see them after saving', async ( {
 			admin,
 			editor,
 			page,
