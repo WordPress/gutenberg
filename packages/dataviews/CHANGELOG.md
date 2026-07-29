@@ -291,6 +291,10 @@
 -   Add new `combobox` DataForm control. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
 -   Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 
+### Breaking changes
+
+- Always include filter container styles via `dataviews-filters__container` selector when using free composition with `DataViews.Filters` and `DataViews.FiltersToggled` components. [#75021](https://github.com/WordPress/gutenberg/pull/75021)
+
 ## 11.2.0 (2026-01-16)
 
 ### Code Quality

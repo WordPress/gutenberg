@@ -126,7 +126,7 @@ function DefaultUI( {
 					{ header }
 				</Stack>
 			</Stack>
-			<FiltersToggled className="dataviews-filters__container" />
+			<FiltersToggled />
 			<DataViewsLayout />
 			<DataViewsFooter />
 		</>
