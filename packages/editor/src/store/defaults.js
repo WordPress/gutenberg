@@ -28,8 +28,8 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
-	fontLibraryEnabled: true,
 	responsiveEditingEnabled: true,
+	fontLibraryEnabled: true,
 	enableCustomFields: undefined,
 	defaultRenderingMode: 'post-only',
 };
