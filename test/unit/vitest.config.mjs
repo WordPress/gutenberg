@@ -48,9 +48,10 @@ if (
 	] );
 }
 
-// Preserve Jest's repository-root configuration discovery and default timezone.
+// Preserve repository-root configuration discovery and default to UTC while
+// allowing the date-test matrix to supply another timezone.
 process.chdir( ROOT_DIR );
-process.env.TZ = 'UTC';
+process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = glob(
 	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )

@@ -79,8 +79,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since both test runners
+              # transform source files through Babel. Some packages have custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
@@ -141,8 +141,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since Vitest transforms
+              # source files through Babel. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
@@ -152,7 +152,7 @@ jobs:
                   # dimension so flakiness.io keeps a separate history per Node
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --maxWorkers="$(nproc)"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version

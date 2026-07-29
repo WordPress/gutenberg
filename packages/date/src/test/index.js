@@ -2,6 +2,7 @@
  * External dependencies
  */
 import momentLib from 'moment';
+import { describe, expect, it, test } from 'vitest';
 
 /**
  * Internal dependencies

@@ -11,6 +11,7 @@
 			"packages/blob",
 			"packages/connectors",
 			"packages/core-commands",
+			"packages/date",
 			"packages/dom-ready",
 			"packages/edit-site",
 			"packages/escape-html",
