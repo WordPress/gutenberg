@@ -24,6 +24,11 @@ import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -48,8 +53,42 @@ export default function Edit( {
 } ) {
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
+
+	const isInnermostActive = useSelect(
+		( select ) => {
+			const {
+				hasSelectedInnerBlock,
+				getSelectedBlockClientId,
+				getBlockParentsByBlockName,
+			} = select( blockEditorStore );
+
+			if ( ! hasSelectedInnerBlock( clientId, true ) ) {
+				return false;
+			}
+
+			const selectedId = getSelectedBlockClientId();
+			if ( ! selectedId ) {
+				return false;
+			}
+
+			const accordionAncestors = getBlockParentsByBlockName(
+				selectedId,
+				'core/accordion'
+			);
+
+			return (
+				accordionAncestors.length > 0 &&
+				accordionAncestors[ accordionAncestors.length - 1 ] === clientId
+			);
+		},
+		[ clientId ]
+	);
+
 	const blockProps = useBlockProps( {
 		role: 'group',
+		className: clsx( {
+			'is-accordion-editing-active': isInnermostActive,
+		} ),
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { updateBlockAttributes, insertBlock } =

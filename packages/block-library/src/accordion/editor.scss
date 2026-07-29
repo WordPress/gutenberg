@@ -1,0 +1,31 @@
+// Editor-only outlines for accordion blocks.
+// Shows contextual sibling awareness when editing inside an accordion.
+
+// Color tokens matching the grid visualizer approach:
+// Uses currentColor with color-mix so outlines adapt to theme context.
+$accordion-outline-color: color-mix(in srgb, currentColor 20%, #0000);
+$accordion-outline-color-faint: color-mix(in srgb, currentColor 10%, #0000);
+
+// When the accordion is the innermost active editing level,
+// show outlines on all accordion items for spatial orientation.
+.wp-block-accordion.is-accordion-editing-active {
+	// All sibling items get a subtle dashed outline.
+	> [data-type="core/accordion-item"]:not(.is-selected) {
+		outline: 1px dashed $accordion-outline-color;
+		outline-offset: -1px;
+	}
+
+	// The item containing the active selection gets a solid outline.
+	> [data-type="core/accordion-item"].has-child-selected {
+		outline: 1px solid $accordion-outline-color;
+		outline-offset: -1px;
+	}
+
+	// Nested structure hint: when the active item contains a nested accordion,
+	// show a faint outline around the nested accordion boundary.
+	> [data-type="core/accordion-item"]:is(.has-child-selected, .is-selected)
+	[data-type="core/accordion"] {
+		outline: 1px dashed $accordion-outline-color-faint;
+		outline-offset: -1px;
+	}
+}
