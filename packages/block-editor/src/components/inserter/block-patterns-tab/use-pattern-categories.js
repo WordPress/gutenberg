@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { _x, _n, sprintf } from '@wordpress/i18n';
 
 import { speak } from '@wordpress/a11y';
@@ -29,10 +29,17 @@ function hasRegisteredCategory( pattern, allCategories ) {
 }
 
 export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
+	const [ isLoading, setIsLoading ] = useState( true );
 	const [ patterns, allCategories ] = usePatternsState(
 		undefined,
 		rootClientId
 	);
+
+	useEffect( () => {
+		if ( patterns.length && allCategories.length ) {
+			setIsLoading( false );
+		}
+	}, [ patterns, allCategories ] );
 
 	const filteredPatterns = useMemo(
 		() =>
@@ -47,6 +54,10 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 
 	// Remove any empty categories.
 	const populatedCategories = useMemo( () => {
+		if ( isLoading ) {
+			return [];
+		}
+
 		const categories = allCategories
 			.filter( ( category ) =>
 				filteredPatterns.some( ( pattern ) =>
@@ -100,7 +111,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 			)
 		);
 		return categories;
-	}, [ allCategories, filteredPatterns ] );
+	}, [ allCategories, filteredPatterns, isLoading ] );
 
-	return populatedCategories;
+	return { categories: populatedCategories, isLoading };
 }

@@ -18,7 +18,8 @@ function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
 		initialCategory?.name
 	);
 
-	const patternCategories = usePatternCategories( rootClientId );
+	const { categories: patternCategories } =
+		usePatternCategories( rootClientId );
 
 	return (
 		<div className="block-editor-block-patterns-explorer">

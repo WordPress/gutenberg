@@ -780,3 +780,10 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 }
+
+.block-editor-inserter__block-patterns-tabs-container-spinner {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

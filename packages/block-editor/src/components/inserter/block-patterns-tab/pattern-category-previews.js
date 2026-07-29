@@ -51,7 +51,7 @@ export function PatternCategoryPreviews( {
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 
-	const availableCategories = usePatternCategories(
+	const { categories: availableCategories } = usePatternCategories(
 		rootClientId,
 		patternSourceFilter
 	);

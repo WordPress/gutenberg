@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,9 +25,17 @@ function BlockPatternsTab( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 
-	const categories = usePatternCategories( rootClientId );
+	const { categories, isLoading } = usePatternCategories( rootClientId );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+
+	if ( isLoading ) {
+		return (
+			<div className="block-editor-inserter__block-patterns-tabs-container-spinner">
+				<Spinner />
+			</div>
+		);
+	}
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;
