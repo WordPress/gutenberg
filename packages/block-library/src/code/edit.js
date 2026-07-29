@@ -1,9 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useTabIndentation } from './hook';
 
 export default function CodeEdit( {
 	attributes,
@@ -13,9 +18,12 @@ export default function CodeEdit( {
 	mergeBlocks,
 } ) {
 	const blockProps = useBlockProps();
+	const ref = useTabIndentation();
+
 	return (
 		<pre { ...blockProps }>
 			<RichText
+				ref={ ref }
 				tagName="code"
 				identifier="content"
 				value={ attributes.content }
