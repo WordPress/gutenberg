@@ -33,6 +33,27 @@ describe( 'mergeActiveViewOverrides', () => {
 	} );
 
 	describe( 'scalar overrides', () => {
+		it( 'should merge type override', () => {
+			const result = mergeActiveViewOverrides( baseView, {
+				type: 'grid',
+			} );
+			expect( result.type ).toBe( 'grid' );
+		} );
+
+		it( 'should merge perPage override', () => {
+			const result = mergeActiveViewOverrides( baseView, {
+				perPage: 10,
+			} );
+			expect( result.perPage ).toBe( 10 );
+		} );
+
+		it( 'should merge fields override', () => {
+			const result = mergeActiveViewOverrides( baseView, {
+				fields: [ 'date' ],
+			} );
+			expect( result.fields ).toEqual( [ 'date' ] );
+		} );
+
 		it( 'should merge titleField override', () => {
 			const result = mergeActiveViewOverrides( baseView, {
 				titleField: 'name',
@@ -113,7 +134,7 @@ describe( 'mergeActiveViewOverrides', () => {
 	} );
 
 	describe( 'filter overrides', () => {
-		it( 'should add override filters', () => {
+		it( 'should add an unlocked override filter as a default when the field is not already present', () => {
 			const result = mergeActiveViewOverrides( baseView, {
 				filters: [
 					{ field: 'status', operator: 'isAny', value: 'publish' },
@@ -132,7 +153,7 @@ describe( 'mergeActiveViewOverrides', () => {
 			);
 		} );
 
-		it( 'should replace same-field filters', () => {
+		it( 'should not clobber an existing filter on the same field with an unlocked override', () => {
 			const result = mergeActiveViewOverrides( baseView, {
 				filters: [
 					{
@@ -142,11 +163,33 @@ describe( 'mergeActiveViewOverrides', () => {
 					},
 				],
 			} );
+			// Unlocked overrides only seed a default; since `author` already
+			// has a filter, the existing (user) value is preserved.
+			expect( result.filters ).toHaveLength( 1 );
+			expect( result.filters![ 0 ] ).toEqual( {
+				field: 'author',
+				operator: 'isAny',
+				value: [ 'admin' ],
+			} );
+		} );
+
+		it( 'should always replace same-field filters when the override is locked', () => {
+			const result = mergeActiveViewOverrides( baseView, {
+				filters: [
+					{
+						field: 'author',
+						operator: 'isAny',
+						value: [ 'editor' ],
+						isLocked: true,
+					},
+				],
+			} );
 			expect( result.filters ).toHaveLength( 1 );
 			expect( result.filters![ 0 ] ).toEqual( {
 				field: 'author',
 				operator: 'isAny',
 				value: [ 'editor' ],
+				isLocked: true,
 			} );
 		} );
 
@@ -291,6 +334,23 @@ describe( 'stripActiveViewOverrides', () => {
 	} );
 
 	describe( 'scalar stripping', () => {
+		it( 'should strip type/perPage/fields keys managed by overrides', () => {
+			const view: View = {
+				...baseView,
+				type: 'grid',
+				perPage: 10,
+				fields: [ 'date' ],
+			};
+			const result = stripActiveViewOverrides( view, {
+				type: 'grid',
+				perPage: 10,
+				fields: [ 'date' ],
+			} );
+			expect( result ).not.toHaveProperty( 'type' );
+			expect( result ).not.toHaveProperty( 'perPage' );
+			expect( result ).not.toHaveProperty( 'fields' );
+		} );
+
 		it( 'should strip a scalar key managed by overrides', () => {
 			const view: View = { ...baseView, titleField: 'name' };
 			const result = stripActiveViewOverrides( view, {
@@ -331,7 +391,7 @@ describe( 'stripActiveViewOverrides', () => {
 	} );
 
 	describe( 'filter stripping', () => {
-		it( 'should remove filters on managed fields', () => {
+		it( 'should remove filters on locked managed fields', () => {
 			const view: View = {
 				...baseView,
 				filters: [
@@ -353,11 +413,54 @@ describe( 'stripActiveViewOverrides', () => {
 						field: 'status',
 						operator: 'isAny',
 						value: 'publish',
+						isLocked: true,
 					},
 				],
 			} );
 			expect( result.filters ).toHaveLength( 1 );
 			expect( result.filters?.[ 0 ].field ).toBe( 'author' );
+		} );
+
+		it( 'should keep filters on unlocked managed fields so user edits persist', () => {
+			const view: View = {
+				...baseView,
+				filters: [
+					{
+						field: 'status',
+						operator: 'isAny',
+						value: 'draft', // user-edited value, different from the override default.
+					},
+					{
+						field: 'author',
+						operator: 'isAny',
+						value: [ 'admin' ],
+					},
+				],
+			};
+			const result = stripActiveViewOverrides( view, {
+				filters: [
+					{
+						field: 'status',
+						operator: 'isAny',
+						value: 'publish',
+					},
+				],
+			} );
+			expect( result.filters ).toHaveLength( 2 );
+			expect( result.filters ).toEqual(
+				expect.arrayContaining( [
+					{
+						field: 'status',
+						operator: 'isAny',
+						value: 'draft',
+					},
+					{
+						field: 'author',
+						operator: 'isAny',
+						value: [ 'admin' ],
+					},
+				] )
+			);
 		} );
 
 		it( 'should handle empty override filters', () => {
@@ -502,7 +605,27 @@ describe( 'merge + strip round-trip', () => {
 		expect( stripped.layout ).toEqual( { density: 'compact' } );
 	} );
 
-	it( 'should strip what merge added for filter overrides', () => {
+	it( 'should strip what merge added for locked filter overrides', () => {
+		const overrides = {
+			filters: [
+				{
+					field: 'status' as const,
+					operator: 'isAny' as const,
+					value: 'publish',
+					isLocked: true as const,
+				},
+			],
+		};
+		const merged = mergeActiveViewOverrides( baseView, overrides );
+		const stripped = stripActiveViewOverrides( merged, overrides );
+		// Only the original author filter should remain; the locked
+		// override is never persisted.
+		expect( stripped.filters ).toEqual( [
+			{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
+		] );
+	} );
+
+	it( 'should keep an unlocked filter override once seeded, so later edits persist', () => {
 		const overrides = {
 			filters: [
 				{
@@ -513,10 +636,20 @@ describe( 'merge + strip round-trip', () => {
 			],
 		};
 		const merged = mergeActiveViewOverrides( baseView, overrides );
-		const stripped = stripActiveViewOverrides( merged, overrides );
-		// Only the original author filter should remain.
-		expect( stripped.filters ).toEqual( [
-			{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
-		] );
+		// Simulate the user editing the seeded filter's value.
+		const userEdited: View = {
+			...merged,
+			filters: merged.filters?.map( ( f ) =>
+				f.field === 'status' ? { ...f, value: 'draft' } : f
+			),
+		};
+		const stripped = stripActiveViewOverrides( userEdited, overrides );
+		// The user's edited value is persisted, not discarded.
+		expect( stripped.filters ).toEqual(
+			expect.arrayContaining( [
+				{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
+				{ field: 'status', operator: 'isAny', value: 'draft' },
+			] )
+		);
 	} );
 } );
