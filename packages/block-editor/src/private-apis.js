@@ -79,6 +79,7 @@ import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
+import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
 import {
 	isHashLink,
 	isRelativePath,
@@ -157,4 +158,6 @@ lock( privateApis, {
 	isHashLink,
 	isRelativePath,
 	InnerContent,
+	useNativeUndo,
+	usesNativeUndo,
 } );
