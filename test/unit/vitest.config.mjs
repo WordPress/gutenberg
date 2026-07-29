@@ -30,6 +30,23 @@ const testMigration = JSON.parse(
 );
 const vitestTests = getVitestTests( ROOT_DIR, testMigration );
 const { sync: glob } = globPackage;
+const reporters = [ 'default' ];
+
+if ( process.env.GITHUB_ACTIONS === 'true' ) {
+	reporters.push( 'github-actions' );
+}
+if (
+	process.env.CI &&
+	process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
+) {
+	reporters.push( [
+		'@flakiness/vitest',
+		{
+			duplicates: 'rename',
+			flakinessProject: 'WordPress/gutenberg',
+		},
+	] );
+}
 
 // Preserve Jest's repository-root configuration discovery and default timezone.
 process.chdir( ROOT_DIR );
@@ -178,21 +195,7 @@ export default defineConfig( {
 		include: vitestTests,
 		includeTaskLocation: true,
 		passWithNoTests: false,
-		reporters:
-			process.env.CI &&
-			process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
-				? [
-						'default',
-						'github-actions',
-						[
-							'@flakiness/vitest',
-							{
-								duplicates: 'rename',
-								flakinessProject: 'WordPress/gutenberg',
-							},
-						],
-				  ]
-				: [ 'default' ],
+		reporters,
 		sequence: {
 			hooks: 'list',
 			setupFiles: 'list',
@@ -201,6 +204,7 @@ export default defineConfig( {
 			path.join( ROOT_DIR, 'test/unit/config/setup-globals.vitest.js' ),
 			path.join( ROOT_DIR, 'test/unit/config/global-mocks.vitest.js' ),
 			path.join( ROOT_DIR, 'test/unit/config/gutenberg-env.js' ),
+			path.join( ROOT_DIR, 'test/unit/config/console.vitest.js' ),
 			path.join( ROOT_DIR, 'test/unit/config/testing-library.vitest.js' ),
 			path.join( ROOT_DIR, 'test/unit/mocks/match-media.vitest.js' ),
 		],
