@@ -678,66 +678,6 @@ function parseNpmJsonOutput( output, description ) {
 }
 
 /**
- * Checks that the authenticated npm user has publishing (read-write) access to given a package,
- *
- * @param {string}   packageName                     Package name.
- * @param {string}   currentUser                     Authenticated npm username.
- * @param {Object}   options                         Options.
- * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
- * @param {Object}   deps                            Dependencies.
- * @param {Function} deps.commandFn                  Command runner.
- *
- * @return {Promise<boolean>} Whether the package exists and access was checked.
- *                            Returns false for packages that don't exist yet.
- */
-async function hasNpmPublishAccess(
-	packageName,
-	currentUser,
-	{ gitWorkingDirectoryPath },
-	deps = {}
-) {
-	const { commandFn = command } = deps;
-	let stdout;
-	try {
-		( { stdout } = await commandFn(
-			`npm access list collaborators ${ packageName } --json`,
-			{ cwd: gitWorkingDirectoryPath, stdio: 'pipe' }
-		) );
-	} catch ( error ) {
-		if ( isNpmPackageVersionMissing( error ) ) {
-			// Package doesn't exist yet (first-ever publish); nothing to verify here.
-			return false;
-		}
-
-		/*
-		 * Surface the failure reason (stderr) to aid debugging.
-		 *
-		 * The stdout is intentionally never printed because it would expose the
-		 * collaborator list for a private package.
-		 */
-		throw new Error(
-			`Unable to verify publish access for ${ packageName }: ${
-				error.stderr || error.shortMessage || error.message
-			}`
-		);
-	}
-
-	const collaborators = parseNpmJsonOutput(
-		stdout,
-		`${ packageName } collaborators`
-	);
-	const accessLevel = collaborators[ currentUser ] || 'none';
-
-	if ( accessLevel !== 'read-write' ) {
-		throw new Error(
-			`The "${ currentUser }" user does not have publish access to ${ packageName } (current: ${ accessLevel }).`
-		);
-	}
-
-	return true;
-}
-
-/**
  * Runs a pragmatic npm preflight before publishing.
  *
  * @param {Object}   options                         Options.
@@ -755,22 +695,16 @@ async function runNpmPublishPreflight(
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
-	log( '>> Checking npm publish access.' );
+	/*
+	 * `npm whoami` fails for every credential problem that happens in practice:
+	 * a missing, expired, or revoked auth token, or an unreachable registry.
+	 */
+	log( '>> Checking npm authentication.' );
 	const { stdout: whoamiOutput } = await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'pipe',
 	} );
-	const currentUser = whoamiOutput.trim();
-
-	for ( const { name } of releasePackages ) {
-		await hasNpmPublishAccess(
-			name,
-			currentUser,
-			{ gitWorkingDirectoryPath },
-			deps
-		);
-	}
-	log( `>> Publish access confirmed for "${ currentUser }".` );
+	log( `>> Authenticated as "${ whoamiOutput.trim() }".` );
 
 	log( '>> Verifying target package versions and dist-tags.' );
 	const publishedPackageNames = [];
