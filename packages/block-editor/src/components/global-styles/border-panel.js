@@ -24,7 +24,7 @@ import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 export function useHasBorderPanel( settings ) {
@@ -107,7 +107,7 @@ export default function BorderPanel( {
 	panelId,
 	name,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
