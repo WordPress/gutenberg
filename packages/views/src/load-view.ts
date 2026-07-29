@@ -26,8 +26,15 @@ import type { ViewConfig } from './types';
  * @return Promise resolving to the loaded view object.
  */
 export async function loadView( config: ViewConfig ) {
-	const { kind, name, slug, defaultView, activeViewOverrides, queryParams } =
-		config;
+	const {
+		kind,
+		name,
+		slug,
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
+		queryParams,
+	} = config;
 	const preferenceKey = generatePreferenceKey( kind, name, slug );
 	const persistedView: View | undefined = select( preferencesStore ).get(
 		'core/views',
@@ -35,7 +42,13 @@ export async function loadView( config: ViewConfig ) {
 	) as View | undefined;
 
 	const baseView = persistedView ?? defaultView;
-	const page = queryParams?.page ?? 1;
+	// `page` and `search` are URL-managed: the URL is their only source. They
+	// are never persisted, and neither the default view nor the active view
+	// overrides may configure them — an absent URL param is indistinguishable
+	// from the user having cleared the value, so any fallback would resurrect
+	// a cleared search on the next read. These win over whatever `baseView`
+	// carries below.
+	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
 	// Resolve the effective layout type first: a `type` override changes
@@ -46,9 +59,7 @@ export async function loadView( config: ViewConfig ) {
 		defaultView
 	);
 	const rawDefaults =
-		config.defaultLayouts?.[
-			effectiveType as keyof typeof config.defaultLayouts
-		];
+		defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
 	const layoutTypeDefaults =
 		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
 	const combinedOverrides = { ...layoutTypeDefaults, ...activeViewOverrides };

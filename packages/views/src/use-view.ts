@@ -75,8 +75,14 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		() => persistedView ?? defaultView ?? {},
 		[ persistedView, defaultView ]
 	);
-	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
-	const search = queryParams?.search ?? baseView.search ?? '';
+	// `page` and `search` are URL-managed: the URL is their only source. They
+	// are never persisted, and neither the default view nor the active view
+	// overrides may configure them — an absent URL param is indistinguishable
+	// from the user having cleared the value, so any fallback would resurrect
+	// a cleared search on the next read. These win over whatever `baseView`
+	// carries below.
+	const page = Number( queryParams?.page ?? 1 );
+	const search = queryParams?.search ?? '';
 
 	const combinedOverrides = useMemo( () => {
 		// Resolve the effective layout type first: a `type` override changes
@@ -131,14 +137,16 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				onChangeQueryParams( urlParams );
 			}
 
-			// Compare with baseView and defaultView after stripping activeViewOverrides
+			// Compare with baseView and defaultView after stripping
+			// activeViewOverrides and the URL params (page, search), which the
+			// preference view never carries.
 			const comparableBaseView = stripActiveViewOverrides(
-				baseView,
+				omit( baseView, [ 'page', 'search' ] ) as View,
 				combinedOverrides,
 				defaultView
 			);
 			const comparableDefaultView = stripActiveViewOverrides(
-				defaultView,
+				omit( defaultView ?? {}, [ 'page', 'search' ] ) as View,
 				combinedOverrides,
 				defaultView
 			);

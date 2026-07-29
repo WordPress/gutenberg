@@ -44,7 +44,7 @@ export interface ViewConfig {
 	slug: string;
 
 	/**
-	 * Default view configuration
+	 * Default view configuration.
 	 */
 	defaultView: View;
 
@@ -64,7 +64,7 @@ export interface ViewConfig {
 	defaultLayouts?: SupportedLayouts;
 
 	/**
-	 * Optional query parameters from URL (page, search)
+	 * Optional query parameters from URL (page, search).
 	 */
 	queryParams?: {
 		page?: number;
