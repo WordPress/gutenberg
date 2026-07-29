@@ -18,6 +18,7 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import { isGlobalStylesInheritanceEnabled } from './inheritance';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
@@ -247,7 +248,7 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 
 	return useMemo( () => {
 		// Skip the cascade merge entirely when the experiment is off.
-		if ( ! window.__experimentalGlobalStylesInheritanceUI ) {
+		if ( ! isGlobalStylesInheritanceEnabled() ) {
 			return NO_RESOLVED_STYLE;
 		}
 		if ( ! blockName ) {
