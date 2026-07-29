@@ -98,7 +98,13 @@ module.exports = {
 	reporters: [
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
-		process.env.CI
+		/*
+		 * Only interact with flakiness.io for the official WordPress/Gutenberg
+		 * repository. Forks and private mirrors should behave the same as
+		 * running the tests outside a CI environment.
+		 */
+		process.env.CI &&
+		process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
 			? [
 					require.resolve( '@flakiness/jest' ),
 					{
