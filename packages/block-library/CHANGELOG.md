@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
+-   Tabs: Place the caret at the end of a newly added tab's default title.
 
 ### Internal
 

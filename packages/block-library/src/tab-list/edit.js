@@ -22,6 +22,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
@@ -113,7 +114,8 @@ function Edit( {
 	const menuRef = useRef();
 	const prevTabCountRef = useRef( tabsList.length );
 
-	// When tabs are added or removed, focus the appropriate button.
+	// When a tab is added, focus the end of its title. When a tab is removed,
+	// focus the appropriate remaining button.
 	useEffect( () => {
 		const prevCount = prevTabCountRef.current;
 		prevTabCountRef.current = tabsList.length;
@@ -134,9 +136,14 @@ function Edit( {
 			window.requestAnimationFrame( () => {
 				const button =
 					menuRef.current?.querySelectorAll( 'button' )?.[ index ];
-				(
-					button?.querySelector( '[contenteditable]' ) ?? button
-				)?.focus();
+				const target =
+					button?.querySelector( '[contenteditable]' ) ?? button;
+
+				if ( tabsList.length > prevCount ) {
+					placeCaretAtHorizontalEdge( target, true );
+				} else {
+					target?.focus();
+				}
 			} );
 		};
 

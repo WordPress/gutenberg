@@ -180,6 +180,48 @@ test.describe( 'Tabs', () => {
 			await expect( tabs ).toHaveCount( 2 );
 		} );
 
+		test( 'should place the caret at the end of a newly added tab title', async ( {
+			editor,
+			page,
+		} ) => {
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			await tab2.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+
+			const editable = editor.canvas
+				.getByRole( 'tab', { name: 'Tab', exact: true } )
+				.locator( '[contenteditable="true"]' );
+			await expect( editable ).toBeFocused();
+			await expect
+				.poll( () =>
+					editable.evaluate( ( element ) => {
+						const selection =
+							element.ownerDocument.defaultView.getSelection();
+						if (
+							! selection?.isCollapsed ||
+							! selection.focusNode ||
+							! element.contains( selection.focusNode )
+						) {
+							return null;
+						}
+
+						const range = element.ownerDocument.createRange();
+						range.selectNodeContents( element );
+						range.setEnd(
+							selection.focusNode,
+							selection.focusOffset
+						);
+
+						return [
+							range.toString().length,
+							element.textContent.length,
+						];
+					} )
+				)
+				.toEqual( [ 3, 3 ] );
+		} );
+
 		test( 'removes the tab and activates the previous one when pressing Delete on an empty tab label', async ( {
 			editor,
 			page,
