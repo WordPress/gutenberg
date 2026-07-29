@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   DataViews: Add a `time` field type and matching `time` control for times of day with no date attached. Values are wall-clock `HH:mm`/`HH:mm:ss` strings that render identically regardless of the visitor's timezone, and `format.time` controls both the rendered format and whether the control offers a seconds field.
+
 ### Enhancements
 
+-   DataViews: Generalize the ordering filter operators (`on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `between`) from dates to temporal values, so they also compare times of day. Comparisons for `date` and `datetime` are unchanged.
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
 

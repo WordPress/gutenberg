@@ -20,6 +20,7 @@ import type {
 	Operator,
 	Option,
 } from '../types';
+import parseTime from '../field-types/utils/parse-time';
 import {
 	OPERATOR_AFTER,
 	OPERATOR_AFTER_INC,
@@ -49,6 +50,32 @@ const filterTextWrappers = {
 	Name: <span className="dataviews-filters__summary-filter-text-name" />,
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
+
+/**
+ * Reduces a value and the value it is compared against to numbers. Both read as
+ * times or neither does: a time compares as seconds since midnight, a date or
+ * datetime as a timestamp, and the two scales must never meet. `parseTime`
+ * accepts only `HH:mm[:ss]`, so no date or datetime is read as a time.
+ *
+ * @param fieldValue  The item's value.
+ * @param filterValue The value it is compared against.
+ * @return            Both values as comparable numbers.
+ */
+function toComparableTemporals(
+	fieldValue: any,
+	filterValue: any
+): [ number, number ] {
+	const fieldTime = parseTime( fieldValue );
+	const filterTime = parseTime( filterValue );
+	if ( fieldTime !== null && filterTime !== null ) {
+		return [ fieldTime, filterTime ];
+	}
+
+	return [
+		getDate( fieldValue ).getTime(),
+		getDate( filterValue ).getTime(),
+	];
+}
 
 /**
  * Calculates a date offset from now.
@@ -213,6 +240,14 @@ const OPERATORS: {
 			}
 
 			const fieldValue = field.getValue( { item } );
+
+			// Times compare as seconds since midnight, so that bounds and value
+			// match regardless of which of them carry seconds.
+			const times = [ fieldValue, ...filterValue ].map( parseTime );
+			if ( times.every( ( time ) => time !== null ) ) {
+				const [ value, min, max ] = times as number[];
+				return value >= min && value <= max;
+			}
 
 			if (
 				typeof fieldValue === 'number' ||
@@ -461,10 +496,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate < filterDate;
+			return fieldTemporal < filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -487,10 +524,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate > filterDate;
+			return fieldTemporal > filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -515,10 +554,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate <= filterDate;
+			return fieldTemporal <= filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -543,10 +584,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate >= filterDate;
+			return fieldTemporal >= filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -664,10 +707,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return filterDate.getTime() === fieldDate.getTime();
+			return fieldTemporal === filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -690,10 +735,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return filterDate.getTime() !== fieldDate.getTime();
+			return fieldTemporal !== filterTemporal;
 		},
 		selection: 'single',
 	},
