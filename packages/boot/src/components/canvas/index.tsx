@@ -74,6 +74,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
+					context="site-editor"
 					settings={ {
 						isPreviewMode: canvas.isPreview,
 						styles: canvas.isPreview
