@@ -33,6 +33,7 @@ For more examples, check out the [Editor Hooks](https://developer.wordpress.org/
 -   [Set a default image size](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#set-a-default-image-size)
 -   [Disable Openverse](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-openverse)
 -   [Disable the Font Library](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-the-font-library)
+-   [Restrict responsive editing](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#restrict-responsive-editing)
 -   [Disable block inspector tabs](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-block-inspector-tabs)
 
 ## Server-side theme.json filters
