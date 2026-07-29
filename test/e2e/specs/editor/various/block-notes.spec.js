@@ -681,10 +681,7 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( block ).toHaveClass( /is-highlighted/ );
-			// @todo: restore, which became flaky - await page.keyboard.press( 'Shift+Tab' );
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
+			await page.keyboard.press( 'Shift+Tab' );
 			await expect( thread ).not.toBeFocused();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
