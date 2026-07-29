@@ -45,18 +45,17 @@ function block_core_table_of_contents_build_list_items( $outline, $list_tag ) {
 
 	foreach ( $outline as $node ) {
 		$heading = $node['heading'];
-		$content = esc_html( $heading['content'] );
 
 		if ( '' !== $heading['link'] ) {
 			$entry = sprintf(
 				'<a class="wp-block-table-of-contents__entry" href="%1$s">%2$s</a>',
 				esc_url( $heading['link'] ),
-				$content
+				esc_html( $heading['content'] )
 			);
 		} else {
 			$entry = sprintf(
 				'<span class="wp-block-table-of-contents__entry">%s</span>',
-				$content
+				esc_html( $heading['content'] )
 			);
 		}
 
