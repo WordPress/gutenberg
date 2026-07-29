@@ -485,7 +485,7 @@ const PlaylistEdit = ( {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Add track' ) }
+					name={ __( 'Add' ) }
 					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple

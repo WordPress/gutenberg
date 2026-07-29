@@ -615,12 +615,13 @@ class WP_Navigation_Block_Renderer {
 			'space-between' => 'items-justified-space-between',
 		);
 
-		$layout_class = '';
+		$layout_class        = '';
+		$nav_justify_content = $attributes['layout']['justifyContent'] ?? null;
 		if (
-			isset( $attributes['layout']['justifyContent'] ) &&
-			isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
+			is_string( $nav_justify_content ) &&
+			isset( $layout_justification[ $nav_justify_content ] )
 		) {
-			$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+			$layout_class .= $layout_justification[ $nav_justify_content ];
 		}
 		if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 			$layout_class .= ' is-vertical';
