@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { isBlobURL, getBlobTypeByURL, downloadBlob } from '..';
@@ -35,23 +40,27 @@ describe( 'getBlobTypeByURL', () => {
 
 describe( 'downloadBlob', () => {
 	const originalURL = window.URL;
-	const createObjectURL = jest.fn().mockReturnValue( 'blob:pannacotta' );
-	const revokeObjectURL = jest.fn().mockReturnValue( false );
+	const createObjectURL = vi.fn().mockReturnValue( 'blob:pannacotta' );
+	const revokeObjectURL = vi.fn().mockReturnValue( false );
 	const mockAnchorElement = document.createElement( 'a' );
-	mockAnchorElement.click = jest.fn();
-	const createElementSpy = jest
+	mockAnchorElement.click = vi.fn();
+	const createElementSpy = vi
 		.spyOn( global.document, 'createElement' )
 		.mockReturnValue( mockAnchorElement );
 
-	const mockBlob = jest.fn();
-	const blobSpy = jest
-		.spyOn( window, 'Blob' )
-		.mockReturnValue( mockBlob as unknown as Blob );
-	jest.spyOn( document.body, 'appendChild' );
-	jest.spyOn( document.body, 'removeChild' );
+	const mockBlob = {};
+	const blobSpy = vi.spyOn( window, 'Blob' ).mockImplementation(
+		class MockBlob {
+			constructor() {
+				return mockBlob;
+			}
+		} as unknown as typeof Blob
+	);
+	vi.spyOn( document.body, 'appendChild' );
+	vi.spyOn( document.body, 'removeChild' );
 	beforeEach( () => {
 		// Can't seem to spy on these static methods. They are `undefined`.
-		// Possibly overwritten: https://github.com/WordPress/gutenberg/blob/trunk/packages/jest-preset-default/scripts/setup-globals.js#L5
+		// They are replaced by the shared test-environment globals setup.
 		// @ts-expect-error This is not a valid URL object.
 		window.URL = {
 			createObjectURL,
