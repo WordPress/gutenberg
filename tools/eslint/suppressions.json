@@ -7428,11 +7428,6 @@
 			"count": 2
 		}
 	},
-	"packages/global-styles-ui/src/pagination/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/presets/dialogs/rename-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

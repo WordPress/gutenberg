@@ -1,34 +1,54 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
-	Spinner,
 	useNavigator,
 } from '@wordpress/components';
-import { useContext, useState, useMemo } from '@wordpress/element';
+import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
+import type { View } from '@wordpress/dataviews';
 import { ScreenHeader } from '../screen-header';
 import { GlobalStylesContext } from '../context';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
-import RevisionsButtons from './revisions-buttons';
-import Pagination from '../pagination';
+import RevisionsList from './revisions-list';
 
 const PAGE_SIZE = 10;
+const EMPTY_ARRAY: string[] = [];
+
+const DEFAULT_VIEW: View = {
+	type: 'pickerActivity',
+	titleField: 'date',
+	descriptionField: 'details',
+	fields: [],
+	layout: { density: 'compact' },
+	page: 1,
+	perPage: PAGE_SIZE,
+};
 
 function ScreenRevisions() {
 	const { user: currentEditorGlobalStyles, onChange: setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { params, goTo } = useNavigator();
 	const { revisionId } = params;
-	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const query = useMemo(
+		() => ( {
+			per_page: view.perPage ?? PAGE_SIZE,
+			page: view.page ?? 1,
+		} ),
+		[ view.perPage, view.page ]
+	);
 	const { revisions, isLoading, hasUnsavedChanges, revisionsCount } =
-		useGlobalStylesRevisions( {
-			query: {
-				per_page: PAGE_SIZE,
-				page: currentPage,
-			},
-		} );
+		useGlobalStylesRevisions( { query } );
 
-	const numPages = Math.ceil( revisionsCount / PAGE_SIZE );
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems: revisionsCount,
+			totalPages: Math.ceil(
+				revisionsCount / ( view.perPage ?? PAGE_SIZE )
+			),
+		} ),
+		[ revisionsCount, view.perPage ]
+	);
 
 	const [
 		isLoadingRevisionWithUnsavedChanges,
@@ -65,13 +85,31 @@ function ScreenRevisions() {
 		closeRevisions();
 	};
 
-	const handleRevisionSelect = ( revision: any ) => {
-		goTo( `/revisions/${ revision.id }` );
-	};
-
 	const currentlySelectedRevisionId =
 		// @ts-expect-error: revision id is not present in the fallback (default object).
 		currentlySelectedRevision?.id ?? revisions[ 0 ]?.id;
+
+	const selection = useMemo(
+		() =>
+			currentlySelectedRevisionId !== undefined
+				? [ String( currentlySelectedRevisionId ) ]
+				: EMPTY_ARRAY,
+		[ currentlySelectedRevisionId ]
+	);
+
+	const onChangeSelection = useCallback(
+		( newSelection: string[] ) => {
+			// The picker's single selection is clearable: clicking the selected
+			// item again emits an empty selection (clicks bubbling up from the
+			// Apply button included). Keep the current revision selected in
+			// that case so the timeline never ends up with nothing selected.
+			if ( ! newSelection.length ) {
+				return;
+			}
+			goTo( `/revisions/${ newSelection[ newSelection.length - 1 ] }` );
+		},
+		[ goTo ]
+	);
 
 	// Only display load button if there is a revision to load,
 	// and it is different from the current editor styles.
@@ -79,7 +117,6 @@ function ScreenRevisions() {
 		!! currentlySelectedRevisionId &&
 		currentlySelectedRevisionId !== 'unsaved' &&
 		! selectedRevisionMatchesEditorStyles;
-	const hasRevisions = !! revisions.length;
 
 	return (
 		<>
@@ -98,13 +135,14 @@ function ScreenRevisions() {
 				) }
 				onBack={ closeRevisions }
 			/>
-			{ ! hasRevisions && (
-				<Spinner className="global-styles-ui-screen-revisions__loading" />
-			) }
-			<RevisionsButtons
-				onChange={ handleRevisionSelect }
-				selectedRevisionId={ currentlySelectedRevisionId }
-				userRevisions={ revisions }
+			<RevisionsList
+				revisions={ revisions }
+				view={ view }
+				onChangeView={ setView }
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				isLoading={ isLoading }
+				paginationInfo={ paginationInfo }
 				canApplyRevision={ isLoadButtonEnabled }
 				onApplyRevision={ () =>
 					hasUnsavedChanges
@@ -112,19 +150,6 @@ function ScreenRevisions() {
 						: restoreRevision( currentlySelectedRevision )
 				}
 			/>
-			{ numPages > 1 && (
-				<div className="global-styles-ui-screen-revisions__footer">
-					<Pagination
-						className="global-styles-ui-screen-revisions__pagination"
-						currentPage={ currentPage }
-						numPages={ numPages }
-						changePage={ setCurrentPage }
-						totalItems={ revisionsCount }
-						disabled={ isLoading }
-						label={ __( 'Global Styles pagination' ) }
-					/>
-				</div>
-			) }
 			{ isLoadingRevisionWithUnsavedChanges && (
 				<ConfirmDialog
 					isOpen={ isLoadingRevisionWithUnsavedChanges }
