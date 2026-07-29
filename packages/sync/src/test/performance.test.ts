@@ -5,10 +5,11 @@ import {
 	describe,
 	expect,
 	it,
-	jest,
+	vi,
 	beforeEach,
 	afterEach,
-} from '@jest/globals';
+	type MockInstance,
+} from 'vitest';
 
 /**
  * Internal dependencies
@@ -21,10 +22,10 @@ import {
 
 describe( 'performance utilities', () => {
 	describe( 'logPerformanceTiming', () => {
-		let consoleSpy: jest.SpiedFunction< typeof console.log >;
+		let consoleSpy: MockInstance< typeof console.log >;
 
 		beforeEach( () => {
-			consoleSpy = jest
+			consoleSpy = vi
 				.spyOn( console, 'log' )
 				.mockImplementation( () => {} );
 		} );
@@ -57,7 +58,7 @@ describe( 'performance utilities', () => {
 		} );
 
 		it( 'passes all arguments to the wrapped function', () => {
-			const fn = jest.fn( ( a: number, b: string, c: boolean ) => {
+			const fn = vi.fn( ( a: number, b: string, c: boolean ) => {
 				return `${ a }-${ b }-${ c }`;
 			} );
 
@@ -116,7 +117,7 @@ describe( 'performance utilities', () => {
 
 	describe( 'passThru', () => {
 		it( 'returns a function that calls the original function', () => {
-			const fn = jest.fn( () => 'result' );
+			const fn = vi.fn( () => 'result' );
 
 			const wrapped = passThru( fn );
 			const result = wrapped();
@@ -126,7 +127,7 @@ describe( 'performance utilities', () => {
 		} );
 
 		it( 'passes all arguments to the original function', () => {
-			const fn = jest.fn( ( a: number, b: string ) => `${ a }-${ b }` );
+			const fn = vi.fn( ( a: number, b: string ) => `${ a }-${ b }` );
 
 			const wrapped = passThru( fn );
 			const result = wrapped( 42, 'test' );
@@ -180,33 +181,33 @@ describe( 'performance utilities', () => {
 
 	describe( 'yieldToEventLoop', () => {
 		beforeEach( () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'delays function execution to the next tick', () => {
-			const fn = jest.fn();
+			const fn = vi.fn();
 
 			const wrapped = yieldToEventLoop( fn );
 			wrapped();
 
 			expect( fn ).not.toHaveBeenCalled();
 
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( fn ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'passes all arguments to the wrapped function', () => {
-			const fn = jest.fn( ( a: number, b: string ) => `${ a }-${ b }` );
+			const fn = vi.fn( ( a: number, b: string ) => `${ a }-${ b }` );
 
 			const wrapped = yieldToEventLoop( fn );
 			wrapped( 42, 'test' );
 
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( fn ).toHaveBeenCalledWith( 42, 'test' );
 		} );
@@ -214,7 +215,7 @@ describe( 'performance utilities', () => {
 		it( 'preserves the this context', () => {
 			const obj = {
 				value: 10,
-				logValue: jest.fn( function ( this: { value: number } ) {
+				logValue: vi.fn( function ( this: { value: number } ) {
 					return this.value;
 				} ),
 			};
@@ -222,14 +223,14 @@ describe( 'performance utilities', () => {
 			const wrapped = yieldToEventLoop( obj.logValue );
 			wrapped.call( obj );
 
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( obj.logValue ).toHaveBeenCalled();
 			expect( obj.logValue.mock.instances[ 0 ] ).toBe( obj );
 		} );
 
 		it( 'handles multiple invocations', () => {
-			const fn = jest.fn();
+			const fn = vi.fn();
 
 			const wrapped = yieldToEventLoop( fn );
 			wrapped();
@@ -238,7 +239,7 @@ describe( 'performance utilities', () => {
 
 			expect( fn ).not.toHaveBeenCalled();
 
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( fn ).toHaveBeenCalledTimes( 3 );
 		} );
@@ -254,14 +255,14 @@ describe( 'performance utilities', () => {
 			wrapped( 2 );
 			wrapped( 3 );
 
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( calls ).toEqual( [ 1, 2, 3 ] );
 		} );
 
 		it( 'uses setTimeout with 0ms delay', () => {
-			const setTimeoutSpy = jest.spyOn( global, 'setTimeout' );
-			const fn = jest.fn();
+			const setTimeoutSpy = vi.spyOn( global, 'setTimeout' );
+			const fn = vi.fn();
 
 			const wrapped = yieldToEventLoop( fn );
 			wrapped();
@@ -275,7 +276,7 @@ describe( 'performance utilities', () => {
 		} );
 
 		it( 'returns void', () => {
-			const fn = jest.fn( () => 'result' );
+			const fn = vi.fn( () => 'result' );
 
 			const wrapped = yieldToEventLoop( fn as () => void );
 			const result = wrapped();

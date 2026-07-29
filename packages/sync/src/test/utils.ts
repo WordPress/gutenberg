@@ -3,7 +3,7 @@
  */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-import { describe, expect, it, beforeEach } from '@jest/globals';
+import { describe, expect, it, beforeEach } from 'vitest';
 
 /**
  * Internal dependencies
