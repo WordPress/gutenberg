@@ -20,7 +20,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { store as noticeStore } from '@wordpress/notices';
@@ -36,7 +36,7 @@ import {
  * Internal dependencies
  */
 import TableOfContentsList from './list';
-import { linearToNestedHeadingList } from './utils';
+import { createListItemBlocks, linearToNestedHeadingList } from './utils';
 import { useObserveHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -104,15 +104,11 @@ function TableOfContentsToolbar( {
 						setIsConfirmingDetach( false );
 						replaceBlocks(
 							clientId,
-							createBlock( 'core/list', {
-								ordered,
-								values: renderToString(
-									<TableOfContentsList
-										nestedHeadingList={ headingTree }
-										ordered={ ordered }
-									/>
-								),
-							} )
+							createBlock(
+								'core/list',
+								{ ordered },
+								createListItemBlocks( headingTree, ordered )
+							)
 						);
 					} }
 					onCancel={ () => setIsConfirmingDetach( false ) }
@@ -261,7 +257,7 @@ export default function TableOfContentsEdit( {
 
 	// If there are no headings or the only heading is empty.
 	// Note that the toolbar controls are intentionally omitted since the
-	// "Convert to static list" option is useless to the placeholder state.
+	// "Detach" option is useless to the placeholder state.
 	if ( headings.length === 0 ) {
 		return (
 			<>
