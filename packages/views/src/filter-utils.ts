@@ -9,6 +9,9 @@ import type { View, Filter } from '@wordpress/dataviews';
 import type { ActiveViewOverrides } from './types';
 
 const SCALAR_VALUES = [
+	'type',
+	'perPage',
+	'fields',
 	'titleField',
 	'mediaField',
 	'descriptionField',
@@ -47,20 +50,32 @@ export function mergeActiveViewOverrides(
 		}
 	}
 
-	// Merge filters
+	// Merge filters.
+	// Locked filters (`isLocked: true`) always win over whatever the user has
+	// set for that field. Unlocked filters only seed a default value for
+	// fields the view doesn't already have a filter for — once a filter
+	// exists for that field (e.g. because the user added/edited it), the
+	// unlocked override no longer clobbers it.
 	if (
 		activeViewOverrides.filters &&
 		activeViewOverrides.filters.length > 0
 	) {
-		const activeFields = new Set(
-			activeViewOverrides.filters.map( ( f ) => f.field )
+		const lockedOverrides = activeViewOverrides.filters.filter(
+			( f: Filter ) => !! f.isLocked
 		);
+		const lockedFields = new Set( lockedOverrides.map( ( f ) => f.field ) );
 		const preserved = ( view.filters ?? [] ).filter(
-			( f: Filter ) => ! activeFields.has( f.field )
+			( f: Filter ) => ! lockedFields.has( f.field )
+		);
+		const existingFields = new Set(
+			preserved.map( ( f: Filter ) => f.field )
+		);
+		const unlockedDefaults = activeViewOverrides.filters.filter(
+			( f: Filter ) => ! f.isLocked && ! existingFields.has( f.field )
 		);
 		result = {
 			...result,
-			filters: [ ...preserved, ...activeViewOverrides.filters ],
+			filters: [ ...preserved, ...lockedOverrides, ...unlockedDefaults ],
 		};
 	}
 
@@ -130,18 +145,23 @@ export function stripActiveViewOverrides(
 		}
 	}
 
-	// Strip managed filters
+	// Strip managed filters.
+	// Only locked filters are force-managed and excluded from persistence;
+	// unlocked ones are just a seeded default, so any value the user set for
+	// that field (including edits to the seeded filter) persists normally.
 	if (
 		activeViewOverrides.filters &&
 		activeViewOverrides.filters.length > 0
 	) {
-		const activeFields = new Set(
-			activeViewOverrides.filters.map( ( f ) => f.field )
+		const lockedFields = new Set(
+			activeViewOverrides.filters
+				.filter( ( f: Filter ) => !! f.isLocked )
+				.map( ( f ) => f.field )
 		);
 		result = {
 			...result,
 			filters: ( view.filters ?? [] ).filter(
-				( f: Filter ) => ! activeFields.has( f.field )
+				( f: Filter ) => ! lockedFields.has( f.field )
 			),
 		};
 	}
