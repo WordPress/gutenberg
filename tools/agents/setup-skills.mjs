@@ -24,7 +24,7 @@ const TARGET_SKILLS_DIRECTORIES = [ '.claude/skills' ];
  * @param {string}   options.repositoryRoot Repository root directory.
  * @param {string}   [options.platform]     Platform used to choose link type.
  * @param {Function} [options.createLink]   Function used to create directory links.
- * @return {Promise<{ conflicts: string[], copied: string[], linked: string[] }>} Setup result.
+ * @return {Promise<{ conflicts: string[], copied: string[], linked: string[], removed: string[] }>} Setup result.
  */
 export async function setupSkills( {
 	repositoryRoot,
@@ -39,6 +39,7 @@ export async function setupSkills( {
 		conflicts: [],
 		copied: [],
 		linked: [],
+		removed: [],
 	};
 	const skillNames = await getSkillNames( sourceSkillsDirectory );
 
@@ -61,9 +62,98 @@ export async function setupSkills( {
 
 			result[ status ].push( path.relative( repositoryRoot, target ) );
 		}
+
+		const removed = await removeStaleSkills( {
+			repositoryRoot,
+			sourceSkillsDirectory,
+			targetSkillsDirectory,
+			skillNames,
+		} );
+		result.removed.push( ...removed );
 	}
 
 	return result;
+}
+
+async function removeStaleSkills( {
+	repositoryRoot,
+	sourceSkillsDirectory,
+	targetSkillsDirectory,
+	skillNames,
+} ) {
+	const targetDirectory = path.join( repositoryRoot, targetSkillsDirectory );
+	let entries;
+
+	try {
+		entries = await readdir( targetDirectory, { withFileTypes: true } );
+	} catch ( error ) {
+		if ( error.code === 'ENOENT' ) {
+			return [];
+		}
+
+		throw error;
+	}
+
+	const removed = [];
+	for ( const entry of entries ) {
+		if (
+			skillNames.includes( entry.name ) ||
+			( ! entry.isDirectory() && ! entry.isSymbolicLink() )
+		) {
+			continue;
+		}
+
+		const target = path.join( targetDirectory, entry.name );
+		if (
+			! ( await isManagedStaleSkill( {
+				target,
+				sourceSkillsDirectory,
+				repositoryRoot,
+				skillName: entry.name,
+			} ) )
+		) {
+			continue;
+		}
+
+		await rm( target, { recursive: true, force: true } );
+		removed.push( path.relative( repositoryRoot, target ) );
+	}
+
+	return removed.sort();
+}
+
+async function isManagedStaleSkill( {
+	target,
+	sourceSkillsDirectory,
+	repositoryRoot,
+	skillName,
+} ) {
+	const targetStats = await lstat( target );
+
+	if ( targetStats.isSymbolicLink() ) {
+		const linkTarget = path.resolve(
+			path.dirname( target ),
+			await readlink( target )
+		);
+		return [
+			path.join( sourceSkillsDirectory, skillName ),
+			path.join( repositoryRoot, 'skills', skillName ),
+		].includes( linkTarget );
+	}
+
+	try {
+		const marker = await readFile(
+			path.join( target, MANAGED_COPY_MARKER ),
+			'utf8'
+		);
+		return marker === `${ skillName }\n`;
+	} catch ( error ) {
+		if ( error.code === 'ENOENT' ) {
+			return false;
+		}
+
+		throw error;
+	}
 }
 
 async function getSkillNames( sourceSkillsDirectory ) {
@@ -214,6 +304,9 @@ function formatResult( result ) {
 	}
 	if ( result.copied.length ) {
 		lines.push( `Copied: ${ result.copied.join( ', ' ) }` );
+	}
+	if ( result.removed.length ) {
+		lines.push( `Removed: ${ result.removed.join( ', ' ) }` );
 	}
 	if ( result.conflicts.length ) {
 		lines.push(

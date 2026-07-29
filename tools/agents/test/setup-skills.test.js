@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import {
 	mkdtemp,
 	mkdir,
+	lstat,
 	readFile,
 	rm,
 	symlink,
@@ -25,24 +26,34 @@ afterEach( async () => {
 	}
 } );
 
-async function createRepository() {
+async function createRepository( skillNames = [ 'testing' ] ) {
 	const repositoryRoot = await mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-agent-skills-' )
 	);
 	temporaryRoots.push( repositoryRoot );
+	await mkdir( path.join( repositoryRoot, '.agents/skills' ), {
+		recursive: true,
+	} );
+
+	for ( const skillName of skillNames ) {
+		await createSkill( repositoryRoot, skillName );
+	}
+
+	return repositoryRoot;
+}
+
+async function createSkill( repositoryRoot, skillName ) {
 	const skillDirectory = path.join(
 		repositoryRoot,
 		'.agents/skills',
-		'testing'
+		skillName
 	);
 
 	await mkdir( skillDirectory, { recursive: true } );
 	await writeFile(
 		path.join( skillDirectory, 'SKILL.md' ),
-		'---\nname: testing\n'
+		`---\nname: ${ skillName }\n`
 	);
-
-	return repositoryRoot;
 }
 
 describe( 'setupSkills', () => {
@@ -55,7 +66,24 @@ describe( 'setupSkills', () => {
 			conflicts: [],
 			copied: [],
 			linked: [ targetSkillPath ],
+			removed: [],
 		} );
+		expect(
+			await readFile(
+				path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
+				'utf8'
+			)
+		).toBe( '---\nname: testing\n' );
+	} );
+
+	test( 'links skills added after an earlier setup', async () => {
+		const repositoryRoot = await createRepository( [] );
+
+		await setupSkills( { repositoryRoot } );
+		await createSkill( repositoryRoot, 'testing' );
+		const result = await setupSkills( { repositoryRoot } );
+
+		expect( result.linked ).toEqual( [ targetSkillPath ] );
 		expect(
 			await readFile(
 				path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
@@ -82,6 +110,35 @@ describe( 'setupSkills', () => {
 				'utf8'
 			)
 		).toBe( '---\nname: testing\n' );
+	} );
+
+	test( 'removes links for skills removed from the canonical directory', async () => {
+		const repositoryRoot = await createRepository();
+		const source = path.join( repositoryRoot, '.agents/skills/testing' );
+		const target = path.join( repositoryRoot, '.claude/skills/testing' );
+
+		await setupSkills( { repositoryRoot } );
+		await rm( source, { recursive: true, force: true } );
+		const result = await setupSkills( { repositoryRoot } );
+
+		expect( result.removed ).toEqual( [ targetSkillPath ] );
+		await expect( lstat( target ) ).rejects.toMatchObject( {
+			code: 'ENOENT',
+		} );
+	} );
+
+	test( 'leaves unmanaged targets for removed skills untouched', async () => {
+		const repositoryRoot = await createRepository( [] );
+		const target = path.join( repositoryRoot, '.claude/skills/testing' );
+
+		await mkdir( target, { recursive: true } );
+		await writeFile( path.join( target, 'SKILL.md' ), 'personal skill\n' );
+		const result = await setupSkills( { repositoryRoot } );
+
+		expect( result.removed ).toEqual( [] );
+		expect(
+			await readFile( path.join( target, 'SKILL.md' ), 'utf8' )
+		).toBe( 'personal skill\n' );
 	} );
 
 	test( 'can be imported from an eval entrypoint', async () => {
@@ -163,6 +220,20 @@ describe( 'setupSkills', () => {
 				'utf8'
 			)
 		).toBe( 'updated skill\n' );
+
+		await rm( path.join( repositoryRoot, '.agents/skills/testing' ), {
+			recursive: true,
+			force: true,
+		} );
+		const removedResult = await setupSkills( {
+			repositoryRoot,
+			createLink: unavailableLinks,
+		} );
+
+		expect( removedResult.removed ).toEqual( [ targetSkillPath ] );
+		await expect(
+			lstat( path.join( repositoryRoot, '.claude/skills/testing' ) )
+		).rejects.toMatchObject( { code: 'ENOENT' } );
 	} );
 
 	test( 'leaves an existing unmanaged skill untouched', async () => {
