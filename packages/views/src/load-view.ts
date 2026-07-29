@@ -35,12 +35,28 @@ export async function loadView( config: ViewConfig ) {
 	) as View | undefined;
 
 	const baseView = persistedView ?? defaultView;
-	const page = queryParams?.page ?? 1;
-	const search = queryParams?.search ?? '';
+	// Same precedence as useView(): URL state, then the tab-specific
+	// override, then the base view, then the entity-wide defaultView.
+	const page =
+		queryParams?.page ??
+		activeViewOverrides?.page ??
+		baseView?.page ??
+		defaultView?.page ??
+		1;
+	const search =
+		queryParams?.search ??
+		activeViewOverrides?.search ??
+		baseView?.search ??
+		defaultView?.search ??
+		'';
 
+	// Use the type the override will resolve to (if any) rather than the
+	// pre-override baseView type, so type-specific layout defaults match the
+	// view type that's actually about to be rendered.
+	const resolvedType = activeViewOverrides?.type ?? baseView?.type;
 	const rawDefaults =
 		config.defaultLayouts?.[
-			baseView?.type as keyof typeof config.defaultLayouts
+			resolvedType as keyof typeof config.defaultLayouts
 		];
 	const layoutTypeDefaults =
 		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
