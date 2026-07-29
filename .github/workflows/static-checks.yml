@@ -51,7 +51,7 @@ jobs:
             # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
             # All other jobs only require a depth of 1.
             - name: Checkout repository
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
