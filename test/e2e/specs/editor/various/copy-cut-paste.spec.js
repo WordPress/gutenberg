@@ -934,19 +934,32 @@ test.describe( 'Copy/cut/paste', () => {
 
 	test( 'should wrap a pasted block in its required parent', async ( {
 		editor,
+		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
-		// Legacy button markup predating the buttons wrapper block. It
-		// parses to a valid standalone button, which can only be inserted
-		// within a buttons block.
-		pageUtils.setClipboardData( {
-			html: `<!-- wp:button {"align":"center"} -->
-<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>
-<!-- /wp:button -->`,
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: { text: 'Click me' },
+				},
+			],
 		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Select and copy only the inner button, which serializes as a
+		// standalone button that can only be inserted within a buttons
+		// block.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
 		await pageUtils.pressKeys( 'primary+v' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -955,10 +968,16 @@ test.describe( 'Copy/cut/paste', () => {
 				innerBlocks: [
 					{
 						name: 'core/button',
-						attributes: {
-							text: 'Help build Gutenberg',
-							url: 'https://github.com/WordPress/gutenberg',
-						},
+						attributes: { text: 'Click me' },
+					},
+				],
+			},
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: { text: 'Click me' },
 					},
 				],
 			},
