@@ -22,7 +22,7 @@ This structure controls context bloat. The root `AGENTS.md` is a fixed cost in e
 
 ## Creating skills
 
-Create repository skills in [`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills), following the shared Agent Skills format described below. When using Claude Code, run `npm run agents:setup` after installing dependencies or changing the skill catalog, then start a new session so it discovers the generated skill view.
+Create repository skills in [`.agents/skills/<domain>/SKILL.md`](https://github.com/WordPress/gutenberg/tree/trunk/.agents/skills), following the shared Agent Skills format described below. When using Claude Code, run `npm run agents:setup` after installing dependencies or changing the skill catalog; it replaces `.claude/skills` with a generated copy. Start a new session so Claude Code discovers it.
 
 ## Where does new guidance belong?
 
