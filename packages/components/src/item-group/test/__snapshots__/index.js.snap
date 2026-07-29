@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`ItemGroup Item should read the value of the size prop from context when the prop is not defined 1`] = `
 Snapshot Diff:

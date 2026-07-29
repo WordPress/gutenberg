@@ -2,7 +2,7 @@
 /**
  * A special compat layer for legacy font files upload directory.
  *
- * @see https://github.com/WordPress/gutenberg/pull/57688#issuecomment-2259037546
+ * @link https://github.com/WordPress/gutenberg/pull/57688#issuecomment-2259037546
  *
  * @package gutenberg
  */

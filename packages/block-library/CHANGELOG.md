@@ -2,12 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
+-   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
+
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 
 ### Internal
 
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Image: Check only `window.__clientSideMediaProcessing` for sideloading status, following the removal of the redundant `window.__heicUploadSupport` flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 
 ## 10.2.0 (2026-07-14)
