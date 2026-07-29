@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add `Combobox.InputGroup` primitive.
 -   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).
 -   Add `Autocomplete.Row` primitive ([#80490](https://github.com/WordPress/gutenberg/pull/80490)).
 -   `Combobox`, `Select`, `SelectControl`: Add `Group` and `GroupLabel` subcomponents ([#80574](https://github.com/WordPress/gutenberg/pull/80574)).
