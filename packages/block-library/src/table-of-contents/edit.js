@@ -123,20 +123,6 @@ function TableOfContentsToolbar( {
 	);
 }
 
-/**
- * Table of Contents block edit component.
- *
- * @param {Object}                       props                                   The props.
- * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
- * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
- * @param {boolean}                      props.attributes.ordered                Whether to display as an ordered list (true) or unordered list (false).
- * @param {string}                       props.clientId                          The client id.
- * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
- *
- * @return {Component} The component.
- */
 export default function TableOfContentsEdit( {
 	attributes: {
 		headings = [],
