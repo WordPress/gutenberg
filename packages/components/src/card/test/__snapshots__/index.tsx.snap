@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Card Card component CardBody should allow scrolling content with the scrollable prop is true 1`] = `
+exports[`Card > Card component > CardBody > should allow scrolling content with the scrollable prop is true 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -17,7 +17,7 @@ Snapshot Diff:
     </div>
 `;
 
-exports[`Card Card component CardBody should render with a darker background color when isShady is true 1`] = `
+exports[`Card > Card component > CardBody > should render with a darker background color when isShady is true 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -34,7 +34,7 @@ Snapshot Diff:
     </div>
 `;
 
-exports[`Card Card component CardFooter should render with a darker background color when isShady is true 1`] = `
+exports[`Card > Card component > CardFooter > should render with a darker background color when isShady is true 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -51,7 +51,7 @@ Snapshot Diff:
       Footer
 `;
 
-exports[`Card Card component CardFooter should use the justify prop to align its content, like a Flex container 1`] = `
+exports[`Card > Card component > CardFooter > should use the justify prop to align its content, like a Flex container 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -69,7 +69,7 @@ Snapshot Diff:
   </div>
 `;
 
-exports[`Card Card component CardHeader should render with a darker background color when isShady is true 1`] = `
+exports[`Card > Card component > CardHeader > should render with a darker background color when isShady is true 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -86,7 +86,7 @@ Snapshot Diff:
       Header
 `;
 
-exports[`Card Card component should add different amounts of white space when using the size prop 1`] = `
+exports[`Card > Card component > should add different amounts of white space when using the size prop 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -115,7 +115,7 @@ Snapshot Diff:
         </div>
 `;
 
-exports[`Card Card component should add rounded border when the isRounded prop is true 1`] = `
+exports[`Card > Card component > should add rounded border when the isRounded prop is true 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles
@@ -129,7 +129,7 @@ Snapshot Diff:
   ]
 `;
 
-exports[`Card Card component should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
+exports[`Card > Card component > should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -166,7 +166,7 @@ Snapshot Diff:
           Footer
 `;
 
-exports[`Card Card component should pass the isBorderless and isSize props from its context to its sub-components 1`] = `
+exports[`Card > Card component > should pass the isBorderless and isSize props from its context to its sub-components 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -209,7 +209,7 @@ Snapshot Diff:
           Footer
 `;
 
-exports[`Card Card component should render correctly 1`] = `
+exports[`Card > Card component > should render correctly 1`] = `
 .emotion-0 {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
@@ -412,7 +412,7 @@ exports[`Card Card component should render correctly 1`] = `
 </div>
 `;
 
-exports[`Card Card component should show a box shadow when the elevation prop is greater than 0 1`] = `
+exports[`Card > Card component > should show a box shadow when the elevation prop is greater than 0 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -439,12 +439,12 @@ Snapshot Diff:
   </div>
 `;
 
-exports[`Card Card component should support the legacy extraSmall value for the size prop as an alias for the xSmall value 1`] = `
+exports[`Card > Card component > should support the legacy extraSmall value for the size prop as an alias for the xSmall value 1`] = `
 Snapshot Diff:
 Compared values have no visual difference.
 `;
 
-exports[`Card Card component should warn when the isElevated prop is passed 1`] = `
+exports[`Card > Card component > should warn when the isElevated prop is passed 1`] = `
 .emotion-0 {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;

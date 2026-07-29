@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -123,7 +124,7 @@ describe( 'CustomGradientPicker', () => {
 	describe( 'GradientTypePicker angle persistence', () => {
 		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<CustomGradientPicker
@@ -146,7 +147,7 @@ describe( 'CustomGradientPicker', () => {
 
 		it( 'should use HORIZONTAL_GRADIENT_ORIENTATION when no prior linear angle exists', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			// Start with a radial gradient so there is no previous linear angle in the ref
 			render(
@@ -168,7 +169,7 @@ describe( 'CustomGradientPicker', () => {
 
 		it( 'should not restore angle when switching to radial', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<CustomGradientPicker

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -27,7 +28,7 @@ describe( 'GradientPicker', () => {
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
 					value={ undefined }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					disableCustomGradients
 				/>
 			);
@@ -42,7 +43,7 @@ describe( 'GradientPicker', () => {
 					gradients={ DUPLICATE_GRADIENTS }
 					value={ GRADIENT_A }
 					selectedSlug="dark-text"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					disableCustomGradients
 				/>
 			);
@@ -59,7 +60,7 @@ describe( 'GradientPicker', () => {
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
 					value={ GRADIENT_A }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					disableCustomGradients
 				/>
 			);
@@ -76,7 +77,7 @@ describe( 'GradientPicker', () => {
 					gradients={ DUPLICATE_GRADIENTS }
 					value={ GRADIENT_A }
 					selectedSlug=""
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					disableCustomGradients
 				/>
 			);
@@ -88,7 +89,7 @@ describe( 'GradientPicker', () => {
 
 		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<GradientPicker
@@ -113,7 +114,7 @@ describe( 'GradientPicker', () => {
 
 		it( 'should pass slug as third argument to onChange for multiple-origin gradients', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<GradientPicker

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { getOptimalTextColor, getOptimalTextShade, rgba } from '../colors';

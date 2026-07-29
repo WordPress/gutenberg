@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -14,7 +15,7 @@ describe( 'TimeInput', () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput
@@ -66,7 +67,7 @@ describe( 'TimeInput', () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput
@@ -113,7 +114,7 @@ describe( 'TimeInput', () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput

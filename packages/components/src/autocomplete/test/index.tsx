@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -130,7 +131,7 @@ describe( 'AutocompleterUI', () => {
 		it( 'should call reset function when a click on another element occurs', async () => {
 			const user = userEvent.setup();
 
-			const resetSpy = jest.fn();
+			const resetSpy = vi.fn();
 
 			const autocompleter = {
 				name: 'fruit',

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { getAutocompleteMatch } from '../get-autocomplete-match';
@@ -177,7 +182,7 @@ describe( 'getAutocompleteMatch', () => {
 	} );
 
 	it( 'should pass correct before/after text to allowContext', () => {
-		const allowContext = jest.fn().mockReturnValue( true );
+		const allowContext = vi.fn().mockReturnValue( true );
 		const completers = [
 			createCompleter( {
 				triggerPrefix: '@',

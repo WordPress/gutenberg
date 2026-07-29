@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`props should render active 1`] = `
+exports[`props > should render active 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;
@@ -41,7 +41,7 @@ exports[`props should render active 1`] = `
 />
 `;
 
-exports[`props should render correctly 1`] = `
+exports[`props > should render correctly 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;
@@ -74,7 +74,7 @@ exports[`props should render correctly 1`] = `
 />
 `;
 
-exports[`props should render hover 1`] = `
+exports[`props > should render hover 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;
@@ -111,7 +111,7 @@ exports[`props should render hover 1`] = `
 />
 `;
 
-exports[`props should render isInteractive 1`] = `
+exports[`props > should render isInteractive 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;
@@ -152,7 +152,7 @@ exports[`props should render isInteractive 1`] = `
 />
 `;
 
-exports[`props should render offset 1`] = `
+exports[`props > should render offset 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;
@@ -193,7 +193,7 @@ exports[`props should render offset 1`] = `
 />
 `;
 
-exports[`props should render value 1`] = `
+exports[`props > should render value 1`] = `
 .emotion-0 {
   background: transparent;
   display: block;

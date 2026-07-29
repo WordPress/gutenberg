@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -23,7 +30,7 @@ const waitForFocusedMenuItem = ( name: string ) =>
 	);
 
 const resetTypeahead = () => {
-	act( () => jest.advanceTimersByTime( 500 ) );
+	act( () => vi.advanceTimersByTime( 500 ) );
 };
 
 // Open dropdown => open menu
@@ -446,7 +453,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
-			const onRadioValueChangeSpy = jest.fn();
+			const onRadioValueChangeSpy = vi.fn();
 
 			const ControlledRadioGroup = () => {
 				const [ radioValue, setRadioValue ] = useState( 'two' );
@@ -535,7 +542,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
-			const onRadioValueChangeSpy = jest.fn();
+			const onRadioValueChangeSpy = vi.fn();
 			render(
 				<Menu>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -615,7 +622,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check checkbox items and keep the menu open when clicking (controlled)', async () => {
-			const onCheckboxValueChangeSpy = jest.fn();
+			const onCheckboxValueChangeSpy = vi.fn();
 
 			const ControlledRadioGroup = () => {
 				const [ itemOneChecked, setItemOneChecked ] =
@@ -747,7 +754,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check checkbox items and keep the menu open when clicking (uncontrolled)', async () => {
-			const onCheckboxValueChangeSpy = jest.fn();
+			const onCheckboxValueChangeSpy = vi.fn();
 
 			render(
 				<Menu>
@@ -1057,15 +1064,8 @@ describe( 'Menu', () => {
 	} );
 
 	describe( 'typeahead', () => {
-		beforeEach( () => {
-			jest.useFakeTimers();
-			user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-		} );
-
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'should highlight matching item', async () => {
@@ -1086,9 +1086,17 @@ describe( 'Menu', () => {
 				} )
 			);
 			await waitForFocusedMenu();
+			vi.useFakeTimers();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.keyboard( 'tw' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), {
+				code: 'KeyT',
+				key: 't',
+			} );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), {
+				code: 'KeyW',
+				key: 'w',
+			} );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
@@ -1097,7 +1105,18 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.keyboard( 'on' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'Two' } ),
+				{
+					key: 'o',
+				}
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'Two' } ),
+				{
+					key: 'n',
+				}
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1121,16 +1140,20 @@ describe( 'Menu', () => {
 				} )
 			);
 			await waitForFocusedMenu();
+			vi.useFakeTimers();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.keyboard( 'abc' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'a' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'b' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'c' } );
 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 
 			// Reset the typeahead search so the next keystrokes start a new query.
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.keyboard( 'on' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'o' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'n' } );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1139,7 +1162,18 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.keyboard( 'abc' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'a' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'b' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'c' }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1148,7 +1182,14 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.keyboard( 'tw' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 't' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'w' }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();

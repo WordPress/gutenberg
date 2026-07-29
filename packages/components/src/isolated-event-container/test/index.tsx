@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -12,7 +13,7 @@ import IsolatedEventContainer from '..';
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
 		const user = userEvent.setup();
-		const clickHandler = jest.fn();
+		const clickHandler = vi.fn();
 		render(
 			<IsolatedEventContainer
 				title="Container"
@@ -45,8 +46,8 @@ describe( 'IsolatedEventContainer', () => {
 	it( 'should stop event propagation only for mousedown, but not for keydown', async () => {
 		const user = userEvent.setup();
 
-		const mousedownHandler = jest.fn();
-		const keydownHandler = jest.fn();
+		const mousedownHandler = vi.fn();
+		const keydownHandler = vi.fn();
 		render(
 			<button
 				onMouseDown={ mousedownHandler }

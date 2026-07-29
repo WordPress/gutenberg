@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Slot bubblesVirtually false should subsume another slot by the same name 1`] = `
+exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 1`] = `
 <div>
   <div
     data-position="first"
@@ -13,7 +13,7 @@ exports[`Slot bubblesVirtually false should subsume another slot by the same nam
 </div>
 `;
 
-exports[`Slot bubblesVirtually false should subsume another slot by the same name 2`] = `
+exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 2`] = `
 <div>
   <div
     data-position="first"
@@ -26,18 +26,7 @@ exports[`Slot bubblesVirtually false should subsume another slot by the same nam
 </div>
 `;
 
-exports[`Slot bubblesVirtually false should unmount two slots with the same name 1`] = `
-<div>
-  <div
-    data-position="first"
-  />
-  <div
-    data-position="second"
-  />
-</div>
-`;
-
-exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
+exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 3`] = `
 <div>
   <div
     data-position="first"
@@ -54,7 +43,7 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
 </div>
 `;
 
-exports[`Slot bubblesVirtually true should subsume another slot by the same name 2`] = `
+exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 4`] = `
 <div>
   <div
     data-position="first"
@@ -69,7 +58,7 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
 </div>
 `;
 
-exports[`Slot bubblesVirtually true should unmount two slots with the same name 1`] = `
+exports[`Slot > bubblesVirtually %p > should unmount two slots with the same name 1`] = `
 <div>
   <div
     data-position="first"
@@ -80,7 +69,18 @@ exports[`Slot bubblesVirtually true should unmount two slots with the same name 
 </div>
 `;
 
-exports[`Slot should not infinite loop with useSlotFills 1`] = `
+exports[`Slot > bubblesVirtually %p > should unmount two slots with the same name 2`] = `
+<div>
+  <div
+    data-position="first"
+  />
+  <div
+    data-position="second"
+  />
+</div>
+`;
+
+exports[`Slot > should not infinite loop with useSlotFills 1`] = `
 <div>
   <div>
     <div>
@@ -94,7 +94,7 @@ exports[`Slot should not infinite loop with useSlotFills 1`] = `
 </div>
 `;
 
-exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
+exports[`Slot > should re-render Slot when not bubbling virtually 1`] = `
 <div>
   <div>
     1
@@ -105,7 +105,7 @@ exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
 </div>
 `;
 
-exports[`Slot should re-render Slot when not bubbling virtually 2`] = `
+exports[`Slot > should re-render Slot when not bubbling virtually 2`] = `
 <div>
   <div>
     2
@@ -116,7 +116,7 @@ exports[`Slot should re-render Slot when not bubbling virtually 2`] = `
 </div>
 `;
 
-exports[`Slot should render a Fill containing an array 1`] = `
+exports[`Slot > should render a Fill containing an array 1`] = `
 <div>
   <div>
     <span />
@@ -126,7 +126,7 @@ exports[`Slot should render a Fill containing an array 1`] = `
 </div>
 `;
 
-exports[`Slot should render a Fill containing an element 1`] = `
+exports[`Slot > should render a Fill containing an element 1`] = `
 <div>
   <div>
     <span />
@@ -134,7 +134,7 @@ exports[`Slot should render a Fill containing an element 1`] = `
 </div>
 `;
 
-exports[`Slot should render a string Fill 1`] = `
+exports[`Slot > should render a string Fill 1`] = `
 <div>
   <div>
     content
@@ -142,7 +142,7 @@ exports[`Slot should render a string Fill 1`] = `
 </div>
 `;
 
-exports[`Slot should render a string Fill with HTML wrapper when render props used 1`] = `
+exports[`Slot > should render a string Fill with HTML wrapper when render props used 1`] = `
 <div>
   <div>
     <blockquote>
@@ -152,19 +152,19 @@ exports[`Slot should render a string Fill with HTML wrapper when render props us
 </div>
 `;
 
-exports[`Slot should render empty Fills 1`] = `
+exports[`Slot > should render empty Fills 1`] = `
 <div>
   <div />
 </div>
 `;
 
-exports[`Slot should render empty Fills without HTML wrapper when render props used 1`] = `
+exports[`Slot > should render empty Fills without HTML wrapper when render props used 1`] = `
 <div>
   <div />
 </div>
 `;
 
-exports[`Slot should render in expected order when fills always mounted 1`] = `
+exports[`Slot > should render in expected order when fills always mounted 1`] = `
 <div>
   <div>
     first (rerendered)
@@ -175,7 +175,7 @@ exports[`Slot should render in expected order when fills always mounted 1`] = `
 </div>
 `;
 
-exports[`Slot should render in expected order when fills unmounted 1`] = `
+exports[`Slot > should render in expected order when fills unmounted 1`] = `
 <div>
   <div>
     second
@@ -198,7 +198,7 @@ exports[`Slot should render in expected order when fills unmounted 1`] = `
 </div>
 `;
 
-exports[`Slot should warn without a Provider 1`] = `
+exports[`Slot > should warn without a Provider 1`] = `
 <div>
   <div>
     <div />

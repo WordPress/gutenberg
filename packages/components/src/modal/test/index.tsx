@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -83,7 +84,7 @@ describe( 'Modal', () => {
 
 	it( 'should call onRequestClose when the escape key is pressed', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 		render(
 			<Modal onRequestClose={ onRequestClose }>
 				<p>Modal content</p>
@@ -123,7 +124,7 @@ describe( 'Modal', () => {
 
 	it( 'should request closing of any non nested modal when opened', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const DismissAdjacent = () => {
 			const [ isShown, setIsShown ] = useState( false );
@@ -148,7 +149,7 @@ describe( 'Modal', () => {
 
 	it( 'should support nested modals', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const NestSupport = () => {
 			const [ isShown, setIsShown ] = useState( false );
@@ -173,7 +174,7 @@ describe( 'Modal', () => {
 
 	it( 'should request closing of nested modal when outer modal unmounts', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const RequestCloseOfNested = () => {
 			const [ isShown, setIsShown ] = useState( true );

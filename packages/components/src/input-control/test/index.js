@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -70,7 +71,7 @@ describe( 'InputControl', () => {
 	describe( 'Value', () => {
 		it( 'should update value onChange', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
 			);
@@ -85,7 +86,7 @@ describe( 'InputControl', () => {
 
 		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			const heldKeySet = new Set();
 			const Example = () => {
 				const [ state, setState ] = useState( 'one' );
@@ -139,7 +140,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should change back to initial value prop, if controlled', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			const { rerender } = render(
 				<InputControl value="Original" onChange={ spy } />
 			);
@@ -159,7 +160,7 @@ describe( 'InputControl', () => {
 
 		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<InputControl
 					value=""
@@ -179,7 +180,7 @@ describe( 'InputControl', () => {
 
 		it( 'should commit value when blurred if value is invalid', async () => {
 			const user = await userEvent.setup();
-			const spyChange = jest.fn();
+			const spyChange = vi.fn();
 			render(
 				<InputControl
 					value="this is"

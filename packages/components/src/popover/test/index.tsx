@@ -2,6 +2,16 @@
  * External dependencies
  */
 import {
+	afterAll,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
+import {
 	act,
 	render,
 	screen,
@@ -50,19 +60,17 @@ beforeAll( () => {
 	// which will always fail in JSDom.
 	//
 	// https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61
-	jest.spyOn(
-		HTMLElement.prototype,
-		'offsetHeight',
-		'get'
-	).mockImplementation( function getOffsetHeight( this: HTMLElement ) {
-		// The `1` returned here is somewhat arbitrary – it just needs to be a
-		// non-zero integer.
-		return 1;
-	} );
+	vi.spyOn( HTMLElement.prototype, 'offsetHeight', 'get' ).mockImplementation(
+		function getOffsetHeight( this: HTMLElement ) {
+			// The `1` returned here is somewhat arbitrary – it just needs to be a
+			// non-zero integer.
+			return 1;
+		}
+	);
 } );
 
 afterAll( () => {
-	jest.restoreAllMocks();
+	vi.restoreAllMocks();
 } );
 
 // There's no matching `placement` for 'middle center' positions,
@@ -286,7 +294,6 @@ describe( 'Popover', () => {
 			// tests for constrained tabbing fail.
 			// [1]: https://github.com/testing-library/user-event/issues/1188
 			//
-			// eslint-disable-next-line jest/no-disabled-tests
 			describe.skip( 'constrains tabbing', () => {
 				test( 'by default', async () => {
 					// The default value for `focusOnMount` is 'firstElement',
@@ -593,8 +600,8 @@ describe( 'Popover', () => {
 			onParentFocusOutside,
 			onNestedFocusOutside,
 		}: {
-			onParentFocusOutside: jest.Mock;
-			onNestedFocusOutside: jest.Mock;
+			onParentFocusOutside: Mock;
+			onNestedFocusOutside: Mock;
 		} ) {
 			const [ isNestedOpen, setIsNestedOpen ] = useState( false );
 
@@ -632,8 +639,8 @@ describe( 'Popover', () => {
 
 		it( 'should call parent onFocusOutside when focus moves from nested popover to external element', async () => {
 			const user = userEvent.setup();
-			const onParentFocusOutside = jest.fn();
-			const onNestedFocusOutside = jest.fn();
+			const onParentFocusOutside = vi.fn();
+			const onNestedFocusOutside = vi.fn();
 
 			render(
 				<NestedPopoverTestComponent
@@ -683,7 +690,7 @@ describe( 'Popover', () => {
 
 		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
 			const user = userEvent.setup();
-			const onFocusOutside = jest.fn();
+			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
 			render(
@@ -703,7 +710,7 @@ describe( 'Popover', () => {
 
 		it( 'should not call onFocusOutside when focus returns from the slot to a popover descendant', async () => {
 			const user = userEvent.setup();
-			const onFocusOutside = jest.fn();
+			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
 			render(
@@ -728,7 +735,7 @@ describe( 'Popover', () => {
 			// to `body` (so the captured `relatedTarget` is `null`), then
 			// is synchronously restored to the popover before the blur
 			// check runs.
-			const onFocusOutside = jest.fn();
+			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
 			render(
@@ -762,7 +769,7 @@ describe( 'Popover', () => {
 
 		it( 'should still call onFocusOutside when focus moves to a sibling outside the slot', async () => {
 			const user = userEvent.setup();
-			const onFocusOutside = jest.fn();
+			const onFocusOutside = vi.fn();
 
 			render(
 				<>
@@ -784,8 +791,8 @@ describe( 'Popover', () => {
 
 	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
-		const onKeyDown = jest.fn();
+		const onClose = vi.fn();
+		const onKeyDown = vi.fn();
 
 		render(
 			<Popover onClose={ onClose } onKeyDown={ onKeyDown }>

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -57,7 +58,7 @@ describe.each( [
 
 	describe( 'semantics and labelling', () => {
 		it( 'should render a radiogroup with an accessible label (legend)', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
@@ -68,7 +69,7 @@ describe.each( [
 		} );
 
 		it( 'should render a radiogroup with an accessible label even when the label is visually hidden', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component
 					{ ...defaultProps }
@@ -93,7 +94,7 @@ describe.each( [
 		} );
 
 		it( 'should describe the radio group with the help text', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component
 					{ ...defaultProps }
@@ -108,7 +109,7 @@ describe.each( [
 		} );
 
 		it( 'should render radio inputs with accessible labels', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
@@ -123,7 +124,7 @@ describe.each( [
 		} );
 
 		it( 'should not select have a selected value when the `selected` prop does not match any available options', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
@@ -136,7 +137,7 @@ describe.each( [
 		} );
 
 		it( 'should render mutually exclusive radio inputs', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component
 					{ ...defaultProps }
@@ -153,7 +154,7 @@ describe.each( [
 		} );
 
 		it( 'should use the option description text to describe individual options', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component
 					{ ...defaultPropsWithDescriptions }
@@ -179,7 +180,7 @@ describe.each( [
 	describe( 'interaction', () => {
 		it( 'should select a new value when clicking on the radio input', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
@@ -204,7 +205,7 @@ describe.each( [
 
 		it( 'should select a new value when clicking on the radio label', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
@@ -227,7 +228,7 @@ describe.each( [
 
 		it( 'should select a new value when using the arrow keys', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);

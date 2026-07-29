@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, click, hover, sleep } from '@ariakit/test';
 
@@ -154,7 +155,7 @@ describe.each( [
 		expect( screen.getByRole( 'radio', { name: 'J' } ) ).not.toBeChecked();
 	} );
 	it( 'should call onChange with proper value', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		render(
 			<Component
@@ -413,7 +414,7 @@ describe.each( [
 	describe( 'isDeselectable', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -464,7 +465,7 @@ describe.each( [
 			} );
 
 			it( 'should ignore disabled radio options', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -512,7 +513,7 @@ describe.each( [
 
 		describe( 'isDeselectable = true', () => {
 			it( 'should be deselectable', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -578,7 +579,7 @@ describe.each( [
 			} );
 
 			it( 'should ignore disabled options', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component

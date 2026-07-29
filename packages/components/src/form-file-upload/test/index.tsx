@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FormFileUpload from '..';
@@ -27,7 +32,7 @@ describe( 'FormFileUpload', () => {
 	it( 'should not fire a change event after selecting the same file', async () => {
 		const user = userEvent.setup();
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<FormFileUpload onChange={ onChange }>
@@ -52,11 +57,11 @@ describe( 'FormFileUpload', () => {
 	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
 		const user = userEvent.setup();
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<FormFileUpload
-				onClick={ jest.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
+				onClick={ vi.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
 				onChange={ onChange }
 			>
 				My Upload Button

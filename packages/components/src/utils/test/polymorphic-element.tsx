@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';

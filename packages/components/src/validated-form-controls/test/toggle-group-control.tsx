@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import { ValidatedToggleGroupControl } from '../components';
 import { ToggleGroupControlOption } from '../../toggle-group-control';
@@ -7,7 +12,6 @@ import { ToggleGroupControlOption } from '../../toggle-group-control';
 // Additionally, the validity target is a hidden delegate radio input, not the
 // toggle group itself. These are pre-existing bugs, not caused by ControlWithError.
 describe( 'ValidatedToggleGroupControl', () => {
-	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'should preserve the help description', () => {
 		render(
 			<ValidatedToggleGroupControl

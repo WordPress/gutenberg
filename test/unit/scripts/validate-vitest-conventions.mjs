@@ -269,7 +269,13 @@ if ( typescriptTests.length ) {
 				path.join( ROOT_DIR, 'typings' ),
 				path.join( ROOT_DIR, 'node_modules/@types' ),
 			],
-			types: [ 'gutenberg-env', 'node', 'style-imports' ],
+			types: [
+				'gutenberg-env',
+				'gutenberg-vitest-test-env',
+				'node',
+				'react-css-custom-properties',
+				'style-imports',
+			],
 		},
 		files: [
 			compatibilityTypesPath,

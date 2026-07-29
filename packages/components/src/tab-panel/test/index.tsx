@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click } from '@ariakit/test';
 
@@ -45,7 +46,7 @@ describe.each( [
 
 	describe( 'Accessibility and semantics', () => {
 		it( 'should use the correct aria attributes', async () => {
-			const panelRenderFunction = jest.fn();
+			const panelRenderFunction = vi.fn();
 
 			render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
@@ -77,7 +78,7 @@ describe.each( [
 		} );
 
 		it( 'should display a tooltip when hovering tabs provided with an icon', async () => {
-			const panelRenderFunction = jest.fn();
+			const panelRenderFunction = vi.fn();
 
 			const TABS_WITH_ICON = [
 				{ ...TABS[ 0 ], icon: wordpress },
@@ -113,8 +114,8 @@ describe.each( [
 		} );
 
 		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
-			const mockOnSelect = jest.fn();
-			const panelRenderFunction = jest.fn();
+			const mockOnSelect = vi.fn();
+			const panelRenderFunction = vi.fn();
 
 			const TABS_WITH_ICON = [
 				{ ...TABS[ 0 ], icon: wordpress },
@@ -174,7 +175,7 @@ describe.each( [
 
 	describe( 'Without `initialTabName`', () => {
 		it( 'should render first tab', async () => {
-			const panelRenderFunction = jest.fn();
+			const panelRenderFunction = vi.fn();
 
 			render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
@@ -187,7 +188,7 @@ describe.each( [
 		} );
 
 		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 			const { rerender } = render(
 				<Component
 					tabs={ TABS }
@@ -258,7 +259,7 @@ describe.each( [
 		} );
 
 		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -290,7 +291,7 @@ describe.each( [
 		} );
 
 		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -322,7 +323,7 @@ describe.each( [
 		} );
 
 		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 			const { rerender } = render(
 				<Component
 					initialTabName="delta"
@@ -360,7 +361,7 @@ describe.each( [
 
 	describe( 'Disabled Tab', () => {
 		it( 'should disable the tab when `disabled` is `true`', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component
@@ -392,7 +393,7 @@ describe.each( [
 		} );
 
 		it( 'should select first enabled tab when the initial tab is disabled', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -427,7 +428,7 @@ describe.each( [
 		} );
 
 		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -463,7 +464,7 @@ describe.each( [
 		} );
 
 		it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 			const { rerender } = render(
 				<Component
 					tabs={ TABS }
@@ -507,7 +508,7 @@ describe.each( [
 		} );
 
 		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -555,8 +556,8 @@ describe.each( [
 
 	describe( 'Tab Activation', () => {
 		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
-			const panelRenderFunction = jest.fn();
-			const mockOnSelect = jest.fn();
+			const panelRenderFunction = vi.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component
@@ -593,7 +594,7 @@ describe.each( [
 		} );
 
 		it( 'defaults to automatic tab activation (arrow keys)', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component
@@ -630,7 +631,7 @@ describe.each( [
 		} );
 
 		it( 'wraps around the last/first tab when using arrow keys', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component
@@ -667,7 +668,7 @@ describe.each( [
 		} );
 
 		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			const { rerender } = render(
 				<Component
@@ -754,7 +755,7 @@ describe.each( [
 		} );
 
 		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component
@@ -833,7 +834,7 @@ describe.each( [
 		} );
 
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
-			const mockOnSelect = jest.fn();
+			const mockOnSelect = vi.fn();
 
 			render(
 				<Component

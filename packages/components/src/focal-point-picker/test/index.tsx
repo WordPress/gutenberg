@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -18,7 +19,7 @@ const Picker = ( props: React.ComponentProps< typeof _Picker > ) => {
 };
 
 const props: FocalPointPickerProps = {
-	onChange: jest.fn(),
+	onChange: vi.fn(),
 	url: 'test-url',
 	value: {
 		x: 0,
@@ -31,7 +32,7 @@ describe( 'FocalPointPicker', () => {
 		it( 'clicking the draggable area should focus it', async () => {
 			const user = userEvent.setup();
 
-			const mockOnChange = jest.fn();
+			const mockOnChange = vi.fn();
 
 			render( <Picker { ...props } onChange={ mockOnChange } /> );
 
@@ -43,9 +44,9 @@ describe( 'FocalPointPicker', () => {
 		} );
 
 		it( 'should stop a drag operation when focus is lost', () => {
-			const mockOnDrag = jest.fn();
-			const mockOnDragEnd = jest.fn();
-			const mockOnChange = jest.fn();
+			const mockOnDrag = vi.fn();
+			const mockOnDragEnd = vi.fn();
+			const mockOnChange = vi.fn();
 
 			render(
 				<Picker
@@ -106,8 +107,8 @@ describe( 'FocalPointPicker', () => {
 		it( 'should allow value altering', async () => {
 			const user = userEvent.setup();
 
-			const spyChange = jest.fn();
-			const spy = jest.fn();
+			const spyChange = vi.fn();
+			const spy = vi.fn();
 
 			render(
 				<Picker
@@ -149,7 +150,7 @@ describe( 'FocalPointPicker', () => {
 		it( 'call onChange with the expected values', async () => {
 			const user = userEvent.setup();
 
-			const spyChange = jest.fn();
+			const spyChange = vi.fn();
 			render(
 				<Picker
 					{ ...props }
@@ -172,7 +173,7 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'value handling', () => {
 		it( 'should handle legacy string values', () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<Picker
 					{ ...props }

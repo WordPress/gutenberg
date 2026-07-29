@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
 
@@ -15,8 +16,11 @@ import { SVG, Path } from '@wordpress/primitives';
  */
 import Snackbar from '../index';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
-const mockedSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+const mockedSpeak = vi.mocked( speak );
 
 describe( 'Snackbar', () => {
 	const testId = 'snackbar';
@@ -56,8 +60,8 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should be dismissible by clicking the snackbar', async () => {
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
@@ -80,8 +84,8 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar
@@ -111,8 +115,8 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should be dismissible by clicking the close button when the `explicitDismiss` prop is set to `true`', async () => {
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar
@@ -180,7 +184,7 @@ describe( 'Snackbar', () => {
 		} );
 
 		it( 'should be rendered as a button and call `onClick` when the `onClick` prop is set', async () => {
-			const onClick = jest.fn();
+			const onClick = vi.fn();
 
 			render(
 				<Snackbar actions={ [ { label: 'View post', onClick } ] }>

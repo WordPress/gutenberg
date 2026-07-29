@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -138,7 +139,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should pass button props to panel title', async () => {
 			const user = userEvent.setup();
-			const mock = jest.fn();
+			const mock = vi.fn();
 
 			render(
 				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>

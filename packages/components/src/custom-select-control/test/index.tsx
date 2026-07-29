@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { click, press, sleep, type, waitFor } from '@ariakit/test';
 import { render } from '@ariakit/test/react';
@@ -89,7 +90,7 @@ const ControlledCustomSelectControl = ( {
 };
 
 it( 'Should apply external controlled updates', async () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const { rerender } = await render(
 		<UncontrolledCustomSelectControl
 			{ ...props }
@@ -128,7 +129,7 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		expect(
@@ -144,7 +145,7 @@ describe.each( [
 	} );
 
 	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 		await render(
 			<Component
 				{ ...props }
@@ -357,7 +358,7 @@ describe.each( [
 	} );
 
 	it( 'Should return object onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
@@ -387,7 +388,7 @@ describe.each( [
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
@@ -413,7 +414,7 @@ describe.each( [
 	} );
 
 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
-		const onChangeMock = jest.fn();
+		const onChangeMock = vi.fn();
 
 		await render( <Component { ...props } onChange={ onChangeMock } /> );
 
@@ -464,7 +465,7 @@ describe.each( [
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
-			const onKeyDown = jest.fn();
+			const onKeyDown = vi.fn();
 
 			await render(
 				<div
@@ -642,8 +643,8 @@ describe.each( [
 		} );
 
 		it( 'Should call custom event handlers', async () => {
-			const onFocusMock = jest.fn();
-			const onBlurMock = jest.fn();
+			const onFocusMock = vi.fn();
+			const onBlurMock = vi.fn();
 
 			await render(
 				<>
@@ -718,7 +719,6 @@ describe( 'Legacy size support', () => {
 } );
 
 describe( 'Type checking', () => {
-	// eslint-disable-next-line jest/expect-expect
 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
 		const options = [
 			{

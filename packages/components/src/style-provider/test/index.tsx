@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it } from 'vitest';
+
 import { render } from '@testing-library/react';
 import { registerStyle } from '@wordpress/style-runtime';
 import StyleProvider from '..';

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
@@ -36,7 +37,7 @@ describe( 'hooks', () => {
 		};
 
 		it( 'should use incoming prop as state on initial render', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render( <Example value="Hello" onChange={ spy } /> );
 
 			const input = getInput();
@@ -46,7 +47,7 @@ describe( 'hooks', () => {
 		} );
 
 		it( 'should update rendered value onChange', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render( <Example onChange={ spy } /> );
 
 			const input = getInput();
@@ -74,7 +75,7 @@ describe( 'hooks', () => {
 		 * be updated if a new incoming prop value is changed.
 		 */
 		it( 'should update changed value with new incoming prop value', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 
 			/**
 			 * The <input /> value starts with "Hello", since it is passed down
@@ -104,7 +105,7 @@ describe( 'hooks', () => {
 		} );
 
 		it( 'should render with initial value and be controllable', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			// Input starts off as being uncontrolled / self-managed.
 			const { rerender } = render(
 				<Example onChange={ spy } initial="Hello" />

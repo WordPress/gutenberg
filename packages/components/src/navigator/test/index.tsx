@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import type { ComponentPropsWithoutRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -508,7 +509,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should navigate across screens', async () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		const user = userEvent.setup();
 
@@ -578,7 +579,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should not render anything if the path does not match any available screen', async () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		const user = userEvent.setup();
 

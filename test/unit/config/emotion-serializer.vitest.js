@@ -34,7 +34,10 @@ export function createClassNameReplacer() {
 
 		if ( isEmptyEmotionClass( className ) ) {
 			preservedClassNames++;
-			return className;
+			const label = className.match( /^css-[^-]+-(.+)$/ )?.[ 1 ];
+			return label
+				? `emotion-empty-${ label }`
+				: `emotion-empty-${ preservedClassNames - 1 }`;
 		}
 
 		return `emotion-${ index - preservedClassNames }`;

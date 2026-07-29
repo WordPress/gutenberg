@@ -1,17 +1,18 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
+import { wordpress } from '@wordpress/icons';
 import { ToolbarGroup } from '..';
 
 /**
  * WordPress dependencies
  */
-import { wordpress } from '@wordpress/icons';
 
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
@@ -98,7 +99,7 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
-			const clickHandler = jest.fn();
+			const clickHandler = vi.fn();
 			const controls = [
 				{
 					icon: wordpress,

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
 
@@ -264,7 +265,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new color appended', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -293,7 +294,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new gradient appended', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -333,7 +334,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can remove a color', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -366,7 +367,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update palette name', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -406,7 +407,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update color palette value', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -437,7 +438,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update gradient palette value', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit

@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SelectControl Legacy size support treats __unstable-large the same as default 1`] = `
+exports[`SelectControl > Legacy size support > treats __unstable-large the same as default 1`] = `
 Snapshot Diff:
 Compared values have no visual difference.
 `;
 
-exports[`SelectControl Legacy size support treats __unstable-large the same as default 2`] = `
+exports[`SelectControl > Legacy size support > treats __unstable-large the same as default 2`] = `
 Snapshot Diff:
 Compared values have no visual difference.
 `;

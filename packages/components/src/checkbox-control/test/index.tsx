@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -98,7 +99,7 @@ describe( 'CheckboxControl', () => {
 			const user = userEvent.setup();
 
 			let state = false;
-			const setState = jest.fn(
+			const setState = vi.fn(
 				( nextState: boolean ) => ( state = nextState )
 			);
 

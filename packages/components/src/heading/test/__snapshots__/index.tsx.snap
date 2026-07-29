@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`props should render correctly 1`] = `
+exports[`props > should render correctly 1`] = `
 .emotion-0 {
   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
   line-height: 1.4;
@@ -21,7 +21,7 @@ exports[`props should render correctly 1`] = `
 </h2>
 `;
 
-exports[`props should render level as a number 1`] = `
+exports[`props > should render level as a number 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles
@@ -40,7 +40,7 @@ Snapshot Diff:
     },
 `;
 
-exports[`props should render level as a string 1`] = `
+exports[`props > should render level as a string 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -12,12 +13,15 @@ import { plusCircle } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { press } from '@ariakit/test';
 import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
-import { press } from '@ariakit/test';
 
-jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+vi.mock( import( '../../icon' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	default: () => <div data-testid="test-icon" />,
+} ) );
 
 const Button = forwardRef(
 	(
@@ -623,23 +627,23 @@ describe( 'Button', () => {
 			expect( button ).toHaveAttribute( 'aria-disabled' );
 		} );
 	} );
-
-	describe( 'static typing', () => {
-		<>
-			<Button href="foo" />
-			{ /* @ts-expect-error - `target` requires `href` */ }
-			<Button target="foo" />
-
-			{ /* @ts-expect-error - `disabled` is only for buttons */ }
-			<Button href="foo" disabled />
-
-			<Button href="foo" type="image/png" />
-			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
-			<Button type="image/png" />
-			{ /* @ts-expect-error */ }
-			<Button type="invalidtype" />
-			{ /* @ts-expect-error */ }
-			<Button disabled accessibleWhenDisabled href="foo" />
-		</>;
-	} );
 } );
+
+// These expressions are checked by TypeScript without registering an empty
+// runtime suite, which Vitest treats as an error.
+<>
+	<Button href="foo" />
+	{ /* @ts-expect-error - `target` requires `href` */ }
+	<Button target="foo" />
+
+	{ /* @ts-expect-error - `disabled` is only for buttons */ }
+	<Button href="foo" disabled />
+
+	<Button href="foo" type="image/png" />
+	{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
+	<Button type="image/png" />
+	{ /* @ts-expect-error */ }
+	<Button type="invalidtype" />
+	{ /* @ts-expect-error */ }
+	<Button disabled accessibleWhenDisabled href="foo" />
+</>;

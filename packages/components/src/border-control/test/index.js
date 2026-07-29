@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import {
 	fireEvent,
 	render,
@@ -35,7 +36,7 @@ function createProps( customProps ) {
 	const props = {
 		colors,
 		label: 'Border',
-		onChange: jest.fn().mockImplementation( ( newValue ) => {
+		onChange: vi.fn().mockImplementation( ( newValue ) => {
 			props.value = newValue;
 		} ),
 		value: defaultBorder,

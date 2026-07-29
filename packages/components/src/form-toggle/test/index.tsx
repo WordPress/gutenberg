@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -81,7 +82,7 @@ describe( 'FormToggle', () => {
 		it( 'should flip the checked property when clicked', async () => {
 			const user = userEvent.setup();
 
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render( <ControlledFormToggle onChange={ onChange } /> );
 
 			const input = getInput();

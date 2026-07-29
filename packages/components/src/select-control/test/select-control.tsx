@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -20,7 +21,7 @@ describe( 'SelectControl', () => {
 
 	it( 'should render its children', async () => {
 		const user = userEvent.setup();
-		const handleChangeMock = jest.fn();
+		const handleChangeMock = vi.fn();
 
 		render(
 			<SelectControl onChange={ handleChangeMock } label="Select">
@@ -49,7 +50,7 @@ describe( 'SelectControl', () => {
 
 	it( 'should render its options', async () => {
 		const user = userEvent.setup();
-		const handleChangeMock = jest.fn();
+		const handleChangeMock = vi.fn();
 
 		render(
 			<SelectControl
@@ -102,7 +103,6 @@ describe( 'SelectControl', () => {
 		).toBeInTheDocument();
 	} );
 
-	/* eslint-disable jest/expect-expect */
 	describe( 'static typing', () => {
 		describe( 'single', () => {
 			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
@@ -225,7 +225,6 @@ describe( 'SelectControl', () => {
 			} );
 		} );
 	} );
-	/* eslint-enable jest/expect-expect */
 
 	describe( 'Legacy size support', () => {
 		it( 'treats __unstable-large the same as default', () => {

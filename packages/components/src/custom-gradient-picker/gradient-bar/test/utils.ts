@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { getHorizontalRelativeGradientPosition } from '../utils';
 
 describe( 'getHorizontalRelativeGradientPosition', () => {
 	it( 'should return relative percentage position', () => {
-		jest.spyOn(
+		vi.spyOn(
 			window.HTMLElement.prototype,
 			'getBoundingClientRect'
 		).mockImplementationOnce(
@@ -23,7 +28,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 	} );
 
 	it( 'should subtract the x position of the container from the mouse position', () => {
-		jest.spyOn(
+		vi.spyOn(
 			window.HTMLElement.prototype,
 			'getBoundingClientRect'
 		).mockImplementationOnce(
@@ -41,7 +46,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 	} );
 
 	it( 'should clamp to a whole percentage number', () => {
-		jest.spyOn(
+		vi.spyOn(
 			window.HTMLElement.prototype,
 			'getBoundingClientRect'
 		).mockImplementationOnce(
@@ -60,7 +65,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 	} );
 
 	it( 'should clamp to zero when mouse position is less the x position', () => {
-		jest.spyOn(
+		vi.spyOn(
 			window.HTMLElement.prototype,
 			'getBoundingClientRect'
 		).mockImplementationOnce(
@@ -78,7 +83,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 	} );
 
 	it( 'should clamp to 100 when mouse position is greater than width', () => {
-		jest.spyOn(
+		vi.spyOn(
 			window.HTMLElement.prototype,
 			'getBoundingClientRect'
 		).mockImplementationOnce(

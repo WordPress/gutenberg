@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 
 /**
@@ -67,7 +68,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should not re-render component when new filter added before component was mounted', async () => {
-		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+		const SpiedComponent = vi.fn( () => <div>Spied component</div> );
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
@@ -88,7 +89,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should re-render component once when new filter added after component was mounted', async () => {
-		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+		const SpiedComponent = vi.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const { container } = render( <EnhancedComponent /> );
@@ -112,7 +113,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should re-render component once when two filters added in the same animation frame', async () => {
-		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+		const SpiedComponent = vi.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const { container } = render( <EnhancedComponent /> );
@@ -145,7 +146,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should re-render component twice when new filter added and removed in two different animation frames', async () => {
-		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+		const SpiedComponent = vi.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 		const { container } = render( <EnhancedComponent /> );
 
@@ -174,7 +175,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should re-render both components once each when one filter added', async () => {
-		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+		const SpiedComponent = vi.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const CombinedComponents = () => (

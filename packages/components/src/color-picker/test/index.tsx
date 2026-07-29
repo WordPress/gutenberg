@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { click } from '@ariakit/test';
@@ -73,7 +74,7 @@ describe( 'ColorPicker', () => {
 	describe( 'legacy props', () => {
 		it( 'should fire onChangeComplete with the legacy color format', async () => {
 			const user = userEvent.setup();
-			const onChangeComplete = jest.fn();
+			const onChangeComplete = vi.fn();
 			const color = '#000';
 
 			render(
@@ -104,7 +105,7 @@ describe( 'ColorPicker', () => {
 	describe( 'Hex input', () => {
 		it( 'should fire onChange with the correct value from the hex input', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const color = '#000';
 
 			render(
@@ -132,7 +133,7 @@ describe( 'ColorPicker', () => {
 
 		it( 'should reset color to black when the hex input is completely cleared', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const color = '#11aabb';
 
 			render(
@@ -160,7 +161,7 @@ describe( 'ColorPicker', () => {
 	] )( 'RGB inputs', ( colorInput, inputLabel, expected ) => {
 		it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const color = '#fff';
 
 			render(
@@ -192,7 +193,7 @@ describe( 'ColorPicker', () => {
 	describe( 'HSL inputs', () => {
 		it( 'sliders should use accurate H and S values based on user interaction when possible', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -333,7 +334,7 @@ describe( 'ColorPicker', () => {
 		} );
 
 		it( 'should preserve hue and saturation when lightness is set to 0 (black)', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -384,7 +385,7 @@ describe( 'ColorPicker', () => {
 		] )(
 			'should allow saturation 50→0 at %s without firing onChange',
 			async ( _label, lightness ) => {
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 
 				render(
 					<ControlledColorPicker
@@ -433,7 +434,7 @@ describe( 'ColorPicker', () => {
 		);
 
 		it( 'should fire onChange once per real color change in controlled mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -512,7 +513,7 @@ describe( 'ColorPicker', () => {
 		} );
 
 		it( 'should preserve hue when saturation is set to 0', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -567,7 +568,7 @@ describe( 'ColorPicker', () => {
 		] )( 'HSL inputs', ( colorInput, inputLabel, expected ) => {
 			it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
 				const user = userEvent.setup();
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				const color = '#2ad5d5';
 
 				render(
@@ -614,7 +615,7 @@ describe( 'ColorPicker', () => {
 		};
 
 		it( 'preserves saturation when keyboard-navigating to black in controlled mode', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			// Saturated red with mid brightness — HSVA s stays high at black.
 			const { container } = render(
@@ -652,7 +653,7 @@ describe( 'ColorPicker', () => {
 		} );
 
 		it( 'preserves saturation when pointer selects black in controlled mode', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const { container } = render(
 				<ControlledColorPicker
@@ -690,7 +691,7 @@ describe( 'ColorPicker', () => {
 
 		it( 'preserves saturation after a full pointer drag to black then HSL hue edit', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const { container } = render(
 				<ControlledColorPicker
@@ -772,7 +773,7 @@ describe( 'ColorPicker', () => {
 
 		it( 'places the pointer at s:0 when HSL lightness is set to white', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const { container } = render(
 				<ControlledColorPicker
@@ -891,7 +892,7 @@ describe( 'ColorPicker', () => {
 
 		it( 'uses the HSL hue when leaving white through the visual surface', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -929,7 +930,7 @@ describe( 'ColorPicker', () => {
 
 		it( 'uses the HSL hue when leaving a mid-gray through the visual surface', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker
@@ -1009,7 +1010,7 @@ describe( 'ColorPicker', () => {
 	] )( 'Alpha-enabled %s format', ( format, formatLabel ) => {
 		it( `should update alpha correctly when ${ formatLabel } format is selected`, async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ControlledColorPicker

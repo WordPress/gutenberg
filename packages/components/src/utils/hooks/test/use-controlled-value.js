@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
@@ -39,7 +40,7 @@ describe( 'useControlledValue', () => {
 	} );
 
 	it( 'should call onChange only when there is no value being passed in', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
 
 		expect( getInput() ).toHaveValue( 'WordPress.org' );
@@ -51,7 +52,7 @@ describe( 'useControlledValue', () => {
 	} );
 
 	it( 'should call onChange when there is a value passed in', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const { rerender } = render(
 			<Input
 				defaultValue="WordPress.org"

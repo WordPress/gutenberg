@@ -26,7 +26,7 @@ describe( 'Emotion snapshot serializer', () => {
 		` );
 	} );
 
-	it( 'preserves stable labels for empty styled components', () => {
+	it( 'normalizes generated hashes while preserving labels for empty styled components', () => {
 		const EmptyBox = styled.div``;
 		const { container } = render( <EmptyBox>Content</EmptyBox> );
 

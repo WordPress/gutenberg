@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, test } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 
 /**

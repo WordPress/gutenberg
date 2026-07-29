@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 // eslint-disable-next-line no-restricted-imports
 import { cx as innerCx } from '@emotion/css';
 import { insertStyles } from '@emotion/utils';
@@ -13,12 +14,12 @@ import createCache from '@emotion/cache';
  */
 import { useCx } from '..';
 
-jest.mock( '@emotion/css', () => ( {
-	cx: jest.fn(),
+vi.mock( import( '@emotion/css' ), () => ( {
+	cx: vi.fn(),
 } ) );
 
-jest.mock( '@emotion/utils', () => ( {
-	insertStyles: jest.fn(),
+vi.mock( import( '@emotion/utils' ), () => ( {
+	insertStyles: vi.fn(),
 } ) );
 
 function Example( { args } ) {

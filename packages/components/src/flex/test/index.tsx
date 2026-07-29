@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, test } from 'vitest';
+
 import type { CSSProperties } from 'react';
 import { render, screen } from '@testing-library/react';
 

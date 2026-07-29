@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -99,7 +100,7 @@ describe( 'Guide', () => {
 
 	it( 'calls onFinish when the finish button is clicked', async () => {
 		const user = userEvent.setup();
-		const onFinish = jest.fn();
+		const onFinish = vi.fn();
 		render(
 			<Guide
 				{ ...defaultProps }
@@ -114,7 +115,7 @@ describe( 'Guide', () => {
 
 	it( 'calls onFinish when the modal is closed', async () => {
 		const user = userEvent.setup();
-		const onFinish = jest.fn();
+		const onFinish = vi.fn();
 		render(
 			<Guide
 				{ ...defaultProps }

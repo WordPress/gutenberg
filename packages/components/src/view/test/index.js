@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -37,7 +38,7 @@ describe( 'props', () => {
 			<section ref={ ref } data-custom-component { ...props } />
 		) );
 
-		const ref = jest.fn();
+		const ref = vi.fn();
 		const { container } = render(
 			<View
 				as={ CustomComponent }

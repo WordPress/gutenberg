@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -131,7 +132,7 @@ describe.each( [
 	it( 'should select the correct option via click events', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 2 ];
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -156,7 +157,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetIndex = 4;
 		const targetOption = timezones[ targetIndex ];
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -184,7 +185,7 @@ describe.each( [
 
 	it( 'calls onFilterValueChange whenever the textbox changes', async () => {
 		const user = userEvent.setup();
-		const onFilterValueChangeSpy = jest.fn();
+		const onFilterValueChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -201,7 +202,7 @@ describe.each( [
 
 	it( 'clears the textbox value if there is no selected value on blur', async () => {
 		const user = userEvent.setup();
-		const onFilterValueChangeSpy = jest.fn();
+		const onFilterValueChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -225,7 +226,7 @@ describe.each( [
 	it( 'should select the correct option from a search', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -252,7 +253,7 @@ describe.each( [
 	it( 'should render aria-live announcement upon selection', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 9 ];
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }
@@ -281,7 +282,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const unmatchedString = 'Mordor';
 		const targetOption = timezones[ 6 ];
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 		render(
 			<Component
 				options={ timezones }

@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -97,7 +102,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const user = userEvent.setup();
 		render(
 			<Provider>
@@ -300,7 +305,7 @@ describe( 'Slot', () => {
 			const styleHash = 'slot-fill-cross-document-style';
 			const css = '.slot-fill-cross-document{padding:32px;}';
 
-			// CSS module registration is skipped by the Jest transform, so mirror the
+			// CSS module registration is skipped by the test transform, so mirror the
 			// generated production call explicitly.
 			registerStyle( styleHash, css );
 

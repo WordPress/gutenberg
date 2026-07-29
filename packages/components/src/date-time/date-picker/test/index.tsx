@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { format } from 'date-fns';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -33,7 +34,7 @@ describe( 'DatePicker', () => {
 	it( 'should call onChange when a day is selected', async () => {
 		const user = userEvent.setup();
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<DatePicker
@@ -52,8 +53,8 @@ describe( 'DatePicker', () => {
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
 		const user = userEvent.setup();
 
-		const onMonthPreviewed = jest.fn();
-		const onChange = jest.fn();
+		const onMonthPreviewed = vi.fn();
+		const onChange = vi.fn();
 
 		render(
 			<DatePicker

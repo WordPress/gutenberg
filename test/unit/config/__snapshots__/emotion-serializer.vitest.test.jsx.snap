@@ -1,8 +1,8 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Emotion snapshot serializer > preserves stable labels for empty styled components 1`] = `
+exports[`Emotion snapshot serializer > normalizes generated hashes while preserving labels for empty styled components 1`] = `
 <div
-  class="css-19mgf5f-EmptyBox emotion-0"
+  class="emotion-empty-EmptyBox emotion-0"
 >
   Content
 </div>

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -41,7 +42,7 @@ const mixedBorders = {
 const props = {
 	colors,
 	label: 'Border Box',
-	onChange: jest.fn().mockImplementation( ( newValue ) => {
+	onChange: vi.fn().mockImplementation( ( newValue ) => {
 		props.value = newValue;
 	} ),
 	value: undefined,
@@ -325,7 +326,7 @@ describe( 'BorderBoxControl', () => {
 
 	describe( 'onChange handling', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			props.value = undefined;
 		} );
 
