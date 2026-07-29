@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { speak } from '@wordpress/a11y';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,8 +7,9 @@ import { createRef } from '@wordpress/element';
 import * as AlertDialog from '..';
 import type { ConfirmResult } from '../types';
 
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
 } ) );
 
 function createDeferred() {
@@ -42,7 +44,7 @@ describe( 'AlertDialog', () => {
 
 	it( 'renders with title, children, and default buttons', async () => {
 		render(
-			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ vi.fn() }>
 				<AlertDialog.Popup title="Test Title">
 					Test message content
 				</AlertDialog.Popup>
@@ -65,7 +67,7 @@ describe( 'AlertDialog', () => {
 
 	it( 'renders description when provided', async () => {
 		render(
-			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ vi.fn() }>
 				<AlertDialog.Popup
 					title="Test Title"
 					description="This is a description"
@@ -82,7 +84,7 @@ describe( 'AlertDialog', () => {
 
 	it( 'renders with role="alertdialog" for default intent', async () => {
 		render(
-			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ vi.fn() }>
 				<AlertDialog.Popup title="Default Dialog">
 					Content
 				</AlertDialog.Popup>
@@ -96,7 +98,7 @@ describe( 'AlertDialog', () => {
 
 	it( 'renders with role="alertdialog" for irreversible intent', async () => {
 		render(
-			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ vi.fn() }>
 				<AlertDialog.Popup
 					intent="irreversible"
 					title="Irreversible Dialog"
@@ -113,7 +115,7 @@ describe( 'AlertDialog', () => {
 
 	it( 'uses custom button labels', async () => {
 		render(
-			<AlertDialog.Root open onOpenChange={ jest.fn() }>
+			<AlertDialog.Root open onOpenChange={ vi.fn() }>
 				<AlertDialog.Popup
 					title="Custom Labels"
 					confirmButtonText="Yes, do it"
@@ -160,8 +162,8 @@ describe( 'AlertDialog', () => {
 
 	describe( 'sync confirm flow', () => {
 		it( 'calls onConfirm and closes on confirm click', async () => {
-			const onConfirm = jest.fn();
-			const onOpenChange = jest.fn();
+			const onConfirm = vi.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -197,13 +199,13 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'provides well-formed event details on confirm close', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
 					open
 					onOpenChange={ onOpenChange }
-					onConfirm={ jest.fn() }
+					onConfirm={ vi.fn() }
 				>
 					<AlertDialog.Popup title="Details Test">
 						Content
@@ -231,7 +233,7 @@ describe( 'AlertDialog', () => {
 			} );
 
 			const details = onOpenChange.mock.calls.find(
-				( [ open ]: [ boolean ] ) => ! open
+				( [ open ] ) => ! open
 			)?.[ 1 ];
 
 			expect( details ).toBeDefined();
@@ -242,7 +244,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'closes without onConfirm when no handler is provided', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root open onOpenChange={ onOpenChange }>
@@ -275,8 +277,8 @@ describe( 'AlertDialog', () => {
 
 	describe( 'cancel and dismiss', () => {
 		it( 'closes on cancel click without calling onConfirm', async () => {
-			const onConfirm = jest.fn();
-			const onOpenChange = jest.fn();
+			const onConfirm = vi.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -308,7 +310,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'closes on escape key', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root open onOpenChange={ onOpenChange }>
@@ -331,7 +333,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'does not close on backdrop click', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root open onOpenChange={ onOpenChange }>
@@ -354,7 +356,7 @@ describe( 'AlertDialog', () => {
 	describe( 'irreversible intent', () => {
 		it( 'renders title and buttons', async () => {
 			render(
-				<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Root open onOpenChange={ vi.fn() }>
 					<AlertDialog.Popup
 						intent="irreversible"
 						title="Irreversible Dialog"
@@ -382,7 +384,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'closes on escape key', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root open onOpenChange={ onOpenChange }>
@@ -410,7 +412,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'does not close on backdrop click', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root open onOpenChange={ onOpenChange }>
@@ -442,7 +444,7 @@ describe( 'AlertDialog', () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => deferred.promise }
 				>
 					<AlertDialog.Popup title="Async Test">
@@ -478,7 +480,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'closes dialog when async confirm resolves', async () => {
 			const deferred = createDeferred();
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -518,14 +520,14 @@ describe( 'AlertDialog', () => {
 
 		it( 're-enables buttons when async confirm rejects (task failure)', async () => {
 			const deferred = createDeferred();
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => deferred.promise }
 				>
 					<AlertDialog.Popup title="Async Reject">
@@ -582,7 +584,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'keeps dialog open when confirm returns { close: false }', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -621,7 +623,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'keeps dialog open when async confirm returns { close: false }', async () => {
 			const deferred = createDeferred();
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -669,7 +671,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'blocks dismiss while pending by default', async () => {
 			const deferred = createDeferred();
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -712,7 +714,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'ignores duplicate confirm clicks while pending', async () => {
-			const onConfirm = jest.fn(
+			const onConfirm = vi.fn(
 				() =>
 					new Promise< void >( () => {
 						// Never resolves
@@ -722,7 +724,7 @@ describe( 'AlertDialog', () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ onConfirm }
 				>
 					<AlertDialog.Popup title="Double Click">
@@ -800,7 +802,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'opens and closes via cancel', async () => {
-			const onConfirm = jest.fn();
+			const onConfirm = vi.fn();
 
 			render(
 				<AlertDialog.Root onConfirm={ onConfirm }>
@@ -833,7 +835,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'closes and unmounts dialog via confirm click', async () => {
-			const onConfirm = jest.fn();
+			const onConfirm = vi.fn();
 
 			render(
 				<AlertDialog.Root onConfirm={ onConfirm }>
@@ -875,7 +877,7 @@ describe( 'AlertDialog', () => {
 			const { unmount } = render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => deferred.promise }
 				>
 					<AlertDialog.Popup title="Unmount Test">
@@ -910,12 +912,12 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'controlled mode: recovers to idle when consumer keeps dialog open after confirm', async () => {
-			const onConfirm = jest.fn();
+			const onConfirm = vi.fn();
 
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ onConfirm }
 				>
 					<AlertDialog.Popup title="Deadlock Test">
@@ -951,11 +953,11 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'recovers when onConfirm throws synchronously', async () => {
-			const onConfirm = jest.fn( () => {
+			const onConfirm = vi.fn( () => {
 				throw new Error( 'Sync error' );
 			} );
-			const onOpenChange = jest.fn();
-			const consoleSpy = jest
+			const onOpenChange = vi.fn();
+			const consoleSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
@@ -1011,7 +1013,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'sets aria-describedby when description is provided', async () => {
 			render(
-				<AlertDialog.Root open onOpenChange={ jest.fn() }>
+				<AlertDialog.Root open onOpenChange={ vi.fn() }>
 					<AlertDialog.Popup
 						title="Describedby Test"
 						description="A helpful description"
@@ -1033,7 +1035,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'allows re-confirm after { close: false, error }', async () => {
 			const deferred = createDeferred();
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -1077,14 +1079,14 @@ describe( 'AlertDialog', () => {
 
 		it( 'allows re-confirm after { close: false }', async () => {
 			let callCount = 0;
-			const onConfirm = jest.fn( (): { close: boolean } | undefined => {
+			const onConfirm = vi.fn( (): { close: boolean } | undefined => {
 				callCount++;
 				if ( callCount === 1 ) {
 					return { close: false };
 				}
 				return undefined;
 			} );
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -1140,14 +1142,14 @@ describe( 'AlertDialog', () => {
 
 	describe( 'error handling', () => {
 		beforeEach( () => {
-			( speak as jest.Mock ).mockClear();
+			vi.mocked( speak ).mockClear();
 		} );
 
 		it( 'displays error message when onConfirm returns { close: false, error }', async () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => ( {
 						close: false,
 						error: 'Something went wrong.',
@@ -1182,7 +1184,7 @@ describe( 'AlertDialog', () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => deferred.promise }
 				>
 					<AlertDialog.Popup title="Async Error">
@@ -1221,7 +1223,7 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'stays open when error is returned without explicit close: false', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<AlertDialog.Root
@@ -1260,7 +1262,7 @@ describe( 'AlertDialog', () => {
 
 		it( 'clears error message on next confirm attempt', async () => {
 			let callCount = 0;
-			const onConfirm = jest.fn( (): ConfirmResult => {
+			const onConfirm = vi.fn( (): ConfirmResult => {
 				callCount++;
 				if ( callCount === 1 ) {
 					return {
@@ -1274,7 +1276,7 @@ describe( 'AlertDialog', () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ onConfirm }
 				>
 					<AlertDialog.Popup title="Clear Error">
@@ -1378,7 +1380,7 @@ describe( 'AlertDialog', () => {
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => ( {
 						close: false,
 						error: 'Announced error.',
@@ -1409,14 +1411,14 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'does not show error message when onConfirm throws', async () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
 			render(
 				<AlertDialog.Root
 					open
-					onOpenChange={ jest.fn() }
+					onOpenChange={ vi.fn() }
 					onConfirm={ () => {
 						throw new Error( 'Unhandled throw' );
 					} }

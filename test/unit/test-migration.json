@@ -27,6 +27,7 @@
 			"packages/style-engine",
 			"packages/sync",
 			"packages/token-list",
+			"packages/ui",
 			"packages/undo-manager",
 			"packages/widget-dashboard",
 			"packages/wordcount"

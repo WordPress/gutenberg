@@ -1,9 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { Stack } from '../stack';
 
-jest.mock( './style.module.css', () => ( {
-	stack: 'stack-class',
+vi.mock( import( './style.module.css' ), () => ( {
+	default: {
+		stack: 'stack-class',
+	},
 } ) );
 
 describe( 'Stack', () => {

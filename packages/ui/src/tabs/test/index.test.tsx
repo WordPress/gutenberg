@@ -1,4 +1,4 @@
-/* eslint-disable jest/no-conditional-expect */
+import { describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DirectionProvider } from '@base-ui/react/direction-provider';
@@ -368,7 +368,7 @@ describe( 'Tabs', () => {
 
 	describe( 'pointer interactions', () => {
 		it( 'should select a tab when clicked', async () => {
-			const mockOnValueChange = jest.fn();
+			const mockOnValueChange = vi.fn();
 
 			const user = userEvent.setup();
 
@@ -426,7 +426,7 @@ describe( 'Tabs', () => {
 		} );
 
 		it( 'should not select a disabled tab when clicked', async () => {
-			const mockOnValueChange = jest.fn();
+			const mockOnValueChange = vi.fn();
 
 			const user = userEvent.setup();
 
@@ -465,7 +465,7 @@ describe( 'Tabs', () => {
 		describe( 'when a selected tab id is not specified', () => {
 			describe( 'when left `undefined` [Uncontrolled]', () => {
 				it( 'should choose the first tab as selected', async () => {
-					const mockOnValueChange = jest.fn();
+					const mockOnValueChange = vi.fn();
 
 					const user = userEvent.setup();
 
@@ -500,7 +500,7 @@ describe( 'Tabs', () => {
 				} );
 
 				it( 'should choose the first non-disabled tab if the first tab is disabled', async () => {
-					const mockOnValueChange = jest.fn();
+					const mockOnValueChange = vi.fn();
 
 					const user = userEvent.setup();
 
@@ -684,8 +684,8 @@ describe( 'Tabs', () => {
 				} );
 
 				it( 'should ignore any changes to the `defaultValue` prop after the first render', async () => {
-					const mockOnValueChange = jest.fn();
-					const consoleErrorSpy = jest
+					const mockOnValueChange = vi.fn();
+					const consoleErrorSpy = vi
 						.spyOn( console, 'error' )
 						.mockImplementation( () => {} );
 
@@ -987,7 +987,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should select tabs in the tablist when using the left and right arrow keys when automatic tab activation is enabled', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 				const user = userEvent.setup();
 
 				const valueProps =
@@ -1087,7 +1087,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should not automatically select tabs in the tablist when pressing the left and right arrow keys by default (manual tab activation)', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 
 				const user = userEvent.setup();
 
@@ -1173,7 +1173,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should not select tabs in the tablist when using the up and down arrow keys, unless the `orientation` prop is set to `vertical`', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 
 				const user = userEvent.setup();
 
@@ -1298,7 +1298,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should loop tab focus at the end of the tablist when using arrow keys', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 
 				const user = userEvent.setup();
 
@@ -1379,7 +1379,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should swap the left and right arrow keys when selecting tabs if the writing direction is set to RTL', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 
 				const user = userEvent.setup();
 
@@ -1484,7 +1484,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should focus tabs in the tablist even if disabled', async () => {
-				const mockOnValueChange = jest.fn();
+				const mockOnValueChange = vi.fn();
 
 				const user = userEvent.setup();
 
@@ -1710,7 +1710,7 @@ describe( 'Tabs', () => {
 		describe( 'removing a tab', () => {
 			describe( 'with no explicitly set initial tab', () => {
 				it( 'should not select a new tab when the selected tab is removed', async () => {
-					const mockOnValueChange = jest.fn();
+					const mockOnValueChange = vi.fn();
 
 					const user = userEvent.setup();
 
@@ -1794,7 +1794,7 @@ describe( 'Tabs', () => {
 				'when using the `%s` prop [%s]',
 				( propName, mode, Component ) => {
 					it( 'should handle the selected tab being removed', async () => {
-						const mockOnValueChange = jest.fn();
+						const mockOnValueChange = vi.fn();
 
 						const initialComponentProps = {
 							tabs: TABS,
@@ -1898,7 +1898,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( `should not fall back to the tab matching the \`${ propName }\` prop when a different selected tab is removed`, async () => {
-						const mockOnValueChange = jest.fn();
+						const mockOnValueChange = vi.fn();
 
 						const initialComponentProps = {
 							tabs: TABS,
@@ -2042,7 +2042,7 @@ describe( 'Tabs', () => {
 				'when using the `%s` prop [%s]',
 				( propName, mode, Component ) => {
 					it( `should select a newly added tab if it matches the \`${ propName }\` prop`, async () => {
-						const mockOnValueChange = jest.fn();
+						const mockOnValueChange = vi.fn();
 
 						const initialComponentProps = {
 							tabs: TABS,
@@ -2140,7 +2140,7 @@ describe( 'Tabs', () => {
 				'when using the `%s` prop [%s]',
 				( propName, mode, Component ) => {
 					it( `should handle the initial tab matching the \`${ propName }\` prop becoming disabled`, async () => {
-						const mockOnValueChange = jest.fn();
+						const mockOnValueChange = vi.fn();
 
 						const initialComponentProps = {
 							tabs: TABS,
@@ -2245,7 +2245,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should handle the user-selected tab becoming disabled', async () => {
-						const mockOnValueChange = jest.fn();
+						const mockOnValueChange = vi.fn();
 
 						const user = userEvent.setup();
 
@@ -2385,14 +2385,19 @@ describe( 'Tabs', () => {
 	describe( 'Development mode validation', () => {
 		function collectUncaughtErrors() {
 			const errors: Error[] = [];
-			const handler = ( event: ErrorEvent ) => {
+			const windowHandler = ( event: ErrorEvent ) => {
 				event.preventDefault();
 				errors.push( event.error );
 			};
-			window.addEventListener( 'error', handler );
+			const processHandler = ( error: Error ) => errors.push( error );
+			window.addEventListener( 'error', windowHandler );
+			process.on( 'uncaughtException', processHandler );
 			return {
 				errors,
-				cleanup: () => window.removeEventListener( 'error', handler ),
+				cleanup: () => {
+					window.removeEventListener( 'error', windowHandler );
+					process.off( 'uncaughtException', processHandler );
+				},
 			};
 		}
 
@@ -2548,4 +2553,3 @@ describe( 'Tabs', () => {
 		} );
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */
