@@ -946,10 +946,18 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 
 		// Multi-select the two whole list items and copy them.
-		await editor.selectBlocks(
-			editor.canvas.locator( '[data-type="core/list-item"]' ).first(),
-			editor.canvas.locator( '[data-type="core/list-item"]' ).last()
-		);
+		await editor.canvas.getByText( 'one' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/list-item', 'core/list-item' ] );
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// The clipboard holds the items in a list wrapper so the markup is
@@ -1040,11 +1048,21 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
-		// Multi-select the two whole columns and copy them.
-		await editor.selectBlocks(
-			editor.canvas.locator( '[data-type="core/column"]' ).first(),
-			editor.canvas.locator( '[data-type="core/column"]' ).last()
-		);
+		// Shift+click across the columns multi-selects the two whole
+		// column blocks.
+		await editor.canvas.getByText( 'col one' ).click();
+		await editor.canvas
+			.getByText( 'col two' )
+			.click( { modifiers: [ 'Shift' ] } );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/column', 'core/column' ] );
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// The clipboard holds the columns in their wrapper so the markup
