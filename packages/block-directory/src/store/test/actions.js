@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
@@ -12,13 +17,14 @@ import apiFetch from '@wordpress/api-fetch';
 import { loadAssets } from '../load-assets';
 import { store as blockDirectoryStore } from '..';
 
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	default: vi.fn(),
 } ) );
 
-jest.mock( '../load-assets', () => ( {
-	loadAssets: jest.fn(),
+vi.mock( import( '../load-assets' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	loadAssets: vi.fn(),
 } ) );
 
 function createRegistryWithStores() {

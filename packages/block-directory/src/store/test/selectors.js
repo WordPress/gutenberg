@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import {
@@ -91,7 +96,7 @@ describe( 'selectors', () => {
 	describe( 'getNewBlockTypes', () => {
 		it( 'should retrieve the block types that are installed and in the post content', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( {
+				select: vi.fn( () => ( {
 					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
 					getClientIdsWithDescendants: () => blockListIds,
 				} ) ),
@@ -111,7 +116,7 @@ describe( 'selectors', () => {
 
 		it( 'should return an empty array if no blocks are used', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( {
+				select: vi.fn( () => ( {
 					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
 					getClientIdsWithDescendants: () => [],
 				} ) ),
@@ -132,7 +137,7 @@ describe( 'selectors', () => {
 	describe( 'getUnusedBlockTypes', () => {
 		it( 'should retrieve the block types that are installed but not used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( {
+				select: vi.fn( () => ( {
 					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
 					getClientIdsWithDescendants: () => blockListIds,
 				} ) ),
@@ -152,7 +157,7 @@ describe( 'selectors', () => {
 
 		it( 'should return all block types if no blocks are used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( {
+				select: vi.fn( () => ( {
 					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
 					getClientIdsWithDescendants: () => [],
 				} ) ),

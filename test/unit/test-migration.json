@@ -9,6 +9,7 @@
 			"packages/abilities",
 			"packages/annotations",
 			"packages/blob",
+			"packages/block-directory",
 			"packages/connectors",
 			"packages/core-commands",
 			"packages/date",
