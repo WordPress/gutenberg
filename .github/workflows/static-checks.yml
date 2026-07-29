@@ -47,7 +47,9 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            # Credentials should only persist when required to perform Git operations, such as within private mirrors.
+            - name: Checkout repository
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: ${{ github.repository_owner != 'WordPress' && github.event.repository.private }}
