@@ -5,7 +5,7 @@
  * @package WordPress
  */
 
-require_once __DIR__ . '/table-of-contents/class-document-outline-parser.php';
+require_once __DIR__ . '/table-of-contents/class-wp-document-outline-parser.php';
 
 /**
  * Adds an aria-label to the table of contents block content.
@@ -96,7 +96,7 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$outline = Document_Outline_Parser::get_outline_from_post( $post, $attributes );
+	$outline = WP_Document_Outline_Parser::get_outline_from_post( $post, $attributes );
 
 	if ( empty( $outline ) ) {
 		return '';

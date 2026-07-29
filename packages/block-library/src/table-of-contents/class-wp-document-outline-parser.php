@@ -1,6 +1,6 @@
 <?php
 /**
- * Document_Outline_Parser class.
+ * WP_Document_Outline_Parser class.
  *
  * @package WordPress
  */
@@ -13,7 +13,7 @@
  *
  * @access private
  */
-final class Document_Outline_Parser {
+final class WP_Document_Outline_Parser {
 
 	/**
 	 * The Heading block's default level when no `level` attribute is saved.
