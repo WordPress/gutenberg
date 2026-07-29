@@ -37,6 +37,7 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import useAutoConvert from './auto-convert-freeform';
 
 export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
@@ -121,6 +122,7 @@ function Root( { className, ...settings } ) {
 		},
 		settings
 	);
+	useAutoConvert();
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />

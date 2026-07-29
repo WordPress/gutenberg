@@ -174,6 +174,8 @@ export const SETTINGS_DEFAULTS = {
 
 	isPreviewMode: false,
 
+	autoConvertFreeform: true,
+
 	// These settings will be completely revamped in the future.
 	// The goal is to evolve this into an API which will instruct
 	// the block inspector to animate transitions between what it
