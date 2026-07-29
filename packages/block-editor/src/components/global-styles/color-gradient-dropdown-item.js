@@ -213,7 +213,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = window.__experimentalGlobalStylesInheritanceUI,
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );

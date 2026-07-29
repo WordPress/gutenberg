@@ -91,6 +91,27 @@ describe( 'TypographyPanel — experiment off', () => {
 			} )
 		).not.toBeInTheDocument();
 	} );
+
+	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
+		await renderAriakit(
+			<TypographyPanel
+				value={ { color: { text: 'var:preset|color|blue' } } }
+				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
+				settings={ PALETTE_SETTINGS }
+				panelId="test"
+				onChange={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', {
+				name: /reset to inherited value/i,
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /^reset$/i } )
+		).toBeInTheDocument();
+	} );
 } );
 
 describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {

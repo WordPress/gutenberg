@@ -665,7 +665,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = window.__experimentalGlobalStylesInheritanceUI,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
