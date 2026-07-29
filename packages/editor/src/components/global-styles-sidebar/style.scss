@@ -15,6 +15,28 @@
 	flex-grow: 1;
 }
 
+// Give the revisions screen a bounded height so the DataViews picker timeline
+// scrolls internally and its pagination footer stays pinned to the bottom.
+//
+// The screen only renders in the Global Styles sidebar, so its ancestors are
+// scoped with `:has()` — keeping the other Global Styles screens on the
+// default outer-scrolling layout (same approach as the post revisions
+// timeline in the document sidebar).
+.editor-global-styles-sidebar:has(.global-styles-ui-screen-revisions) {
+	overflow: hidden;
+
+	.editor-global-styles-sidebar__panel {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
+	.global-styles-ui-sidebar__navigator-provider {
+		flex: 1;
+		min-height: 0;
+	}
+}
+
 .editor-global-styles-sidebar .editor-global-styles-sidebar__header-title {
 	margin: 0;
 }

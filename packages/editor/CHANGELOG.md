@@ -29,6 +29,7 @@
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
+-   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### New Features
 

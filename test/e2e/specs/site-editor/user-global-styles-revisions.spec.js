@@ -276,10 +276,13 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel( 'Global Styles pagination' );
-		await expect( pagination ).toContainText( '1 of 2' );
-		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
-		await expect( pagination ).toContainText( '2 of 2' );
+		const currentPage = page.getByLabel( 'Current page' );
+		await expect( currentPage ).toHaveValue( '1' );
+		await page.getByRole( 'button', { name: 'Next page' } ).click();
+		await expect( currentPage ).toHaveValue( '2' );
+		await expect(
+			page.getByRole( 'button', { name: 'Next page' } )
+		).toBeDisabled();
 	} );
 } );
 

@@ -1727,11 +1727,6 @@
 			"count": 2
 		}
 	},
-	"packages/global-styles-ui/src/pagination/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/palette.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
