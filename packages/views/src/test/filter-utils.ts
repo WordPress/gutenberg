@@ -199,16 +199,70 @@ describe( 'mergeActiveViewOverrides', () => {
 			);
 		} );
 
-		it( 'should replace same-field filters', () => {
+		it( 'should always replace same-field filters when the override is locked', () => {
 			const result = mergeActiveViewOverrides( baseView, {
 				filters: [
 					{
 						field: 'author',
 						operator: 'isAny',
 						value: [ 'editor' ],
+						isLocked: true,
 					},
 				],
 			} );
+			expect( result.filters ).toHaveLength( 1 );
+			expect( result.filters![ 0 ] ).toEqual( {
+				field: 'author',
+				operator: 'isAny',
+				value: [ 'editor' ],
+				isLocked: true,
+			} );
+		} );
+
+		it( 'should not replace a user-modified same-field filter when the override is unlocked', () => {
+			// The view's author filter differs from the default view's, meaning
+			// the user has modified it: the unlocked override must not win.
+			const result = mergeActiveViewOverrides(
+				baseView,
+				{
+					filters: [
+						{
+							field: 'author',
+							operator: 'isAny',
+							value: [ 'editor' ],
+						},
+					],
+				},
+				defaultView
+			);
+			expect( result.filters ).toHaveLength( 1 );
+			expect( result.filters![ 0 ] ).toEqual( {
+				field: 'author',
+				operator: 'isAny',
+				value: [ 'admin' ],
+			} );
+		} );
+
+		it( 'should replace a same-field filter that still matches the default view when the override is unlocked', () => {
+			const defaultWithFilter: View = {
+				...defaultView,
+				filters: [
+					{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
+				],
+			};
+			const result = mergeActiveViewOverrides(
+				baseView,
+				{
+					filters: [
+						{
+							field: 'author',
+							operator: 'isAny',
+							value: [ 'editor' ],
+						},
+					],
+				},
+				defaultWithFilter
+			);
 			expect( result.filters ).toHaveLength( 1 );
 			expect( result.filters![ 0 ] ).toEqual( {
 				field: 'author',
@@ -494,6 +548,74 @@ describe( 'stripActiveViewOverrides', () => {
 				filters: [],
 			} );
 			expect( result.filters ).toEqual( baseView.filters );
+		} );
+
+		it( 'should keep a user-modified filter on a field managed by an unlocked override', () => {
+			const view: View = {
+				...baseView,
+				filters: [
+					{ field: 'status', operator: 'isAny', value: 'draft' },
+				],
+			};
+			const result = stripActiveViewOverrides( view, {
+				filters: [
+					{ field: 'status', operator: 'isAny', value: 'publish' },
+				],
+			} );
+			expect( result.filters ).toEqual( [
+				{ field: 'status', operator: 'isAny', value: 'draft' },
+			] );
+		} );
+
+		it( 'should never persist filters on a field managed by a locked override', () => {
+			const view: View = {
+				...baseView,
+				filters: [
+					{ field: 'status', operator: 'isAny', value: 'draft' },
+				],
+			};
+			const result = stripActiveViewOverrides( view, {
+				filters: [
+					{
+						field: 'status',
+						operator: 'isAny',
+						value: 'trash',
+						isLocked: true,
+					},
+				],
+			} );
+			expect( result.filters ).toEqual( [] );
+		} );
+
+		it( 'should restore the default filter when current matches an unlocked override', () => {
+			const defaultWithFilter: View = {
+				...defaultView,
+				filters: [
+					{ field: 'status', operator: 'isAny', value: 'any' },
+				],
+			};
+			const view: View = {
+				...baseView,
+				filters: [
+					{ field: 'status', operator: 'isAny', value: 'publish' },
+				],
+			};
+			const result = stripActiveViewOverrides(
+				view,
+				{
+					filters: [
+						{
+							field: 'status',
+							operator: 'isAny',
+							value: 'publish',
+						},
+					],
+				},
+				defaultWithFilter
+			);
+			expect( result.filters ).toEqual( [
+				{ field: 'status', operator: 'isAny', value: 'any' },
+			] );
 		} );
 	} );
 

@@ -31,7 +31,8 @@ const DEFAULT_BOUND_VALUES = [ 'type', 'perPage', 'fields' ] as const;
 
 /**
  * Merges activeViewOverrides into a view.
- * Filters: Active filters take precedence; same-field filters are replaced.
+ * Filters: Locked filters always replace same-field filters; unlocked filters
+ * apply only while the user has no filter of their own for the field.
  * Sort, type, perPage, fields: Applied only if the current value matches the
  * default, so user modifications win.
  *
@@ -73,20 +74,34 @@ export function mergeActiveViewOverrides(
 		}
 	}
 
-	// Merge filters
+	// Merge filters. Locked filters always apply, replacing any same-field
+	// filter. Unlocked filters act as defaults: they apply only while the
+	// user has no filter of their own for the field (none at all, or one
+	// that still matches the default view).
 	if (
 		activeViewOverrides.filters &&
 		activeViewOverrides.filters.length > 0
 	) {
-		const activeFields = new Set(
-			activeViewOverrides.filters.map( ( f ) => f.field )
-		);
-		const preserved = ( view.filters ?? [] ).filter(
-			( f: Filter ) => ! activeFields.has( f.field )
+		const viewFilters = view.filters ?? [];
+		const applied = activeViewOverrides.filters.filter( ( override ) => {
+			if ( override.isLocked ) {
+				return true;
+			}
+			const current = viewFilters.find(
+				( f: Filter ) => f.field === override.field
+			);
+			const defaultFilter = defaultView?.filters?.find(
+				( f: Filter ) => f.field === override.field
+			);
+			return ! current || dequal( current, defaultFilter );
+		} );
+		const appliedFields = new Set( applied.map( ( f ) => f.field ) );
+		const preserved = viewFilters.filter(
+			( f: Filter ) => ! appliedFields.has( f.field )
 		);
 		result = {
 			...result,
-			filters: [ ...preserved, ...activeViewOverrides.filters ],
+			filters: [ ...preserved, ...applied ],
 		};
 	}
 
@@ -129,7 +144,8 @@ export function mergeActiveViewOverrides(
 
 /**
  * Strips overrides before persisting.
- * Filters: Removes filters on fields managed by activeViewOverrides.
+ * Filters: Locked filters are never persisted; unlocked filters are restored
+ * to the default view's filter unless the user modified them.
  * Sort, type, perPage, fields: If the value matches the override, restores
  * the default value.
  *
@@ -171,19 +187,41 @@ export function stripActiveViewOverrides(
 		}
 	}
 
-	// Strip managed filters
+	// Strip managed filters. Filters managed by a locked override are never
+	// persisted. For unlocked overrides, an unmodified filter is restored to
+	// the default view's filter (if any); a user-modified filter is
+	// persisted as is.
 	if (
 		activeViewOverrides.filters &&
 		activeViewOverrides.filters.length > 0
 	) {
-		const activeFields = new Set(
-			activeViewOverrides.filters.map( ( f ) => f.field )
-		);
+		const overrideFilters = activeViewOverrides.filters;
+		const strippedFilters: Filter[] = [];
+		for ( const filter of view.filters ?? [] ) {
+			const override = overrideFilters.find(
+				( f ) => f.field === filter.field
+			);
+			if ( ! override ) {
+				strippedFilters.push( filter );
+				continue;
+			}
+			if ( override.isLocked ) {
+				continue;
+			}
+			if ( dequal( filter, override ) ) {
+				const defaultFilter = defaultView?.filters?.find(
+					( f: Filter ) => f.field === filter.field
+				);
+				if ( defaultFilter ) {
+					strippedFilters.push( defaultFilter );
+				}
+				continue;
+			}
+			strippedFilters.push( filter );
+		}
 		result = {
 			...result,
-			filters: ( view.filters ?? [] ).filter(
-				( f: Filter ) => ! activeFields.has( f.field )
-			),
+			filters: strippedFilters,
 		};
 	}
 
