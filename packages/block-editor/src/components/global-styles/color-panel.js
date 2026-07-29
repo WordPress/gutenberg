@@ -138,6 +138,8 @@ const DEFAULT_CONTROLS = {
 	caption: true,
 };
 
+const EMPTY_ARRAY = [];
+
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
 	value,
@@ -149,7 +151,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
-	additionalElements = [],
+	additionalElements = EMPTY_ARRAY,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
