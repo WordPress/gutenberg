@@ -12,11 +12,12 @@ import TEMPLATE from './template';
 
 export default function CommentsEdit( props ) {
 	const { attributes, setAttributes, clientId } = props;
-	const { tagName: TagName, legacy } = attributes;
+	const { tagName: TagName, legacy, layout } = attributes;
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
+		layout,
 	} );
 
 	if ( legacy ) {

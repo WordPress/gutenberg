@@ -1,10 +1,78 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
-// v1: Deprecate the initial version of the block which was called "Comments
-// Query Loop" instead of "Comments".
+const v2 = {
+	attributes: {
+		tagName: {
+			type: 'string',
+			default: 'div',
+		},
+		legacy: {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	apiVersion: 3,
+	supports: {
+		anchor: true,
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+			heading: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	save( { attributes: { tagName: Tag, legacy } } ) {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+		// The legacy version is dynamic (i.e. PHP rendered) and doesn't allow inner
+		// blocks, so nothing is saved in that case.
+		return legacy ? null : <Tag { ...innerBlocksProps } />;
+	},
+};
+
 const v1 = {
 	attributes: {
 		tagName: {
@@ -50,4 +118,4 @@ const v1 = {
 	},
 };
 
-export default [ v1 ];
+export default [ v2, v1 ];
