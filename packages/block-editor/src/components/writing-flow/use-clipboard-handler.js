@@ -281,31 +281,37 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				// If every pasted block requires a parent block, wrap them
-				// all in one. A copied multi-selection is always a set of
-				// same-parent siblings, so this covers any copied selection
-				// of parent-restricted blocks: columns paste as one columns
-				// block, list items as one list, a button as a buttons
-				// block. The first insertable parent allowed by every block
-				// serves as the default when a block allows several.
-				const requiredParent =
-					! canInsertBlockType( blocks[ 0 ]?.name, rootClientId ) &&
-					getBlockType( blocks[ 0 ].name )?.parent?.find(
-						( parentName ) =>
-							canInsertBlockType( parentName, rootClientId ) &&
-							blocks.every( ( block ) =>
-								getBlockType( block.name )?.parent?.includes(
-									parentName
-								)
+				// Blocks that cannot be pasted directly may declare parent
+				// block types they must be inserted in, so wrap them in the
+				// first insertable type they all accept, if any. A copied
+				// multi-selection is always a set of same-parent siblings,
+				// so one wrapper fits all, e.g. copied columns paste as one
+				// columns block.
+				if (
+					blocks.length &&
+					! canInsertBlockType( blocks[ 0 ].name, rootClientId )
+				) {
+					const wrapperName = blocks
+						.map(
+							( block ) =>
+								getBlockType( block.name )?.parent ?? []
+						)
+						.reduce( ( common, parents ) =>
+							common.filter( ( name ) =>
+								parents.includes( name )
 							)
-					);
+						)
+						.find( ( name ) =>
+							canInsertBlockType( name, rootClientId )
+						);
 
-				if ( requiredParent ) {
-					__unstableSplitSelection( [
-						createBlock( requiredParent, {}, blocks ),
-					] );
-					event.preventDefault();
-					return;
+					if ( wrapperName ) {
+						__unstableSplitSelection( [
+							createBlock( wrapperName, {}, blocks ),
+						] );
+						event.preventDefault();
+						return;
+					}
 				}
 
 				const newBlocks = [];
