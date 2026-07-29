@@ -2,9 +2,11 @@
  * WordPress dependencies
  */
 import {
+	createBlock,
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
+	getBlockType,
 	hasBlockSupport,
 	switchToBlockType,
 } from '@wordpress/blocks';
@@ -285,6 +287,22 @@ export default function useClipboardHandler() {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
 						newBlocks.push( block );
 					} else {
+						// If the block requires exactly one type of parent
+						// block, wrap it. Example: a standalone button (from
+						// markup predating the buttons block) can only be
+						// inserted within a buttons block.
+						const parent = getBlockType( block.name )?.parent;
+
+						if (
+							parent?.length === 1 &&
+							canInsertBlockType( parent[ 0 ], rootClientId )
+						) {
+							newBlocks.push(
+								createBlock( parent[ 0 ], {}, [ block ] )
+							);
+							continue;
+						}
+
 						// If a block cannot be inserted in a root block, try
 						// converting it to that root block type and insert the
 						// inner blocks.
