@@ -963,6 +963,18 @@ test.describe( 'Copy/cut/paste', () => {
 			.toBe( 2 );
 		await pageUtils.pressKeys( 'primary+c' );
 
+		// The clipboard holds the items in a list wrapper so the markup is
+		// valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+
 		// Create a second, ordered list by typing, and paste in a fresh
 		// empty item.
 		await editor.insertBlock( { name: 'core/paragraph' } );
@@ -1143,6 +1155,14 @@ test.describe( 'Copy/cut/paste', () => {
 			.click();
 		await page.keyboard.press( 'Escape' );
 		await pageUtils.pressKeys( 'primary+c' );
+
+		// The clipboard holds the button in a buttons wrapper so the
+		// markup is valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Click me</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->` );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
