@@ -9,7 +9,7 @@
 ### New Features
 
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
--   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu when set to `false`.
+-   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu when set to `false` ([#80814](https://github.com/WordPress/gutenberg/pull/80814)).
 
 ### Bug Fixes
 
