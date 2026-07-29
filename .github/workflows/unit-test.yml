@@ -46,6 +46,9 @@ jobs:
             - name: Validate JavaScript test routing
               run: npm run test:unit:routing
 
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'

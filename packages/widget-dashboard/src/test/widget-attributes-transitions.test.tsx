@@ -32,13 +32,13 @@ const mockObserved = new Map< Element, ( entries: unknown[] ) => void >();
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
+	useResizeObserver: ( ( callback: ( entries: unknown[] ) => void ) => {
 		return ( element: Element | null ) => {
 			if ( element ) {
 				mockObserved.set( element, callback );
 			}
 		};
-	},
+	} ) as typeof import('@wordpress/compose').useResizeObserver,
 } ) );
 
 /**

@@ -15,10 +15,10 @@ let notifyResize: ( entries: unknown[] ) => void = () => {};
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
+	useResizeObserver: ( ( callback: ( entries: unknown[] ) => void ) => {
 		notifyResize = callback;
 		return () => {};
-	},
+	} ) as typeof import('@wordpress/compose').useResizeObserver,
 } ) );
 
 let availableSize: number | null = null;

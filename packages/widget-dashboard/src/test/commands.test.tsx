@@ -26,13 +26,24 @@ const layout: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },
 ];
 
+interface CommandsSelectors {
+	getContext: () => string;
+	getCommands: ( contextual: boolean ) => Array< { name: string } >;
+}
+
 function CommandsProbe( { names }: { names: string[] } ) {
 	const context = useSelect(
-		( select ) => select( commandsStore ).getContext(),
+		( select ) =>
+			(
+				select( commandsStore ) as unknown as CommandsSelectors
+			 ).getContext(),
 		[]
 	);
 	const contextualCommands = useSelect(
-		( select ) => select( commandsStore ).getCommands( true ),
+		( select ) =>
+			(
+				select( commandsStore ) as unknown as CommandsSelectors
+			 ).getCommands( true ),
 		[]
 	);
 
