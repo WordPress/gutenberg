@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
+import type { WidgetRenderProps } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -13,7 +14,9 @@ import { Stack } from '@wordpress/ui';
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
-export default function WelcomeBanner() {
+export default function WelcomeBanner( {
+	titleId,
+}: Pick< WidgetRenderProps, 'titleId' > ) {
 	const isClassicTheme = useSelect(
 		( select ) =>
 			select( coreStore ).getCurrentTheme()?.is_block_theme === false,
@@ -62,7 +65,7 @@ export default function WelcomeBanner() {
 
 	return (
 		<Stack className={ styles.root } direction="column" gap="lg">
-			<Banner />
+			<Banner titleId={ titleId } />
 
 			<Stack className={ styles.columns }>
 				<FeatureHighlight

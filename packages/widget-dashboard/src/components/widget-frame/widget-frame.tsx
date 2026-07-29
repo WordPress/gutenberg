@@ -97,18 +97,23 @@ export function WidgetFrame( {
 	const isHeaderHidden = presentation === 'full-bleed';
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
+	const isHostHeadingRendered = ! widgetType.hasOwnHeading;
 
 	const body = (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
-				<WidgetRender widget={ widget } widgetType={ widgetType } />
+				<WidgetRender
+					widget={ widget }
+					widgetType={ widgetType }
+					titleId={ titleId }
+				/>
 			</Suspense>
 		</WidgetErrorBoundary>
 	);
 
 	return (
 		<>
-			{ ! isHeaderHidden && (
+			{ isHostHeadingRendered && ! isHeaderHidden && (
 				<WidgetHeader
 					showIdentity
 					widgetType={ widgetType }
@@ -126,11 +131,13 @@ export function WidgetFrame( {
 				) }
 				{ ...( editMode ? { inert: 'true' } : {} ) }
 			>
-				{ isHeaderHidden && widgetType.title && (
-					<VisuallyHidden render={ <h2 id={ titleId } /> }>
-						{ widgetType.title }
-					</VisuallyHidden>
-				) }
+				{ isHostHeadingRendered &&
+					isHeaderHidden &&
+					widgetType.title && (
+						<VisuallyHidden render={ <h2 id={ titleId } /> }>
+							{ widgetType.title }
+						</VisuallyHidden>
+					) }
 				{ body }
 			</Card.Content>
 		</>

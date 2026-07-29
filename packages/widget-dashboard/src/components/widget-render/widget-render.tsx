@@ -14,6 +14,7 @@ import type { DashboardWidget } from '../../types';
 interface WidgetRenderProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
+	titleId?: string;
 }
 
 /**
@@ -24,7 +25,11 @@ interface WidgetRenderProps {
  *
  * @param {WidgetRenderProps} props Component props.
  */
-export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
+export function WidgetRender( {
+	widget,
+	widgetType,
+	titleId,
+}: WidgetRenderProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
 
@@ -52,6 +57,7 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 			widgetType={ widgetType }
 			attributes={ widget.attributes }
 			setAttributes={ setAttributes }
+			titleId={ titleId }
 			resolveWidgetModule={ resolveWidgetModule }
 		/>
 	);
