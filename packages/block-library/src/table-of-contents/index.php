@@ -96,7 +96,13 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$outline = WP_Document_Outline_Parser::get_outline_from_post( $post, $attributes );
+	$outline = WP_Document_Outline_Parser::get_outline_from_post(
+		$post,
+		array(
+			'max_level'                 => isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0,
+			'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
+		)
+	);
 
 	if ( empty( $outline ) ) {
 		return '';

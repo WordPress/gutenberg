@@ -31,24 +31,35 @@ final class WP_Document_Outline_Parser {
 	/**
 	 * Gets the document outline from a post.
 	 *
-	 * @param WP_Post $post       Post to scan.
-	 * @param array   $attributes Attributes of the block being rendered.
+	 * @param WP_Post $post    Post to scan.
+	 * @param array   $options {
+	 *     Options for building the outline.
+	 *
+	 *     @type int  $max_level                 Maximum heading level to include.
+	 *     @type bool $only_include_current_page Whether to include only headings on the current page.
+	 * }
 	 *
 	 * @return array Nested heading data.
 	 */
-	public static function get_outline_from_post( $post, $attributes ) {
+	public static function get_outline_from_post( $post, $options = array() ) {
 		if ( ! $post instanceof WP_Post ) {
 			return array();
 		}
 
-		$attributes = is_array( $attributes ) ? $attributes : array();
-		$max_level  = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
+		$options   = wp_parse_args(
+			$options,
+			array(
+				'max_level'                 => 0,
+				'only_include_current_page' => false,
+			)
+		);
+		$max_level = (int) $options['max_level'];
 		// Heading context records the current pagination state so collection can
 		// skip headings outside the rendered page and build page-aware links.
 		$context = self::normalize_heading_context(
 			$post->post_content,
 			array(
-				'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
+				'only_include_current_page' => ! empty( $options['only_include_current_page'] ),
 				'permalink'                 => get_permalink( $post ),
 				'target_page'               => self::get_current_page_number(),
 			)
