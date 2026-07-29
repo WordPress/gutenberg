@@ -38,9 +38,16 @@ export async function loadView( config: ViewConfig ) {
 	const page = queryParams?.page ?? 1;
 	const search = queryParams?.search ?? '';
 
+	// Resolve the effective layout type first: a `type` override changes
+	// which layout's defaults apply.
+	const { type: effectiveType } = mergeActiveViewOverrides(
+		{ ...baseView },
+		activeViewOverrides,
+		defaultView
+	);
 	const rawDefaults =
 		config.defaultLayouts?.[
-			baseView?.type as keyof typeof config.defaultLayouts
+			effectiveType as keyof typeof config.defaultLayouts
 		];
 	const layoutTypeDefaults =
 		! rawDefaults || rawDefaults === true ? {} : rawDefaults;

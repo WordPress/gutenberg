@@ -53,6 +53,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		name,
 		slug,
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams,
 		onChangeQueryParams,
@@ -78,14 +79,19 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const search = queryParams?.search ?? baseView.search ?? '';
 
 	const combinedOverrides = useMemo( () => {
+		// Resolve the effective layout type first: a `type` override changes
+		// which layout's defaults apply.
+		const { type: effectiveType } = mergeActiveViewOverrides(
+			baseView,
+			activeViewOverrides,
+			defaultView
+		);
 		const rawDefaults =
-			config.defaultLayouts?.[
-				baseView.type as keyof typeof config.defaultLayouts
-			];
+			defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
 		const layoutTypeDefaults =
 			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
 		return { ...layoutTypeDefaults, ...activeViewOverrides };
-	}, [ config.defaultLayouts, baseView.type, activeViewOverrides ] );
+	}, [ defaultLayouts, baseView, activeViewOverrides, defaultView ] );
 
 	// Merge URL query parameters (page, search) and activeViewOverrides into the view
 	const view: View = useMemo( () => {

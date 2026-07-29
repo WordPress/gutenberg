@@ -49,6 +49,27 @@ describe( 'useView', () => {
 			expect( result.current.view.type ).toBe( 'table' );
 		} );
 
+		it( 'should apply the layout defaults of the overridden type', () => {
+			const registry = createTestRegistry();
+			const { result } = renderUseView( registry, {
+				kind: 'postType',
+				name: 'page',
+				slug: 'default',
+				defaultView: { type: 'list' },
+				activeViewOverrides: { type: 'table' },
+				defaultLayouts: {
+					table: {
+						layout: { styles: { author: { align: 'start' } } },
+					},
+					list: {},
+				},
+			} );
+			expect( result.current.view.type ).toBe( 'table' );
+			expect( ( result.current.view as any ).layout ).toEqual( {
+				styles: { author: { align: 'start' } },
+			} );
+		} );
+
 		it( 'should not apply a type override when the user has persisted a different type', () => {
 			const registry = createTestRegistry();
 			registry
