@@ -85,9 +85,9 @@ jobs:
 
             - name: Check root dependencies
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
-              env:
-                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
-              run: npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+              run: |
+                  BASE_SHA="$(git rev-parse HEAD^1)"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
 
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
