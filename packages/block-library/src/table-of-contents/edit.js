@@ -15,11 +15,12 @@ import {
 	SelectControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString } from '@wordpress/element';
+import { renderToString, useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { store as noticeStore } from '@wordpress/notices';
@@ -58,48 +59,69 @@ function TableOfContentsToolbar( {
 		[ clientId ]
 	);
 	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
 	return (
 		<>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
-					title={ __( 'Unordered' ) }
-					description={ __( 'Convert to unordered list' ) }
-					onClick={ () => setAttributes( { ordered: false } ) }
-					isActive={ ordered === false }
-				/>
-				<ToolbarButton
-					icon={
-						isRTL() ? formatListNumberedRTL : formatListNumbered
-					}
-					title={ __( 'Ordered' ) }
-					description={ __( 'Convert to ordered list' ) }
-					onClick={ () => setAttributes( { ordered: true } ) }
-					isActive={ ordered === true }
-				/>
-			</ToolbarGroup>
-			{ canInsertList && (
+			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						onClick={ () =>
-							replaceBlocks(
-								clientId,
-								createBlock( 'core/list', {
-									ordered,
-									values: renderToString(
-										<TableOfContentsList
-											nestedHeadingList={ headingTree }
-											ordered={ ordered }
-										/>
-									),
-								} )
-							)
+						icon={
+							isRTL() ? formatListBulletsRTL : formatListBullets
 						}
-					>
-						{ __( 'Convert to static list' ) }
-					</ToolbarButton>
+						title={ __( 'Unordered' ) }
+						description={ __( 'Convert to unordered list' ) }
+						onClick={ () => setAttributes( { ordered: false } ) }
+						isActive={ ordered === false }
+					/>
+					<ToolbarButton
+						icon={
+							isRTL() ? formatListNumberedRTL : formatListNumbered
+						}
+						title={ __( 'Ordered' ) }
+						description={ __( 'Convert to ordered list' ) }
+						onClick={ () => setAttributes( { ordered: true } ) }
+						isActive={ ordered === true }
+					/>
 				</ToolbarGroup>
+				{ canInsertList && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => setIsConfirmingDetach( true ) }
+						>
+							{ __( 'Detach' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				) }
+			</BlockControls>
+			{ isConfirmingDetach && (
+				<ConfirmDialog
+					isOpen
+					title={ __( 'Detach Table of Contents' ) }
+					__experimentalHideHeader={ false }
+					confirmButtonText={ __( 'Detach' ) }
+					onConfirm={ () => {
+						setIsConfirmingDetach( false );
+						replaceBlocks(
+							clientId,
+							createBlock( 'core/list', {
+								ordered,
+								values: renderToString(
+									<TableOfContentsList
+										nestedHeadingList={ headingTree }
+										ordered={ ordered }
+									/>
+								),
+							} )
+						);
+					} }
+					onCancel={ () => setIsConfirmingDetach( false ) }
+					size="medium"
+				>
+					{ __(
+						'The table of contents lists the headings in the post. Detaching will enable you to edit, reorder, or remove entries. However, new headings will no longer be added automatically.'
+					) }
+				</ConfirmDialog>
 			) }
 		</>
 	);
@@ -151,14 +173,12 @@ export default function TableOfContentsEdit( {
 	const headingTree = linearToNestedHeadingList( headings );
 
 	const toolbarControls = (
-		<BlockControls>
-			<TableOfContentsToolbar
-				clientId={ clientId }
-				headingTree={ headingTree }
-				ordered={ ordered }
-				setAttributes={ setAttributes }
-			/>
-		</BlockControls>
+		<TableOfContentsToolbar
+			clientId={ clientId }
+			headingTree={ headingTree }
+			ordered={ ordered }
+			setAttributes={ setAttributes }
+		/>
 	);
 
 	const inspectorControls = (
