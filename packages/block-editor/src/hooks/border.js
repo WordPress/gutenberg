@@ -322,7 +322,7 @@ function addAttributes( settings ) {
 	}
 
 	// Allow blocks to specify default value if needed.
-	if ( settings.attributes.borderColor ) {
+	if ( settings.attributes?.borderColor ) {
 		return settings;
 	}
 
