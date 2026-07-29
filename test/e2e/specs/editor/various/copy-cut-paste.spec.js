@@ -963,17 +963,20 @@ test.describe( 'Copy/cut/paste', () => {
 			.toBe( 2 );
 		await pageUtils.pressKeys( 'primary+c' );
 
-		// Create a second list by typing, and paste in a fresh empty item.
+		// Create a second, ordered list by typing, and paste in a fresh
+		// empty item.
 		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type( '* alpha' );
+		await page.keyboard.type( '1. alpha' );
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		// The wrapper is dropped and the items are inserted as siblings,
-		// not as a nested list.
+		// The pasted wrapper is dropped and the items are inserted as
+		// siblings, not as a nested list; the target list keeps its own
+		// wrapper, staying ordered.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
+				attributes: { ordered: false },
 				innerBlocks: [
 					{
 						name: 'core/list-item',
@@ -987,6 +990,7 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 			{
 				name: 'core/list',
+				attributes: { ordered: true },
 				innerBlocks: [
 					{
 						name: 'core/list-item',
@@ -1053,6 +1057,22 @@ test.describe( 'Copy/cut/paste', () => {
 			)
 			.toBe( 2 );
 		await pageUtils.pressKeys( 'primary+c' );
+
+		// The clipboard holds the columns in their wrapper so the markup
+		// is valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>col one</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>col two</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->` );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
