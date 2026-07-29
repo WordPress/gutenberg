@@ -16,13 +16,15 @@ import { __ } from '@wordpress/i18n';
 
 /**
  * Whether the inspector surfaces inherited Global Styles values.
- * Plugin-only, so Core builds show locally-set values alone.
+ *
+ * Set by the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment,
+ * so the treatment is off unless someone opts in on the Experiments screen.
+ * With it off, the panels show locally-set values alone.
  *
  * @type {boolean}
  */
-export const ENABLE_GLOBAL_STYLES_INHERITANCE = globalThis.IS_GUTENBERG_PLUGIN
-	? true
-	: false;
+export const ENABLE_GLOBAL_STYLES_INHERITANCE =
+	!! window.__experimentalGlobalStylesInheritanceUI;
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`

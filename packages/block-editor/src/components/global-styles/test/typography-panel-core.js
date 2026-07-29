@@ -9,9 +9,10 @@ import { click, render as renderAriakit } from '@ariakit/test/react';
  */
 import TypographyPanel from '../typography-panel';
 
-// Core-build coverage for `TypographyPanel`. Tests run with
-// `IS_GUTENBERG_PLUGIN` true, so the core path needs a mock. `jest.mock` is
-// file-scoped, so these tests live apart from `typography-panel.js`.
+// Coverage for `TypographyPanel` with the Global Styles inheritance experiment
+// off, which is what WordPress Core gets. Tests run with the experiment on, so
+// the off path needs a mock. `jest.mock` is file-scoped, so these tests live
+// apart from `typography-panel.js`.
 jest.mock( '../inheritance', () => ( {
 	...jest.requireActual( '../inheritance' ),
 	ENABLE_GLOBAL_STYLES_INHERITANCE: false,

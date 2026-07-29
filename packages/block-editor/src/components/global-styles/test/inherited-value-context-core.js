@@ -14,9 +14,10 @@ import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
-// Core-build coverage for `useResolvedStyle`. Tests run with
-// `IS_GUTENBERG_PLUGIN` true, so the core path needs a mock. `jest.mock` is
-// file-scoped, so these tests live apart from `inherited-value-context.js`.
+// Coverage for `useResolvedStyle` with the Global Styles inheritance
+// experiment off, which is what WordPress Core gets. Tests run with the
+// experiment on, so the off path needs a mock. `jest.mock` is file-scoped, so
+// these tests live apart from `inherited-value-context.js`.
 jest.mock( '../inheritance', () => ( {
 	...jest.requireActual( '../inheritance' ),
 	ENABLE_GLOBAL_STYLES_INHERITANCE: false,
