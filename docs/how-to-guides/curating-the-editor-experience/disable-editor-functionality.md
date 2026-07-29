@@ -106,6 +106,21 @@ add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access', 
 
 This code prevents all users from accessing the Code Editor. You could also add [capability](https://wordpress.org/documentation/article/roles-and-capabilities/) checks to disable access for specific users.
 
+## Disable responsive editing
+
+The "Responsive styles" option in the View menu lets users apply style changes to a single viewport only. If you want style edits to always apply to every viewport, add the following to your `functions.php` file.
+
+```php
+function example_disable_responsive_editing( $settings, $context ) {
+    $settings[ 'responsiveEditingEnabled' ] = false;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing', 10, 2 );
+```
+
+Responsive styles already defined in `theme.json` or in Global Styles continue to be applied on the front end.
+
 ## Disable formatting options for RichText blocks
 
 Blocks that support [RichText](https://developer.wordpress.org/block-editor/reference-guides/richtext/) come with the default formatting options provided by WordPress.
