@@ -168,7 +168,16 @@ _Returns_
 
 Returns a block given its client ID. This is a parsed copy of the block, containing its `blockName`, `clientId`, and current `attributes` state. This is not the block's registration settings, which must be retrieved from the blocks module registration store.
 
-getBlock recurses through its inner blocks until all its children blocks have been retrieved. Note that getBlock will not return the child inner blocks of an inner block controller. This is because an inner block controller syncs itself with its own entity, and should therefore not be included with the blocks of a different entity. For example, say you call `getBlocks( TP )` to get the blocks of a template part. If another template part is a child of TP, then the nested template part's child blocks will not be returned. This way, the template block itself is considered part of the parent, but the children are not.
+getBlock recurses through its inner blocks until all its children blocks have been retrieved, with one exception: the children of an "inner block controller" are not part of its tree, so `innerBlocks` usually comes back empty even though the block clearly has children in the editor. Never rely on a controller's `innerBlocks`; ask for its children directly:
+
+```js
+getBlock( syncedPatternClientId ).innerBlocks; // Usually [].
+getBlocks( syncedPatternClientId ); // The pattern's blocks.
+```
+
+A block is an inner block controller when its children belong to, and are synced with, an entity other than the one being edited. Synced patterns (`core/block`) and template parts (`core/template-part`) are the usual examples: each owns its own blocks, and editing them saves to that pattern or template part, not to the post or template it sits in. Leaving their children out of the tree is what keeps the two entities separate, so walking a template's blocks stops at a template part placed inside it.
+
+`areInnerBlocksControlled( clientId )` tells whether a block is such a controller.
 
 _Parameters_
 

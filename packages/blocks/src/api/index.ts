@@ -183,6 +183,13 @@ export {
 const fieldsKey = Symbol( 'fields' );
 const formKey = Symbol( 'form' );
 
+// A private block setting, opted into by core text blocks, that makes the
+// editor canvas the contentEditable editing host (see `useEditableRoot`). It's
+// a Symbol rather than a `supports` key so it stays private for now: it can't
+// be set from `block.json` and third-party blocks can't opt in yet. It may
+// become a public support once the feature has settled.
+const editableRootKey = Symbol( 'editableRoot' );
+
 import { parseRawBlock as _parseRawBlock } from './parser';
 
 export const privateApis = {};
@@ -190,5 +197,6 @@ lock( privateApis, {
 	isContentBlock,
 	fieldsKey,
 	formKey,
+	editableRootKey,
 	parseRawBlock: _parseRawBlock,
 } );

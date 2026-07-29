@@ -505,13 +505,13 @@ body {
 .has-big-font-size { font-size: 32; }
 .has-normal-font-size { font-size: 16; }
 
-/* Block-level classes (bounded to the group block) */
-.wp-block-group.has-black-color { color: #a156b4 !important; }
-.wp-block-group.has-black-background-color { background-color: #a156b4 !important; }
-.wp-block-group.has-black-border-color { border-color: #a156b4 !important; }
-.wp-block-group.has-white-color { color: #444 !important; }
-.wp-block-group.has-white-background-color { background-color: #444 !important; }
-.wp-block-group.has-white-border-color { border-color: #444 !important; }
+/* Block-level classes (bounded to the group block, wrapped in :where() to keep the same specificity as top-level classes) */
+:where(.wp-block-group).has-black-color { color: #a156b4 !important; }
+:where(.wp-block-group).has-black-background-color { background-color: #a156b4 !important; }
+:where(.wp-block-group).has-black-border-color { border-color: #a156b4 !important; }
+:where(.wp-block-group).has-white-color { color: #444 !important; }
+:where(.wp-block-group).has-white-background-color { background-color: #444 !important; }
+:where(.wp-block-group).has-white-border-color { border-color: #444 !important; }
 
 ```
 {% end %}
