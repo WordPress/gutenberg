@@ -74,13 +74,35 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		() => persistedView ?? defaultView ?? {},
 		[ persistedView, defaultView ]
 	);
-	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
-	const search = queryParams?.search ?? baseView.search ?? '';
+	// Precedence: explicit URL state wins, then a tab-specific default
+	// (activeViewOverrides, e.g. from a `view_list` entry), then the base
+	// view's own value, then the entity-wide defaultView. baseView.page/search
+	// are only ever populated from defaultView (persisted views never carry
+	// page/search — see updateView below), but the extra fallbacks keep page
+	// and search from resetting once a persisted view exists and no longer
+	// mirrors defaultView.
+	const page = Number(
+		queryParams?.page ??
+			activeViewOverrides?.page ??
+			baseView.page ??
+			defaultView?.page ??
+			1
+	);
+	const search =
+		queryParams?.search ??
+		activeViewOverrides?.search ??
+		baseView.search ??
+		defaultView?.search ??
+		'';
 
 	const combinedOverrides = useMemo( () => {
+		// Use the type the override will resolve to (if any) rather than the
+		// pre-override baseView type, so type-specific layout defaults match
+		// the view type that's actually about to be rendered.
+		const resolvedType = activeViewOverrides?.type ?? baseView.type;
 		const rawDefaults =
 			config.defaultLayouts?.[
-				baseView.type as keyof typeof config.defaultLayouts
+				resolvedType as keyof typeof config.defaultLayouts
 			];
 		const layoutTypeDefaults =
 			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
