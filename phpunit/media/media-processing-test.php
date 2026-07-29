@@ -253,8 +253,52 @@ HTML;
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( '<audio crossorigin="anonymous"', $output );
-		$this->assertStringContainsString( '<img crossorigin="anonymous"', $output );
 		$this->assertStringContainsString( '<video crossorigin="anonymous"', $output );
+		$this->assertStringNotContainsString(
+			'crossorigin="anonymous" crossorigin=',
+			$output,
+			'Tags must not receive a duplicate crossorigin attribute when WordPress Core has already added one.'
+		);
+	}
+
+	/**
+	 * Tests that the media template processing adds crossorigin to AUDIO and
+	 * VIDEO tags, skips tags that already have it, and leaves IMG tags
+	 * untouched (adding it breaks previews of media served without CORS
+	 * headers).
+	 *
+	 * @covers ::gutenberg_update_media_template_crossorigin_attributes
+	 */
+	public function test_gutenberg_update_media_template_crossorigin_attributes(): void {
+		$html = <<<HTML
+<script type="text/html" id="tmpl-test-media">
+	<img src="{{ data.url }}" draggable="false" alt="" />
+	<audio controls src="{{ data.url }}"></audio>
+	<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>
+	<video controls src="{{ data.url }}"></video>
+</script>
+<script type="text/javascript">var notATemplate = '<img src="test.jpg" />';</script>
+HTML;
+
+		$actual = gutenberg_update_media_template_crossorigin_attributes( $html );
+
+		$this->assertStringContainsString( '<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>', $actual );
+		$this->assertStringContainsString( '<video crossorigin="anonymous" controls src="{{ data.url }}"></video>', $actual );
+		$this->assertSame(
+			3,
+			substr_count( $actual, 'crossorigin' ),
+			'Only the two AUDIO tags and one VIDEO tag should carry a crossorigin attribute, with no duplicates.'
+		);
+		$this->assertDoesNotMatchRegularExpression(
+			'/<img\b[^>]*\bcrossorigin/i',
+			$actual,
+			'IMG tags must not receive a crossorigin attribute.'
+		);
+		$this->assertStringContainsString(
+			"var notATemplate = '<img src=\"test.jpg\" />';",
+			$actual,
+			'Script tags that are not text/html templates must not be modified.'
+		);
 	}
 
 	/**

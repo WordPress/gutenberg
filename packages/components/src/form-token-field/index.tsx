@@ -25,10 +25,10 @@ import deprecated from '@wordpress/deprecated';
  */
 import Token from './token';
 import TokenInput from './token-input';
-import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
-import { FlexItem } from '../flex';
+import { Flex, FlexItem } from '../flex';
+import styles from './style.module.scss';
 import {
 	StyledHelp,
 	StyledLabel,
@@ -826,14 +826,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				<TokensAndInputWrapperFlex
+				<Flex
+					className={ styles[ 'tokens-and-input' ] }
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
 					wrap
 				>
 					{ renderTokensAndInput() }
-				</TokensAndInputWrapperFlex>
+				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }

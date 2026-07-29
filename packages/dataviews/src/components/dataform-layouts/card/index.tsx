@@ -9,6 +9,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 
 /**
@@ -25,8 +27,9 @@ import type {
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
+import getValidationMessage from '../get-validation-message';
 import { getSummaryFields } from '../get-summary-fields';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import ValidationBadge from '../validation-badge';
 
 function isSummaryFieldVisible< Item >(
@@ -198,6 +201,7 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
 	const contentRef = useRef< HTMLDivElement >( null );
+	const hasFocusedContentRef = useRef( false );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -225,18 +229,45 @@ export default function FormCardField< Item >( {
 		setIsOpen( open );
 	}, [] );
 
-	// Mark the card as touched when any field inside it is blurred.
-	// This aligns with how validated controls show errors on blur.
-	const handleBlur = useCallback( () => {
-		setTouched( true );
-	}, [] );
-
 	// When the card is expanded after being touched (collapsed with errors),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity(
+	// reveal the field-level errors.
+	const revealValidity = useRevealValidity(
 		contentRef,
 		( isCollapsible ? isOpen : true ) && touched
 	);
+
+	const handleContentFocus = useCallback( () => {
+		hasFocusedContentRef.current = true;
+	}, [] );
+
+	// Reveal the errors of every field in the card once focus leaves the card,
+	// replicating at the card level how validated controls show errors on
+	// their first blur. Moving focus between fields within the card doesn't
+	// count, so the natural tab sequence is preserved.
+	const handleFocusOutside = useCallback( () => {
+		// Leaving without ever entering the fields — for instance tabbing past
+		// the header of a collapsed card — isn't an interaction to report on.
+		if ( ! hasFocusedContentRef.current ) {
+			return;
+		}
+		setTouched( true );
+		// A collapsed card reveals nothing: its content is hidden but still
+		// in the DOM, so the reveal would count the invalid fields and
+		// announce them. The header badge already conveys them, and expanding
+		// the card reveals the errors through the effect above.
+		if ( isCollapsible && ! isOpen ) {
+			return;
+		}
+		// The errors appear without moving focus, so announce them: their
+		// arrival is otherwise imperceptible to assistive technology.
+		const revealedCount = revealValidity();
+		const message = getValidationMessage( validity );
+		if ( revealedCount > 0 && message ) {
+			speak( message, 'polite' );
+		}
+	}, [ isCollapsible, isOpen, revealValidity, validity ] );
+
+	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 
 	let label = field.label;
 	let withHeader: boolean;
@@ -287,13 +318,14 @@ export default function FormCardField< Item >( {
 				className="dataforms-layouts-card__field"
 				open={ isOpen }
 				onOpenChange={ handleOpenChange }
+				{ ...focusOutsideProps }
 			>
 				<CollapsibleCard.Header>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content
 					ref={ contentRef }
-					onBlur={ handleBlur }
+					onFocus={ handleContentFocus }
 				>
 					{ bodyContent }
 				</CollapsibleCard.Content>
@@ -302,9 +334,12 @@ export default function FormCardField< Item >( {
 	}
 
 	return (
-		<Card.Root className="dataforms-layouts-card__field">
+		<Card.Root
+			className="dataforms-layouts-card__field"
+			{ ...focusOutsideProps }
+		>
 			{ withHeader && <Card.Header>{ headerContent }</Card.Header> }
-			<Card.Content ref={ contentRef } onBlur={ handleBlur }>
+			<Card.Content ref={ contentRef } onFocus={ handleContentFocus }>
 				{ bodyContent }
 			</Card.Content>
 		</Card.Root>

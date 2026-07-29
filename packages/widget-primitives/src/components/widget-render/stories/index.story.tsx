@@ -761,7 +761,7 @@ const actionsWidgetType: WidgetType< DemoAttributes > = {
 		{
 			id: 'export-greeting',
 			label: 'Export greeting',
-			href: 'data:text/plain;charset=utf-8,Hello%20World',
+			href: new URL( './greeting.txt', import.meta.url ).href,
 			download: 'greeting.txt',
 		},
 	] satisfies WidgetAction[],

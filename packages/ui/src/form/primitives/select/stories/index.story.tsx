@@ -9,6 +9,8 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Portal': Select.Portal,
 		'Select.Positioner': Select.Positioner,
 		'Select.Popup': Select.Popup,
+		'Select.Group': Select.Group,
+		'Select.GroupLabel': Select.GroupLabel,
 		'Select.Item': Select.Item,
 	},
 	parameters: {
@@ -90,6 +92,58 @@ export const Minimal: Story = {
 		],
 
 		defaultValue: '1',
+	},
+};
+
+const groupedItems = [
+	{
+		label: 'Common',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+			{ value: 'orange', label: 'Orange' },
+		],
+	},
+	{
+		label: 'Berries',
+		items: [
+			{ value: 'strawberry', label: 'Strawberry' },
+			{ value: 'blueberry', label: 'Blueberry' },
+			{ value: 'raspberry', label: 'Raspberry' },
+		],
+	},
+	{
+		label: 'Tropical',
+		items: [
+			{ value: 'mango', label: 'Mango' },
+			{ value: 'pineapple', label: 'Pineapple' },
+			{ value: 'papaya', label: 'Papaya' },
+		],
+	},
+];
+
+/**
+ * Options can be organized into labeled groups with `Select.Group`
+ * and `Select.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: groupedItems.flatMap( ( group ) => group.items ),
+		children: [
+			<Select.Trigger key="trigger" />,
+			<Select.Popup key="popup">
+				{ groupedItems.map( ( group ) => (
+					<Select.Group key={ group.label }>
+						<Select.GroupLabel>{ group.label }</Select.GroupLabel>
+						{ group.items.map( ( item ) => (
+							<Select.Item key={ item.value } value={ item }>
+								{ item.label }
+							</Select.Item>
+						) ) }
+					</Select.Group>
+				) ) }
+			</Select.Popup>,
+		],
 	},
 };
 

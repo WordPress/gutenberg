@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -15,7 +10,10 @@ import {
 	page as pageIcon,
 	verse,
 } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -34,7 +32,6 @@ import {
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
-import { getTemplatePartIcon } from '../utils';
 import {
 	getDeviceTypeByCanvasWidth,
 	getCanvasWidthByDeviceType,
@@ -56,6 +53,8 @@ const EMPTY_INSERTION_POINT = {
 	insertionIndex: undefined,
 	filterValue: undefined,
 };
+
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 /**
  * These are rendering modes that the editor supports.
@@ -189,45 +188,6 @@ export const getPostIcon = createRegistrySelector(
 			}
 			return pageIcon;
 		}
-	}
-);
-
-/**
- * Returns true if there are unsaved changes to the
- * post's meta fields, and false otherwise.
- *
- * @param {Object} state    Global application state.
- * @param {string} postType The post type of the post.
- * @param {number} postId   The ID of the post.
- *
- * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
- */
-export const hasPostMetaChanges = createRegistrySelector(
-	( select ) => ( state, postType, postId ) => {
-		const { type: currentPostType, id: currentPostId } =
-			getCurrentPost( state );
-		// If no postType or postId is passed, use the current post.
-		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		);
-
-		if ( ! edits?.meta ) {
-			return false;
-		}
-
-		// Compare if anything apart from `footnotes` has changed.
-		const originalPostMeta = select( coreStore ).getEntityRecord(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		)?.meta;
-
-		return ! fastDeepEqual(
-			{ ...originalPostMeta, footnotes: undefined },
-			{ ...edits.meta, footnotes: undefined }
-		);
 	}
 );
 

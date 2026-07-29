@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, renderHook, screen } from '@testing-library/react';
+import { click, render as renderAriakit } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -15,6 +16,17 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
@@ -208,6 +220,50 @@ const baseSettings = {
 		},
 	},
 };
+
+describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
+	const duplicateHexSettings = {
+		color: {
+			link: true,
+			defaultPalette: false,
+			palette: {
+				theme: [
+					{
+						slug: 'dark-background',
+						color: '#000000',
+						name: 'Dark background',
+					},
+					{ slug: 'dark-text', color: '#000000', name: 'Dark text' },
+				],
+			},
+		},
+	};
+
+	it( 'marks only the local link preset as selected when another preset shares its hex', async () => {
+		await renderAriakit(
+			<ColorPanel
+				value={ {
+					elements: {
+						link: {
+							color: { text: 'var:preset|color|dark-text' },
+						},
+					},
+				} }
+				settings={ duplicateHexSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		await click( screen.getByRole( 'button', { name: /^Link/ } ) );
+		const swatches = await screen.findAllByRole( 'option' );
+
+		// swatch[0] = 'Dark background', swatch[1] = 'Dark text'. Selection
+		// must follow the stored slug; matching by hex would mark both.
+		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
 
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {

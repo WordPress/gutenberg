@@ -67,7 +67,7 @@ export function NoteThread( {
 	const unregisterThread = floating?.unregisterThread;
 
 	// Register block + floating elements with the board.
-	// The board's ResizeObserver and autoUpdate track changes automatically.
+	// The board's ResizeObserver tracks height changes automatically.
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {

@@ -51,7 +51,7 @@
 		"eslint-config-prettier": "^10.0.0",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
-		"eslint-plugin-jest": "^28.11.0",
+		"eslint-plugin-jest": "^29.16.0",
 		"eslint-plugin-jsdoc": "^50.0.0",
 		"eslint-plugin-jsx-a11y": "^6.10.0",
 		"eslint-plugin-playwright": "^2.1.0",
