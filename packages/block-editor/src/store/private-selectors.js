@@ -3,6 +3,7 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
+	getBlockType,
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
@@ -43,7 +44,7 @@ import {
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
@@ -264,11 +265,9 @@ export const canHostEditableRoot = createSelector(
 			// host then, only a textarea, which the editing host would
 			// interfere with.
 			getBlockMode( state, clientId ) !== 'visual' ||
-			! hasBlockSupport(
-				getBlockName( state, clientId ),
-				'editableRoot',
-				false
-			)
+			! getBlockType( getBlockName( state, clientId ) )?.[
+				editableRootKey
+			]
 		) {
 			return false;
 		}
