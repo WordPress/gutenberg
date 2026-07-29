@@ -22,7 +22,7 @@ This structure controls context bloat. The root `AGENTS.md` is a fixed cost in e
 
 ## Supported agents
 
-Codex discovers the repository skill catalog natively. Claude Code uses the generated compatibility view maintained by `npm run agents:setup`. No other agent-specific view is currently configured.
+Codex discovers the repository skill catalog natively. Claude Code uses a generated compatibility view. Installing dependencies initializes that view when it is absent, without replacing an existing local view. No other agent-specific view is currently configured.
 
 ## Creating skills
 

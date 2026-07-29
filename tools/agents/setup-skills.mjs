@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rm } from 'node:fs/promises';
+import { cp, lstat, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
@@ -12,11 +12,21 @@ const TARGET_SKILLS_DIRECTORY = '.claude/skills';
  * @param {Object}   options                Setup options.
  * @param {string}   options.repositoryRoot Repository root directory.
  * @param {Function} [options.confirm]      Confirms removing unmatched skill entries.
+ * @param {boolean}  [options.ifMissing]    Generates skills only when absent.
  * @return {Promise<boolean>} Whether the skill directory was generated.
  */
-export async function setupSkills( { repositoryRoot, confirm = () => true } ) {
-	const source = path.join( repositoryRoot, SOURCE_SKILLS_DIRECTORY );
+export async function setupSkills( {
+	repositoryRoot,
+	confirm = () => true,
+	ifMissing = false,
+} ) {
 	const target = path.join( repositoryRoot, TARGET_SKILLS_DIRECTORY );
+
+	if ( ifMissing && ( await pathExists( target ) ) ) {
+		return false;
+	}
+
+	const source = path.join( repositoryRoot, SOURCE_SKILLS_DIRECTORY );
 	const unmatchedEntries = await getUnmatchedEntries( source, target );
 
 	if ( unmatchedEntries.length && ! ( await confirm( unmatchedEntries ) ) ) {
@@ -27,6 +37,19 @@ export async function setupSkills( { repositoryRoot, confirm = () => true } ) {
 	await mkdir( path.dirname( target ), { recursive: true } );
 	await cp( source, target, { recursive: true } );
 	return true;
+}
+
+async function pathExists( target ) {
+	try {
+		await lstat( target );
+		return true;
+	} catch ( error ) {
+		if ( error.code === 'ENOENT' ) {
+			return false;
+		}
+
+		throw error;
+	}
 }
 
 async function getUnmatchedEntries( source, target ) {
@@ -75,11 +98,20 @@ async function confirmReplacement( unmatchedEntries ) {
 }
 
 async function runSetupSkills() {
+	const ifMissing = process.argv.includes( '--if-missing' );
 	const generated = await setupSkills( {
 		repositoryRoot: process.cwd(),
 		confirm: confirmReplacement,
+		ifMissing,
 	} );
 	if ( ! generated ) {
+		if ( ifMissing ) {
+			console.log(
+				`Skipped: ${ TARGET_SKILLS_DIRECTORY } already exists. Run npm run agents:setup to apply skill catalog changes.`
+			);
+			return;
+		}
+
 		console.log( 'Cancelled.' );
 		process.exitCode = 1;
 		return;

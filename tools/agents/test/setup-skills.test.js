@@ -81,6 +81,44 @@ describe( 'setupSkills', () => {
 		).resolves.toBe( '---\nname: release\n' );
 	} );
 
+	test( 'initializes the Claude directory when it is absent', async () => {
+		const repositoryRoot = await createRepository();
+
+		const generated = await setupSkills( {
+			repositoryRoot,
+			ifMissing: true,
+		} );
+
+		expect( generated ).toBe( true );
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: testing\n' );
+	} );
+
+	test( 'leaves the Claude directory untouched when it already exists', async () => {
+		const repositoryRoot = await createRepository();
+		await createFloatingSkill( repositoryRoot, 'private' );
+		const confirm = jest.fn();
+
+		const generated = await setupSkills( {
+			repositoryRoot,
+			confirm,
+			ifMissing: true,
+		} );
+
+		expect( generated ).toBe( false );
+		expect( confirm ).not.toHaveBeenCalled();
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/private/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: private\n' );
+	} );
+
 	test( 'replaces the generated directory when the skill catalog changes', async () => {
 		const repositoryRoot = await createRepository();
 		const confirmedEntries = [];
@@ -145,6 +183,27 @@ describe( 'setupSkills', () => {
 		);
 
 		expect( stdout ).toBe( 'Generated: .claude/skills\n' );
+	} );
+
+	test( 'skips existing Claude skills when run with --if-missing', async () => {
+		const repositoryRoot = await createRepository();
+		await createFloatingSkill( repositoryRoot, 'private' );
+
+		const { stdout } = await execFileAsync(
+			process.execPath,
+			[ setupScript, '--if-missing' ],
+			{ cwd: repositoryRoot }
+		);
+
+		expect( stdout ).toBe(
+			'Skipped: .claude/skills already exists. Run npm run agents:setup to apply skill catalog changes.\n'
+		);
+		await expect(
+			readFile(
+				path.join( repositoryRoot, '.claude/skills/private/SKILL.md' ),
+				'utf8'
+			)
+		).resolves.toBe( '---\nname: private\n' );
 	} );
 
 	test( 'fails safely when unmatched skills need non-interactive confirmation', async () => {
