@@ -283,7 +283,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		}
 
 		/* Hide legacy admin elements */
-		body.js #wpbody-content > div:not(.boot-layout-container):not(#screen-meta):not(.hide-if-js) {
+		body.js #wpbody-content > div:not(.boot-layout-container):not(#screen-meta) {
 			display: none;
 		}
 		body.js #wpfooter {
