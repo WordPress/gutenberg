@@ -63,7 +63,7 @@ The setting defaults to the returned value of the [`user_can_richedit`](https://
 
 ### Restrict responsive editing
 
-The `responsiveEditingEnabled` setting, which defaults to `true`, controls whether the "Responsive styles" option is available in the Editor's View menu. When it is `false`, the option is not rendered and users cannot target style changes at a single viewport. Responsive styles already defined in the theme or in Global Styles are unaffected.
+The `responsiveEditingEnabled` setting, which defaults to `true`, controls whether the "Responsive styles" option is available in the Editor's View menu. When it is `false`, the option is not rendered, and the viewport state control in Global Styles is hidden as well, so users cannot target style changes at a single viewport. Pseudo states such as hover remain available. Responsive styles already defined in the theme or in Global Styles are unaffected.
 
 ```php
 add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
