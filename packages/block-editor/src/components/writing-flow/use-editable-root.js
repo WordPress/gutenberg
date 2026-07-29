@@ -3,7 +3,10 @@
  */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,6 +15,8 @@ import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 /**
  * Returns true when the writing flow wrapper can host editing for the given
@@ -40,7 +45,7 @@ export function canHostEditableRoot( select, clientId ) {
 		// host then, only a textarea, which the editing host would
 		// interfere with.
 		getBlockMode( clientId ) !== 'visual' ||
-		! hasBlockSupport( getBlockName( clientId ), 'editableRoot', false )
+		! getBlockType( getBlockName( clientId ) )?.[ editableRootKey ]
 	) {
 		return false;
 	}
