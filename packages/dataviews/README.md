@@ -1256,7 +1256,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
+Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `time`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 -   Type: `string`.
 -   Optional.
@@ -1547,7 +1547,7 @@ Fields that provide a `type` will have a default Edit control:
 }
 ```
 
-Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
+Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `time`, `toggle`, `toggleGroup`, or `url`.
 
 ```js
 {
@@ -2031,6 +2031,7 @@ Valid operators per field type:
 -   password: none.
 -   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   time: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`.
 -   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   fields with no type: any operator.
 

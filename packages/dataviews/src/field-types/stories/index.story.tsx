@@ -50,6 +50,7 @@ const meta = {
 				'telephone',
 				'url',
 				'text',
+				'time',
 				'toggle',
 				'toggleGroup',
 			],
@@ -119,6 +120,7 @@ type DataType = {
 	datetimeWithElements: string;
 	date: string;
 	dateWithElements: string;
+	time: string;
 	email: string;
 	emailWithElements: string;
 	telephone: string;
@@ -160,6 +162,7 @@ const data: DataType[] = [
 		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
+		time: '14:30',
 		email: 'hi@example.com',
 		emailWithElements: 'bob@example.com',
 		telephone: '+1-555-123-4567',
@@ -356,6 +359,12 @@ const fields: Field< DataType >[] = [
 			{ value: '2021-02-01', label: 'February 1st, 2021' },
 			{ value: '2021-03-01', label: 'March 1st, 2021' },
 		],
+	},
+	{
+		id: 'time',
+		type: 'time',
+		label: 'Time',
+		description: 'Help for time.',
 	},
 	{
 		id: 'email',
@@ -586,6 +595,7 @@ type ControlTypes =
 	| 'telephone'
 	| 'url'
 	| 'text'
+	| 'time'
 	| 'toggle'
 	| 'toggleGroup';
 
@@ -1162,6 +1172,37 @@ DateComponent.argTypes = {
 			'Day that the week starts on. Leave as Default to use WordPress default.',
 	},
 };
+
+export const TimeComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
+} ) => {
+	const timeFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'time' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ timeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+TimeComponent.storyName = 'time';
 
 export const EmailComponent = ( {
 	type,

@@ -26,6 +26,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
+import { default as time } from './time';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
 import getFilter from './utils/get-filter';
@@ -52,6 +53,7 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 		telephone,
 		color,
 		url,
+		time,
 	].find( ( fieldType ) => fieldType?.type === type );
 
 	if ( !! found ) {

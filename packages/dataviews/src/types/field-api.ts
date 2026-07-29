@@ -72,6 +72,7 @@ export type FieldTypeName =
 	| 'email'
 	| 'password'
 	| 'telephone'
+	| 'time'
 	| 'color'
 	| 'url'
 	| 'array';

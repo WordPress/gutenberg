@@ -27,6 +27,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
+import time from './time';
 import hasElements from '../../field-types/utils/has-elements';
 
 interface FormControls {
@@ -50,6 +51,7 @@ const FORM_CONTROLS: FormControls = {
 	radio,
 	select,
 	text,
+	time,
 	toggle,
 	textarea,
 	richtext,

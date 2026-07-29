@@ -339,6 +339,44 @@ describe( 'normalizeFields: default getValue', () => {
 		} );
 	} );
 
+	describe( 'time fields', () => {
+		it( 'normalizes time fields using the time field definition', () => {
+			const item = { startTime: '14:30' };
+			const fields: Field< typeof item >[] = [
+				{
+					id: 'startTime',
+					type: 'time',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const field = normalizedFields[ 0 ];
+
+			expect( field.type ).toBe( 'time' );
+			expect( field.Edit ).not.toBeNull();
+			expect( field.getValueFormatted( { item, field } ) ).toBe(
+				'14:30'
+			);
+			expect( field.filterBy ).toStrictEqual( {
+				isPrimary: false,
+				operators: [
+					'is',
+					'isNot',
+					'lessThan',
+					'greaterThan',
+					'lessThanOrEqual',
+					'greaterThanOrEqual',
+				],
+			} );
+			expect(
+				field.sort(
+					{ startTime: '09:30' },
+					{ startTime: '14:30' },
+					'asc'
+				)
+			).toBeLessThan( 0 );
+		} );
+	} );
+
 	describe( 'validation normalization', () => {
 		it( 'ignores string min/max rules on numeric fields', () => {
 			const fields: Field< {} >[] = [

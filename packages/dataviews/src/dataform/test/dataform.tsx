@@ -189,6 +189,38 @@ describe( 'DataForm component', () => {
 			expect( priceInput ).toHaveValue( 3.75 );
 		} );
 
+		it( 'should edit time fields with a time input', async () => {
+			const onChange = jest.fn();
+			const timeFields = [
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+				},
+			];
+
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ timeFields }
+					form={ { fields: [ 'startTime' ] } }
+					data={ { startTime: '14:30' } }
+				/>
+			);
+
+			const timeInput = screen.getByLabelText( 'Start time' );
+			expect( timeInput ).toHaveAttribute( 'type', 'time' );
+			expect( timeInput ).toHaveValue( '14:30' );
+
+			const user = userEvent.setup();
+			await user.clear( timeInput );
+			await user.type( timeInput, '18:45' );
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				startTime: '18:45',
+			} );
+		} );
+
 		it( 'should render combined fields correctly', async () => {
 			const formWithCombinedFields = {
 				fields: [

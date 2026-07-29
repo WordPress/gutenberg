@@ -18,7 +18,7 @@ export type DataFormValidatedTextControlProps< Item > =
 		/**
 		 * The input type of the control.
 		 */
-		type?: 'text' | 'email' | 'tel' | 'url' | 'password';
+		type?: 'text' | 'email' | 'tel' | 'url' | 'password' | 'time';
 		/**
 		 * Optional prefix element to display before the input.
 		 */
