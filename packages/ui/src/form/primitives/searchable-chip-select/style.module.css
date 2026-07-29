@@ -11,6 +11,7 @@
 
 		.chips-list {
 			flex-grow: 1;
+			min-width: 0;
 		}
 
 		.input {
