@@ -46,8 +46,9 @@ jobs:
               run: npm run build -- --skip-types
 
             - name: Install Playwright dependencies
-              run: |
-                  npx playwright install chromium firefox webkit --with-deps
+              uses: ./.github/setup-playwright
+              with:
+                  browsers: chromium firefox webkit
 
             - name: Install WordPress and start the server
               run: |
@@ -95,9 +96,11 @@ jobs:
             - name: Npm build
               run: npm run build -- --skip-types
 
+            # No collaboration spec is tagged `@webkit` or `@firefox`.
             - name: Install Playwright dependencies
-              run: |
-                  npx playwright install chromium firefox webkit --with-deps
+              uses: ./.github/setup-playwright
+              with:
+                  browsers: chromium
 
             - name: Install WordPress and start the server
               run: |

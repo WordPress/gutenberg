@@ -1,0 +1,55 @@
+name: 'Install Playwright browsers'
+description: 'Install Playwright browsers and their system dependencies, caching the Debian packages that WebKit needs.'
+
+inputs:
+    browsers:
+        description: 'Optional. Space separated list of browsers to install. When not specified, all browsers are installed.'
+        required: false
+
+runs:
+    using: 'composite'
+    steps:
+        # Only WebKit pulls system dependencies on the runner images, and the
+        # Ubuntu mirror throttles them often enough to stall a job for tens of
+        # minutes.
+        - name: Prepare the package cache
+          id: prepare
+          env:
+              BROWSERS: ${{ inputs.browsers }}
+          run: |
+              VERSION="$(node -p "require('playwright-core/package.json').version")"
+              echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+              echo "BROWSERS_KEY=$(echo "${BROWSERS:-all}" | tr ' ' '-')" >> "$GITHUB_OUTPUT"
+              echo "IMAGE=${ImageOS:-unknown}-${ImageVersion:-unknown}" >> "$GITHUB_OUTPUT"
+
+              if [ -z "$BROWSERS" ] || [ "${BROWSERS#*webkit}" != "$BROWSERS" ]; then
+                  echo "CACHE_DEPS=true" >> "$GITHUB_OUTPUT"
+              else
+                  echo "CACHE_DEPS=false" >> "$GITHUB_OUTPUT"
+              fi
+
+              echo 'APT::Keep-Downloaded-Packages "true";' | sudo tee /etc/apt/apt.conf.d/99keep-downloaded-packages > /dev/null
+              mkdir -p "$HOME/apt-cache"
+          shell: bash
+
+        - name: Cache Playwright system dependencies
+          if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' }}
+          uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ~/apt-cache
+              # The cached packages must match the versions in the runner image's apt lists.
+              key: playwright-apt-${{ runner.os }}-${{ runner.arch }}-${{ steps.prepare.outputs.IMAGE }}-${{ steps.prepare.outputs.VERSION }}-${{ steps.prepare.outputs.BROWSERS_KEY }}
+
+        - name: Install Playwright browsers and system dependencies
+          env:
+              BROWSERS: ${{ inputs.browsers }}
+          run: |
+              # `--update=none` needs coreutils 9.3+, so ubuntu-24.04 or newer.
+              sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
+
+              # shellcheck disable=SC2086 # The browser list is intentionally split into separate arguments.
+              npx playwright install $BROWSERS --with-deps
+
+              sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
+              sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
+          shell: bash

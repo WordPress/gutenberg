@@ -49,10 +49,15 @@ jobs:
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 
-            - name: Install test-runner and Playwright dependencies
+            - name: Install test-runner
               run: |
                   npm install --no-save @storybook/test-runner@0.24.2
-                  npx playwright install --with-deps
+
+            # The Storybook test runner only launches Chromium.
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  browsers: chromium
 
             - name: Serve Storybook and run tests
               run: |
