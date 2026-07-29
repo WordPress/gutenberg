@@ -13,7 +13,7 @@ const testMigration = require( './test-migration.json' );
 const escapeRegExp = ( value ) =>
 	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 const vitestTestPathIgnorePatterns = [
-	...testMigration.vitest.files.map(
+	...[ ...testMigration.vitest.files, ...testMigration.added.vitest ].map(
 		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
 	),
 	...testMigration.vitest.directories.map(
