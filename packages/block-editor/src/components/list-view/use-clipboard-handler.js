@@ -9,6 +9,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { useNotifyPaste } from '../../utils/use-notify-paste';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
 
@@ -29,6 +30,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 	const { flashBlock, removeBlocks, replaceBlocks, insertBlocks } =
 		useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+	const notifyPaste = useNotifyPaste();
 
 	return useRefEffect( ( node ) => {
 		function updateFocusAndSelection( focusClientId, shouldSelectBlock ) {
@@ -167,6 +169,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 							undefined,
 							selectedBlockClientId
 						);
+						notifyPaste( blocks );
 						updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
 						return;
 					}
@@ -178,6 +181,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 					blocks.length - 1,
 					-1
 				);
+				notifyPaste( blocks );
 				updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
 			}
 		}
