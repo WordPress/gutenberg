@@ -65,7 +65,8 @@
 	},
 	"devDependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/preferences": "file:../preferences"
+		"@wordpress/preferences": "file:../preferences",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

@@ -50,6 +50,7 @@
 					"packages/preferences-persistence",
 					"packages/priority-queue",
 					"packages/private-apis",
+					"packages/reusable-blocks",
 					"packages/server-side-render",
 					"packages/shortcode",
 					"packages/style-engine",
