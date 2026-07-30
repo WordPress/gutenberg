@@ -55,7 +55,23 @@
 		}
 	},
 	"retired": [],
-	"renamed": {},
+	"renamed": {
+		"packages/compose/src/higher-order/pure/test/index.js": "packages/compose/src/higher-order/pure/test/index.jsx",
+		"packages/compose/src/higher-order/with-global-events/test/index.js": "packages/compose/src/higher-order/with-global-events/test/index.jsx",
+		"packages/compose/src/higher-order/with-instance-id/test/index.js": "packages/compose/src/higher-order/with-instance-id/test/index.jsx",
+		"packages/compose/src/higher-order/with-state/test/index.js": "packages/compose/src/higher-order/with-state/test/index.jsx",
+		"packages/compose/src/hooks/use-disabled/test/index.js": "packages/compose/src/hooks/use-disabled/test/index.jsx",
+		"packages/compose/src/hooks/use-drop-zone/test/index.js": "packages/compose/src/hooks/use-drop-zone/test/index.jsx",
+		"packages/compose/src/hooks/use-focus-outside/test/index.js": "packages/compose/src/hooks/use-focus-outside/test/index.jsx",
+		"packages/compose/src/hooks/use-instance-id/test/index.js": "packages/compose/src/hooks/use-instance-id/test/index.jsx",
+		"packages/compose/src/hooks/use-media-query/test/index.js": "packages/compose/src/hooks/use-media-query/test/index.jsx",
+		"packages/compose/src/hooks/use-media-query/test/ssr.js": "packages/compose/src/hooks/use-media-query/test/ssr.jsx",
+		"packages/compose/src/hooks/use-merge-refs/test/index.js": "packages/compose/src/hooks/use-merge-refs/test/index.jsx",
+		"packages/compose/src/hooks/use-observable-value/test/index.js": "packages/compose/src/hooks/use-observable-value/test/index.jsx",
+		"packages/compose/src/hooks/use-state-with-history/test/index.js": "packages/compose/src/hooks/use-state-with-history/test/index.jsx",
+		"packages/compose/src/hooks/use-viewport-match/test/index.js": "packages/compose/src/hooks/use-viewport-match/test/index.jsx",
+		"packages/compose/src/utils/create-higher-order-component/test/index.js": "packages/compose/src/utils/create-higher-order-component/test/index.jsx"
+	},
 	"added": {
 		"jest": [ "packages/wp-build/lib/test/source-files.js" ],
 		"vitest": {
