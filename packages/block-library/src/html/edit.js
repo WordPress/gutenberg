@@ -106,7 +106,7 @@ export default function HTMLEdit( { clientId, attributes } ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ attributes.content ] );
 
-	// Show placeholder when content is empty
+	// Show placeholder when content is empty.
 	if ( ! content?.trim() ) {
 		return (
 			<div { ...blockProps }>
