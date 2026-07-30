@@ -48,6 +48,9 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

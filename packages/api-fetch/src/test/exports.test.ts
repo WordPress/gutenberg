@@ -1,3 +1,11 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
 import apiFetch from '..';
 
 describe( 'apiFetch exports', () => {

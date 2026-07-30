@@ -14,6 +14,7 @@
 				"directories": [
 					"packages/abilities",
 					"packages/annotations",
+					"packages/api-fetch",
 					"packages/autop",
 					"packages/blob",
 					"packages/block-directory",
