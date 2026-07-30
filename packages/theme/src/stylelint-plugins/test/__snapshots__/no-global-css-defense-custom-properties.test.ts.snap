@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`flags warnings with invalid global CSS defense custom properties css snapshot matches warnings 1`] = `
+[
+  {
+    "column": 2,
+    "endColumn": 35,
+    "endLine": 3,
+    "line": 3,
+    "rule": "plugin-wpds/no-global-css-defense-custom-properties",
+    "severity": "error",
+    "text": "Do not set '--_gcd-heading-font-weight'. Customize theme values via ThemeProvider instead. \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense implementation detail. (plugin-wpds/no-global-css-defense-custom-properties)",
+  },
+  {
+    "column": 2,
+    "endColumn": 31,
+    "endLine": 4,
+    "line": 4,
+    "rule": "plugin-wpds/no-global-css-defense-custom-properties",
+    "severity": "error",
+    "text": "Do not set '--_gcd-input-font-size'. Customize theme values via ThemeProvider instead. \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense implementation detail. (plugin-wpds/no-global-css-defense-custom-properties)",
+  },
+  {
+    "column": 19,
+    "endColumn": 45,
+    "endLine": 9,
+    "line": 9,
+    "rule": "plugin-wpds/no-global-css-defense-custom-properties",
+    "severity": "error",
+    "text": "Do not use '--_gcd-heading-font-weight'. Use Design System tokens (\`--wpds-*\`) instead. \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense implementation detail. (plugin-wpds/no-global-css-defense-custom-properties)",
+  },
+  {
+    "column": 17,
+    "endColumn": 39,
+    "endLine": 10,
+    "line": 10,
+    "rule": "plugin-wpds/no-global-css-defense-custom-properties",
+    "severity": "error",
+    "text": "Do not use '--_gcd-input-font-size'. Use Design System tokens (\`--wpds-*\`) instead. \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense implementation detail. (plugin-wpds/no-global-css-defense-custom-properties)",
+  },
+  {
+    "column": 13,
+    "endColumn": 33,
+    "endLine": 11,
+    "line": 11,
+    "rule": "plugin-wpds/no-global-css-defense-custom-properties",
+    "severity": "error",
+    "text": "Do not use '--_gcd-heading-color'. Use Design System tokens (\`--wpds-*\`) instead. \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense implementation detail. (plugin-wpds/no-global-css-defense-custom-properties)",
+  },
+]
+`;

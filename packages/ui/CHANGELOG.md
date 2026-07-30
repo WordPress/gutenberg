@@ -22,6 +22,7 @@
 
 ### Internal
 
+-   Disable `plugin-wpds/no-global-css-defense-custom-properties` for this package so global CSS defense can keep using `--_gcd-*` bridges.
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).

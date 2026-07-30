@@ -9,6 +9,7 @@ export default {
 		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
 		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme/stylelint-plugins/no-global-css-defense-custom-properties',
 	],
 	rules: {
 		'at-rule-empty-line-before': [
@@ -81,6 +82,7 @@ export default {
 		'plugin-wpds/no-setting-wpds-custom-properties': true,
 		'plugin-wpds/no-token-fallback-values': true,
 		'plugin-wpds/no-unknown-ds-tokens': true,
+		'plugin-wpds/no-global-css-defense-custom-properties': true,
 
 		/* Disable new rules from stylelint-config-recommended 7 > 14 */
 		'function-no-unknown': null,

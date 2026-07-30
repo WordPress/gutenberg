@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Added `no-global-css-defense-custom-properties` stylelint rule that disallows using or overriding `--_gcd-*` (global CSS defense) custom properties. Available as `@wordpress/theme/stylelint-plugins/no-global-css-defense-custom-properties`.
 -   Widen optional peer dependency ranges so projects on newer tooling can install without peer resolution conflicts: Vite `^7 || ^8`, Stylelint `^16 || ^17`, and esbuild `>=0.27.2 <1.0.0` ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
 
 ### Documentation
