@@ -76,7 +76,8 @@ export function mergeOverrides(
 		};
 	}
 
-	// These overrides are merged only if the user has not modified the view (i.e., the current value matches the default view).
+	// These overrides are merged only if the user has not modified the view
+	// (i.e., the current value matches the default view).
 	for ( const key of OVERRIDES_WIN_IF_NO_USER_VALUE ) {
 		if ( key in overrides && dequal( view[ key ], defaultView[ key ] ) ) {
 			result = {
@@ -86,13 +87,16 @@ export function mergeOverrides(
 		}
 	}
 
-	// Merge filters. Locked filters always apply, replacing any same-field
-	// filter. Unlocked filters act as defaults: they apply only while the
-	// user has no filter of their own for the field (none at all, or one
-	// that still matches the default view).
+	// Merge filters managed by overrides:
+	//
+	// - Locked: merge always, replacing any same-field filter.
+	// - Unlocked: act as defaults. They apply only while the
+	//   user has no filter of their own for the field
+	//   (none at all, or one that still matches the default view).
 	if ( overrides.filters && overrides.filters.length > 0 ) {
+		const overrideFilters = overrides.filters;
 		const viewFilters = view.filters ?? [];
-		const applied = overrides.filters.filter( ( override ) => {
+		const shouldApplyOverride = ( override: Filter ) => {
 			if ( override.isLocked ) {
 				return true;
 			}
@@ -103,14 +107,36 @@ export function mergeOverrides(
 				( f: Filter ) => f.field === override.field
 			);
 			return ! current || dequal( current, defaultFilter );
-		} );
-		const appliedFields = new Set( applied.map( ( f ) => f.field ) );
-		const preserved = viewFilters.filter(
-			( f: Filter ) => ! appliedFields.has( f.field )
-		);
+		};
+
+		// Walk the current view's filters so their order is preserved: an
+		// applied override replaces the same-field filter in place.
+		const mergedFilters: Filter[] = [];
+		for ( const filter of viewFilters ) {
+			const override = overrideFilters.find(
+				( f ) => f.field === filter.field
+			);
+			mergedFilters.push(
+				override && shouldApplyOverride( override ) ? override : filter
+			);
+		}
+
+		// Then append the applied overrides for fields not in the view.
+		for ( const override of overrideFilters ) {
+			const inView = viewFilters.some(
+				( f: Filter ) => f.field === override.field
+			);
+			if ( ! inView && shouldApplyOverride( override ) ) {
+				mergedFilters.push( override );
+			}
+		}
+
 		result = {
 			...result,
-			filters: [ ...preserved, ...applied ],
+			filters: [
+				...mergedFilters.filter( ( f ) => f.isLocked ),
+				...mergedFilters.filter( ( f ) => ! f.isLocked ),
+			],
 		};
 	}
 
@@ -176,7 +202,8 @@ export function stripOverrides(
 		} as View;
 	}
 
-	// These overrides are removed only if the user has not modified the view (i.e., the current value matches the override value).
+	// These overrides are removed only if the user has not modified the view
+	// (i.e., the current value matches the override value).
 	for ( const key of OVERRIDES_WIN_IF_NO_USER_VALUE ) {
 		if ( key in overrides && dequal( view[ key ], overrides[ key ] ) ) {
 			result = {
@@ -186,10 +213,11 @@ export function stripOverrides(
 		}
 	}
 
-	// Strip managed filters. Filters managed by a locked override are never
-	// persisted. For unlocked overrides, an unmodified filter is restored to
-	// the default view's filter (if any); a user-modified filter is
-	// persisted as is.
+	// Strip filters managed by overrides:
+	//
+	// - Locked: removed, never persisted.
+	// - Unlocked: an unmodified filter is restored to the default view's filter (if any);
+	//   a user-modified filter is persisted as is.
 	if ( overrides.filters && overrides.filters.length > 0 ) {
 		const overrideFilters = overrides.filters;
 		const strippedFilters: Filter[] = [];

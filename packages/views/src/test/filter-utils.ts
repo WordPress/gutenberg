@@ -264,6 +264,21 @@ describe( 'mergeOverrides', () => {
 			} );
 		} );
 
+		it( 'should preserve the order of the view filters when an unlocked override applies to a non-last field', () => {
+			const filters = [
+				{ field: 'status', operator: 'isAny', value: [ 'publish' ] },
+				{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
+			];
+			const viewWithFilters: View = { ...baseView, filters };
+			const defaultWithFilters: View = { ...defaultView, filters };
+			const result = mergeOverrides(
+				viewWithFilters,
+				{ filters: [ filters[ 0 ] ] },
+				defaultWithFilters
+			);
+			expect( result.filters ).toEqual( filters );
+		} );
+
 		it( 'should handle empty override filters array', () => {
 			const result = mergeOverrides( baseView, {
 				filters: [],
