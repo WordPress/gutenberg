@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import isGenerator from '../is-generator';

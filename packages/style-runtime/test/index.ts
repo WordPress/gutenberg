@@ -1,3 +1,11 @@
+/**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
 import { registerDocument, registerStyle } from '../src';
 
 type GlobalScopeWithStyleRuntime = typeof globalThis & {

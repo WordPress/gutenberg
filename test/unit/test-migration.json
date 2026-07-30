@@ -37,6 +37,7 @@
 					"packages/server-side-render",
 					"packages/shortcode",
 					"packages/style-engine",
+					"packages/style-runtime",
 					"packages/sync",
 					"packages/theme",
 					"packages/token-list",
@@ -50,7 +51,12 @@
 			},
 			"node": {
 				"files": [],
-				"directories": []
+				"directories": [
+					"packages/data-controls",
+					"packages/preferences",
+					"packages/redux-routine",
+					"packages/views"
+				]
 			}
 		}
 	},

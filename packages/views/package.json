@@ -49,6 +49,9 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"dequal": "^2.0.3"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
