@@ -241,11 +241,9 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 }
 
 /**
- * Constrains a widget icon reference to a registered icon name in the
- * form `collection/icon-name`, the shape the Icons API serves. Anything
- * else is dropped silently, so authoring forms this gate does not accept
- * yet (inline SVG markup, widget-local `.svg` files) degrade to no icon
- * rather than warn on every request.
+ * Constrains a widget icon reference to a registered icon name
+ * (`collection/icon-name`). Anything else drops silently, so authoring
+ * forms not accepted yet degrade to no icon rather than warn.
  *
  * @param string|null $icon Icon reference from the build manifest.
  * @return string|null The icon name, or null when the shape does not match.

@@ -14,10 +14,8 @@ import { registerIconResolver } from '@wordpress/widget-primitives';
 import type { WidgetIcon } from '@wordpress/widget-primitives';
 
 /**
- * Registers the dashboard's icon resolver: widget icon references
- * resolve against the `icon` core-data entity, and the record's SVG
- * content becomes the rendered element hosts receive. Idempotent: the
- * registry keeps the first registration.
+ * Registers the dashboard's icon resolver: references resolve against
+ * the `icon` entity, and the record's SVG content becomes the element.
  */
 export function registerDashboardIconResolver() {
 	registerIconResolver( async ( reference ) => {
@@ -32,9 +30,8 @@ export function registerDashboardIconResolver() {
 		}
 
 		/*
-		 * Registry-served content may carry whitespace around the root
-		 * `<svg>`, which makes `parse()` return an array of nodes; the
-		 * icon is the element among them.
+		 * Whitespace around the root `<svg>` makes `parse()` return an
+		 * array; take the element.
 		 */
 		const parsed = parse( safeHTML( record.content.trim() ) );
 		const element = Array.isArray( parsed )

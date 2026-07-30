@@ -2,11 +2,8 @@
 /**
  * Widget-owned icons.
  *
- * Icons the in-tree widgets reference declaratively but that are not
- * part of the public `core` collection are registered here, under a
- * collection the widgets own. `widget.json` references them by name
- * (`dashboard-widgets/drafts`) and hosts resolve them through the
- * Icons API like any other registered icon.
+ * Icons the widgets reference declaratively but that are not public in
+ * the `core` collection, registered under a collection the widgets own.
  *
  * @package gutenberg
  */
@@ -14,9 +11,7 @@
 /**
  * Registers the dashboard widgets icon collection and its icons.
  *
- * Icon content is sourced from the `@wordpress/icons` library files, so
- * a widget's declarative reference renders the same asset its metadata
- * module would import.
+ * Content is sourced from the `@wordpress/icons` library files.
  */
 function gutenberg_register_dashboard_widget_icons() {
 	if ( ! function_exists( 'wp_register_icon_collection' ) ) {

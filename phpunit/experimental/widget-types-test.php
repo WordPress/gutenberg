@@ -114,9 +114,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Only names shaped `collection/icon-name` pass; the markup and file
-	 * authoring forms are not accepted by this gate yet and normalize to
-	 * null, as does anything malformed.
+	 * Only names shaped `collection/icon-name` pass; markup, files, and
+	 * anything malformed normalize to null.
 	 */
 	public function test_sanitize_widget_icon_requires_a_registered_name_shape() {
 		$this->assertSame( 'core/calendar', gutenberg_sanitize_widget_icon( 'core/calendar' ) );

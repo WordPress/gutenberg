@@ -108,9 +108,8 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $help = null;
 
 		/**
-		 * Registered icon name identifying the widget type visually, in the
-		 * form `collection/icon-name`. Clients resolve the name through the
-		 * Icons API; an unregistered name degrades to no icon.
+		 * Registered icon name (`collection/icon-name`), resolved by
+		 * clients through the Icons API.
 		 *
 		 * Null when the widget did not declare the field.
 		 *

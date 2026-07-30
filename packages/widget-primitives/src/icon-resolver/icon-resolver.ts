@@ -1,12 +1,9 @@
 /**
  * Icon resolver registry.
  *
- * A widget's `widget.json` may reference its icon by registered icon
- * name (`collection/icon-name`) instead of shipping a rendered element.
- * The application registers a single resolver that turns such a
- * reference into a renderable `WidgetIcon`; `useWidgetTypes` invokes it
- * while assembling each `WidgetType`, so hosts only ever receive
- * renderable icons.
+ * The application registers a single resolver that turns a registered
+ * icon name (`collection/icon-name`) into a renderable `WidgetIcon`;
+ * `useWidgetTypes` invokes it while assembling each `WidgetType`.
  */
 
 /**
@@ -25,12 +22,9 @@ export type WidgetIconResolver = (
 let iconResolver: WidgetIconResolver | undefined;
 
 /**
- * Registers the icon resolver.
+ * Registers the icon resolver. First registration wins.
  *
- * First registration wins: a later call is ignored.
- *
- * @param resolver Resolver turning an icon reference into a renderable
- *                 icon.
+ * @param resolver Resolver turning a reference into a renderable icon.
  * @return The registered resolver, or `undefined` when ignored.
  */
 export function registerIconResolver(
@@ -57,10 +51,8 @@ export function unregisterIconResolver(): WidgetIconResolver | undefined {
 }
 
 /**
- * Resolves an icon reference through the registered resolver.
- *
- * Returns `null` when no resolver is registered or the resolver fails:
- * an unresolvable reference degrades to no icon rather than breaking.
+ * Resolves an icon reference through the registered resolver. An
+ * unresolvable reference degrades to `null` rather than breaking.
  *
  * @param reference Icon reference to resolve.
  * @return The renderable icon, or `null`.

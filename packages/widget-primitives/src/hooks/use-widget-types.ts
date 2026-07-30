@@ -21,8 +21,8 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * module's default export with the runtime fields (`name`, `renderModule`).
  * Attribute schemas pass through `resolveFields`, so attributes referencing
  * registered field types reach hosts as plain DataViews fields. Icon
- * references resolve through the registered icon resolver (see
- * `registerIconResolver`), so hosts only receive renderable icons.
+ * references resolve through the registered icon resolver, so hosts only
+ * receive renderable icons.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -67,12 +67,9 @@ export function useWidgetTypes(
 					const metadata = module.default as Partial< WidgetType >;
 
 					/*
-					 * Icon precedence mirrors the other identity fields:
-					 * the record's resolved reference wins, and the
-					 * module's element stands when the record has none or
-					 * the reference does not resolve. Non-element module
-					 * values are dropped so hosts only receive renderable
-					 * icons.
+					 * The record's resolved reference wins; the module's
+					 * element stands when there is none or it does not
+					 * resolve. Non-elements are dropped.
 					 */
 					const resolvedIcon = record.icon
 						? await resolveIcon( record.icon )
