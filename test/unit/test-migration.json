@@ -56,7 +56,7 @@
 	},
 	"retired": [],
 	"added": {
-		"jest": [],
+		"jest": [ "packages/wp-build/lib/test/source-files.js" ],
 		"vitest": {
 			"browser": [ "test/unit/browser/components.vitest.test.tsx" ],
 			"jsdom": [

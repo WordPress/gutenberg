@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions.
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into
     the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
 
