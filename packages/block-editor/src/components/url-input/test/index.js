@@ -503,6 +503,23 @@ describe( 'URLInput', () => {
 			fireEvent.keyDown( input, KEY_EVENTS.up );
 			expect( input.selectionEnd ).toBe( 0 );
 		} );
+
+		it( 'should leave a selection being extended with the shift key alone', async () => {
+			const { user, input } = renderURLInput( {
+				disableSuggestions: true,
+			} );
+
+			await user.type( input, 'hello' );
+			input.setSelectionRange( 0, 5 );
+
+			fireEvent.keyDown( input, {
+				...KEY_EVENTS.up,
+				shiftKey: true,
+			} );
+
+			expect( input.selectionStart ).toBe( 0 );
+			expect( input.selectionEnd ).toBe( 5 );
+		} );
 	} );
 
 	describe( 'suggestion selection', () => {

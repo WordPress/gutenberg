@@ -276,14 +276,20 @@ export default function URLInput( props ) {
 		// Unless the list can consume them, the keys must reach the editor for
 		// block navigation, so they mustn't be prevented.
 		if ( ! showSuggestions || ! suggestions.length || isLoading ) {
-			if ( event.keyCode === UP || event.keyCode === DOWN ) {
+			// Holding Shift extends the selection, which the browser handles.
+			if (
+				! event.shiftKey &&
+				( event.keyCode === UP || event.keyCode === DOWN )
+			) {
 				// Firefox on Windows leaves the caret in place, trapping focus,
 				// since the editor only navigates away from an edge.
 				// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
 				const caret =
 					event.keyCode === UP ? 0 : event.target.value.length;
 
-				// Yield only once the caret is collapsed at that edge.
+				// UP moves the caret to the start of the text, DOWN to the end.
+				// Once it is already there, with nothing selected, the key is
+				// left to the editor to navigate out of the field.
 				if (
 					event.target.selectionStart !== caret ||
 					event.target.selectionEnd !== caret
