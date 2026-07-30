@@ -931,5 +931,4 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
-
 } );
