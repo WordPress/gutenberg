@@ -965,36 +965,37 @@ test.describe( 'Table of Contents', () => {
 			}
 		);
 
-		// Desired behavior: ToC in templates without post content should show a specific editor explanation; trunk only shows the generic empty-heading placeholder.
-		test.fixme(
-			'templates that do not render post content show an editor placeholder and render nothing to readers',
-			async ( { admin, editor, page, requestUtils } ) => {
-				await requestUtils.createTemplate( 'wp_template', {
-					slug: 'archive',
-					title: 'Archive',
-					content: '<!-- wp:table-of-contents /-->',
-				} );
+		test( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'archive',
+				title: 'Archive',
+				content: '<!-- wp:table-of-contents /-->',
+			} );
 
-				await admin.visitSiteEditor( {
-					postId: 'emptytheme//archive',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
-				// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
-				await expect(
-					getTableOfContentsEditorBlock( editor )
-				).toContainText(
-					'Table of Contents needs a single post or page to list headings.'
-				);
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//archive',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
+			// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
+			await expect(
+				getTableOfContentsEditorBlock( editor )
+			).toContainText(
+				'Table of Contents needs a single post or page to list headings.'
+			);
 
-				await page.goto( '/?m=202001' );
-				await expect(
-					page.getByRole( 'navigation', {
-						name: 'Table of Contents',
-					} )
-				).toHaveCount( 0 );
-			}
-		);
+			await page.goto( '/?m=202001' );
+			await expect(
+				page.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} )
+			).toHaveCount( 0 );
+		} );
 	} );
 
 	test.describe( 'Supporting content built with other blocks', () => {
