@@ -686,7 +686,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/context/test/context-system-provider.js": {
+	"packages/components/src/context/test/context-system-provider.jsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -939,7 +939,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/hooks/test/use-cx.js": {
+	"packages/components/src/utils/hooks/test/use-cx.jsx": {
 		"no-restricted-imports": {
 			"count": 3
 		}
