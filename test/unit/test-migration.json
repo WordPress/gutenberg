@@ -12,6 +12,7 @@
 			"packages/block-directory",
 			"packages/connectors",
 			"packages/components",
+			"packages/compose",
 			"packages/core-commands",
 			"packages/date",
 			"packages/dom-ready",

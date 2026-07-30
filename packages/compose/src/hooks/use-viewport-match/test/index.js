@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
 /**
@@ -8,9 +9,7 @@ import { render } from '@testing-library/react';
  */
 import useViewportMatch from '../';
 
-jest.mock( '../../use-media-query', () => {
-	return jest.fn();
-} );
+vi.mock( import( '../../use-media-query' ), () => ( { default: vi.fn() } ) );
 
 import useMediaQueryMock from '../../use-media-query';
 

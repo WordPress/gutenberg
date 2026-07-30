@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -26,7 +27,7 @@ const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
 
 describe( 'useFocusOutside', () => {
 	it( 'should not call handler if focus shifts to element within component', async () => {
-		const mockOnFocusOutside = jest.fn();
+		const mockOnFocusOutside = vi.fn();
 		const user = userEvent.setup();
 
 		render(
@@ -47,7 +48,7 @@ describe( 'useFocusOutside', () => {
 	} );
 
 	it( 'should not call handler if focus transitions via click to button', async () => {
-		const mockOnFocusOutside = jest.fn();
+		const mockOnFocusOutside = vi.fn();
 		const user = userEvent.setup();
 
 		render(
@@ -64,7 +65,7 @@ describe( 'useFocusOutside', () => {
 	} );
 
 	it( 'should call handler if focus shifts to element outside component', async () => {
-		const mockOnFocusOutside = jest.fn();
+		const mockOnFocusOutside = vi.fn();
 		const user = userEvent.setup();
 
 		render(
@@ -89,10 +90,10 @@ describe( 'useFocusOutside', () => {
 	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
 		// Force document.hasFocus() to return false to simulate the window/document losing focus
 		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-		const mockedDocumentHasFocus = jest
+		const mockedDocumentHasFocus = vi
 			.spyOn( document, 'hasFocus' )
 			.mockImplementation( () => false );
-		const mockOnFocusOutside = jest.fn();
+		const mockOnFocusOutside = vi.fn();
 		const user = userEvent.setup();
 
 		render(
@@ -121,9 +122,7 @@ describe( 'useFocusOutside', () => {
 		const promise = new Promise( ( resolve ) => {
 			resolvePromise = resolve;
 		} );
-		const mockOnFocusOutside = jest
-			.fn()
-			.mockImplementation( resolvePromise );
+		const mockOnFocusOutside = vi.fn().mockImplementation( resolvePromise );
 		const user = userEvent.setup();
 
 		const { unmount } = render(

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Make the `basePipe` TypeScript signature reflect its existing support for arrays of functions, and use an explicitly browser-scoped timer in `useFocusOutside`.
+
 ## 8.4.0 (2026-07-14)
 
 ### Enhancements

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { matchMedia, setMedia } from 'mock-match-media';
 
