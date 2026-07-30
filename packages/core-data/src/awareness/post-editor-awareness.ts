@@ -81,7 +81,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		// in the subscription.
 		let selectionStart = getSelectionStart();
 		let selectionEnd = getSelectionEnd();
-		let localCursorTimeout: NodeJS.Timeout | null = null;
+		let localCursorTimeout: ReturnType< typeof setTimeout > | null = null;
 
 		// During rapid selection changes (e.g. undo restoring content and
 		// selection), the debounce discards intermediate events. If we use the

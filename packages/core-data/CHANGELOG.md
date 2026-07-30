@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Migrate unit tests from Jest to Vitest and use platform timer types.
 -   Rename JSX-bearing source files to use the `.jsx` extension.
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 

@@ -30,6 +30,7 @@
 					"packages/components",
 					"packages/compose",
 					"packages/core-commands",
+					"packages/core-data",
 					"packages/customize-widgets",
 					"packages/data",
 					"packages/date",

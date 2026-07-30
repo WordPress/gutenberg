@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { describe, expect, test, beforeEach, afterEach } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 /**
  * WordPress dependencies

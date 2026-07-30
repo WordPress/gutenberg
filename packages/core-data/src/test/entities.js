@@ -1,16 +1,21 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	...jest.requireActual( '../sync' ),
-	getSyncManager: jest.fn(),
+vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getSyncManager: vi.fn(),
 } ) );
-jest.mock( '../utils/crdt', () => ( {
-	...jest.requireActual( '../utils/crdt' ),
-	applyPostChangesToCRDTDoc: jest.fn(),
+vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	applyPostChangesToCRDTDoc: vi.fn(),
 } ) );
 
 /**
@@ -111,7 +116,7 @@ describe( 'prePersistPostType', () => {
 	it( 'adds meta with serialized CRDT doc when createPersistedCRDTDoc returns a value', async () => {
 		const mockSerializedDoc = 'serialized-crdt-doc-data';
 		getSyncManager.mockReturnValue( {
-			createPersistedCRDTDoc: jest
+			createPersistedCRDTDoc: vi
 				.fn()
 				.mockReturnValue( mockSerializedDoc ),
 		} );

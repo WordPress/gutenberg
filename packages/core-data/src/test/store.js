@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import triggerFetch from '@wordpress/api-fetch';
@@ -9,7 +14,7 @@ import { createRegistry } from '@wordpress/data';
  */
 import { store as coreDataStore } from '../index';
 
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( '@wordpress/api-fetch' );
 
 function createTestRegistry() {
 	const registry = createRegistry();

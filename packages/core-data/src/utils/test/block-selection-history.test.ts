@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 
 /**
@@ -97,7 +98,7 @@ describe( 'BlockSelectionHistory', () => {
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'initialization', () => {

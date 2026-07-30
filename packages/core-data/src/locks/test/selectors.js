@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 
 /**

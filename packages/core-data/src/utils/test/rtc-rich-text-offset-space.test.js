@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -11,8 +11,8 @@ import { Y } from '@wordpress/sync';
 /**
  * Mock block schemas and sync providers.
  */
-jest.mock( '@wordpress/blocks', () => {
-	const actual = jest.requireActual( '@wordpress/blocks' );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 
 	return {
 		...actual,
@@ -27,8 +27,8 @@ jest.mock( '@wordpress/blocks', () => {
 	};
 } );
 
-jest.mock( '../../../../sync/src/providers', () => ( {
-	getProviderCreators: jest.fn(),
+vi.mock( '../../../../sync/src/providers', () => ( {
+	getProviderCreators: vi.fn(),
 } ) );
 
 /**
@@ -41,7 +41,7 @@ import { applyPostChangesToCRDTDoc } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
 import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
 
-const mockGetProviderCreators = jest.mocked( getProviderCreators );
+const mockGetProviderCreators = vi.mocked( getProviderCreators );
 
 const SYNCED_PROPERTIES = new Set( [ 'blocks' ] );
 const OLD_HTML = '<em>italic</em><em>italic</em>';
@@ -200,11 +200,11 @@ function assertEqualWithContext( actual, expected, context ) {
 
 describe( 'RTC rich-text offset-space bug', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockGetProviderCreators.mockReturnValue( [
-			jest.fn( async () => ( {
-				destroy: jest.fn(),
-				on: jest.fn(),
+			vi.fn( async () => ( {
+				destroy: vi.fn(),
+				on: vi.fn(),
 			} ) ),
 		] );
 	} );
@@ -422,25 +422,25 @@ describe( 'RTC rich-text offset-space bug', () => {
 		let capturedDoc;
 		const manager = createSyncManager();
 		const handlers = {
-			addUndoMeta: jest.fn(),
-			editRecord: jest.fn(),
-			getEditedRecord: jest.fn( async () => ( {
+			addUndoMeta: vi.fn(),
+			editRecord: vi.fn(),
+			getEditedRecord: vi.fn( async () => ( {
 				id: 1,
 				blocks: [ makeParagraphBlock( OLD_HTML ) ],
 			} ) ),
-			onStatusChange: jest.fn(),
-			persistCRDTDoc: jest.fn(),
-			refetchRecord: jest.fn( async () => {} ),
-			restoreUndoMeta: jest.fn(),
+			onStatusChange: vi.fn(),
+			persistCRDTDoc: vi.fn(),
+			refetchRecord: vi.fn( async () => {} ),
+			restoreUndoMeta: vi.fn(),
 		};
 		const syncConfig = {
 			applyChangesToCRDTDoc: ( ydoc, changes ) => {
 				capturedDoc = ydoc;
 				applyPostChangesToCRDTDoc( ydoc, changes, SYNCED_PROPERTIES );
 			},
-			createAwareness: jest.fn(),
-			getChangesFromCRDTDoc: jest.fn( () => ( {} ) ),
-			getPersistedCRDTDoc: jest.fn( () => null ),
+			createAwareness: vi.fn(),
+			getChangesFromCRDTDoc: vi.fn( () => ( {} ) ),
+			getPersistedCRDTDoc: vi.fn( () => null ),
 		};
 
 		await manager.load(

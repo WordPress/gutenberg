@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi, type Mock } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { renderHook } from '@testing-library/react';
 
@@ -21,7 +22,7 @@ type MockBlock = EditorStoreBlock & {
 	innerBlocks: MockBlock[];
 };
 
-let mockGetClientIdsTree: jest.Mock;
+let mockGetClientIdsTree: Mock;
 
 function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
 	return blocks.flatMap( ( b ) => [
@@ -30,12 +31,13 @@ function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
 	] );
 }
 
-jest.mock( '../../lock-unlock', () => ( {
+vi.mock( import( '../../lock-unlock' ), () => ( {
 	unlock: ( obj: any ) => obj,
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: ( selector: Function ) =>
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: ( ( selector: Function ) =>
 		selector( () => ( {
 			getClientIdsTree: ( ...args: any[] ) =>
 				mockGetClientIdsTree( ...args ),
@@ -43,10 +45,11 @@ jest.mock( '@wordpress/data', () => ( {
 				mockFlattenBlocks( mockGetClientIdsTree( '' ) )
 					.filter( ( b ) => b.name === blockName )
 					.map( ( b ) => b.clientId ),
-		} ) ),
+		} ) ) ) as unknown as typeof import('@wordpress/data').useSelect,
 } ) );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+// @ts-expect-error @wordpress/block-editor does not publish TypeScript declarations.
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: 'core/block-editor',
 } ) );
 
@@ -405,7 +408,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 			// Override getClientIdsTree to return post content blocks when
 			// called with the post-content clientId (mimicking controlled
 			// inner blocks behavior in useBlockSync).
-			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = vi.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -440,7 +443,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = vi.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -487,7 +490,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = vi.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -519,7 +522,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = vi.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return postContentBlocks;
 				}
@@ -551,7 +554,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = vi.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}

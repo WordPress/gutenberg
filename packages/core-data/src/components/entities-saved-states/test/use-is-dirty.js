@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 
 /**
@@ -8,12 +9,12 @@ import { act, renderHook } from '@testing-library/react';
  */
 import { useIsDirty } from '../hooks/use-is-dirty';
 
-jest.mock( '@wordpress/data', () => {
+vi.mock( '@wordpress/data', () => {
 	return {
-		useSelect: jest.fn().mockImplementation( ( fn ) => {
+		useSelect: vi.fn().mockImplementation( ( fn ) => {
 			const select = () => {
 				return {
-					__experimentalGetDirtyEntityRecords: jest
+					__experimentalGetDirtyEntityRecords: vi
 						.fn()
 						.mockReturnValue( [
 							{
@@ -29,10 +30,10 @@ jest.mock( '@wordpress/data', () => {
 								property: 'property',
 							},
 						] ),
-					getEntityRecordEdits: jest.fn().mockReturnValue( {
+					getEntityRecordEdits: vi.fn().mockReturnValue( {
 						title: 'My Site',
 					} ),
-					getEntityConfig: jest.fn().mockReturnValue( {
+					getEntityConfig: vi.fn().mockReturnValue( {
 						meta: { labels: { title: 'Title' } },
 					} ),
 				};

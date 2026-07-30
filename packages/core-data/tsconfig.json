@@ -4,7 +4,7 @@
 	"compilerOptions": {
 		"checkJs": false,
 		"noImplicitAny": false,
-		"types": [ "jest", "node" ]
+		"types": []
 	},
 	"references": [
 		{ "path": "../api-fetch" },

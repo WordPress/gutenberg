@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Tests for the Attachment type against real REST API responses.
  *
  * These tests validate the Attachment type definition by comparing it with

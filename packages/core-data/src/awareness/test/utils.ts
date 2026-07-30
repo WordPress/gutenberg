@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
@@ -174,11 +179,11 @@ describe( 'Awareness Utils', () => {
 			mockUserAgent(
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 			);
-			jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+			vi.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 		} );
 
 		afterEach( () => {
-			jest.restoreAllMocks();
+			vi.restoreAllMocks();
 		} );
 
 		test( 'should generate collaboratorInfo with user properties', () => {

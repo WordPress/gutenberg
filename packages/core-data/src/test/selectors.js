@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -29,8 +30,8 @@ import {
 } from '../selectors';
 import { getSyncManager } from '../sync';
 
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
+vi.mock( '../sync', () => ( {
+	getSyncManager: vi.fn(),
 } ) );
 
 describe( 'hasUndo/hasRedo', () => {
@@ -40,8 +41,8 @@ describe( 'hasUndo/hasRedo', () => {
 
 	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
 		const undoManager = {
-			hasUndo: jest.fn( () => false ),
-			hasRedo: jest.fn( () => false ),
+			hasUndo: vi.fn( () => false ),
+			hasRedo: vi.fn( () => false ),
 		};
 		getSyncManager.mockReturnValue( { undoManager } );
 
@@ -60,8 +61,8 @@ describe( 'hasUndo/hasRedo', () => {
 
 	it( 'falls back to the default undo manager when no sync undo manager is available', () => {
 		const undoManager = {
-			hasUndo: jest.fn( () => true ),
-			hasRedo: jest.fn( () => false ),
+			hasUndo: vi.fn( () => true ),
+			hasRedo: vi.fn( () => false ),
 		};
 		getSyncManager.mockReturnValue( undefined );
 

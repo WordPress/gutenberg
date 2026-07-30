@@ -1,6 +1,15 @@
 /**
  * External dependencies
  */
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
 import { Y } from '@wordpress/sync';
 import { select } from '@wordpress/data';
 
@@ -14,16 +23,13 @@ import {
 } from '../crdt-user-selections';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
-	// Needed because @wordpress/rich-text initialises its store at import time.
-	combineReducers: jest.fn( () => jest.fn( () => ( {} ) ) ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	register: jest.fn(),
-	createSelector: ( selector: Function ) => selector,
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	select: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+// @ts-expect-error @wordpress/block-editor does not publish TypeScript declarations.
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: 'core/block-editor',
 } ) );
 import type {
@@ -452,18 +458,18 @@ describe( 'getSelectionState', () => {
 	beforeEach( () => {
 		testDoc = createTestDocWithBlocks();
 
-		( select as jest.Mock ).mockReturnValue( {
-			getBlockIndex: jest
+		( select as Mock ).mockReturnValue( {
+			getBlockIndex: vi
 				.fn()
 				.mockImplementation(
 					( clientId: string ) => blockIndexMap[ clientId ] ?? -1
 				),
-			getBlockRootClientId: jest
+			getBlockRootClientId: vi
 				.fn()
 				.mockImplementation(
 					( clientId: string ) => blockParentMap[ clientId ] ?? ''
 				),
-			getBlockName: jest.fn().mockReturnValue( 'core/paragraph' ),
+			getBlockName: vi.fn().mockReturnValue( 'core/paragraph' ),
 		} );
 	} );
 

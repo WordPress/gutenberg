@@ -1,15 +1,8 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, waitFor } from '@testing-library/react';
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	jest,
-} from '@jest/globals';
 
 /**
  * WordPress dependencies
@@ -26,9 +19,9 @@ import { Y } from '@wordpress/sync';
 /**
  * Mock sync manager accessor.
  */
-jest.mock( '../sync', () => ( {
-	...jest.requireActual( '../sync' ),
-	getSyncManager: jest.fn(),
+vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getSyncManager: vi.fn(),
 	LOCAL_EDITOR_ORIGIN: 'local-editor',
 } ) );
 
@@ -41,7 +34,7 @@ import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
 
-const mockGetSyncManager = jest.mocked( getSyncManager );
+const mockGetSyncManager = vi.mocked( getSyncManager );
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -127,7 +120,7 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		} );
 
 		mockGetSyncManager.mockReturnValue( {
-			update: jest.fn( ( _objectType, _objectId, changes ) => {
+			update: vi.fn( ( _objectType, _objectId, changes ) => {
 				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
