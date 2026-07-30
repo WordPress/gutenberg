@@ -58,4 +58,42 @@ describe( 'Playlist transforms', () => {
 			} ),
 		] );
 	} );
+
+	it( 'preserves shared layout attributes when converting Audio to Playlist', () => {
+		const audio = createBlock( 'core/audio', {
+			align: 'wide',
+			anchor: 'my-audio',
+			style: {
+				spacing: {
+					margin: { top: '1rem' },
+					padding: { bottom: '2rem' },
+				},
+			},
+		} );
+
+		const [ playlist ] = switchToBlockType( audio, 'core/playlist' );
+
+		expect( playlist.attributes ).toMatchObject( {
+			align: 'wide',
+			anchor: 'my-audio',
+			style: {
+				spacing: {
+					margin: { top: '1rem' },
+					padding: { bottom: '2rem' },
+				},
+			},
+		} );
+	} );
+
+	it( 'converts Audio without an attachment ID', () => {
+		const audio = createBlock( 'core/audio', {
+			src: 'https://example.com/track.mp3',
+		} );
+
+		const [ playlist ] = switchToBlockType( audio, 'core/playlist' );
+
+		expect( playlist.innerBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'id'
+		);
+	} );
 } );

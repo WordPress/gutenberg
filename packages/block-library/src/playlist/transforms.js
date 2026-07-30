@@ -8,14 +8,25 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/audio' ],
-			transform: ( { blob, caption, id, src } ) =>
-				createBlock( 'core/playlist', { caption }, [
-					createBlock( 'core/playlist-track', {
-						blob,
-						id,
-						src,
-					} ),
-				] ),
+			transform: ( { align, anchor, blob, caption, id, src, style } ) =>
+				createBlock(
+					'core/playlist',
+					{
+						caption,
+						...( align && { align } ),
+						...( anchor && { anchor } ),
+						...( style?.spacing && {
+							style: { spacing: style.spacing },
+						} ),
+					},
+					[
+						createBlock( 'core/playlist-track', {
+							blob,
+							src,
+							...( id !== undefined && { id } ),
+						} ),
+					]
+				),
 		},
 	],
 };
