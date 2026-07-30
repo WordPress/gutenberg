@@ -92,13 +92,20 @@ export default function useClipboardHandler() {
 			// text should copy the heading block. Fields within a larger
 			// block, like a caption, are not the block element and keep
 			// the native copy.
-			let isWholeSingleBlockCopy = false;
+			// Whether the entire text of a single selected block is
+			// copied, in which case the block itself is copied.
+			const isWholeSingleBlockCopy =
+				event.type === 'copy' &&
+				! hasMultiSelection() &&
+				isBlockEntirelySelected(
+					event.target.ownerDocument,
+					selectedBlockClientIds[ 0 ]
+				);
 
 			// Let native copy/paste behaviour take over in input fields.
 			// But always handle multiple selected blocks.
 			if ( ! hasMultiSelection() ) {
-				const { target } = event;
-				const { ownerDocument } = target;
+				const { ownerDocument } = event.target;
 				// If copying, only consider actual text selection as selection.
 				// Otherwise, any focus on an input field is considered.
 				const hasSelection =
@@ -106,13 +113,6 @@ export default function useClipboardHandler() {
 						? documentHasUncollapsedSelection( ownerDocument )
 						: documentHasSelection( ownerDocument ) &&
 						  ! ownerDocument.activeElement.isContentEditable;
-
-				isWholeSingleBlockCopy =
-					event.type === 'copy' &&
-					isBlockEntirelySelected(
-						ownerDocument,
-						selectedBlockClientIds[ 0 ]
-					);
 
 				// Let native copy behaviour take over in input fields.
 				if ( hasSelection && ! isWholeSingleBlockCopy ) {
