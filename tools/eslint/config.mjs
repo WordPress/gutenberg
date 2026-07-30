@@ -454,6 +454,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			'test/unit/browser/**/*.[tj]s?(x)',
 		],
 	},
 	{
@@ -463,6 +464,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			'test/unit/browser/**/*.[tj]s?(x)',
 		],
 	},
 	{
@@ -472,6 +474,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			'test/unit/browser/**/*.[tj]s?(x)',
 		],
 		rules: {
 			...jestPlugin.configs[ 'flat/recommended' ].rules,

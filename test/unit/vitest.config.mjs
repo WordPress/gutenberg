@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
  * External dependencies
  */
 import { transformAsync } from '@babel/core';
+import { playwright } from '@vitest/browser-playwright';
 import globPackage from 'glob';
 import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
@@ -190,6 +191,41 @@ export default defineConfig( {
 		includeTaskLocation: true,
 		passWithNoTests: false,
 		projects: [
+			{
+				extends: true,
+				optimizeDeps: {
+					entries: vitestTests.browser,
+					// Babel injects the automatic JSX runtime after Vite's
+					// dependency scan, so declare it directly.
+					include: [ 'react/jsx-runtime' ],
+					esbuildOptions: {
+						// Gutenberg still has JSX in .js package sources.
+						// Keep this browser dependency-scan exception explicit
+						// until that legacy contract is removed.
+						loader: {
+							'.js': 'jsx',
+						},
+					},
+				},
+				test: {
+					name: 'browser',
+					attachmentsDir: 'test-results/vitest-browser-attachments',
+					include: vitestTests.browser,
+					browser: {
+						enabled: true,
+						headless: true,
+						instances: [ { browser: 'chromium' } ],
+						provider: playwright(),
+						screenshotDirectory:
+							'test-results/vitest-browser-screenshots',
+						screenshotFailures: true,
+						trace: {
+							mode: 'retain-on-failure',
+							tracesDir: 'test-results/vitest-browser-traces',
+						},
+					},
+				},
+			},
 			{
 				extends: true,
 				test: {

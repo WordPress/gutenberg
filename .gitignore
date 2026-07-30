@@ -50,6 +50,7 @@ phpunit.xml
 phpunit-watcher.yml
 .tool-versions
 test/storybook-playwright/test-results
+test-results/vitest-browser-*
 test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**
 test/gutenberg-test-themes/twentytwentyone

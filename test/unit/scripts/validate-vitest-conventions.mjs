@@ -23,7 +23,11 @@ import { fileURLToPath } from 'node:url';
 /**
  * Internal dependencies
  */
-import { getVitestTests } from './discover-test-files.mjs';
+import {
+	getVitestTests,
+	getVitestTestsByProject,
+	VITEST_PROJECT_NAMES,
+} from './discover-test-files.mjs';
 
 const traverse = traverseModule.default ?? traverseModule;
 const { sync: glob } = globPackage;
@@ -37,6 +41,7 @@ const migration = JSON.parse(
 		'utf8'
 	)
 );
+const vitestTestsByProject = getVitestTestsByProject( ROOT_DIR, migration );
 const vitestTests = getVitestTests( ROOT_DIR, migration );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
@@ -242,12 +247,30 @@ if ( violations.length ) {
 	);
 }
 
-const typescriptTests = vitestTests.filter( ( file ) =>
-	/\.tsx?$/.test( file )
+const typescriptTestsByProject = Object.fromEntries(
+	VITEST_PROJECT_NAMES.map( ( projectName ) => [
+		projectName,
+		vitestTestsByProject[ projectName ].filter( ( file ) =>
+			/\.tsx?$/.test( file )
+		),
+	] )
 );
-if ( typescriptTests.length ) {
+const typescriptTests = Object.values( typescriptTestsByProject ).flat();
+const commonTypes = [
+	'gutenberg-env',
+	'node',
+	'react-css-custom-properties',
+	'style-imports',
+];
+
+for ( const projectName of VITEST_PROJECT_NAMES ) {
+	const projectTypescriptTests = typescriptTestsByProject[ projectName ];
+	if ( ! projectTypescriptTests.length ) {
+		continue;
+	}
+
 	const temporaryDirectory = mkdtempSync(
-		path.join( os.tmpdir(), 'gutenberg-vitest-typecheck-' )
+		path.join( os.tmpdir(), `gutenberg-vitest-${ projectName }-typecheck-` )
 	);
 	const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
 	const compatibilityTypesPath = path.join(
@@ -269,18 +292,24 @@ if ( typescriptTests.length ) {
 				path.join( ROOT_DIR, 'typings' ),
 				path.join( ROOT_DIR, 'node_modules/@types' ),
 			],
-			types: [
-				'gutenberg-env',
-				'gutenberg-vitest-test-env',
-				'node',
-				'react-css-custom-properties',
-				'style-imports',
-			],
+			types:
+				projectName === 'jsdom'
+					? [ ...commonTypes, 'gutenberg-vitest-test-env' ]
+					: commonTypes,
 		},
 		files: [
 			compatibilityTypesPath,
-			path.join( ROOT_DIR, 'test/unit/config/testing-library.vitest.js' ),
-			...typescriptTests.map( ( file ) => path.join( ROOT_DIR, file ) ),
+			...( projectName === 'jsdom'
+				? [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/testing-library.vitest.js'
+						),
+				  ]
+				: [] ),
+			...projectTypescriptTests.map( ( file ) =>
+				path.join( ROOT_DIR, file )
+			),
 		],
 	};
 
