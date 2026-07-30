@@ -30,6 +30,64 @@ const OVERRIDES_ALWAYS_WIN = [
 	'search',
 ] as const;
 
+type PlainObject = Record< string, unknown >;
+
+function isPlainObject( value: unknown ): value is PlainObject {
+	return (
+		typeof value === 'object' && value !== null && ! Array.isArray( value )
+	);
+}
+
+/**
+ * Merges an override value into a view value, recursing into nested objects so
+ * the override only takes over the leaves it declares. Arrays and scalars are
+ * leaves: they are replaced wholesale.
+ *
+ * `layout` is nested (e.g. `layout.styles.<field>.width`), so a shallow merge
+ * would let an override for one field's styles wipe every other field's.
+ *
+ * @param value    The current value.
+ * @param override The override value.
+ * @return The merged value.
+ */
+function mergeNested( value: unknown, override: unknown ): unknown {
+	if ( ! isPlainObject( value ) || ! isPlainObject( override ) ) {
+		return override;
+	}
+	const result: PlainObject = { ...value };
+	for ( const key of Object.keys( override ) ) {
+		result[ key ] = mergeNested( value[ key ], override[ key ] );
+	}
+	return result;
+}
+
+/**
+ * Removes the leaves managed by an override from a view value, leaving the
+ * user's sibling values untouched. Mirrors `mergeNested`.
+ *
+ * @param value    The current value.
+ * @param override The override value.
+ * @return The stripped value, or `undefined` when nothing is left.
+ */
+function stripNested( value: unknown, override: unknown ): unknown {
+	if ( ! isPlainObject( value ) || ! isPlainObject( override ) ) {
+		return undefined;
+	}
+	const result: PlainObject = { ...value };
+	for ( const key of Object.keys( override ) ) {
+		if ( ! ( key in result ) ) {
+			continue;
+		}
+		const stripped = stripNested( result[ key ], override[ key ] );
+		if ( stripped === undefined ) {
+			delete result[ key ];
+		} else {
+			result[ key ] = stripped;
+		}
+	}
+	return Object.keys( result ).length > 0 ? result : undefined;
+}
+
 /**
  * Merges the overrides into a view.
  *
@@ -59,21 +117,15 @@ export function mergeOverrides(
 	if ( overrides.layout ) {
 		result = {
 			...result,
-			layout: {
-				...( result as any ).layout,
-				...overrides.layout,
-			},
+			layout: mergeNested( result.layout ?? {}, overrides.layout ),
 		} as View;
 	}
 
 	if ( overrides.groupBy ) {
 		result = {
 			...result,
-			groupBy: {
-				...( result as any ).groupBy,
-				...overrides.groupBy,
-			},
-		};
+			groupBy: mergeNested( result.groupBy ?? {}, overrides.groupBy ),
+		} as View;
 	}
 
 	// These overrides are merged only if the user has not modified the view
@@ -181,24 +233,16 @@ export function stripOverrides(
 	}
 
 	if ( overrides.layout && result.layout ) {
-		const layout = { ...result.layout } as Record< string, unknown >;
-		for ( const key of Object.keys( overrides.layout ) ) {
-			delete layout[ key ];
-		}
 		result = {
 			...result,
-			layout: Object.keys( layout ).length > 0 ? layout : undefined,
+			layout: stripNested( result.layout, overrides.layout ),
 		} as View;
 	}
 
 	if ( overrides.groupBy && result.groupBy ) {
-		const groupBy = { ...result.groupBy } as Record< string, unknown >;
-		for ( const key of Object.keys( overrides.groupBy ) ) {
-			delete groupBy[ key ];
-		}
 		result = {
 			...result,
-			groupBy: Object.keys( groupBy ).length > 0 ? groupBy : undefined,
+			groupBy: stripNested( result.groupBy, overrides.groupBy ),
 		} as View;
 	}
 

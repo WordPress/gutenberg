@@ -351,21 +351,38 @@ describe( 'mergeOverrides', () => {
 			} );
 		} );
 
-		it( 'should override matching layout keys', () => {
+		it( 'should preserve the styles of fields the override does not manage', () => {
 			const view: View = {
 				...baseView,
 				layout: {
 					density: 'compact',
-					styles: { old: { width: '10%' } },
+					styles: { title: { width: '10%' } },
 				},
 			};
 			const result = mergeOverrides( view, {
-				layout: { styles: { new: { width: '20%' } } },
+				layout: { styles: { author: { width: '20%' } } },
 			} );
-			// Shallow merge: styles key is replaced entirely.
 			expect( result.layout ).toEqual( {
 				density: 'compact',
-				styles: { new: { width: '20%' } },
+				styles: {
+					title: { width: '10%' },
+					author: { width: '20%' },
+				},
+			} );
+		} );
+
+		it( 'should only override the managed properties of a same-field style', () => {
+			const view: View = {
+				...baseView,
+				layout: {
+					styles: { title: { width: '10%', align: 'start' } },
+				},
+			};
+			const result = mergeOverrides( view, {
+				layout: { styles: { title: { align: 'end' } } },
+			} );
+			expect( result.layout ).toEqual( {
+				styles: { title: { width: '10%', align: 'end' } },
 			} );
 		} );
 	} );
@@ -723,6 +740,39 @@ describe( 'stripOverrides', () => {
 				layout: { styles: { author: { align: 'end' } } },
 			} );
 			expect( result.layout ).toBeUndefined();
+		} );
+
+		it( 'should keep the styles of fields the override does not manage', () => {
+			const view: View = {
+				...baseView,
+				layout: {
+					styles: {
+						author: { align: 'end' },
+						date: { width: '100px' },
+					},
+				},
+			};
+			const result = stripOverrides( view, {
+				layout: { styles: { author: { align: 'end' } } },
+			} );
+			expect( result.layout ).toEqual( {
+				styles: { date: { width: '100px' } },
+			} );
+		} );
+
+		it( 'should keep the unmanaged properties of a same-field style', () => {
+			const view: View = {
+				...baseView,
+				layout: {
+					styles: { title: { align: 'end', width: '100px' } },
+				},
+			};
+			const result = stripOverrides( view, {
+				layout: { styles: { title: { align: 'end' } } },
+			} );
+			expect( result.layout ).toEqual( {
+				styles: { title: { width: '100px' } },
+			} );
 		} );
 
 		it( 'should not touch layout when view has no layout', () => {
