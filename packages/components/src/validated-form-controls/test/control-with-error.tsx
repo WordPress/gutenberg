@@ -542,5 +542,47 @@ describe( 'ControlWithError', () => {
 				).toHaveFocus();
 			} );
 		} );
+
+		it( 'should show the error message without moving focus on a synthetic `invalid` event', async () => {
+			const user = userEvent.setup();
+			function ValidatedInputControlWithRef(
+				props: React.ComponentProps< typeof ValidatedInputControl >
+			) {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl ref={ ref } { ...props } />
+						<button
+							type="button"
+							onClick={ () =>
+								ref.current?.dispatchEvent(
+									new Event( 'invalid', {
+										cancelable: true,
+									} )
+								)
+							}
+						>
+							Show errors
+						</button>
+					</>
+				);
+			}
+
+			render( <ValidatedInputControlWithRef label="Text" required /> );
+
+			const button = screen.getByRole( 'button', {
+				name: 'Show errors',
+			} );
+			await user.click( button );
+
+			// The error message is revealed...
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Constraints not satisfied' )
+				).toBeVisible();
+			} );
+			// ...but focus is not moved to the invalid field.
+			expect( button ).toHaveFocus();
+		} );
 	} );
 } );
