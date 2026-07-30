@@ -393,9 +393,9 @@ export default dedupePlugins( [
 
 	// Override: Package source files — forbid raw SVG elements.
 	{
-		files: [ 'packages/**/*.js' ],
+		files: [ 'packages/**/*.js?(x)' ],
 		ignores: [
-			'packages/block-library/src/*/save.js',
+			'packages/block-library/src/*/save.js?(x)',
 			...developmentFiles,
 		],
 		rules: {

@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1294,
-	"sha256": "a01315872e5ec7da457270bea49e45c10604a6eedb4a9693426f58823a7529b7",
+	"count": 1287,
+	"sha256": "256696c0accaadbdf080836ce5d220ad91d272e0edeb3d7eae5062058b6fa0af",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -816,7 +816,6 @@
 		"packages/blocks/src/api/test/registration.js",
 		"packages/blocks/src/api/test/serializer.js",
 		"packages/blocks/src/store/test/selectors.js",
-		"packages/commands/src/components/command-menu.js",
 		"packages/components/src/border-control/test/index.js",
 		"packages/components/src/context/test/context-system-provider.js",
 		"packages/components/src/input-control/test/index.js",
@@ -844,7 +843,6 @@
 		"packages/compose/src/hooks/use-state-with-history/test/index.js",
 		"packages/compose/src/hooks/use-viewport-match/test/index.js",
 		"packages/compose/src/utils/create-higher-order-component/test/index.js",
-		"packages/core-commands/src/index.js",
 		"packages/core-data/src/components/entities-saved-states/entity-record-item.js",
 		"packages/core-data/src/components/entities-saved-states/entity-type-list.js",
 		"packages/core-data/src/components/entities-saved-states/index.js",
@@ -1277,11 +1275,7 @@
 		"packages/patterns/src/components/rename-pattern-modal.js",
 		"packages/patterns/src/components/reset-overrides-control.js",
 		"packages/plugins/src/components/test/plugin-area.js",
-		"packages/primitives/src/svg/index.js",
 		"packages/private-apis/src/test/index.js",
-		"packages/reusable-blocks/src/components/reusable-blocks-menu-items/index.js",
-		"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js",
-		"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-blocks-manage-button.js",
 		"packages/viewport/src/test/if-viewport-matches.js",
 		"packages/viewport/src/test/with-viewport-match.js",
 		"packages/widgets/src/blocks/legacy-widget/edit/convert-to-blocks-button.js",
@@ -1295,7 +1289,6 @@
 		"packages/widgets/src/blocks/widget-group/edit.js",
 		"packages/widgets/src/blocks/widget-group/save.js",
 		"packages/widgets/src/components/move-to-widget-area/index.js",
-		"packages/workflow/src/components/workflow-menu.js",
 		"test/integration/helpers/integration-test-editor.js"
 	]
 }

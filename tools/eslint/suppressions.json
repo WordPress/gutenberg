@@ -608,7 +608,7 @@
 			"count": 2
 		}
 	},
-	"packages/commands/src/components/command-menu.js": {
+	"packages/commands/src/components/command-menu.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
@@ -1894,7 +1894,7 @@
 			"count": 7
 		}
 	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js": {
+	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -1924,7 +1924,7 @@
 			"count": 2
 		}
 	},
-	"packages/workflow/src/components/workflow-menu.js": {
+	"packages/workflow/src/components/workflow-menu.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		},

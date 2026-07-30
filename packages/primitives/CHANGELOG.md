@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Rename the JSX-bearing SVG source entry point from `.js` to `.jsx`.
+
 ## 4.51.0 (2026-07-14)
 
 ### Enhancements

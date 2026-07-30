@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Rename JSX-bearing Reusable Blocks Menu Item source files from `.js` to `.jsx`.
+
 ## 5.51.0 (2026-07-14)
 
 ### Deprecations

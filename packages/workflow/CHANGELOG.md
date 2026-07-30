@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Rename the JSX-bearing Workflow Menu source file from `.js` to `.jsx`.
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 0.1.0 (2025-10-23)

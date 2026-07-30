@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Rename the JSX-bearing package entry point from `.js` to `.jsx`.
+
 ## 1.51.0 (2026-07-14)
 
 ### Enhancements
