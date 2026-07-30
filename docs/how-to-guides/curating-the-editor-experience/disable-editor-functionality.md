@@ -121,6 +121,21 @@ add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
 
 Responsive styles already defined in `theme.json` or in Global Styles continue to be applied on the front end.
 
+## Disable block states editing
+
+The block states control in the block inspector lets users apply style changes to a block-level state. To hide that control, add the following to your `functions.php` file.
+
+```php
+function example_disable_block_states_editing( $settings ) {
+	$settings[ 'blockStatesEnabled' ] = false;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
+```
+
+State styles already defined in block attributes continue to be applied in the editor and on the front end.
+
 ## Disable formatting options for RichText blocks
 
 Blocks that support [RichText](https://developer.wordpress.org/block-editor/reference-guides/richtext/) come with the default formatting options provided by WordPress.

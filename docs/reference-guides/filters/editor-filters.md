@@ -74,6 +74,19 @@ function example_disable_responsive_editing( $settings ) {
 }
 ```
 
+### Restrict block states editing
+
+The `blockStatesEnabled` setting, which defaults to `true`, controls whether the block-level states control is available in the block inspector. When it is `false`, the control is not rendered, so users cannot target style changes at a block-level state from that UI. State styles already defined in a block's `style` attribute are unaffected.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
+
+function example_disable_block_states_editing( $settings ) {
+	$settings['blockStatesEnabled'] = false;
+	return $settings;
+}
+```
+
 ### Set a default image size
 
 Images are set to the `large` image size by default in the Editor. You can modify this using the `imageDefaultSize` setting, which is especially useful if you have configured your own custom image sizes. The following example changes the default image size to `medium`.
