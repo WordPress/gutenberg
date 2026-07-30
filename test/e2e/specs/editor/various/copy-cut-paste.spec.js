@@ -1056,10 +1056,9 @@ test.describe( 'Copy/cut/paste', () => {
 		// The navigation wrapper does not serialize its inner blocks (the
 		// synced menu entity owns them), so wrapping would lose the copied
 		// link. The clipboard holds the bare link instead.
-		const { html } = pageUtils.getClipboardData();
-		expect( html ).toContain( '<!-- wp:navigation-link' );
-		expect( html ).toContain( '"label":"Nav item one"' );
-		expect( html ).not.toContain( 'wp:navigation {' );
+		expect( pageUtils.getClipboardData().html ).toBe(
+			'<!-- wp:navigation-link {"label":"Nav item one","url":"https://wordpress.org","kind":"custom"} /-->'
+		);
 
 		await requestUtils.deleteAllMenus();
 	} );
