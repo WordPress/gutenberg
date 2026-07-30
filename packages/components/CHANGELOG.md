@@ -33,6 +33,7 @@
 
 ### Internal
 
+-   Run the Tabs interaction tests in Vitest Browser Mode ([#80987](https://github.com/WordPress/gutenberg/pull/80987)).
 -   Run the custom-select interaction tests in Vitest Browser Mode ([#80985](https://github.com/WordPress/gutenberg/pull/80985)).
 -   Run the first interaction-test batch in Vitest Browser Mode ([#80983](https://github.com/WordPress/gutenberg/pull/80983)).
 -   Rename the JSX-bearing context system provider source file from `.js` to `.jsx`.
