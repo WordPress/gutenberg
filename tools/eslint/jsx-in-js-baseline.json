@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1205,
-	"sha256": "9103fb8f87919d510c817fa9392139c9367a5570977fc0b10f1b263ef933419f",
+	"count": 1199,
+	"sha256": "e4b4f852535cfa8a90379840c5b27f48b67de52ba79261af6a1b7d2315c9b279",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -807,12 +807,6 @@
 		"packages/block-library/src/video/save.js",
 		"packages/block-library/src/video/tracks-editor.js",
 		"packages/block-library/src/video/tracks.js",
-		"packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js",
-		"packages/blocks/src/api/parser/test/fix-custom-classname.js",
-		"packages/blocks/src/api/parser/test/index.js",
-		"packages/blocks/src/api/test/registration.js",
-		"packages/blocks/src/api/test/serializer.js",
-		"packages/blocks/src/store/test/selectors.js",
 		"packages/customize-widgets/src/components/block-appender/index.js",
 		"packages/customize-widgets/src/components/block-inspector-button/index.js",
 		"packages/customize-widgets/src/components/customize-widgets/index.js",
