@@ -15,12 +15,11 @@ import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
-} from './discover-test-files.mjs';
+} from './test-projects.mjs';
 import { resolvePackageBin } from './resolve-package-bin.mjs';
 import { resolveTypeRoots } from './resolve-type-roots.mjs';
 import {
 	findVitestIsolationOptOuts,
-	validateRoutingScripts,
 	validateVitestCleanupConfig,
 	validateVitestShuffleScripts,
 } from './test-infrastructure-policy.mjs';
@@ -34,22 +33,13 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const require = createRequire( import.meta.url );
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
 const policyExceptions = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
 		'utf8'
 	)
 );
-const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	migration
-);
+const vitestTestsByProject = getVitestTestsByProject( ROOT_DIR );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const vitestTestSet = new Set( vitestTests );
 const jsdomTests = new Set( vitestTestsByProject.jsdom );
@@ -147,7 +137,6 @@ const vitestConfig = (
 ).default;
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
-	...validateRoutingScripts( rootPackageJson, unitTestPackageJson ),
 	...validateVitestCleanupConfig( vitestConfig ),
 	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson )
 );

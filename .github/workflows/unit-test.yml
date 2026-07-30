@@ -56,6 +56,37 @@ jobs:
                           # Other workflows, and everything under .github that this one does not use.
                           - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
 
+    unit-js-invariants:
+        name: JavaScript test invariants
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: '20'
+
+            - name: Build workspaces and package TypeScript declarations
+              run: |
+                  npm exec --no -- lerna run build
+                  npm run --workspace @wordpress/build-scripts generate-worker-placeholders
+                  npm exec --no --workspace @wordpress/unit-tests -- tsc6 --build ../../tsconfig.json --noCheck
+
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
+            - name: Validate Jest removal
+              run: npm run test:unit:no-jest
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
@@ -94,7 +125,7 @@ jobs:
               # Some packages have custom build tasks that their tests consume.
               run: npm exec --no -- lerna run build
 
-            - name: Run the remaining Jest partition
+            - name: Run the Node and jsdom Vitest projects
               env:
                   SHARD: ${{ matrix.shard }}
                   # Record the Node.js major as a custom flakiness environment
@@ -103,20 +134,6 @@ jobs:
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
-                    --ci \
-                    --maxWorkers="$(nproc)" \
-                    --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache" \
-                    --passWithNoTests
-
-            - name: Run the migrated Vitest partition
-              env:
-                  SHARD: ${{ matrix.shard }}
-                  # Preserve the same Flakiness.io environment identity used
-                  # by the Jest partition.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
-              run: |
-                  npm run test:unit:vitest:shuffled -- \
                     --project=node \
                     --project=jsdom \
                     --shard="$SHARD" \
@@ -195,9 +212,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
+              # It is not necessary to run the full build because Vite transforms
+              # source modules. Some packages have custom build tasks, however.
               run: npm exec --no -- lerna run build
 
             - name: Run the date tests

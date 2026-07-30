@@ -1,1 +1,1 @@
-// Stub file for Jest and Vitest.
+// Stub file for unit tests.

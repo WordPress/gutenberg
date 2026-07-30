@@ -67,6 +67,9 @@ npm run fixtures:regenerate
 
 Name an invalid fixture after the schema definition that rejects it, adding a `_suffix` when one definition needs several cases, as in `stylesPropertiesAndElementsComplete_pseudo.json`. Nothing enforces the name, so check the failure comes from the definition you meant to test.
 
-## Jest Configuration
+## Vitest Configuration
 
-These tests reuse the Jest configuration from `test/unit/jest.config.js`. There is no separate Jest config in this directory — `test/unit`'s config sets `rootDir` to the repo root, which automatically discovers tests in this directory.
+These tests use the repository Vitest configuration in
+`test/unit/vitest.config.mjs`. There is no separate configuration in this
+directory. The shared test-project routing discovers these files and assigns
+them to Node.js or jsdom from their filename.

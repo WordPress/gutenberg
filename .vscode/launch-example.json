@@ -14,15 +14,20 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Debug current e2e test",
-			"program": "${workspaceFolder}/node_modules/@wordpress/scripts/bin/wp-scripts.js",
-			"args": [
+			"runtimeExecutable": "npm",
+			"runtimeArgs": [
+				"exec",
+				"--workspace",
+				"@wordpress/e2e-tests-playwright",
+				"--",
+				"wp-scripts",
 				"test-e2e",
-				"--config=${workspaceFolder}/packages/e2e-tests/jest.config.js",
-				"--verbose=true",
-				"--runInBand",
-				"--watch",
+				"--config",
+				"playwright.config.ts",
+				"--debug",
 				"${file}"
 			],
+			"autoAttachChildProcesses": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",
 			"trace": "all"

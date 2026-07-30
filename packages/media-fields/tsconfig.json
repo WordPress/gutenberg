@@ -2,7 +2,11 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
+		"types": [
+			"gutenberg-env",
+			"gutenberg-vitest-test-env",
+			"@testing-library/jest-dom/vitest"
+		]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [

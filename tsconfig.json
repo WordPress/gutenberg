@@ -36,7 +36,7 @@
 		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/interactivity-router/tsconfig.test.json" },
 		{ "path": "packages/is-shallow-equal" },
-		{ "path": "packages/jest-console" },
+		{ "path": "packages/kebab-case" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/media-editor" },
 		{ "path": "packages/media-fields" },

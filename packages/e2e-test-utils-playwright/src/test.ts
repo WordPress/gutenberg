@@ -108,9 +108,8 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
 	// Disable reason: We intentionally bubble up the console message
-	// which, unless the test explicitly anticipates the logging via
-	// @wordpress/jest-console matchers, will cause the intended test
-	// failure.
+	// which, unless the test explicitly anticipates it through the Playwright
+	// console allowlist, will cause the intended test failure.
 	// eslint-disable-next-line no-console
 	console[ logFunction ]( text );
 }

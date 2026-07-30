@@ -7,28 +7,16 @@ import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-import {
-	discoverTestFiles,
-	getVitestTestsByProject,
-} from '../../test/unit/scripts/discover-test-files.mjs';
+import { getVitestTestsByProject } from '../../test/unit/scripts/test-projects.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
-const testMigration = require(
-	join( rootDir, 'test/unit/test-migration.json' )
-);
-
-const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( rootDir ),
-	testMigration
-);
+const vitestTestsByProject = getVitestTestsByProject( rootDir );
 const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
 const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
 const vitestBrowserTestPatterns = vitestTestsByProject.browser;
-const jestTestPatterns = testMigration.jest.files;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -406,12 +394,6 @@ export default dedupePlugins( [
 			// @typescript-eslint/consistent-type-imports are scoped to
 			// TS files below since they require the TypeScript parser.
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'jsdoc/check-tag-names': [
-				'error',
-				{
-					definedTags: [ 'jest-environment' ],
-				},
-			],
 			'react/jsx-filename-extension': [
 				'error',
 				{ extensions: [ '.tsx' ] },
@@ -569,41 +551,15 @@ export default dedupePlugins( [
 		},
 	} ) ),
 
-	// Override: Tests that remain on Jest while the migration completes.
+	// Override: The Babel input is source text transformed by its parent test.
 	{
-		...jestDomPlugin.configs[ 'flat/recommended' ],
-		files: jestTestPatterns,
-	},
-	{
-		...testingLibraryPlugin.configs[ 'flat/react' ],
-		files: jestTestPatterns,
-	},
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: jestTestPatterns,
-	},
-
-	// Override: Remaining Jest tooling tests. Removed with the legacy packages
-	// in the final migration cleanup.
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [
-			'packages/jest-console/**/*.[tj]s?(x)',
-			'packages/jest-preset-default/**/*.[tj]s?(x)',
-		],
-	},
-	{
-		files: [
-			'packages/babel-preset-default/test/fixtures/input.js',
-			'test/unit/config/global-mocks.js',
-			'test/unit/config/matchers/to-be-positioned-popover.js',
-			'test/unit/config/matchers/to-match-style-diff-snapshot.js',
-			'test/unit/config/video-conversion-worker-code-stub.js',
-			'test/unit/config/vips-worker-code-stub.js',
-			'test/unit/mocks/match-media.js',
-		],
+		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
 		languageOptions: {
-			globals: jestPlugin.environments.globals.globals,
+			globals: {
+				describe: 'readonly',
+				expect: 'readonly',
+				test: 'readonly',
+			},
 		},
 	},
 
@@ -613,14 +569,6 @@ export default dedupePlugins( [
 		files: [ 'packages/e2e-test*/**/*.js' ],
 		ignores: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 	} ) ),
-	{
-		files: [ 'packages/e2e-test*/**/*.js' ],
-		ignores: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
-		rules: {
-			'jest/expect-expect': 'off',
-		},
-	},
-
 	// Override: Playwright tests.
 	...wpPlugin.configs[ 'test-playwright' ].map( ( config ) => ( {
 		...config,
@@ -1014,17 +962,11 @@ export default dedupePlugins( [
 	// --- Merged package-level configs ---
 
 	// From packages/block-serialization-spec-parser/.eslintrc.json:
-	// Add test-unit config for shared-tests.js with jest/no-export off.
+	// Add test-unit config for shared-tests.js.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 	} ) ),
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			'jest/no-export': 'off',
-		},
-	},
 
 	// From packages/dependency-extraction-webpack-plugin/lib/.eslintrc.json:
 	// Add Node.js globals for the lib directory.

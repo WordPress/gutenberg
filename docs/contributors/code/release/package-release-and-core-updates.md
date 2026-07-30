@@ -159,8 +159,8 @@ Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](http
    ```shell
    npm exec --no -- lerna updated
    @wordpress/e2e-tests
-   @wordpress/jest-preset-default
    @wordpress/scripts
+   @wordpress/vitest-preset-default
    lerna success found 3 packages ready to publish
    ```
 
