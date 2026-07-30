@@ -108,9 +108,6 @@ module.exports = {
 		...vitestTestPathIgnorePatterns,
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
-	transform: {
-		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
-	},
 	transformIgnorePatterns: [
 		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
