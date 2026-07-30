@@ -85,6 +85,7 @@
 					"packages/block-serialization-spec-parser",
 					"packages/browserslist-config",
 					"packages/data-controls",
+					"packages/dependency-extraction-webpack-plugin",
 					"packages/design-system-mcp",
 					"packages/docgen",
 					"packages/eslint-plugin",

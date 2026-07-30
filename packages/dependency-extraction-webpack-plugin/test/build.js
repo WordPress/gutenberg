@@ -1,17 +1,39 @@
 /**
+ * Node dependencies
+ */
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
-const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).mkdirp.sync;
-const rimraf = require( 'rimraf' ).sync;
-const webpack = require( 'webpack' );
+import globPackage from 'glob';
+import { mkdirpSync } from 'mkdirp';
+import { rimrafSync } from 'rimraf';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+} from 'vitest';
+import webpack from 'webpack';
 
-const fixturesPath = path.join( __dirname, 'fixtures' );
+const require = createRequire( import.meta.url );
+const glob = globPackage.sync;
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
+const fixturesPath = path.join( currentDirectory, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
-afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
+afterAll( () => rimrafSync( path.join( currentDirectory, 'build' ) ) );
+
+function expectCompilationError( stats ) {
+	expect( stats.hasErrors() ).toBe( true );
+	expect( stats.toString( { errors: true, all: false } ) ).toMatchSnapshot();
+}
 
 describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	'DependencyExtractionWebpackPlugin %s',
@@ -19,19 +41,19 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 		describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 			const testDirectory = path.join( fixturesPath, configCase );
 			const outputDirectory = path.join(
-				__dirname,
+				currentDirectory,
 				'build',
 				moduleMode,
 				configCase
 			);
 
 			beforeEach( () => {
-				rimraf( outputDirectory );
-				mkdirp( outputDirectory );
+				rimrafSync( outputDirectory );
+				mkdirpSync( outputDirectory );
 			} );
 
 			// This afterEach is necessary to prevent watched tests from retriggering on every run.
-			afterEach( () => rimraf( outputDirectory ) );
+			afterEach( () => rimrafSync( outputDirectory ) );
 
 			test( 'should produce expected output', async () => {
 				const options = Object.assign(
@@ -72,15 +94,10 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 					} )
 				);
 
-				/* eslint-disable jest/no-conditional-expect */
 				if ( configCase.includes( 'error' ) ) {
-					expect( stats.hasErrors() ).toBe( true );
-					expect(
-						stats.toString( { errors: true, all: false } )
-					).toMatchSnapshot();
+					expectCompilationError( stats );
 					return;
 				}
-				/* eslint-enable jest/no-conditional-expect */
 
 				if ( stats.hasErrors() ) {
 					throw new Error(
@@ -139,7 +156,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	( moduleMode ) => {
 		const fixtureDirectory = path.join( fixturesPath, 'style-cache-group' );
 		const workingDirectory = path.join(
-			__dirname,
+			currentDirectory,
 			'build',
 			moduleMode,
 			'style-cache-group-version'
@@ -147,8 +164,8 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 		const sourceDirectory = path.join( workingDirectory, 'src' );
 
 		beforeEach( () => {
-			rimraf( workingDirectory );
-			mkdirp( sourceDirectory );
+			rimrafSync( workingDirectory );
+			mkdirpSync( sourceDirectory );
 			for ( const file of [ 'index.js', 'style.css' ] ) {
 				fs.copyFileSync(
 					path.join( fixtureDirectory, file ),
@@ -157,7 +174,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 			}
 		} );
 
-		afterEach( () => rimraf( workingDirectory ) );
+		afterEach( () => rimrafSync( workingDirectory ) );
 
 		const build = async ( outputDirectory ) => {
 			const options = Object.assign(

@@ -1,11 +1,18 @@
 /**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
-const {
-	camelCaseDash,
-	defaultRequestToExternal,
-	defaultRequestToHandle,
-} = require( '../lib/util' );
+const { camelCaseDash, defaultRequestToExternal, defaultRequestToHandle } =
+	createRequire( import.meta.url )( '../lib/util' );
 
 describe( 'camelCaseDash', () => {
 	test( 'does not change a single word', () => {
