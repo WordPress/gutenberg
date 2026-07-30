@@ -69,6 +69,14 @@
 	}
 }
 
+// Rows that pair two number inputs (X/Y, Width/Height). `Stack` has no
+// per-child sizing prop, so give each input an equal share of the row and
+// let it shrink below its content width.
+.media-editor-crop-advanced-panel__row > * {
+	flex: 1;
+	min-width: 0;
+}
+
 // `<SnackbarNotices>` renders `.components-snackbar-list` with
 // `position: absolute; width: 100%`. Portaled to `<body>` it has no
 // positioned ancestor, so it collapses to a 0-size box at the document
