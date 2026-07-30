@@ -260,7 +260,12 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
@@ -343,7 +348,12 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
