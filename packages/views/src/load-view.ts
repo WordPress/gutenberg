@@ -10,7 +10,7 @@ import type { View } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import { generatePreferenceKey } from './preference-keys';
-import { mergeActiveViewOverrides } from './filter-utils';
+import { mergeOverrides } from './filter-utils';
 import type { ViewConfig } from './types';
 
 /**
@@ -53,7 +53,7 @@ export async function loadView( config: ViewConfig ) {
 
 	// Resolve the effective layout type first: a `type` override changes
 	// which layout's defaults apply.
-	const { type: effectiveType } = mergeActiveViewOverrides(
+	const { type: effectiveType } = mergeOverrides(
 		{ ...baseView },
 		activeViewOverrides,
 		defaultView
@@ -62,15 +62,15 @@ export async function loadView( config: ViewConfig ) {
 		defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
 	const layoutTypeDefaults =
 		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
-	const combinedOverrides = { ...layoutTypeDefaults, ...activeViewOverrides };
+	const overrides = { ...layoutTypeDefaults, ...activeViewOverrides };
 
-	return mergeActiveViewOverrides(
+	return mergeOverrides(
 		{
 			...baseView,
 			page,
 			search,
 		},
-		combinedOverrides,
+		overrides,
 		defaultView
 	);
 }

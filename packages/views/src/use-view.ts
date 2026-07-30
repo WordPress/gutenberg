@@ -16,10 +16,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { generatePreferenceKey } from './preference-keys';
-import {
-	mergeActiveViewOverrides,
-	stripActiveViewOverrides,
-} from './filter-utils';
+import { mergeOverrides, stripOverrides } from './filter-utils';
 import type { ViewConfig } from './types';
 
 interface UseViewReturn {
@@ -84,10 +81,10 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
-	const combinedOverrides = useMemo( () => {
+	const overrides = useMemo( () => {
 		// Resolve the effective layout type first: a `type` override changes
 		// which layout's defaults apply.
-		const { type: effectiveType } = mergeActiveViewOverrides(
+		const { type: effectiveType } = mergeOverrides(
 			baseView,
 			activeViewOverrides,
 			defaultView
@@ -101,16 +98,16 @@ export function useView( config: ViewConfig ): UseViewReturn {
 
 	// Merge URL query parameters (page, search) and activeViewOverrides into the view
 	const view: View = useMemo( () => {
-		return mergeActiveViewOverrides(
+		return mergeOverrides(
 			{
 				...baseView,
 				page,
 				search,
 			},
-			combinedOverrides,
+			overrides,
 			defaultView
 		);
-	}, [ baseView, page, search, combinedOverrides, defaultView ] );
+	}, [ baseView, page, search, overrides, defaultView ] );
 
 	const isModified = !! persistedView;
 
@@ -123,9 +120,9 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			};
 			// Strip activeViewOverrides and URL params before persisting
 			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
-			const preferenceView = stripActiveViewOverrides(
+			const preferenceView = stripOverrides(
 				omit( newView, [ 'page', 'search' ] ) as View,
-				combinedOverrides,
+				overrides,
 				defaultView
 			);
 
@@ -140,14 +137,14 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			// Compare with baseView and defaultView after stripping
 			// activeViewOverrides and the URL params (page, search), which the
 			// preference view never carries.
-			const comparableBaseView = stripActiveViewOverrides(
+			const comparableBaseView = stripOverrides(
 				omit( baseView, [ 'page', 'search' ] ) as View,
-				combinedOverrides,
+				overrides,
 				defaultView
 			);
-			const comparableDefaultView = stripActiveViewOverrides(
+			const comparableDefaultView = stripOverrides(
 				omit( defaultView ?? {}, [ 'page', 'search' ] ) as View,
-				combinedOverrides,
+				overrides,
 				defaultView
 			);
 
@@ -166,7 +163,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			search,
 			baseView,
 			defaultView,
-			combinedOverrides,
+			overrides,
 			set,
 			preferenceKey,
 		]

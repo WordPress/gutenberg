@@ -41,7 +41,7 @@ const DEFAULT_BOUND_VALUES = [ 'type', 'perPage', 'fields' ] as const;
  * @param defaultView         The default view configuration.
  * @return A new view with merged overrides, or the original view if no overrides.
  */
-export function mergeActiveViewOverrides(
+export function mergeOverrides(
 	view: View,
 	activeViewOverrides?: ActiveViewOverrides,
 	defaultView?: View
@@ -154,7 +154,7 @@ export function mergeActiveViewOverrides(
  * @param defaultView         The default view configuration.
  * @return A new view with overrides stripped, or the original view if no overrides.
  */
-export function stripActiveViewOverrides(
+export function stripOverrides(
 	view: View,
 	activeViewOverrides?: ActiveViewOverrides,
 	defaultView?: View
