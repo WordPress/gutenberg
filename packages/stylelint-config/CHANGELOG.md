@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Include `plugin-wpds/no-global-css-defense-custom-properties` from `@wordpress/theme` to catch direct use or overrides of `--_gcd-*` (global CSS defense) custom properties.
+-   Include `plugin-wpds/no-global-css-defense-custom-properties` from `@wordpress/theme` to catch direct use or overrides of `--_gcd-*` (global CSS defense) custom properties ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 
 ## 25.0.0 (2026-09-10)
 

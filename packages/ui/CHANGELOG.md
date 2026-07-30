@@ -201,7 +201,7 @@
 
 ### Internal
 
--   Disable `plugin-wpds/no-global-css-defense-custom-properties` for this package so global CSS defense can keep using `--_gcd-*` bridges.
+-   Disable `plugin-wpds/no-global-css-defense-custom-properties` for this package so global CSS defense can keep using `--_gcd-*` bridges ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).
 
