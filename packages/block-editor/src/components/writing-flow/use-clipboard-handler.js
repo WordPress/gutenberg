@@ -5,9 +5,7 @@ import {
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
-	getBlockType,
 	hasBlockSupport,
-	isUnmodifiedDefaultBlock,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import {
@@ -259,26 +257,6 @@ export default function useClipboardHandler() {
 						-1
 					);
 					event.preventDefault();
-					return;
-				}
-
-				// A single pasted block with mergeable text content pastes
-				// into rich text as inline content: let rich text handle
-				// the paste. Within a same-type target, splitting would
-				// merge it anyway, but a cross-type target, like a
-				// paragraph pasted in a list item, would be converted to
-				// the surrounding block type, turning soft line breaks
-				// into separate list items. A block whose content is
-				// untouched is still replaced by the pasted block.
-				if (
-					! hasMultiSelection() &&
-					blocks.length === 1 &&
-					getBlockType( blocks[ 0 ].name )?.merge &&
-					! isUnmodifiedDefaultBlock(
-						getBlocksByClientId( selectedBlockClientIds )[ 0 ],
-						'content'
-					)
-				) {
 					return;
 				}
 
