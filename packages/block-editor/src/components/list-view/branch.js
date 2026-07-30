@@ -5,7 +5,7 @@ import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
-import { memo, useRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
@@ -127,8 +127,6 @@ function ListViewBranch( props ) {
 		draggedClientIds,
 	} = useListViewContext();
 
-	const nextPositionRef = useRef();
-
 	if ( ! canParentExpand ) {
 		return null;
 	}
@@ -139,7 +137,7 @@ function ListViewBranch( props ) {
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
-	nextPositionRef.current = listPosition;
+	let nextPosition = listPosition;
 
 	const rows = [];
 
@@ -171,7 +169,7 @@ function ListViewBranch( props ) {
 		const { clientId, innerBlocks } = block;
 
 		if ( index > 0 ) {
-			nextPositionRef.current += countBlocks(
+			nextPosition += countBlocks(
 				filteredBlocks[ index - 1 ],
 				expandedState,
 				draggedClientIds,
@@ -182,7 +180,7 @@ function ListViewBranch( props ) {
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
 		const { itemInView } = fixedListWindow;
-		const blockInView = itemInView( nextPositionRef.current );
+		const blockInView = itemInView( nextPosition );
 
 		const position = index + 1;
 		const updatedPath =
@@ -259,7 +257,7 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						path={ updatedPath }
 						isExpanded={ isDragged ? false : shouldExpand }
-						listPosition={ nextPositionRef.current }
+						listPosition={ nextPosition }
 						selectedClientIds={ selectedClientIds }
 						isSyncedBranch={ syncedBranch }
 						displacement={ displacement }
@@ -275,7 +273,7 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						level={ level + 1 }
 						path={ updatedPath }
-						listPosition={ nextPositionRef.current + 1 }
+						listPosition={ nextPosition + 1 }
 						fixedListWindow={ fixedListWindow }
 						isBranchSelected={ isSelectedBranch }
 						selectedClientIds={ selectedClientIds }

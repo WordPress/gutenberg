@@ -265,11 +265,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/list-view/branch.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/list-view/drop-indicator.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
