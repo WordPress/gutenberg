@@ -27,17 +27,17 @@ Get hands-on: check out the [block editor live demo](https://wordpress.org/guten
 
 ### Using Gutenberg
 
--   **Download:** To use the latest release of the Gutenberg plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/gutenberg/).
+-   **Download:** To use the latest release of the Gutenberg plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](http://web.archive.org/web/20260718153641/https://wordpress.org/plugins/gutenberg/).
 
 -   **User Documentation:** See the [WordPress Editor documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) for detailed docs on using the editor as an author creating posts and pages.
 
--   **User Support:** If you have run into an issue, you should check the [Support Forums first](https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm it's not a duplicate.
+-   **User Support:** If you have run into an issue, you should check the [Support Forums first](http://web.archive.org/web/20260718044429/https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm it's not a duplicate.
 
 ### Developing for Gutenberg
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-Review the [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) for the fastest way to get started extending the block editor. See the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) for extensive tutorials, documentation, and API references. Also, check the [WordPress Developer Blog](https://developer.wordpress.org/blog/) for great articles about block development, among other topics.
+Review the [Quick Start Guide](http://web.archive.org/web/20260717005659/https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) for the fastest way to get started extending the block editor. See the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) for extensive tutorials, documentation, and API references. Also, check the [WordPress Developer Blog](http://web.archive.org/web/20231208230932/https://developer.wordpress.org/blog/) for great articles about block development, among other topics.
 
 ### Contribute to Gutenberg
 
