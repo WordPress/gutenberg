@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Rename JSX-bearing source files to use the `.jsx` extension.
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 9.36.0 (2026-07-14)
