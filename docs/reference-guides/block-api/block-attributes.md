@@ -118,6 +118,8 @@ The `selector` can be an HTML tag, or anything queryable with [querySelector](ht
 
 For example, a `selector` of `img` will match an `img` element, and `img.class` will match an `img` element that has a class of `class`.
 
+A selector can also match the block's root element itself. For example, if a block saves `<div class="wp-block-myplugin-section" data-section-name="…">`, an attribute sourced from `data-section-name` needs `"selector": "div.wp-block-myplugin-section"` (or simply `"div"`) — without a selector, the block's own attributes are not matched.
+
 Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
 
 To summarize, the `source` determines where data is stored in your content, and the `type` determines what that data is. To reduce the amount of data stored it is usually better to store as much data as possible within HTML rather than as attributes within the comment delimiter.
