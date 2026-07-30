@@ -7,8 +7,9 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
-    -   `ResizableBox` ([#80720](https://github.com/WordPress/gutenberg/pull/80720)).
-    -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))    
+    -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
+    -   `ResizableBox` ([#80720](https://github.com/WordPress/gutenberg/pull/80720))
+       
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Enhancements
