@@ -91,6 +91,12 @@ type DialogInputEvent =
 
 An optional `title` for the dialog. Setting a title will render it in a title bar at the top of the dialog, making it a bit taller. The bar will also include an `x` close button at the top-right corner.
 
+### `size`: `'small' | 'medium' | 'large' | 'fill'`
+
+-   Required: No
+
+Size of the underlying [`Modal`](/packages/components/src/modal/README.md). See `Modal`'s `size` prop for details.
+
 ### `children`: `React.ReactNode`
 
 -   Required: Yes

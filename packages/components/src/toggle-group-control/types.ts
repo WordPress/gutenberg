@@ -117,6 +117,10 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	children: ReactNode;
 	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
+	/**
 	 * The size variant of the control.
 	 *
 	 * @deprecated This prop no longer has any effect.
