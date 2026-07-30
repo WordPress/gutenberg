@@ -9,7 +9,10 @@
 	},
 	"retired": [],
 	"added": {
-		"jest": [],
+		"jest": [
+			"packages/ui/src/form/primitives/searchable-chip-select/test/index.test.tsx",
+			"tools/agents/test/setup-skills.test.js"
+		],
 		"vitest": [
 			"test/unit/config/console.vitest.test.js",
 			"test/unit/config/emotion-serializer.vitest.test.jsx",
