@@ -1070,6 +1070,10 @@ export const __unstableSplitSelection =
 					...head.attributes,
 					...headType.merge( head.attributes, first.attributes ),
 				},
+				// The merge only joins attributes; carry over the inner
+				// blocks of the merged block so they are not lost, e.g. the
+				// nested list of a pasted list item.
+				innerBlocks: [ ...head.innerBlocks, ...first.innerBlocks ],
 			};
 			output.push( head );
 			selection = {
@@ -1080,7 +1084,7 @@ export const __unstableSplitSelection =
 			};
 			clonedBlocks.unshift( ...firstBlocks );
 		} else {
-			if ( ! isUnmodifiedBlock( head ) ) {
+			if ( ! isUnmodifiedBlock( head ) || head.innerBlocks.length ) {
 				output.push( head );
 			}
 			output.push( firstBlock );
@@ -1107,6 +1111,7 @@ export const __unstableSplitSelection =
 						...tail.attributes,
 						...tailType.merge( last.attributes, tail.attributes ),
 					},
+					innerBlocks: [ ...last.innerBlocks, ...tail.innerBlocks ],
 				} );
 				output.push( ...lastBlocks );
 				selection = {
@@ -1118,11 +1123,11 @@ export const __unstableSplitSelection =
 				};
 			} else {
 				output.push( lastBlock );
-				if ( ! isUnmodifiedBlock( tail ) ) {
+				if ( ! isUnmodifiedBlock( tail ) || tail.innerBlocks.length ) {
 					output.push( tail );
 				}
 			}
-		} else if ( ! isUnmodifiedBlock( tail ) ) {
+		} else if ( ! isUnmodifiedBlock( tail ) || tail.innerBlocks.length ) {
 			output.push( tail );
 		}
 
