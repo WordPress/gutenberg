@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1199,
-	"sha256": "e4b4f852535cfa8a90379840c5b27f48b67de52ba79261af6a1b7d2315c9b279",
+	"count": 1187,
+	"sha256": "dbf2b11f1b19134d641178dfca430a86c1af4f9b381a6ff3e4a6309cb821303a",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -811,7 +811,6 @@
 		"packages/customize-widgets/src/components/block-inspector-button/index.js",
 		"packages/customize-widgets/src/components/customize-widgets/index.js",
 		"packages/customize-widgets/src/components/error-boundary/index.js",
-		"packages/customize-widgets/src/components/error-boundary/test/error-boundary.js",
 		"packages/customize-widgets/src/components/focus-control/index.js",
 		"packages/customize-widgets/src/components/header/index.js",
 		"packages/customize-widgets/src/components/inserter/index.js",
@@ -930,7 +929,6 @@
 		"packages/edit-widgets/src/blocks/widget-area/edit/index.js",
 		"packages/edit-widgets/src/blocks/widget-area/edit/inner-blocks.js",
 		"packages/edit-widgets/src/components/error-boundary/index.js",
-		"packages/edit-widgets/src/components/error-boundary/test/error-boundary.js",
 		"packages/edit-widgets/src/components/header/document-tools/index.js",
 		"packages/edit-widgets/src/components/header/index.js",
 		"packages/edit-widgets/src/components/header/undo-redo/redo.js",
@@ -1174,10 +1172,6 @@
 		"packages/editor/src/hooks/push-changes-to-global-styles/index.js",
 		"packages/editor/src/hooks/template-part-navigation-edit-button.js",
 		"packages/editor/src/store/test/selectors.js",
-		"packages/element/src/test/index.js",
-		"packages/element/src/test/platform.js",
-		"packages/element/src/test/raw-html.js",
-		"packages/element/src/test/serialize.js",
 		"packages/format-library/src/bold/index.js",
 		"packages/format-library/src/code/index.js",
 		"packages/format-library/src/image/index.js",
@@ -1187,7 +1181,6 @@
 		"packages/format-library/src/link/css-classes-setting.js",
 		"packages/format-library/src/link/index.js",
 		"packages/format-library/src/link/inline.js",
-		"packages/format-library/src/link/test/css-classes-setting.js",
 		"packages/format-library/src/math/index.js",
 		"packages/format-library/src/non-breaking-space/index.js",
 		"packages/format-library/src/strikethrough/index.js",
@@ -1196,11 +1189,6 @@
 		"packages/format-library/src/text-color/index.js",
 		"packages/format-library/src/text-color/inline.js",
 		"packages/format-library/src/underline/index.js",
-		"packages/format-library/src/unknown/index.js",
-		"packages/nux/src/components/dot-tip/test/index.js",
-		"packages/plugins/src/components/test/plugin-area.js",
-		"packages/viewport/src/test/if-viewport-matches.js",
-		"packages/viewport/src/test/with-viewport-match.js",
-		"test/integration/helpers/integration-test-editor.js"
+		"packages/format-library/src/unknown/index.js"
 	]
 }
