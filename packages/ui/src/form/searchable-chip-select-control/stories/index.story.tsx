@@ -7,9 +7,14 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 	title: 'Design System/Components/Form/SearchableChipSelectControl',
 	component: SearchableChipSelectControl,
 	subcomponents: {
+		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
+		'SearchableChipSelectControl.GroupLabel':
+			SearchableChipSelectControl.GroupLabel,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,
+		'SearchableChipSelectControl.Collection':
+			SearchableChipSelectControl.Collection,
 	},
 	argTypes: {
 		items: { control: false },
@@ -66,5 +71,22 @@ export const WithoutClearButton: Story = {
 	args: {
 		...Default.args,
 		...SearchableChipSelectStories.WithoutClearButton.args,
+	},
+};
+
+/**
+ * Options can be organized into labeled groups with
+ * `SearchableChipSelectControl.Group`, `SearchableChipSelectControl.GroupLabel`,
+ * and `SearchableChipSelectControl.Collection`. Pass an array of groups to
+ * `items` (each with `label` and `items` properties), and use `children` to
+ * render each group.
+ */
+export const Grouped: Story = {
+	...SearchableChipSelectStories.Grouped,
+	args: {
+		...Default.args,
+		...SearchableChipSelectStories.Grouped.args,
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
 	},
 };
