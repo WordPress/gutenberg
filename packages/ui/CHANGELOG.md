@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add `no-global-css-defense-custom-properties` stylelint rule that disallows using or overriding `--_gcd-*` (global CSS defense) custom properties. Available as `@wordpress/ui/stylelint-plugins/no-global-css-defense-custom-properties` ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 -   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).
 -   Add `Autocomplete.Row` primitive ([#80490](https://github.com/WordPress/gutenberg/pull/80490)).
@@ -22,7 +23,6 @@
 
 ### Internal
 
--   Disable `plugin-wpds/no-global-css-defense-custom-properties` for this package so global CSS defense can keep using `--_gcd-*` bridges ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).

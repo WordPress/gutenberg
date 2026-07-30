@@ -19,7 +19,8 @@
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" },
-		{ "path": "../theme" }
+		{ "path": "../theme" },
+		{ "path": "./tsconfig.plugins.json" }
 	],
 	"files": [ "global.d.ts" ],
 	"exclude": []

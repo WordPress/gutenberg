@@ -253,6 +253,34 @@ When designing props for a new component:
     ```
 -   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
 
+## Stylelint Plugins
+
+These rules guard against misuse of `@wordpress/ui` internals in CSS. Enable them in your Stylelint configuration:
+
+```json
+{
+	"plugins": [
+		"@wordpress/ui/stylelint-plugins/no-global-css-defense-custom-properties"
+	],
+	"rules": {
+		"plugin-wpds/no-global-css-defense-custom-properties": true
+	}
+}
+```
+
+`@wordpress/stylelint-config` enables this rule by default.
+
+For rules that validate Design System token usage (`--wpds-*`), see the [Stylelint plugins in `@wordpress/theme`](../theme/README.md#stylelint-plugins).
+
+### `plugin-wpds/no-global-css-defense-custom-properties`
+
+Reports references to and definitions of `--_gcd-*` custom properties. These are an internal global CSS defense bridge used by this package to resist unlayered wp-admin element styles — not a public theming API.
+
+-   **Do not use** `var(--_gcd-*)` — use Design System tokens (`--wpds-*`) instead.
+-   **Do not set** `--_gcd-*: …` — customize theme values via `ThemeProvider` instead.
+
+This package disables the rule for its own stylesheets via `.stylelintrc.mjs`.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

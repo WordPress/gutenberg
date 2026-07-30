@@ -216,17 +216,17 @@ These rules validate design token usage in CSS. Enable them in your Stylelint co
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
 		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
-		"@wordpress/theme/stylelint-plugins/no-token-fallback-values",
-		"@wordpress/theme/stylelint-plugins/no-global-css-defense-custom-properties"
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
 		"plugin-wpds/no-setting-wpds-custom-properties": true,
-		"plugin-wpds/no-token-fallback-values": true,
-		"plugin-wpds/no-global-css-defense-custom-properties": true
+		"plugin-wpds/no-token-fallback-values": true
 	}
 }
 ```
+
+For rules that guard `@wordpress/ui` internals (such as `--_gcd-*` global CSS defense properties), see the [Stylelint plugins in `@wordpress/ui`](../ui/README.md#stylelint-plugins).
 
 ### `plugin-wpds/no-unknown-ds-tokens`
 
@@ -239,10 +239,6 @@ Reports definitions or overrides in the `--wpds-*` namespace.
 ### `plugin-wpds/no-token-fallback-values`
 
 Reports manual fallbacks that can drift from the generated values.
-
-### `plugin-wpds/no-global-css-defense-custom-properties`
-
-Reports references to and definitions of `--_gcd-*` custom properties. These are an internal `@wordpress/ui` global CSS defense bridge — use `--wpds-*` tokens in styles, and customize theme values via `ThemeProvider` instead of overriding `--_gcd-*`.
 
 ## Build Plugins
 

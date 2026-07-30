@@ -27,7 +27,9 @@
 		"build",
 		"build-module",
 		"build-types",
-		"*.md"
+		"stylelint-plugins",
+		"*.md",
+		"!build-types/**/*.d.mts.map"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -36,6 +38,10 @@
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
+		},
+		"./stylelint-plugins/no-global-css-defense-custom-properties": {
+			"types": "./build-types/stylelint-plugins/no-global-css-defense-custom-properties.d.mts",
+			"default": "./stylelint-plugins/no-global-css-defense-custom-properties.mjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -67,15 +73,20 @@
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"fast-glob": "^3.2.7",
-		"storybook": "^10.4.3"
+		"storybook": "^10.4.3",
+		"stylelint": "^16.26.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",
-		"react-dom": "^18 || ^19"
+		"react-dom": "^18 || ^19",
+		"stylelint": "^16 || ^17"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"stylelint": {
 			"optional": true
 		}
 	},
