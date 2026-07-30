@@ -32,8 +32,6 @@ function getJavaScriptFiles() {
 			'ls-files',
 			'-z',
 			'--cached',
-			'--others',
-			'--exclude-standard',
 			'--',
 			'*.js',
 		],
