@@ -14,6 +14,9 @@
 
 ### Documentation
 
+-   Describe an action as a verb with one fulfillment rather than as a link,
+    and separate the host's three decisions (fulfillment, materialization,
+    placement); add diagrams for both.
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add an Actions doc page and a `WithActions` story, and cover `actions`
     in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).

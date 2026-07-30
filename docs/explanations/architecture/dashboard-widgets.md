@@ -33,7 +33,7 @@ The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is 
 
 Unlike the other translatable strings, `help` is an object: `content` plus optional `links`, meant for compact surfaces such as tooltips.
 
-`actions`: declarative links (`id`, `label`, `href`, optional `download` / `openInNewTab`). Hosts place them; the dashboard uses a "More" menu. A relative `href` that exists under `widgets/{name}/` becomes a plugin URL at registration; missing relative non-admin files are dropped. `data:` and `javascript:` hrefs are rejected. Prefer absolute URLs for assets that must work in the plugin zip (which does not ship `widgets/`).
+`actions`: declarative verbs (`id`, `label`, plus exactly one fulfillment key). Today the only key is `href`, a link target, with optional `download` / `openInNewTab`. Hosts mount the primitive and place it; the dashboard uses a "More" menu. A relative `href` that exists under `widgets/{name}/` becomes a plugin URL at registration; missing relative non-admin files are dropped. `data:` and `javascript:` hrefs are rejected. Prefer absolute URLs for assets that must work in the plugin zip (which does not ship `widgets/`).
 
 `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
 
