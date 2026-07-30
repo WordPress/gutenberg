@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support JSX files in direct build entry naming and default unit-test lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ### Internal
 
 -   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -22,8 +26,7 @@
 
 ### Enhancements
 
--       `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
--   Support JSX files in direct build entry naming and default unit-test lint configuration.
+- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 33.0.0 (2026-07-14)
 

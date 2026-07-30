@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Resolve `.jsx` modules when generating package documentation.
+-   Resolve `.jsx` modules when generating package documentation ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ## 2.54.0 (2026-08-26)
 

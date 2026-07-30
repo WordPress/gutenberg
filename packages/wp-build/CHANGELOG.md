@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ### Bug Fixes
 
 -   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
@@ -26,7 +30,6 @@
 
 ### Enhancements
 
--   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds.
 -   Widgets: carry an action's `icon` and `relevance` from `widget.json`
     into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 25.10.0 (2026-08-26)
 
 ### Bug Fixes
@@ -22,10 +26,6 @@
 
 -   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
 -   Update `use-recommended-components` rule to allow `Calendar` and `RangeCalendar` from `@wordpress/ui` ([#81337](https://github.com/WordPress/gutenberg/pull/81337)).
-
-### Bug Fixes
-
--   Apply test-only DOM global exceptions to both JavaScript and JSX test files.
 
 ## 25.8.0 (2026-07-29)
 
