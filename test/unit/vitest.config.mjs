@@ -266,6 +266,10 @@ export default defineConfig( {
 					name: 'node',
 					environment: 'node',
 					include: vitestTests.node,
+					setupFiles: path.join(
+						ROOT_DIR,
+						'test/unit/config/gutenberg-env.js'
+					),
 				},
 			},
 		],

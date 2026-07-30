@@ -1,9 +1,7 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import getGlobalStylesChanges, {
-	getGlobalStylesChangelist,
-} from '../utils/get-global-styles-changes';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -13,6 +11,13 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import getGlobalStylesChanges, {
+	getGlobalStylesChangelist,
+} from '../utils/get-global-styles-changes';
 
 describe( 'getGlobalStylesChanges and utils', () => {
 	const next = {
@@ -195,6 +200,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 	beforeEach( () => {
 		registerBlockType( 'core/test-fiori-di-zucca', {
 			apiVersion: 3,
+			attributes: {},
 			save: () => {},
 			category: 'text',
 			title: 'Test pumpkin flowers',

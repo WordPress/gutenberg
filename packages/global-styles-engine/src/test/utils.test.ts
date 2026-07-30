@@ -4,6 +4,11 @@
  */
 
 /**
+ * External dependencies
+ */
+import { describe, expect, it, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import type { GlobalStylesConfig } from '../types';
