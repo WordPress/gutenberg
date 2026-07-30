@@ -26,6 +26,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {string}        titlePlaceholder                       Empty title placeholder
  * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
  * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
+ * @property {boolean}       blockStatesEnabled                     Whether or not the block-level style states control is rendered
  * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
  * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
  * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
