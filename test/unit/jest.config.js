@@ -21,6 +21,19 @@ const transpiledPackageNames = glob(
 	return relative.split( path.sep )[ 1 ];
 } );
 
+const dependenciesToTransform = [
+	'@ariakit/test',
+	'@ariakit/utils',
+	'@preact',
+	'comctx',
+	'docker-compose',
+	'marked',
+	'parsel-js',
+	'preact',
+	'uuid',
+	'yaml',
+];
+
 // Make sure the tests run in UTC timezone, regardless of the system timezone.
 process.env.TZ = 'UTC';
 
@@ -99,7 +112,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked|@ariakit/(test|utils))/)',
+		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
