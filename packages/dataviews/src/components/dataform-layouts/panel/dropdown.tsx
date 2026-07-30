@@ -24,7 +24,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function DropdownHeader( {
@@ -68,7 +68,7 @@ function DropdownContentWithValidation( {
 	children: React.ReactNode;
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
-	useReportValidity( ref, touched );
+	useRevealValidity( ref, touched );
 	return <div ref={ ref }>{ children }</div>;
 }
 

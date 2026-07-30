@@ -19,9 +19,9 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
 	ToolsPanelHeaderProps,
@@ -36,7 +36,11 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
+	const resetSuffix = (
+		<span aria-hidden className={ styles[ 'reset-label' ] }>
+			{ __( 'Reset' ) }
+		</span>
+	);
 
 	return (
 		<>
