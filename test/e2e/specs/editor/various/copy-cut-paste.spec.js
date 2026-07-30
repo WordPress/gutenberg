@@ -864,4 +864,95 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	test( 'should not lose nested blocks when pasting a block into text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'aaa' } },
+				{
+					name: 'core/list-item',
+					attributes: { content: 'two' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'nested' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		// Select and copy the whole second item, nested list included.
+		await editor.canvas.getByText( 'two', { exact: true } ).click();
+		await page.keyboard.press( 'Escape' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/list-item' ] );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// Paste at the start of the first item.
+		await editor.canvas
+			.getByText( 'aaa', { exact: true } )
+			.click( { position: { x: 1, y: 8 } } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The pasted item keeps its nested list.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'aaa' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
 } );
