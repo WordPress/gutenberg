@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -14,17 +15,21 @@ import { useViewportMatch } from '@wordpress/compose';
 import '../store';
 import ifViewportMatches from '../if-viewport-matches';
 
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match' );
+vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const mockedUseViewportMatch = vi.mocked( useViewportMatch );
 
 describe( 'ifViewportMatches()', () => {
 	const Component = () => <div>Hello</div>;
 
 	afterEach( () => {
-		useViewportMatch.mockClear();
+		mockedUseViewportMatch.mockClear();
 	} );
 
 	it( 'should not render if query does not match', () => {
-		useViewportMatch.mockReturnValueOnce( false );
+		mockedUseViewportMatch.mockReturnValueOnce( false );
 		const EnhancedComponent = ifViewportMatches( '< wide' )( Component );
 		render( <EnhancedComponent /> );
 
@@ -34,7 +39,7 @@ describe( 'ifViewportMatches()', () => {
 	} );
 
 	it( 'should render if query does match', () => {
-		useViewportMatch.mockReturnValueOnce( true );
+		mockedUseViewportMatch.mockReturnValueOnce( true );
 		const EnhancedComponent = ifViewportMatches( '>= wide' )( Component );
 		render( <EnhancedComponent /> );
 

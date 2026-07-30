@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -48,7 +49,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 	it( 'shows input when toggled on and calls onChange when typing', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CSSClassesSettingComponent
@@ -94,7 +95,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 	it( 'hides input and clears value when toggled off with existing value', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CSSClassesSettingComponent

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 /**
@@ -12,30 +13,11 @@ import type { WidgetModuleRecord } from '../../types';
 
 const LocationControl = () => null;
 
-jest.mock(
-	'test-widget/widget-module',
-	() => ( {
-		__esModule: true,
-		default: {
-			apiVersion: 1,
-			title: 'Store',
-			attributes: [
-				{
-					id: 'location',
-					label: 'Location',
-					type: 'test/location',
-				},
-				{ id: 'label', label: 'Label', type: 'text' },
-			],
-		},
-	} ),
-	{ virtual: true }
-);
-
 const records: WidgetModuleRecord[] = [
 	{
 		name: 'test/store',
-		widget_module: 'test-widget/widget-module',
+		widget_module:
+			'/packages/widget-primitives/src/hooks/test/fixtures/widget-module.mjs',
 		render_module: 'test-widget/render-module',
 	},
 ];
