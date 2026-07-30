@@ -1,7 +1,18 @@
+/**
+ * External dependencies
+ */
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { act, render, screen } from '@testing-library/react';
-import { click } from '@ariakit/test';
+
+/**
+ * WordPress dependencies
+ */
 import { useEffect, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import SnackbarList from '../list';
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
@@ -36,7 +47,7 @@ describe( 'SnackbarList', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getAllByRole( 'button', {
 				name: 'Dismiss this notice',
 			} )[ 0 ]
