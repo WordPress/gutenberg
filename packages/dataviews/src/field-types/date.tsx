@@ -21,6 +21,7 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import isValidRequired from './utils/is-valid-required';
+import { isValidMaxDate, isValidMinDate } from './utils/is-valid-date-boundary';
 import render from './utils/render-default';
 
 const format = {
@@ -91,5 +92,7 @@ export default {
 	validate: {
 		required: isValidRequired,
 		elements: isValidElements,
+		min: isValidMinDate,
+		max: isValidMaxDate,
 	},
 } satisfies FieldType< any >;

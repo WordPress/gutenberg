@@ -3,7 +3,7 @@
  */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 
 /**
@@ -47,7 +47,7 @@ function IsolatedEditButton( {
 				variant="secondary"
 				onClick={ handleClick }
 			>
-				{ __( 'Edit section' ) }
+				{ __( 'Edit original' ) }
 			</Button>
 		</VStack>
 	);
@@ -59,11 +59,15 @@ function InlineEditButton( {
 	editContentOnlySection,
 	stopEditingContentOnlySection,
 } ) {
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( ! editedContentOnlySection ) {
 			editContentOnlySection( clientId );
+			selectBlock( clientId );
 		} else {
 			stopEditingContentOnlySection();
+			// Keep the selected section pattern or content block selected after exiting.
+			selectBlock( clientId );
 		}
 	};
 
@@ -76,8 +80,10 @@ function InlineEditButton( {
 				onClick={ handleClick }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit section' )
-					: __( 'Edit section' ) }
+					? /* translators: Button label to leave pattern editing mode. */
+					  __( 'Exit pattern' )
+					: /* translators: Button label to enter pattern editing mode. */
+					  __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
 	);
@@ -92,19 +98,21 @@ export default function EditContents( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { block, onNavigateToEntityRecord } = useSelect(
+	const { block, onNavigateToEntityRecord, canEdit } = useSelect(
 		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
+			const { getBlock, getSettings, canEditBlock } =
+				select( blockEditorStore );
 			return {
 				block: getBlock( clientId ),
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
+				canEdit: canEditBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	if ( ! isWithinSection && ! isWithinEditedSection ) {
+	if ( ! canEdit || ( ! isWithinSection && ! isWithinEditedSection ) ) {
 		return null;
 	}
 

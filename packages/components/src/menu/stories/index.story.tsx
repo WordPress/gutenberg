@@ -55,6 +55,11 @@ const meta: Meta< typeof Menu > = {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
 		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
+		},
 	},
 };
 export default meta;
@@ -508,7 +513,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { envelope } from '@wordpress/icons';
@@ -18,6 +18,7 @@ export default function Email< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	return (
@@ -27,11 +28,12 @@ export default function Email< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				markWhenOptional,
 				validity,
 				type: 'email',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ envelope } />
+						<WCIcon icon={ envelope } />
 					</InputControlPrefixWrapper>
 				),
 			} }

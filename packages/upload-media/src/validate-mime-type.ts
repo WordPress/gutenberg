@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { UploadError } from './upload-error';
+import { ErrorCode, UploadError } from './upload-error';
 
 /**
  * Verifies if the caller (e.g. a block) supports this mime type.
@@ -31,7 +31,7 @@ export function validateMimeType( file: File, allowedTypes?: string[] ) {
 
 	if ( file.type && ! isAllowedType ) {
 		throw new UploadError( {
-			code: 'MIME_TYPE_NOT_SUPPORTED',
+			code: ErrorCode.MIME_TYPE_NOT_SUPPORTED,
 			message: sprintf(
 				// translators: %s: file name.
 				__( '%s: Sorry, this file type is not supported here.' ),

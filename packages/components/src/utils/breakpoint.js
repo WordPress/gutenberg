@@ -4,7 +4,7 @@
 import breakpoints from './breakpoint-values';
 
 /**
- * @param {keyof breakpoints} point
+ * @param {keyof typeof breakpoints} point
  * @return {string} Media query declaration.
  */
 export const breakpoint = ( point ) =>

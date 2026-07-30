@@ -314,19 +314,19 @@ export default function PostSummary( { onActionPerformed } ) {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<VStack spacing={ 4 }>
+						<Stack direction="column" gap="lg">
 							<PostCardPanel
 								onActionPerformed={ onActionPerformed }
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
-							<VStack spacing={ 1 }>
+							<Stack direction="column" gap="xs">
 								<PostContentInformation />
 								<PostLastEditedPanel />
-							</VStack>
+							</Stack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 2 }>
-									<VStack spacing={ 1 }>
+								<Stack direction="column" gap="sm">
+									<Stack direction="column" gap="xs">
 										<PostStatusPanel />
 										<PostSchedulePanel />
 										<PostURLPanel />
@@ -340,12 +340,12 @@ export default function PostSummary( { onActionPerformed } ) {
 										<SiteDiscussion />
 										<PostFormatPanel />
 										<PostStickyPanel />
-									</VStack>
+									</Stack>
 									<TemplateAreas />
 									{ fills }
-								</VStack>
+								</Stack>
 							) }
-						</VStack>
+						</Stack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>

@@ -35,23 +35,7 @@ const getTabbableContainerTabbables = () => [
 	screen.getByRole( 'link', { name: 'Item 4' } ),
 ];
 
-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-
 describe( 'TabbableContainer', () => {
-	beforeAll( () => {
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	it( 'moves focus on its tabbable children by using the tab key', async () => {
 		const user = userEvent.setup();
 

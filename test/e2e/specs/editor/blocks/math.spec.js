@@ -68,10 +68,16 @@ test.describe( 'Math Block', () => {
 			},
 		] );
 
-		await expect( page.locator( '[aria-live="polite"]' ) ).toHaveText(
-			`Error parsing mathematical expression: Expected 'EOF', got '&' at position 1: &̲x^2`
+		// The parsing error is surfaced once the field is blurred.
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect(
+			page.getByRole( 'textbox', { name: 'LaTeX math syntax' } )
+		).toHaveAccessibleDescription(
+			`Expected 'EOF', got '&' at position 1: &̲x^2`
 		);
 
+		// Fix syntax error.
+		await page.keyboard.press( 'Backspace' );
 		// Can delete the math block.
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await page.keyboard.press( 'Backspace' );

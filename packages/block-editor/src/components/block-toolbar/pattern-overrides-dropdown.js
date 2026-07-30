@@ -4,7 +4,7 @@
 import {
 	Popover,
 	ToolbarButton,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
@@ -22,7 +22,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {Object} props            Component props.
  * @param {Array}  props.clientIds  The client IDs of selected blocks.
  * @param {string} props.blockTitle The display title of the block.
- * @return {JSX.Element} The popover content.
+ * @return {React.JSX.Element} The popover content.
  */
 function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 	const blockMetaName = useSelect(
@@ -48,18 +48,18 @@ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 		description = __( 'These blocks are editable using overrides.' );
 	}
 
-	return <Text>{ description }</Text>;
+	return <WCText>{ description }</WCText>;
 }
 
 /**
  * Renders a toolbar button that displays information about pattern overrides in a popover.
  *
- * @param {Object}      props            Component props.
- * @param {JSX.Element} props.icon       The icon element to display.
- * @param {Array}       props.clientIds  The client IDs of selected blocks.
- * @param {string}      props.blockTitle The display title of the block.
- * @param {string}      props.label      The label for the button.
- * @return {JSX.Element} The pattern overrides button component.
+ * @param {Object}            props            Component props.
+ * @param {React.JSX.Element} props.icon       The icon element to display.
+ * @param {Array}             props.clientIds  The client IDs of selected blocks.
+ * @param {string}            props.blockTitle The display title of the block.
+ * @param {string}            props.label      The label for the button.
+ * @return {React.JSX.Element} The pattern overrides button component.
  */
 export default function PatternOverridesDropdown( {
 	icon,

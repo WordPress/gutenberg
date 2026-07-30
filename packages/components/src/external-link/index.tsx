@@ -23,17 +23,7 @@ function UnforwardedExternalLink(
 	>,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
-	const { href, children, className, rel = '', ...additionalProps } = props;
-	const optimizedRel = [
-		...new Set(
-			[
-				...rel.split( ' ' ),
-				'external',
-				'noreferrer',
-				'noopener',
-			].filter( Boolean )
-		),
-	].join( ' ' );
+	const { href, children, className, ...additionalProps } = props;
 	const classes = clsx( 'components-external-link', className );
 	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
@@ -60,14 +50,17 @@ function UnforwardedExternalLink(
 			href={ href }
 			onClick={ onClickHandler }
 			target="_blank"
-			rel={ optimizedRel }
 			ref={ ref }
 		>
 			<span className="components-external-link__contents">
 				{ children }
 			</span>
 			<span
-				className="components-external-link__icon"
+				className={ clsx(
+					'components-external-link__icon',
+					// This class prevents the arrow from being replaced by a Twemoji image.
+					'wp-exclude-emoji'
+				) }
 				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )

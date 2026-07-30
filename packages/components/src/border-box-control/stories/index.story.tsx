@@ -25,6 +25,10 @@ const meta: Meta< typeof BorderBoxControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -53,7 +57,6 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	return (
 		<>
 			<BorderBoxControl
-				__next40pxDefaultSize
 				{ ...otherProps }
 				onChange={ onChangeMerged }
 				value={ borders }
@@ -86,5 +89,4 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
-	__next40pxDefaultSize: true,
 };

@@ -18,9 +18,11 @@ export default function Toggle< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -31,12 +33,14 @@ export default function Toggle< Item >( {
 	return (
 		<ValidatedToggleControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
 			onChange={ onChangeControl }
+			disabled={ disabled }
 		/>
 	);
 }

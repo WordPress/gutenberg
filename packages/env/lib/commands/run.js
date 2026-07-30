@@ -13,13 +13,14 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
 /**
  * Runs an arbitrary command on the given Docker container.
  *
- * @param {Object}   options
- * @param {string}   options.container The Docker container to run the command on.
- * @param {string[]} options.command   The command to run.
- * @param {string[]} options.'--'      Any arguments that were passed after a double dash.
- * @param {string}   options.envCwd    The working directory for the command to be executed from.
- * @param {Object}   options.spinner   A CLI spinner which indicates progress.
- * @param {boolean}  options.debug     True if debug mode is enabled.
+ * @param {Object}      options
+ * @param {string}      options.container The Docker container to run the command on.
+ * @param {string[]}    options.command   The command to run.
+ * @param {string[]}    options.'--'      Any arguments that were passed after a double dash.
+ * @param {string}      options.envCwd    The working directory for the command to be executed from.
+ * @param {Object}      options.spinner   A CLI spinner which indicates progress.
+ * @param {boolean}     options.debug     True if debug mode is enabled.
+ * @param {string|null} options.config    Path to a custom .wp-env.json configuration file.
  */
 module.exports = async function run( {
 	container,
@@ -28,8 +29,9 @@ module.exports = async function run( {
 	envCwd,
 	spinner,
 	debug,
+	config: customConfigPath,
 } ) {
-	const config = await loadConfig( path.resolve( '.' ) );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 	const runtime = getRuntime(
 		await detectRuntime( config.workDirectoryPath )
 	);

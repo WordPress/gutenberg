@@ -5,7 +5,12 @@ import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Type } from '@wordpress/core-data';
-import type { View, Filter } from '@wordpress/dataviews';
+import type {
+	View,
+	Filter,
+	SupportedLayouts,
+	ViewTable,
+} from '@wordpress/dataviews';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -19,10 +24,20 @@ const DEFAULT_VIEW: View = {
 	descriptionField: 'excerpt',
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
+const DEFAULT_TABLE_LAYOUT: Omit< ViewTable, 'type' > = {
+	layout: {
+		styles: {
+			author: {
+				align: 'start',
+			},
+		},
+	},
+};
+
+export const DEFAULT_LAYOUTS: SupportedLayouts = {
+	table: DEFAULT_TABLE_LAYOUT,
+	grid: true,
+	list: true,
 };
 
 export const DEFAULT_VIEWS: {
@@ -55,17 +70,30 @@ export const DEFAULT_VIEWS: {
 	},
 ];
 
-export function getActiveFiltersForTab( slug: string ): Filter[] {
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+	layout?: Record< string, unknown >;
+};
+
+export function getActiveViewOverridesForTab(
+	slug: string
+): ActiveViewOverrides {
 	if ( slug === 'all' ) {
-		return [];
+		return {
+			...DEFAULT_TABLE_LAYOUT,
+		};
 	}
-	return [
-		{
-			field: 'status',
-			operator: 'is',
-			value: slug,
-		},
-	];
+	return {
+		...DEFAULT_TABLE_LAYOUT,
+		filters: [
+			{
+				field: 'status',
+				operator: 'is',
+				value: slug,
+			},
+		],
+	};
 }
 
 export function getDefaultView( postType: Type | undefined ): View {
@@ -87,13 +115,13 @@ export async function ensureView(
 		name: type,
 		slug: 'default-new',
 		defaultView,
-		activeFilters: getActiveFiltersForTab( slug ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTab( slug ?? 'all' ),
 		queryParams: search,
 	} );
 }
 
 export function viewToQuery( view: View, postType: string ) {
-	const result: Record< string, any > = {};
+	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
 	// Pagination, sorting, search.
 	if ( undefined !== view.perPage ) {

@@ -1,42 +1,69 @@
 const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
 const tokenList = tokenListModule.default || tokenListModule;
 
-const DS_TOKEN_PREFIX = 'wpds-';
+const {
+	DS_TOKEN_PREFIX,
+	collectTokenOccurrences,
+	getStaticNodeValue,
+	wpdsTokensRegex,
+} = require( '../utils/ds-token-utils' );
+
+const knownTokens = new Set( tokenList );
 
 /**
- * Extracts all unique CSS custom properties (variables) from a given CSS value string,
- * including those in fallback positions, optionally filtering by a specific prefix.
- *
- * @param {string} value       - The CSS value string to search for variables.
- * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
- * @return {Set<string>} A Set of unique matched CSS variable names (e.g., Set { '--wpds-token' }).
- *
- * @example
- * extractCSSVariables(
- *   'border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback)); ' +
- *   'color: var(--wpds-color-fg, black); ' +
- *   'background: var(--unrelated-bg);',
- *   'wpds'
- * );
- * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
+ * @param {Array<{ token: string, bare: boolean, declaration: boolean }>} occurrences
+ * @param {{ includeBareTokens?: boolean }}                               [options]
  */
-function extractCSSVariables( value, prefix = '' ) {
-	const regex = /--[\w-]+/g;
-	const variables = new Set();
+function getInvalidTokenNames(
+	occurrences,
+	{ includeBareTokens = true } = {}
+) {
+	const unknownTokens = new Set();
+	const bareTokens = new Set();
 
-	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		const variableName = match[ 0 ];
-		if ( variableName.startsWith( `--${ prefix }` ) ) {
-			variables.add( variableName );
+	for ( const { token, bare, declaration } of occurrences ) {
+		if ( ! knownTokens.has( token ) ) {
+			unknownTokens.add( token );
+			continue;
+		}
+
+		if ( includeBareTokens && bare && ! declaration ) {
+			bareTokens.add( token );
 		}
 	}
 
-	return variables;
+	return {
+		unknownTokens: [ ...unknownTokens ],
+		bareTokens: [ ...bareTokens ],
+	};
 }
 
-const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+/**
+ * @param {string[]} tokenNames
+ */
+function formatTokenNames( tokenNames ) {
+	return tokenNames.map( ( token ) => `'${ token }'` ).join( ', ' );
+}
+
+/**
+ * @param {import('eslint').Rule.RuleContext} context
+ * @param {import('estree').Node}             node
+ * @param {'onlyKnownTokens' | 'bareToken'}   messageId
+ * @param {string[]}                          tokenNames
+ */
+function reportTokenNames( context, node, messageId, tokenNames ) {
+	if ( tokenNames.length === 0 ) {
+		return;
+	}
+
+	context.report( {
+		node,
+		messageId,
+		data: {
+			tokenNames: formatTokenNames( tokenNames ),
+		},
+	} );
+}
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
@@ -48,53 +75,110 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		messages: {
 			onlyKnownTokens:
 				'The following CSS variables are not valid Design System tokens: {{ tokenNames }}',
+			dynamicToken:
+				'Design System tokens must not be dynamically constructed, as they cannot be statically verified for correctness or processed automatically to inject fallbacks.',
+			bareToken:
+				'Design System tokens must be wrapped in `var()` for build-time fallback injection to work: {{ tokenNames }}',
 		},
 	},
 	create( context ) {
-		const disallowedTokensAST = `JSXAttribute[name.name="style"] :matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const dynamicTemplateLiteralAST = `TemplateLiteral[expressions.length>0]:has(TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const staticTokensAST = `:matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral[expressions.length=0] TemplateElement[value.raw=${ wpdsTokensRegex }])`;
+		const dynamicTokenEndRegex = new RegExp(
+			`--${ DS_TOKEN_PREFIX }[\\w-]*$`
+		);
+
 		return {
+			/**
+			 * For template literals with expressions, check each quasi
+			 * individually: flag as dynamic only when a `--wpds-*` token
+			 * name is split across a quasi/expression boundary, and
+			 * validate any complete static tokens normally.
+			 *
+			 * @param {import('estree').TemplateLiteral} node
+			 */
+			[ dynamicTemplateLiteralAST ]( node ) {
+				let hasDynamic = false;
+				const occurrences = [];
+
+				for ( const quasi of node.quasis ) {
+					const raw = quasi.value.raw;
+					const value = quasi.value.cooked ?? raw;
+					const isFollowedByExpression = ! quasi.tail;
+
+					if (
+						isFollowedByExpression &&
+						dynamicTokenEndRegex.test( raw )
+					) {
+						hasDynamic = true;
+					}
+
+					let quasiOccurrences = collectTokenOccurrences(
+						value,
+						DS_TOKEN_PREFIX
+					);
+
+					if ( isFollowedByExpression ) {
+						const endMatch = value.match( /(--([\w-]+))$/ );
+						if ( endMatch ) {
+							quasiOccurrences = quasiOccurrences.filter(
+								( { token } ) => token !== endMatch[ 1 ]
+							);
+						}
+					}
+
+					occurrences.push( ...quasiOccurrences );
+				}
+
+				const { unknownTokens, bareTokens } =
+					getInvalidTokenNames( occurrences );
+
+				if ( hasDynamic ) {
+					context.report( {
+						node,
+						messageId: 'dynamicToken',
+					} );
+				}
+
+				reportTokenNames(
+					context,
+					node,
+					'onlyKnownTokens',
+					unknownTokens
+				);
+				reportTokenNames( context, node, 'bareToken', bareTokens );
+			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
-			[ disallowedTokensAST ]( node ) {
-				let computedValue;
-
-				if ( ! node.value ) {
-					return;
-				}
-
-				if ( typeof node.value === 'string' ) {
-					// Get the node's value when it's a "string"
-					computedValue = node.value;
-				} else if (
-					typeof node.value === 'object' &&
-					'raw' in node.value
-				) {
-					// Get the node's value when it's a `template literal`
-					computedValue = node.value.cooked ?? node.value.raw;
-				}
+			[ staticTokensAST ]( node ) {
+				const computedValue = getStaticNodeValue( node );
 
 				if ( ! computedValue ) {
 					return;
 				}
 
-				const usedTokens = extractCSSVariables(
+				const occurrences = collectTokenOccurrences(
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
-				const unknownTokens = [ ...usedTokens ].filter(
-					( token ) => ! knownTokens.has( token )
+				// Skip bare-token check for property keys
+				// (e.g. `{ '--wpds-token': value }` declaring a custom property).
+				const isPropertyKey =
+					node.parent?.type === 'Property' &&
+					node.parent.key === node;
+				const { unknownTokens, bareTokens } = getInvalidTokenNames(
+					occurrences,
+					{
+						includeBareTokens: ! isPropertyKey,
+					}
 				);
 
-				if ( unknownTokens.length > 0 ) {
-					context.report( {
-						node,
-						messageId: 'onlyKnownTokens',
-						data: {
-							tokenNames: unknownTokens
-								.map( ( token ) => `'${ token }'` )
-								.join( ', ' ),
-						},
-					} );
-				}
+				reportTokenNames(
+					context,
+					node,
+					'onlyKnownTokens',
+					unknownTokens
+				);
+				reportTokenNames( context, node, 'bareToken', bareTokens );
 			},
 		};
 	},

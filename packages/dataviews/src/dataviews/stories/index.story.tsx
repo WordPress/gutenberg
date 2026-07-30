@@ -13,6 +13,7 @@ import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
@@ -21,8 +22,24 @@ import EmptyComponent from './empty';
 import './style.css';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <DataViews { ...args } />,
+	args: {
+		containerHeight: 'auto',
+	},
+	argTypes: {
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '600px', '80vh' ],
+			description: 'Height of the container',
+		},
+	},
 	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
 	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
 	// (sb-main-padding class). This ensures consistent layout in DataViews stories
@@ -31,9 +48,17 @@ const meta = {
 		layout: 'fullscreen',
 	},
 	decorators: [
-		( Story ) => (
+		( Story, { args, parameters }: { args: any; parameters: any } ) => (
 			<div style={ { padding: '1rem' } }>
-				<Story />
+				<div
+					style={ {
+						height:
+							parameters.containerHeight ?? args.containerHeight,
+						minHeight: 0,
+					} }
+				>
+					<Story containerHeight={ args.containerHeight } />
+				</div>
 			</div>
 		),
 	],
@@ -119,6 +144,7 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -129,6 +155,11 @@ export const LayoutList = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -157,6 +188,7 @@ export const LayoutList = {
 export const LayoutActivity = {
 	render: LayoutActivityComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -167,6 +199,11 @@ export const LayoutActivity = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -200,18 +237,12 @@ export const Empty = {
 	render: EmptyComponent,
 	args: {
 		customEmpty: false,
-		containerHeight: '50vh',
 		isLoading: false,
 	},
 	argTypes: {
 		customEmpty: {
 			control: 'boolean',
 			description: 'Use custom empty state with planet illustration',
-		},
-		containerHeight: {
-			control: 'select',
-			options: [ 'auto', '50vh', '100vh' ],
-			description: 'Height of the container',
 		},
 		isLoading: {
 			control: 'boolean',
@@ -241,4 +272,36 @@ export const WithCard = {
 
 export const InfiniteScroll = {
 	render: InfiniteScrollComponent,
+	parameters: {
+		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};
+
+/**
+ * Infinite scroll where pages load asynchronously (with `isLoading`), like a
+ * real network-backed consumer that fetches one window at a time. Reproduces
+ * the scroll-position jump that the synchronous story does not.
+ */
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
+	parameters: {
+		// Fill the viewport so the list bottom is the window bottom.
+		containerHeight: 'calc(100vh - 2rem)',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
 };

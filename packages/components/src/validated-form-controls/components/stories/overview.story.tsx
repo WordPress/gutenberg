@@ -149,7 +149,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				>[ 'customValidity' ]
 			>( undefined );
 
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef =
+			useRef< ReturnType< typeof setTimeout > >( undefined );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		const debouncedValidate = useCallback(
@@ -358,6 +359,57 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 					onClick={ () => ref.current?.reportValidity() }
 				>
 					Report validity
+				</Button>
+			</VStack>
+		);
+	},
+};
+
+/**
+ * A synthetic `invalid` event can be dispatched to reveal an existing error
+ * without moving focus.
+ */
+export const ShowingErrorsWithoutMovingFocus: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	decorators: [],
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const ref = useRef< HTMLInputElement >( null );
+
+		return (
+			<VStack spacing={ 4 } alignment="left">
+				<ValidatedInputControl
+					ref={ ref }
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () =>
+						ref.current?.dispatchEvent(
+							new Event( 'invalid', {
+								cancelable: true,
+							} )
+						)
+					}
+				>
+					Show errors
 				</Button>
 			</VStack>
 		);

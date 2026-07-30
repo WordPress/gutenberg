@@ -25,16 +25,26 @@ export const DEFAULT_VIEW = {
 	...defaultLayouts.grid,
 };
 
-export function getActiveFiltersForTab( activeView ) {
-	if ( activeView === 'active' || activeView === 'user' ) {
-		return [];
+export function getActiveViewOverridesForTab( activeView ) {
+	// User view: sort by date, newest first
+	if ( activeView === 'user' ) {
+		return {
+			sort: { field: 'date', direction: 'desc' },
+		};
 	}
-	// Author-based view
-	return [
-		{
-			field: 'author',
-			operator: 'isAny',
-			value: [ activeView ],
-		},
-	];
+	// Active view: no overrides
+	if ( activeView === 'active' ) {
+		return {};
+	}
+	// Author-based view: filter by author
+	return {
+		filters: [
+			{
+				field: 'author',
+				operator: 'is',
+				value: activeView,
+				isLocked: true,
+			},
+		],
+	};
 }

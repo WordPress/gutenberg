@@ -8,7 +8,7 @@
  * External dependencies
  */
 import type { Change } from 'diff';
-import { diffChars } from 'diff';
+import { diffChars, diffLines } from 'diff';
 import { default as isEqual } from 'fast-deep-equal/es6';
 
 /**
@@ -23,6 +23,22 @@ function cloneDeep< T >( value: T ): T {
 }
 
 const NULL_CHARACTER = String.fromCharCode( 0 ); // Placeholder char for embed in diff()
+const STRING_TOO_LARGE_THRESHOLD = 10000; // If either string is larger than this, use a less precise diff algorithm optimized for large strings
+
+/**
+ * Normalize diff changes so that `count` reflects UTF-16 code-unit length
+ * rather than grapheme-cluster count (which diffChars may return when
+ * Intl.Segmenter is available, e.g. diff v8+).
+ *
+ * @param changes - The array of changes from diffChars.
+ * @return The changes with `count` normalized to UTF-16 code-unit length.
+ */
+function normalizeChangeCounts( changes: Change[] ): Change[] {
+	return changes.map( ( change ) => ( {
+		...change,
+		count: change.value.length,
+	} ) );
+}
 
 interface EmbedHandler< T > {
 	compose: ( a: T, b: T, keepNull: boolean ) => T;
@@ -399,7 +415,9 @@ class Delta {
 			return new Delta();
 		}
 		const strings = this.deltasToStrings( other );
-		const diffResult = diffChars( strings[ 0 ], strings[ 1 ] );
+		const diffResult = normalizeChangeCounts(
+			diffChars( strings[ 0 ], strings[ 1 ] )
+		);
 		const thisIter = new OpIterator( this.ops );
 		const otherIter = new OpIterator( other.ops );
 		const retDelta = this.convertChangesToDelta(
@@ -599,6 +617,12 @@ class Delta {
 	 * Given a Delta and a cursor position, do a diff and attempt to adjust
 	 * the diff to place insertions or deletions at the cursor position.
 	 *
+	 * @todo There are at least a few known cases where this produces a corrupted
+	 *       diff. When this is fixed, it should not be necessary to verify that the
+	 *       transformed diff applies cleanly.
+	 *
+	 * @see import("@wordpress/core-data/src/utils/crdt-blocks").mergeRichTextUpdate()
+	 *
 	 * @param other             - The other Delta to diff against.
 	 * @param cursorAfterChange - The cursor position index after the change.
 	 * @return A Delta that attempts to place insertions or deletions at the cursor position.
@@ -606,13 +630,42 @@ class Delta {
 	diffWithCursor( other: Delta, cursorAfterChange: number | null ): Delta {
 		if ( this.ops === other.ops ) {
 			return new Delta();
-		} else if ( cursorAfterChange === null ) {
-			// If no cursor position is provided, do a regular diff.
-			return this.diff( other );
 		}
 
 		const strings = this.deltasToStrings( other );
-		let diffs = diffChars( strings[ 0 ], strings[ 1 ] );
+
+		// When large changes are pasted into the code editor, this can
+		// result in very long strings as a result of comparing the
+		// `content` of the code editor before and after the change.
+		// In this case, diffChars() can take a very long time to complete,
+		// which causes the editor to freeze.
+		// When we detect strings that are too long, use a less-precise diff
+		// method that is optimized for large inputs, at the cost of less
+		// accurate diffing and cursor placement.
+		const maxStringLength = Math.max(
+			...strings.map( ( str ) => str.length )
+		);
+
+		if ( maxStringLength > STRING_TOO_LARGE_THRESHOLD ) {
+			const diffResult = normalizeChangeCounts(
+				diffLines( strings[ 0 ], strings[ 1 ] )
+			);
+			const thisIterLarge = new OpIterator( this.ops );
+			const otherIterLarge = new OpIterator( other.ops );
+			return this.convertChangesToDelta(
+				diffResult,
+				thisIterLarge,
+				otherIterLarge
+			).chop();
+		} else if ( cursorAfterChange === null ) {
+			// If no cursor position is provided and the string
+			// is a reasonable length, do a regular diff.
+			return this.diff( other );
+		}
+
+		let diffs = normalizeChangeCounts(
+			diffChars( strings[ 0 ], strings[ 1 ] )
+		);
 		let lastDiffPosition = 0;
 		const adjustedDiffs: Change[] = [];
 

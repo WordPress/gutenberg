@@ -35,6 +35,7 @@ const commonPathProps = css`
 	stroke-width: 1.5px;
 `;
 
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 export const SpinnerTrack = styled.circle`
 	${ commonPathProps };
 	stroke: ${ COLORS.gray[ 300 ] };

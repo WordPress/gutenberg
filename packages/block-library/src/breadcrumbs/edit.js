@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 
@@ -109,7 +109,25 @@ export default function BreadcrumbEdit( {
 		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
-
+	const prevContentRef = useRef( '' );
+	useEffect( () => {
+		if ( status === 'success' ) {
+			prevContentRef.current = content;
+		}
+	}, [ content, status ] );
+	const [ showLoader, setShowLoader ] = useState( false );
+	useEffect( () => {
+		if ( status !== 'loading' ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 400 );
+		return () => {
+			clearTimeout( timeout );
+			setShowLoader( false );
+		};
+	}, [ status ] );
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
 
@@ -246,7 +264,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
 							value={ separator }
@@ -272,7 +289,7 @@ export default function BreadcrumbEdit( {
 						setAttributes( { showOnHomePage: value } )
 					}
 					help={ __(
-						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
+						'If this Breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
 					) }
 				/>
 				<CheckboxControl
@@ -286,11 +303,24 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			{ status === 'loading' && ! showPlaceholder && (
-				<div { ...blockProps }>
-					<Spinner />
-				</div>
-			) }
+			{ status === 'loading' &&
+				! showPlaceholder &&
+				( prevContentRef.current ? (
+					<HtmlRenderer
+						wrapperProps={ {
+							...blockProps,
+							style: {
+								...blockProps.style,
+								opacity: showLoader ? 0.3 : 1,
+							},
+						} }
+						html={ prevContentRef.current }
+					/>
+				) : (
+					<div { ...blockProps }>
+						<Spinner />
+					</div>
+				) ) }
 			{ status === 'error' && (
 				<div { ...blockProps }>
 					<p>

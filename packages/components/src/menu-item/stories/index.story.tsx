@@ -16,6 +16,7 @@ import MenuItem from '..';
 import Shortcut from '../../shortcut';
 
 const meta: Meta< typeof MenuItem > = {
+	tags: [ 'manifest' ],
 	component: MenuItem,
 	title: 'Components/Actions/MenuItem',
 	id: 'components-menuitem',
@@ -36,6 +37,11 @@ const meta: Meta< typeof MenuItem > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
 	},
 };
 export default meta;

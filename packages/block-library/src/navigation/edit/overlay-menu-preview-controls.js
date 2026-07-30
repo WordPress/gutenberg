@@ -22,7 +22,7 @@ import OverlayMenuIcon from './overlay-menu-icon';
  * @param {boolean}  props.hasIcon       Whether the overlay menu has an icon.
  * @param {string}   props.icon          Icon type for overlay menu.
  * @param {Function} props.setAttributes Function to update block attributes.
- * @return {JSX.Element}                The overlay menu preview controls.
+ * @return {React.JSX.Element}                The overlay menu preview controls.
  */
 export default function OverlayMenuPreviewControls( {
 	hasIcon,
@@ -40,7 +40,6 @@ export default function OverlayMenuPreviewControls( {
 				checked={ hasIcon }
 			/>
 			<ToggleGroupControl
-				__next40pxDefaultSize
 				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }

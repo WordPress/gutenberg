@@ -276,4 +276,78 @@ describe( 'useEntityBlockEditor', () => {
 			'A paragraph<sup data-fn="abcd" class="fn"><a href="#abcd" id="abcd-link">2</a></sup>'
 		);
 	} );
+
+	it( 'preserves block clientIds across unmount and remount when content is unchanged', () => {
+		let blocks;
+		const TestComponent = () => {
+			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 1,
+			} );
+			return <div />;
+		};
+
+		const { unmount } = render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		const firstClientIds = blocks.map( ( b ) => b.clientId );
+		expect( firstClientIds ).toHaveLength( 2 );
+
+		// Simulate navigating away.
+		unmount();
+
+		// Simulate navigating back — same entity, same content.
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		// The cache should return the same block objects with the same clientIds.
+		expect( blocks.map( ( b ) => b.clientId ) ).toEqual( firstClientIds );
+	} );
+
+	it( 'returns new blocks when content changes', () => {
+		let blocks;
+		const TestComponent = () => {
+			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 1,
+			} );
+			return <div />;
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		const firstClientIds = blocks.map( ( b ) => b.clientId );
+
+		// Receive a new entity record with different content.
+		act( () => {
+			registry
+				.dispatch( coreDataStore )
+				.receiveEntityRecords( 'postType', 'post', [
+					{
+						id: 1,
+						type: 'post',
+						content: {
+							raw: '<!-- wp:test-block --><p>Different content</p><!-- /wp:test-block -->',
+							rendered: '<p>Different content</p>',
+						},
+						meta: { footnotes: '[]' },
+					},
+				] );
+		} );
+
+		// Blocks should be new objects with new clientIds.
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].attributes.content ).toEqual( 'Different content' );
+		expect( blocks.map( ( b ) => b.clientId ) ).not.toEqual(
+			firstClientIds
+		);
+	} );
 } );

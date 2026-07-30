@@ -24,8 +24,12 @@ interface Flusher {
 
 declare global {
 	interface Window {
-		scheduler?: {
-			readonly yield?: () => Promise< void >;
+		scheduler: {
+			postTask: (
+				callback: () => unknown,
+				options?: object
+			) => Promise< unknown >;
+			yield: () => Promise< void >;
 		};
 	}
 }
@@ -397,7 +401,7 @@ export const warn = ( message: string ): void => {
 		// A consumer can use 'pause on caught exceptions'
 		try {
 			throw Error( message );
-		} catch ( e ) {
+		} catch {
 			// Do nothing.
 		}
 		logged.add( message );
@@ -506,6 +510,15 @@ export function deepReadOnly< T extends object >(
 }
 
 export const navigationSignal = signal( 0 );
+
+/**
+ * Unique identifier for the current browser session of the interactivity
+ * runtime. Generated once when the module is first evaluated. Used by the
+ * router to tag history entries so that, after a full page reload, popstate
+ * events for entries created in a previous session trigger a full reload
+ * instead of a client-side navigation that would leave stale content.
+ */
+export const sessionId = Math.random().toString( 36 ).slice( 2 );
 
 /**
  * Recursively clones the passed object.

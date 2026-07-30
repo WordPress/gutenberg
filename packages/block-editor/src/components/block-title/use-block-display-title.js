@@ -39,7 +39,7 @@ export default function useBlockDisplayTitle( {
 				return null;
 			}
 
-			const { getBlockName, getBlockAttributes } =
+			const { getBlockName, getBlockAttributes, getBlock } =
 				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -57,7 +57,12 @@ export default function useBlockDisplayTitle( {
 				return label;
 			}
 
-			const match = getActiveBlockVariation( blockName, attributes );
+			const match = getActiveBlockVariation(
+				blockName,
+				attributes,
+				undefined,
+				getBlock?.( clientId )?.innerContent
+			);
 			// Label will fallback to the title if no label is defined for the current label context.
 			return match?.title || blockType.title;
 		},

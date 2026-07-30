@@ -41,8 +41,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option (16px)
@@ -61,8 +59,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option
@@ -81,8 +77,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should show default option
@@ -101,8 +95,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should show default option
@@ -122,8 +114,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			await user.click(
@@ -145,8 +135,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			await user.click(
@@ -188,8 +176,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should show the first matching font size when there are multiple matches
@@ -208,8 +194,6 @@ describe( 'FontSizePickerSelect', () => {
 					onChange={ onChange }
 					onSelectCustom={ jest.fn() }
 					disableCustomFontSizes={ false }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the specific font size by slug

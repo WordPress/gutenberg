@@ -6,7 +6,7 @@ import {
 	DropdownMenu,
 	ToolbarGroup,
 	ToolbarItem,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	MenuGroup,
 } from '@wordpress/components';
 import {
@@ -87,8 +87,8 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		}
 	}
 	// Simple block transformation based on the `Block Transforms` API.
-	function onBlockTransform( name ) {
-		const newBlocks = switchToBlockType( blocks, name );
+	function onBlockTransform( name, variationName ) {
+		const newBlocks = switchToBlockType( blocks, name, variationName );
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}
@@ -166,8 +166,8 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 						blockVariationTransformations
 					}
 					blocks={ blocks }
-					onSelect={ ( name ) => {
-						onBlockTransform( name );
+					onSelect={ ( name, variationName ) => {
+						onBlockTransform( name, variationName );
 						onClose();
 					} }
 					onSelectVariation={ ( name ) => {
@@ -184,9 +184,9 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 			) }
 			{ isUsingBindings && (
 				<MenuGroup>
-					<Text className="block-editor-block-switcher__binding-indicator">
+					<WCText className="block-editor-block-switcher__binding-indicator">
 						{ connectedBlockDescription }
-					</Text>
+					</WCText>
 				</MenuGroup>
 			) }
 		</div>

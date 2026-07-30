@@ -43,14 +43,14 @@ describe( 'Notice', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
-		const { container } = render(
+	it( 'should not render a dismiss control when isDismissible prop is false', () => {
+		render(
 			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
 		);
-		const wrapper = getNoticeWrapper( container );
 
-		expect( wrapper ).toHaveClass( 'components-notice' );
-		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
+		expect(
+			screen.queryByRole( 'button', { name: 'Close' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should default to info status', () => {

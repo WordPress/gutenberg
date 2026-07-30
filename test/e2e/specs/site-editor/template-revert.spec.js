@@ -14,15 +14,27 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template revert involves visitSiteEditor() page navigations to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-	test.beforeEach( async ( { admin, requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -230,28 +242,8 @@ class TemplateRevertUtils {
 	}
 
 	async getCurrentSiteEditorContent() {
-		return this.page.evaluate( () => {
-			const postId = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostId();
-			const postType = window.wp.data
-				.select( 'core/editor' )
-				.getCurrentPostType();
-			const record = window.wp.data
-				.select( 'core' )
-				.getEditedEntityRecord( 'postType', postType, postId );
-			if ( record ) {
-				if ( typeof record.content === 'function' ) {
-					return record.content( record );
-				} else if ( record.blocks ) {
-					return window.wp.blocks.__unstableSerializeAndClean(
-						record.blocks
-					);
-				} else if ( record.content ) {
-					return record.content;
-				}
-			}
-			return '';
-		} );
+		return this.page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getEditedPostContent()
+		);
 	}
 }

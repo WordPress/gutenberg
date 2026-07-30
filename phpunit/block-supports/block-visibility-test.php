@@ -93,7 +93,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->assertSame( '', $result, 'Block content should be empty when blockVisibility is false and support is opted in.' );
 	}
 
-	public function test_block_visibility_support_shows_block_when_support_not_opted_in() {
+	public function test_block_visibility_support_hides_block_when_visibility_false_even_without_support() {
 		$this->register_visibility_block_with_support(
 			'test/visibility-block',
 			array( 'visibility' => false )
@@ -111,7 +111,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		$result = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when blockVisibility support is not opted in.' );
+		$this->assertSame( '', $result, 'Block content should be empty when blockVisibility is false, even without visibility support.' );
 	}
 
 	public function test_block_visibility_support_no_visibility_attribute() {
@@ -373,6 +373,130 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			$result,
 			'Block should have the visibility class for the mobile viewport size in the class attribute'
 		);
+	}
+
+	public function test_block_visibility_support_uses_custom_viewport_breakpoints() {
+		$this->register_visibility_block_with_support(
+			'test/viewport-custom-breakpoints',
+			array( 'visibility' => true )
+		);
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile' => '640px',
+							'tablet' => '960px',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$block = array(
+				'blockName' => 'test/viewport-custom-breakpoints',
+				'attrs'     => array(
+					'metadata' => array(
+						'blockVisibility' => array(
+							'viewport' => array(
+								'mobile'  => false,
+								'tablet'  => false,
+								'desktop' => false,
+							),
+						),
+					),
+				),
+			);
+
+			gutenberg_render_block_visibility_support( '<div>Test content</div>', $block );
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+			$this->assertStringContainsString(
+				'@media (width <= 640px){.wp-block-hidden-mobile{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom mobile visibility rule'
+			);
+			$this->assertStringContainsString(
+				'@media (640px < width <= 960px){.wp-block-hidden-tablet{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom tablet visibility rule'
+			);
+			$this->assertStringContainsString(
+				'@media (width > 960px){.wp-block-hidden-desktop{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom desktop visibility rule'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	public function test_block_visibility_support_uses_single_max_width_tablet_query_for_single_breakpoint() {
+		$this->register_visibility_block_with_support(
+			'test/viewport-tablet-only-breakpoint',
+			array( 'visibility' => true )
+		);
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'tablet' => '64rem',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$block = array(
+				'blockName' => 'test/viewport-tablet-only-breakpoint',
+				'attrs'     => array(
+					'metadata' => array(
+						'blockVisibility' => array(
+							'viewport' => array(
+								'mobile' => false,
+								'tablet' => false,
+							),
+						),
+					),
+				),
+			);
+
+			$result            = gutenberg_render_block_visibility_support( '<div>Test content</div>', $block );
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+			$this->assertStringContainsString(
+				'class="wp-block-hidden-tablet"',
+				$result,
+				'Block should have the visibility class for the tablet viewport size.'
+			);
+			$this->assertStringContainsString(
+				'@media (width <= 64rem){.wp-block-hidden-tablet{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain a single max-width tablet visibility rule.'
+			);
+			$this->assertStringNotContainsString(
+				'wp-block-hidden-mobile',
+				$result,
+				'Block should not have the mobile visibility class when no mobile breakpoint is configured.'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_content() {

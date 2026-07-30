@@ -20,6 +20,10 @@ const meta: Meta< typeof Tip > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'unaudited',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

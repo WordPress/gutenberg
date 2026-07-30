@@ -14,6 +14,39 @@ import {
 	CardHeader,
 	CardMedia,
 } from '../';
+import { useCx } from '../../utils/hooks/use-cx';
+import * as styles from '../styles';
+
+function EmotionStylePrimer( {
+	styleFragment,
+}: {
+	styleFragment: Parameters< ReturnType< typeof useCx > >[ 0 ];
+} ) {
+	const cx = useCx();
+
+	return <div className={ cx( styleFragment ) } />;
+}
+
+function expectComposedEmotionClassName(
+	element: HTMLElement,
+	styleLabels: string[]
+) {
+	const matchingClassNames = element.className
+		.split( /\s+/ )
+		.filter( ( className ) => className.startsWith( 'css-' ) )
+		.filter( ( className ) =>
+			styleLabels.some( ( styleLabel ) =>
+				className.includes( styleLabel )
+			)
+		);
+
+	expect( matchingClassNames ).toHaveLength( 1 );
+	for ( const styleLabel of styleLabels ) {
+		expect( matchingClassNames[ 0 ] ).toEqual(
+			expect.stringContaining( styleLabel )
+		);
+	}
+}
 
 describe( 'Card', () => {
 	describe( 'Card component', () => {
@@ -55,6 +88,22 @@ describe( 'Card', () => {
 			expect( screen.getByTestId( 'card-wrapper' ) ).toHaveStyle(
 				'box-shadow: none'
 			);
+		} );
+
+		it( 'should remove borders regardless of Emotion insertion order', () => {
+			render(
+				<EmotionStylePrimer styleFragment={ styles.boxShadowless } />
+			);
+			render(
+				<Card data-testid="card-wrapper" isBorderless>
+					Code is Poetry
+				</Card>
+			);
+
+			const card = screen.getByTestId( 'card-wrapper' );
+
+			expectComposedEmotionClassName( card, [ 'Card', 'boxShadowless' ] );
+			expect( window.getComputedStyle( card ).boxShadow ).toBe( 'none' );
 		} );
 
 		it( 'should add rounded border when the isRounded prop is true', () => {
@@ -181,6 +230,30 @@ describe( 'Card', () => {
 				);
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
+
+			it( 'should remove borders regardless of Emotion insertion order', () => {
+				expect.hasAssertions();
+
+				render(
+					<EmotionStylePrimer styleFragment={ styles.borderless } />
+				);
+				render(
+					<Card>
+						<CardHeader data-testid="card-header" isBorderless>
+							Header
+						</CardHeader>
+						<CardBody>Body</CardBody>
+					</Card>
+				);
+
+				expectComposedEmotionClassName(
+					screen.getByTestId( 'card-header' ),
+					[ 'Header', 'borderRadius', 'borderColor', 'borderless' ]
+				);
+				expect( screen.getByTestId( 'card-header' ) ).toHaveStyle(
+					'border: none'
+				);
+			} );
 		} );
 
 		describe( 'CardFooter', () => {
@@ -198,6 +271,30 @@ describe( 'Card', () => {
 					<CardFooter justify="flex-end">Footer</CardFooter>
 				);
 				expect( container ).toMatchDiffSnapshot( containerWithFlexEnd );
+			} );
+
+			it( 'should remove borders regardless of Emotion insertion order', () => {
+				expect.hasAssertions();
+
+				render(
+					<EmotionStylePrimer styleFragment={ styles.borderless } />
+				);
+				render(
+					<Card>
+						<CardBody>Body</CardBody>
+						<CardFooter data-testid="card-footer" isBorderless>
+							Footer
+						</CardFooter>
+					</Card>
+				);
+
+				expectComposedEmotionClassName(
+					screen.getByTestId( 'card-footer' ),
+					[ 'Footer', 'borderRadius', 'borderColor', 'borderless' ]
+				);
+				expect( screen.getByTestId( 'card-footer' ) ).toHaveStyle(
+					'border: none'
+				);
 			} );
 		} );
 

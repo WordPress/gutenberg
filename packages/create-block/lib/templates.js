@@ -118,7 +118,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
-	} catch ( error ) {
+	} catch {
 		return false;
 	}
 	return true;

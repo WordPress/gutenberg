@@ -18,7 +18,7 @@ const meta: Meta< typeof DataForm > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
 };
 export default meta;
 
@@ -68,7 +68,7 @@ export const Labels: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< SampleData >
 					data={ data }
 					fields={ fields }
@@ -135,7 +135,7 @@ export const HelpText: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< HelpTextData >
 					data={ data }
 					fields={ fields }
@@ -240,7 +240,7 @@ export const ValidationMessages: Story = {
 
 		return (
 			<div ref={ containerRef }>
-				<Stack direction="column" gap="lg">
+				<Stack direction="column" gap="xl">
 					<DataForm< ValidationMessagesData >
 						data={ data }
 						fields={ fields }
@@ -297,7 +297,7 @@ export const HighLevelHelpText: Story = {
 				fields: [
 					{
 						id: 'accountForm',
-						label: 'Account Information',
+						label: 'Account information',
 						description:
 							'We collect this information to create your account and provide personalized services. Your data will be kept secure and used only for account management and service improvements.',
 						children: [ 'name', 'email', 'phone' ],
@@ -314,7 +314,7 @@ export const HighLevelHelpText: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< HighLevelHelpTextData >
 					data={ data }
 					fields={ fields }
@@ -375,7 +375,7 @@ export const Placeholders: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< PlaceholdersData >
 					data={ data }
 					fields={ fields }

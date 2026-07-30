@@ -88,8 +88,7 @@ const BlockTransformationsMenu = ( {
 	onSelectVariation,
 	blocks,
 } ) => {
-	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
-		useState();
+	const [ hoveredTransformItem, setHoveredTransformItem ] = useState();
 
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
@@ -101,17 +100,18 @@ const BlockTransformationsMenu = ( {
 		<RestTransformationItems
 			restTransformations={ restTransformations }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
+			setHoveredTransformItem={ setHoveredTransformItem }
 		/>
 	);
 	return (
 		<>
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
-				{ hoveredTransformItemName && (
+				{ hoveredTransformItem && (
 					<PreviewBlockPopover
 						blocks={ switchToBlockType(
 							blocks,
-							hoveredTransformItemName
+							hoveredTransformItem.name,
+							hoveredTransformItem.variationName
 						) }
 					/>
 				) }
@@ -126,12 +126,10 @@ const BlockTransformationsMenu = ( {
 				) }
 				{ priorityTextTransformations.map( ( item ) => (
 					<BlockTransformationItem
-						key={ item.name }
+						key={ item.id || item.name }
 						item={ item }
 						onSelect={ onSelect }
-						setHoveredTransformItemName={
-							setHoveredTransformItemName
-						}
+						setHoveredTransformItem={ setHoveredTransformItem }
 					/>
 				) ) }
 				{ ! hasBothContentTransformations && restTransformItems }
@@ -148,14 +146,14 @@ const BlockTransformationsMenu = ( {
 function RestTransformationItems( {
 	restTransformations,
 	onSelect,
-	setHoveredTransformItemName,
+	setHoveredTransformItem,
 } ) {
 	return restTransformations.map( ( item ) => (
 		<BlockTransformationItem
-			key={ item.name }
+			key={ item.id || item.name }
 			item={ item }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
+			setHoveredTransformItem={ setHoveredTransformItem }
 		/>
 	) );
 }
@@ -163,7 +161,7 @@ function RestTransformationItems( {
 function BlockTransformationItem( {
 	item,
 	onSelect,
-	setHoveredTransformItemName,
+	setHoveredTransformItem,
 } ) {
 	const { name, icon, title, isDisabled } = item;
 	return (
@@ -171,11 +169,13 @@ function BlockTransformationItem( {
 			className={ getBlockMenuDefaultClassName( name ) }
 			onClick={ ( event ) => {
 				event.preventDefault();
-				onSelect( name );
+				onSelect( name, item.variationName );
 			} }
 			disabled={ isDisabled }
-			onMouseLeave={ () => setHoveredTransformItemName( null ) }
-			onMouseEnter={ () => setHoveredTransformItemName( name ) }
+			onMouseLeave={ () => setHoveredTransformItem( null ) }
+			onMouseEnter={ () => setHoveredTransformItem( item ) }
+			onFocus={ () => setHoveredTransformItem( item ) }
+			onBlur={ () => setHoveredTransformItem( null ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

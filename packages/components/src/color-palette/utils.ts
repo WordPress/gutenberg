@@ -32,7 +32,8 @@ const isSimpleCSSColor = ( value: string ): boolean => {
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: boolean = false
+	showMultiplePalettes: boolean = false,
+	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -50,7 +51,18 @@ export const extractColorNameFromCurrentValue = (
 		? ( colors as PaletteObject[] )
 		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
+		for ( const {
+			name: colorName,
+			color: colorValue,
+			slug,
+		} of paletteColors ) {
+			if ( selectedSlug ) {
+				if ( slug === selectedSlug ) {
+					return colorName;
+				}
+				continue;
+			}
+
 			const normalizedColorValue = currentValueIsSimpleColor
 				? colord( colorValue ).toHex()
 				: colorValue;

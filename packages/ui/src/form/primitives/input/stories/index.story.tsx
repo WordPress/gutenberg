@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input, InputLayout } from '../../../..';
+import { Input } from '../';
+import { InputLayout } from '../../input-layout';
+import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	title: 'Design System/Components/Form/Primitives/Input',
@@ -9,6 +11,13 @@ const meta: Meta< typeof Input > = {
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		type: { control: 'text' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -31,6 +40,12 @@ export const WithPrefix: Story = {
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
+
+WithSuffixControl.args = {
+	...WithSuffixControl.args,
+	children: undefined,
+};
+export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

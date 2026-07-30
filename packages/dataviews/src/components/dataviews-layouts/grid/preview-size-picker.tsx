@@ -84,7 +84,6 @@ export default function PreviewSizePicker() {
 
 	return (
 		<RangeControl
-			__next40pxDefaultSize
 			showTooltip={ false }
 			label={ __( 'Preview size' ) }
 			value={ previewSizeToUse }

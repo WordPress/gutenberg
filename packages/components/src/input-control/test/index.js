@@ -13,18 +13,13 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import BaseInputControl from '../';
+import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
 const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
 	const InputControl = ( props ) => {
-		return (
-			<BaseInputControl
-				{ ...props }
-				__next40pxDefaultSize
-				data-testid="input"
-			/>
-		);
+		return <BaseInputControl { ...props } data-testid="input" />;
 	};
 
 	describe( 'Basic rendering', () => {
@@ -211,6 +206,33 @@ describe( 'InputControl', () => {
 			await user.click( document.body );
 
 			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
+		} );
+	} );
+
+	describe( 'Legacy size support', () => {
+		it( 'treats __unstable-large the same as default', () => {
+			const prefix = (
+				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
+			);
+
+			render( <InputControl label="Test" prefix={ prefix } /> );
+			render(
+				<InputControl
+					label="Test"
+					prefix={ prefix }
+					{ ...{ size: '__unstable-large' } }
+				/>
+			);
+
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultInput, legacyInput ] =
+				screen.getAllByTestId( 'input' );
+
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacyInput ).toMatchStyleDiffSnapshot( defaultInput );
 		} );
 	} );
 } );

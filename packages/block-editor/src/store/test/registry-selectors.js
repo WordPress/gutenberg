@@ -104,7 +104,7 @@ describe( 'selectors', () => {
 			expect(
 				select( store ).__experimentalGetAllowedPatterns( {
 					blocks: { byClientId: new Map() },
-					blockListSettings: {},
+					blockListSettings: new Map(),
 					settings: {
 						__experimentalBlockPatterns: [
 							{

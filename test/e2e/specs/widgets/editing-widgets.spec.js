@@ -17,6 +17,14 @@ const test = base.extend( {
 } );
 
 test.describe( 'Widgets screen', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			// TODO: Ideally we can bundle our test theme directly in the repo.
+			requestUtils.activateTheme( 'twentytwenty' ),
+			requestUtils.deleteAllWidgets(),
+		] );
+	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitAdminPage( 'widgets.php' );
 
@@ -27,14 +35,6 @@ test.describe( 'Widgets screen', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllWidgets();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			// TODO: Ideally we can bundle our test theme directly in the repo.
-			requestUtils.activateTheme( 'twentytwenty' ),
-			requestUtils.deleteAllWidgets(),
-		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -51,8 +51,11 @@ test.describe( 'Widgets screen', () => {
 			'Update button should start out disabled'
 		).toBeDisabled();
 
-		const [ firstWidgetArea, secondWidgetArea ] =
-			await widgetsScreen.widgetAreas.all();
+		await expect
+			.poll( () => widgetsScreen.widgetAreas.count() )
+			.toBeGreaterThanOrEqual( 2 );
+		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		const secondWidgetArea = widgetsScreen.widgetAreas.nth( 1 );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
@@ -633,6 +636,8 @@ test.describe( 'Widgets screen', () => {
 		await pageUtils.setBrowserViewport( 'small' );
 
 		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		// Wait for the widget areas to render before inserting.
+		await expect( firstWidgetArea ).toBeVisible();
 
 		const addParagraphBlock =
 			await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );

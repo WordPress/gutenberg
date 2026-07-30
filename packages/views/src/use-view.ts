@@ -16,7 +16,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { generatePreferenceKey } from './preference-keys';
-import { mergeActiveFilters, stripActiveFilterFields } from './filter-utils';
+import {
+	mergeActiveViewOverrides,
+	stripActiveViewOverrides,
+} from './filter-utils';
 import type { ViewConfig } from './types';
 
 interface UseViewReturn {
@@ -40,14 +43,7 @@ function omit< T extends object, K extends keyof T >(
 /**
  * Hook for managing DataViews view state with local persistence.
  *
- * @param config                     Configuration object for loading the view.
- * @param config.kind                Entity kind (e.g., 'postType', 'taxonomy', 'root').
- * @param config.name                Specific entity name.
- * @param config.slug                View identifier.
- * @param config.defaultView         Default view configuration.
- * @param config.activeFilters       Filters applied on top of the view but never persisted.
- * @param config.queryParams         Object with `page` and/or `search` from URL.
- * @param config.onChangeQueryParams Optional callback to update URL parameters.
+ * @param config Configuration object for loading the view.
  *
  * @return Object with current view, modification state, and update functions.
  */
@@ -57,7 +53,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		name,
 		slug,
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams,
 		onChangeQueryParams,
 	} = config;
@@ -74,21 +70,35 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = persistedView ?? defaultView;
+	const baseView: View = useMemo(
+		() => persistedView ?? defaultView ?? {},
+		[ persistedView, defaultView ]
+	);
 	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
 
-	// Merge URL query parameters (page, search) and activeFilters into the view
+	const combinedOverrides = useMemo( () => {
+		const rawDefaults =
+			config.defaultLayouts?.[
+				baseView.type as keyof typeof config.defaultLayouts
+			];
+		const layoutTypeDefaults =
+			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
+		return { ...layoutTypeDefaults, ...activeViewOverrides };
+	}, [ config.defaultLayouts, baseView.type, activeViewOverrides ] );
+
+	// Merge URL query parameters (page, search) and activeViewOverrides into the view
 	const view: View = useMemo( () => {
-		return mergeActiveFilters(
+		return mergeActiveViewOverrides(
 			{
 				...baseView,
 				page,
 				search,
 			},
-			activeFilters
+			combinedOverrides,
+			defaultView
 		);
-	}, [ baseView, page, search, activeFilters ] );
+	}, [ baseView, page, search, combinedOverrides, defaultView ] );
 
 	const isModified = !! persistedView;
 
@@ -99,11 +109,12 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				page: newView?.page,
 				search: newView?.search,
 			};
-			// Strip activeFilters and URL params before persisting
+			// Strip activeViewOverrides and URL params before persisting
 			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
-			const preferenceView = stripActiveFilterFields(
+			const preferenceView = stripActiveViewOverrides(
 				omit( newView, [ 'page', 'search' ] ) as View,
-				activeFilters
+				combinedOverrides,
+				defaultView
 			);
 
 			// If we have URL handling enabled, separate URL state from preference state
@@ -114,14 +125,16 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				onChangeQueryParams( urlParams );
 			}
 
-			// Compare with baseView and defaultView after stripping activeFilters
-			const comparableBaseView = stripActiveFilterFields(
+			// Compare with baseView and defaultView after stripping activeViewOverrides
+			const comparableBaseView = stripActiveViewOverrides(
 				baseView,
-				activeFilters
+				combinedOverrides,
+				defaultView
 			);
-			const comparableDefaultView = stripActiveFilterFields(
+			const comparableDefaultView = stripActiveViewOverrides(
 				defaultView,
-				activeFilters
+				combinedOverrides,
+				defaultView
 			);
 
 			// Only persist non-URL preferences if different from baseView
@@ -139,7 +152,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			search,
 			baseView,
 			defaultView,
-			activeFilters,
+			combinedOverrides,
 			set,
 			preferenceKey,
 		]

@@ -287,7 +287,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Block title.
+-   `React.JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -406,6 +406,9 @@ _Parameters_
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
 -   _props.value_ `string`: The current dimension value.
+-   _props.placeholder_ `?string`: Placeholder text for the custom-value input.
+-   _props.className_ `?string`: Additional CSS class on the wrapping fieldset.
+-   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
 
 _Returns_
 
@@ -504,6 +507,18 @@ _Parameters_
 _Returns_
 
 -   `string`: Mapping of the spacing preset to its equivalent custom value.
+
+### getDimensionsClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's dimensions support attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Dimensions block support derived CSS classes & styles.
 
 ### getFontSize
 
@@ -692,6 +707,43 @@ _Related_
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
+### Usage Patterns
+
+The component does not support a fully controlled implementation, but it does support an observable implementation.
+
+### Uncontrolled (default)
+
+The component manages its own search input state:
+
+```jsx
+<LinkControl value={ link } onChange={ setLink } />
+```
+
+### Observable
+
+Observe input changes without controlling the value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
+
+### Uncontrolled with Initial Value
+
+Pre-populate the search input with a default value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	inputValue="wordpress"
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
+
 _Parameters_
 
 -   _props_ `WPLinkControlProps`: Component props.
@@ -801,11 +853,11 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
 -   _props.blockName_ `string`: Optional block name.
--   _props.children_ `JSX.Element`: React children.
+-   _props.children_ `React.JSX.Element`: React children.
 
 _Returns_
 
--   `JSX.Element`: A React element.
+-   `React.JSX.Element`: A React element.
 
 ### RichText
 
@@ -887,12 +939,12 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
--   _wrapperSelector_ `string`: Wrapper selector.
+-   _wrapperSelector_ Wrapper selector.
 -   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
--   `Array`: converted rules.
+-   converted rules.
 
 ### Typewriter
 
@@ -900,9 +952,15 @@ Ensures that the text selection keeps the same vertical distance from the viewpo
 
 ### URLInput
 
+Text field for entering a URL, with an autocomplete list of matching posts, pages and other link suggestions.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
 
 ### URLInputButton
 

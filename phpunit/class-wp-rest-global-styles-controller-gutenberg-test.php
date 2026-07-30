@@ -581,6 +581,24 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_non_string_styles_css() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array( 'css' => array( 'body { color: red; }' ) ),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_custom_css_invalid_type', $response, 400 );
+	}
+
+	/**
 	 * Tests the submission of a custom block style variation that was defined
 	 * within a theme style variation and wouldn't be registered at the time
 	 * of saving via the API.
@@ -806,6 +824,43 @@ CSS;
 			'truncated "</sty"'          => array( '</sty', 'The CSS must not end in "&lt;/sty".' ),
 			'truncated "</STYL"'         => array( '</STYL', 'The CSS must not end in "&lt;/STYL".' ),
 			'truncated "</stYle"'        => array( '</stYle', 'The CSS must not end in "&lt;/stYle".' ),
+		);
+	}
+
+	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::validate_custom_css
+	 *
+	 * @dataProvider data_custom_css_non_string
+	 *
+	 * @param mixed $custom_css Non-string value to validate.
+	 */
+	public function test_validate_custom_css_non_string( $custom_css ) {
+		$controller = new WP_REST_Global_Styles_Controller_Gutenberg();
+		$validate   = Closure::bind(
+			function ( $css ) {
+				return $this->validate_custom_css( $css );
+			},
+			$controller,
+			$controller
+		);
+
+		$result = $validate( $custom_css );
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_custom_css_invalid_type', $result->get_error_code() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, mixed[]>
+	 */
+	public static function data_custom_css_non_string(): array {
+		return array(
+			'array'   => array( array( 'body { color: red; }' ) ),
+			'integer' => array( 123 ),
+			'boolean' => array( true ),
+			'null'    => array( null ),
+			'object'  => array( new stdClass() ),
 		);
 	}
 }

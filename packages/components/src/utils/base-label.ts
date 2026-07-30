@@ -12,7 +12,7 @@ import CONFIG from './config-values.js';
 // Try to use BaseControl's StyledLabel or BaseControl.VisualLabel if you can.
 export const baseLabelTypography = css`
 	font-size: 11px;
-	font-weight: ${ CONFIG.fontWeightMedium };
+	font-weight: ${ CONFIG.fontWeightEmphasis };
 	line-height: 1.4;
 	text-transform: uppercase;
 `;

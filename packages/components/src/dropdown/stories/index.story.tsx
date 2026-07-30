@@ -14,10 +14,16 @@ import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
 	subcomponents: { DropdownContentWrapper },
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Dropdown { ...args } />,
 	args: {
 		onClose: fn(),
 		onToggle: fn(),
@@ -40,6 +46,10 @@ const meta: Meta< typeof Dropdown > = {
 	parameters: {
 		controls: {
 			expanded: true,
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
 		},
 	},
 };

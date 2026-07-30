@@ -157,5 +157,35 @@ describe( 'focusable', () => {
 
 			expect( find( node ) ).toEqual( [] );
 		} );
+
+		it( 'ignores elements inside inert containers', () => {
+			const node = createElement( 'div' );
+			const inertDiv = createElement( 'div' );
+			inertDiv.setAttribute( 'inert', '' );
+			const input = createElement( 'input' );
+			inertDiv.appendChild( input );
+			node.appendChild( inertDiv );
+
+			expect( find( node ) ).toEqual( [] );
+		} );
+
+		it( 'returns focusable elements outside inert containers', () => {
+			const node = createElement( 'div' );
+
+			// Inert container with input
+			const inertDiv = createElement( 'div' );
+			inertDiv.setAttribute( 'inert', '' );
+			const inertInput = createElement( 'input' );
+			inertDiv.appendChild( inertInput );
+			node.appendChild( inertDiv );
+
+			// Non-inert input
+			const visibleInput = createElement( 'input' );
+			node.appendChild( visibleInput );
+
+			const focusable = find( node );
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ] ).toBe( visibleInput );
+		} );
 	} );
 } );

@@ -34,7 +34,6 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 					) }
 				>
 					<TextControl
-						__next40pxDefaultSize
 						value={ commentId }
 						onChange={ ( val ) =>
 							setCommentIdInput( parseInt( val ) )

@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import type { FetchHandler } from '../../types';
-import createPreloadingMiddleware from '../preloading';
+import createPreloadingMiddleware, {
+	CLEAR,
+	ENABLE_MULTI_USE,
+} from '../preloading';
 
 describe( 'Preloading Middleware', () => {
 	describe( 'given preloaded data', () => {
@@ -54,6 +57,40 @@ describe( 'Preloading Middleware', () => {
 
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).not.toHaveBeenCalled();
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).toHaveBeenCalled();
+				} );
+
+				it( 'keeps returning the preloaded data when multi-use is enabled', async () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': { body },
+					};
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
+					( preloadingMiddleware as any )[ ENABLE_MULTI_USE ]();
+
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
+					const nextSpy = jest.fn();
+
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					expect( nextSpy ).not.toHaveBeenCalled();
+
+					// `CLEAR` is the explicit boundary at which
+					// subsequent requests should fall through. It also
+					// logs whether anything went unconsumed.
+					( preloadingMiddleware as any )[ CLEAR ]();
+					expect( console ).toHaveLogged();
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).toHaveBeenCalled();
 				} );

@@ -24,10 +24,7 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover(
-	{ gutter, children, shift, modal = true, ...otherProps },
-	ref
-) {
+>( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
 	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.
@@ -70,6 +67,18 @@ export const Popover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
 		<Styled.Menu
 			{ ...otherProps }
@@ -88,9 +97,7 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			variant={ menuContext.variant }
-		>
-			{ children }
-		</Styled.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );

@@ -35,18 +35,34 @@ export const DEFAULT_LAYOUTS = {
 	},
 };
 
-export function getActiveFiltersForTab( activeView: string ): Filter[] {
-	if ( activeView === 'active' || activeView === 'user' ) {
-		return [];
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
+
+export function getActiveViewOverridesForTab(
+	activeView: string
+): ActiveViewOverrides {
+	// User view: sort by date, newest first
+	if ( activeView === 'user' ) {
+		return {
+			sort: { field: 'date', direction: 'desc' as const },
+		};
 	}
-	// Author-based view
-	return [
-		{
-			field: 'author',
-			operator: 'isAny',
-			value: [ activeView ],
-		},
-	];
+	// Active view: no overrides
+	if ( activeView === 'active' ) {
+		return {};
+	}
+	// Author-based view: filter by author
+	return {
+		filters: [
+			{
+				field: 'author',
+				operator: 'isAny',
+				value: [ activeView ],
+			},
+		],
+	};
 }
 
 export async function ensureView(
@@ -58,23 +74,29 @@ export async function ensureView(
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
-		activeFilters: getActiveFiltersForTab( activeView ?? 'active' ),
+		activeViewOverrides: getActiveViewOverridesForTab(
+			activeView ?? 'active'
+		),
 		queryParams: search,
 	} );
 }
 
-export function getActiveFiltersForTabLegacy( activeView: string ): Filter[] {
+export function getActiveViewOverridesForTabLegacy(
+	activeView: string
+): ActiveViewOverrides {
 	if ( activeView === 'all' ) {
-		return [];
+		return {};
 	}
 	// Author-based view
-	return [
-		{
-			field: 'author',
-			operator: 'isAny',
-			value: [ activeView ],
-		},
-	];
+	return {
+		filters: [
+			{
+				field: 'author',
+				operator: 'isAny',
+				value: [ activeView ],
+			},
+		],
+	};
 }
 
 export async function ensureViewLegacy(
@@ -86,7 +108,9 @@ export async function ensureViewLegacy(
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW_LEGACY,
-		activeFilters: getActiveFiltersForTabLegacy( activeView ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTabLegacy(
+			activeView ?? 'all'
+		),
 		queryParams: search,
 	} );
 }

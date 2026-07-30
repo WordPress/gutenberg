@@ -110,7 +110,7 @@ export function WorkflowMenu() {
 
 	useShortcut(
 		'core/workflows',
-		/** @type {import('react').KeyboardEventHandler} */
+		/** @type {React.KeyboardEventHandler} */
 		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
@@ -124,6 +124,14 @@ export function WorkflowMenu() {
 			bindGlobal: true,
 		}
 	);
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// Load @wordpress/core-abilities on demand. Importing it fetches
+			// and registers all server abilities and categories.
+			import( '@wordpress/core-abilities' );
+		}
+	}, [ isOpen ] );
 
 	const closeAndReset = () => {
 		setSearch( '' );

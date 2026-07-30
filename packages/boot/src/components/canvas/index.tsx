@@ -74,7 +74,12 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ { isPreviewMode: canvas.isPreview } }
+					settings={ {
+						isPreviewMode: canvas.isPreview,
+						styles: canvas.isPreview
+							? [ { css: 'body{min-height:100vh;}' } ]
+							: [],
+					} }
 					backButton={ backButton }
 				/>
 			</div>

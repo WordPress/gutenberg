@@ -4,7 +4,7 @@
  */
 import {
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -87,6 +87,12 @@ export const validateBlocksToTemplate =
 
 /**
  * A block selection object.
+ *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
  *
  * @typedef {Object} WPBlockSelection
  *
@@ -517,11 +523,12 @@ export function moveBlockToPosition(
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
  * a templateLock is active on the block list.
  *
- * @param {Object}   block           Block object to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta            Optional Meta values to be passed to the action object.
+ * @param {Object}    block           Block object to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -530,6 +537,7 @@ export function insertBlock(
 	index,
 	rootClientId,
 	updateSelection,
+	initialPosition,
 	meta
 ) {
 	return insertBlocks(
@@ -537,7 +545,7 @@ export function insertBlock(
 		index,
 		rootClientId,
 		updateSelection,
-		0,
+		initialPosition,
 		meta
 	);
 }
@@ -814,6 +822,8 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
+				// Block A's inner blocks sit inside the selection; only B's survive.
+				innerBlocks: blockB.innerBlocks,
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
@@ -1243,10 +1253,16 @@ export const mergeBlocks =
 		}
 
 		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
+			const isASelected = select.isBlockSelected( clientIdA );
+
+			if ( isASelected ) {
+				registry.batch( () => {
+					dispatch.removeBlock( clientIdA, false );
+					dispatch.selectBlock( clientIdB, 0 );
+				} );
+			} else {
+				dispatch.removeBlock( clientIdA, false );
+			}
 			return;
 		}
 
@@ -1614,16 +1630,17 @@ export function updateSettings( settings ) {
  * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
- * @param {string} id        Reusable block's id.
- * @param {string} updatedId Updated block's id.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function __unstableSaveReusableBlock( id, updatedId ) {
+export function __unstableSaveReusableBlock() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSaveReusableBlock',
+		{
+			since: '7.1',
+		}
+	);
 	return {
-		type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-		id,
-		updatedId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1637,12 +1654,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Action that signals that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly
+ * as not persistent.
  *
+ * By default, non-persistent changes may still merge into undo history. Use
+ * `history: 'ignore'` for derived changes that should never be captured by undo.
+ *
+ * @param {Object} options         Options object.
+ * @param {string} options.history How the change should interact with history.
  * @return {Object} Action object.
  */
-export function __unstableMarkNextChangeAsNotPersistent() {
-	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+export function __unstableMarkNextChangeAsNotPersistent( {
+	history = 'merge',
+} = {} ) {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT', history };
 }
 
 /**
@@ -1736,7 +1761,7 @@ export const duplicateBlocks =
 			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
-			__experimentalCloneSanitizedBlock( block )
+			cloneSanitizedBlock( block )
 		);
 		dispatch.insertBlocks(
 			clonedBlocks,
@@ -1765,15 +1790,11 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
@@ -1808,15 +1829,11 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(
@@ -1924,6 +1941,7 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  *
  * @typedef {Object} InserterMediaRequest
  * @property {number} per_page How many items to fetch per page.
+ * @property {number} [page]   Which page of results to fetch. Defaults to the first page.
  * @property {string} search   The search term to use for filtering the results.
  */
 
@@ -1943,6 +1961,17 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  */
 
 /**
+ * Interface for paginated inserter media responses. A media category's `fetch`
+ * may return this instead of a plain array to opt into pagination, in which case
+ * the media tab renders paging controls for the category.
+ *
+ * @typedef {Object} InserterMediaResponse
+ * @property {InserterMediaItem[]} mediaItems The media items for the requested page.
+ * @property {number}              totalItems The total number of items across all pages.
+ * @property {number}              totalPages The total number of pages available.
+ */
+
+/**
  * Registers a new inserter media category. Once registered, the media category is
  * available in the inserter's media tab.
  *
@@ -1955,6 +1984,7 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * _Properties_
  *
  * - _per_page_ `number`: How many items to fetch per page.
+ * - _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
  * - _search_ `string`: The search term to use for filtering the results.
  *
  * _Type Definition_
@@ -1973,7 +2003,19 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * - _alt_ `[string]`: The alt text of the media item.
  * - _caption_ `[string]`: The caption of the media item.
  *
- * @param    {InserterMediaCategory}                                  category                       The inserter media category to register.
+ * _Type Definition_
+ *
+ * - _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media
+ * category's `fetch` may return this instead of a plain array to opt into pagination, in which
+ * case the media tab renders paging controls for the category.
+ *
+ * _Properties_
+ *
+ * - _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
+ * - _totalItems_ `number`: The total number of items across all pages.
+ * - _totalPages_ `number`: The total number of pages available.
+ *
+ * @param    {InserterMediaCategory}                                                        category                       The inserter media category to register.
  *
  * @example
  * ```js
@@ -2030,16 +2072,20 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * ```
  *
  * @typedef {Object} InserterMediaCategory Interface for inserter media category.
- * @property {string}                                                 name                           The name of the media category, that should be unique among all media categories.
- * @property {Object}                                                 labels                         Labels for the media category.
- * @property {string}                                                 labels.name                    General name of the media category. It's used in the inserter media items list.
- * @property {string}                                                 [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
- * @property {('image'|'audio'|'video')}                              mediaType                      The media type of the media category.
- * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                          The function to fetch media items for the category.
- * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
- *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
- * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
- *                                                                                                   This is used to avoid making a request to the external resource when the user
+ * @property {string}                                                                       name                           The name of the media category, that should be unique among all media categories.
+ * @property {Object}                                                                       labels                         Labels for the media category.
+ * @property {string}                                                                       labels.name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string}                                                                       [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ * @property {('image'|'audio'|'video')}                                                    mediaType                      The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>} fetch                          The function to fetch media items for the category. Returning an
+ *                                                                                                                         `InserterMediaResponse` instead of a plain array opts the category into
+ *                                                                                                                         pagination.
+ * @property {(InserterMediaItem) => string}                                                [getReportUrl]                 If the media category supports reporting media items, this function should return
+ *                                                                                                                         the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                                      [isExternalResource]           If the media category is an external resource, this should be set to true.
+ *                                                                                                                         This is used to avoid making a request to the external resource when checking
+ *                                                                                                                         whether the category has any media items to display in the media tab.
+ * @property {string}                                                                       [emptyMessage]                 Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -2068,7 +2114,7 @@ export const registerInserterMediaCategory =
 		}
 		if ( ! category.fetch || typeof category.fetch !== 'function' ) {
 			console.error(
-				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`.'
 			);
 			return;
 		}
@@ -2140,5 +2186,60 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Sets which List View panel should be opened.
+ *
+ * @param {string|null} clientId The client ID of the panel to open, or null to close all.
+ * @return {Object} Action object.
+ */
+export function __unstableSetOpenListViewPanel( clientId ) {
+	return {
+		type: 'SET_OPEN_LIST_VIEW_PANEL',
+		clientId,
+	};
+}
+
+/**
+ * Sets all List View panels to be opened.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetAllListViewPanelsOpen() {
+	return {
+		type: 'SET_ALL_LIST_VIEW_PANELS_OPEN',
+	};
+}
+
+/**
+ * Toggles a List View panel open/closed state.
+ *
+ * @param {string}  clientId The client ID of the panel to toggle.
+ * @param {boolean} isOpen   Whether the panel should be open.
+ * @return {Object} Action object.
+ */
+export function __unstableToggleListViewPanel( clientId, isOpen ) {
+	return {
+		type: 'TOGGLE_LIST_VIEW_PANEL',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableIncrementListViewExpandRevision() {
+	return {
+		type: 'INCREMENT_LIST_VIEW_EXPAND_REVISION',
 	};
 }

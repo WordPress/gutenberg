@@ -16,14 +16,14 @@ export default function useListViewClientIds( { blocks, rootClientId } ) {
 			const {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
-				getEnabledClientIdsTree,
+				getListViewClientIdsTree,
 			} = unlock( select( blockEditorStore ) );
 
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
 				clientIdsTree:
-					blocks ?? getEnabledClientIdsTree( rootClientId ),
+					blocks ?? getListViewClientIdsTree( rootClientId ),
 			};
 		},
 		[ blocks, rootClientId ]

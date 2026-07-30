@@ -17,7 +17,7 @@ import {
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
-export default function save( { attributes, className } ) {
+export default function save( { attributes } ) {
 	const {
 		tagName,
 		type,
@@ -28,9 +28,7 @@ export default function save( { attributes, className } ) {
 		text,
 		title,
 		url,
-		width,
 	} = attributes;
-
 	const TagName = tagName || 'a';
 	const isButtonTag = 'button' === TagName;
 	const buttonType = type || 'button';
@@ -65,12 +63,8 @@ export default function save( { attributes, className } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
-	const wrapperClasses = clsx( className, {
-		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-	} );
-
 	return (
-		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+		<div { ...useBlockProps.save() }>
 			<RichText.Content
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }

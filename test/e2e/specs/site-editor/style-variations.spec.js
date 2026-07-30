@@ -14,6 +14,9 @@ test.describe( 'Global styles variations', () => {
 		await requestUtils.activateTheme(
 			'gutenberg-test-themes/style-variations'
 		);
+		// Ensure a clean slate so the "Default" variation is detected as active,
+		// independent of any global styles a prior spec saved for this theme.
+		await requestUtils.resetThemeGlobalStyles();
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
@@ -76,23 +79,23 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors"i]' );
+		await page.click( 'role=button[name="Background styles"i]' );
 
 		await expect(
 			page.locator(
-				'role=button[name="Background"i] >> .component-color-indicator'
+				'role=button[name="Color"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
-
-		await expect(
-			page.locator(
-				'role=button[name="Text"i] >> .component-color-indicator'
-			)
-		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
 		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography"i]' );
 		await page.click( 'role=button[name="Text"i]' );
+
+		await expect(
+			page.locator(
+				'role=button[name="Color"i] >> .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
 		await expect(
 			page.locator( 'role=radio[name="Medium"i]' )
@@ -112,23 +115,23 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors"i]' );
+		await page.click( 'role=button[name="Background styles"i]' );
 
 		await expect(
 			page.locator(
-				'role=button[name="Background"i] >> .component-color-indicator'
+				'role=button[name="Color"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
-
-		await expect(
-			page.locator(
-				'role=button[name="Text"i] >> .component-color-indicator'
-			)
-		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
 		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography"i]' );
 		await page.click( 'role=button[name="Text"i]' );
+
+		await expect(
+			page.locator(
+				'role=button[name="Color"i] >> .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
 		await expect(
 			page.locator( 'role=spinbutton[name="Font size"i]' )

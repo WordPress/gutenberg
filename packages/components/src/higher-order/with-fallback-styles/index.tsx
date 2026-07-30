@@ -6,17 +6,15 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { useState, useRef } from '@wordpress/element';
+import {
+	createHigherOrderComponent,
+	useIsomorphicLayoutEffect,
+} from '@wordpress/compose';
 
 type Props = {
 	node?: HTMLElement;
 	[ key: string ]: any;
-};
-
-type State = {
-	fallbackStyles?: { [ key: string ]: any };
-	grabStylesCompleted: boolean;
 };
 
 export default (
@@ -26,69 +24,41 @@ export default (
 	) => { [ key: string ]: any }
 ) =>
 	createHigherOrderComponent( ( WrappedComponent ) => {
-		return class WithFallbackStyles extends Component< Props, State > {
-			nodeRef?: HTMLElement;
+		return function WithFallbackStyles( props: Props ) {
+			const [ fallbackStyles, setFallbackStyles ] = useState<
+				{ [ key: string ]: any } | undefined
+			>( undefined );
 
-			constructor( props: Props ) {
-				super( props );
-				this.nodeRef = this.props.node;
-				this.state = {
-					fallbackStyles: undefined,
-					grabStylesCompleted: false,
-				};
+			const nodeRef = useRef< HTMLDivElement >( null );
 
-				this.bindRef = this.bindRef.bind( this );
-			}
+			// Runs before paint, so the fallback styles apply without a flash.
+			useIsomorphicLayoutEffect( () => {
+				const node = props.node ?? nodeRef.current;
+				// Derived from fallbackStyles: the grab is complete once every
+				// mapped value has resolved to a truthy style.
+				const grabStylesCompleted =
+					!! fallbackStyles &&
+					Object.values( fallbackStyles ).every( Boolean );
 
-			bindRef( node: HTMLDivElement ) {
-				if ( ! node ) {
-					return;
-				}
-				this.nodeRef = node;
-			}
-
-			componentDidMount() {
-				this.grabFallbackStyles();
-			}
-
-			componentDidUpdate() {
-				this.grabFallbackStyles();
-			}
-
-			grabFallbackStyles() {
-				const { grabStylesCompleted, fallbackStyles } = this.state;
-				if ( this.nodeRef && ! grabStylesCompleted ) {
-					const newFallbackStyles = mapNodeToProps(
-						this.nodeRef,
-						this.props
-					);
+				if ( node && ! grabStylesCompleted ) {
+					const newFallbackStyles = mapNodeToProps( node, props );
 
 					if (
 						! fastDeepEqual( newFallbackStyles, fallbackStyles )
 					) {
-						this.setState( {
-							fallbackStyles: newFallbackStyles,
-							grabStylesCompleted:
-								Object.values( newFallbackStyles ).every(
-									Boolean
-								),
-						} );
+						setFallbackStyles( newFallbackStyles );
 					}
 				}
-			}
+			} );
 
-			render() {
-				const wrappedComponent = (
-					<WrappedComponent
-						{ ...this.props }
-						{ ...this.state.fallbackStyles }
-					/>
-				);
-				return this.props.node ? (
-					wrappedComponent
-				) : (
-					<div ref={ this.bindRef }> { wrappedComponent } </div>
-				);
-			}
+			const wrappedComponent = (
+				<WrappedComponent { ...props } { ...fallbackStyles } />
+			);
+
+			return props.node ? (
+				wrappedComponent
+			) : (
+				<div ref={ nodeRef }> { wrappedComponent } </div>
+			);
 		};
 	}, 'withFallbackStyles' );

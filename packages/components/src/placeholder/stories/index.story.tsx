@@ -33,6 +33,10 @@ const meta: Meta< typeof Placeholder > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -44,7 +48,6 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
 		<Placeholder { ...args }>
 			<div>
 				<TextControl
-					__next40pxDefaultSize
 					label="Sample Field"
 					placeholder="Enter something here"
 					value={ value }

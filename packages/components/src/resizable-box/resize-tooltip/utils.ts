@@ -19,7 +19,7 @@ interface UseResizeLabelProps {
 	/** The label value. */
 	label?: string;
 	/** Element to be rendered for resize listening events. */
-	resizeListener: JSX.Element;
+	resizeListener: React.JSX.Element;
 }
 
 interface UseResizeLabelArgs {
@@ -82,7 +82,7 @@ export function useResizeLabel( {
 	 * This timeout is used with setMoveX and setMoveY to determine of
 	 * both width and height values have changed at (roughly) the same time.
 	 */
-	const moveTimeoutRef = useRef< number >();
+	const moveTimeoutRef = useRef< number >( undefined );
 
 	const debounceUnsetMoveXY = useCallback( () => {
 		const unsetMoveXY = () => {

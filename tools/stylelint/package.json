@@ -1,0 +1,33 @@
+{
+	"name": "@wordpress/stylelint-tools",
+	"version": "1.0.0",
+	"description": "Consolidated Stylelint configuration for the repo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"stylelint"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/stylelint",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/stylelint"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"exports": {
+		"./config": "./config.js"
+	},
+	"dependencies": {
+		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
+		"@wordpress/theme": "file:../../packages/theme",
+		"stylelint-plugin-logical-css": "^1.2.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

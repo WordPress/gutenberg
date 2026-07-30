@@ -18,10 +18,11 @@ import {
 import {
 	BaseControl,
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import {
 	useCallback,
 	useEffect,
@@ -38,6 +39,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -161,8 +163,8 @@ function ValidatedDateControl< Item >( {
 	field: NormalizedField< Item >;
 	validity?: FieldValidity;
 	inputRefs:
-		| React.RefObject< HTMLInputElement >
-		| React.RefObject< HTMLInputElement >[];
+		| React.RefObject< HTMLInputElement | null >
+		| React.RefObject< HTMLInputElement | null >[];
 	isTouched: boolean;
 	setIsTouched: ( touched: boolean ) => void;
 	children: React.ReactNode;
@@ -209,7 +211,8 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ inputRefs, isValid, validity ] );
 
-	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	// Listen for 'invalid' events (e.g., dispatched by layouts when a card
+	// re-expands or loses focus).
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const handleInvalid = ( event: Event ) => {
@@ -240,6 +243,12 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
 			return;
@@ -258,26 +267,24 @@ function ValidatedDateControl< Item >( {
 	return (
 		<div onBlur={ onBlur }>
 			{ children }
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							customValidity.type === 'invalid'
-								? 'is-invalid'
-								: undefined
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
+			{ customValidity && (
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						customValidity.type === 'invalid'
+							? 'is-invalid'
+							: undefined
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
+			) }
 		</div>
 	);
 }
@@ -287,16 +294,19 @@ function CalendarDateControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
 		label,
+		description,
 		setValue,
 		getValue,
 		isValid,
 		format: fieldFormat,
 	} = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
@@ -314,6 +324,9 @@ function CalendarDateControl< Item >( {
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDate );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -365,9 +378,12 @@ function CalendarDateControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel = isValid?.required
-		? `${ label } (${ __( 'Required' ) })`
-		: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl
@@ -381,13 +397,14 @@ function CalendarDateControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -400,6 +417,8 @@ function CalendarDateControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -413,8 +432,8 @@ function CalendarDateControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							disabled={ !! selectedPresetId }
-							accessibleWhenDisabled={ false }
+							disabled={ !! selectedPresetId || disabled }
+							accessibleWhenDisabled
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -422,7 +441,6 @@ function CalendarDateControl< Item >( {
 
 					{ /* Manual date input */ }
 					<InputControl
-						__next40pxDefaultSize
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -430,6 +448,9 @@ function CalendarDateControl< Item >( {
 						value={ value }
 						onChange={ handleManualDateChange }
 						required={ !! field.isValid?.required }
+						disabled={ disabled }
+						min={ minConstraint }
+						max={ maxConstraint }
 					/>
 
 					{ /* Calendar widget */ }
@@ -443,6 +464,8 @@ function CalendarDateControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled || disabledMatchers }
+						disableNavigation={ disabled }
 					/>
 				</Stack>
 			</BaseControl>
@@ -455,9 +478,19 @@ function CalendarDateRangeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue, format: fieldFormat } = field;
+	const {
+		id,
+		label,
+		description,
+		getValue,
+		setValue,
+		isValid,
+		format: fieldFormat,
+	} = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -471,6 +504,9 @@ function CalendarDateRangeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDate );
 
 	const onChangeCallback = useCallback(
 		( newValue: DateRange ) => {
@@ -573,9 +609,12 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone } = getSettings();
 
-	const displayLabel = field.isValid?.required
-		? `${ label } (${ __( 'Required' ) })`
-		: label;
+	let displayLabel = label;
+	if ( field.isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! field.isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl
@@ -589,13 +628,14 @@ function CalendarDateRangeControl< Item >( {
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
+				help={ description }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -608,6 +648,8 @@ function CalendarDateRangeControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -621,8 +663,8 @@ function CalendarDateRangeControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							accessibleWhenDisabled={ false }
-							disabled={ !! selectedPresetId }
+							accessibleWhenDisabled
+							disabled={ !! selectedPresetId || disabled }
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -631,12 +673,11 @@ function CalendarDateRangeControl< Item >( {
 					{ /* Manual date range inputs */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -646,9 +687,11 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'from', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }
@@ -658,6 +701,9 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'to', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 					</Stack>
 
@@ -669,6 +715,7 @@ function CalendarDateRangeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled || disabledMatchers }
 					/>
 				</Stack>
 			</BaseControl>
@@ -681,6 +728,7 @@ export default function DateControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -704,6 +752,7 @@ export default function DateControl< Item >( {
 				field={ field }
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
+				markWhenOptional={ markWhenOptional }
 				validity={ validity }
 			/>
 		);
@@ -715,6 +764,7 @@ export default function DateControl< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
 			validity={ validity }
 		/>
 	);

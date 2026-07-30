@@ -10,6 +10,7 @@ There are two ways to register commands: static or dynamic. Both methods receive
 -   `label`: A human-readable label
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
+-   `category`: (Optional) The category of the command. See [Command categories](#command-categories) below
 -   `context`: (Optional) The context of the command
 -   `keywords`: (Optional) An array of keywords for search matching
 
@@ -36,6 +37,17 @@ At the moment, three contexts have been implemented:
 As the usage of the Command Palette expands, more contexts will be added.
 
 Attaching a command or command loader to a given context is as simple as adding the `context` property (with the right context value from the available contexts above) to the `useCommand` or `useCommandLoader` calls.
+
+## Command categories
+
+Each command can be assigned a `category` that describes what kind of action it performs. Categories are used by the Command Palette to visually differentiate commands. The following categories are available:
+
+-   `command`: Executes code or toggles a command (e.g., Add block, duplicating a block).
+-   `view`: Navigates to an area in the admin or opens a panel (e.g., "Go to: Templates").
+-   `edit`: Navigates to edit a document (e.g., editing a template, editing a page).
+-   `action`: A generic fallback for commands that don't fit the other categories. This is also the default when an invalid category is provided.
+
+If no `category` is specified, the command will have `action` set. If an invalid value is provided, a warning is emitted in development mode and the category defaults to `action`.
 
 ## WordPress Data API
 
@@ -104,6 +116,7 @@ useCommand( {
 	name: 'myplugin/my-command-name',
 	label: __( 'Add new post' ),
 	icon: plus,
+	category: 'command',
 	callback: ( { close } ) => {
 		document.location.href = 'post-new.php';
 		close();
@@ -160,6 +173,7 @@ function usePageSearchCommandLoader( { search } ) {
 					? record.title?.rendered
 					: __( '(no title)' ),
 				icon: page,
+				category: 'edit',
 				callback: ( { close } ) => {
 					const args = {
 						p: '/page',
@@ -203,6 +217,7 @@ useCommands( [
 		name: 'myplugin/add-post',
 		label: __( 'Add new post' ),
 		icon: plus,
+		category: 'command',
 		callback: ( { close } ) => {
 			document.location.href = 'post-new.php';
 			close();
@@ -212,6 +227,7 @@ useCommands( [
 		name: 'myplugin/edit-posts',
 		label: __( 'Edit posts' ),
 		icon: pencil,
+		category: 'view',
 		callback: ( { close } ) => {
 			document.location.href = 'edit.php';
 			close();

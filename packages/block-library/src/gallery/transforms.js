@@ -13,6 +13,7 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import { defaultColumnsNumber } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -21,6 +22,15 @@ const parseShortcodeIds = ( ids ) => {
 
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
+
+const cloneInnerBlocks = ( innerBlocks ) =>
+	innerBlocks.map( ( innerBlock ) =>
+		createBlock(
+			innerBlock.name,
+			innerBlock.attributes,
+			cloneInnerBlocks( innerBlock.innerBlocks || [] )
+		)
+	);
 
 /**
  * Third party block plugins don't have an easy way to detect if the
@@ -259,6 +269,43 @@ const transforms = {
 					);
 				}
 				return createBlock( 'core/image', { align } );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			variationName: 'group-grid',
+			transform: ( attributes, innerBlocks ) => {
+				const {
+					allowResize,
+					aspectRatio,
+					caption,
+					columns,
+					fixedHeight,
+					ids,
+					imageCrop,
+					images,
+					linkTarget,
+					linkTo,
+					navigationButtonType,
+					randomOrder,
+					shortCodeTransforms,
+					sizeSlug,
+					...rest
+				} = attributes;
+				return createBlock(
+					'core/group',
+					{
+						...rest,
+						layout: {
+							type: 'grid',
+							columnCount:
+								columns ??
+								defaultColumnsNumber( innerBlocks.length ),
+						},
+					},
+					cloneInnerBlocks( innerBlocks )
+				);
 			},
 		},
 	],

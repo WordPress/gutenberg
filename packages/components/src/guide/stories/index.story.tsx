@@ -24,6 +24,12 @@ const meta: Meta< typeof Guide > = {
 		previousButtonText: { control: 'text' },
 		onFinish: { action: 'onFinish' },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
+	},
 };
 export default meta;
 

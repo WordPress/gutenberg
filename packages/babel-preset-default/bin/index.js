@@ -29,7 +29,6 @@ builder( {
 	)
 	.then( ( output ) => writeFile( './build/polyfill.min.js', output.code ) )
 	.catch( ( error ) => {
-		// eslint-disable-next-line no-console
 		console.log( error );
 		process.exit( 1 );
 	} );

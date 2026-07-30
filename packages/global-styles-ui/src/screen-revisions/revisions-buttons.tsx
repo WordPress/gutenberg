@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Composite } from '@wordpress/components';
+import {
+	Button,
+	Composite,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -13,6 +17,9 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import type { Revision } from './types';
+import { unlock } from '../lock-unlock';
+
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
@@ -229,11 +236,12 @@ function RevisionsButtons( {
 						</span>
 						{ isSelected &&
 							( areStylesEqual ? (
-								<p className="global-styles-ui-screen-revisions__applied-text">
-									{ __(
-										'These styles are already applied to your site.'
-									) }
-								</p>
+								<WCBadge
+									className="global-styles-ui-screen-revisions__active-badge"
+									intent="info"
+								>
+									{ __( 'Active' ) }
+								</WCBadge>
 							) : (
 								<Button
 									size="compact"

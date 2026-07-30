@@ -362,7 +362,7 @@ test.describe( 'Post-type locking', () => {
 				'Group',
 				'Preformatted',
 				'Pullquote',
-				'Verse',
+				'Poetry',
 			] );
 		} );
 	} );

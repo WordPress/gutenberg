@@ -11,8 +11,10 @@ export {
 	useParams,
 	useSearch,
 } from '@tanstack/react-router';
+
 export type {
 	AnyRoute,
+	AnyRouter,
 	LinkProps,
 	NavigateOptions,
 	RouteOptions,

@@ -11,15 +11,12 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import {
-	__experimentalText as Text,
-	__experimentalView as View,
-} from '@wordpress/components';
+import { __experimentalView as View } from '@wordpress/components';
 
 function Example() {
 	return (
 		<View>
-			<Text>Code is Poetry</Text>
+			<span>Code is Poetry</span>
 		</View>
 	);
 }
@@ -32,9 +29,3 @@ function Example() {
 **Type**: `string`,`E`
 
 Render the component as another React Component or HTML Element.
-
-### css
-
-**Type**: `InterpolatedCSS`
-
-Render custom CSS using the style system.

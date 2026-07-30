@@ -10,15 +10,49 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
+const baseTestIgnore: Array< string | RegExp > = [];
+if ( Array.isArray( baseConfig.testIgnore ) ) {
+	baseTestIgnore.push( ...baseConfig.testIgnore );
+} else if ( baseConfig.testIgnore ) {
+	baseTestIgnore.push( baseConfig.testIgnore );
+}
+
 const config = defineConfig( {
 	...baseConfig,
+	webServer: {
+		...baseConfig.webServer,
+		command: 'npm run --prefix ../.. wp-env-test -- start',
+	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
+		? [
+				[ 'github' ],
+				[ './config/flaky-tests-reporter.ts' ],
+				[ 'blob' ],
+				/*
+				 * Only interact with flakiness.io for the official WordPress/Gutenberg
+				 * repository. Forks and private mirrors are not configured on the service.
+				 */
+				...( process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
+					? ( [
+							[
+								'@flakiness/playwright',
+								{ flakinessProject: 'WordPress/gutenberg' },
+							],
+					  ] as const )
+					: [] ),
+		  ]
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
+	// The default suite runs RTC tests on the HTTP polling provider. Specs
+	// that rely on WebSocket-only semantics live under `websocket-only/` and
+	// are picked up by playwright.rtc-websocket.config.ts instead.
+	testIgnore: [
+		...baseTestIgnore,
+		'**/specs/editor/collaboration/websocket-only/**',
+	],
 	projects: [
 		{
 			name: 'chromium',

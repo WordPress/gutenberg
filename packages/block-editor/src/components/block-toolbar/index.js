@@ -36,8 +36,11 @@ import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
+import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
+import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
  * Renders the block toolbar.
@@ -75,7 +78,11 @@ export function PrivateBlockToolbar( {
 		showLockButtons,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
+		areSelectedBlocksHiddenOnViewport,
+		showStyleStateSlot,
+		canEdit,
 	} = useSelect( ( select ) => {
+		const { canEditBlock } = select( blockEditorStore );
 		const {
 			getBlockName,
 			getBlockMode,
@@ -84,10 +91,14 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockEditingMode,
 			getBlockAttributes,
+			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
 			isZoomOut,
 			isSectionBlock,
+			isBlockHiddenAtViewport,
+			getSelectedBlockStyleState,
+			isResponsiveEditing,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -117,7 +128,22 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
-		const _showSwitchSectionStyleButton = _isZoomOut || _isSectionBlock;
+		const _canEditBlock = canEditBlock( selectedBlockClientId );
+		const _showSwitchSectionStyleButton =
+			_canEditBlock && ( _isZoomOut || _isSectionBlock );
+
+		const _currentDeviceType =
+			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+		const _areSelectedBlocksHiddenOnViewport =
+			selectedBlockClientIds.length > 0 &&
+			selectedBlockClientIds.every( ( id ) =>
+				isBlockHiddenAtViewport( id, _currentDeviceType )
+			);
+		const _isEditingResponsiveStyleState =
+			isResponsiveEditing() &&
+			hasViewportBlockStyleState(
+				getSelectedBlockStyleState( selectedBlockClientId )
+			);
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -141,11 +167,15 @@ export function PrivateBlockToolbar( {
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
-			showSlots: ! _isZoomOut,
+			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
+			showStyleStateSlot: ! _isZoomOut && _isEditingResponsiveStyleState,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
+			areSelectedBlocksHiddenOnViewport:
+				_areSelectedBlocksHiddenOnViewport,
+			canEdit: _canEditBlock,
 		};
 	}, [] );
 
@@ -225,42 +255,62 @@ export function PrivateBlockToolbar( {
 						</ToolbarGroup>
 					</div>
 				) }
-				{ ! hasContentOnlyLocking &&
+				{ ! areSelectedBlocksHiddenOnViewport &&
+					! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ showShuffleButton && (
+				{ ! isMultiToolbar && canEdit && (
+					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
+				) }
+				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
 					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
-				{ showSwitchSectionStyleButton && (
-					<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
-				) }
-				{ shouldShowVisualToolbar && showSlots && (
-					<>
-						{ ! isSectionContainer && (
-							<>
-								<BlockControls.Slot
-									group="parent"
-									className="block-editor-block-toolbar__slot"
-								/>
-								<BlockControls.Slot
-									group="block"
-									className="block-editor-block-toolbar__slot"
-								/>
-								<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-								<BlockControls.Slot
-									group="inline"
-									className="block-editor-block-toolbar__slot"
-								/>
-							</>
-						) }
-						<BlockControls.Slot
-							group="other"
-							className="block-editor-block-toolbar__slot"
-						/>
-						<__unstableBlockToolbarLastItem.Slot />
-					</>
-				) }
+				{ ! areSelectedBlocksHiddenOnViewport &&
+					showSwitchSectionStyleButton && (
+						<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
+					) }
+				{ ! areSelectedBlocksHiddenOnViewport &&
+					shouldShowVisualToolbar && (
+						<>
+							{ ! isSectionContainer && (
+								<>
+									{ showSlots && (
+										<>
+											<BlockControls.Slot
+												group="parent"
+												className="block-editor-block-toolbar__slot"
+											/>
+											<BlockControls.Slot
+												group="block"
+												className="block-editor-block-toolbar__slot"
+											/>
+											<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+											<BlockControls.Slot
+												group="inline"
+												className="block-editor-block-toolbar__slot"
+											/>
+										</>
+									) }
+									{ showStyleStateSlot && (
+										<BlockControls.Slot
+											group="style-state"
+											className="block-editor-block-toolbar__slot"
+										/>
+									) }
+								</>
+							) }
+							{ showSlots && (
+								<>
+									<BlockControls.Slot
+										group="other"
+										className="block-editor-block-toolbar__slot"
+									/>
+									<__unstableBlockToolbarLastItem.Slot />
+								</>
+							) }
+						</>
+					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>

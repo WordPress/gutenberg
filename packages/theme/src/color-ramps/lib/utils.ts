@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import { type ColorTypes } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
+import { type PlainColorObject } from 'colorjs.io/fn';
 import {
 	WHITE,
 	BLACK,
@@ -142,7 +134,7 @@ export function stepsForStep(
  * ramp direction value.
  */
 export function computeBetterFgColorDirection(
-	seed: ColorTypes,
+	seed: string | PlainColorObject,
 	preferLighter?: boolean
 ): {
 	better: RampDirection;

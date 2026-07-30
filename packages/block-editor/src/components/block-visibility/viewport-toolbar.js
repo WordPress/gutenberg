@@ -3,21 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { seen, unseen } from '@wordpress/icons';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { BlockVisibilityModal } from './';
 import { unlock } from '../../lock-unlock';
+import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
 			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
@@ -39,6 +39,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 
 		[ clientIds ]
 	);
+	const blockEditorDispatch = useDispatch( blockEditorStore );
 
 	/*
 	 * If the block visibility button has been shown, we don't want to
@@ -53,6 +54,10 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 		}
 	}, [ areBlocksHiddenAnywhere ] );
 
+	if ( blockVisibility === false ) {
+		return null;
+	}
+
 	if (
 		! areBlocksHiddenAnywhere &&
 		! hasBlockVisibilityButtonShownRef.current
@@ -60,28 +65,19 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 		return null;
 	}
 
+	const { showViewportModal } = unlock( blockEditorDispatch );
+
 	return (
-		<>
-			<ToolbarGroup className="block-editor-block-visibility-toolbar">
-				<ToolbarButton
-					disabled={ ! canToggleBlockVisibility }
-					icon={ areBlocksHiddenAnywhere ? unseen : seen }
-					label={
-						areBlocksHiddenAnywhere
-							? __( 'Hidden' )
-							: __( 'Visible' )
-					}
-					onClick={ () => setIsModalOpen( true ) }
-					aria-expanded={ isModalOpen }
-					aria-haspopup={ ! isModalOpen ? 'dialog' : undefined }
-				/>
-			</ToolbarGroup>
-			{ isModalOpen && (
-				<BlockVisibilityModal
-					clientIds={ clientIds }
-					onClose={ () => setIsModalOpen( false ) }
-				/>
-			) }
-		</>
+		<ToolbarGroup className="block-editor-block-visibility-toolbar">
+			<ToolbarButton
+				disabled={ ! canToggleBlockVisibility }
+				icon={ areBlocksHiddenAnywhere ? unseen : seen }
+				label={
+					areBlocksHiddenAnywhere ? __( 'Hidden' ) : __( 'Visible' )
+				}
+				onClick={ () => showViewportModal( clientIds ) }
+				aria-haspopup="dialog"
+			/>
+		</ToolbarGroup>
 	);
 }
