@@ -1,8 +1,5 @@
-/**
- * @jest-environment node
- */
 import { beforeAll, describe, expect, it } from 'vitest';
-import plugin from '../no-global-css-defense-custom-properties.mjs';
+import plugin from '../../../stylelint-plugins/no-global-css-defense-custom-properties.mjs';
 import { getStylelintResult } from './utils';
 
 const CONFIG = {

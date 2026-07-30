@@ -32,6 +32,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning" },
+		{ "path": "./tsconfig.plugins.json" }
 	]
 }

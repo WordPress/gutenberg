@@ -44,6 +44,7 @@
 	"dependencies": {
 		"@stylistic/stylelint-plugin": "^5.2.1",
 		"@wordpress/theme": "file:../theme",
+		"@wordpress/ui": "file:../ui",
 		"stylelint-config-recommended": "^18.0.0",
 		"stylelint-config-recommended-scss": "^17.0.1"
 	},

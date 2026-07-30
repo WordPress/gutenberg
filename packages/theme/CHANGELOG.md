@@ -46,7 +46,6 @@
 
 ### Enhancements
 
--   Added `no-global-css-defense-custom-properties` stylelint rule that disallows using or overriding `--_gcd-*` (global CSS defense) custom properties. Available as `@wordpress/theme/stylelint-plugins/no-global-css-defense-custom-properties` ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
 
 ### Bug Fixes

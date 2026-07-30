@@ -118,6 +118,7 @@
 
 ### Enhancements
 
+-   Add `no-global-css-defense-custom-properties` stylelint rule that disallows using or overriding `--_gcd-*` (global CSS defense) custom properties. Available as `@wordpress/ui/stylelint-plugins/no-global-css-defense-custom-properties` ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   `Calendar`, `RangeCalendar`: Add custom root roles and month-aware application labels. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
 -   `CollapsibleCard`: Support multiple `CollapsibleCard.HeaderDescription` components ([#81227](https://github.com/WordPress/gutenberg/pull/81227)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
@@ -201,7 +202,6 @@
 
 ### Internal
 
--   Disable `plugin-wpds/no-global-css-defense-custom-properties` for this package so global CSS defense can keep using `--_gcd-*` bridges ([#80952](https://github.com/WordPress/gutenberg/pull/80952)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).
 
