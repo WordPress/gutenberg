@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
+import '../../../store';
 import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,
@@ -37,11 +43,6 @@ describe( 'block parser', () => {
 		},
 		save: ( { attributes } ) => attributes.content || null,
 	};
-
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../../store' );
-	} );
 
 	afterEach( () => {
 		setFreeformContentHandlerName( undefined );

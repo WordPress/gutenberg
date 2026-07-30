@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 
 /**
  * Internal dependencies
  */
+import '../../../store';
 import { applyBlockDeprecatedVersions } from '../apply-block-deprecated-versions';
 import {
 	registerBlockType,
@@ -27,11 +29,6 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		category: 'text',
 		title: 'block title',
 	};
-
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../../store' );
-	} );
 
 	afterEach( () => {
 		setFreeformContentHandlerName( undefined );

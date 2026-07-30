@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import phrasingContentReducer from '../phrasing-content-reducer';

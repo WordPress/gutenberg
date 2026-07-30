@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
 import { parse } from 'hpq';
 
 /**

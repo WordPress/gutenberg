@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { createElement, Component } from '@wordpress/element';
@@ -6,6 +11,7 @@ import { createElement, Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import '../../store';
 import serialize, {
 	getCommentAttributes,
 	getSaveContent,
@@ -24,11 +30,6 @@ import {
 import { createBlock } from '../';
 
 describe( 'block serializer', () => {
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );

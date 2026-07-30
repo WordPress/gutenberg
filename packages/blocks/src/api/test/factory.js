@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
 
 /**
  * Internal dependencies
  */
+import '../../store';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
@@ -43,11 +45,6 @@ describe( 'block factory', () => {
 		category: 'text',
 		title: 'block title',
 	};
-
-	beforeAll( () => {
-		// Load blocks store.
-		require( '../../store' );
-	} );
 
 	beforeEach( () => {
 		// Reset warning logging so deduped warnings fire within each test.
@@ -1086,7 +1083,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object and the block object as its arguments', () => {
-			const isMatch = jest.fn();
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
@@ -1121,7 +1118,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes and an array of source blocks as its arguments', () => {
-			const isMatch = jest.fn();
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
@@ -2010,7 +2007,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should call "__experimentalConvert" with mixed block types and wildcard', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2023,7 +2020,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2074,7 +2071,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should call "__experimentalConvert" with same block types', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2087,7 +2084,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2135,7 +2132,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should not call "__experimentalConvert" with non-matching block types', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2148,7 +2145,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2196,7 +2193,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2209,7 +2206,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,

@@ -25,6 +25,7 @@
 					"packages/autop",
 					"packages/blob",
 					"packages/block-directory",
+					"packages/blocks",
 					"packages/connectors",
 					"packages/components",
 					"packages/compose",

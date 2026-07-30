@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { normalizeStyleStateAliases } from '../convert-legacy-block';
