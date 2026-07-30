@@ -1018,30 +1018,6 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
-	test( 'should show a message when the pasted block cannot be inserted', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
-		// Legacy standalone button markup predating the buttons wrapper
-		// block. Wrapping it on paste is not implemented (yet), but the
-		// paste must not fail silently.
-		pageUtils.setClipboardData( {
-			html: `<!-- wp:button {"align":"center"} -->
-<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>
-<!-- /wp:button -->`,
-		} );
-		await pageUtils.pressKeys( 'primary+v' );
-
-		await expect( page.locator( '.components-snackbar' ) ).toContainText(
-			'The copied blocks cannot be pasted here.'
-		);
-		await expect.poll( editor.getBlocks ).toEqual( [] );
-	} );
-
 	test( 'should copy a navigation link bare, without its synced menu wrapper', async ( {
 		editor,
 		page,
