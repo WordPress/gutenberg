@@ -25,7 +25,7 @@ const meta: Meta< typeof Surface > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated. Write your own CSS instead.',
+			notes: 'Deprecated. Write your own CSS instead, preferably using the [`design tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
 	},
 };

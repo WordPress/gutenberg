@@ -34,7 +34,9 @@ function UnconnectedSurface(
 /**
  * `Surface` is a core component that renders a primary background color.
  *
- * This component is deprecated. Write your own CSS instead.
+ * This component is deprecated. Write your own CSS instead,
+ * preferably using the [design tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs)
+ * available in `@wordpress/theme`.
  *
  * @deprecated
  *
