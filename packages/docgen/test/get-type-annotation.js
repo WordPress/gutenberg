@@ -1,8 +1,16 @@
 /**
  * Internal dependencies
  */
-const engine = require( '../lib/engine' );
-const getTypeAnnotation = require( '../lib/get-type-annotation' );
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
+import engine from '../lib/engine';
+import getTypeAnnotation from '../lib/get-type-annotation';
 
 /**
  * Generate the AST necessary to assert inferred types.

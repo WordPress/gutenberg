@@ -1,8 +1,16 @@
 /**
  * Internal dependencies
  */
-const engine = require( '../lib/engine' );
-const getExportEntries = require( '../lib/get-export-entries' );
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
+import engine from '../lib/engine';
+import getExportEntries from '../lib/get-export-entries';
 
 /**
  * Parses sample code into testable structure.

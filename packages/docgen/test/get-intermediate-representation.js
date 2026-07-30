@@ -1,8 +1,16 @@
 /**
  * Internal dependencies
  */
-const engine = require( '../lib/engine' );
-const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
+import engine from '../lib/engine';
+import getIntermediateRepresentation from '../lib/get-intermediate-representation';
 
 /**
  * Parses sample code into testable structure.

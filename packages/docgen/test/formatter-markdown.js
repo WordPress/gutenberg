@@ -1,7 +1,15 @@
 /**
  * Internal dependencies
  */
-const formatter = require( '../lib/markdown/formatter' );
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
+import formatter from '../lib/markdown/formatter';
 
 describe( 'Formatter', () => {
 	it( 'returns markdown', () => {

@@ -57,6 +57,7 @@
 					"packages/babel-plugin-makepot",
 					"packages/browserslist-config",
 					"packages/data-controls",
+					"packages/docgen",
 					"packages/eslint-plugin",
 					"packages/npm-package-json-lint-config",
 					"packages/preferences",
