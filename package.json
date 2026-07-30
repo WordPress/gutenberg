@@ -127,6 +127,7 @@
 		"lint:deps": "syncpack lint",
 		"lint:deps:fix": "syncpack fix",
 		"lint:js": "node ./tools/eslint/lint-js.cjs --concurrency=auto",
+		"lint:jsx-extensions": "npm run --workspace @wordpress/eslint-tools lint:jsx-extensions",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
@@ -187,6 +188,7 @@
 		"test:unit:php:multisite:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:multisite:base",
 		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
+		"update:jsx-extensions-baseline": "npm run --workspace @wordpress/eslint-tools update:jsx-extensions-baseline",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json"
 	},
