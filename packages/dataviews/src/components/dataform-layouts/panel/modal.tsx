@@ -31,7 +31,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
@@ -104,8 +104,8 @@ function ModalContent< Item >( {
 	const mergedRef = useMergeRefs( [ focusOnMountRef, contentRef ] );
 
 	// When the modal is opened after being previously closed (touched),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity( contentRef, touched );
+	// reveal the field-level errors.
+	useRevealValidity( contentRef, touched );
 
 	return (
 		<Modal

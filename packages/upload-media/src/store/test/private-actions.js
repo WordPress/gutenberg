@@ -23,6 +23,7 @@ import {
 	uploadItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
+import { ErrorCode } from '../../upload-error';
 import {
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
@@ -448,22 +449,32 @@ describe( 'private actions', () => {
 			} );
 		} );
 
-		it( 'should handle mediaFinalize errors gracefully', async () => {
-			const mediaFinalize = jest
-				.fn()
-				.mockRejectedValue( new Error( 'Network error' ) );
+		it( 'should cancel the item when mediaFinalize fails', async () => {
+			// Finalize is the server's commit point. When it fails the
+			// attachment metadata was never written, so the item must be
+			// cancelled (surfacing the error) rather than finished — which
+			// would falsely report "upload complete".
+			// apiFetch rejects a failed REST request with a plain object, not
+			// an Error instance, so reject with one here to mirror that.
+			const restError = { code: 'rest_error', message: 'Server error' };
+			const mediaFinalize = jest.fn().mockRejectedValue( restError );
 			const finishOperation = jest.fn();
+			const cancelItem = jest.fn();
 			const warnSpy = jest
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
+			const file = new File( [ 'foo' ], 'foo.jpg', {
+				type: 'image/jpeg',
+			} );
 			const select = {
 				getItem: () => ( {
+					file,
 					attachment: { id: 42 },
 					subSizes: mockSubSizes,
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = { finishOperation, cancelItem };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
@@ -471,9 +482,16 @@ describe( 'private actions', () => {
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
-				expect.any( Error )
+				restError
 			);
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( finishOperation ).not.toHaveBeenCalled();
+			expect( cancelItem ).toHaveBeenCalledWith(
+				'test-id',
+				expect.objectContaining( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					file,
+				} )
+			);
 			warnSpy.mockRestore();
 		} );
 
