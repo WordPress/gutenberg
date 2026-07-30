@@ -159,7 +159,7 @@ export default function HTMLEdit( { clientId, attributes } ) {
 							variant="secondary"
 							onClick={ () => setIsModalOpen( true ) }
 						>
-							{ __( 'Show code' ) }
+							{ __( 'Edit code' ) }
 						</Button>
 					</VStack>
 				</InspectorControls>
@@ -175,7 +175,7 @@ export default function HTMLEdit( { clientId, attributes } ) {
 						variant="primary"
 						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Edit code' ) }
+						{ __( 'Show code' ) }
 					</Button>
 				</Placeholder>
 				{ isModalOpen && (
