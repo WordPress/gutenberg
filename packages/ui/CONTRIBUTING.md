@@ -363,7 +363,7 @@ WordPress loads broad, **unlayered** global styles in the admin (`common.css`, `
 -   The **fallback** encodes the default that `@wordpress/ui` wants when nothing else is set, so many components need no extra declarations.
 -   A component’s **layered** module can set `--_gcd-*` on a wrapper or the element itself. Custom property resolution is not blocked by cascade layers the same way longhand properties are, so the layered stylesheet can still supply the real token values while the unlayered rule applies them in a context where admin CSS would otherwise win.
 
-Use the `--_gcd-*` prefix only inside this package; treat these variables as implementation details, not public theming API.
+Use the `--_gcd-*` prefix only inside this package; treat these variables as implementation details, not public theming API. The `plugin-wpds/no-global-css-defense-custom-properties` Stylelint rule enforces this outside `@wordpress/ui` (this package disables it in `.stylelintrc.mjs`).
 
 **When to use it:** Whenever you introduce or change a primitive that renders a native element commonly styled by wp-admin globals, wire in the matching defense class from `global-css-defense.module.css` (see existing usages in `Button`, `Input`, `Textarea`, `Link`, `Text`, field descriptions, and related form primitives). If admin styles affect a new element type, extend the defense module with a new class and the same bridge pattern rather than duplicating unlayered overrides inside individual components.
 
