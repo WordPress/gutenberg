@@ -904,11 +904,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/tools-panel/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/tools-panel/tools-panel/hook.ts": {
 		"react-hooks/refs": {
 			"count": 2

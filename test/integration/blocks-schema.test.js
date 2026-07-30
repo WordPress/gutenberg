@@ -14,6 +14,10 @@ describe( 'block.json schema', () => {
 		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
 		{ onlyFiles: true }
 	);
+	const invalidFiles = glob.sync(
+		[ 'test/integration/fixtures/block-schemas/*.json' ],
+		{ onlyFiles: true }
+	);
 	const ajv = new Ajv();
 
 	test( 'strictly adheres to the draft-07 meta schema', () => {
@@ -40,4 +44,15 @@ describe( 'block.json schema', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	test.each( invalidFiles )(
+		'rejects invalid block metadata in `%s`',
+		( filepath ) => {
+			const { $schema, ...blockMetadata } = require( filepath );
+
+			const result = ajv.validate( blockSchema, blockMetadata );
+
+			expect( result ).toBe( false );
+		}
+	);
 } );

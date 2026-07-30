@@ -4,8 +4,10 @@
 
 ### Enhancements
 
+-   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
 -   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
 -   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
+-   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
 
 ### Bug Fixes
 
@@ -13,6 +15,7 @@
 
 ### Internal
 
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Image: Check only `window.__clientSideMediaProcessing` for sideloading status, following the removal of the redundant `window.__heicUploadSupport` flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 
 ## 10.2.0 (2026-07-14)
