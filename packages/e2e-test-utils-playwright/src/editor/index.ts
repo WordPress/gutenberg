@@ -14,7 +14,6 @@ import type {
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { getBlocks } from './get-blocks';
-import { getSelectedBlocks } from './get-selected-blocks';
 import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
@@ -59,9 +58,6 @@ export class Editor {
 		clickBlockToolbarButton.bind( this );
 	/** @borrows getBlocks as this.getBlocks */
 	getBlocks: typeof getBlocks = getBlocks.bind( this );
-	/** @borrows getSelectedBlocks as this.getSelectedBlocks */
-	getSelectedBlocks: typeof getSelectedBlocks =
-		getSelectedBlocks.bind( this );
 	/** @borrows getEditedPostContent as this.getEditedPostContent */
 	getEditedPostContent: typeof getEditedPostContent =
 		getEditedPostContent.bind( this );
