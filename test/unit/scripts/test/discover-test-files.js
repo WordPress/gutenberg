@@ -8,6 +8,7 @@ import { describe, expect, test } from 'vitest';
  */
 import {
 	assertVitestProjectNames,
+	canonicalizeRenamedTestFiles,
 	findOverlappingVitestProjectTests,
 } from '../discover-test-files.mjs';
 
@@ -55,6 +56,24 @@ describe( 'Vitest project routing', () => {
 			} )
 		).toEqual( [
 			'packages/components/src/test/index.js: browser, jsdom',
+		] );
+	} );
+
+	test( 'preserves baseline identities for renamed tests', () => {
+		expect(
+			canonicalizeRenamedTestFiles(
+				[
+					'packages/example/src/test/unchanged.js',
+					'packages/example/src/test/renamed.jsx',
+				],
+				{
+					'packages/example/src/test/renamed.js':
+						'packages/example/src/test/renamed.jsx',
+				}
+			)
+		).toEqual( [
+			'packages/example/src/test/renamed.js',
+			'packages/example/src/test/unchanged.js',
 		] );
 	} );
 } );

@@ -71,6 +71,18 @@ export function findOverlappingVitestProjectTests( testsByProject ) {
 		);
 }
 
+export function canonicalizeRenamedTestFiles( testFiles, renamedTests ) {
+	const currentToBaseline = new Map(
+		Object.entries( renamedTests ).map(
+			( [ baselinePath, currentPath ] ) => [ currentPath, baselinePath ]
+		)
+	);
+
+	return testFiles
+		.map( ( testPath ) => currentToBaseline.get( testPath ) ?? testPath )
+		.sort();
+}
+
 function normalizeTestPath( testPath ) {
 	return testPath.split( path.sep ).join( '/' );
 }

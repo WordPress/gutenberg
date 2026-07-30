@@ -18,6 +18,7 @@ import globPackage from 'glob';
  */
 import {
 	assertVitestProjectNames,
+	canonicalizeRenamedTestFiles,
 	discoverTestFiles,
 	findOverlappingVitestProjectTests,
 	getVitestTests,
@@ -146,6 +147,9 @@ const addedJestTests = manifest.added.jest;
 const addedVitestTests = Object.values( manifest.added.vitest ).flat();
 const addedTests = [ ...addedJestTests, ...addedVitestTests ];
 const retiredTests = manifest.retired;
+const renamedTests = manifest.renamed;
+const renamedBaselineTests = Object.keys( renamedTests );
+const renamedCurrentTests = Object.values( renamedTests );
 const migratedTestFiles = Object.values( manifest.vitest.projects ).flatMap(
 	( project ) => project.files
 );
@@ -155,6 +159,8 @@ const migratedDirectories = Object.values( manifest.vitest.projects ).flatMap(
 
 assertUniquePaths( 'added.jest', addedJestTests );
 assertUniquePaths( 'retired', retiredTests );
+assertUniquePaths( 'renamed baseline paths', renamedBaselineTests );
+assertUniquePaths( 'renamed current paths', renamedCurrentTests );
 for ( const projectName of VITEST_PROJECT_NAMES ) {
 	assertUniquePaths(
 		`added.vitest.${ projectName }`,
@@ -179,6 +185,27 @@ assert.deepEqual(
 	duplicateManifestEntries,
 	[],
 	`Migration manifest entries must be disjoint:\n${ duplicateManifestEntries.join(
+		'\n'
+	) }`
+);
+
+const conflictingRenamedEntries = Object.entries( renamedTests )
+	.filter(
+		( [ baselinePath, currentPath ] ) =>
+			baselinePath === currentPath ||
+			addedTests.includes( baselinePath ) ||
+			addedTests.includes( currentPath ) ||
+			retiredTests.includes( baselinePath ) ||
+			retiredTests.includes( currentPath )
+	)
+	.map(
+		( [ baselinePath, currentPath ] ) =>
+			`${ baselinePath } -> ${ currentPath }`
+	);
+assert.deepEqual(
+	conflictingRenamedEntries,
+	[],
+	`Renamed tests must be distinct from added and retired tests:\n${ conflictingRenamedEntries.join(
 		'\n'
 	) }`
 );
@@ -218,6 +245,28 @@ assert.deepEqual(
 	invalidAddedTests,
 	[],
 	`Added tests do not exist:\n${ invalidAddedTests.join( '\n' ) }`
+);
+
+const invalidRenamedTests = Object.entries( renamedTests )
+	.filter(
+		( [ baselinePath, currentPath ] ) =>
+			existsSync( path.join( ROOT_DIR, baselinePath ) ) ||
+			! existsSync( path.join( ROOT_DIR, currentPath ) ) ||
+			jestTests.has( baselinePath ) ||
+			vitestTests.has( baselinePath ) ||
+			( ! jestTests.has( currentPath ) &&
+				! vitestTests.has( currentPath ) )
+	)
+	.map(
+		( [ baselinePath, currentPath ] ) =>
+			`${ baselinePath } -> ${ currentPath }`
+	);
+assert.deepEqual(
+	invalidRenamedTests,
+	[],
+	`Renamed tests must replace an absent baseline path with one discoverable current path:\n${ invalidRenamedTests.join(
+		'\n'
+	) }`
 );
 
 const activeRetiredTests = retiredTests.filter(
@@ -294,14 +343,18 @@ const accountedBaseline = [
 		...retiredTests,
 	] ),
 ].sort();
+const canonicalBaseline = canonicalizeRenamedTestFiles(
+	accountedBaseline,
+	renamedTests
+);
 
 assert.equal(
-	accountedBaseline.length,
+	canonicalBaseline.length,
 	manifest.baseline.count,
 	'The number of accounted baseline tests changed.'
 );
 assert.equal(
-	hashTestFiles( accountedBaseline ),
+	hashTestFiles( canonicalBaseline ),
 	manifest.baseline.sha256,
 	'The accounted baseline test file list changed.'
 );
@@ -344,7 +397,7 @@ console.log(
 	} Vitest (${ VITEST_PROJECT_NAMES.map(
 		( projectName ) =>
 			`${ projectName }: ${ vitestTestsByProject[ projectName ].size }`
-	).join( ', ' ) }), ${ retiredTests.length } retired, and ${
-		addedTests.length
-	} added.`
+	).join( ', ' ) }), ${ retiredTests.length } retired, ${
+		renamedBaselineTests.length
+	} renamed, and ${ addedTests.length } added.`
 );

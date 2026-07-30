@@ -55,6 +55,7 @@
 		}
 	},
 	"retired": [],
+	"renamed": {},
 	"added": {
 		"jest": [ "packages/wp-build/lib/test/source-files.js" ],
 		"vitest": {
