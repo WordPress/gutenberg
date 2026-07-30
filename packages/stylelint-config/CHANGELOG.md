@@ -6,6 +6,10 @@
 
 -   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
 
+### Enhancements
+
+-   Include `plugin-wpds/no-global-css-defense-custom-properties` from `@wordpress/theme` to catch direct use or overrides of `--_gcd-*` (global CSS defense) custom properties.
+
 ## 25.0.0 (2026-09-10)
 
 ### Breaking Changes

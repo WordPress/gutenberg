@@ -1,0 +1,12 @@
+/* Invalid: Setting global CSS defense custom properties is not allowed */
+.override {
+	--_gcd-heading-font-weight: 11px;
+	--_gcd-input-font-size: 16px;
+}
+
+/* Invalid: Using global CSS defense custom properties as values is not allowed */
+.usage {
+	font-weight: var(--_gcd-heading-font-weight);
+	font-size: var(--_gcd-input-font-size, inherit);
+	color: var(--_gcd-heading-color, var(--wpds-color-foreground-content-neutral));
+}

@@ -1,0 +1,11 @@
+/* Valid: Using wpds tokens is allowed */
+.example {
+	color: var(--wpds-color-foreground-content-neutral);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+/* Valid: Setting non-global-CSS-defense custom properties is allowed */
+:root {
+	--my-custom-color: #f00;
+	--heading-font-weight: 600;
+}
