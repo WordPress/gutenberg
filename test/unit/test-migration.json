@@ -72,7 +72,8 @@
 					"packages/warning",
 					"packages/widget-dashboard",
 					"packages/widget-primitives",
-					"packages/wordcount"
+					"packages/wordcount",
+					"test/integration"
 				]
 			},
 			"node": {

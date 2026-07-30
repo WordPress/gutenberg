@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';

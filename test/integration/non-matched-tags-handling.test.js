@@ -1,13 +1,21 @@
 /**
+ * External dependencies
+ */
+import { beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { pasteHandler, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
+/**
+ * Internal dependencies
+ */
+import '../../packages/editor/src/hooks';
+
 describe( 'Handling of non matched tags in block transforms', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 	it( 'correctly pastes preformatted tag even if preformatted block is removed', () => {

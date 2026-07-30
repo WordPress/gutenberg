@@ -2,6 +2,7 @@
  * External dependencies
  */
 import Ajv from 'ajv';
+import { describe, expect, test } from 'vitest';
 
 /**
  * Internal dependencies

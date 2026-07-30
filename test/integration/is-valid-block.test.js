@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
@@ -10,12 +15,12 @@ import {
 } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
-describe( 'validateBlock', () => {
-	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
-	} );
+/**
+ * Internal dependencies
+ */
+import '../../packages/editor/src/hooks';
 
+describe( 'validateBlock', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
