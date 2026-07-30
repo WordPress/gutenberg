@@ -1,18 +1,27 @@
 /**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { uploadMedia } from '../upload-media';
 import { UploadError } from '../upload-error';
 import { uploadToServer } from '../upload-to-server';
 
-jest.mock( '../upload-to-server', () => ( {
-	uploadToServer: jest.fn(),
+vi.mock( import( '../upload-to-server' ), () => ( {
+	uploadToServer: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn(),
-	revokeBlobURL: jest.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/blob' ),
+	() =>
+		( {
+			createBlobURL: vi.fn(),
+			revokeBlobURL: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/blob')
+);
 
 const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', {
 	type: 'text/xml',
@@ -23,12 +32,12 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 
 describe( 'uploadMedia', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should do nothing on no files', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			filesList: [],
 			onError,
@@ -40,8 +49,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should error if allowedTypes contains a partial mime type and the validation fails', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ xmlFile ],
@@ -61,8 +70,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should error if allowedTypes contains a complete mime type and the validation fails', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image/gif' ],
 			filesList: [ imageFile ],
@@ -75,15 +84,15 @@ describe( 'uploadMedia', () => {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
 				message:
 					'test.jpeg: Sorry, this file type is not supported here.',
-				file: xmlFile,
+				file: imageFile,
 			} )
 		);
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image/jpeg' ],
 			filesList: [ imageFile ],
@@ -97,8 +106,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should error if allowedTypes contains multiple types and the validation fails', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ xmlFile ],
@@ -118,8 +127,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should work if allowedTypes contains multiple types and the validation succeeds', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ imageFile ],
@@ -133,8 +142,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile, xmlFile ],
@@ -145,7 +154,7 @@ describe( 'uploadMedia', () => {
 
 		expect( onError ).toHaveBeenCalledWith(
 			new UploadError( {
-				code: 'MIME_TYPE_NOT_SUPPORTED',
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
 				message:
 					'test.xml: Sorry, you are not allowed to upload this file type.',
 				file: xmlFile,
@@ -155,8 +164,8 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should error if the file size is greater than the maximum', () => {
-		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onError = vi.fn();
+		const onFileChange = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
@@ -178,7 +187,7 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
-		const onError = jest.fn();
+		const onError = vi.fn();
 		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
@@ -198,7 +207,7 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should throw error when multiple files are selected in single file upload mode', () => {
-		const onError = jest.fn();
+		const onError = vi.fn();
 		uploadMedia( {
 			filesList: [ imageFile, xmlFile ],
 			onError,
@@ -212,14 +221,14 @@ describe( 'uploadMedia', () => {
 	} );
 
 	it( 'should return error that is not an Error object', () => {
-		( uploadToServer as jest.Mock ).mockImplementation( () => {
+		( uploadToServer as Mock ).mockImplementation( () => {
 			throw {
 				code: 'fetch_error',
 				message: 'Could not get a valid response from the server.',
 			};
 		} );
 
-		const onError = jest.fn();
+		const onError = vi.fn();
 		uploadMedia( {
 			filesList: [ imageFile ],
 			onError,

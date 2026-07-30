@@ -3,6 +3,15 @@
  */
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 
 /**
  * WordPress dependencies
@@ -20,9 +29,10 @@ import { unlock } from '../../../lock-unlock';
 
 const preferenceKey = 'dataviews-postType-attachment-media-modal';
 
-jest.mock( '@wordpress/core-data', () => {
-	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
-		jest.requireActual( '@wordpress/private-apis' );
+vi.mock( import( '@wordpress/core-data' ), async () => {
+	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } = await import(
+		'@wordpress/private-apis'
+	);
 	const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/core-data'
@@ -30,7 +40,7 @@ jest.mock( '@wordpress/core-data', () => {
 	// Keep the private API contract real while replacing only the data hook.
 	const privateApis = {};
 	lock( privateApis, {
-		useEntityRecordsWithPermissions: jest.fn(),
+		useEntityRecordsWithPermissions: vi.fn(),
 	} );
 
 	return {
@@ -38,11 +48,11 @@ jest.mock( '@wordpress/core-data', () => {
 		store: {
 			name: 'core',
 		},
-	};
+	} as unknown as typeof import('@wordpress/core-data');
 } );
 
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
-	.useEntityRecordsWithPermissions as jest.Mock;
+	.useEntityRecordsWithPermissions as Mock;
 
 const IMAGE_RECORDS = [
 	{
@@ -72,15 +82,15 @@ function mockRecords( records: unknown[] ) {
 	} );
 }
 
-type ModalProps = { isOpen?: boolean; value?: number | number[] };
+type ModalProps = { isOpen: boolean; value?: number | number[] };
 
-function renderModal( { isOpen = true, value }: ModalProps = {} ) {
+function renderModal( { isOpen = true, value }: Partial< ModalProps > = {} ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
 
-	const onSelect = jest.fn();
-	const onClose = jest.fn();
+	const onSelect = vi.fn();
+	const onClose = vi.fn();
 
 	const view = render(
 		<RegistryProvider value={ registry }>
@@ -119,7 +129,7 @@ describe( 'MediaUploadModal', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {

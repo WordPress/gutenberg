@@ -52,6 +52,7 @@
 					"packages/is-shallow-equal",
 					"packages/keycodes",
 					"packages/media-fields",
+					"packages/media-utils",
 					"packages/notices",
 					"packages/nux",
 					"packages/plugins",

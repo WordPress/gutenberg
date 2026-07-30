@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { validateMimeType } from '../validate-mime-type';
@@ -13,7 +18,7 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 
 describe( 'validateMimeType', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
@@ -37,7 +42,7 @@ describe( 'validateMimeType', () => {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
 				message:
 					'test.jpeg: Sorry, this file type is not supported here.',
-				file: xmlFile,
+				file: imageFile,
 			} )
 		);
 	} );
