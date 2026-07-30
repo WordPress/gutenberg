@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wp-admin-theme-color` internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
+
 ### Enhancements
 
 -   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
+
+### Bug Fixes
+
+-   Lower the editor z-index of left/right aligned blocks below sticky and fixed position blocks, so floated blocks no longer cover stuck blocks while scrolling ([#80749](https://github.com/WordPress/gutenberg/pull/80749)).
 
 ### Internal
 

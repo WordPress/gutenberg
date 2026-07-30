@@ -145,6 +145,65 @@ describe( 'utils', () => {
 			expect( typeof parsed.document ).toBe( 'string' );
 			expect( parsed.document.length ).toBeGreaterThan( 0 );
 		} );
+
+		it( 'garbage-collects undo-pinned deleted content when serializing', () => {
+			const ytext = testDoc.getText( 'content' );
+			const origin = 'test-local-origin';
+			const undoManager = new Y.UndoManager( ytext, {
+				captureTimeout: 0,
+				trackedOrigins: new Set( [ origin ] ),
+			} );
+			const largeText = 'x'.repeat( 100000 );
+
+			// Insert and delete in separate tracked transactions. The undo
+			// manager flags the deleted content with `keep`, blocking garbage
+			// collection in the live doc.
+			testDoc.transact( () => ytext.insert( 0, largeText ), origin );
+			testDoc.transact(
+				() => ytext.delete( 0, largeText.length ),
+				origin
+			);
+
+			const liveDocSize = Y.encodeStateAsUpdateV2( testDoc ).byteLength;
+			const serialized = serializeCrdtDoc( testDoc );
+			const compactedSize = buffer.fromBase64(
+				JSON.parse( serialized ).document
+			).byteLength;
+
+			// The live doc still carries the deleted content for undo; the
+			// serialized snapshot must not.
+			expect( liveDocSize ).toBeGreaterThan( largeText.length );
+			expect( compactedSize ).toBeLessThan( 1000 );
+
+			// The snapshot deserializes to the current (post-delete) state.
+			const deserialized = deserializeCrdtDoc( serialized );
+			expect( deserialized!.getText( 'content' ).toString() ).toBe( '' );
+
+			undoManager.destroy();
+		} );
+
+		it( 'does not affect undo history on the live doc', () => {
+			const ytext = testDoc.getText( 'content' );
+			const origin = 'test-local-origin';
+			const undoManager = new Y.UndoManager( ytext, {
+				captureTimeout: 0,
+				trackedOrigins: new Set( [ origin ] ),
+			} );
+
+			testDoc.transact(
+				() => ytext.insert( 0, 'Hello, world!' ),
+				origin
+			);
+			testDoc.transact( () => ytext.delete( 0, 13 ), origin );
+
+			serializeCrdtDoc( testDoc );
+
+			// Undo the delete: the content must still be restorable.
+			undoManager.undo();
+			expect( ytext.toString() ).toBe( 'Hello, world!' );
+
+			undoManager.destroy();
+		} );
 	} );
 
 	describe( 'deserializeCrdtDoc', () => {

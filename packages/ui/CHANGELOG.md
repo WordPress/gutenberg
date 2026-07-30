@@ -4,10 +4,14 @@
 
 ### Enhancements
 
+-   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
+-   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
+-   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).
 -   Add `Autocomplete.Row` primitive ([#80490](https://github.com/WordPress/gutenberg/pull/80490)).
 -   `Combobox`, `Select`, `SelectControl`: Add `Group` and `GroupLabel` subcomponents ([#80574](https://github.com/WordPress/gutenberg/pull/80574)).
 -   `Popover`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so popovers stack reliably above other overlays in mixed-library compositions. A caller-supplied `Popover.Portal` `container` prop continues to take precedence ([#80278](https://github.com/WordPress/gutenberg/pull/80278)).
 -   `Button`: Add Storybook example demonstrating manual keyboard shortcut composition with `Tooltip`, `aria-keyshortcuts`, and an accessible description ([#80353](https://github.com/WordPress/gutenberg/pull/80353)).
+-   `Dialog`: Add Storybook usage guidelines for choosing between `Dialog` and `Drawer` ([#80783](https://github.com/WordPress/gutenberg/pull/80783)).
 
 ### Bug Fixes
 
@@ -19,6 +23,8 @@
 
 ### Internal
 
+-   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).
 
 ## 0.18.0 (2026-07-14)
