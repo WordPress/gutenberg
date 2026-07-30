@@ -44,7 +44,7 @@ const NOOP = () => {};
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
-function DetachPageListDialog( { onConfirm, onCancel } ) {
+function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
 	return (
 		<ConfirmDialog
 			isOpen
@@ -53,6 +53,7 @@ function DetachPageListDialog( { onConfirm, onCancel } ) {
 			confirmButtonText={ __( 'Detach' ) }
 			onConfirm={ onConfirm }
 			onCancel={ onCancel }
+			isBusy={ isBusy }
 			size="medium"
 		>
 			{ __(
@@ -372,7 +373,7 @@ export default function PageListEdit( {
 									justifyContent: 'center',
 								} }
 							>
-								{ __( 'Detach' ) }
+								{ __( 'Detach Page List' ) }
 							</Button>
 						) }
 					</ToolsPanel>
@@ -391,6 +392,9 @@ export default function PageListEdit( {
 					</BlockControls>
 					{ isConfirmingDetach && (
 						<DetachPageListDialog
+							// Converting a still-resolving list would map over
+							// an incomplete (or empty) set of pages.
+							isBusy={ ! hasResolvedPages }
 							onConfirm={ () => {
 								convertToNavigationLinks();
 								setIsConfirmingDetach( false );
