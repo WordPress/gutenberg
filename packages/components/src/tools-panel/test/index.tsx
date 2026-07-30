@@ -9,8 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import { ContextSystemProvider } from '../../context';
+import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
@@ -19,25 +19,12 @@ import type {
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 const noop = () => undefined;
-
-type EmotionStyleFragment = Parameters< ReturnType< typeof useCx > >[ 0 ];
-
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
-
-function EmotionStyleTest( {
-	styleFragment,
-}: {
-	styleFragment: EmotionStyleFragment;
-} ) {
-	const cx = useCx();
-
-	return (
-		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
-	);
-}
+const gridContextValue = {
+	Grid: {
+		columnGap: '40px',
+		rowGap: '48px',
+	},
+};
 
 type ControlValue = boolean | undefined;
 
@@ -280,24 +267,6 @@ describe( 'ToolsPanel', () => {
 			expect( resetAllItem ).toBeInTheDocument();
 		} );
 
-		it( 'should compose inner wrapper visibility styles in a single generated class', () => {
-			render(
-				<EmotionStyleTest
-					styleFragment={ styles.getToolsPanelStyles( {
-						columns: 2,
-						hasInnerWrapper: true,
-						areAllOptionalControlsHidden: true,
-					} ) }
-				/>
-			);
-
-			expect(
-				getGeneratedEmotionClassNames(
-					screen.getByTestId( 'emotion-style' )
-				)
-			).toHaveLength( 1 );
-		} );
-
 		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
 			await openDropdownMenu();
@@ -314,6 +283,103 @@ describe( 'ToolsPanel', () => {
 			const header = screen.getByText( defaultProps.label );
 
 			expect( header ).toBeInTheDocument();
+		} );
+
+		it( 'should apply SCSS Module styles to the panel and its items', () => {
+			render(
+				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
+					<ToolsPanelItem
+						{ ...controlProps }
+						className="custom-item"
+						data-testid="tools-panel-item"
+					>
+						<div>Example control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel' ],
+				'components-tools-panel'
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-item' ],
+				'components-tools-panel-item',
+				'custom-item'
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				name: defaultProps.label,
+			} );
+
+			expect( heading ).toHaveClass(
+				moduleStyles[ 'tools-panel-heading' ]
+			);
+			// Disable reason: Semantic queries can't reach the header wrapper.
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( heading.parentElement ).toHaveClass(
+				moduleStyles[ 'tools-panel-header' ],
+				'components-tools-panel-header'
+			);
+		} );
+
+		it( 'should preserve its spacing against Grid context values', () => {
+			render(
+				<ContextSystemProvider value={ gridContextValue }>
+					<ToolsPanel { ...defaultProps } data-testid="tools-panel">
+						<span>Panel content</span>
+					</ToolsPanel>
+				</ContextSystemProvider>
+			);
+
+			const panel = screen.getByTestId( 'tools-panel' );
+			const generatedClassName = Array.from( panel.classList ).find(
+				( className ) => /^(css|emotion)-/.test( className )
+			);
+			const generatedRule = Array.from( document.styleSheets )
+				.flatMap( ( styleSheet ) => Array.from( styleSheet.cssRules ) )
+				.find( ( rule ) =>
+					rule.cssText.includes( `.${ generatedClassName }` )
+				);
+
+			expect( generatedRule?.cssText ).toContain(
+				'grid-column-gap: calc(4px * 4);'
+			);
+			expect( generatedRule?.cssText ).toContain(
+				'grid-row-gap: calc(4px * 4);'
+			);
+		} );
+
+		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
+			render(
+				<ToolsPanel
+					{ ...defaultProps }
+					data-testid="tools-panel"
+					hasInnerWrapper
+					shouldRenderPlaceholderItems
+				>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="tools-panel-item"
+					>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
+				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-item' ],
+				moduleStyles[ 'tools-panel-item-placeholder' ]
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 	} );
 
