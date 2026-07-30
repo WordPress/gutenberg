@@ -831,7 +831,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	// Wrap and return the public API.
 	return {
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
-		entityContainsSnapshot,
+		entityContainsSnapshot: debugWrap( entityContainsSnapshot ),
 		getAwareness,
 		getEntitySnapshot: debugWrap( getEntitySnapshot ),
 		load: debugWrap( loadEntity ),
