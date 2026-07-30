@@ -9,7 +9,7 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import { useFocusOnMount, useRefEffect } from '@wordpress/compose';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -86,35 +86,10 @@ export function RevisionsSlider( {
 } ) {
 	const setFocusOnMountRef = useFocusOnMount( true );
 	const initialActiveElementRef = useRef();
-	const didInteractWhileLoadingRef = useRef( false );
-	const loadingRef = useRefEffect( ( node ) => {
-		if ( initialActiveElementRef.current === undefined ) {
+	const loadingRef = useCallback( ( node ) => {
+		if ( node && initialActiveElementRef.current === undefined ) {
 			initialActiveElementRef.current = node.ownerDocument.activeElement;
 		}
-
-		const handleInteraction = () => {
-			didInteractWhileLoadingRef.current = true;
-		};
-		const { ownerDocument } = node;
-		ownerDocument.addEventListener(
-			'pointerdown',
-			handleInteraction,
-			true
-		);
-		ownerDocument.addEventListener( 'keydown', handleInteraction, true );
-
-		return () => {
-			ownerDocument.removeEventListener(
-				'pointerdown',
-				handleInteraction,
-				true
-			);
-			ownerDocument.removeEventListener(
-				'keydown',
-				handleInteraction,
-				true
-			);
-		};
 	}, [] );
 
 	const focusOnMountRef = useCallback(
@@ -134,7 +109,7 @@ export function RevisionsSlider( {
 
 			// If the user moves focus while revisions load, keep it there when the
 			// slider mounts.
-			if ( ! didInteractWhileLoadingRef.current && focusHasNotMoved ) {
+			if ( focusHasNotMoved ) {
 				setFocusOnMountRef( node );
 			}
 		},
