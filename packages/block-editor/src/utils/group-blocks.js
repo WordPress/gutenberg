@@ -29,7 +29,8 @@ export function groupBlocks( blocks, groupingBlockName ) {
 	);
 
 	if ( groupingBlockTransform?.__experimentalConvert ) {
-		return [ groupingBlockTransform.__experimentalConvert( blocks ) ];
+		const result = groupingBlockTransform.__experimentalConvert( blocks );
+		return Array.isArray( result ) ? result : [ result ];
 	}
 
 	// A grouping block without a wildcard transform. Fall back to regular

@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import {
 	hasBlockSupport,
-	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -48,6 +47,7 @@ import {
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import { useBlockRename, BlockRenameModal } from '../block-rename';
@@ -385,10 +385,7 @@ function ListViewBlock( {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( blocksToUpdate );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = switchToBlockType(
-					blocks,
-					groupingBlockName
-				);
+				const newBlocks = groupBlocks( blocks, groupingBlockName );
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
