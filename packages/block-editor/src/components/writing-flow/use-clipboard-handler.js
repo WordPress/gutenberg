@@ -5,12 +5,15 @@ import {
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
+	getBlockType,
 	hasBlockSupport,
+	isUnmodifiedDefaultBlock,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
+	isEntirelySelected,
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -61,6 +64,13 @@ export default function useClipboardHandler() {
 				return;
 			}
 
+			// Whether the entire content of a block whose editable element
+			// is the block itself is selected: copying all of a heading's
+			// text should copy the heading block. Fields within a larger
+			// block, like a caption, are not the block element and keep
+			// the native copy.
+			let isWholeSingleBlockCopy = false;
+
 			// Let native copy/paste behaviour take over in input fields.
 			// But always handle multiple selected blocks.
 			if ( ! hasMultiSelection() ) {
@@ -74,8 +84,25 @@ export default function useClipboardHandler() {
 						: documentHasSelection( ownerDocument ) &&
 						  ! ownerDocument.activeElement.isContentEditable;
 
+				// The selection's editable element, resolved from the
+				// selection itself: with a focused editing host the event
+				// targets the host, not the editable.
+				const selection = ownerDocument.defaultView.getSelection();
+				const anchorElement =
+					selection.anchorNode?.nodeType === selection.anchorNode?.ELEMENT_NODE
+						? selection.anchorNode
+						: selection.anchorNode?.parentElement;
+				const blockElement = anchorElement?.closest(
+					'[data-block][contenteditable="true"]'
+				);
+
+				isWholeSingleBlockCopy =
+					event.type === 'copy' &&
+					!! blockElement &&
+					isEntirelySelected( blockElement );
+
 				// Let native copy behaviour take over in input fields.
-				if ( hasSelection ) {
+				if ( hasSelection && ! isWholeSingleBlockCopy ) {
 					return;
 				}
 			}
@@ -88,7 +115,9 @@ export default function useClipboardHandler() {
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
 			const shouldHandleWholeBlocks =
-				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
+				__unstableIsSelectionCollapsed() ||
+				__unstableIsFullySelected() ||
+				isWholeSingleBlockCopy;
 			const expandSelectionIsNeeded =
 				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -209,6 +238,23 @@ export default function useClipboardHandler() {
 						false
 					) &&
 					! event.__deprecatedOnSplit
+				) {
+					return;
+				}
+
+				// A single pasted block with mergeable text content, like a
+				// copied heading, pastes into existing text as inline
+				// content rather than splitting it: let rich text handle
+				// the paste. A block whose content is untouched is still
+				// replaced by the pasted block.
+				if (
+					! hasMultiSelection() &&
+					blocks.length === 1 &&
+					getBlockType( blocks[ 0 ].name )?.merge &&
+					! isUnmodifiedDefaultBlock(
+						getBlocksByClientId( selectedBlockClientIds )[ 0 ],
+						'content'
+					)
 				) {
 					return;
 				}
