@@ -9,6 +9,7 @@ import { describe, expect, test } from 'vitest';
 import {
 	assertVitestProjectNames,
 	canonicalizeRenamedTestFiles,
+	excludeExplicitFileOverrides,
 	findOverlappingVitestProjectTests,
 } from '../discover-test-files.mjs';
 
@@ -57,6 +58,39 @@ describe( 'Vitest project routing', () => {
 		).toEqual( [
 			'packages/components/src/test/index.js: browser, jsdom',
 		] );
+	} );
+
+	test( 'lets explicit file ownership override directory ownership', () => {
+		const manifest = {
+			vitest: {
+				projects: {
+					browser: {
+						files: [ 'packages/example/test/browser.js' ],
+					},
+					jsdom: {
+						files: [],
+					},
+					node: {
+						files: [],
+					},
+				},
+			},
+			added: {
+				vitest: {
+					browser: [],
+					jsdom: [],
+					node: [],
+				},
+			},
+		};
+		const directoryTests = [
+			'packages/example/test/browser.js',
+			'packages/example/test/jsdom.js',
+		];
+
+		expect(
+			excludeExplicitFileOverrides( 'jsdom', directoryTests, manifest )
+		).toEqual( [ 'packages/example/test/jsdom.js' ] );
 	} );
 
 	test( 'preserves baseline identities for renamed tests', () => {

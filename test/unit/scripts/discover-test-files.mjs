@@ -102,10 +102,33 @@ export function discoverTestFiles( rootDir ) {
 	].sort();
 }
 
+export function excludeExplicitFileOverrides(
+	projectName,
+	testPaths,
+	manifest
+) {
+	const testsExplicitlyOwnedByOtherProjects = new Set(
+		VITEST_PROJECT_NAMES.filter(
+			( otherProjectName ) => otherProjectName !== projectName
+		).flatMap( ( otherProjectName ) => [
+			...manifest.vitest.projects[ otherProjectName ].files,
+			...manifest.added.vitest[ otherProjectName ],
+		] )
+	);
+
+	return testPaths.filter(
+		( testPath ) => ! testsExplicitlyOwnedByOtherProjects.has( testPath )
+	);
+}
+
 export function getVitestTestsForProject( rootDir, manifest, projectName ) {
 	const discoveredTests = discoverTestFiles( rootDir );
 	const project = manifest.vitest.projects[ projectName ];
-	const directoryTests = discoveredTests.filter( ( testPath ) =>
+	const directoryTests = excludeExplicitFileOverrides(
+		projectName,
+		discoveredTests,
+		manifest
+	).filter( ( testPath ) =>
 		project.directories.some(
 			( directoryPath ) =>
 				testPath === directoryPath ||

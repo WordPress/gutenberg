@@ -2,8 +2,8 @@
  * External dependencies
  */
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import { press, click } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -40,7 +40,7 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should be centered by default', async () => {
 			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( getCell( 'center center' ) ).toHaveFocus();
 		} );
@@ -70,7 +70,7 @@ describe( 'AlignmentMatrixControl', () => {
 
 					const cell = getCell( alignment );
 
-					await click( cell );
+					await userEvent.click( cell );
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( alignment );
@@ -88,7 +88,7 @@ describe( 'AlignmentMatrixControl', () => {
 
 					const cell = getCell( 'center center' );
 
-					await click( cell );
+					await userEvent.click( cell );
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).not.toHaveBeenCalled();
@@ -110,8 +110,8 @@ describe( 'AlignmentMatrixControl', () => {
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
-					await press.Tab();
-					await press[ keyRef ]();
+					await userEvent.tab();
+					await userEvent.keyboard( `{${ keyRef }}` );
 
 					expect( getCell( cellRef ) ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
@@ -132,8 +132,8 @@ describe( 'AlignmentMatrixControl', () => {
 					);
 
 					const cell = getCell( cellRef );
-					await click( cell );
-					await press[ keyRef ]();
+					await userEvent.click( cell );
+					await userEvent.keyboard( `{${ keyRef }}` );
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );

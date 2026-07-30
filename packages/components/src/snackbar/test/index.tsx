@@ -2,8 +2,8 @@
  * External dependencies
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen, within } from '@testing-library/react';
-import { click } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -77,7 +77,7 @@ describe( 'Snackbar', () => {
 			'Dismiss this notice'
 		);
 
-		await click( snackbar );
+		await userEvent.click( snackbar );
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
@@ -108,7 +108,7 @@ describe( 'Snackbar', () => {
 			'components-snackbar-explicit-dismiss'
 		);
 
-		await click( snackbar );
+		await userEvent.click( snackbar );
 
 		expect( onRemove ).not.toHaveBeenCalled();
 		expect( onDismiss ).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe( 'Snackbar', () => {
 			name: 'Dismiss this notice',
 		} );
 
-		await click( closeButton );
+		await userEvent.click( closeButton );
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
@@ -197,7 +197,7 @@ describe( 'Snackbar', () => {
 				name: 'View post',
 			} );
 
-			await click( button );
+			await userEvent.click( button );
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );

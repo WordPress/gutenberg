@@ -6,7 +6,14 @@
 	"vitest": {
 		"projects": {
 			"browser": {
-				"files": [],
+				"files": [
+					"packages/components/src/alignment-matrix-control/test/index.tsx",
+					"packages/components/src/button/test/index.tsx",
+					"packages/components/src/circular-option-picker/test/index.tsx",
+					"packages/components/src/search-control/test/index.tsx",
+					"packages/components/src/snackbar/test/index.tsx",
+					"packages/components/src/snackbar/test/list.tsx"
+				],
 				"directories": []
 			},
 			"jsdom": {

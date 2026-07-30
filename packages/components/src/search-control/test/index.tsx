@@ -2,8 +2,8 @@
  * External dependencies
  */
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { click, type } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ describe( 'SearchControl', () => {
 			render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 			expect( searchInput ).toHaveValue( 'test' );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( 'test' );
 		} );
@@ -63,7 +63,7 @@ describe( 'SearchControl', () => {
 			const paddingInlineEndWithoutSuffix =
 				getComputedStyle( searchInput ).paddingInlineEnd;
 
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 			const resetButton = screen.getByRole( 'button', {
 				name: 'Reset search',
 			} );
@@ -72,7 +72,7 @@ describe( 'SearchControl', () => {
 				paddingInlineEndWithoutSuffix
 			);
 
-			await click( resetButton );
+			await userEvent.click( resetButton );
 			expect( searchInput ).toHaveValue( '' );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '' );
 			expect( getComputedStyle( searchInput ).paddingInlineEnd ).toBe(
@@ -98,7 +98,7 @@ describe( 'SearchControl', () => {
 			).not.toBeInTheDocument();
 
 			const searchInput = screen.getByRole( 'searchbox' );
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 
 			expect(
 				screen.queryByRole( 'button', { name: 'Close search' } )
@@ -108,7 +108,7 @@ describe( 'SearchControl', () => {
 			).not.toBeInTheDocument();
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 'test'.length );
 
-			await click(
+			await userEvent.click(
 				screen.getByRole( 'button', { name: 'Close search' } )
 			);
 			expect( onCloseSpy ).toHaveBeenCalledTimes( 1 );

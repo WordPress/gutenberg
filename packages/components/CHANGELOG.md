@@ -33,6 +33,7 @@
 
 ### Internal
 
+-   Run the first interaction-test batch in Vitest Browser Mode.
 -   Rename the JSX-bearing context system provider source file from `.js` to `.jsx`.
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).

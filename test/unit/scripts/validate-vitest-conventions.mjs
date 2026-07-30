@@ -1,11 +1,4 @@
 /**
- * External dependencies
- */
-import { parseSync } from '@babel/core';
-import traverseModule from '@babel/traverse';
-import globPackage from 'glob';
-
-/**
  * Node dependencies
  */
 import { execFileSync } from 'node:child_process';
@@ -19,6 +12,13 @@ import {
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+/**
+ * External dependencies
+ */
+import { parseSync } from '@babel/core';
+import traverseModule from '@babel/traverse';
+import globPackage from 'glob';
 
 /**
  * Internal dependencies
@@ -311,6 +311,19 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			temporaryDirectory,
 			'compatibility.d.ts'
 		);
+		const setupTypeFiles = [];
+		if ( projectName === 'browser' ) {
+			setupTypeFiles.push(
+				path.join( ROOT_DIR, 'test/unit/config/browser.vitest.js' )
+			);
+		} else if ( projectName === 'jsdom' ) {
+			setupTypeFiles.push(
+				path.join(
+					ROOT_DIR,
+					'test/unit/config/testing-library.vitest.js'
+				)
+			);
+		}
 		const typecheckConfig = {
 			extends: baseConfigPath,
 			compilerOptions: {
@@ -326,25 +339,15 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 					path.join( ROOT_DIR, 'typings' ),
 					path.join( ROOT_DIR, 'node_modules/@types' ),
 				],
-				types:
-					projectName === 'jsdom'
-						? [
-								...commonTypes,
-								...( needsNodeTypes ? [ 'node' ] : [] ),
-								'gutenberg-vitest-test-env',
-						  ]
-						: [ ...commonTypes, 'node' ],
+				types: [
+					...commonTypes,
+					...( needsNodeTypes ? [ 'node' ] : [] ),
+					'gutenberg-vitest-test-env',
+				],
 			},
 			files: [
 				compatibilityTypesPath,
-				...( projectName === 'jsdom'
-					? [
-							path.join(
-								ROOT_DIR,
-								'test/unit/config/testing-library.vitest.js'
-							),
-					  ]
-					: [] ),
+				...setupTypeFiles,
 				...typeScriptTests.map( ( file ) =>
 					path.join( ROOT_DIR, file )
 				),
