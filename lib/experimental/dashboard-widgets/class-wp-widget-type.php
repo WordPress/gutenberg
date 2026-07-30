@@ -108,6 +108,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $help = null;
 
 		/**
+		 * Registered icon name identifying the widget type visually, in the
+		 * form `collection/icon-name`. Clients resolve the name through the
+		 * Icons API; an unregistered name degrades to no icon.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $icon = null;
+
+		/**
 		 * Declarative actions the widget exposes. Each entry carries `id`,
 		 * `label`, `href`, and optional `download`/`openInNewTab`. Labels are
 		 * translated at registration time using the widget's text domain.
