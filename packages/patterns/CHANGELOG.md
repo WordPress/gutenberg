@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Rename JSX-bearing source files to use the `.jsx` extension.
+
 ## 2.51.0 (2026-07-14)
 
 ### Enhancements
