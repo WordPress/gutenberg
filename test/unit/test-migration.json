@@ -84,6 +84,7 @@
 					"packages/postcss-themes",
 					"packages/preferences",
 					"packages/prettier-config",
+					"packages/project-management-automation",
 					"packages/readable-js-assets-webpack-plugin",
 					"packages/redux-routine",
 					"packages/stylelint-config",

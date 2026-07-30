@@ -1,7 +1,15 @@
 /**
- * Internal dependencies
+ * Node dependencies
  */
-import getAssociatedPullRequest from '../get-associated-pull-request';
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+const require = createRequire( import.meta.url );
+const getAssociatedPullRequest = require( '../get-associated-pull-request' );
 
 /** @typedef {import('../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 

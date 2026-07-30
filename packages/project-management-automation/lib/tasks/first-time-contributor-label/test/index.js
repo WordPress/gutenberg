@@ -1,7 +1,15 @@
 /**
- * Internal dependencies
+ * Node dependencies
  */
-import firstTimeContributorLabel from '../';
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+const require = createRequire( import.meta.url );
+const firstTimeContributorLabel = require( '../' );
 
 describe( 'firstTimeContributorLabel', () => {
 	const payload = {
@@ -34,10 +42,10 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				search: {
-					commits: jest.fn(),
+					commits: vi.fn(),
 				},
 			},
 		};
@@ -52,7 +60,7 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -63,11 +71,11 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				search: {
-					commits: jest.fn(),
+					commits: vi.fn(),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
+					createComment: vi.fn(),
 				},
 			},
 		};
@@ -88,12 +96,10 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( { data: [] } )
-					),
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
 				},
 				search: {
-					commits: jest.fn( () =>
+					commits: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								total_count: 1,
@@ -107,8 +113,8 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
+					createComment: vi.fn(),
 				},
 			},
 		};
@@ -127,12 +133,10 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( { data: [] } )
-					),
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
 				},
 				search: {
-					commits: jest.fn( () =>
+					commits: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								total_count: 0,
@@ -142,8 +146,8 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
+					createComment: vi.fn(),
 				},
 			},
 		};

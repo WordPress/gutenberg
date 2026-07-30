@@ -1,7 +1,15 @@
 /**
- * Internal dependencies
+ * Node dependencies
  */
-import assignFixedIssues from '../';
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+const require = createRequire( import.meta.url );
+const assignFixedIssues = require( '../' );
 
 describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {
@@ -13,8 +21,8 @@ describe( 'assignFixedIssues', () => {
 		const octokit = {
 			rest: {
 				issues: {
-					addAssignees: jest.fn(),
-					addLabels: jest.fn(),
+					addAssignees: vi.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -43,8 +51,8 @@ describe( 'assignFixedIssues', () => {
 		const octokit = {
 			rest: {
 				issues: {
-					addAssignees: jest.fn( () => Promise.resolve( {} ) ),
-					addLabels: jest.fn( () => Promise.resolve( {} ) ),
+					addAssignees: vi.fn( () => Promise.resolve( {} ) ),
+					addLabels: vi.fn( () => Promise.resolve( {} ) ),
 				},
 			},
 		};

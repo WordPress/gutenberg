@@ -110,7 +110,6 @@ export default defineConfig( {
 			filter: ( id ) =>
 				[
 					`${ ROOT_DIR }/packages/env/lib/`,
-					`${ ROOT_DIR }/packages/project-management-automation/lib/`,
 					`${ ROOT_DIR }/packages/scripts/utils/`,
 					`${ ROOT_DIR }/tools/release/commands/changelog.js`,
 				].some( ( directory ) => id.startsWith( directory ) ) &&
