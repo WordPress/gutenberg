@@ -102,11 +102,16 @@ function visibleProps( node ) {
  * into a single entry. Any component or prop with no description is added to
  * `missing`.
  *
- * @param {WPManifestNode}                  node    Component or subcomponent.
- * @param {Map<string,WPCombinedComponent>} target  Map of name to combined entry.
- * @param {Set<string>}                     missing Collects undocumented names.
+ * Subcomponents are prefixed with their parent's name (`Parent>Child`) so a
+ * subcomponent can't clash with a same-named top-level component (for example,
+ * `Navigator`'s `Button` vs. the top-level `Button`).
+ *
+ * @param {WPManifestNode}                  node          Component or subcomponent.
+ * @param {Map<string,WPCombinedComponent>} target        Map of name to combined entry.
+ * @param {Set<string>}                     missing       Collects undocumented names.
+ * @param {string}                          qualifiedName The node's parent-qualified name.
  */
-function mergeNode( node, target, missing ) {
+function mergeNode( node, target, missing, qualifiedName = node.name ) {
 	let combined = target.get( node.name );
 	if ( ! combined ) {
 		combined = {
@@ -118,19 +123,24 @@ function mergeNode( node, target, missing ) {
 	}
 
 	if ( ! node.description?.trim() ) {
-		missing.add( node.name );
+		missing.add( qualifiedName );
 	}
 
 	for ( const [ propName, info ] of visibleProps( node ) ) {
 		combined.props.add( propName );
 		if ( ! info.description?.trim() ) {
-			missing.add( `${ node.name }:${ propName }` );
+			missing.add( `${ qualifiedName }:${ propName }` );
 		}
 	}
 
 	if ( node.subcomponents ) {
 		for ( const sub of Object.values( node.subcomponents ) ) {
-			mergeNode( sub, combined.subcomponents, missing );
+			mergeNode(
+				sub,
+				combined.subcomponents,
+				missing,
+				`${ qualifiedName }>${ sub.name }`
+			);
 		}
 	}
 }
