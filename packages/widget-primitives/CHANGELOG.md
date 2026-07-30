@@ -10,7 +10,7 @@
     carries a registered icon name and `useWidgetTypes` resolves it through
     the application-registered resolver (`registerIconResolver`), so
     `WidgetType.icon` always reaches hosts renderable
-    ([#80938](https://github.com/WordPress/gutenberg/issues/80938)).
+    ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 
 ### Enhancements
 
@@ -22,7 +22,7 @@
 -   Add an Icons doc page and a `WithIconReference` story, cover
     `registerIconResolver` in the README, and update the architecture doc
     for declarative icon references
-    ([#80938](https://github.com/WordPress/gutenberg/issues/80938)).
+    ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add an Actions doc page and a `WithActions` story, and cover `actions`
     in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
