@@ -21,9 +21,11 @@ import {
  * Internal dependencies
  */
 import { registerDashboardFieldTypes } from './field-types';
+import { registerDashboardIconResolver } from './icons';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 
 registerDashboardFieldTypes();
+registerDashboardIconResolver();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
