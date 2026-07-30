@@ -8,6 +8,7 @@
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
+    -   `DropdownContentWrapper` ([#80750](https://github.com/WordPress/gutenberg/pull/80750))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Enhancements
