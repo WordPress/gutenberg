@@ -24,6 +24,11 @@
  *
  * ...run these tests to verify the two paths still agree.
  */
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 import {
 	createCamera,
 	worldToScreen,

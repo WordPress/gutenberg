@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -60,7 +61,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'fires onChange with value + step on ArrowRight', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }
@@ -77,7 +78,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'fires onChange with value + step / 2 on Shift+ArrowRight', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }
@@ -93,7 +94,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'does not fire onChange when disabled', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }

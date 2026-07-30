@@ -1,6 +1,11 @@
 /**
  * Internal dependencies
  */
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 import {
 	isValidSize,
 	safeBoundedNumber,

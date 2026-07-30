@@ -2,6 +2,15 @@
  * External dependencies
  */
 import {
+	afterAll,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	type Mock,
+	vi,
+} from 'vitest';
+import {
 	act,
 	fireEvent,
 	render,
@@ -32,22 +41,22 @@ function createController(): CropperController {
 				naturalHeight: 400,
 			},
 		},
-		setImage: jest.fn(),
-		setPan: jest.fn(),
-		setZoom: jest.fn(),
-		setZoomAtPoint: jest.fn(),
-		setRotation: jest.fn(),
-		setFlip: jest.fn(),
-		toggleFlip: jest.fn(),
-		snapRotate90: jest.fn(),
-		setCropRect: jest.fn(),
-		settleCrop: jest.fn(),
-		applyOperation: jest.fn(),
-		reset: jest.fn(),
+		setImage: vi.fn(),
+		setPan: vi.fn(),
+		setZoom: vi.fn(),
+		setZoomAtPoint: vi.fn(),
+		setRotation: vi.fn(),
+		setFlip: vi.fn(),
+		toggleFlip: vi.fn(),
+		snapRotate90: vi.fn(),
+		setCropRect: vi.fn(),
+		settleCrop: vi.fn(),
+		applyOperation: vi.fn(),
+		reset: vi.fn(),
 		isDirty: false,
-		getCroppedImage: jest.fn(),
-		setVisualSize: jest.fn(),
-		adjustCropRectForViewport: jest.fn(),
+		getCroppedImage: vi.fn(),
+		setVisualSize: vi.fn(),
+		adjustCropRectForViewport: vi.fn(),
 	};
 }
 
@@ -56,10 +65,10 @@ describe( 'Cropper', () => {
 
 	beforeAll( () => {
 		if ( ! HTMLElement.prototype.setPointerCapture ) {
-			HTMLElement.prototype.setPointerCapture = jest.fn();
+			HTMLElement.prototype.setPointerCapture = vi.fn();
 		}
 		if ( ! HTMLElement.prototype.releasePointerCapture ) {
-			HTMLElement.prototype.releasePointerCapture = jest.fn();
+			HTMLElement.prototype.releasePointerCapture = vi.fn();
 		}
 		if ( typeof ( globalThis as any ).PointerEvent === 'undefined' ) {
 			( globalThis as any ).PointerEvent = class PointerEvent extends (
@@ -296,8 +305,8 @@ describe( 'Cropper', () => {
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
-		( controller.setCropRect as jest.Mock ).mockClear();
-		( controller.adjustCropRectForViewport as jest.Mock ).mockClear();
+		( controller.setCropRect as Mock ).mockClear();
+		( controller.adjustCropRectForViewport as Mock ).mockClear();
 
 		rerender(
 			<Cropper
@@ -345,8 +354,8 @@ describe( 'Cropper', () => {
 		);
 	} );
 
-	it( 'clears settling state when a new resize starts before the settle fallback fires', async () => {
-		jest.useFakeTimers();
+	it( 'clears settling state when a new resize starts before the settle fallback fires', () => {
+		vi.useFakeTimers();
 
 		render(
 			<Cropper
@@ -357,7 +366,7 @@ describe( 'Cropper', () => {
 			/>
 		);
 
-		const handle = await screen.findByRole( 'button', {
+		const handle = screen.getByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 		// The settle transition and viewport pan live on the stage, not the
@@ -391,18 +400,18 @@ describe( 'Cropper', () => {
 
 		// Advance past the old settle fallback; it was cancelled so the stage
 		// should still have no transition.
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
-	it( 'keeps settling active until the settle transform transition ends', async () => {
-		jest.useFakeTimers();
+	it( 'keeps settling active until the settle transform transition ends', () => {
+		vi.useFakeTimers();
 
 		render(
 			<Cropper
@@ -413,7 +422,7 @@ describe( 'Cropper', () => {
 			/>
 		);
 
-		const handle = await screen.findByRole( 'button', {
+		const handle = screen.getByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
@@ -428,7 +437,7 @@ describe( 'Cropper', () => {
 
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
-		act( () => jest.advanceTimersByTime( 200 ) );
+		act( () => vi.advanceTimersByTime( 200 ) );
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		// The transform transition runs on the image and bubbles up to the
@@ -446,11 +455,11 @@ describe( 'Cropper', () => {
 			'transition: transform 200ms ease-out'
 		);
 
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
-	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
-		jest.useFakeTimers();
+	it( 'clears settling via the fallback timer when no transitionend fires', () => {
+		vi.useFakeTimers();
 
 		render(
 			<Cropper
@@ -461,7 +470,7 @@ describe( 'Cropper', () => {
 			/>
 		);
 
-		const handle = await screen.findByRole( 'button', {
+		const handle = screen.getByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
@@ -477,20 +486,20 @@ describe( 'Cropper', () => {
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		// Without a transitionend, settling persists past the CSS duration...
-		act( () => jest.advanceTimersByTime( 200 ) );
+		act( () => vi.advanceTimersByTime( 200 ) );
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		// ...and is cleared by the fallback timer (CSS duration + 100ms).
-		act( () => jest.advanceTimersByTime( 100 ) );
+		act( () => vi.advanceTimersByTime( 100 ) );
 		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
-	it( 'ignores non-transform transitionend events while settling', async () => {
-		jest.useFakeTimers();
+	it( 'ignores non-transform transitionend events while settling', () => {
+		vi.useFakeTimers();
 
 		render(
 			<Cropper
@@ -501,7 +510,7 @@ describe( 'Cropper', () => {
 			/>
 		);
 
-		const handle = await screen.findByRole( 'button', {
+		const handle = screen.getByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
@@ -527,11 +536,11 @@ describe( 'Cropper', () => {
 
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
-	it( 'pans the canvas when a keyboard resize extends the crop past the canvas edge', async () => {
-		jest.useFakeTimers();
+	it( 'pans the canvas when a keyboard resize extends the crop past the canvas edge', () => {
+		vi.useFakeTimers();
 
 		// zoom: 2 so the image bounds extend past [0, 1] in normalized space,
 		// allowing the crop to be resized beyond the canvas edge.
@@ -548,7 +557,7 @@ describe( 'Cropper', () => {
 		);
 
 		// East handle (4th button clockwise: nw, n, ne, e).
-		const eHandle = await screen.findByRole( 'button', {
+		const eHandle = screen.getByRole( 'button', {
 			name: 'Resize from right edge',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
@@ -567,7 +576,7 @@ describe( 'Cropper', () => {
 		expect( Number( match?.[ 1 ] ) ).toBeCloseTo( -2, 4 );
 		expect( Number( match?.[ 2 ] ) ).toBeCloseTo( 0, 5 );
 
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'ignores wheel zoom while a crop resize is active', async () => {
@@ -654,11 +663,11 @@ describe( 'Cropper', () => {
 			cb( 0 );
 			return 0;
 		};
-		globalThis.cancelAnimationFrame = jest.fn();
+		globalThis.cancelAnimationFrame = vi.fn();
 
 		try {
 			const controller = createController();
-			const onGestureEnd = jest.fn();
+			const onGestureEnd = vi.fn();
 			render(
 				<Cropper
 					src="test.jpg"
@@ -685,7 +694,7 @@ describe( 'Cropper', () => {
 				isPrimary: true,
 			} );
 
-			( controller.setPan as jest.Mock ).mockClear();
+			( controller.setPan as Mock ).mockClear();
 			fireEvent.pointerDown( canvas, {
 				button: 0,
 				clientX: 250,
@@ -719,8 +728,8 @@ describe( 'Cropper', () => {
 			expect( controller.settleCrop ).not.toHaveBeenCalled();
 			expect( onGestureEnd ).not.toHaveBeenCalled();
 
-			( controller.setCropRect as jest.Mock ).mockClear();
-			( controller.setZoomAtPoint as jest.Mock ).mockClear();
+			( controller.setCropRect as Mock ).mockClear();
+			( controller.setZoomAtPoint as Mock ).mockClear();
 
 			fireEvent.pointerMove( resizeHandle, {
 				button: 0,
@@ -930,8 +939,7 @@ describe( 'Cropper', () => {
 		} );
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
 
-		const rect = ( controller.setCropRect as jest.Mock ).mock
-			.calls[ 0 ][ 0 ];
+		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
 			{ ...controller.state, cropRect: rect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
@@ -970,11 +978,10 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from right edge',
 		} );
-		( controller.setCropRect as jest.Mock ).mockClear();
+		( controller.setCropRect as Mock ).mockClear();
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
 
-		const rect = ( controller.setCropRect as jest.Mock ).mock
-			.calls[ 0 ][ 0 ];
+		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
 			{ ...controller.state, cropRect: rect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
@@ -1007,8 +1014,7 @@ describe( 'Cropper', () => {
 		} );
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
 
-		const rect = ( controller.setCropRect as jest.Mock ).mock
-			.calls[ 0 ][ 0 ];
+		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
 			{ ...controller.state, cropRect: rect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
@@ -1063,8 +1069,7 @@ describe( 'Cropper', () => {
 		await waitFor( () =>
 			expect( controller.setCropRect ).toHaveBeenCalledTimes( 1 )
 		);
-		const rect = ( controller.setCropRect as jest.Mock ).mock
-			.calls[ 0 ][ 0 ];
+		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
 			{ ...controller.state, cropRect: rect },
 			{ width: image.naturalWidth, height: image.naturalHeight }

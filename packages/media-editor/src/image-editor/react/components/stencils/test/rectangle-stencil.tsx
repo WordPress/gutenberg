@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import { RectangleStencil } from '../rectangle-stencil';
-import type { NormalizedRect, Size } from '../../../../core/types';
+import type {
+	HandlePosition,
+	NormalizedRect,
+	Size,
+} from '../../../../core/types';
 import { DEFAULT_KEYBOARD_STEP } from '../../../../core/constants';
 
 const DEFAULT_CROP_RECT: NormalizedRect = {
@@ -29,10 +34,10 @@ const CROP_BOUNDS = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 function renderStencil(
 	overrides: Partial< React.ComponentProps< typeof RectangleStencil > > = {}
 ) {
-	const onCropChange = jest.fn();
-	const onResizeStart = jest.fn();
-	const onResizeEnd = jest.fn();
-	const onEscape = jest.fn();
+	const onCropChange = vi.fn();
+	const onResizeStart = vi.fn();
+	const onResizeEnd = vi.fn();
+	const onEscape = vi.fn();
 	const props = {
 		cropRect: DEFAULT_CROP_RECT,
 		containerSize: CONTAINER_SIZE,
@@ -63,10 +68,10 @@ describe( 'RectangleStencil', () => {
 	// handle drag tests work. Same pattern as core/test/interaction-controller.ts.
 	beforeAll( () => {
 		if ( ! HTMLElement.prototype.setPointerCapture ) {
-			HTMLElement.prototype.setPointerCapture = jest.fn();
+			HTMLElement.prototype.setPointerCapture = vi.fn();
 		}
 		if ( ! HTMLElement.prototype.releasePointerCapture ) {
-			HTMLElement.prototype.releasePointerCapture = jest.fn();
+			HTMLElement.prototype.releasePointerCapture = vi.fn();
 		}
 		// Without a PointerEvent constructor, fireEvent.pointerDown falls back to
 		// the base Event class which has no `button` property. The stencil's
@@ -133,8 +138,8 @@ describe( 'RectangleStencil', () => {
 
 	describe( 'keyboard — Escape', () => {
 		it( 'handles Escape on a handle without bubbling', () => {
-			const onKeyDown = jest.fn();
-			const onEscape = jest.fn();
+			const onKeyDown = vi.fn();
+			const onEscape = vi.fn();
 			render(
 				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 				<div onKeyDown={ onKeyDown }>
@@ -142,7 +147,7 @@ describe( 'RectangleStencil', () => {
 						cropRect={ DEFAULT_CROP_RECT }
 						containerSize={ CONTAINER_SIZE }
 						imageSize={ IMAGE_SIZE }
-						onCropChange={ jest.fn() }
+						onCropChange={ vi.fn() }
 						onEscape={ onEscape }
 						freeformCrop
 						cropBounds={ CROP_BOUNDS }
@@ -170,7 +175,7 @@ describe( 'RectangleStencil', () => {
 
 	describe( 'keyboard — arrow keys (fine step)', () => {
 		it( 'calls onResizeStart once and onResizeEnd after keyboard resize settles', () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			const { onResizeStart, onResizeEnd } = renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
@@ -181,11 +186,11 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeEnd ).not.toHaveBeenCalled();
 
 			act( () => {
-				jest.advanceTimersByTime( 500 );
+				vi.advanceTimersByTime( 500 );
 			} );
 
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', () => {
@@ -223,7 +228,12 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'applies snapCropRect to freeform resize output', () => {
-			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => ( {
+			const snapCropRect = vi.fn<
+				(
+					rect: NormalizedRect,
+					handle: HandlePosition
+				) => NormalizedRect
+			>( ( rect ) => ( {
 				...rect,
 				width: 0.82,
 			} ) );
@@ -318,7 +328,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'does not apply snapCropRect while resizing a locked aspect ratio', () => {
-			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => rect );
+			const snapCropRect = vi.fn( ( rect: NormalizedRect ) => rect );
 			renderStencil( { aspectRatio: 1, snapCropRect } );
 			const nwHandle = screen.getByRole( 'button', {
 				name: 'Resize from top-left corner',
@@ -357,7 +367,7 @@ describe( 'RectangleStencil', () => {
 			renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
-			jest.spyOn( firstHandle, 'focus' );
+			vi.spyOn( firstHandle, 'focus' );
 
 			fireEvent.pointerDown( firstHandle, {
 				button: 0,
@@ -413,14 +423,14 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'only stops touchstart propagation for single-touch handle gestures', () => {
-			const onTouchStart = jest.fn();
+			const onTouchStart = vi.fn();
 			render(
 				<div onTouchStart={ onTouchStart }>
 					<RectangleStencil
 						cropRect={ DEFAULT_CROP_RECT }
 						containerSize={ CONTAINER_SIZE }
 						imageSize={ IMAGE_SIZE }
-						onCropChange={ jest.fn() }
+						onCropChange={ vi.fn() }
 						freeformCrop
 						cropBounds={ CROP_BOUNDS }
 					/>

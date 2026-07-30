@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, type Mock, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
@@ -17,7 +18,7 @@ function setupCropPanel(
 ) {
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
-		onAspectRatioChange: jest.fn(),
+		onAspectRatioChange: vi.fn(),
 		aspectRatioOptions: [
 			{ label: 'Free', value: 0 },
 			{ label: 'Original', value: -1 },
@@ -47,7 +48,7 @@ describe( 'MediaEditorCropPanel', () => {
 
 		expect( controls.onAspectRatioChange ).toHaveBeenCalled();
 		expect(
-			( controls.onAspectRatioChange as jest.Mock ).mock.calls[ 0 ][ 0 ]
+			( controls.onAspectRatioChange as Mock ).mock.calls[ 0 ][ 0 ]
 		).toBe( '0' );
 	} );
 

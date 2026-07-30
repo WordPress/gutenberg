@@ -52,6 +52,7 @@
 					"packages/interactivity-router",
 					"packages/is-shallow-equal",
 					"packages/keycodes",
+					"packages/media-editor",
 					"packages/media-fields",
 					"packages/media-utils",
 					"packages/notices",

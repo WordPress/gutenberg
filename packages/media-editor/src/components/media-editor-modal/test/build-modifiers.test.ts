@@ -56,6 +56,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 
 /**
