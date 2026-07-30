@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1210,
-	"sha256": "fb178d7a173936fe1221aee6382dfe47710ce1bd06fb2c59e2d929b963f107fb",
+	"count": 1205,
+	"sha256": "9103fb8f87919d510c817fa9392139c9367a5570977fc0b10f1b263ef933419f",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -832,11 +832,6 @@
 		"packages/customize-widgets/src/filters/move-to-sidebar.js",
 		"packages/customize-widgets/src/filters/wide-widget-display.js",
 		"packages/customize-widgets/src/index.js",
-		"packages/data/src/components/use-dispatch/test/use-dispatch.js",
-		"packages/data/src/components/use-select/test/index.js",
-		"packages/data/src/components/use-select/test/suspense.js",
-		"packages/data/src/components/with-dispatch/test/index.js",
-		"packages/data/src/components/with-select/test/index.js",
 		"packages/edit-post/src/components/back-button/fullscreen-mode-close.js",
 		"packages/edit-post/src/components/back-button/index.js",
 		"packages/edit-post/src/components/init-pattern-modal/index.js",
