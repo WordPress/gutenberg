@@ -1,8 +1,19 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it, vi } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
-import { click, press, type } from '@ariakit/test';
-import { render } from '@ariakit/test/react';
+import { render } from 'vitest-browser-react';
+
+/**
+ * WordPress dependencies
+ */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
 
@@ -59,15 +70,16 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'option', {
 				name: 'crimson clover',
 			} )
@@ -75,9 +87,9 @@ describe.each( [
 
 		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'option', {
 				name: 'poppy',
 			} )
@@ -87,87 +99,95 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await press.Tab();
-		await press.Enter();
-		expect(
-			screen.getByRole( 'listbox', {
-				name: defaultProps.label,
-			} )
-		).toBeVisible();
+		await user.tab();
+		await user.keyboard( '{Enter}' );
+		await expect
+			.element(
+				page.getByRole( 'listbox', {
+					name: defaultProps.label,
+				} )
+			)
+			.toBeVisible();
 
-		await press.Escape();
-		expect(
-			screen.queryByRole( 'listbox', {
-				name: defaultProps.label,
-			} )
-		).not.toBeInTheDocument();
+		await user.keyboard( '{Escape}' );
+		await expect
+			.element(
+				page.getByRole( 'listbox', {
+					name: defaultProps.label,
+				} )
+			)
+			.not.toBeInTheDocument();
 
 		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
-			await press.Enter();
+			await user.keyboard( '{Enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
 					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
-			await press.ArrowDown();
-			await press.Enter();
+			await user.keyboard( '{ArrowDown}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
-			await press.Enter();
+			await user.tab();
+			await user.keyboard( '{Enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
 					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
-			await type( 'a' );
-			await press.Enter();
+			await user.keyboard( 'a' );
+			await user.keyboard( '{Enter}' );
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
 
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
-			await type( 'a' );
+			await user.keyboard( 'a' );
 
 			expect(
 				screen.queryByRole( 'listbox', {
@@ -176,55 +196,66 @@ describe.each( [
 				} )
 			).not.toBeInTheDocument();
 
-			// This Enter is a workaround for flakiness, and shouldn't be necessary in an actual browser
-			await press.Enter();
-
-			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+			await expect
+				.element(
+					page.getByRole( 'combobox', {
+						expanded: false,
+					} )
+				)
+				.toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			// assert that first item has aria-selected="true"
-			expect(
-				screen.getByRole( 'option', {
-					name: 'violets',
-					selected: true,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: 'violets',
+						selected: true,
+					} )
+				)
+				.toBeVisible();
 
 			// change the current selection
-			await click( screen.getByRole( 'option', { name: 'poppy' } ) );
+			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
 
 			// click combobox to mount listbox with options again
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			// check that first item is has aria-selected="false" after new selection
-			expect(
-				screen.getByRole( 'option', {
-					name: 'violets',
-					selected: false,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: 'violets',
+						selected: false,
+					} )
+				)
+				.toBeVisible();
 
 			// check that new selected item now has aria-selected="true"
-			expect(
-				screen.getByRole( 'option', {
-					name: 'poppy',
-					selected: true,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: 'poppy',
+						selected: true,
+					} )
+				)
+				.toBeVisible();
 		} );
 	} );
 
 	describe( 'Multiple selection', () => {
 		it( 'Should be able to select multiple items when provided an array', async () => {
+			const user = userEvent.setup();
 			const onChangeMock = vi.fn();
 
 			// initial selection as defaultValue
@@ -265,21 +296,23 @@ describe.each( [
 				`${ defaultValues.length } items selected`
 			);
 
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
 				'aria-multiselectable'
 			);
 
 			// ensure defaultValues are selected in list of items
-			defaultValues.forEach( ( value ) =>
-				expect(
-					screen.getByRole( 'option', {
-						name: value,
-						selected: true,
-					} )
-				).toBeVisible()
-			);
+			for ( const value of defaultValues ) {
+				await expect
+					.element(
+						page.getByRole( 'option', {
+							name: value,
+							selected: true,
+						} )
+					)
+					.toBeVisible();
+			}
 
 			// name of next selection
 			const nextSelectionName = 'rose blush';
@@ -290,14 +323,21 @@ describe.each( [
 			} );
 
 			// click next selection to add another item to current selection
-			await click( nextSelection );
+			await user.click( nextSelection );
 
 			// updated array containing defaultValues + the item just selected
 			const updatedSelection = defaultValues.concat( nextSelectionName );
 
 			expect( onChangeMock ).toHaveBeenCalledWith( updatedSelection );
 
-			expect( nextSelection ).toHaveAttribute( 'aria-selected' );
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: nextSelectionName,
+						selected: true,
+					} )
+				)
+				.toBeVisible();
 
 			// expect increased array length for current selection
 			expect( currentSelectedItem ).toHaveTextContent(
@@ -306,6 +346,7 @@ describe.each( [
 		} );
 
 		it( 'Should be able to deselect items when provided an array', async () => {
+			const user = userEvent.setup();
 			// initial selection as defaultValue
 			const defaultValues = [
 				'aurora borealis green',
@@ -332,7 +373,7 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			// Array containing items to deselect
 			const nextSelection = [
@@ -343,19 +384,17 @@ describe.each( [
 
 			// Deselect some items by clicking them to ensure that changes
 			// are reflected correctly
-			await Promise.all(
-				nextSelection.map( async ( value ) => {
-					await click(
-						screen.getByRole( 'option', { name: value } )
-					);
-					expect(
-						screen.getByRole( 'option', {
+			for ( const value of nextSelection ) {
+				await user.click( page.getByRole( 'option', { name: value } ) );
+				await expect
+					.element(
+						page.getByRole( 'option', {
 							name: value,
 							selected: false,
 						} )
-					).toBeVisible();
-				} )
-			);
+					)
+					.toBeVisible();
+			}
 
 			// expect different array length from defaultValues due to deselecting items
 			expect( currentSelectedItem ).toHaveTextContent(
@@ -367,6 +406,7 @@ describe.each( [
 	} );
 
 	it( 'Should allow rendering a custom value when using `renderSelectedValue`', async () => {
+		const user = userEvent.setup();
 		const renderValue = ( value: string | readonly string[] ) => {
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
@@ -397,32 +437,37 @@ describe.each( [
 			screen.queryByRole( 'img', { name: 'july-9' } )
 		).not.toBeInTheDocument();
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
 		// expect that the other image is only visible after opening popover with options
-		expect( screen.getByRole( 'img', { name: 'july-9' } ) ).toBeVisible();
-		expect(
-			screen.getByRole( 'option', { name: 'july-9' } )
-		).toBeVisible();
+		await expect
+			.element( page.getByRole( 'img', { name: 'july-9' } ) )
+			.toBeVisible();
+		await expect
+			.element( page.getByRole( 'option', { name: 'july-9' } ) )
+			.toBeVisible();
 	} );
 
 	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await press.Tab();
+		await user.tab();
 		expect( currentSelectedItem ).toHaveFocus();
 		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
 
-		await press.ArrowDown();
-		expect(
-			screen.getByRole( 'listbox', {
-				name: defaultProps.label,
-			} )
-		).toBeVisible();
+		await user.keyboard( '{ArrowDown}' );
+		await expect
+			.element(
+				page.getByRole( 'listbox', {
+					name: defaultProps.label,
+				} )
+			)
+			.toBeVisible();
 	} );
 
 	it( 'Should label the component correctly even when the label is not visible', async () => {

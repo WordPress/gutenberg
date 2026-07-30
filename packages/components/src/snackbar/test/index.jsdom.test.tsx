@@ -1,8 +1,19 @@
+/**
+ * External dependencies
+ */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { click } from '@ariakit/test';
+
+/**
+ * WordPress dependencies
+ */
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
+
+/**
+ * Internal dependencies
+ */
 import Snackbar from '../index';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
@@ -86,7 +97,7 @@ describe( 'Snackbar', () => {
 			'Dismiss this notice'
 		);
 
-		await click( snackbar );
+		await userEvent.click( snackbar );
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
@@ -148,7 +159,7 @@ describe( 'Snackbar', () => {
 			name: 'Dismiss this notice',
 		} );
 
-		await click( closeButton );
+		await userEvent.click( closeButton );
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
@@ -212,7 +223,7 @@ describe( 'Snackbar', () => {
 				name: 'View post',
 			} );
 
-			await click( button );
+			await userEvent.click( button );
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
