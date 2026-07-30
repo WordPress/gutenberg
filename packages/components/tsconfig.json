@@ -34,6 +34,7 @@
 	"files": [ "global.d.ts", "storybook.d.ts" ],
 	"exclude": [
 		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
+		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+		"src/**/test/**/*.jsx"
 	]
 }
