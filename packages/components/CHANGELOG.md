@@ -10,14 +10,10 @@
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
-<<<<<<< Updated upstream
-=======
 ### Deprecations
 
--   `Animate`: Deprecate the component, planned for removal in WordPress 7.4 ([#80931](https://github.com/WordPress/gutenberg/pull/80931)).
--   `Surface`: Deprecate the component, planned for removal in WordPress 7.4.
+-   `Surface`: Deprecate the component, planned for removal in WordPress 7.4 ([#80943](https://github.com/WordPress/gutenberg/pull/80943)).
 
->>>>>>> Stashed changes
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
