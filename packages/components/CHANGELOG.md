@@ -8,6 +8,7 @@
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
+    -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Enhancements
@@ -34,11 +35,8 @@
 ### Internal
 
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
--   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
--   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
--   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
 -   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).

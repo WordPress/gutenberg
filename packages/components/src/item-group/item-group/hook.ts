@@ -18,10 +18,11 @@ export function useItemGroup(
 	} = useContextSystem( props, 'ItemGroup' );
 
 	const classes = clsx(
+		styles[ 'item-group' ],
 		{
-			[ styles.bordered ]: isBordered,
-			[ styles.separated ]: isSeparated,
-			[ styles.rounded ]: isRounded,
+			[ styles[ 'is-bordered' ] ]: isBordered,
+			[ styles[ 'is-separated' ] ]: isSeparated,
+			[ styles[ 'is-rounded' ] ]: isRounded,
 		},
 		className
 	);

@@ -29,10 +29,10 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const as = asProp || ( typeof onClick !== 'undefined' ? 'button' : 'div' );
 
 	const classes = clsx(
-		as === 'button' && styles[ 'unstyled-button' ],
-		as === 'a' && styles[ 'unstyled-link' ],
-		sizeClassName[ size ] || sizeClassName.medium,
 		styles.item,
+		as === 'button' && styles[ 'is-unstyled-button' ],
+		as === 'a' && styles[ 'is-unstyled-link' ],
+		sizeClassName[ size ] || sizeClassName.medium,
 		spacedAround && styles[ 'spaced-around' ],
 		className
 	);

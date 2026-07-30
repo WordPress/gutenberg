@@ -11,8 +11,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-size-medium style-item style-spaced-around components-item"
-+         class="style-size-large style-item style-spaced-around components-item"
+-         class="style-item style-size-medium style-spaced-around components-item"
++         class="style-item style-size-large style-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -24,8 +24,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-size-medium style-item style-spaced-around components-item"
-+         class="style-size-large style-item style-spaced-around components-item"
+-         class="style-item style-size-medium style-spaced-around components-item"
++         class="style-item style-size-large style-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -44,8 +44,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="style-size-medium style-item components-item"
-+       class="style-size-large style-item components-item"
+-       class="style-item style-size-medium components-item"
++       class="style-item style-size-large components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -56,7 +56,7 @@ Snapshot Diff:
 exports[`ItemGroup ItemGroup component should render correctly 1`] = `
 <div>
   <div
-    class="style-rounded components-item-group"
+    class="style-item-group style-is-rounded components-item-group"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
@@ -66,7 +66,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
       role="listitem"
     >
       <div
-        class="style-size-medium style-item style-spaced-around components-item"
+        class="style-item style-size-medium style-spaced-around components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -85,8 +85,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="style-rounded components-item-group"
-+     class="style-separated style-rounded components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-separated style-is-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -96,8 +96,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-size-medium style-item style-spaced-around components-item"
-+         class="style-size-medium style-item components-item"
+-         class="style-item style-size-medium style-spaced-around components-item"
++         class="style-item style-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -113,8 +113,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="style-rounded components-item-group"
-+     class="style-bordered style-rounded components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-bordered style-is-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -124,8 +124,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-size-medium style-item style-spaced-around components-item"
-+         class="style-size-medium style-item components-item"
+-         class="style-item style-size-medium style-spaced-around components-item"
++         class="style-item style-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -141,8 +141,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="style-rounded components-item-group"
-+     class="components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
