@@ -49,11 +49,21 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			const wrapperBlockName = getBlockName( wrapperBlockClientId );
 
 			if ( wrapperBlockName ) {
-				_blocks = createBlock(
+				const wrapped = createBlock(
 					wrapperBlockName,
 					getBlockAttributes( wrapperBlockClientId ),
-					_blocks
+					blocks
 				);
+
+				// Only use the wrapper if it serializes its inner blocks.
+				// A wrapper synced to an entity (a navigation menu)
+				// serializes as a self-closing pointer and would drop the
+				// copied blocks.
+				if (
+					serialize( wrapped ).includes( serialize( firstBlock ) )
+				) {
+					_blocks = wrapped;
+				}
 			}
 		}
 	}

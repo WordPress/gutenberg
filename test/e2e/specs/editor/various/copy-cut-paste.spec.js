@@ -1018,6 +1018,52 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should copy a navigation link bare, without its synced menu wrapper', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Copy test menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Nav item one","url":"https://wordpress.org","kind":"custom"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Select the link within the menu and copy it with a collapsed
+		// selection, which copies the whole block. The first click lands
+		// on the navigation block's overlay and selects the menu; the
+		// second selects the link.
+		await editor.canvas.locator( '[data-type="core/navigation"]' ).click();
+		await editor.canvas.getByText( 'Nav item one' ).click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/navigation-link' ] );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// The navigation wrapper does not serialize its inner blocks (the
+		// synced menu entity owns them), so wrapping would lose the copied
+		// link. The clipboard holds the bare link instead.
+		const { html } = pageUtils.getClipboardData();
+		expect( html ).toContain( '<!-- wp:navigation-link' );
+		expect( html ).toContain( '"label":"Nav item one"' );
+		expect( html ).not.toContain( 'wp:navigation {' );
+
+		await requestUtils.deleteAllMenus();
+	} );
+
 	test( 'should wrap multiple pasted blocks in one required parent', async ( {
 		editor,
 		page,
