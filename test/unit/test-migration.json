@@ -70,7 +70,14 @@
 		"packages/compose/src/hooks/use-observable-value/test/index.js": "packages/compose/src/hooks/use-observable-value/test/index.jsx",
 		"packages/compose/src/hooks/use-state-with-history/test/index.js": "packages/compose/src/hooks/use-state-with-history/test/index.jsx",
 		"packages/compose/src/hooks/use-viewport-match/test/index.js": "packages/compose/src/hooks/use-viewport-match/test/index.jsx",
-		"packages/compose/src/utils/create-higher-order-component/test/index.js": "packages/compose/src/utils/create-higher-order-component/test/index.jsx"
+		"packages/compose/src/utils/create-higher-order-component/test/index.js": "packages/compose/src/utils/create-higher-order-component/test/index.jsx",
+		"packages/core-data/src/hooks/test/use-entity-record.js": "packages/core-data/src/hooks/test/use-entity-record.jsx",
+		"packages/core-data/src/hooks/test/use-entity-records.js": "packages/core-data/src/hooks/test/use-entity-records.jsx",
+		"packages/core-data/src/hooks/test/use-query-select.js": "packages/core-data/src/hooks/test/use-query-select.jsx",
+		"packages/core-data/src/hooks/test/use-resource-permissions.js": "packages/core-data/src/hooks/test/use-resource-permissions.jsx",
+		"packages/core-data/src/test/entity-provider.js": "packages/core-data/src/test/entity-provider.jsx",
+		"packages/core-data/src/test/rtc-rich-text-offset-space.test.js": "packages/core-data/src/test/rtc-rich-text-offset-space.test.jsx",
+		"packages/interface/src/components/fullscreen-mode/test/index.js": "packages/interface/src/components/fullscreen-mode/test/index.jsx"
 	},
 	"added": {
 		"jest": [ "packages/wp-build/lib/test/source-files.js" ],
