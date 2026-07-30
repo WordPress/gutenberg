@@ -69,10 +69,11 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 `;
 
 /**
- * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit's `render` prop so
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
  * this element wraps the inner surface that receives all merged menu props
- * (ref, role, `data-*`, children). Transitions are driven by `data-enter` /
- * `data-side` on the inner surface via `:has(> …)`.
+ * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
+ * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
+ * surface via `:has(> …)`.
  */
 export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
