@@ -1,19 +1,17 @@
 /**
  * External dependencies
  */
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	type Mock,
+	vi,
+} from 'vitest';
 
-// Mock the vips worker module.
-// The mock functions must be declared inside the factory to avoid hoisting issues.
-jest.mock( '@wordpress/vips/worker', () => ( {
-	vipsConvertImageFormat: jest.fn(),
-	vipsCompressImage: jest.fn(),
-	vipsHasTransparency: jest.fn(),
-	vipsResizeImage: jest.fn(),
-	vipsRotateImage: jest.fn(),
-	vipsCancelOperations: jest.fn(),
-} ) );
-
-// Import the mocked module to get access to the mock functions.
+// Vitest aliases the worker entry point to the repository's worker-code stub.
 import * as vipsWorker from '@wordpress/vips/worker';
 
 /**
@@ -32,13 +30,12 @@ import {
 	vipsCancelOperations,
 } from '../utils';
 
-// Cast to jest.Mock for type safety.
-const mockConvertImageFormat = vipsWorker.vipsConvertImageFormat as jest.Mock;
-const mockCompressImage = vipsWorker.vipsCompressImage as jest.Mock;
-const mockHasTransparency = vipsWorker.vipsHasTransparency as jest.Mock;
-const mockResizeImage = vipsWorker.vipsResizeImage as jest.Mock;
-const mockRotateImage = vipsWorker.vipsRotateImage as jest.Mock;
-const mockCancelOperations = vipsWorker.vipsCancelOperations as jest.Mock;
+const mockConvertImageFormat = vi.mocked( vipsWorker.vipsConvertImageFormat );
+const mockCompressImage = vi.mocked( vipsWorker.vipsCompressImage );
+const mockHasTransparency = vi.mocked( vipsWorker.vipsHasTransparency );
+const mockResizeImage = vi.mocked( vipsWorker.vipsResizeImage );
+const mockRotateImage = vi.mocked( vipsWorker.vipsRotateImage );
+const mockCancelOperations = vi.mocked( vipsWorker.vipsCancelOperations );
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
 	type: 'image/jpeg',
@@ -52,7 +49,7 @@ const pngFile = new File( [ 'test-content' ], 'image.png', {
 
 describe( 'vips utilities', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'vipsConvertImageFormat', () => {
@@ -157,12 +154,12 @@ describe( 'vips utilities', () => {
 	} );
 
 	describe( 'vipsHasTransparency', () => {
-		let mockFetch: jest.Mock;
+		let mockFetch: Mock;
 		let originalFetch: typeof window.fetch;
 
 		beforeEach( () => {
 			originalFetch = window.fetch;
-			mockFetch = jest.fn().mockResolvedValue( {
+			mockFetch = vi.fn().mockResolvedValue( {
 				ok: true,
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
@@ -297,7 +294,7 @@ describe( 'vips utilities', () => {
 			expect( mockResizeImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].smartCrop ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.smartCrop ).toBe(
 				true
 			);
 		} );
@@ -320,10 +317,10 @@ describe( 'vips utilities', () => {
 				maxBitdepth: 8,
 			} );
 
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].stripMeta ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.stripMeta ).toBe(
 				false
 			);
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].maxBitdepth ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.maxBitdepth ).toBe(
 				8
 			);
 		} );
@@ -342,8 +339,8 @@ describe( 'vips utilities', () => {
 			expect( result ).toBeInstanceOf( ImageFile );
 			expect( result.name ).toBe( 'test-rotated.jpg' );
 			expect( result.type ).toBe( 'image/jpeg' );
-			expect( result.width ).toBe( 200 );
-			expect( result.height ).toBe( 300 );
+			expect( ( result as ImageFile ).width ).toBe( 200 );
+			expect( ( result as ImageFile ).height ).toBe( 300 );
 
 			expect( mockRotateImage ).toHaveBeenCalledTimes( 1 );
 			expect( mockRotateImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );

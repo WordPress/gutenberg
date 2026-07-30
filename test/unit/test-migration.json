@@ -71,6 +71,7 @@
 					"packages/token-list",
 					"packages/ui",
 					"packages/undo-manager",
+					"packages/upload-media",
 					"packages/url",
 					"packages/viewport",
 					"packages/warning",

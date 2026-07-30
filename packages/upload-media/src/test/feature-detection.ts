@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import {
@@ -42,10 +47,10 @@ describe( 'feature-detection', () => {
 		} as unknown as typeof Worker;
 
 		// jsdom does not implement URL.createObjectURL/revokeObjectURL.
-		global.URL.createObjectURL = jest.fn(
+		global.URL.createObjectURL = vi.fn(
 			() => 'blob:http://localhost/test'
 		);
-		global.URL.revokeObjectURL = jest.fn();
+		global.URL.revokeObjectURL = vi.fn();
 
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
@@ -317,9 +322,9 @@ describe( 'feature-detection', () => {
 
 		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
 			global.createImageBitmap =
-				jest.fn() as unknown as typeof createImageBitmap;
+				vi.fn() as unknown as typeof createImageBitmap;
 			global.OffscreenCanvas =
-				jest.fn() as unknown as typeof OffscreenCanvas;
+				vi.fn() as unknown as typeof OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( true );
 		} );
@@ -328,14 +333,14 @@ describe( 'feature-detection', () => {
 			// @ts-ignore
 			delete global.createImageBitmap;
 			global.OffscreenCanvas =
-				jest.fn() as unknown as typeof OffscreenCanvas;
+				vi.fn() as unknown as typeof OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 
 		it( 'returns false when OffscreenCanvas is unavailable', () => {
 			global.createImageBitmap =
-				jest.fn() as unknown as typeof createImageBitmap;
+				vi.fn() as unknown as typeof createImageBitmap;
 			// @ts-ignore
 			delete global.OffscreenCanvas;
 
