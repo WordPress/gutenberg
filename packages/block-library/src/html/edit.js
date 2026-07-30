@@ -136,10 +136,10 @@ export default function HTMLEdit( { clientId, attributes } ) {
 		);
 	}
 
-	// When the block contains only JavaScript or CSS, both stripped by
-	// `safeHTML` before canvas injection, `InnerContent` collapses to zero
-	// height, making the block invisible. Show a named placeholder instead so
-	// editors always see something on the canvas and can reach the modal.
+	// Scripts and Styles get stripped before canvas injection, which
+	// leaves the InnerContent empty and the block becomes invisible.
+	// Show a named placeholder instead, so it's always visible and the
+	// modal stays reachable.
 	const { html: visibleHtml } = parseContent( content );
 	if ( ! visibleHtml ) {
 		return (
@@ -159,7 +159,7 @@ export default function HTMLEdit( { clientId, attributes } ) {
 							variant="secondary"
 							onClick={ () => setIsModalOpen( true ) }
 						>
-							{ __( 'Edit code' ) }
+							{ __( 'Show code' ) }
 						</Button>
 					</VStack>
 				</InspectorControls>
