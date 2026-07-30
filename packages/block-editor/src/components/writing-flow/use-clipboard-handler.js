@@ -23,6 +23,32 @@ import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
+import { getBlockClientId } from '../../utils/dom';
+
+/**
+ * Whether the DOM selection entirely spans the content of the given block,
+ * and the block's editable element is the block element itself, like a
+ * heading or a paragraph, not a field within a larger block, like a caption.
+ *
+ * @param {Document} ownerDocument The block's document.
+ * @param {string}   clientId      The block's client ID.
+ *
+ * @return {boolean} Whether the block is entirely selected.
+ */
+function isBlockEntirelySelected( ownerDocument, clientId ) {
+	const selection = ownerDocument.defaultView.getSelection();
+
+	if ( getBlockClientId( selection.anchorNode ) !== clientId ) {
+		return false;
+	}
+
+	const blockElement = ownerDocument.getElementById( `block-${ clientId }` );
+
+	return (
+		!! blockElement?.isContentEditable &&
+		isEntirelySelected( blockElement )
+	);
+}
 
 export default function useClipboardHandler() {
 	const registry = useRegistry();
@@ -82,22 +108,12 @@ export default function useClipboardHandler() {
 						: documentHasSelection( ownerDocument ) &&
 						  ! ownerDocument.activeElement.isContentEditable;
 
-				// The selection's editable element, resolved from the
-				// selection itself: with a focused editing host the event
-				// targets the host, not the editable.
-				const selection = ownerDocument.defaultView.getSelection();
-				const anchorElement =
-					selection.anchorNode?.nodeType === selection.anchorNode?.ELEMENT_NODE
-						? selection.anchorNode
-						: selection.anchorNode?.parentElement;
-				const blockElement = anchorElement?.closest(
-					'[data-block][contenteditable="true"]'
-				);
-
 				isWholeSingleBlockCopy =
 					event.type === 'copy' &&
-					!! blockElement &&
-					isEntirelySelected( blockElement );
+					isBlockEntirelySelected(
+						ownerDocument,
+						selectedBlockClientIds[ 0 ]
+					);
 
 				// Let native copy behaviour take over in input fields.
 				if ( hasSelection && ! isWholeSingleBlockCopy ) {
@@ -216,6 +232,25 @@ export default function useClipboardHandler() {
 				}
 
 				if ( isFullySelected ) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					event.preventDefault();
+					return;
+				}
+
+				// Pasting over an entirely selected block replaces it, the
+				// equivalent of pasting into an empty block.
+				if (
+					! hasMultiSelection() &&
+					isBlockEntirelySelected(
+						event.target.ownerDocument,
+						selectedBlockClientIds[ 0 ]
+					)
+				) {
 					replaceBlocks(
 						selectedBlockClientIds,
 						blocks,
