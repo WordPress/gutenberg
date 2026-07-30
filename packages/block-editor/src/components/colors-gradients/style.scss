@@ -129,16 +129,13 @@ $swatch-gap: 12px;
 		}
 	}
 
+	// Space for the indicator and the contrast warning is reserved
+	// unconditionally. Widening the label only when no warning is showing made
+	// it reflow every time the selected colour crossed the contrast threshold.
 	.block-editor-panel-color-gradient-settings__color-name {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
-	}
-
-	// Reserve extra space for the always-visible contrast warning icon,
-	// which sits alongside the hover-revealed reset button.
-	> button.has-contrast-warning .block-editor-panel-color-gradient-settings__color-name {
 		max-width: calc(100% - ($button-size-next-default-40px + $button-size-small + $grid-unit));
 	}
 }
@@ -176,11 +173,15 @@ $swatch-gap: 12px;
 		opacity: 1;
 	}
 
-	// While a contrast warning is in effect the warning icon occupies the
-	// far-right slot, so the reset button shifts left to sit beside it.
-	.block-editor-panel-color-gradient-settings__dropdown.has-contrast-warning + & {
-		right: $button-size-small + $grid-unit-05;
-	}
+}
+
+// While an override indicator is present it holds the far-right slot, so the
+// contrast warning sits inboard of it. Keying this off the indicator rather
+// than the warning is what keeps the indicator still: it never moves when the
+// selected colour crosses the contrast threshold, and no space is reserved
+// beside it when no warning is showing.
+.has-local-override-from-global-styles .block-editor-panel-color-gradient-settings__contrast-warning {
+	right: $button-size-small + $grid-unit-05;
 }
 
 // Icon-only "Low contrast" warning shown to the right of the color

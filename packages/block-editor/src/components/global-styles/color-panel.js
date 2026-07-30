@@ -301,6 +301,7 @@ export default function ColorPanel( {
 	const items = [
 		showLinkPanel && {
 			key: 'link',
+			stylePath: 'elements.link.color.text',
 			label: __( 'Link' ),
 			hasValue: hasLink,
 			resetValue: resetLink,
@@ -461,6 +462,7 @@ export default function ColorPanel( {
 
 		items.push( {
 			key: name,
+			stylePath: `elements.${ name }.color.text`,
 			label: elementLabel,
 			hasValue: hasElement,
 			resetValue: resetElement,

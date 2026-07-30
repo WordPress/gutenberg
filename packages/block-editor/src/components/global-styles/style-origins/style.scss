@@ -1,0 +1,125 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// Match the colour picker popover exactly, so the two read as the same kind of
+// surface. That panel derives its width from the swatch grid:
+// ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panel-padding * 2 ).
+$origin-popover-padding: $grid-unit-20;
+$origin-popover-width: (28px * 6) + (12px * 5) + ($origin-popover-padding * 2);
+
+.block-editor-style-origins__popover {
+	box-sizing: border-box;
+	width: $origin-popover-width;
+	padding: $origin-popover-padding;
+}
+
+// The property this cascade explains, set like the sidebar's own control
+// labels (uppercase, tracked out) so it reads as the same kind of heading.
+// A plain `h3` would also bring a large browser default margin with it, which
+// shows up as stray padding above the title.
+.block-editor-style-origins__popover-title {
+	margin: 0 0 $grid-unit-15;
+	font-size: $helptext-font-size;
+	font-weight: 500;
+	line-height: 1.4;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: $gray-900;
+}
+
+// Every contributing layer, low to high precedence. Overridden layers are
+// struck through, the way a CSS inspector shows a declaration that lost.
+.block-editor-style-origins__cascade {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	overflow: hidden;
+
+	li {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: $grid-unit-10;
+		margin: 0;
+		padding: $grid-unit-10 $grid-unit-15;
+		font-size: $font-size-small;
+		line-height: 1.4;
+
+		+ li {
+			border-top: $border-width solid $gray-300;
+		}
+
+		&.is-overridden {
+			color: $gray-600;
+			text-decoration: line-through;
+			text-decoration-thickness: from-font;
+		}
+
+		&.is-winner {
+			background: $gray-100;
+			font-weight: 500;
+			color: $gray-900;
+		}
+	}
+}
+
+// The origin takes the room it needs and wraps on word boundaries. `min-width`
+// is required: a flex item defaults to `min-width: auto`, which lets a long
+// value squeeze the label down to one character per line.
+.block-editor-style-origins__origin {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: break-word;
+}
+
+// Values stay on one line so no single row can tower over the others; anything
+// still too long truncates, with the full value on the element's `title`.
+// `min-width: 0` is what allows a flex item to shrink far enough to ellipsis.
+.block-editor-style-origins__value {
+	flex: 0 1 auto;
+	min-width: 0;
+	// The origin labels are short, so the value can take the larger share.
+	max-width: 65%;
+	font-family: $font-family-mono;
+	text-align: end;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+// Mirrors the colour picker's own clear action: a borderless link, aligned to
+// the trailing edge, set off from the content above it.
+.block-editor-style-origins__actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: $grid-unit-15;
+}
+
+// Warns that the winner shown above is not what the browser actually applied.
+.block-editor-style-origins__mismatch {
+	margin: $grid-unit-15 0 0;
+	font-size: $helptext-font-size;
+}
+
+.block-editor-style-origins__reset.block-editor-style-origins__reset {
+	height: auto;
+	padding: 0;
+	font-weight: 600;
+	text-decoration: none;
+
+	// The popover takes focus on open, so this never receives it by pointer.
+	// Keyboard users still get the ring via `:focus-visible`.
+	&:focus:not(:focus-visible) {
+		box-shadow: none;
+		outline: none;
+	}
+}
+
+.block-editor-style-origins__hint {
+	margin: $grid-unit-10 0 0;
+	font-size: $helptext-font-size;
+	line-height: 1.4;
+	color: $gray-700;
+}

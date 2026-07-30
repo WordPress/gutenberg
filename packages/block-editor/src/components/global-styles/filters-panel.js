@@ -33,7 +33,7 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
+	InheritanceOriginButton,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
@@ -162,9 +162,11 @@ const renderToggle = ( duotone, resetConfig ) =>
 				</Button>
 				{ hasLocalValue &&
 					( hasLocalOverride ? (
-						<InheritanceResetButton
+						<InheritanceOriginButton
 							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
+							stylePath="filter.duotone"
+							label={ __( 'Duotone' ) }
+							onReset={ onReset }
 						/>
 					) : (
 						<Button

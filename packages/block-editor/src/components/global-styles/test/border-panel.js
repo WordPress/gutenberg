@@ -126,7 +126,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
 			expect(
 				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).toBeInTheDocument();
 		} );
@@ -244,7 +244,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// The local override surfaces the accessible reset affordance.
 			expect(
 				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} ).length
 			).toBeGreaterThanOrEqual( 1 );
 		} );
@@ -338,7 +338,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).toBeInTheDocument();
 		} );
@@ -382,12 +382,12 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			).not.toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+		it( 'renders the blue-dot InheritanceOriginButton for a local override', () => {
 			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
 			const value = { shadow: 'var:preset|shadow|hard' };
 
@@ -405,7 +405,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// color/gradient controls), not the plain remove button.
 			expect(
 				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).toBeInTheDocument();
 			expect(
@@ -433,7 +433,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).not.toBeInTheDocument();
 		} );
