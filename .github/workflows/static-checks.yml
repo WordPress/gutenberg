@@ -47,9 +47,14 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
+            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
+            # All other jobs only require a depth of 1.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
@@ -80,12 +85,8 @@ jobs:
 
             - name: Check root dependencies
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
-              env:
-                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
-              # Fetch just the base commit so the check can read its
-              # package.json without a costly full-history checkout.
               run: |
-                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
+                  BASE_SHA="$(git rev-parse HEAD^1)"
                   npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
 
             - name: Lint package-lock.json file
@@ -99,6 +100,9 @@ jobs:
               # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
               # `--prune-suppressions` ensures `suppressions.json` stays in sync.
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
+
+            - name: Test agent skill setup
+              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}

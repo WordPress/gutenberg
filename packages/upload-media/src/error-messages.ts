@@ -111,6 +111,15 @@ export function getErrorMessage(
 			),
 			action: __( 'The file may be corrupted. Try a different file.' ),
 		},
+		[ ErrorCode.MEDIA_FINALIZE_ERROR ]: {
+			title: __( 'Upload failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Could not finalize the upload of "%s".' ),
+				fileName
+			),
+			action: __( 'Please try again.' ),
+		},
 		[ ErrorCode.GENERAL ]: {
 			title: __( 'Upload failed' ),
 			description: sprintf(
