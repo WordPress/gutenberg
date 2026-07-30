@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   `saveEntityRecord`: Add an `invalidateCache` option (defaults to `true`) to let consumers opt out of query cache invalidation.
 
 ### Bug Fixes
 
