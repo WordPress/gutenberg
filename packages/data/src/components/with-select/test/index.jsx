@@ -3,6 +3,7 @@
  */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -47,11 +48,11 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => ( {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
 			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.data }</div>
 		) );
 
@@ -92,15 +93,15 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			count: _select( 'counter' ).getCount(),
 		} ) );
 
-		const mapDispatchToProps = jest.fn( ( _dispatch ) => ( {
+		const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
 			increment: _dispatch( 'counter' ).increment,
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<button onClick={ props.increment }>{ props.count }</button>
 		) );
 
@@ -175,13 +176,13 @@ describe( 'withSelect', () => {
 			}
 		}
 
-		const renderSpy = jest.spyOn( OriginalComponent.prototype, 'render' );
+		const renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			count: _select( 'counter' ).getCount(),
 		} ) );
 
-		const mapDispatchToProps = jest.fn( ( _dispatch ) => ( {
+		const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
 			increment: _dispatch( 'counter' ).increment,
 		} ) );
 
@@ -240,11 +241,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => ( {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
 			count: _select( 'counter' ).getCount( ownProps.offset ),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.count }</div>
 		) );
 
@@ -280,8 +281,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -322,11 +323,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			value: _select( 'demo' ).getUnchangingValue(),
 		} ) );
 
-		const OriginalComponent = jest.fn( () => <div /> );
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
@@ -355,8 +356,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -390,8 +391,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -421,13 +422,13 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
 			return {
 				[ ownProps.propName ]: _select( 'demo' ).getValue(),
 			};
 		} );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ JSON.stringify( props ) }</div>
 		) );
 
@@ -475,7 +476,7 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
 			if ( ownProps.pass ) {
 				return {
 					count: _select( 'demo' ).getValue(),
@@ -483,7 +484,7 @@ describe( 'withSelect', () => {
 			}
 		} );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.count || 'Unknown' }</div>
 		) );
 
@@ -534,13 +535,13 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const childMapSelectToProps = jest.fn();
-		const parentMapSelectToProps = jest.fn( ( _select ) => ( {
+		const childMapSelectToProps = vi.fn();
+		const parentMapSelectToProps = vi.fn( ( _select ) => ( {
 			isRenderingChild: _select( 'childRender' ).getValue(),
 		} ) );
 
-		const ChildOriginalComponent = jest.fn( () => <div /> );
-		const ParentOriginalComponent = jest.fn( ( props ) => (
+		const ChildOriginalComponent = vi.fn( () => <div /> );
+		const ParentOriginalComponent = vi.fn( ( props ) => (
 			<div>{ props.isRenderingChild ? <Child /> : null }</div>
 		) );
 
@@ -583,11 +584,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			value: _select( 'demo' ).getValue(),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.value }</div>
 		) );
 

@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -37,25 +38,21 @@ describe( 'withDispatch', () => {
 		const registry = createRegistry();
 		registry.registerStore( 'counter', storeOptions );
 
-		const ButtonSpy = jest.fn( ( { onClick } ) => (
+		const ButtonSpy = vi.fn( ( { onClick } ) => (
 			<button onClick={ onClick } />
 		) );
 		const Button = memo( ButtonSpy );
+		let actionReturnedFromDispatch;
 
 		const Component = withDispatch( ( dispatch, ownProps ) => {
 			const { count } = ownProps;
 
 			return {
 				increment: () => {
-					const actionReturnedFromDispatch = Promise.resolve(
+					actionReturnedFromDispatch = Promise.resolve(
 						dispatch( 'counter' ).increment( count )
 					);
-					return expect(
-						actionReturnedFromDispatch
-					).resolves.toEqual( {
-						type: 'inc',
-						count,
-					} );
+					return actionReturnedFromDispatch;
 				},
 			};
 		} )( ( props ) => (
@@ -81,6 +78,10 @@ describe( 'withDispatch', () => {
 		expect( ButtonSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
+		await expect( actionReturnedFromDispatch ).resolves.toEqual( {
+			type: 'inc',
+			count: 2,
+		} );
 		expect( registry.select( 'counter' ).getCount() ).toBe( 2 );
 	} );
 

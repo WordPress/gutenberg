@@ -30,6 +30,7 @@
 					"packages/compose",
 					"packages/core-commands",
 					"packages/customize-widgets",
+					"packages/data",
 					"packages/date",
 					"packages/dataviews",
 					"packages/deprecated",

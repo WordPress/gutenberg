@@ -2,6 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies

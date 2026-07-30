@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import objectStorage from '../object';
