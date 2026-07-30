@@ -4,15 +4,6 @@
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 
-/*
- * Resolve the directory of `@wordpress/jest-preset-default` from this
- * workspace's `node_modules`. Jest's `preset` option expects a directory
- * containing a `jest-preset.js` or `jest-preset.json` file.
- */
-const jestPresetDefaultDir = path.dirname(
-	require.resolve( '@wordpress/jest-preset-default/jest-preset.js' )
-);
-
 /**
  * Path to root project directory.
  */
@@ -36,6 +27,13 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
+		// Jest resolves dependencies from CommonJS and cannot select import-only
+		// package exports. Map Ariakit's ESM test helpers explicitly.
+		'^@ariakit/test$': '<rootDir>/node_modules/@ariakit/test/dist/index.js',
+		'^@ariakit/test/react$':
+			'<rootDir>/node_modules/@ariakit/test/dist/react.js',
+		'^@ariakit/utils$':
+			'<rootDir>/node_modules/@ariakit/utils/dist/index.js',
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
@@ -52,7 +50,7 @@ module.exports = {
 			'<rootDir>/packages/block-library/src/$1.js',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
-	preset: jestPresetDefaultDir,
+	preset: require.resolve( '@wordpress/jest-preset-default' ),
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
@@ -80,7 +78,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked|@ariakit/(test|utils))/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
