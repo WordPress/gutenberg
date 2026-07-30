@@ -17,6 +17,7 @@ const meta: Meta< typeof Surface > = {
 		children: { control: false },
 		as: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,

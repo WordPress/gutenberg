@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useSurface } from './hook';
