@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { renderHook, act } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies

@@ -3,6 +3,7 @@
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -150,17 +151,17 @@ function DataViewWrapper( {
 	return <DataViews { ...dataViewProps } />;
 }
 
-// jest.useFakeTimers();
-
 // Tests run against a DataView which is 500px wide.
-const mockUseViewportMatch = jest.fn(
+const mockUseViewportMatch = vi.fn(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	( _viewport: string, _operator: string ) => false
 );
-jest.mock( '@wordpress/compose', () => {
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/compose' ),
-		useResizeObserver: jest.fn( ( callback ) => {
+		...original,
+		useResizeObserver: vi.fn( ( callback ) => {
 			setTimeout( () => {
 				callback( [
 					{
@@ -172,7 +173,7 @@ jest.mock( '@wordpress/compose', () => {
 		} ),
 		useViewportMatch: ( viewport: string, operator: string ): boolean =>
 			mockUseViewportMatch( viewport, operator ),
-	};
+	} as unknown as typeof original;
 } );
 
 describe( 'DataViews component', () => {
@@ -241,14 +242,17 @@ describe( 'DataViews component', () => {
 	} );
 
 	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
-		const onChangeView = jest.fn();
+		const onChangeView = vi.fn();
 
-		if ( typeof global.IntersectionObserver === 'undefined' ) {
-			( global as any ).IntersectionObserver = jest.fn( () => ( {
-				observe: jest.fn(),
-				unobserve: jest.fn(),
-				disconnect: jest.fn(),
-			} ) );
+		if ( typeof globalThis.IntersectionObserver === 'undefined' ) {
+			class IntersectionObserverMock {
+				observe = vi.fn();
+				unobserve = vi.fn();
+				disconnect = vi.fn();
+			}
+
+			globalThis.IntersectionObserver =
+				IntersectionObserverMock as unknown as typeof IntersectionObserver;
 		}
 
 		const { container } = render(
@@ -338,7 +342,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
-			const onClickItemCallback = jest.fn();
+			const onClickItemCallback = vi.fn();
 
 			render(
 				<DataViewWrapper
@@ -575,7 +579,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'swallows modifier clicks on non-selectable items and skips them in ranges', async () => {
-			const onClickItem = jest.fn();
+			const onClickItem = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ {
@@ -678,7 +682,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and a media field is clicked', async () => {
-			const mediaClickItemCallback = jest.fn();
+			const mediaClickItemCallback = vi.fn();
 
 			render(
 				<DataViewWrapper

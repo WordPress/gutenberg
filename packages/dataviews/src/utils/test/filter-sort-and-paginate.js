@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { subDays, subYears } from 'date-fns';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies

@@ -3,6 +3,7 @@
  */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -34,7 +35,7 @@ type Data = {
 	order?: number;
 };
 
-const onChangeSelection = jest.fn();
+const onChangeSelection = vi.fn();
 
 const data: Data[] = [
 	{
@@ -57,7 +58,7 @@ const data: Data[] = [
 	},
 ];
 
-const singleSelectCallback = jest.fn();
+const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
@@ -68,7 +69,7 @@ const singleSelectActions: ActionButton< Data >[] = [
 	},
 ];
 
-const multiSelectCallback = jest.fn();
+const multiSelectCallback = vi.fn();
 const multiSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',

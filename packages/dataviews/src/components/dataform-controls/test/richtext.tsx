@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 // The rich-text assembly (`./control`) wires `@wordpress/rich-text`'s
 // useRichText hook (format types, event listeners, etc.) into the
@@ -10,8 +11,7 @@ import userEvent from '@testing-library/user-event';
 // integration-heavy. Mock the assembly entirely so this file can verify the
 // dataform control's prop wiring in isolation without standing up the real
 // editing pipeline.
-jest.mock( '../richtext/control', () => ( {
-	__esModule: true,
+vi.mock( import( '../richtext/control' ), () => ( {
 	default( props: any ) {
 		const handleChange = ( event: any ) =>
 			props.onChange( event.target.value );
@@ -81,7 +81,7 @@ describe( 'dataform-controls/richtext', () => {
 			<RichText< TestItem >
 				data={ { content: 'Hello world' } }
 				field={ buildField() as any }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision={ false }
 				config={ {} }
 			/>
@@ -97,7 +97,7 @@ describe( 'dataform-controls/richtext', () => {
 
 	it( 'invokes onChange with the result of field.setValue when the value changes', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RichText< TestItem >
 				data={ { content: '' } }
@@ -117,7 +117,7 @@ describe( 'dataform-controls/richtext', () => {
 
 	it( 'normalizes a null field value to an empty string and still sets string values', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RichText< { content: string | null } >
 				data={ { content: null } }
@@ -145,7 +145,7 @@ describe( 'dataform-controls/richtext', () => {
 			<RichText< TestItem >
 				data={ { content: '' } }
 				field={ buildField( { placeholder: 'No title' } ) as any }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision={ false }
 				config={ {} }
 			/>
@@ -160,7 +160,7 @@ describe( 'dataform-controls/richtext', () => {
 			<RichText< TestItem >
 				data={ { content: '' } }
 				field={ buildField() as any }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision
 				config={ {
 					clientId: 'abc-123',
@@ -190,7 +190,7 @@ describe( 'dataform-controls/richtext', () => {
 			<RichText< TestItem >
 				data={ { content: '' } }
 				field={ buildField( { isDisabled: () => true } ) as any }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision={ false }
 				config={ {} }
 			/>
@@ -209,7 +209,7 @@ describe( 'dataform-controls/richtext', () => {
 						isValid: { required: {} },
 					} ) as any
 				}
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision={ false }
 				markWhenOptional
 				config={ {} }
@@ -233,7 +233,7 @@ describe( 'dataform-controls/richtext', () => {
 			<RichText< TestItem >
 				data={ { content: 'x' } }
 				field={ buildField() as any }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				hideLabelFromVision={ false }
 				config={ undefined }
 			/>
