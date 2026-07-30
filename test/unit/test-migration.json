@@ -12,6 +12,7 @@
 			"jsdom": {
 				"files": [ "packages/html-entities/src/test/entities.ts" ],
 				"directories": [
+					"packages/a11y",
 					"packages/abilities",
 					"packages/admin-ui",
 					"packages/annotations",
@@ -71,6 +72,7 @@
 					"packages/babel-preset-default",
 					"packages/browserslist-config",
 					"packages/data-controls",
+					"packages/design-system-mcp",
 					"packages/docgen",
 					"packages/eslint-plugin",
 					"packages/npm-package-json-lint-config",
