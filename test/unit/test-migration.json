@@ -89,6 +89,7 @@
 					"packages/design-system-mcp",
 					"packages/docgen",
 					"packages/eslint-plugin",
+					"packages/env",
 					"packages/global-styles-engine",
 					"packages/npm-package-json-lint-config",
 					"packages/postcss-themes",

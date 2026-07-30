@@ -1,8 +1,17 @@
-'use strict';
-/* eslint-disable jest/no-conditional-expect */
+/**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
 /**
  * Internal dependencies
  */
+const require = createRequire( import.meta.url );
 const {
 	LifecycleScriptError,
 	executeLifecycleScript,
@@ -10,11 +19,11 @@ const {
 
 describe( 'executeLifecycleScript', () => {
 	const spinner = {
-		info: jest.fn(),
+		info: vi.fn(),
 	};
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should do nothing without event option when debugging', async () => {
@@ -56,4 +65,3 @@ describe( 'executeLifecycleScript', () => {
 		}
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

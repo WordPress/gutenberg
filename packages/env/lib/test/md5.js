@@ -1,7 +1,17 @@
-'use strict';
+/**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 /**
  * Internal dependencies
  */
+const require = createRequire( import.meta.url );
 const md5 = require( '../md5' );
 
 describe( 'md5', () => {

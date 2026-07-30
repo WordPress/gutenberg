@@ -11,7 +11,6 @@ import { fileURLToPath } from 'node:url';
 import { transformAsync } from '@babel/core';
 import { playwright } from '@vitest/browser-playwright';
 import globPackage from 'glob';
-import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -104,13 +103,7 @@ function wordpressBabelTransform() {
 
 export default defineConfig( {
 	root: ROOT_DIR,
-	plugins: [
-		wordpressBabelTransform(),
-		commonjs( {
-			filter: ( id ) =>
-				id.startsWith( `${ ROOT_DIR }/packages/env/lib/` ),
-		} ),
-	],
+	plugins: [ wordpressBabelTransform() ],
 	resolve: {
 		alias: [
 			{

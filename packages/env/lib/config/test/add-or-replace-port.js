@@ -1,14 +1,20 @@
-'use strict';
+/**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 /**
  * Internal dependencies
  */
+const require = createRequire( import.meta.url );
 const addOrReplacePort = require( '../add-or-replace-port.js' );
 
 describe( 'addOrReplacePort', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
-	} );
-
 	it( 'should add or replace port with various inputs', () => {
 		const testMap = [
 			// Addition
