@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1272,
-	"sha256": "45d70a737855c1c3fa1a7609cc700f28a2232edad28cafb332654cfa0e6640ba",
+	"count": 1268,
+	"sha256": "9160713aee312199de7f7d45dd369cc7f3af850743e7eb243011bf8f0d8c6c2c",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -828,10 +828,6 @@
 		"packages/components/src/utils/hooks/test/use-cx.js",
 		"packages/components/src/utils/test/get-node-text.js",
 		"packages/components/src/view/test/index.js",
-		"packages/core-data/src/components/entities-saved-states/entity-record-item.js",
-		"packages/core-data/src/components/entities-saved-states/entity-type-list.js",
-		"packages/core-data/src/components/entities-saved-states/index.js",
-		"packages/core-data/src/entity-provider.js",
 		"packages/core-data/src/hooks/test/use-entity-record.js",
 		"packages/core-data/src/hooks/test/use-entity-records.js",
 		"packages/core-data/src/hooks/test/use-query-select.js",

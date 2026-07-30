@@ -989,7 +989,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/components/entities-saved-states/index.js": {
+	"packages/core-data/src/components/entities-saved-states/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
