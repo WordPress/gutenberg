@@ -71,6 +71,7 @@ module.exports = {
 			'packages/$1/src',
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
+	testEnvironment: require.resolve( 'jest-environment-jsdom' ),
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
