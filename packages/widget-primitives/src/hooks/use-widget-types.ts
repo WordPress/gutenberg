@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { isValidElement, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { resolveFields } from '../field-types';
+import { resolveIcon } from '../icon-resolver';
 import type { WidgetModuleRecord, WidgetName, WidgetType } from '../types';
 
 /* `true` while records or their metadata imports are still resolving; hosts
@@ -19,7 +20,9 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * For each record it dynamically imports `widget_module` and merges the
  * module's default export with the runtime fields (`name`, `renderModule`).
  * Attribute schemas pass through `resolveFields`, so attributes referencing
- * registered field types reach hosts as plain DataViews fields.
+ * registered field types reach hosts as plain DataViews fields. Icon
+ * references resolve through the registered icon resolver (see
+ * `registerIconResolver`), so hosts only receive renderable icons.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -63,6 +66,22 @@ export function useWidgetTypes(
 
 					const metadata = module.default as Partial< WidgetType >;
 
+					/*
+					 * Icon precedence mirrors the other identity fields:
+					 * the record's resolved reference wins, and the
+					 * module's element stands when the record has none or
+					 * the reference does not resolve. Non-element module
+					 * values are dropped so hosts only receive renderable
+					 * icons.
+					 */
+					const resolvedIcon = record.icon
+						? await resolveIcon( record.icon )
+						: null;
+					const moduleIcon = isValidElement( metadata.icon )
+						? metadata.icon
+						: undefined;
+					const icon = resolvedIcon ?? moduleIcon;
+
 					return {
 						...metadata,
 						...( metadata.attributes
@@ -74,6 +93,7 @@ export function useWidgetTypes(
 							: {} ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
+						icon,
 						/*
 						 * `title` is required:
 						 * - Server-side title wins

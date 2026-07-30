@@ -6,6 +6,11 @@
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
     user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Widgets can reference their icon declaratively: `WidgetModuleRecord`
+    carries a registered icon name and `useWidgetTypes` resolves it through
+    the application-registered resolver (`registerIconResolver`), so
+    `WidgetType.icon` always reaches hosts renderable
+    ([#80938](https://github.com/WordPress/gutenberg/issues/80938)).
 
 ### Enhancements
 

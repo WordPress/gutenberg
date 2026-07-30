@@ -32,6 +32,14 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * Declarative reference to a widget icon: the name of an icon registered
+ * in the site's icon registry, shaped `collection/icon-name`. Resolved
+ * into a `WidgetIcon` at the `useWidgetTypes` boundary through the
+ * application-registered resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
+
+/**
  * A link in a widget's help note.
  */
 export interface WidgetHelpLink {
@@ -159,9 +167,10 @@ export interface WidgetTypeMetadata< Item = unknown > {
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
-	 * whether, to render it.
+	 * whether, to render it. `widget.json` declares a reference; a
+	 * metadata module may declare a rendered element instead.
 	 */
-	icon?: WidgetIcon;
+	icon?: WidgetIcon | WidgetIconReference;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
@@ -237,6 +246,13 @@ export interface WidgetTypeMetadata< Item = unknown > {
  */
 export interface WidgetType< Item = unknown >
 	extends WidgetTypeMetadata< Item > {
+	/**
+	 * Renderable icon only: `useWidgetTypes` resolves references and
+	 * drops anything that is not an element before a `WidgetType`
+	 * reaches a host.
+	 */
+	icon?: WidgetIcon;
+
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time, produced from the conventional `render.*` entry point.
@@ -317,4 +333,12 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
+
+	/**
+	 * Registered icon name (`collection/icon-name`), resolved client-side
+	 * through the application's icon resolver. Always a string reference,
+	 * never an element; `null`/absent means the metadata module's icon
+	 * stands.
+	 */
+	icon?: WidgetIconReference | null;
 }
