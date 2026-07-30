@@ -6,7 +6,8 @@
 
 -   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
 
--   Update the `test-unit` configuration to lint Vitest tests instead of Jest tests.
+-   Update the `test-unit` configuration to lint Vitest tests instead of Jest
+    tests ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
 
 ### Enhancements
 
