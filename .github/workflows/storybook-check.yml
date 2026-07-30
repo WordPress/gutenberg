@@ -41,6 +41,9 @@ jobs:
                   NODE_ENV: test
               run: npm run storybook:build
 
+            - name: Validate manifest matches design-system-mcp contract
+              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
+
             # Regenerates the committed snapshot of components/props/descriptions
             # from the freshly built manifest. Fails if a component or prop is
             # newly missing a description (see the allowlist for known gaps).
