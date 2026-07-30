@@ -12,7 +12,9 @@
 			"jsdom": {
 				"files": [
 					"packages/html-entities/src/test/entities.ts",
-					"packages/report-flaky-tests/src/__tests__/markdown.test.ts"
+					"packages/report-flaky-tests/src/__tests__/markdown.test.ts",
+					"routes/connectors-home/test/ai-plugin-callout.tsx",
+					"routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.test.ts"
 				],
 				"directories": [
 					"packages/a11y",
@@ -75,7 +77,9 @@
 			},
 			"node": {
 				"files": [
-					"packages/report-flaky-tests/src/__tests__/run.test.ts"
+					"packages/report-flaky-tests/src/__tests__/run.test.ts",
+					"test/unit/scripts/test/resolver.js",
+					"tools/validation/validate-package-contents.test.js"
 				],
 				"directories": [
 					"packages/babel-plugin-import-jsx-pragma",
