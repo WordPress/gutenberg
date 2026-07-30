@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, act, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -89,7 +90,7 @@ function setNativeSupport( supported: boolean ) {
 			return supported;
 		}
 		return originalSupports
-			? originalSupports.call( CSS, property, value as string )
+			? originalSupports( property, value as string )
 			: false;
 	};
 }
@@ -104,7 +105,7 @@ function restoreSupport() {
 function flushRaf() {
 	// jsdom polyfills `requestAnimationFrame` via `setTimeout`; an
 	// `act` boundary lets React commit any state set inside the rAF.
-	jest.runAllTimers();
+	vi.runAllTimers();
 }
 
 beforeEach( () => {
@@ -112,11 +113,11 @@ beforeEach( () => {
 	originalRaf = global.requestAnimationFrame;
 	global.requestAnimationFrame = ( cb ) =>
 		setTimeout( () => cb( performance.now() ), 0 ) as unknown as number;
-	jest.useFakeTimers();
+	vi.useFakeTimers();
 } );
 
 afterEach( () => {
-	jest.useRealTimers();
+	vi.useRealTimers();
 	global.requestAnimationFrame = originalRaf;
 	restoreObserver();
 	restoreSupport();

@@ -1,3 +1,11 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
 import { clampResizeDelta, gridSpanToPixelSize } from '../resize-snap';
 
 describe( 'gridSpanToPixelSize', () => {

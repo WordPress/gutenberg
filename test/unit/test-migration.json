@@ -37,6 +37,7 @@
 					"packages/fields",
 					"packages/format-library",
 					"packages/global-styles-ui",
+					"packages/grid",
 					"packages/hooks",
 					"packages/i18n",
 					"packages/interface",
