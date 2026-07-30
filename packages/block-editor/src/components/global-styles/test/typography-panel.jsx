@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { click, render as renderAriakit } from '@ariakit/test/react';
@@ -205,7 +206,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// A local commit writes only the path the user touched. The
 		// inherited value is never copied into local attributes by typing.
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const inheritedValue = {
 			typography: { textColumns: 3, lineHeight: '1.7' },
 		};
@@ -412,7 +413,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			// never invoke the parent `onChange`. Otherwise the act
 			// of opening the inspector would silently commit every
 			// inherited value into the local block attributes.
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				typography: {
 					textDecoration: 'underline',
@@ -442,7 +443,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			// bypasses the inner ToggleGroupControl's equality
 			// short-circuit which would otherwise emit `undefined`.
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				typography: { textDecoration: 'underline' },
 			};
@@ -532,7 +533,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 	describe( 'Font appearance (composite ToggleGroup-like select)', () => {
 		it( 'mounting an at-rest font appearance does not call onChange (display-without-commit)', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				typography: { fontStyle: 'italic', fontWeight: '700' },
 			};
@@ -549,7 +550,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 	describe( 'FontFamily (CustomSelect archetype)', () => {
 		it( 'mounting an at-rest font family does not call onChange (display-without-commit)', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				typography: { fontFamily: 'Georgia, serif' },
 			};
@@ -623,7 +624,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 	describe( 'FontSize (preset picker + custom-size input)', () => {
 		it( 'mounting an at-rest font size does not call onChange (display-without-commit)', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
@@ -762,7 +763,7 @@ async function openTextColorDropdown() {
 
 describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 	it( 'commits the inherited preset slug when accepting the preselected inherited color', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		await renderAriakit(
 			<TypographyPanel
@@ -793,7 +794,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 				value={ { color: { text: 'var:preset|color|dark-text' } } }
 				settings={ DUPLICATE_PALETTE_SETTINGS }
 				panelId="test"
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 			/>
 		);
 
@@ -807,7 +808,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 
 describe( 'TypographyPanel — setTextColor link sync', () => {
 	it( 'syncs the link color when text and link share the same raw preset reference', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const sharedRef = 'var:preset|color|dark-background';
 
 		await renderAriakit(
@@ -836,7 +837,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	} );
 
 	it( 'does NOT sync the link color when text and link have different raw refs, even if their decoded hex values match', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		await renderAriakit(
 			<TypographyPanel
@@ -871,7 +872,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		// color the user set on the block instance must survive a
 		// subsequent text color change instead of being overwritten to
 		// track the text color.
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		await renderAriakit(
 			<TypographyPanel
@@ -906,7 +907,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	it( 'keeps a local link color tracking when it currently matches the local text color', async () => {
 		// When the local link color equals the local text color it is
 		// still tracking, so a text color change carries the link along.
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const sharedRef = 'var:preset|color|blue';
 		const distinctPaletteSettings = {
 			color: {

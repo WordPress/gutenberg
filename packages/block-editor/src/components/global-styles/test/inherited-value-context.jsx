@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -28,23 +29,23 @@ afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
 } );
 
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	useDispatch: jest.fn( () => ( {} ) ),
-	useRegistry: jest.fn( () => ( {} ) ),
-	createSelector: jest.fn( ( callback ) => callback ),
-	createReduxStore: jest.fn(),
-	createRegistry: jest.fn(),
-	register: jest.fn(),
-	select: jest.fn(),
-	dispatch: jest.fn(),
-	combineReducers: jest.fn( ( reducers ) => reducers ),
-	subscribe: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
+	useDispatch: vi.fn( () => ( {} ) ),
+	useRegistry: vi.fn( () => ( {} ) ),
+	createSelector: vi.fn( ( callback ) => callback ),
+	createReduxStore: vi.fn(),
+	createRegistry: vi.fn(),
+	register: vi.fn(),
+	select: vi.fn(),
+	dispatch: vi.fn(),
+	combineReducers: vi.fn( ( reducers ) => reducers ),
+	subscribe: vi.fn(),
 	RegistryProvider: ( { children } ) => children,
 	RegistryConsumer: ( { children } ) => children( {} ),
 	AsyncModeProvider: ( { children } ) => children,
-	useRegistrySelect: jest.fn(),
-	useRegistryDispatch: jest.fn( () => ( {} ) ),
+	useRegistrySelect: vi.fn(),
+	useRegistryDispatch: vi.fn( () => ( {} ) ),
 	withSelect: ( mapStateToProps ) => ( Component ) => ( props ) =>
 		Component( {
 			...props,
@@ -54,7 +55,7 @@ jest.mock( '@wordpress/data', () => ( {
 	withRegistry: ( Component ) => Component,
 } ) );
 
-jest.mock( '../../../store', () => ( {
+vi.mock( import( '../../../store' ), () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
 
@@ -63,7 +64,7 @@ jest.mock( '../../../store', () => ( {
 // transitive import chain fails under this file's `@wordpress/data` mock
 // (missing `createSelector`), so stub the blocks module with just the shape
 // needed.
-jest.mock( '@wordpress/blocks', () => ( {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
 	store: { name: 'core/blocks' },
 	getBlockType: ( blockName ) =>
 		( {
@@ -77,7 +78,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 // `className`; map `is-style-<slug>` to `<slug>` for these tests. The
 // variation-ref resolution itself now lives in `resolveStyle`
 // (`@wordpress/global-styles-engine`) and is covered by its own tests.
-jest.mock( '../../../hooks/block-style-variation', () => ( {
+vi.mock( import( '../../../hooks/block-style-variation' ), () => ( {
 	getVariationNameFromClass: ( className ) => {
 		const match = /is-style-([\w-]+)/.exec( className || '' );
 		return match ? match[ 1 ] : null;

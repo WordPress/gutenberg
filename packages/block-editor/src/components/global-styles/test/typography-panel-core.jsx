@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
 
@@ -106,7 +107,7 @@ describe( 'TypographyPanel — experiment off', () => {
 				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
 				settings={ PALETTE_SETTINGS }
 				panelId="test"
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 			/>
 		);
 
@@ -123,7 +124,7 @@ describe( 'TypographyPanel — experiment off', () => {
 
 describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		await renderAriakit(
 			<TypographyPanel
 				value={ value }

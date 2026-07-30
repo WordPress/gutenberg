@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -14,7 +15,7 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const BaseComponent = jest.fn( () => <div /> );
+		const BaseComponent = vi.fn( () => <div /> );
 		const EnhancedComponent =
 			withCustomColors( 'backgroundColor' )( BaseComponent );
 
@@ -54,7 +55,7 @@ describe( 'createCustomColorsHOC', () => {
 			)
 		);
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 
 		render(
 			<EnhancedComponent
@@ -84,7 +85,7 @@ describe( 'createCustomColorsHOC', () => {
 			)
 		);
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 
 		render(
 			<EnhancedComponent

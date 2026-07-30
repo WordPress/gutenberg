@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -18,11 +19,11 @@ const PANEL_ID = 'test-panel';
 
 function renderInspectorControls( props = {} ) {
 	return render(
-		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+		<ToolsPanel label="Layout" resetAll={ vi.fn() } panelId={ PANEL_ID }>
 			<GridLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ {} }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				{ ...props }
 			/>
 		</ToolsPanel>

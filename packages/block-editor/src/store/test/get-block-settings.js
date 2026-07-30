@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';

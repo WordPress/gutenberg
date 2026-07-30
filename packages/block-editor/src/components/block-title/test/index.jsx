@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -30,8 +31,8 @@ const blockLabelMap = {
 	'Reusable Block': 'Reuse me!',
 };
 
-jest.mock( '@wordpress/blocks', () => {
-	const actualImplementation = jest.requireActual( '@wordpress/blocks' );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const actualImplementation = await importOriginal();
 	return {
 		...actualImplementation,
 		isReusableBlock( { title } ) {
@@ -44,7 +45,10 @@ jest.mock( '@wordpress/blocks', () => {
 } );
 
 // This allows us to tweak the returned value on each test.
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {

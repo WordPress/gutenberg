@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -16,7 +17,7 @@ import AlignmentUI from '../ui';
 
 describe( 'AlignmentUI', () => {
 	const alignment = 'left';
-	const onChangeSpy = jest.fn();
+	const onChangeSpy = vi.fn();
 
 	afterEach( () => {
 		onChangeSpy.mockClear();

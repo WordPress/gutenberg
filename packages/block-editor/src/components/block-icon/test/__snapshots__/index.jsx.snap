@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`BlockIcon renders a Icon 1`] = `
+exports[`BlockIcon > renders a Icon 1`] = `
 <div>
   <span
     class="block-editor-block-icon"

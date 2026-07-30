@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
 /**
@@ -8,8 +9,13 @@ import { render } from '@testing-library/react';
  */
 import { MediaPlaceholder } from '../';
 
-jest.mock( '../../media-upload/check', () => () => null );
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
+vi.mock( import( '../../media-upload/check' ), () => ( {
+	default: () => null,
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: () => ( {} ),
+} ) );
 
 describe( 'MediaPlaceholder', () => {
 	it( 'renders successfully when allowedTypes property is not specified', () => {

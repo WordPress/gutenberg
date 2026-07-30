@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 
@@ -29,7 +30,7 @@ describe( 'InheritanceResetButton', () => {
 	} );
 
 	test( 'invokes the reset handler when activated', async () => {
-		const onResetToInherited = jest.fn();
+		const onResetToInherited = vi.fn();
 		render(
 			<InheritanceResetButton onResetToInherited={ onResetToInherited } />
 		);
@@ -241,7 +242,7 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 	} );
 
 	test( 'the reset dot invokes the deselect handler', async () => {
-		const onDeselect = jest.fn();
+		const onDeselect = vi.fn();
 		renderItem( { hasLocalOverride: true, onDeselect } );
 		await click(
 			screen.getByRole( 'button', { name: 'Reset to inherited value' } )

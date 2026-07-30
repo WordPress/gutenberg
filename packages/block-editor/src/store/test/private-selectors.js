@@ -1,4 +1,18 @@
 /**
+ * External dependencies
+ */
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -436,10 +450,10 @@ describe( 'private selectors', () => {
 			derivedBlockEditingModes: new Map(),
 		};
 
-		const hasContentRoleAttribute = jest.fn( () => false );
-		const get = jest.fn( () => 'edit' );
+		const hasContentRoleAttribute = vi.fn( () => false );
+		const get = vi.fn( () => 'edit' );
 		getBlockEditingMode.registry = {
-			select: jest.fn( () => ( {
+			select: vi.fn( () => ( {
 				hasContentRoleAttribute,
 				get,
 			} ) ),
@@ -651,7 +665,7 @@ describe( 'private selectors', () => {
 			] ),
 		};
 		getEnabledClientIdsTree.registry = {
-			select: jest.fn( () => ( {} ) ),
+			select: vi.fn( () => ( {} ) ),
 		};
 
 		it( 'should return tree containing only clientId and innerBlocks', () => {
@@ -946,7 +960,7 @@ describe( 'private selectors', () => {
 
 		beforeEach( () => {
 			getListViewClientIdsTree.registry = {
-				select: jest.fn( () => ( {} ) ),
+				select: vi.fn( () => ( {} ) ),
 			};
 		} );
 

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { click, render } from '@ariakit/test/react';
 
@@ -167,7 +168,7 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		it( 'calls onColorChange with (color, slug) when a swatch is clicked (color-only palette)', async () => {
-			const onColorChange = jest.fn();
+			const onColorChange = vi.fn();
 
 			await render(
 				<ColorGradientControl
@@ -190,8 +191,8 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		it( 'calls onColorChange with (color, slug) and calls onGradientChange() when both colors and gradients are available', async () => {
-			const onColorChange = jest.fn();
-			const onGradientChange = jest.fn();
+			const onColorChange = vi.fn();
+			const onGradientChange = vi.fn();
 
 			await render(
 				<ColorGradientControl

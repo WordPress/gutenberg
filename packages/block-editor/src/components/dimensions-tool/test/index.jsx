@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -84,7 +85,7 @@ function ControlledExample( { value, onChange, ...props } ) {
 describe( 'DimensionsTool', () => {
 	describe( 'controlled values', () => {
 		it( 'updates the aspect ratio control when the value prop changes', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '16/9' } }
@@ -118,7 +119,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating aspectRatio', () => {
 		it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -158,7 +159,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just height, setting aspectRatio also sets scale (0001) -> (1101)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -198,7 +199,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just width, setting aspectRatio also sets scale (0010) -> (1110)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -238,7 +239,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, setting aspectRatio also clears height (0111) -> (1110)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -278,7 +279,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio and scale, setting aspectRatio to "Original" also clears scale (1100) -> (0000)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -310,7 +311,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and height, setting aspectRatio to "Original" also clears scale (1101) -> (0001)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -344,7 +345,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and width, setting aspectRatio to "Original" also clears scale (1110) -> (0010)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -380,7 +381,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating scale', () => {
 		it( 'when default scale is cover, setting scale to fill preserves the fill value', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -407,7 +408,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating dimensions', () => {
 		it( 'when starting with just height, setting width also sets scale (0001) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -447,7 +448,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just width, setting height also sets scale (0010) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -487,7 +488,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, clearing width also clears scale (0111) -> (0001)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -521,7 +522,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, clearing height also clears scale (0111) -> (0010)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -555,7 +556,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and height, setting width also clears aspectRatio (1101) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -601,7 +602,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and width, setting height also clears aspectRatio (1110) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -649,7 +650,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'internal component state', () => {
 		it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio (1100) -> (1110) -> (0111) -> (1101)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const value = {
 				aspectRatio: '16/9',
@@ -688,7 +689,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back (1100) -> (1100) -> (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const value = {
 				aspectRatio: '16/9',

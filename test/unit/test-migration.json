@@ -25,6 +25,7 @@
 					"packages/autop",
 					"packages/blob",
 					"packages/block-directory",
+					"packages/block-editor",
 					"packages/block-library",
 					"packages/blocks",
 					"packages/connectors",

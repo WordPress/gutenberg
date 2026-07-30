@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { expect, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { ratioToNumber } from '../aspect-ratio-dropdown';

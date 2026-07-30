@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import {

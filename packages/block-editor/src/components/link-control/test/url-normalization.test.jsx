@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -16,24 +17,21 @@ import { useSelect } from '@wordpress/data';
 import LinkControl from '../';
 import { fetchFauxEntitySuggestions } from './fixtures';
 
-const mockFetchSearchSuggestions = jest.fn();
+const mockFetchSearchSuggestions = vi.fn();
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	const mock = jest.fn();
-	return mock;
-} );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	useSelect: vi.fn(),
+} ) );
 
 useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 } ) );
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
-} ) );
-
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useReducedMotion: jest.fn( () => true ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useReducedMotion: vi.fn( () => true ),
 } ) );
 
 beforeEach( () => {
@@ -51,7 +49,7 @@ function renderWithProvider( ui ) {
 describe( 'URL normalization consistency', () => {
 	it( 'should normalize bare domain (wordpress.org) to https:// when clicking Apply', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		// Start with existing link to show Apply button
 		renderWithProvider(
@@ -89,7 +87,7 @@ describe( 'URL normalization consistency', () => {
 
 	it( 'should normalize www domain (www.wordpress.org) to https:// when clicking Apply', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		// Start with existing link to show Apply button
 		renderWithProvider(
@@ -127,7 +125,7 @@ describe( 'URL normalization consistency', () => {
 
 	it( 'should preserve explicit http:// protocol', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		renderWithProvider(
 			<LinkControl
@@ -162,7 +160,7 @@ describe( 'URL normalization consistency', () => {
 
 	it( 'should preserve mailto: links without normalization', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		renderWithProvider(
 			<LinkControl
@@ -196,7 +194,7 @@ describe( 'URL normalization consistency', () => {
 
 	it( 'should preserve relative paths without normalization', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		renderWithProvider(
 			<LinkControl
@@ -230,7 +228,7 @@ describe( 'URL normalization consistency', () => {
 
 	it( 'should preserve hash links without normalization', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		renderWithProvider(
 			<LinkControl

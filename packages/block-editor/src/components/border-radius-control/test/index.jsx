@@ -21,6 +21,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -34,7 +35,7 @@ import userEvent from '@testing-library/user-event';
 import BorderRadiusControl from '../index';
 
 describe( 'BorderRadiusControl', () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const mockPresets = {
 		default: [
 			{ name: 'None', slug: '0', size: 0 },

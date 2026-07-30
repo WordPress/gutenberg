@@ -23,6 +23,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -35,14 +36,18 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import SpacingSizesControl from '../index';
+import useSpacingSizes from '../hooks/use-spacing-sizes';
 
 // Mock useSelect
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 // Mock useSpacingSizes hook
-jest.mock( '../hooks/use-spacing-sizes', () => ( {
+vi.mock( import( '../hooks/use-spacing-sizes' ), () => ( {
 	__esModule: true,
-	default: jest.fn( () => [
+	default: vi.fn( () => [
 		{ name: 'None', slug: '0', size: 0 },
 		{ name: 'Small', slug: '20', size: '0.5rem' },
 		{ name: 'Medium', slug: '40', size: '1rem' },
@@ -52,8 +57,8 @@ jest.mock( '../hooks/use-spacing-sizes', () => ( {
 } ) );
 
 // Mock useSettings hook
-jest.mock( '../../use-settings', () => ( {
-	useSettings: jest.fn( ( ...keys ) => {
+vi.mock( import( '../../use-settings' ), () => ( {
+	useSettings: vi.fn( ( ...keys ) => {
 		const defaults = {
 			'spacing.units': [ 'px', 'em', 'rem' ],
 			'spacing.spacingSizes.custom': [],
@@ -66,7 +71,7 @@ jest.mock( '../../use-settings', () => ( {
 } ) );
 
 describe( 'SpacingSizesControl', () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const defaultProps = {
 		label: 'Padding',
 		onChange: mockOnChange,
@@ -733,15 +738,11 @@ describe( 'SpacingSizesControl', () => {
 
 		// Mock the large preset set
 		beforeEach( () => {
-			jest.requireMock(
-				'../hooks/use-spacing-sizes'
-			).default.mockReturnValue( largeSpacingSizes );
+			useSpacingSizes.mockReturnValue( largeSpacingSizes );
 		} );
 
 		afterEach( () => {
-			jest.requireMock(
-				'../hooks/use-spacing-sizes'
-			).default.mockReturnValue( [
+			useSpacingSizes.mockReturnValue( [
 				{ name: 'None', slug: '0', size: 0 },
 				{ name: 'Small', slug: '20', size: '0.5rem' },
 				{ name: 'Medium', slug: '40', size: '1rem' },
@@ -903,8 +904,8 @@ describe( 'SpacingSizesControl', () => {
 		} );
 
 		it( 'calls onMouseOver and onMouseOut callbacks', async () => {
-			const mockOnMouseOver = jest.fn();
-			const mockOnMouseOut = jest.fn();
+			const mockOnMouseOver = vi.fn();
+			const mockOnMouseOut = vi.fn();
 			const user = userEvent.setup();
 
 			render(
@@ -967,9 +968,7 @@ describe( 'SpacingSizesControl', () => {
 				{ name: 'Huge', slug: '100', size: '5rem' },
 			];
 
-			jest.requireMock(
-				'../hooks/use-spacing-sizes'
-			).default.mockReturnValueOnce( customSpacingSizes );
+			useSpacingSizes.mockReturnValueOnce( customSpacingSizes );
 
 			render(
 				<SpacingSizesControl { ...defaultProps } values={ undefined } />
@@ -985,9 +984,7 @@ describe( 'SpacingSizesControl', () => {
 				{ name: 'Theme Large', slug: 'theme-lg', size: '2.25rem' },
 			];
 
-			jest.requireMock(
-				'../hooks/use-spacing-sizes'
-			).default.mockReturnValueOnce( themeSpacingSizes );
+			useSpacingSizes.mockReturnValueOnce( themeSpacingSizes );
 
 			render(
 				<SpacingSizesControl

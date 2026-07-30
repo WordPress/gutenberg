@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { dispatch, select } from '@wordpress/data';
 import {
 	createBlock,
 	getBlockTypes,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

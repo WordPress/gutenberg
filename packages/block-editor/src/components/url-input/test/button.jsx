@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -78,7 +79,7 @@ describe( 'URLInputButton', () => {
 
 	it( 'should call `onChange` function once per each value change', async () => {
 		const user = userEvent.setup();
-		const onChangeMock = jest.fn();
+		const onChangeMock = vi.fn();
 
 		render( <URLInputButton onChange={ onChangeMock } /> );
 

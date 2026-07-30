@@ -6,6 +6,7 @@ import { registerBlockType } from '@wordpress/blocks';
 /**
  * External dependencies
  */
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
 /**
@@ -16,13 +17,13 @@ import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
 
 import { store as blockEditorStore } from '../../../store';
-jest.mock( '../../../store/actions', () => {
-	const actions = jest.requireActual( '../../../store/actions' );
+vi.mock( import( '../../../store/actions' ), async ( importOriginal ) => {
+	const actions = await importOriginal();
 	return {
 		...actions,
-		resetBlocks: jest.fn( actions.resetBlocks ),
-		replaceInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
-		setHasControlledInnerBlocks: jest.fn(
+		resetBlocks: vi.fn( actions.resetBlocks ),
+		replaceInnerBlocks: vi.fn( actions.replaceInnerBlocks ),
+		setHasControlledInnerBlocks: vi.fn(
 			actions.setHasControlledInnerBlocks
 		),
 	};
@@ -48,18 +49,18 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'resets the block-editor blocks when the controlled value changes', async () => {
 		const fakeBlocks = [];
-		const resetBlocks = jest.spyOn( blockEditorActions, 'resetBlocks' );
-		const replaceInnerBlocks = jest.spyOn(
+		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const { rerender, unmount } = render(
 			<TestWrapper
@@ -105,13 +106,13 @@ describe( 'useBlockSync hook', () => {
 
 	it( 'replaces the inner blocks of a block when the controlled value changes if a clientId is passed', async () => {
 		const fakeBlocks = [];
-		const replaceInnerBlocks = jest.spyOn(
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
-		const resetBlocks = jest.spyOn( blockEditorActions, 'resetBlocks' );
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const { rerender, unmount } = render(
 			<TestWrapper
@@ -167,12 +168,12 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
-		const replaceInnerBlocks = jest.spyOn(
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const value1 = [
 			{
@@ -225,7 +226,7 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'sets a block as an inner block controller if a clientId is provided', async () => {
-		const setAsController = jest.spyOn(
+		const setAsController = vi.spyOn(
 			blockEditorActions,
 			'setHasControlledInnerBlocks'
 		);
@@ -234,16 +235,16 @@ describe( 'useBlockSync hook', () => {
 			<TestWrapper
 				clientId="test"
 				value={ [] }
-				onChange={ jest.fn() }
-				onInput={ jest.fn() }
+				onChange={ vi.fn() }
+				onInput={ vi.fn() }
 			/>
 		);
 		expect( setAsController ).toHaveBeenCalledWith( 'test', true );
 	} );
 
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
@@ -278,8 +279,8 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'passes undoIgnore when a non-persistent block change ignores history', async () => {
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
@@ -318,8 +319,8 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'calls onChange if a persistent change occurs', async () => {
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
@@ -352,13 +353,13 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'avoids updating the parent if there is a pending incoming change', async () => {
-		const replaceInnerBlocks = jest.spyOn(
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
 
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const value1 = [
 			{
@@ -397,13 +398,13 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'avoids updating the block-editor store if there is a pending outgoint change', async () => {
-		const replaceInnerBlocks = jest.spyOn(
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
 
-		const onChange = jest.fn();
-		const onInput = jest.fn();
+		const onChange = vi.fn();
+		const onInput = vi.fn();
 
 		const value1 = [
 			{
@@ -453,8 +454,8 @@ describe( 'useBlockSync hook', () => {
 		const fakeBlocks = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
-		const onChange1 = jest.fn();
-		const onInput = jest.fn();
+		const onChange1 = vi.fn();
+		const onInput = vi.fn();
 
 		let registry;
 		const setRegistry = ( reg ) => {
@@ -490,7 +491,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Reset it so that we can test that it was not called after this point.
 		onChange1.mockReset();
-		const onChange2 = jest.fn();
+		const onChange2 = vi.fn();
 
 		// Update the component to point at a "different entity" (e.g. different
 		// blocks and onChange handler.)
@@ -522,8 +523,8 @@ describe( 'useBlockSync hook', () => {
 		const fakeBlocks = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
-		const onChange1 = jest.fn();
-		const onInput = jest.fn();
+		const onChange1 = vi.fn();
+		const onInput = vi.fn();
 
 		let registry;
 		const setRegistry = ( reg ) => {
@@ -543,7 +544,7 @@ describe( 'useBlockSync hook', () => {
 			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
 		];
 
-		const onChange2 = jest.fn();
+		const onChange2 = vi.fn();
 
 		// Update the component to point at a "different entity" (e.g. different
 		// blocks and onChange handler.)
@@ -574,9 +575,9 @@ describe( 'useBlockSync hook', () => {
 	it( 'preserves external client IDs in onChange callback for inner block controllers', async () => {
 		const originalClientId = 'original-external-id';
 		const innerBlockClientId = 'inner-external-id';
-		const onChange = jest.fn();
-		const onInput = jest.fn();
-		const replaceInnerBlocks = jest.spyOn(
+		const onChange = vi.fn();
+		const onInput = vi.fn();
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
@@ -642,7 +643,7 @@ describe( 'useBlockSync hook', () => {
 
 	it( 'clones blocks with new internal IDs for inner block controllers', async () => {
 		const originalClientId = 'original-external-id';
-		const replaceInnerBlocks = jest.spyOn(
+		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
 		);
@@ -661,8 +662,8 @@ describe( 'useBlockSync hook', () => {
 			<TestWrapper
 				clientId="test-controller"
 				value={ controlledBlocks }
-				onChange={ jest.fn() }
-				onInput={ jest.fn() }
+				onChange={ vi.fn() }
+				onInput={ vi.fn() }
 			/>
 		);
 

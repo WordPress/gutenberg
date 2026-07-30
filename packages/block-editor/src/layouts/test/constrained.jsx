@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -19,11 +20,11 @@ const PANEL_ID = 'test-panel';
 
 function renderInspectorControls( props = {} ) {
 	return render(
-		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+		<ToolsPanel label="Layout" resetAll={ vi.fn() } panelId={ PANEL_ID }>
 			<ConstrainedLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ {} }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				{ ...props }
 			/>
 		</ToolsPanel>
@@ -85,7 +86,7 @@ describe( 'ConstrainedLayoutInspectorControls', () => {
 		'preserves a cleared %s value for viewport layout overrides',
 		async ( label, layoutKey ) => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			renderInspectorControls( {
 				layout: { type: 'constrained', [ layoutKey ]: '800px' },
 				resetLayout: { type: 'constrained', [ layoutKey ]: '800px' },

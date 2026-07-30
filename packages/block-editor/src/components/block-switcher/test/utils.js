@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';

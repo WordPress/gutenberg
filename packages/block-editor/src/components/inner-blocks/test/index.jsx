@@ -1,6 +1,11 @@
 /* eslint-disable testing-library/render-result-naming-convention */
 
 /**
+ * External dependencies
+ */
+import { afterEach, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import {

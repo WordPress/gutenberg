@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
 import { render, waitFor, queryByAttribute } from '@testing-library/react';
 
 /**

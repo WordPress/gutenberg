@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -132,7 +133,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited radius is present (display-without-commit)', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = { border: { radius: '8px' } };
 
 			render(
@@ -150,7 +151,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 		it( 'commits a typed local radius override without copying any inherited values (strip-not-copy)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: { radius: '8px' },
 				shadow: 'var:preset|shadow|soft',
@@ -179,7 +180,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 		it( 'does not bake the inherited border color/style/width into the local override when only a radius is set', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -259,7 +260,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// renders the blue dot) even though the user never
 			// customised the radius.
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -296,7 +297,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited border is present', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -344,7 +345,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited shadow is present', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				shadow: 'var:preset|shadow|soft',
 			};

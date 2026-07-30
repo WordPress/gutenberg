@@ -1,21 +1,25 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
+import { describe, expect, it, vi } from 'vitest';
+
 /**
  * WordPress dependencies
  */
 import { findTransform, pasteHandler } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
+
 const noop = () => {};
 
-jest.mock( '@wordpress/blocks/src/api/factory', () => ( {
-	findTransform: jest.fn(),
-	getBlockTransforms: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/blocks/src/api/raw-handling', () => ( {
-	pasteHandler: jest.fn(),
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	findTransform: vi.fn(),
+	getBlockTransforms: vi.fn(),
+	pasteHandler: vi.fn(),
 } ) );
 
 describe( 'parseDropEvent', () => {
@@ -98,7 +102,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		const getBlockIndex = noop;
 		const getClientIdsOfDescendants = noop;
-		const moveBlocks = jest.fn();
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -126,9 +130,9 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		// Target and source block index is the same.
-		const getBlockIndex = jest.fn( () => targetBlockIndex );
+		const getBlockIndex = vi.fn( () => targetBlockIndex );
 		const getClientIdsOfDescendants = noop;
-		const moveBlocks = jest.fn();
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -158,9 +162,9 @@ describe( 'onBlockDrop', () => {
 	it( 'does nothing if the block is dropped as a child of itself', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const getBlockIndex = jest.fn( () => 6 );
+		const getBlockIndex = vi.fn( () => 6 );
 		const getClientIdsOfDescendants = noop;
-		const moveBlocks = jest.fn();
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -190,12 +194,10 @@ describe( 'onBlockDrop', () => {
 	it( 'does nothing if the block is dropped as a descendant of itself', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const getBlockIndex = jest.fn( () => 1 );
+		const getBlockIndex = vi.fn( () => 1 );
 		// Dragged block is being dropped as a descendant of itself.
-		const getClientIdsOfDescendants = jest.fn( () => [
-			targetRootClientId,
-		] );
-		const moveBlocks = jest.fn();
+		const getClientIdsOfDescendants = vi.fn( () => [ targetRootClientId ] );
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -226,9 +228,9 @@ describe( 'onBlockDrop', () => {
 		const sourceRootClientId = '0';
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const getBlockIndex = jest.fn( () => 1 );
+		const getBlockIndex = vi.fn( () => 1 );
 		const getClientIdsOfDescendants = () => [];
-		const moveBlocks = jest.fn();
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -263,10 +265,10 @@ describe( 'onBlockDrop', () => {
 		const sourceRootClientId = '0';
 		const targetRootClientId = sourceRootClientId;
 		const targetBlockIndex = 5;
-		const getBlockIndex = jest.fn( () => 1 );
+		const getBlockIndex = vi.fn( () => 1 );
 		// Dragged block is being dropped as a descendant of itself.
 		const getClientIdsOfDescendants = () => [];
-		const moveBlocks = jest.fn();
+		const moveBlocks = vi.fn();
 
 		const event = {
 			dataTransfer: {
@@ -302,11 +304,11 @@ describe( 'onBlockDrop', () => {
 
 describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
-		const updateBlockAttributes = jest.fn();
+		const updateBlockAttributes = vi.fn();
 		const canInsertBlockType = noop;
-		const insertOrReplaceBlocks = jest.fn();
+		const insertOrReplaceBlocks = vi.fn();
 		const targetRootClientId = '1';
-		const getSettings = jest.fn( () => ( {} ) );
+		const getSettings = vi.fn( () => ( {} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
@@ -326,10 +328,10 @@ describe( 'onFilesDrop', () => {
 		// to have no return value.
 		findTransform.mockImplementation( noop );
 		const updateBlockAttributes = noop;
-		const insertOrReplaceBlocks = jest.fn();
+		const insertOrReplaceBlocks = vi.fn();
 		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
-		const getSettings = jest.fn( () => ( {
+		const getSettings = vi.fn( () => ( {
 			mediaUpload: true,
 		} ) );
 
@@ -351,13 +353,13 @@ describe( 'onFilesDrop', () => {
 		// of the transform isn't important just that there is a callable 'transform'
 		// function that returns a value.
 		const blocks = 'blocks';
-		const transformation = { transform: jest.fn( () => blocks ) };
+		const transformation = { transform: vi.fn( () => blocks ) };
 		findTransform.mockImplementation( () => transformation );
 		const updateBlockAttributes = noop;
 		const canInsertBlockType = noop;
-		const insertOrReplaceBlocks = jest.fn();
+		const insertOrReplaceBlocks = vi.fn();
 		const targetRootClientId = '1';
-		const getSettings = jest.fn( () => ( {
+		const getSettings = vi.fn( () => ( {
 			mediaUpload: true,
 		} ) );
 
@@ -383,7 +385,7 @@ describe( 'onFilesDrop', () => {
 describe( 'onHTMLDrop', () => {
 	it( 'does nothing if the HTML cannot be converted into blocks', () => {
 		pasteHandler.mockImplementation( () => [] );
-		const insertOrReplaceBlocks = jest.fn();
+		const insertOrReplaceBlocks = vi.fn();
 
 		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
 		eventHandler();
@@ -394,7 +396,7 @@ describe( 'onHTMLDrop', () => {
 	it( 'inserts blocks if the HTML can be converted into blocks', () => {
 		const blocks = [ 'blocks' ];
 		pasteHandler.mockImplementation( () => blocks );
-		const insertOrReplaceBlocks = jest.fn();
+		const insertOrReplaceBlocks = vi.fn();
 
 		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
 		eventHandler();

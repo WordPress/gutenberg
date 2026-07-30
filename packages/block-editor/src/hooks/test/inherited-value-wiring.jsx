@@ -1,7 +1,23 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { TypographyPanel } from '../typography';
+import { ElementsEdit } from '../elements';
+import { BorderPanel } from '../border';
+import { DimensionsPanel } from '../dimensions';
+import { BackgroundImagePanel } from '../background';
 
 /**
  * Tests the wiring between inspector hook wrappers and shared
@@ -14,24 +30,31 @@ import { render } from '@testing-library/react';
  * intentionally mocked out so each test exercises only the wiring contract.
  */
 
-// Jest hoists `jest.mock` factories; proxies for spies need to satisfy
-// the `/^mock/i` naming convention.
+// Vitest hoists `vi.mock` factories, so recorder values are exposed through
+// mutable objects that the factories can close over safely.
 const mockHookRecorder = { calls: [] };
 const mockPanelRecorder = { calls: [] };
 const mockInheritedReturn = { value: {} };
 
-jest.mock( '../../components/global-styles/inherited-value-context', () => ( {
-	__esModule: true,
-	useResolvedStyle: ( blockName, className, selectedState ) => {
-		mockHookRecorder.calls.push( { blockName, className, selectedState } );
-		return {
-			value: mockInheritedReturn.value,
-			sources: {},
-		};
-	},
-} ) );
+vi.mock(
+	import( '../../components/global-styles/inherited-value-context' ),
+	() => ( {
+		__esModule: true,
+		useResolvedStyle: ( blockName, className, selectedState ) => {
+			mockHookRecorder.calls.push( {
+				blockName,
+				className,
+				selectedState,
+			} );
+			return {
+				value: mockInheritedReturn.value,
+				sources: {},
+			};
+		},
+	} )
+);
 
-jest.mock( '../../components/global-styles/typography-panel', () => ( {
+vi.mock( import( '../../components/global-styles/typography-panel' ), () => ( {
 	__esModule: true,
 	default: ( props ) => {
 		mockPanelRecorder.calls.push( [ 'typography', props ] );
@@ -39,7 +62,7 @@ jest.mock( '../../components/global-styles/typography-panel', () => ( {
 	},
 	useHasTypographyPanel: () => true,
 } ) );
-jest.mock( '../../components/global-styles/color-panel', () => ( {
+vi.mock( import( '../../components/global-styles/color-panel' ), () => ( {
 	__esModule: true,
 	default: ( { children, ...rest } ) => {
 		mockPanelRecorder.calls.push( [ 'color', rest ] );
@@ -47,7 +70,7 @@ jest.mock( '../../components/global-styles/color-panel', () => ( {
 	},
 	useHasColorPanel: () => true,
 } ) );
-jest.mock( '../../components/global-styles/border-panel', () => ( {
+vi.mock( import( '../../components/global-styles/border-panel' ), () => ( {
 	__esModule: true,
 	default: ( props ) => {
 		mockPanelRecorder.calls.push( [ 'border', props ] );
@@ -56,7 +79,7 @@ jest.mock( '../../components/global-styles/border-panel', () => ( {
 	useHasBorderPanel: () => true,
 	useHasBorderPanelControls: () => ( {} ),
 } ) );
-jest.mock( '../../components/global-styles/dimensions-panel', () => ( {
+vi.mock( import( '../../components/global-styles/dimensions-panel' ), () => ( {
 	__esModule: true,
 	default: ( props ) => {
 		mockPanelRecorder.calls.push( [ 'dimensions', props ] );
@@ -64,7 +87,7 @@ jest.mock( '../../components/global-styles/dimensions-panel', () => ( {
 	},
 	useHasDimensionsPanel: () => true,
 } ) );
-jest.mock( '../../components/global-styles/background-panel', () => ( {
+vi.mock( import( '../../components/global-styles/background-panel' ), () => ( {
 	__esModule: true,
 	default: ( props ) => {
 		mockPanelRecorder.calls.push( [ 'background', props ] );
@@ -78,7 +101,7 @@ jest.mock( '../../components/global-styles/background-panel', () => ( {
 // The Typography, Background and Elements wrappers now request a contrast
 // warning (relocated color controls). The hook pulls the data store into its
 // import graph, so stub it to a no-op for these wiring-only tests.
-jest.mock( '../contrast-checker', () => ( {
+vi.mock( import( '../contrast-checker' ), () => ( {
 	__esModule: true,
 	default: () => undefined,
 } ) );
@@ -86,9 +109,9 @@ jest.mock( '../contrast-checker', () => ( {
 // Stub the minimal `@wordpress/data` surface the wrappers call into
 // directly. The real store + persistence machinery is intentionally
 // elided. The prop plumbing is testable with the mocked selector surface.
-jest.mock( '@wordpress/data', () => ( {
+vi.mock( import( '@wordpress/data' ), () => ( {
 	__esModule: true,
-	useSelect: jest.fn(),
+	useSelect: vi.fn(),
 	useDispatch: () => ( {} ),
 	useRegistry: () => ( {} ),
 	createSelector: ( fn ) => fn,
@@ -107,12 +130,12 @@ jest.mock( '@wordpress/data', () => ( {
 	withDispatch: () => ( c ) => c,
 } ) );
 
-jest.mock( '@wordpress/blocks', () => ( {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
 	__esModule: true,
-	getBlockSupport: jest.fn( () => undefined ),
-	hasBlockSupport: jest.fn( () => false ),
-	getBlockType: jest.fn( () => null ),
-	getBlockTypes: jest.fn( () => [] ),
+	getBlockSupport: vi.fn( () => undefined ),
+	hasBlockSupport: vi.fn( () => false ),
+	getBlockType: vi.fn( () => null ),
+	getBlockTypes: vi.fn( () => [] ),
 	store: { name: 'core/blocks' },
 } ) );
 
@@ -122,14 +145,14 @@ jest.mock( '@wordpress/blocks', () => ( {
 // not carry the private-API marker. Short-circuit to a passthrough so
 // these tests can exercise the wrapper wiring without threading
 // the full private-API handshake through every stub.
-jest.mock( '@wordpress/private-apis', () => ( {
+vi.mock( import( '@wordpress/private-apis' ), () => ( {
 	__esModule: true,
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules: () => ( {
 		lock: () => {},
-		unlock: ( value ) =>
-			new Proxy( value ?? {}, {
-				get: () => () => undefined,
-			} ),
+		unlock: () => ( {
+			hideBlockInterface: () => undefined,
+			showBlockInterface: () => undefined,
+		} ),
 	} ),
 } ) );
 
@@ -138,12 +161,12 @@ jest.mock( '@wordpress/private-apis', () => ( {
 // is already mocked to a Proxy-driven stub and never actually touches
 // the store. Providing a stub avoids the private-APIs unlock that
 // the real `store/index.js` performs at module load.
-jest.mock( '../../store', () => ( {
+vi.mock( import( '../../store' ), () => ( {
 	__esModule: true,
 	store: { name: 'core/block-editor' },
 } ) );
 
-jest.mock( '../../store/private-keys', () => ( {
+vi.mock( import( '../../store/private-keys' ), () => ( {
 	__esModule: true,
 	globalStylesDataKey: Symbol( 'globalStylesDataKey' ),
 	globalStylesLinksDataKey: Symbol( 'globalStylesLinksDataKey' ),
@@ -152,14 +175,11 @@ jest.mock( '../../store/private-keys', () => ( {
 
 // Short-circuit the block-editor components barrel (`../../components`),
 // which pulls the data store into its import graph transitively.
-jest.mock(
-	'../../components',
-	() => new Proxy( {}, { get: () => () => null } )
-);
+vi.mock( import( '../../components' ), () => ( {} ) );
 
 // `InspectorControls` is a slot-fill component with registry dependencies.
 // Mock it to a passthrough div.
-jest.mock( '../../components/inspector-controls', () => ( {
+vi.mock( import( '../../components/inspector-controls' ), () => ( {
 	__esModule: true,
 	default: ( { children } ) => (
 		<div data-testid="inspector-controls">{ children }</div>
@@ -174,7 +194,6 @@ beforeEach( () => {
 	mockPanelRecorder.calls = [];
 	mockInheritedReturn.value = {};
 	mockUseSelectImpl.fn = () => undefined;
-	const { useSelect } = require( '@wordpress/data' );
 	useSelect.mockImplementation( ( mapSelect ) => {
 		// Feed mapSelect a synthetic `select()` that returns an object
 		// whose methods all yield what the current test configured.
@@ -193,9 +212,6 @@ beforeEach( () => {
 
 describe( 'inspector hook wrappers thread inheritedValue into the panel', () => {
 	test( 'TypographyPanel calls useResolvedStyle with the block name and threads inheritedValue', () => {
-		// Imported inside the test so the `jest.mock` factories are
-		// applied before the wrapper's module graph is resolved.
-		const { TypographyPanel } = require( '../typography' );
 		mockUseSelectImpl.fn = () => ( {
 			style: { typography: { fontSize: '14px' } },
 			fontFamily: undefined,
@@ -233,7 +249,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	// and background color are wired through the Typography and Background
 	// wrappers and covered above/below.
 	test( 'ElementsEdit wires block-scoped Global Styles into the Color panel', () => {
-		const { ElementsEdit } = require( '../elements' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
 			className: undefined,
@@ -261,7 +276,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'BorderPanel threads a border-scoped inheritedValue into the panel', () => {
-		const { BorderPanel } = require( '../border' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
 			borderColor: undefined,
@@ -289,7 +303,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'DimensionsPanel threads spacing inheritedValue into the panel', () => {
-		const { DimensionsPanel } = require( '../dimensions' );
 		mockUseSelectImpl.fn = () => ( {
 			value: undefined,
 			className: undefined,
@@ -316,10 +329,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'BackgroundImagePanel replaces its pre-feature partial wiring with a full inherited payload', () => {
-		const {
-			hasBlockSupport,
-			getBlockSupport,
-		} = require( '@wordpress/blocks' );
 		getBlockSupport.mockImplementation( ( _n, key ) => {
 			if ( key === 'background' ) {
 				return { backgroundImage: true };
@@ -328,7 +337,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		} );
 		hasBlockSupport.mockReturnValue( true );
 
-		const { BackgroundImagePanel } = require( '../background' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
 			className: undefined,
@@ -355,7 +363,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'wrappers forward the block className to useResolvedStyle', () => {
-		const { TypographyPanel } = require( '../typography' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
 			fontFamily: undefined,
@@ -381,7 +388,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'wrappers fall back to empty inheritedValue during hydration', () => {
-		const { TypographyPanel } = require( '../typography' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
 			fontFamily: undefined,

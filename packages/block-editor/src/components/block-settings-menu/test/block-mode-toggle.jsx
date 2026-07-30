@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -13,7 +14,10 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockModeToggle from '../block-mode-toggle';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 function setupUseSelectMock( mode, blockType, codeEditingEnabled = true ) {
 	useSelect.mockImplementation( () => {

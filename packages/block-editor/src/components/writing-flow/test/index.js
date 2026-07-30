@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';

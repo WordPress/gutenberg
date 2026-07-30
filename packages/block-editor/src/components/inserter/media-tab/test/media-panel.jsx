@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -10,7 +11,7 @@ import { MediaCategoryPanel } from '../media-panel';
 
 // Keep the panel's data + async surface out of the test: return a small,
 // non-empty result set so the grid (and the detach affordance) render.
-jest.mock( '../hooks', () => ( {
+vi.mock( import( '../hooks' ), () => ( {
 	useMediaResults: () => ( {
 		mediaList: [
 			{ id: 1, title: 'Example', url: 'https://example.com/1' },
@@ -22,7 +23,7 @@ jest.mock( '../hooks', () => ( {
 
 // Replace `MediaList` with a marker that only reports whether it was wired for
 // detach, so the gate can be asserted without the full preview/dropdown tree.
-jest.mock( '../media-list', () => ( {
+vi.mock( import( '../media-list' ), () => ( {
 	__esModule: true,
 	default: ( { onDetach } ) => (
 		<div
@@ -34,11 +35,11 @@ jest.mock( '../media-list', () => ( {
 
 // The attach button renders through MediaUpload's render prop behind a
 // capability check; stub both so the real Button (and its label) render.
-jest.mock( '../../../media-upload', () => ( {
+vi.mock( import( '../../../media-upload' ), () => ( {
 	__esModule: true,
 	default: ( { render: renderProp } ) => renderProp( { open: () => {} } ),
 } ) );
-jest.mock( '../../../media-upload/check', () => ( {
+vi.mock( import( '../../../media-upload/check' ), () => ( {
 	__esModule: true,
 	default: ( { children } ) => children,
 } ) );
@@ -47,17 +48,17 @@ const baseCategory = {
 	name: 'attached-images',
 	labels: { name: 'Attached images', search_items: 'Search attachments' },
 	mediaType: 'image',
-	fetch: jest.fn(),
-	attach: jest.fn(),
-	detach: jest.fn(),
-	invalidate: jest.fn(),
+	fetch: vi.fn(),
+	attach: vi.fn(),
+	detach: vi.fn(),
+	invalidate: vi.fn(),
 };
 
 function renderPanel( category ) {
 	return render(
 		<MediaCategoryPanel
 			rootClientId=""
-			onInsert={ jest.fn() }
+			onInsert={ vi.fn() }
 			category={ category }
 		/>
 	);
@@ -95,8 +96,8 @@ describe( 'MediaCategoryPanel attach/detach gating', () => {
 
 describe( 'MediaCategoryPanel subscription gating', () => {
 	it( 'subscribes a local source to media changes and unsubscribes on unmount', () => {
-		const unsubscribe = jest.fn();
-		const subscribe = jest.fn( () => unsubscribe );
+		const unsubscribe = vi.fn();
+		const subscribe = vi.fn( () => unsubscribe );
 
 		const { unmount } = renderPanel( { ...baseCategory, subscribe } );
 
@@ -118,7 +119,7 @@ describe( 'MediaCategoryPanel subscription gating', () => {
 		// `subscribe` is core-only, gated like `attach`/`detach`: an
 		// extender-registered source is always external, so it cannot hook into
 		// the panel's refresh cycle just by setting the prop.
-		const subscribe = jest.fn();
+		const subscribe = vi.fn();
 
 		renderPanel( { ...baseCategory, subscribe, isExternalResource: true } );
 

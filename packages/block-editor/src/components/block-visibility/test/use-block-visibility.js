@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 /**
@@ -9,9 +10,9 @@ import { renderHook } from '@testing-library/react';
 import { useMediaQuery } from '@wordpress/compose';
 
 // Mock WordPress dependencies before importing the hook
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useMediaQuery: jest.fn(),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useMediaQuery: vi.fn(),
 } ) );
 
 /**
@@ -38,7 +39,7 @@ describe( 'useBlockVisibility', () => {
 
 	beforeEach( () => {
 		// Reset all mocks before each test
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'Device type overrides', () => {
