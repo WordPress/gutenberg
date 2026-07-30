@@ -72,6 +72,8 @@
 					"packages/babel-plugin-import-jsx-pragma",
 					"packages/babel-plugin-makepot",
 					"packages/babel-preset-default",
+					"packages/block-serialization-default-parser",
+					"packages/block-serialization-spec-parser",
 					"packages/browserslist-config",
 					"packages/data-controls",
 					"packages/design-system-mcp",

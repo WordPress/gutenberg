@@ -1,17 +1,27 @@
 /**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+/**
  * External dependencies
  */
-import path from 'path';
+import { describe, expect, test } from 'vitest';
 
 /**
  * Internal dependencies
  */
-import { parse } from '../';
 import { jsTester, phpTester } from '../shared-tests';
 
-describe( 'block-serialization-spec-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe-callback
+const require = createRequire( import.meta.url );
+const { parse } = require( '../parser.js' );
+const testRunner = { describe, expect, test };
+
+describe( 'block-serialization-spec-parser-js', jsTester( parse, testRunner ) );
 
 phpTester(
 	'block-serialization-spec-parser-php',
-	path.join( __dirname, 'test-parser.php' )
+	fileURLToPath( new URL( './test-parser.php', import.meta.url ) ),
+	testRunner
 );

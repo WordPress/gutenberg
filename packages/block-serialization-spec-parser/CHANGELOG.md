@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Allow the shared parser-test helpers to receive explicit runner APIs and use Node ESM imports.
+
 ## 5.51.0 (2026-07-14)
 
 ## 5.50.0 (2026-07-01)

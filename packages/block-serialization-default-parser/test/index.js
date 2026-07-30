@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import { fileURLToPath } from 'node:url';
+
+/**
  * External dependencies
  */
-import path from 'path';
+import { describe, expect, test } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -16,9 +21,15 @@ import {
  */
 import { parse } from '../src';
 
-describe( 'block-serialization-default-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe-callback
+const testRunner = { describe, expect, test };
+
+describe(
+	'block-serialization-default-parser-js',
+	jsTester( parse, testRunner )
+);
 
 phpTester(
 	'block-serialization-default-parser-php',
-	path.join( __dirname, 'test-parser.php' )
+	fileURLToPath( new URL( './test-parser.php', import.meta.url ) ),
+	testRunner
 );

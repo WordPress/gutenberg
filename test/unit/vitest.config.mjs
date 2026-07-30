@@ -109,7 +109,6 @@ export default defineConfig( {
 		commonjs( {
 			filter: ( id ) =>
 				[
-					`${ ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
 					`${ ROOT_DIR }/packages/env/lib/`,
 					`${ ROOT_DIR }/packages/project-management-automation/lib/`,
 					`${ ROOT_DIR }/packages/scripts/utils/`,
