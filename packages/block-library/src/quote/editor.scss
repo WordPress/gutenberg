@@ -1,0 +1,14 @@
+// The appender shown when the quote has no inner blocks. The generic
+// appender styles collapse an in-block appender into a corner button unless
+// it is the block's only child, which the citation next to it prevents;
+// restore the writable prompt presentation.
+.wp-block-quote > .block-list-appender {
+	position: relative;
+	right: auto;
+	width: 100%;
+	line-height: inherit;
+
+	.block-editor-default-block-appender__content {
+		display: block;
+	}
+}
