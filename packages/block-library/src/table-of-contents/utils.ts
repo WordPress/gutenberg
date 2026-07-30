@@ -3,7 +3,7 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
-import { escapeAttribute, escapeHTML } from '@wordpress/escape-html';
+import { escapeAttribute, escapeEditableHTML } from '@wordpress/escape-html';
 
 export interface HeadingData {
 	/** The plain text content of the heading. */
@@ -98,12 +98,12 @@ export function createListItemBlocks(
 					// Headings are plain text, and links can carry query args on
 					// paginated posts, so both need escaping to become markup.
 					content: link
-						? `<a href="${ escapeAttribute( link ) }">${ escapeHTML(
-								content
-						  ) }</a>`
-						: escapeHTML( content ),
+						? `<a href="${ escapeAttribute(
+								link
+						  ) }">${ escapeEditableHTML( content ) }</a>`
+						: escapeEditableHTML( content ),
 				},
-				children
+				children?.length
 					? [
 							createBlock(
 								'core/list',

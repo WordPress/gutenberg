@@ -115,7 +115,7 @@ function TableOfContentsToolbar( {
 					size="medium"
 				>
 					{ __(
-						'The table of contents lists the headings in the post. Detaching will enable you to edit, reorder, or remove entries. However, new headings will no longer be added automatically.'
+						'The Table of Contents block lists the headings in the post. Detaching will enable you to edit, reorder, or remove entries. However, new headings will no longer be added automatically.'
 					) }
 				</ConfirmDialog>
 			) }
