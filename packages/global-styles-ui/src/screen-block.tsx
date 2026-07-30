@@ -99,6 +99,7 @@ interface ScreenBlockProps {
 	variation?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function ScreenBlock( {
@@ -106,6 +107,7 @@ function ScreenBlock( {
 	variation,
 	selectedViewport: controlledSelectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -131,19 +133,27 @@ function ScreenBlock( {
 		() => getValidViewportStates( viewportSettings ),
 		[ viewportSettings ]
 	);
-	const effectiveSelectedViewport =
+	const hasValidSelectedViewport =
 		selectedViewport === 'default' ||
 		validViewportStates.some(
 			( state ) => state.value === selectedViewport
-		)
+		);
+	const effectiveSelectedViewport =
+		showResponsiveStateControls && hasValidSelectedViewport
 			? selectedViewport
 			: 'default';
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
+	const effectiveSelectedPseudoState = showBlockStateControls
+		? selectedPseudoState
+		: 'default';
 
-	const stateParam = [ effectiveSelectedViewport, selectedPseudoState ]
+	const stateParam = [
+		effectiveSelectedViewport,
+		effectiveSelectedPseudoState,
+	]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -369,14 +379,17 @@ function ScreenBlock( {
 				viewportStates={ validViewportStates }
 				pseudoStates={ validPseudoStates }
 				selectedViewport={ effectiveSelectedViewport }
-				selectedPseudoState={ selectedPseudoState }
+				selectedPseudoState={ effectiveSelectedPseudoState }
 				onChangeViewport={
 					showResponsiveStateControls
 						? setSelectedViewport
 						: undefined
 				}
-				onChangePseudoState={ setSelectedPseudoState }
+				onChangePseudoState={
+					showBlockStateControls ? setSelectedPseudoState : undefined
+				}
 				showResponsiveStateControls={ showResponsiveStateControls }
+				showBlockStateControls={ showBlockStateControls }
 			/>
 			<BlockPreviewPanel
 				name={ name }

@@ -76,7 +76,7 @@ function example_disable_responsive_editing( $settings ) {
 
 ### Restrict block states editing
 
-The `blockStatesEnabled` setting, which defaults to `true`, controls whether the block-level states control is available in the block inspector. When it is `false`, the control is not rendered, so users cannot target style changes at a block-level state from that UI. State styles already defined in a block's `style` attribute are unaffected.
+The `blockStatesEnabled` setting, which defaults to `true`, controls whether state controls for blocks are available in the block inspector and Global Styles. When it is `false`, those controls are not rendered, so users cannot apply block styles to states from those UIs. Viewport state controls are unaffected and remain controlled by `responsiveEditingEnabled`. State styles already defined in a block's `style` attribute are unaffected.
 
 ```php
 add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );

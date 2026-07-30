@@ -123,7 +123,7 @@ Responsive styles already defined in `theme.json` or in Global Styles continue t
 
 ## Disable block states editing
 
-The block states control in the block inspector lets users apply style changes to a block-level state. To hide that control, add the following to your `functions.php` file.
+The state controls for blocks in the block inspector and Global Styles let users apply block styles to states. To hide those controls, add the following to your `functions.php` file.
 
 ```php
 function example_disable_block_states_editing( $settings ) {
@@ -134,7 +134,7 @@ function example_disable_block_states_editing( $settings ) {
 add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
 ```
 
-State styles already defined in block attributes continue to be applied in the editor and on the front end.
+State styles already defined in block attributes continue to be applied in the editor and on the front end. This setting does not affect viewport state controls, which are controlled by `responsiveEditingEnabled`.
 
 ## Disable formatting options for RichText blocks
 

@@ -34,6 +34,7 @@ interface ScreenHeaderProps {
 	onChangeViewport?: ( value: string ) => void;
 	onChangePseudoState?: ( value: string ) => void;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 export function ScreenHeader( {
@@ -47,7 +48,15 @@ export function ScreenHeader( {
 	onChangeViewport,
 	onChangePseudoState,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenHeaderProps ) {
+	const enabledViewportStates = showResponsiveStateControls
+		? viewportStates
+		: [];
+	const enabledPseudoStates = showBlockStateControls ? pseudoStates : [];
+	const hasStateControls =
+		!! enabledViewportStates?.length || !! enabledPseudoStates?.length;
+
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -69,34 +78,44 @@ export function ScreenHeader( {
 									>
 										{ title }
 									</Heading>
-									<VStack spacing={ 2 } alignment="right">
-										<StateControl
-											viewportStates={
-												showResponsiveStateControls
-													? viewportStates
-													: []
-											}
-											pseudoStates={ pseudoStates }
-											viewportValue={ selectedViewport }
-											pseudoStateValue={
-												selectedPseudoState
-											}
-											onChangeViewport={
-												onChangeViewport
-											}
-											onChangePseudoState={
-												onChangePseudoState
-											}
-										/>
-										<StateControlBadges
-											viewportStates={ viewportStates }
-											pseudoStates={ pseudoStates }
-											viewportValue={ selectedViewport }
-											pseudoStateValue={
-												selectedPseudoState
-											}
-										/>
-									</VStack>
+									{ hasStateControls && (
+										<VStack spacing={ 2 } alignment="right">
+											<StateControl
+												viewportStates={
+													enabledViewportStates
+												}
+												pseudoStates={
+													enabledPseudoStates
+												}
+												viewportValue={
+													selectedViewport
+												}
+												pseudoStateValue={
+													selectedPseudoState
+												}
+												onChangeViewport={
+													onChangeViewport
+												}
+												onChangePseudoState={
+													onChangePseudoState
+												}
+											/>
+											<StateControlBadges
+												viewportStates={
+													enabledViewportStates
+												}
+												pseudoStates={
+													enabledPseudoStates
+												}
+												viewportValue={
+													selectedViewport
+												}
+												pseudoStateValue={
+													selectedPseudoState
+												}
+											/>
+										</VStack>
+									) }
 								</HStack>
 							</Spacer>
 						</HStack>
