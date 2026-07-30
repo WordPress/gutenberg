@@ -175,9 +175,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * already contains everything the autosave holds, so the "more recent
 	 * autosave" notice can be suppressed as redundant.
 	 *
-	 * Anything invalid is dropped rather than erroring, because a missing
-	 * snapshot only means the editor falls back to showing the "newer autosave"
-	 * notice.
+	 * Anything invalid is dropped rather than erroring, and any previously
+	 * stored snapshot is cleared, because a missing snapshot only means the
+	 * editor falls back to showing the "newer autosave" notice.
 	 *
 	 * @param int             $autosave_id Autosave revision ID.
 	 * @param WP_REST_Request $request     Full details about the request.
@@ -186,11 +186,20 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	private function store_crdt_snapshot( $autosave_id, $request ) {
 		$snapshot = $request->get_param( self::CRDT_SNAPSHOT_PARAM );
 
-		if ( ! is_string( $snapshot ) || '' === $snapshot ) {
-			return;
-		}
+		$is_valid_snapshot = (
+			is_string( $snapshot ) &&
+			'' !== $snapshot &&
+			strlen( $snapshot ) <= self::MAX_CRDT_SNAPSHOT_LENGTH
+		);
 
-		if ( strlen( $snapshot ) > self::MAX_CRDT_SNAPSHOT_LENGTH ) {
+		if ( ! $is_valid_snapshot ) {
+			/*
+			 * The autosave revision is reused across autosaves, so a snapshot
+			 * stored by an earlier request would otherwise remain attached to
+			 * this request's newer content and could wrongly vouch for it.
+			 * Clear it so the editor falls back to showing the notice.
+			 */
+			delete_metadata( 'post', $autosave_id, self::CRDT_SNAPSHOT_META_KEY );
 			return;
 		}
 
