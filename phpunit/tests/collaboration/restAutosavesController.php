@@ -611,6 +611,67 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( '', get_post_meta( $autosave->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
 	}
 
+	public function test_autosave_without_a_crdt_snapshot_clears_a_previously_stored_snapshot() {
+		$post_id = $this->create_draft( 'Stale snapshot draft title', '<!-- wp:paragraph --><p>Stale snapshot draft content</p><!-- /wp:paragraph -->' );
+
+		$this->dispatch_autosave(
+			$post_id,
+			'Stale snapshot autosaved title one',
+			'<!-- wp:paragraph --><p>Stale snapshot autosaved content one</p><!-- /wp:paragraph -->',
+			array(),
+			'STALE_SNAPSHOT'
+		);
+
+		$first_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $first_autosave );
+		$this->assertSame( 'STALE_SNAPSHOT', get_post_meta( $first_autosave->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
+
+		// A later autosave without a snapshot, e.g. from a non-RTC client or
+		// a direct REST call, updates the same revision. The old snapshot
+		// must not remain attached to content it does not describe, or it
+		// could wrongly suppress the recovery notice for that content.
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Stale snapshot autosaved title two',
+			'<!-- wp:paragraph --><p>Stale snapshot autosaved content two</p><!-- /wp:paragraph -->'
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$second_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertSame( $first_autosave->ID, $second_autosave->ID, 'Expected the existing autosave revision to be updated.' );
+		$this->assertSame( '', get_post_meta( $second_autosave->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
+	}
+
+	public function test_oversize_crdt_snapshot_clears_a_previously_stored_snapshot() {
+		$post_id = $this->create_draft( 'Oversize stale snapshot draft title', '<!-- wp:paragraph --><p>Oversize stale snapshot draft content</p><!-- /wp:paragraph -->' );
+
+		$this->dispatch_autosave(
+			$post_id,
+			'Oversize stale snapshot autosaved title one',
+			'<!-- wp:paragraph --><p>Oversize stale snapshot autosaved content one</p><!-- /wp:paragraph -->',
+			array(),
+			'VALID_SNAPSHOT'
+		);
+
+		$first_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $first_autosave );
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Oversize stale snapshot autosaved title two',
+			'<!-- wp:paragraph --><p>Oversize stale snapshot autosaved content two</p><!-- /wp:paragraph -->',
+			array(),
+			str_repeat( 'A', MB_IN_BYTES + 1 )
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$second_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertSame( $first_autosave->ID, $second_autosave->ID, 'Expected the existing autosave revision to be updated.' );
+		$this->assertSame( '', get_post_meta( $second_autosave->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
+	}
+
 	public function test_autosave_without_a_crdt_snapshot_stores_no_meta() {
 		$post_id = $this->create_draft( 'No snapshot draft title', '<!-- wp:paragraph --><p>No snapshot draft content</p><!-- /wp:paragraph -->' );
 
