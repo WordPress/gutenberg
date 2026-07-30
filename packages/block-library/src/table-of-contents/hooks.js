@@ -6,11 +6,86 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Template slugs that resolve to a single post or page on the front of site,
+ * so the Table of Contents can list that post's headings when the block is
+ * placed in the template. Includes the specific slugs and the hierarchical
+ * prefixes (e.g. `single-book`, `page-about`, custom page templates).
+ */
+const SINGULAR_TEMPLATE_SLUGS = [
+	'single',
+	'page',
+	'singular',
+	'attachment',
+	'privacy-policy',
+];
+const SINGULAR_TEMPLATE_PREFIXES = [
+	'single-',
+	'page-',
+	'attachment-',
+	'wp-custom-template-',
+];
+
+function isSingularTemplateSlug( slug ) {
+	if ( ! slug ) {
+		return false;
+	}
+	return (
+		SINGULAR_TEMPLATE_SLUGS.includes( slug ) ||
+		SINGULAR_TEMPLATE_PREFIXES.some( ( prefix ) =>
+			slug.startsWith( prefix )
+		)
+	);
+}
+
+/**
+ * Detects the editing context of the Table of Contents block.
+ *
+ * The block lists headings from the post being viewed, which is resolved on the
+ * server from the current request. While editing a template directly there is
+ * no single post to preview against, so the editor can only explain what the
+ * block will do rather than show a live list. This hook reports which
+ * explanation applies:
+ *
+ * - `'singular'`: a template that renders one post or page (e.g. Single, Page).
+ * - `'nonSingular'`: a template with no single post (e.g. Archive, Search, 404).
+ * - `null`: not editing a template (an ordinary post or page), so the block can
+ *   show its live heading list as usual.
+ *
+ * @return {('singular'|'nonSingular'|null)} The template editing context.
+ */
+export function useTemplateContext() {
+	return useSelect( ( select ) => {
+		// FIXME: @wordpress/block-library should not depend on
+		// @wordpress/editor. Blocks can be loaded into a *non-post* block editor
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getCurrentPostId, getCurrentPostType } =
+			select( 'core/editor' );
+
+		// Only treat the block as being in a template when the template itself
+		// is the edited entity. In the post editor `getCurrentPostType()`
+		// returns the post type (e.g. `post`/`page`), so ordinary editing keeps
+		// its normal behavior.
+		if ( getCurrentPostType() !== 'wp_template' ) {
+			return null;
+		}
+
+		const slug = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			getCurrentPostId()
+		)?.slug;
+
+		return isSingularTemplateSlug( slug ) ? 'singular' : 'nonSingular';
+	}, [] );
+}
 
 function getLatestHeadings( select, clientId ) {
 	const {

@@ -36,7 +36,7 @@ import {
  */
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { useObserveHeadings, useTemplateContext } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
@@ -67,6 +67,7 @@ export default function TableOfContentsEdit( {
 } ) {
 	useObserveHeadings( clientId );
 
+	const templateContext = useTemplateContext();
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
 		TableOfContentsEdit,
@@ -221,19 +222,37 @@ export default function TableOfContentsEdit( {
 		</InspectorControls>
 	);
 
-	// If there are no headings or the only heading is empty.
-	// Note that the toolbar controls are intentionally omitted since the
-	// "Convert to static list" option is useless to the placeholder state.
-	if ( headings.length === 0 ) {
+	// Work out the placeholder message, if any. While editing a template there
+	// is no single post to preview against, so explain what the block will do
+	// on the front of site instead of showing a list built from unrelated
+	// template headings.
+	let instructions;
+	if ( templateContext === 'nonSingular' ) {
+		instructions = __(
+			'Table of Contents needs a single post or page to list headings.'
+		);
+	} else if ( templateContext === 'singular' ) {
+		instructions = __(
+			'This table of contents will show headings from the post being viewed.'
+		);
+	} else if ( headings.length === 0 ) {
+		// There are no headings, or the only heading is empty.
+		instructions = __(
+			'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+		);
+	}
+
+	// The toolbar controls are intentionally omitted from the placeholder
+	// states since the "Convert to static list" option is useless without a
+	// rendered list.
+	if ( instructions ) {
 		return (
 			<>
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
-						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
-						) }
+						instructions={ instructions }
 					/>
 				</div>
 				{ inspectorControls }
