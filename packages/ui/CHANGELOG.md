@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `SearchableChipSelectControl` form control ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
+-   Add `SearchableChipSelectControl` component ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 -   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).
