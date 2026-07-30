@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support JSX files in direct build entry naming and default unit-test lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 34.1.0 (2026-08-12)
 
 ### Bug Fixes
@@ -17,7 +21,6 @@
 ### Enhancements
 
 -       `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
--   Support JSX files in direct build entry naming and default unit-test lint configuration.
 
 ## 33.0.0 (2026-07-14)
 
