@@ -51,8 +51,8 @@ const ruleFunction = ( primary ) => {
 			let match;
 			globalCssDefenseTokenInValueRegex.lastIndex = 0;
 			while (
-				( match =
-					globalCssDefenseTokenInValueRegex.exec( value ) ) !== null
+				( match = globalCssDefenseTokenInValueRegex.exec( value ) ) !==
+				null
 			) {
 				report( {
 					message: messages.rejectedUsage( match[ 0 ] ),
