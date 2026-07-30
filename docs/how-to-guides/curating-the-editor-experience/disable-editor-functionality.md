@@ -96,15 +96,30 @@ This JavaScript should be enqueued much like the block variation example above. 
 The Code Editor allows you to view the underlying block markup for a page or post. While this view is handy for experienced users, you can inadvertently break block markup by editing content. Add the following to your `functions.php` file to restrict access.
 
 ```php
-function example_restrict_code_editor_access( $settings, $context ) {
-    $settings[ 'codeEditingEnabled' ] = false;
+function example_restrict_code_editor_access( $settings ) {
+	$settings[ 'codeEditingEnabled' ] = false;
 
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access', 10, 2 );
+add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access' );
 ```
 
 This code prevents all users from accessing the Code Editor. You could also add [capability](https://wordpress.org/documentation/article/roles-and-capabilities/) checks to disable access for specific users.
+
+## Disable responsive editing
+
+The "Responsive styles" option in the View menu lets users apply style changes to a single viewport only. If you want style edits to always apply to every viewport, add the following to your `functions.php` file.
+
+```php
+function example_disable_responsive_editing( $settings ) {
+	$settings[ 'responsiveEditingEnabled' ] = false;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
+```
+
+Responsive styles already defined in `theme.json` or in Global Styles continue to be applied on the front end.
 
 ## Disable formatting options for RichText blocks
 

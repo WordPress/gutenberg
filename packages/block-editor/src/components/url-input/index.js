@@ -273,96 +273,69 @@ export default function URLInput( props ) {
 	function handleKeyDown( event ) {
 		onKeyDown?.( event );
 
-		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
-		// We shouldn't preventDefault to allow block arrow keys navigation.
+		// Unless the list can consume them, the keys must reach the editor for
+		// block navigation, so they mustn't be prevented.
 		if ( ! showSuggestions || ! suggestions.length || isLoading ) {
-			// In the Windows version of Firefox the up and down arrows don't move the caret
-			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
-			// a form of focus trapping that is disruptive to the user experience. This disruption
-			// only happens if the caret is not in the first or last position in the text input.
-			// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
-			switch ( event.keyCode ) {
-				// When UP is pressed, if the caret is at the start of the text, move it to the 0
-				// position.
-				case UP: {
-					if ( 0 !== event.target.selectionStart ) {
-						event.preventDefault();
+			// Holding Shift extends the selection, which the browser handles.
+			if (
+				! event.shiftKey &&
+				( event.keyCode === UP || event.keyCode === DOWN )
+			) {
+				// Firefox on Windows leaves the caret in place, trapping focus,
+				// since the editor only navigates away from an edge.
+				// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
+				const caret =
+					event.keyCode === UP ? 0 : event.target.value.length;
 
-						// Set the input caret to position 0.
-						event.target.setSelectionRange( 0, 0 );
-					}
-					break;
+				// UP moves the caret to the start of the text, DOWN to the end.
+				// Once it is already there, with nothing selected, the key is
+				// left to the editor to navigate out of the field.
+				if (
+					event.target.selectionStart !== caret ||
+					event.target.selectionEnd !== caret
+				) {
+					event.preventDefault();
+					event.target.setSelectionRange( caret, caret );
 				}
-				// When DOWN is pressed, if the caret is not at the end of the text, move it to the
-				// last position.
-				case DOWN: {
-					if ( value.length !== event.target.selectionStart ) {
-						event.preventDefault();
-
-						// Set the input caret to the last position.
-						event.target.setSelectionRange(
-							value.length,
-							value.length
-						);
-					}
-					break;
-				}
-
-				// Submitting while loading should trigger onSubmit.
-				case ENTER: {
-					if ( onSubmit ) {
-						event.preventDefault();
-						onSubmit( null, event );
-					}
-					break;
-				}
+			} else if ( event.keyCode === ENTER && onSubmit ) {
+				event.preventDefault();
+				onSubmit( null, event );
 			}
 
 			return;
 		}
 
-		const suggestion = suggestions[ selectedSuggestion ];
+		const suggestion = suggestions[ selectedSuggestion ] ?? null;
 
 		switch ( event.keyCode ) {
-			case UP: {
-				event.preventDefault();
-				setSelectedSuggestion(
-					! selectedSuggestion
-						? suggestions.length - 1
-						: selectedSuggestion - 1
-				);
-				break;
-			}
+			case UP:
 			case DOWN: {
 				event.preventDefault();
+
+				const offset = event.keyCode === UP ? -1 : 1;
+				// An unselected list is entered from the end nearest the key,
+				// and the ends wrap into each other.
+				const from = selectedSuggestion ?? ( offset === -1 ? 0 : -1 );
+
 				setSelectedSuggestion(
-					selectedSuggestion === null ||
-						selectedSuggestion === suggestions.length - 1
-						? 0
-						: selectedSuggestion + 1
+					( from + offset + suggestions.length ) % suggestions.length
 				);
 				break;
 			}
 			case TAB: {
-				if ( selectedSuggestion !== null ) {
+				if ( suggestion ) {
 					selectLink( suggestion );
-					// Announce a link has been selected when tabbing away from the input field.
 					speak( __( 'Link selected.' ) );
 				}
 				break;
 			}
 			case ENTER: {
 				event.preventDefault();
-				if ( selectedSuggestion !== null ) {
+				if ( suggestion ) {
 					selectLink( suggestion );
-
-					if ( onSubmit ) {
-						onSubmit( suggestion, event );
-					}
-				} else if ( onSubmit ) {
-					onSubmit( null, event );
 				}
 
+				onSubmit?.( suggestion, event );
 				break;
 			}
 		}

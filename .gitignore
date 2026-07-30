@@ -34,6 +34,9 @@ yarn.lock
 .eslintcache
 *.tsbuildinfo
 
+# Generated native views of repository agent skills
+/.claude/skills/
+
 # Operating system specific files
 .DS_Store
 Thumbs.db
