@@ -27,6 +27,28 @@
 # Tooling
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
+/tools/eslint/suppressions.json
+/tools/stylelint/stylelint-suppressions.json
+/packages/babel-plugin-import-jsx-pragma        @ntwb @ajitbohra
+/packages/babel-plugin-makepot                  @ntwb @ajitbohra
+/packages/babel-preset-default                  @ntwb @ajitbohra
+/packages/browserslist-config                   @ntwb @ajitbohra
+/packages/create-block                          @ryanwelcher
+/packages/create-block-tutorial-template        @ryanwelcher
+/packages/dependency-extraction-webpack-plugin
+/packages/docgen
+/packages/e2e-tests                             @ntwb @ajitbohra
+/packages/e2e-test-utils-playwright             @kevin940726
+/packages/eslint-plugin                         @ntwb @ajitbohra
+/packages/jest-console                          @ntwb @ajitbohra
+/packages/jest-preset-default                   @ntwb @ajitbohra
+/packages/vitest-console                        @ntwb @ajitbohra
+/packages/vitest-preset-default                 @ntwb @ajitbohra
+/packages/npm-package-json-lint-config          @ntwb @ajitbohra
+/packages/postcss-themes                        @ntwb @ajitbohra
+/packages/prettier-config                       @ntwb
+/packages/scripts                               @ntwb @ajitbohra @ryanwelcher
+/packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components

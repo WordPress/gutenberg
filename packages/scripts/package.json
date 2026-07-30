@@ -47,6 +47,7 @@
 		"@wordpress/postcss-plugins-preset": "file:../postcss-plugins-preset",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/stylelint-config": "file:../stylelint-config",
+		"@wordpress/vitest-preset-default": "file:../vitest-preset-default",
 		"adm-zip": "^0.6.0",
 		"babel-jest": "^30.5.0",
 		"babel-loader": "^9.2.1",
@@ -82,14 +83,15 @@
 		"stylelint": "^17.14.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
+		"vite": "^7.3.2",
+		"vitest": "^4.1.10",
 		"webpack": "^5.108.1",
 		"webpack-bundle-analyzer": "^4.9.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^5.2.1"
 	},
 	"devDependencies": {
-		"rimraf": "^5.0.10",
-		"vitest": "^4.1.10"
+		"rimraf": "^5.0.10"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

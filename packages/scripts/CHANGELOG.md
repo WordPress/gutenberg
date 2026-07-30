@@ -6,6 +6,8 @@
 
 -   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
 
+-   Run `test-unit-js` with Vitest 4 instead of Jest, add the `test-unit-vitest` alias, require Node.js 20.19 or newer, and use ESM Vitest configuration. The explicit `test-unit-jest` command remains available during the Gutenberg migration.
+
 ### Bug Fixes
 
 -   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).

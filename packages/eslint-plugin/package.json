@@ -43,6 +43,7 @@
 	"dependencies": {
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
 		"@eslint/compat": "^2.0.0",
+		"@vitest/eslint-plugin": "^1.6.24",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/theme": "file:../theme",
 		"cosmiconfig": "^7.0.0",

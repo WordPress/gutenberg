@@ -10,6 +10,7 @@ const {
 } = require( './cli' );
 const {
 	getJestOverrideConfigFile,
+	getVitestOverrideConfigFile,
 	getPhpFilePaths,
 	getProjectSourcePath,
 	getWebpackArgs,
@@ -17,6 +18,7 @@ const {
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
+	hasVitestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 } = require( './config' );
@@ -41,6 +43,7 @@ module.exports = {
 	getArgsFromCLI,
 	getFileArgsFromCLI,
 	getJestOverrideConfigFile,
+	getVitestOverrideConfigFile,
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getPhpFilePaths,
@@ -54,6 +57,7 @@ module.exports = {
 	hasCssnanoConfig,
 	hasFileArgInCLI,
 	hasJestConfig,
+	hasVitestConfig,
 	hasPackageProp,
 	hasPostCSSConfig,
 	hasPrettierConfig,
