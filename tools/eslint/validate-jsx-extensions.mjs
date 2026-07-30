@@ -21,13 +21,7 @@ const acceptNew = process.argv.includes( '--accept-new' );
 function getJavaScriptFiles() {
 	return execFileSync(
 		'git',
-		[
-			'ls-files',
-			'-z',
-			'--cached',
-			'--',
-			'*.js',
-		],
+		[ 'ls-files', '-z', '--cached', '--', '*.js' ],
 		{
 			cwd: ROOT_DIR,
 			encoding: 'utf8',

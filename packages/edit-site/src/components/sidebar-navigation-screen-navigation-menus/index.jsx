@@ -15,7 +15,7 @@ import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-m
 import { unlock } from '../../lock-unlock';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
-// Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
+// Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 function buildMenuLabel( title, id, status ) {
 	if ( ! title ) {
 		/* translators: %s: the index of the menu in the list of menus. */

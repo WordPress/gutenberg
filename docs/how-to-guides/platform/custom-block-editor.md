@@ -445,7 +445,7 @@ And with that you have covered the render of you custom `<BlockEditor>`.
 
 <div class="callout callout-tip">
 <a href="https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-editor/src/components/block-inspector/index.js"><code>&lt;BlockInspector&gt;</code></a>
-itself actually renders a <code>Slot</code> for <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inspector-controls"><code>&lt;InspectorControls&gt;</code></a>. This is what allows you <a href="https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-library/src/paragraph/edit.js#L127">render</a> a <code>&lt;InspectorControls>&gt;</code> component inside
+itself actually renders a <code>Slot</code> for <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inspector-controls"><code>&lt;InspectorControls&gt;</code></a>. This is what allows you <a href="https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-library/src/paragraph/edit.js#L127">render</a> a <code>&lt;InspectorControls&gt;</code> component inside
 the <code>edit()</code> definition for your block and have
 it display within the editor's sidebar. Exploring this component in more detail is recommended.
 </div>

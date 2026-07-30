@@ -46,7 +46,7 @@ jest.mock( '../../../store', () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
 
-// `inherited-value-context.js` imports `store as blocksStore` from
+// `inherited-value-context.jsx` imports `store as blocksStore` from
 // `@wordpress/blocks` for `useVariationAndElements`. The blocks store's
 // transitive import chain fails under this file's `@wordpress/data` mock
 // (missing `createSelector`), so stub the blocks module with just the shape

@@ -222,7 +222,7 @@ export function GallerySourcePanel( {
 
 	// In static mode this panel is just an entry into dynamic mode, so hide it
 	// when there's no post type to preview against. This is intentionally
-	// stricter than the placeholder's entry button (see `edit.js`), which stays
+	// stricter than the placeholder's entry button (see `edit.jsx`), which stays
 	// available anywhere because the source resolves at render time.
 	if ( ! canUseDynamicSource ) {
 		return null;

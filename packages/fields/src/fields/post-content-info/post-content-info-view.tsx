@@ -9,7 +9,7 @@ import { humanTimeDiff } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
 import type { BasePostWithEditedEntity } from '../../types';
 
-// Taken from packages/editor/src/components/time-to-read/index.js.
+// Taken from packages/editor/src/components/time-to-read/index.jsx.
 const AVERAGE_READING_RATE = 189;
 
 export default function PostContentInfoView( {

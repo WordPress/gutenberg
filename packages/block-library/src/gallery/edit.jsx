@@ -619,7 +619,7 @@ export default function GalleryEdit( props ) {
 			'has-nested-images',
 			// In dynamic mode there are no inner blocks and the gallery isn't
 			// rendered through the `Gallery` component, so the classes that
-			// component normally composes onto the `<figure>` (see `gallery.js`)
+			// component normally composes onto the `<figure>` (see `gallery.jsx`)
 			// must be added here to keep the preview's flex/crop layout matching
 			// the static gallery and the frontend.
 			isDynamic && [
@@ -677,7 +677,7 @@ export default function GalleryEdit( props ) {
 					 * hidden in content-only editing (where this structural change
 					 * isn't allowed), but intentionally not hidden by
 					 * `canUseDynamicSource` the way the inspector is (see
-					 * `dynamic-gallery.js`): even with no
+					 * `dynamic-gallery.jsx`): even with no
 					 * post type to preview against, the source still resolves at
 					 * render time via `get_the_ID()` (see `index.php`) — e.g. in a
 					 * template part or pattern shown on a singular page.

@@ -305,7 +305,7 @@ export default function BackgroundImagePanel( {
 	// Get current gradient value, decoding preset slug references.
 	// Fall back to color.gradient for legacy blocks that haven't migrated
 	// to background.gradient yet (mirrors block inspector fallback in
-	// packages/block-editor/src/hooks/background.js).
+	// packages/block-editor/src/hooks/background.jsx).
 	const currentGradient = decodeValue(
 		value?.background?.gradient ?? value?.color?.gradient
 	);
@@ -315,7 +315,7 @@ export default function BackgroundImagePanel( {
 
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
-	// matching the block inspector behavior in hooks/background.js.
+	// matching the block inspector behavior in hooks/background.jsx.
 	const setGradient = ( newGradient, newSlug ) => {
 		let newValue = setImmutably(
 			value,

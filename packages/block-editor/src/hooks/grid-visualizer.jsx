@@ -29,7 +29,7 @@ function GridTools( { clientId, layout } ) {
 
 				// These calls are purposely ordered from least expensive to most expensive.
 				// Hides the visualizer in cases where the user is not or cannot interact with it.
-				// Also hide if a child block is selected, because layout-child.js will render
+				// Also hide if a child block is selected, because layout-child.jsx will render
 				// the visualizer in that case (with proper childGridClientId handling).
 				if (
 					( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||

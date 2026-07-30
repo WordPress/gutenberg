@@ -310,7 +310,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	static $global_styles = null;
 
 	// In dynamic mode the gallery's images are resolved at render time instead of
-	// being authored as inner blocks, so `save.js` persists at most the
+	// being authored as inner blocks, so `save.jsx` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
 	// caption. Resolve the configured source to a list of attachments, render an
 	// image block for each, and build the gallery `<figure>` wrapper from scratch.
@@ -360,7 +360,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		// render filter adds the flex layout classes downstream — the same way a
 		// static gallery's wrapper is composed (`useBlockProps.save()` plus that
 		// filter). Only the gallery-specific classes are added explicitly, and
-		// they mirror `save.js` (kept in sync deliberately — see that file).
+		// they mirror `save.jsx` (kept in sync deliberately — see that file).
 		$gallery_classes  = 'wp-block-gallery has-nested-images';
 		$gallery_classes .= isset( $attributes['columns'] )
 			? ' columns-' . (int) $attributes['columns']
@@ -370,7 +370,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		}
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $gallery_classes ) );
 
-		// In dynamic mode `save.js` persists only the gallery-level caption, so
+		// In dynamic mode `save.jsx` persists only the gallery-level caption, so
 		// `$content` is the saved `<figcaption>` (or empty). Append it after the
 		// resolved images — matching the static gallery's `{images}{caption}`
 		// order — without parsing it.

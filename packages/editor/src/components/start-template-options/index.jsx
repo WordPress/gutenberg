@@ -44,7 +44,7 @@ function useStartPatterns( fallbackContent ) {
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet
 	);
 
-	// Duplicated from packages/block-library/src/pattern/edit.js.
+	// Duplicated from packages/block-library/src/pattern/edit.jsx.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
 			block.innerBlocks.find(

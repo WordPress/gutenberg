@@ -29,6 +29,7 @@
 		{ "path": "../warning" }
 	],
 	"exclude": [
-		"src/**/test/**/*.js" // only exclude js files, ts files should be checked
+		"src/**/test/**/*.js", // only exclude js files, ts files should be checked
+		"src/**/test/**/*.jsx"
 	]
 }

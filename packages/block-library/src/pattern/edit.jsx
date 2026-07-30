@@ -36,7 +36,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	const [ hasRecursionError, setHasRecursionError ] = useState( false );
 	const parsePatternDependencies = useParsePatternDependencies();
 
-	// Duplicated in packages/editor/src/components/start-template-options/index.js.
+	// Duplicated in packages/editor/src/components/start-template-options/index.jsx.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
 			block.innerBlocks.find(

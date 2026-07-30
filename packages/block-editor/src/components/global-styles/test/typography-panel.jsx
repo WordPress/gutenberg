@@ -6,7 +6,7 @@ import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
 // tests exercise the inheriting path. The off path lives in
-// `typography-panel-core.js`.
+// `typography-panel-core.jsx`.
 beforeEach( () => {
 	window.__experimentalGlobalStylesInheritanceUI = true;
 } );
