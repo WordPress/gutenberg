@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
 
@@ -65,6 +65,10 @@ export default function useFixedWindowList(
 		}
 	);
 
+	// Kept out of state so that measuring the list does not, on its own, force a
+	// re-render. Only the rendered window does that.
+	const visibleItemsRef = useRef( initWindowSize );
+
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {
 			return;
@@ -83,6 +87,7 @@ export default function useFixedWindowList(
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
+			visibleItemsRef.current = visibleItems;
 			// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 			const windowOverscan = initRender
 				? visibleItems
@@ -96,6 +101,17 @@ export default function useFixedWindowList(
 				firstViewableIndex + visibleItems + windowOverscan
 			);
 			setFixedListWindow( ( lastWindow ) => {
+				// The initial window is rendered before the list can be measured.
+				// When it already covers the visible items there is nothing to
+				// add, and re-rendering would only force a second style
+				// recalculation before the list is first painted.
+				if (
+					initRender &&
+					lastWindow.start <= firstViewableIndex &&
+					lastWindow.end >= firstViewableIndex + visibleItems
+				) {
+					return lastWindow;
+				}
 				const nextWindow = {
 					visibleItems,
 					start,
@@ -167,14 +183,14 @@ export default function useFixedWindowList(
 					return scrollContainer?.scrollTo( {
 						top:
 							scrollContainer.scrollTop -
-							fixedListWindow.visibleItems * itemHeight,
+							visibleItemsRef.current * itemHeight,
 					} );
 				}
 				case PAGEDOWN: {
 					return scrollContainer?.scrollTo( {
 						top:
 							scrollContainer.scrollTop +
-							fixedListWindow.visibleItems * itemHeight,
+							visibleItemsRef.current * itemHeight,
 					} );
 				}
 			}
@@ -193,7 +209,6 @@ export default function useFixedWindowList(
 		totalItems,
 		itemHeight,
 		elementRef,
-		fixedListWindow.visibleItems,
 		useWindowing,
 		options?.expandedState,
 	] );
