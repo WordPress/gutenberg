@@ -113,9 +113,7 @@ export default function PreferencesModalTabs( {
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
-											// @ts-expect-error: Navigator.Button is currently typed in a way that prevents Item from being passed in
 											as={ Item }
-											isAction
 										>
 											<HStack justify="space-between">
 												<FlexItem>

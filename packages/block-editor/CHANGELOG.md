@@ -10,13 +10,16 @@
 
 ### Internal
 
--   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#80555](https://github.com/WordPress/gutenberg/pull/80555)).
+-   Gate the inherited Global Styles treatment in the block inspector on the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances until the experiment is turned on ([#80555](https://github.com/WordPress/gutenberg/pull/80555), [#80815](https://github.com/WordPress/gutenberg/pull/80815)).
 -   `URLInput`: Convert the class component to a function component with hooks, replacing the `compose( withSafeTimeout, withSpokenMessages, withInstanceId, withSelect )` wrapper. The unused `setTimeout` prop injected by `withSafeTimeout` is dropped, and the block editor settings are now read on demand rather than subscribed to ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 
 ### Bug Fixes
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
+-   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
+-   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
+-   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace`.
 
 ## 16.0.0 (2026-07-14)
 

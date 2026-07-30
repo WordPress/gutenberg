@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Card Card component CardBody should allow scrolling content with the scrollable prop is true 1`] = `
 Snapshot Diff:
