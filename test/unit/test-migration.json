@@ -14,7 +14,8 @@
 					"packages/components/src/custom-select-control/test/index.tsx",
 					"packages/components/src/search-control/test/index.tsx",
 					"packages/components/src/snackbar/test/index.tsx",
-					"packages/components/src/snackbar/test/list.tsx"
+					"packages/components/src/snackbar/test/list.tsx",
+					"packages/components/src/tabs/test/index.tsx"
 				],
 				"directories": []
 			},
@@ -314,6 +315,7 @@
 			],
 			"node": [
 				"packages/wp-build/lib/test/source-files.js",
+				"test/unit/config/playwright-provider.vitest.test.js",
 				"test/unit/scripts/test/discover-test-files.js"
 			]
 		}

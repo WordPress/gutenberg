@@ -9,7 +9,6 @@ import { fileURLToPath } from 'node:url';
  * External dependencies
  */
 import { transformAsync } from '@babel/core';
-import { playwright } from '@vitest/browser-playwright';
 import globPackage from 'glob';
 import { defineConfig } from 'vitest/config';
 
@@ -17,6 +16,7 @@ import { defineConfig } from 'vitest/config';
  * Internal dependencies
  */
 import { getVitestTestsByProject } from './scripts/discover-test-files.mjs';
+import { gutenbergPlaywright } from './config/playwright-provider.vitest.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -216,7 +216,7 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: gutenbergPlaywright(),
 						screenshotDirectory:
 							'test-results/vitest-browser-screenshots',
 						screenshotFailures: true,
