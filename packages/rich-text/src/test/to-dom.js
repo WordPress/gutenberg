@@ -1,18 +1,18 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
+import '../store';
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
 
 describe( 'recordToDom', () => {
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
-
 	spec.forEach( ( { description, record, startPath, endPath } ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const { body, selection } = toDom( {
 				value: record,
@@ -100,7 +100,6 @@ describe( 'applyValue', () => {
 	];
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode(

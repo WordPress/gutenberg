@@ -842,7 +842,7 @@ export const specWithRegistration = [
 		endPath: [ 0, 0, 1 ],
 		value: {
 			formats: [ [ math, mi ] ],
-			replacements: [],
+			replacements: [ , ],
 			text: 'x',
 		},
 	},

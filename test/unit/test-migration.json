@@ -62,6 +62,7 @@
 					"packages/priority-queue",
 					"packages/private-apis",
 					"packages/reusable-blocks",
+					"packages/rich-text",
 					"packages/server-side-render",
 					"packages/shortcode",
 					"packages/style-engine",

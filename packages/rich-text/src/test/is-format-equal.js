@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 
@@ -106,7 +111,6 @@ describe( 'isFormatEqual', () => {
 	];
 
 	spec.forEach( ( { format1, format2, isEqual, description } ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			expect( isFormatEqual( format1, format2 ) ).toBe( isEqual );
 		} );

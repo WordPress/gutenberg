@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { dispatch, select } from '@wordpress/data';
@@ -21,9 +26,6 @@ const UNKNOWN_FORMAT = {
 
 describe( 'registerFormatType', () => {
 	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-
 		// Register "core/unknown" format
 		dispatch( richTextStore ).addFormatTypes( UNKNOWN_FORMAT );
 	} );

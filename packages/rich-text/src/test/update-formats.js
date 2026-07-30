@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
+import '../store';
 
 import { updateFormats } from '../update-formats';
 import { create } from '../create';
@@ -11,11 +17,6 @@ import { getSparseArrayLength } from './helpers';
 
 describe( 'updateFormats', () => {
 	const em = { type: 'em' };
-
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
 
 	it( 'should update formats with empty array', () => {
 		const value = {
