@@ -249,7 +249,16 @@ export function stripOverrides(
 		};
 	}
 
-	if ( overrides.sort && dequal( view.sort, overrides.sort ) ) {
+	// The sort override may be partial: the merged sort is the default view's
+	// sort with the override's keys on top. Compare against that merged shape,
+	// otherwise a partial override would look user-modified and be persisted.
+	if (
+		overrides.sort &&
+		dequal( view.sort, {
+			...( defaultView?.sort as any ),
+			...overrides.sort,
+		} )
+	) {
 		result = {
 			...result,
 			sort: defaultView?.sort,

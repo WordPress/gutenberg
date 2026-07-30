@@ -642,6 +642,44 @@ describe( 'stripOverrides', () => {
 			expect( result.sort ).toEqual( defaultView.sort );
 		} );
 
+		it( 'should restore default sort when a partial override is applied and the rest still matches the default', () => {
+			// The override only sets `field`, so `direction` comes from the
+			// default view: the resulting sort is not user-modified and must
+			// not be persisted.
+			const merged = mergeOverrides(
+				baseView,
+				{ sort: { field: 'title' } },
+				defaultView
+			);
+			expect( merged.sort ).toEqual( {
+				field: 'title',
+				direction: 'desc',
+			} );
+
+			const result = stripOverrides(
+				{ ...baseView, sort: merged.sort },
+				{ sort: { field: 'title' } },
+				defaultView
+			);
+			expect( result.sort ).toEqual( defaultView.sort );
+		} );
+
+		it( 'should keep sort when the user changed a key not covered by a partial override', () => {
+			const view: View = {
+				...baseView,
+				sort: { field: 'title', direction: 'asc' },
+			};
+			const result = stripOverrides(
+				view,
+				{ sort: { field: 'title' } },
+				defaultView
+			);
+			expect( result.sort ).toEqual( {
+				field: 'title',
+				direction: 'asc',
+			} );
+		} );
+
 		it( 'should not change sort when it does not match override', () => {
 			const view: View = {
 				...baseView,
