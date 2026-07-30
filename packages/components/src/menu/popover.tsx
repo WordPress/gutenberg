@@ -11,6 +11,8 @@ import {
 	useMemo,
 	forwardRef,
 	useCallback,
+	useRef,
+	useInsertionEffect,
 } from '@wordpress/element';
 
 /**
@@ -26,6 +28,25 @@ export const Popover = forwardRef<
 	WordPressComponentProps< PopoverProps, 'div', false >
 >( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
 	const menuContext = useContext( Context );
+
+	const open = Ariakit.useStoreState( menuContext?.store, 'open' );
+	const disclosureElement = Ariakit.useStoreState(
+		menuContext?.store,
+		'disclosureElement'
+	);
+
+	// Focus the trigger before the popover is removed from the DOM so that
+	// any `useFocusReturn` ref callback (which fires after the DOM mutations
+	// in the same commit) captures the trigger, not <body>.
+	const prevOpenRef = useRef( open );
+	useInsertionEffect( () => {
+		const wasOpen = prevOpenRef.current;
+		prevOpenRef.current = open;
+
+		if ( wasOpen && ! open && disclosureElement ) {
+			disclosureElement.focus();
+		}
+	}, [ open, disclosureElement ] );
 
 	// Extract the side from the applied placement — useful for animations.
 	// Using `currentPlacement` instead of `placement` to make sure that we
@@ -68,16 +89,14 @@ export const Popover = forwardRef<
 	}
 
 	const renderMenu = useCallback(
-		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => {
-			const { children, ...restHtmlProps } = htmlProps;
-			return (
-				<Styled.MenuMotionRoot { ...restHtmlProps }>
-					<Styled.MenuSurface variant={ menuContext.variant }>
-						{ children }
-					</Styled.MenuSurface>
-				</Styled.MenuMotionRoot>
-			);
-		},
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
 		[ menuContext.variant ]
 	);
 
