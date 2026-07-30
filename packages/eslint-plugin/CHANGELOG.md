@@ -4,7 +4,8 @@
 
 ### Breaking Changes
 
--   Update the `test-unit` configuration to lint Vitest tests instead of Jest tests.
+-   Update the `test-unit` configuration to lint Vitest tests instead of Jest
+    tests ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
 
 ## 25.9.0 (2026-08-12)
 
