@@ -4,7 +4,12 @@
 import '@testing-library/jest-dom/vitest';
 // eslint-disable-next-line testing-library/no-manual-cleanup -- Vitest globals are disabled, so Testing Library cannot register cleanup automatically.
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterEach, expect } from 'vitest';
+
+/**
+ * Internal dependencies
+ */
+import './matchers/to-match-style-diff-snapshot.vitest';
 
 // Run browser tests with the same development feature flags as the jsdom
 // project. Browser-native platform APIs intentionally remain untouched.
@@ -17,3 +22,14 @@ globalThis.tinyMCEPreInit = {
 globalThis.userSettings = { uid: 1 };
 
 afterEach( cleanup );
+
+expect.addSnapshotSerializer( {
+	test( value ) {
+		return (
+			typeof value === 'string' && value.startsWith( 'Snapshot Diff:\n' )
+		);
+	},
+	serialize( value ) {
+		return value;
+	},
+} );
