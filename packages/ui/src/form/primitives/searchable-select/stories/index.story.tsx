@@ -8,9 +8,10 @@ const meta: Meta< typeof SearchableSelect > = {
 	title: 'Design System/Components/Form/Primitives/SearchableSelect',
 	component: SearchableSelect,
 	subcomponents: {
-		Item: SearchableSelect.Item,
+		'SearchableSelect.Item': SearchableSelect.Item,
 	},
 	argTypes: {
+		items: { control: false },
 		onValueChange: { action: fn() },
 	},
 	parameters: {

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { createRef, useId } from '@wordpress/element';
+import { createRef } from '@wordpress/element';
 import { SearchableSelect } from '../index';
 
 describe( 'SearchableSelect', () => {
@@ -12,21 +12,16 @@ describe( 'SearchableSelect', () => {
 	} );
 
 	it( 'passes aria-label and aria-describedby props to the appropriate components', () => {
-		function TestComponent() {
-			const descriptionId = useId();
-
-			return (
-				<>
-					<SearchableSelect
-						aria-label="My label"
-						aria-describedby={ descriptionId }
-					/>
-					<p id={ descriptionId }>My description</p>
-				</>
-			);
-		}
-
-		render( <TestComponent /> );
+		render(
+			<>
+				<SearchableSelect
+					aria-label="My label"
+					aria-describedby="searchable-select-description"
+				/>
+				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
+				<p id="searchable-select-description">My description</p>
+			</>
+		);
 
 		expect(
 			screen.getByRole( 'combobox', {
@@ -37,18 +32,13 @@ describe( 'SearchableSelect', () => {
 	} );
 
 	it( 'passes aria-labelledby prop to the appropriate component', () => {
-		function TestComponent() {
-			const labelId = useId();
-
-			return (
-				<>
-					<p id={ labelId }>My label</p>
-					<SearchableSelect aria-labelledby={ labelId } />
-				</>
-			);
-		}
-
-		render( <TestComponent /> );
+		render(
+			<>
+				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
+				<p id="searchable-select-label">My label</p>
+				<SearchableSelect aria-labelledby="searchable-select-label" />
+			</>
+		);
 
 		expect(
 			screen.getByRole( 'combobox', {
