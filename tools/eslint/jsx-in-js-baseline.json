@@ -1,7 +1,7 @@
 {
 	"description": "Tracked JavaScript files that still contain JSX during the .js to .jsx migration.",
-	"count": 1254,
-	"sha256": "b6bd12bb2b7300c62405e800333eb7d77d819f3c945b9dd1c762b984d05d556e",
+	"count": 1243,
+	"sha256": "818fe0bdf31b40cf18b7992d21b4e1e7c8145b937ba163dabff17cdc92cd8afc",
 	"files": [
 		"packages/block-directory/src/components/block-ratings/index.js",
 		"packages/block-directory/src/components/block-ratings/stars.js",
@@ -1245,17 +1245,6 @@
 		"packages/private-apis/src/test/index.js",
 		"packages/viewport/src/test/if-viewport-matches.js",
 		"packages/viewport/src/test/with-viewport-match.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/convert-to-blocks-button.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/form.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/index.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/inspector-card.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/no-preview.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/preview.js",
-		"packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js",
-		"packages/widgets/src/blocks/widget-group/deprecated.js",
-		"packages/widgets/src/blocks/widget-group/edit.js",
-		"packages/widgets/src/blocks/widget-group/save.js",
-		"packages/widgets/src/components/move-to-widget-area/index.js",
 		"test/integration/helpers/integration-test-editor.js"
 	]
 }

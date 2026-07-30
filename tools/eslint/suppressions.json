@@ -1919,7 +1919,7 @@
 			"count": 1
 		}
 	},
-	"packages/widgets/src/blocks/legacy-widget/edit/index.js": {
+	"packages/widgets/src/blocks/legacy-widget/edit/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
