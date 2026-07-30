@@ -136,8 +136,8 @@ export default function HTMLEdit( { clientId, attributes } ) {
 		);
 	}
 
-	// When the block contains only JavaScript or CSS — both stripped by
-	// `safeHTML` before canvas injection — `InnerContent` collapses to zero
+	// When the block contains only JavaScript or CSS, both stripped by
+	// `safeHTML` before canvas injection, `InnerContent` collapses to zero
 	// height, making the block invisible. Show a named placeholder instead so
 	// editors always see something on the canvas and can reach the modal.
 	const { html: visibleHtml } = parseContent( content );
