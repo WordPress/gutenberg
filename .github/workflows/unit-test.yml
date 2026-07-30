@@ -47,7 +47,9 @@ jobs:
               run: npm run test:unit:routing
 
             - name: Build package TypeScript declarations
-              run: npx tsc --build
+              run: |
+                  npm run --workspace @wordpress/build-scripts generate-worker-placeholders
+                  npx tsc --build
 
             - name: Validate Vitest conventions and TypeScript test graph
               run: npm run test:unit:conventions
