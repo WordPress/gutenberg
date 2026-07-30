@@ -57,6 +57,9 @@
 		"@wordpress/worker-threads": "file:../worker-threads",
 		"mediabunny": "^1.45.2"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -61,6 +61,7 @@
 					"packages/preferences",
 					"packages/prettier-config",
 					"packages/redux-routine",
+					"packages/video-conversion",
 					"packages/views",
 					"packages/worker-threads",
 					"packages/wp-build"
