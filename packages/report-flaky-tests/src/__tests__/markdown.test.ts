@@ -2,6 +2,15 @@
  * External dependencies
  */
 import * as core from '@actions/core';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 
 /**
  * Internal dependencies
@@ -17,9 +26,25 @@ import {
 } from '../markdown';
 import type { ReportedIssue } from '../types';
 
-jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	error: vi.fn(),
+} ) );
 
-jest.spyOn( core, 'error' ).mockImplementation( () => {} );
+const mockedCoreError = vi.mocked( core.error );
+
+beforeAll( () => {
+	vi.useFakeTimers();
+	vi.setSystemTime( new Date( '2020-05-10' ) );
+} );
+
+afterEach( () => {
+	mockedCoreError.mockClear();
+} );
+
+afterAll( () => {
+	vi.useRealTimers();
+} );
 
 describe( 'formatTestErrorMessage', () => {
 	it( 'should format test error message for jest-circus', async () => {
@@ -206,7 +231,7 @@ describe( 'parseIssueBody', () => {
 
 		const parsed = parseIssueBody( view );
 
-		expect( core.error ).toHaveBeenCalledTimes( 1 );
+		expect( mockedCoreError ).toHaveBeenCalledTimes( 1 );
 
 		expect( parsed ).toEqual( {
 			meta,

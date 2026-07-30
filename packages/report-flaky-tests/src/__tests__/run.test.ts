@@ -2,13 +2,20 @@
  * External dependencies
  */
 import * as core from '@actions/core';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 
 /**
  * Internal dependencies
  */
 import { run } from '../run';
-
-jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
 
 const mockPushEventContext = {
 	runId: 100,
@@ -39,42 +46,77 @@ const mockPullRequestEventContext = {
 		},
 	},
 };
-const mockGetContext = jest.fn(
-	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
-		mockPullRequestEventContext
+const { mockGetContext, mockAPI, mockReaddir, mockReadFile } = vi.hoisted(
+	() => ( {
+		mockGetContext: vi.fn(),
+		mockAPI: {
+			fetchAllIssuesLabeledFlaky: vi.fn(),
+			findMergeBaseCommit: vi.fn(),
+			updateIssue: vi.fn(),
+			createIssue: vi.fn(),
+			createCommentOnPR: vi.fn(),
+			createCommentOnCommit: vi.fn(),
+		},
+		mockReaddir: vi.fn< ( path: string ) => Promise< string[] > >(),
+		mockReadFile:
+			vi.fn< ( path: string, encoding: string ) => Promise< string > >(),
+	} )
 );
-jest.mock( '@actions/github', () => ( {
+
+vi.mock( import( '@actions/github' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	get context() {
 		return mockGetContext();
 	},
 } ) );
 
-jest.mock( '@actions/core', () => ( {
-	error: jest.fn(),
-	info: jest.fn(),
-	getInput: jest.fn(),
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	error: vi.fn(),
+	info: vi.fn(),
+	getInput: vi.fn(),
 } ) );
 
-const mockAPI = {
-	fetchAllIssuesLabeledFlaky: jest.fn(),
-	findMergeBaseCommit: jest.fn(),
-	updateIssue: jest.fn(),
-	createIssue: jest.fn(),
-	createCommentOnPR: jest.fn(),
-	createCommentOnCommit: jest.fn(),
-};
-jest.mock( '../github-api', () => ( {
-	GitHubAPI: jest.fn( () => mockAPI ),
-} ) );
+vi.mock( import( '../github-api' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-jest.mock( 'fs/promises', () => ( {
-	readdir: jest.fn(),
-	readFile: jest.fn(),
-} ) );
+	return {
+		...original,
+		GitHubAPI: vi.fn(
+			class MockGitHubAPI {
+				constructor() {
+					return mockAPI;
+				}
+			}
+		) as unknown as typeof original.GitHubAPI,
+	};
+} );
+
+vi.mock( import( 'fs/promises' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		readdir: mockReaddir as unknown as typeof original.readdir,
+		readFile: mockReadFile as unknown as typeof original.readFile,
+	};
+} );
+
+const mockedGetInput = vi.mocked( core.getInput );
+
+beforeAll( () => {
+	vi.useFakeTimers();
+	vi.setSystemTime( new Date( '2020-05-10' ) );
+} );
+
+afterAll( () => {
+	vi.useRealTimers();
+} );
 
 describe( 'Report flaky tests', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
+	beforeEach( () => {
+		vi.clearAllMocks();
+		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
 	} );
 
 	it( 'should report flaky tests to issue on pull request', async () => {
@@ -88,7 +130,7 @@ describe( 'Report flaky tests', () => {
 			'../__fixtures__/flaky-issues.json'
 		).then( ( json ) => json.default );
 
-		( core.getInput as jest.Mock )
+		mockedGetInput
 			// token
 			.mockReturnValueOnce( 'repo-token' )
 			// artifact-path
@@ -102,14 +144,13 @@ describe( 'Report flaky tests', () => {
 			process.cwd()
 		);
 
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () =>
+		mockReaddir.mockImplementationOnce( () =>
 			Promise.resolve( [
 				`${ existingFlakyTest.title }.json`,
 				`${ newFlakyTest.title }.json`,
 			] )
 		);
-		mockedFs.readFile
+		mockReadFile
 			.mockImplementationOnce( () =>
 				Promise.resolve( JSON.stringify( existingFlakyTest ) )
 			)
@@ -180,7 +221,7 @@ describe( 'Report flaky tests', () => {
 			'../__fixtures__/flaky-issues.json'
 		).then( ( json ) => json.default );
 
-		( core.getInput as jest.Mock )
+		mockedGetInput
 			// token
 			.mockReturnValueOnce( 'repo-token' )
 			// artifact-path
@@ -194,14 +235,13 @@ describe( 'Report flaky tests', () => {
 			process.cwd()
 		);
 
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () =>
+		mockReaddir.mockImplementationOnce( () =>
 			Promise.resolve( [
 				`${ existingFlakyTest.title }.json`,
 				`${ newFlakyTest.title }.json`,
 			] )
 		);
-		mockedFs.readFile
+		mockReadFile
 			.mockImplementationOnce( () =>
 				Promise.resolve( JSON.stringify( existingFlakyTest ) )
 			)
@@ -267,8 +307,6 @@ describe( 'Report flaky tests', () => {
 		- #1 in \`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`
 		- #2 in \`specs/site-editor/template-part.test.js\`"
 	` );
-
-		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
 	} );
 
 	it( 'should skip for outdated branches', async () => {
@@ -279,7 +317,7 @@ describe( 'Report flaky tests', () => {
 			'../__fixtures__/flaky-issues.json'
 		).then( ( json ) => json.default );
 
-		( core.getInput as jest.Mock )
+		mockedGetInput
 			.mockReturnValueOnce( 'repo-token' )
 			.mockReturnValueOnce( 'flaky-tests-report' )
 			.mockReturnValueOnce( '[Type] Flaky Test' );
@@ -290,11 +328,10 @@ describe( 'Report flaky tests', () => {
 			process.cwd()
 		);
 
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () =>
+		mockReaddir.mockImplementationOnce( () =>
 			Promise.resolve( [ `${ flakyTest.title }.json` ] )
 		);
-		mockedFs.readFile.mockImplementationOnce( () =>
+		mockReadFile.mockImplementationOnce( () =>
 			Promise.resolve( JSON.stringify( flakyTest ) )
 		);
 

@@ -10,7 +10,10 @@
 				"directories": []
 			},
 			"jsdom": {
-				"files": [ "packages/html-entities/src/test/entities.ts" ],
+				"files": [
+					"packages/html-entities/src/test/entities.ts",
+					"packages/report-flaky-tests/src/__tests__/markdown.test.ts"
+				],
 				"directories": [
 					"packages/a11y",
 					"packages/abilities",
@@ -71,7 +74,9 @@
 				]
 			},
 			"node": {
-				"files": [],
+				"files": [
+					"packages/report-flaky-tests/src/__tests__/run.test.ts"
+				],
 				"directories": [
 					"packages/babel-plugin-import-jsx-pragma",
 					"packages/babel-plugin-makepot",
