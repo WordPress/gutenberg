@@ -758,6 +758,58 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
+		it( 'applies queued solo updates before a synchronous collaborative update', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			// With no remote peers present, the first update is deferred.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'First' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+
+			// Simulate a remote peer joining before the deferred update has
+			// been applied.
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
+			// The collaborative update is applied synchronously, after the
+			// queued update.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Second' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const appliedChanges =
+				mockSyncConfig.applyChangesToCRDTDoc.mock.calls.map(
+					( call ) => call[ 1 ]
+				);
+			expect( appliedChanges ).toEqual( [
+				{ title: 'First' },
+				{ title: 'Second' },
+			] );
+		} );
+
 		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
@@ -896,6 +948,38 @@ describe( 'SyncManager', () => {
 			// unchanged and nothing enters the undo scope.
 			expect( Y.encodeStateVector( ydoc ) ).toEqual( stateVectorBefore );
 			expect( manager.undoManager?.hasUndo() ).toBe( false );
+		} );
+
+		it( 'includes updates issued in the same tick in the snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			jest.clearAllMocks();
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const snapshotBefore = manager.getEntitySnapshot( 'post', '123' );
+
+			// With no remote peers present, this update is deferred to the
+			// next tick.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Updated Title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const snapshotAfter = manager.getEntitySnapshot( 'post', '123' );
+
+			// The deferred update was applied before the snapshot was
+			// encoded, so the snapshot describes state the earlier snapshot
+			// does not.
+			expect( snapshotAfter ).not.toEqual( snapshotBefore );
 		} );
 
 		it( 'still matches after the document moves ahead of the snapshot', async () => {

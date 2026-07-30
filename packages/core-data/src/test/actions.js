@@ -1763,6 +1763,46 @@ describe( 'saveEntityRecord', () => {
 
 			expect( callOrder ).toEqual( [ 'snapshot', 'fetch' ] );
 		} );
+
+		it( 'applies direct record changes to the CRDT before capturing the snapshot', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			// A direct caller can pass content that never went through
+			// `editEntityRecord`, so it is not yet in the CRDT. If the
+			// snapshot were captured first, it would describe a state
+			// without this content and wrongly suppress the recovery
+			// notice on reload.
+			const callOrder = [];
+			syncManager.update = jest.fn( () => {
+				callOrder.push( 'update' );
+			} );
+			syncManager.getEntitySnapshot.mockImplementation( () => {
+				callOrder.push( 'snapshot' );
+				return 'ENCODED_SNAPSHOT';
+			} );
+
+			const record = {
+				id: 10,
+				content: 'Directly autosaved content',
+			};
+
+			await saveEntityRecord( 'postType', 'post', record, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.update ).toHaveBeenCalledWith(
+				'postType/post',
+				10,
+				record,
+				'local-undo-ignored'
+			);
+			expect( callOrder ).toEqual( [ 'update', 'snapshot' ] );
+		} );
 	} );
 } );
 

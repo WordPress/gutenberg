@@ -13,11 +13,7 @@ import {
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
-import {
-	logPerformanceTiming,
-	passThru,
-	yieldToEventLoop,
-} from './performance';
+import { logPerformanceTiming, passThru } from './performance';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -682,10 +678,34 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 	}
 
-	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
-	const deferUpdateCRDTDoc = yieldToEventLoop( updateCRDTDoc );
+	/*
+	 * Local updates deferred off the typing hot path (#79964). They are held
+	 * in a queue, rather than closed over in their timeouts, so that reads of
+	 * the document (snapshots, persistence) can flush them synchronously
+	 * instead of waiting out the scheduled timeout.
+	 */
+	const pendingCRDTDocUpdates: Array< Parameters< typeof updateCRDTDoc > > =
+		[];
 
-	// Apply local changes to the CRDT doc — synchronously when a remote peer is
+	function flushPendingCRDTDocUpdates(): void {
+		while ( pendingCRDTDocUpdates.length > 0 ) {
+			const args = pendingCRDTDocUpdates.shift();
+
+			if ( args ) {
+				updateCRDTDoc( ...args );
+			}
+		}
+	}
+
+	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
+	function deferUpdateCRDTDoc(
+		...args: Parameters< typeof updateCRDTDoc >
+	): void {
+		pendingCRDTDocUpdates.push( args );
+		setTimeout( flushPendingCRDTDocUpdates, 0 );
+	}
+
+	// Apply local changes to the CRDT doc, synchronously when a remote peer is
 	// present so the change lands before a remote update can race it (#78756),
 	// otherwise deferred off the typing hot path (#79964).
 	function updateOrDefer(
@@ -699,8 +719,15 @@ export function createSyncManager( debug = false ): SyncManager {
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
 
-		const update = hasRemotePeers ? updateCRDTDoc : deferUpdateCRDTDoc;
-		update( objectType, objectId, changes, origin, options );
+		if ( hasRemotePeers ) {
+			// Apply any updates queued while editing alone first, so changes
+			// are never applied out of order.
+			flushPendingCRDTDocUpdates();
+			updateCRDTDoc( objectType, objectId, changes, origin, options );
+			return;
+		}
+
+		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );
 	}
 
 	/**
@@ -726,6 +753,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			log( 'getEntitySnapshot', 'no entity state', entityId );
 			return undefined;
 		}
+
+		// Apply deferred updates so the snapshot reflects every change issued
+		// before it, including changes made in the same tick.
+		flushPendingCRDTDocUpdates();
 
 		return encodeDocSnapshot( entityState.ydoc );
 	}
@@ -753,6 +784,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		if ( ! entityState ) {
 			return false;
 		}
+
+		// Compare against the settled document, with no deferred updates
+		// pending.
+		flushPendingCRDTDocUpdates();
 
 		return docContainsSnapshot( entityState.ydoc, encodedSnapshot );
 	}
@@ -814,10 +849,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			return null;
 		}
 
-		// Local updates may be deferred via yieldToEventLoop when editing alone.
-		// Await a promise that resolves on the next tick of the event loop so
-		// pending updates are flushed before we serialize the document.
-		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		// Local updates may be deferred when editing alone. Apply them so
+		// they are included in the serialized document.
+		flushPendingCRDTDocUpdates();
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}

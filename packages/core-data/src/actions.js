@@ -730,6 +730,25 @@ export const saveEntityRecord =
 					? select.getRawEntityRecord( kind, name, recordId )
 					: {};
 
+				// `saveEntityRecord` can be called directly, bypassing
+				// `editEntityRecord`, so make sure its changes enter the
+				// CRDT first. An autosave snapshots the document below, and
+				// a regular save creates the persisted document from it, so
+				// both must see these changes.
+				if (
+					entityConfig.syncConfig &&
+					! __unstableSkipSyncUpdate &&
+					! isNewRecord &&
+					persistedRecord
+				) {
+					getSyncManager()?.update(
+						`${ kind }/${ name }`,
+						recordId,
+						record,
+						LOCAL_UNDO_IGNORED_ORIGIN
+					);
+				}
+
 				// Most of this autosave logic is very specific to posts.
 				// This is fine for now as it is the only supported autosave,
 				// but ideally this should all be handled in the back end,
@@ -763,8 +782,9 @@ export const saveEntityRecord =
 									: undefined,
 						}
 					);
-					// Capture the CRDT snapshot in the same tick as the payload
-					// so it describes exactly the content being autosaved.
+					// Capture the CRDT snapshot in the same tick as the
+					// payload so it describes exactly the content being
+					// autosaved.
 					if ( entityConfig.syncConfig ) {
 						const crdtSnapshot =
 							getSyncManager()?.getEntitySnapshot(
@@ -835,23 +855,6 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
-					// `saveEntityRecord` can be called directly, bypassing
-					// `editEntityRecord`, so make sure its changes enter the
-					// CRDT before the persisted document is created below.
-					if (
-						entityConfig.syncConfig &&
-						! __unstableSkipSyncUpdate &&
-						! isNewRecord &&
-						persistedRecord
-					) {
-						getSyncManager()?.update(
-							`${ kind }/${ name }`,
-							recordId,
-							record,
-							LOCAL_UNDO_IGNORED_ORIGIN
-						);
-					}
-
 					let edits = record;
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
