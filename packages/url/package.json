@@ -45,6 +45,9 @@
 	"dependencies": {
 		"remove-accents": "^0.5.0"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

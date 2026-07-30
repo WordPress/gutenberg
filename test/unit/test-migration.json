@@ -36,6 +36,7 @@
 			"packages/token-list",
 			"packages/ui",
 			"packages/undo-manager",
+			"packages/url",
 			"packages/warning",
 			"packages/widget-dashboard",
 			"packages/wordcount"
