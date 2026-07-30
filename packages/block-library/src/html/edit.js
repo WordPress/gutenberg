@@ -28,6 +28,7 @@ import { code } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
+import { parseContent } from './utils';
 
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
@@ -122,6 +123,59 @@ export default function HTMLEdit( { clientId, attributes } ) {
 						onClick={ () => setIsModalOpen( true ) }
 					>
 						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				{ isModalOpen && (
+					<HTMLEditModal
+						onRequestClose={ () => setIsModalOpen( false ) }
+						content={ content }
+						onUpdate={ onUpdate }
+					/>
+				) }
+			</div>
+		);
+	}
+
+	// When the block contains only JavaScript or CSS — both stripped by
+	// `safeHTML` before canvas injection — `InnerContent` collapses to zero
+	// height, making the block invisible. Show a named placeholder instead so
+	// editors always see something on the canvas and can reach the modal.
+	const { html: visibleHtml } = parseContent( content );
+	if ( ! visibleHtml ) {
+		return (
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+							{ __( 'Edit code' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<VStack className="block-library-html__edit-code" expanded>
+						<Button
+							className="block-library-html__edit-code-button"
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => setIsModalOpen( true ) }
+						>
+							{ __( 'Edit code' ) }
+						</Button>
+					</VStack>
+				</InspectorControls>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'This block contains JavaScript or CSS that cannot be previewed in the editor.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
 					</Button>
 				</Placeholder>
 				{ isModalOpen && (
