@@ -1,7 +1,7 @@
 # Surface
 
 <div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+This component is deprecated. Write your own CSS instead.
 </div>
 
 `Surface` is a core component that renders a primary background color.
