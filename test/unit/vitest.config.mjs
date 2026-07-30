@@ -108,10 +108,7 @@ export default defineConfig( {
 		wordpressBabelTransform(),
 		commonjs( {
 			filter: ( id ) =>
-				[
-					`${ ROOT_DIR }/packages/env/lib/`,
-					`${ ROOT_DIR }/tools/release/commands/changelog.js`,
-				].some( ( directory ) => id.startsWith( directory ) ),
+				id.startsWith( `${ ROOT_DIR }/packages/env/lib/` ),
 		} ),
 	],
 	resolve: {

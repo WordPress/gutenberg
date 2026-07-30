@@ -1,7 +1,18 @@
 /**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
-import {
+const require = createRequire( import.meta.url );
+const {
 	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
@@ -17,7 +28,7 @@ import {
 	runNpmReleasePhase,
 	runPackagesRelease,
 	verifyRemotePackageTags,
-} from '../packages';
+} = require( '../packages' );
 
 describe( 'prepareNpmRelease', () => {
 	it.each( [
@@ -32,12 +43,12 @@ describe( 'prepareNpmRelease', () => {
 				gitWorkingDirectoryPath: '/repo',
 				releaseType,
 			};
-			const checkoutNpmReleaseBranchFn = jest.fn();
-			const findPluginReleaseBranchNameFn = jest
+			const checkoutNpmReleaseBranchFn = vi.fn();
+			const findPluginReleaseBranchNameFn = vi
 				.fn()
 				.mockResolvedValue( 'release/23.5' );
-			const runNpmReleaseBranchSyncStepFn = jest.fn();
-			const updatePackagesFn = jest
+			const runNpmReleaseBranchSyncStepFn = vi.fn();
+			const updatePackagesFn = vi
 				.fn()
 				.mockResolvedValue( 'changelog-sha' );
 
@@ -79,7 +90,7 @@ describe( 'finalizePreparedNpmRelease', () => {
 		'finalizes a %s release',
 		async ( releaseType, pluginReleaseBranch, expectedBranches ) => {
 			const config = { releaseType };
-			const backportCommitsToBranchFn = jest.fn();
+			const backportCommitsToBranchFn = vi.fn();
 			const commits = [ 'changelog-sha', 'publish-sha' ];
 
 			await finalizePreparedNpmRelease(
@@ -110,11 +121,11 @@ describe( 'runPackagesRelease', () => {
 			interactive: false,
 		};
 		const releaseState = { changelogCommit: 'changelog-sha' };
-		const prepareNpmReleaseFn = jest.fn().mockResolvedValue( releaseState );
-		const publishPreparedPackagesToNpmFn = jest
+		const prepareNpmReleaseFn = vi.fn().mockResolvedValue( releaseState );
+		const publishPreparedPackagesToNpmFn = vi
 			.fn()
 			.mockResolvedValue( 'publish-sha' );
-		const finalizePreparedNpmReleaseFn = jest.fn();
+		const finalizePreparedNpmReleaseFn = vi.fn();
 
 		await runPackagesRelease( config, [], {
 			finalizePreparedNpmReleaseFn,
@@ -173,7 +184,7 @@ describe( 'getNpmReleasePackages', () => {
 			},
 		};
 		const git = {
-			raw: jest
+			raw: vi
 				.fn()
 				.mockResolvedValue(
 					[
@@ -187,7 +198,7 @@ describe( 'getNpmReleasePackages', () => {
 		await expect(
 			getNpmReleasePackages( '/repo', {
 				git,
-				globFn: jest.fn().mockResolvedValue( files ),
+				globFn: vi.fn().mockResolvedValue( files ),
 				readJSON: ( file ) => packageJsonByPath[ file ],
 			} )
 		).resolves.toEqual( [
@@ -258,7 +269,7 @@ describe( 'getNpmReleaseGitRecoveryCommands', () => {
 describe( 'getRemoteBranchSha', () => {
 	it( 'returns the exact remote branch ref SHA', async () => {
 		const git = {
-			raw: jest
+			raw: vi
 				.fn()
 				.mockResolvedValue(
 					[
@@ -283,7 +294,7 @@ describe( 'getRemoteBranchSha', () => {
 describe( 'getRemoteTagShas', () => {
 	it( 'fetches tag refs in one call and prefers peeled SHAs', async () => {
 		const git = {
-			raw: jest
+			raw: vi
 				.fn()
 				.mockResolvedValue(
 					[
@@ -329,7 +340,7 @@ describe( 'verifyRemotePackageTags', () => {
 					publishCommit: 'expected-sha',
 				},
 				{
-					getRemoteTagShasFn: jest.fn().mockResolvedValue(
+					getRemoteTagShasFn: vi.fn().mockResolvedValue(
 						new Map( [
 							[ '@wordpress/a11y@4.50.0', 'expected-sha' ],
 							[ '@wordpress/blocks@14.20.0', 'other-sha' ],
@@ -348,7 +359,7 @@ describe( 'runNpmPublishPreflight', () => {
 	const WHOAMI = { stdout: 'wp-user\n' };
 
 	it( 'verifies npm authentication before checking registry state', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockRejectedValueOnce( {
@@ -382,7 +393,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'fails without checking registry state when npm authentication fails', async () => {
-		const commandFn = jest.fn().mockRejectedValueOnce(
+		const commandFn = vi.fn().mockRejectedValueOnce(
 			Object.assign( new Error( 'Command failed: npm whoami' ), {
 				stderr: 'npm ERR! code ENEEDAUTH',
 			} )
@@ -406,7 +417,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'accepts a published version from the prepared commit with the expected dist-tag', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
@@ -431,7 +442,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'fails when a published version came from another commit', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
@@ -457,7 +468,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'fails with an actionable error when a published version has no gitHead', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
@@ -483,7 +494,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'fails when a published version has the wrong dist-tag', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
@@ -509,7 +520,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 
 	it( 'fails when the registry returns a different version', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
@@ -537,11 +548,11 @@ describe( 'runNpmPublishPreflight', () => {
 
 describe( 'runNpmReleasePhase', () => {
 	it( 'retries a failed phase before surfacing success', async () => {
-		const task = jest
+		const task = vi
 			.fn()
 			.mockRejectedValueOnce( new Error( 'transient failure' ) )
 			.mockResolvedValueOnce();
-		const wait = jest.fn();
+		const wait = vi.fn();
 
 		await runNpmReleasePhase( 'Package tag push', task, { wait } );
 
@@ -553,10 +564,10 @@ describe( 'runNpmReleasePhase', () => {
 
 describe( 'pushNpmReleaseGitMetadata', () => {
 	it( 'pushes the branch before pushing and verifying package tags', async () => {
-		const git = { raw: jest.fn().mockResolvedValue() };
-		const runPhase = jest.fn( async ( _label, task ) => task() );
-		const verifyRemoteNpmReleaseBranchFn = jest.fn();
-		const verifyRemotePackageTagsFn = jest.fn();
+		const git = { raw: vi.fn().mockResolvedValue() };
+		const runPhase = vi.fn( async ( _label, task ) => task() );
+		const verifyRemoteNpmReleaseBranchFn = vi.fn();
+		const verifyRemotePackageTagsFn = vi.fn();
 
 		await pushNpmReleaseGitMetadata(
 			{
@@ -614,19 +625,19 @@ describe( 'pushNpmReleaseGitMetadata', () => {
 
 describe( 'publishVersionedPackagesToNpm', () => {
 	it( 'preflights, publishes from package, and pushes metadata', async () => {
-		const commandFn = jest.fn().mockResolvedValue();
-		const getNpmReleasePackagesFn = jest
+		const commandFn = vi.fn().mockResolvedValue();
+		const getNpmReleasePackagesFn = vi
 			.fn()
 			.mockResolvedValue( [
 				{ name: '@wordpress/a11y', tagName: '@wordpress/a11y@4.50.0' },
 			] );
-		const runNpmPublishPreflightFn = jest
+		const runNpmPublishPreflightFn = vi
 			.fn()
 			.mockResolvedValueOnce( [] )
 			.mockResolvedValueOnce( [ '@wordpress/a11y' ] );
-		const pushNpmReleaseGitMetadataFn = jest.fn();
+		const pushNpmReleaseGitMetadataFn = vi.fn();
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
 		await publishVersionedPackagesToNpm(
@@ -674,11 +685,11 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	} );
 
 	it( 'rechecks registry state before retrying from-package', async () => {
-		const commandFn = jest
+		const commandFn = vi
 			.fn()
 			.mockRejectedValueOnce( new Error( 'partial publish' ) )
 			.mockResolvedValueOnce();
-		const runNpmPublishPreflightFn = jest
+		const runNpmPublishPreflightFn = vi
 			.fn()
 			.mockResolvedValueOnce( [] )
 			.mockResolvedValueOnce( [ '@wordpress/a11y' ] )
@@ -687,8 +698,8 @@ describe( 'publishVersionedPackagesToNpm', () => {
 				'@wordpress/blocks',
 			] );
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
-			reset: jest.fn(),
+			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+			reset: vi.fn(),
 		};
 
 		await publishVersionedPackagesToNpm(
@@ -701,7 +712,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			},
 			{
 				commandFn,
-				getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
 					{
 						name: '@wordpress/a11y',
 						tagName: '@wordpress/a11y@4.50.0-next.0',
@@ -712,7 +723,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 					},
 				] ),
 				git,
-				pushNpmReleaseGitMetadataFn: jest.fn(),
+				pushNpmReleaseGitMetadataFn: vi.fn(),
 				runNpmPublishPreflightFn,
 			}
 		);
@@ -727,9 +738,9 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	} );
 
 	it( 'skips Lerna when all package versions are already published', async () => {
-		const commandFn = jest.fn();
+		const commandFn = vi.fn();
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
 		await publishVersionedPackagesToNpm(
@@ -742,15 +753,15 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			},
 			{
 				commandFn,
-				getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
 					{
 						name: '@wordpress/a11y',
 						tagName: '@wordpress/a11y@4.50.0',
 					},
 				] ),
 				git,
-				pushNpmReleaseGitMetadataFn: jest.fn(),
-				runNpmPublishPreflightFn: jest
+				pushNpmReleaseGitMetadataFn: vi.fn(),
+				runNpmPublishPreflightFn: vi
 					.fn()
 					.mockResolvedValue( [ '@wordpress/a11y' ] ),
 			}
@@ -761,12 +772,12 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	} );
 
 	it( 'does not push metadata when final registry verification is incomplete', async () => {
-		const commandFn = jest.fn().mockResolvedValue();
-		const pushNpmReleaseGitMetadataFn = jest.fn();
-		const runNpmPublishPreflightFn = jest.fn().mockResolvedValue( [] );
-		const runPhase = jest.fn( async ( _label, task ) => task() );
+		const commandFn = vi.fn().mockResolvedValue();
+		const pushNpmReleaseGitMetadataFn = vi.fn();
+		const runNpmPublishPreflightFn = vi.fn().mockResolvedValue( [] );
+		const runPhase = vi.fn( async ( _label, task ) => task() );
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
 		await expect(
@@ -780,7 +791,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 				},
 				{
 					commandFn,
-					getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+					getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
 						{
 							name: '@wordpress/a11y',
 							tagName: '@wordpress/a11y@4.50.0',
@@ -807,18 +818,18 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	} );
 
 	it( 'retries final registry verification after propagation lag', async () => {
-		const commandFn = jest.fn().mockResolvedValue();
-		const pushNpmReleaseGitMetadataFn = jest.fn();
-		const runNpmPublishPreflightFn = jest
+		const commandFn = vi.fn().mockResolvedValue();
+		const pushNpmReleaseGitMetadataFn = vi.fn();
+		const runNpmPublishPreflightFn = vi
 			.fn()
 			.mockResolvedValueOnce( [] )
 			.mockResolvedValueOnce( [] )
 			.mockResolvedValueOnce( [ '@wordpress/a11y' ] );
-		const wait = jest.fn();
+		const wait = vi.fn();
 		const runPhase = ( label, task ) =>
 			runNpmReleasePhase( label, task, { wait } );
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
 		await publishVersionedPackagesToNpm(
@@ -831,7 +842,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			},
 			{
 				commandFn,
-				getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
 					{
 						name: '@wordpress/a11y',
 						tagName: '@wordpress/a11y@4.50.0',
@@ -890,14 +901,14 @@ describe( 'publishPackagesToNpm', () => {
 	] )(
 		'routes %s releases through the shared metadata publishing path',
 		async ( releaseType, versionCommand, distTag, npmReleaseBranch ) => {
-			const commandFn = jest.fn().mockResolvedValue();
+			const commandFn = vi.fn().mockResolvedValue();
 			const git = {
-				revparse: jest
+				revparse: vi
 					.fn()
 					.mockResolvedValueOnce( 'before-sha' )
 					.mockResolvedValueOnce( 'after-sha' ),
 			};
-			const publishVersionedPackagesToNpmFn = jest.fn();
+			const publishVersionedPackagesToNpmFn = vi.fn();
 			const config = {
 				...getConfig( releaseType ),
 				distTag,

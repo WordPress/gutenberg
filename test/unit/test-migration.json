@@ -103,7 +103,8 @@
 					"packages/vips",
 					"packages/views",
 					"packages/worker-threads",
-					"packages/wp-build"
+					"packages/wp-build",
+					"tools/release"
 				]
 			}
 		}

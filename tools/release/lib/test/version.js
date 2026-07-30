@@ -1,7 +1,18 @@
 /**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
-import { getNextMajorVersion } from '../version';
+const require = createRequire( import.meta.url );
+const { getNextMajorVersion } = require( '../version' );
 
 describe( 'getNextMajorVersion', () => {
 	it( 'increases the minor number by default', () => {

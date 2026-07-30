@@ -1,7 +1,18 @@
 /**
+ * Node dependencies
+ */
+import { createRequire } from 'node:module';
+
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
-import { calculateVersionBumpFromChangelog } from '../common';
+const require = createRequire( import.meta.url );
+const { calculateVersionBumpFromChangelog } = require( '../common' );
 
 describe( 'calculateVersionBumpFromChangelog', () => {
 	it( 'should return null when no lines provided', () => {
