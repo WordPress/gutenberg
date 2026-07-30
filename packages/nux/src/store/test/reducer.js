@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 import reducer from '../reducer';
 
 describe( 'reducer', () => {

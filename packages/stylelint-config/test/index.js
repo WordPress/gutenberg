@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
-const utils = require( './utils' );
-const getStylelintResult = utils.getStylelintResult;
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid css', () => {
 	let result;

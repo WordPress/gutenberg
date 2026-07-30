@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
 /* eslint-disable testing-library/render-result-naming-convention */
 
 /**

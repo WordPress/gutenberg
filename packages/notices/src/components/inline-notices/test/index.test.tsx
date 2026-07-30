@@ -1,6 +1,11 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * External dependencies
+ */
 import { render, screen, within } from '@testing-library/react';
 
 /**
@@ -122,10 +127,12 @@ describe( 'InlineNotices', () => {
 			</RegistryProvider>
 		);
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const pinned = container.querySelector( '.test-pinned' )!;
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const dismissible = container.querySelector( '.test-dismissible' )!;
+		const pinned =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-pinned' )!;
+		const dismissible =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-dismissible' )!;
 
 		expect(
 			within( pinned ).getByText( 'Pinned notice' )
@@ -147,8 +154,9 @@ describe( 'InlineNotices', () => {
 			dismissibleNoticesClassName: 'test-dismissible',
 		} );
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const dismissible = container.querySelector( '.test-dismissible' )!;
+		const dismissible =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-dismissible' )!;
 
 		expect(
 			within( dismissible ).getByText( 'Extra notice' )

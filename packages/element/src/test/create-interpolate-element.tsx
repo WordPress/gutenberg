@@ -1,6 +1,11 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
+
+/**
+ * External dependencies
+ */
 import { render } from '@testing-library/react';
 
 /**
@@ -97,6 +102,8 @@ describe( 'createInterpolateElement', () => {
 			JSON.stringify(
 				createInterpolateElement( partialString, {
 					em: <em />,
+					// @ts-expect-error - The unmatched closing tag is
+					// intentionally included to exercise runtime recovery.
 					strong: <strong />,
 				} )
 			)
