@@ -7,6 +7,7 @@ import { diffLines } from 'diff';
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +17,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { buildRevisionsPageQuery } from '../../store/private-selectors';
 import { unlock } from '../../lock-unlock';
 
 const MAX_DIFF_EDIT_LENGTH = 1000;
@@ -93,9 +95,39 @@ export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
 	} );
 }
 
+/**
+ * Determines whether the code diff should wait for an older revision or fall
+ * back to showing the selected revision without a diff.
+ *
+ * @param {Object}      options                             Display options.
+ * @param {Object|null} options.previousRevision            Previous revision.
+ * @param {boolean}     options.showDiff                    Whether changes should be highlighted.
+ * @param {boolean}     options.hasOlderRevisionPage        Whether another revisions page exists.
+ * @param {boolean}     options.hasFinishedPreviousRevision Whether the previous revision request finished.
+ * @return {Object} Code-diff display state.
+ */
+export function getCodeDiffDisplayState( {
+	previousRevision,
+	showDiff,
+	hasOlderRevisionPage,
+	hasFinishedPreviousRevision,
+} ) {
+	const needsPreviousRevision =
+		showDiff && previousRevision === null && hasOlderRevisionPage;
+
+	return {
+		showDiff:
+			showDiff &&
+			! ( needsPreviousRevision && hasFinishedPreviousRevision ),
+		isPreviousRevisionLoading:
+			needsPreviousRevision && ! hasFinishedPreviousRevision,
+	};
+}
+
 export default function ConnectedRevisionsCodeDiff() {
 	const revisionDiff = useSelect( ( select ) => {
 		const editorSelectors = select( editorStore );
+		const coreSelectors = select( coreStore );
 		const {
 			getCurrentRevision,
 			getPreviousRevision,
@@ -105,20 +137,44 @@ export default function ConnectedRevisionsCodeDiff() {
 		} = unlock( editorSelectors );
 		const _previousRevision = getPreviousRevision();
 		const _showDiff = isShowingRevisionDiff();
+		const revisionPage = getRevisionPage();
 		const totalPages =
 			Math.ceil(
 				editorSelectors.getCurrentPostRevisionsCount() /
 					getRevisionsPerPage()
 			) || 1;
+		const hasOlderRevisionPage = revisionPage < totalPages;
+		let hasFinishedPreviousRevision = true;
+
+		if ( _showDiff && _previousRevision === null && hasOlderRevisionPage ) {
+			const postType = editorSelectors.getCurrentPostType();
+			const postId = editorSelectors.getCurrentPostId();
+			const entityConfig = coreSelectors.getEntityConfig(
+				'postType',
+				postType
+			);
+			const revisionKey = entityConfig?.revisionKey || 'id';
+
+			hasFinishedPreviousRevision = coreSelectors.hasFinishedResolution(
+				'getRevisions',
+				[
+					'postType',
+					postType,
+					postId,
+					buildRevisionsPageQuery( revisionKey, revisionPage + 1 ),
+				]
+			);
+		}
 
 		return {
 			revision: getCurrentRevision(),
 			previousRevision: _previousRevision,
-			showDiff: _showDiff,
-			isPreviousRevisionLoading:
-				_showDiff &&
-				_previousRevision === null &&
-				getRevisionPage() < totalPages,
+			...getCodeDiffDisplayState( {
+				previousRevision: _previousRevision,
+				showDiff: _showDiff,
+				hasOlderRevisionPage,
+				hasFinishedPreviousRevision,
+			} ),
 		};
 	}, [] );
 

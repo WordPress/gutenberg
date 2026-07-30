@@ -6,7 +6,11 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { RevisionsCodeDiff, getCodeDiffRows } from '../revisions-code-diff';
+import {
+	RevisionsCodeDiff,
+	getCodeDiffDisplayState,
+	getCodeDiffRows,
+} from '../revisions-code-diff';
 
 function renderCodeDiff( {
 	currentContent = '',
@@ -128,6 +132,50 @@ describe( 'getCodeDiffRows', () => {
 			status: 'added',
 			previousLineNumber: null,
 			currentLineNumber: 501,
+		} );
+	} );
+} );
+
+describe( 'getCodeDiffDisplayState', () => {
+	it( 'waits for an older revision from the next page', () => {
+		expect(
+			getCodeDiffDisplayState( {
+				previousRevision: null,
+				showDiff: true,
+				hasOlderRevisionPage: true,
+				hasFinishedPreviousRevision: false,
+			} )
+		).toEqual( {
+			showDiff: true,
+			isPreviousRevisionLoading: true,
+		} );
+	} );
+
+	it( 'shows the selected revision without a diff when the older revision request finishes without data', () => {
+		expect(
+			getCodeDiffDisplayState( {
+				previousRevision: null,
+				showDiff: true,
+				hasOlderRevisionPage: true,
+				hasFinishedPreviousRevision: true,
+			} )
+		).toEqual( {
+			showDiff: false,
+			isPreviousRevisionLoading: false,
+		} );
+	} );
+
+	it( 'compares the oldest revision against empty content', () => {
+		expect(
+			getCodeDiffDisplayState( {
+				previousRevision: null,
+				showDiff: true,
+				hasOlderRevisionPage: false,
+				hasFinishedPreviousRevision: true,
+			} )
+		).toEqual( {
+			showDiff: true,
+			isPreviousRevisionLoading: false,
 		} );
 	} );
 } );
