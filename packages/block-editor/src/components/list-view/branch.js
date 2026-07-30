@@ -46,44 +46,21 @@ function countBlocks(
 		return 0;
 	}
 	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
-
-	if ( isExpanded ) {
-		return (
-			1 +
-			block.innerBlocks.reduce(
-				countReducer(
-					expandedState,
-					draggedClientIds,
-					isExpandedByDefault
-				),
-				0
-			)
-		);
+	if ( ! isExpanded ) {
+		return 1;
 	}
-	return 1;
+	return block.innerBlocks.reduce(
+		( count, innerBlock ) =>
+			count +
+			countBlocks(
+				innerBlock,
+				expandedState,
+				draggedClientIds,
+				isExpandedByDefault
+			),
+		1
+	);
 }
-const countReducer =
-	( expandedState, draggedClientIds, isExpandedByDefault ) =>
-	( count, block ) => {
-		const isDragged = draggedClientIds?.includes( block.clientId );
-		if ( isDragged ) {
-			return count;
-		}
-		const isExpanded =
-			expandedState[ block.clientId ] ?? isExpandedByDefault;
-		if ( isExpanded && block.innerBlocks.length > 0 ) {
-			return (
-				count +
-				countBlocks(
-					block,
-					expandedState,
-					draggedClientIds,
-					isExpandedByDefault
-				)
-			);
-		}
-		return count + 1;
-	};
 
 const noop = () => {};
 
@@ -141,9 +118,8 @@ function ListViewBranch( props ) {
 
 	const rows = [];
 
-	// Blocks outside of the render window are represented by a placeholder row
-	// that preserves their height. Consecutive placeholders are collapsed into a
-	// single row, so that a long list does not pay for a DOM row per block.
+	// A run of blocks outside of the render window becomes one spacer row that
+	// stands in for their height.
 	let placeholderRows = 0;
 	let placeholderKey;
 
@@ -168,19 +144,19 @@ function ListViewBranch( props ) {
 	filteredBlocks.forEach( ( block, index ) => {
 		const { clientId, innerBlocks } = block;
 
-		if ( index > 0 ) {
-			nextPosition += countBlocks(
-				filteredBlocks[ index - 1 ],
-				expandedState,
-				draggedClientIds,
-				isExpanded
-			);
-		}
+		// The next sibling is offset by this block's subtree.
+		const blockListPosition = nextPosition;
+		nextPosition += countBlocks(
+			block,
+			expandedState,
+			draggedClientIds,
+			isExpanded
+		);
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
 		const { itemInView } = fixedListWindow;
-		const blockInView = itemInView( nextPosition );
+		const blockInView = itemInView( blockListPosition );
 
 		const position = index + 1;
 		const updatedPath =
@@ -219,8 +195,7 @@ function ListViewBranch( props ) {
 			placeholderRows += 1;
 			placeholderKey ??= clientId;
 
-			// Inner blocks of a block outside of the render window may still be
-			// in view, so the placeholder run has to end before they render.
+			// Inner blocks of an off-window block may still be in view.
 			if ( ! showNestedBlocks ) {
 				return;
 			}
@@ -257,7 +232,7 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						path={ updatedPath }
 						isExpanded={ isDragged ? false : shouldExpand }
-						listPosition={ nextPosition }
+						listPosition={ blockListPosition }
 						selectedClientIds={ selectedClientIds }
 						isSyncedBranch={ syncedBranch }
 						displacement={ displacement }
@@ -273,7 +248,7 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						level={ level + 1 }
 						path={ updatedPath }
-						listPosition={ nextPosition + 1 }
+						listPosition={ blockListPosition + 1 }
 						fixedListWindow={ fixedListWindow }
 						isBranchSelected={ isSelectedBranch }
 						selectedClientIds={ selectedClientIds }

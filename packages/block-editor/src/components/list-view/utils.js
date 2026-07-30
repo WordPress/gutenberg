@@ -4,8 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
 
-// List View renders a fixed number of items and relies on each item having this
-// fixed height. It is also the height set for `.block-editor-list-view-block-contents`.
+// Must match the row height in `style.scss`; the windowing math relies on it.
 // See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
