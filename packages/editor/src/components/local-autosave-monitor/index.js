@@ -14,6 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import AutosaveMonitor from '../autosave-monitor';
 import {
 	localAutosaveGet,
+	localAutosaveGetSnapshot,
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
@@ -91,7 +92,7 @@ function useAutosaveNotice() {
 	const snapshotStatus = useEntityContainsSnapshot( {
 		postType,
 		postId,
-		snapshot: localAutosave?.crdt_snapshot,
+		snapshot: localAutosaveGetSnapshot( localAutosave ),
 	} );
 
 	useEffect( () => {

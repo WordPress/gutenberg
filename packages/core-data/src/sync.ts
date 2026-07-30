@@ -32,6 +32,16 @@ export {
 	retrySyncConnection,
 };
 
+/**
+ * Key under which an autosave records the CRDT snapshot describing its
+ * content. Used both as the REST autosave request parameter and as the key in
+ * the local (sessionStorage) autosave backup.
+ *
+ * This string must match CRDT_SNAPSHOT_PARAM in
+ * Gutenberg_REST_Autosaves_Controller on the PHP side.
+ */
+export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
+
 let syncManager: SyncManager;
 
 export function getSyncManager(): SyncManager | undefined {

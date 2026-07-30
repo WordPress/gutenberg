@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import {
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	getSyncManager,
@@ -772,7 +773,7 @@ export const saveEntityRecord =
 							);
 
 						if ( crdtSnapshot ) {
-							data.crdt_snapshot = crdtSnapshot;
+							data[ CRDT_AUTOSAVE_SNAPSHOT_KEY ] = crdtSnapshot;
 						}
 					}
 

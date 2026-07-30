@@ -22,6 +22,16 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	public const CRDT_SNAPSHOT_META_KEY = '_crdt_autosave_snapshot';
 
 	/**
+	 * Request parameter holding the CRDT snapshot describing an autosave's
+	 * content.
+	 *
+	 * This string must match CRDT_AUTOSAVE_SNAPSHOT_KEY in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
+
+	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
 	 *
 	 * A snapshot is a state vector plus a delete set, so it grows with the
@@ -174,7 +184,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * @return void
 	 */
 	private function store_crdt_snapshot( $autosave_id, $request ) {
-		$snapshot = $request->get_param( 'crdt_snapshot' );
+		$snapshot = $request->get_param( self::CRDT_SNAPSHOT_PARAM );
 
 		if ( ! is_string( $snapshot ) || '' === $snapshot ) {
 			return;

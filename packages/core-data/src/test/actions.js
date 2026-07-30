@@ -32,6 +32,7 @@ jest.mock( '../batch', () => {
 
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
+	CRDT_AUTOSAVE_SNAPSHOT_KEY: 'crdt_snapshot',
 	LOCAL_EDITOR_ORIGIN: 'local-editor',
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );

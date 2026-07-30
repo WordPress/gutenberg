@@ -12,6 +12,7 @@ import {
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 import {
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	entityContainsSnapshot,
 	getEntitySnapshot,
 	retrySyncConnection,
@@ -24,6 +25,7 @@ import {
 const lockedApis = {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	entityContainsSnapshot,
 	getEntitySnapshot,
 	retrySyncConnection,
