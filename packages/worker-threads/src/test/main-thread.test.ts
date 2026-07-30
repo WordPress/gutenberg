@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { wrap, terminate } from '../main-thread';
@@ -10,8 +15,8 @@ import { WORKER_SYMBOL } from '../types';
  * error/messageerror events used for worker failure detection.
  */
 class MockWorker {
-	postMessage = jest.fn();
-	terminate = jest.fn();
+	postMessage = vi.fn();
+	terminate = vi.fn();
 
 	private listeners: Map< string, Array< ( event: Event ) => void > > =
 		new Map();
@@ -47,7 +52,7 @@ class MockWorker {
 	 * @param type  Event type.
 	 * @param event Event object.
 	 */
-	simulateEvent( type: string, event: Partial< Event > = {} ) {
+	simulateEvent( type: string, event: Partial< ErrorEvent > = {} ) {
 		for ( const handler of this.listeners.get( type ) || [] ) {
 			handler( event as Event );
 		}

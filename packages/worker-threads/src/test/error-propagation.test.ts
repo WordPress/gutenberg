@@ -8,15 +8,28 @@
  * a rejection. See https://github.com/WordPress/gutenberg/issues/80259.
  */
 
+/**
+ * External dependencies
+ */
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
+
 // Store the original self.
 const originalSelf = globalThis.self;
 
 // Mock self for worker context.
-let mockPostMessage: jest.Mock;
+let mockPostMessage: Mock;
 let messageListeners: Array< ( event: MessageEvent ) => void > = [];
 
 function setupMockSelf() {
-	mockPostMessage = jest.fn();
+	mockPostMessage = vi.fn();
 	messageListeners = [];
 
 	// Override self with addEventListener pattern (matching comctx usage).
@@ -104,7 +117,7 @@ async function callExposedMethod(
 describe( 'worker-thread error propagation', () => {
 	beforeEach( () => {
 		setupMockSelf();
-		jest.resetModules();
+		vi.resetModules();
 	} );
 
 	afterEach( () => {

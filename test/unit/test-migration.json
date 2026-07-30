@@ -62,6 +62,7 @@
 					"packages/prettier-config",
 					"packages/redux-routine",
 					"packages/views",
+					"packages/worker-threads",
 					"packages/wp-build"
 				]
 			}
