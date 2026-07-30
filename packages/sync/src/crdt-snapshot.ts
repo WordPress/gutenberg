@@ -58,11 +58,17 @@ export function docContainsSnapshot(
 		}
 	}
 
+	// The merge below deliberately uses a fresh delete set instead of using
+	// `localSnapshot`. `Y.mergeDeleteSets` mutates delete sets in place.
+	// This edits the baseline (localSnapshot) to agree and mutates its deletion
+	// contents. Instead, use a fresh snapshot to avoid affecting the original.
+	const copiedDeleteSet = Y.snapshot( ydoc ).ds;
+
 	// Check for missing deletions. Merging in a delete set that is already
 	// contained changes nothing, so equality with the local delete set proves
 	// containment.
 	const mergedDeleteSet = Y.mergeDeleteSets( [
-		Y.snapshot( ydoc ).ds,
+		copiedDeleteSet,
 		snapshot.ds,
 	] );
 
