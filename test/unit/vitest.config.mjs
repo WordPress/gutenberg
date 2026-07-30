@@ -198,14 +198,6 @@ export default defineConfig( {
 					// Babel injects the automatic JSX runtime after Vite's
 					// dependency scan, so declare it directly.
 					include: [ 'react/jsx-runtime' ],
-					esbuildOptions: {
-						// Gutenberg still has JSX in .js package sources.
-						// Keep this browser dependency-scan exception explicit
-						// until that legacy contract is removed.
-						loader: {
-							'.js': 'jsx',
-						},
-					},
 				},
 				test: {
 					name: 'browser',

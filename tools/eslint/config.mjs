@@ -69,7 +69,7 @@ const developmentFiles = [
 const glob = require( 'glob' ).sync;
 const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js?(x)' ) );
 
 const restrictedImports = [
 	{
