@@ -10,6 +10,10 @@
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
+### Deprecations
+
+-   `Animate`: Deprecate the component, planned for removal in WordPress 7.4 ([#80931](https://github.com/WordPress/gutenberg/pull/80931)).
+
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
@@ -24,10 +28,6 @@
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
 -   `ColorPicker`: Keep the visual picker in native HSVA so gradient/controlled HSLA echoes no longer jitter the saturation pointer, and preserve the black-edge saturation coordinate without leaving white at a chromatic position ([#80205](https://github.com/WordPress/gutenberg/pull/80205)).
-
-### Deprecations
-
--   `Animate`: Deprecate the component. It will be removed in WordPress 7.4.
 
 ### TypeScript
 
