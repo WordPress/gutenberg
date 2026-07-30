@@ -47,6 +47,7 @@
 					"packages/notices",
 					"packages/nux",
 					"packages/plugins",
+					"packages/preferences-persistence",
 					"packages/priority-queue",
 					"packages/private-apis",
 					"packages/server-side-render",
