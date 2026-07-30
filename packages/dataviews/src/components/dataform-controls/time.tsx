@@ -15,6 +15,7 @@ import { Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatTime } from '../../types';
 import { OPERATOR_BETWEEN } from '../../constants';
 import { unlock } from '../../lock-unlock';
+import parseTime from '../../field-types/utils/parse-time';
 import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
@@ -22,11 +23,40 @@ const { ValidatedInputControl } = unlock( componentsPrivateApis );
 type TimeBetween = [ string, string ];
 
 // `input[type=time]` only offers a seconds field when `step` is finer than the
-// default of one minute, so the input's precision follows the display format.
-function getStep( timeFormat?: string ): number | undefined {
+// default of one minute, so the input's precision follows the display format —
+// or the values themselves, which need a seconds field to be editable at all.
+function getStep(
+	timeFormat: string | undefined,
+	values: unknown[]
+): number | undefined {
 	// Backslash-escaped characters are literals, not format tokens.
 	const tokens = ( timeFormat ?? '' ).replace( /\\./g, '' );
-	return tokens.includes( 's' ) ? 1 : undefined;
+	const hasSeconds =
+		tokens.includes( 's' ) ||
+		values.some( ( value ) => ( parseTime( value ) ?? 0 ) % 60 !== 0 );
+	return hasSeconds ? 1 : undefined;
+}
+
+// `input[type=time]` accepts only zero-padded `HH:mm[:ss]`, so the variants
+// `parseTime` tolerates — unpadded hours, a trailing zone designator — must be
+// reduced to that canonical shape before they reach the input.
+function toInputValue( value: unknown ): string {
+	const seconds = parseTime( value );
+	if ( seconds === null ) {
+		return '';
+	}
+
+	const parts = [
+		Math.floor( seconds / 3600 ),
+		Math.floor( ( seconds % 3600 ) / 60 ),
+	];
+	if ( seconds % 60 !== 0 ) {
+		parts.push( seconds % 60 );
+	}
+
+	return parts
+		.map( ( part ) => String( part ).padStart( 2, '0' ) )
+		.join( ':' );
 }
 
 function BetweenControls( {
@@ -103,7 +133,7 @@ export default function Time< Item >( {
 		field;
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
-	const step = getStep( ( field.format as FormatTime )?.time );
+	const timeFormat = ( field.format as FormatTime )?.time;
 	const min =
 		typeof isValid.min?.constraint === 'string'
 			? isValid.min.constraint
@@ -125,19 +155,25 @@ export default function Time< Item >( {
 	);
 
 	const onChangeBetweenControls = useCallback(
-		( newValue: TimeBetween ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
+		( [ from, to ]: TimeBetween ) =>
+			onChange(
+				setValue( {
+					item: data,
+					// An unfilled bound is stored as `undefined`, which the
+					// `between` operator reads as "do not apply the filter".
+					value: [ from || undefined, to || undefined ],
+				} )
+			),
 		[ data, onChange, setValue ]
 	);
 
 	if ( operator === OPERATOR_BETWEEN ) {
 		let valueBetween: TimeBetween = [ '', '' ];
-		if (
-			Array.isArray( value ) &&
-			value.length === 2 &&
-			value.every( ( element ) => typeof element === 'string' )
-		) {
-			valueBetween = value as TimeBetween;
+		if ( Array.isArray( value ) && value.length === 2 ) {
+			valueBetween = [
+				toInputValue( value[ 0 ] ),
+				toInputValue( value[ 1 ] ),
+			];
 		}
 		return (
 			<BetweenControls
@@ -145,7 +181,7 @@ export default function Time< Item >( {
 				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
 				disabled={ disabled }
-				step={ step }
+				step={ getStep( timeFormat, valueBetween ) }
 				min={ min }
 				max={ max }
 			/>
@@ -161,11 +197,11 @@ export default function Time< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			help={ description }
-			value={ value ?? '' }
+			value={ toInputValue( value ) }
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			disabled={ disabled }
-			step={ step }
+			step={ getStep( timeFormat, [ value ] ) }
 			min={ min }
 			max={ max }
 		/>

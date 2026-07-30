@@ -964,6 +964,36 @@ describe( 'filters', () => {
 			);
 		} );
 
+		it( 'should not apply a BETWEEN filter until both bounds are filled', () => {
+			const all = [ 'Early', 'Mid', 'Late' ];
+			expect(
+				filterBy( 'between', [ '13:00', undefined ] )
+			).toStrictEqual( all );
+			expect( filterBy( 'between', [ '', '13:00' ] ) ).toStrictEqual(
+				all
+			);
+		} );
+
+		it( 'should treat a missing value the way `is`/`isNot` do', () => {
+			const withMissing = [ ...timeData, { title: 'Unset' } ];
+
+			// Ordering operators never match a missing value.
+			expect( filterBy( 'before', '13:00', withMissing ) ).toStrictEqual(
+				[ 'Early' ]
+			);
+			expect( filterBy( 'on', '13:00', withMissing ) ).toStrictEqual( [
+				'Mid',
+			] );
+
+			// `notOn` keeps it, the same way `isNot` keeps items whose value
+			// is not the filtered one.
+			expect( filterBy( 'notOn', '13:00', withMissing ) ).toStrictEqual( [
+				'Early',
+				'Late',
+				'Unset',
+			] );
+		} );
+
 		it( 'should match regardless of seconds precision', () => {
 			const mixed = [
 				{ title: 'Stored with seconds', opensAt: '13:00:00' },

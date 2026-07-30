@@ -52,10 +52,14 @@ const filterTextWrappers = {
 };
 
 /**
- * Reduces a value and the value it is compared against to numbers. Both read as
- * times or neither does: a time compares as seconds since midnight, a date or
- * datetime as a timestamp, and the two scales must never meet. `parseTime`
- * accepts only `HH:mm[:ss]`, so no date or datetime is read as a time.
+ * Reduces a value and the value it is compared against to numbers. The filter
+ * value picks the scale: a time filter compares field values as seconds since
+ * midnight, anything else compares as timestamps. `parseTime` accepts only
+ * `HH:mm[:ss]`, so no date or datetime is read as a time.
+ *
+ * A field value that does not parse on a time filter's scale becomes `NaN`:
+ * every ordering operator is false for it, and `notOn` is true — matching how
+ * `is`/`isNot` treat a missing value.
  *
  * @param fieldValue  The item's value.
  * @param filterValue The value it is compared against.
@@ -65,10 +69,9 @@ function toComparableTemporals(
 	fieldValue: any,
 	filterValue: any
 ): [ number, number ] {
-	const fieldTime = parseTime( fieldValue );
 	const filterTime = parseTime( filterValue );
-	if ( fieldTime !== null && filterTime !== null ) {
-		return [ fieldTime, filterTime ];
+	if ( filterTime !== null ) {
+		return [ parseTime( fieldValue ) ?? NaN, filterTime ];
 	}
 
 	return [
@@ -233,8 +236,10 @@ const OPERATORS: {
 			if (
 				! Array.isArray( filterValue ) ||
 				filterValue.length !== 2 ||
-				filterValue[ 0 ] === undefined ||
-				filterValue[ 1 ] === undefined
+				// An unfilled bound is `undefined` from the controls, or `''`
+				// when it arrives from a persisted view.
+				filterValue.includes( undefined ) ||
+				filterValue.includes( '' )
 			) {
 				return true;
 			}

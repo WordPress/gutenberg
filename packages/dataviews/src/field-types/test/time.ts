@@ -20,8 +20,10 @@ describe( 'parseTime', () => {
 		// A trailing offset is accepted but does not shift the value, since
 		// times are wall-clock.
 		[ '09:30:00Z', 34200 ],
+		[ '09:30:00z', 34200 ],
 		[ '09:30:00+02:00', 34200 ],
 		[ '09:30:00-0500', 34200 ],
+		[ '09:30+23:59', 34200 ],
 	] )( 'parses %s', ( value, expected ) => {
 		expect( parseTime( value ) ).toBe( expected );
 	} );
@@ -31,6 +33,11 @@ describe( 'parseTime', () => {
 		[ '09:60' ],
 		[ '09:30:60' ],
 		[ '09:30:15.500' ],
+		// A malformed offset is not a zone designator, so the whole value is
+		// rejected rather than silently accepted.
+		[ '09:30:00+99:99' ],
+		[ '09:30:00+24:00' ],
+		[ '09:30:00-05:60' ],
 		[ '' ],
 		[ 'noon' ],
 		// Rejecting these is what keeps the shared temporal operators from
