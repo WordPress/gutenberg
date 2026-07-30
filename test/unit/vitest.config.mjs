@@ -110,10 +110,8 @@ export default defineConfig( {
 			filter: ( id ) =>
 				[
 					`${ ROOT_DIR }/packages/env/lib/`,
-					`${ ROOT_DIR }/packages/scripts/utils/`,
 					`${ ROOT_DIR }/tools/release/commands/changelog.js`,
-				].some( ( directory ) => id.startsWith( directory ) ) &&
-				! id.endsWith( '/packages/scripts/utils/license.js' ),
+				].some( ( directory ) => id.startsWith( directory ) ),
 		} ),
 	],
 	resolve: {
@@ -265,10 +263,16 @@ export default defineConfig( {
 					name: 'node',
 					environment: 'node',
 					include: vitestTests.node,
-					setupFiles: path.join(
-						ROOT_DIR,
-						'test/unit/config/gutenberg-env.js'
-					),
+					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+					],
 				},
 			},
 		],

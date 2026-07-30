@@ -97,6 +97,7 @@
 					"packages/project-management-automation",
 					"packages/readable-js-assets-webpack-plugin",
 					"packages/redux-routine",
+					"packages/scripts",
 					"packages/stylelint-config",
 					"packages/video-conversion",
 					"packages/vips",
