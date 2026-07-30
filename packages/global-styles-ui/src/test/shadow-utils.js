@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { getShadowParts, shadowStringToObject } from '../shadow-utils';

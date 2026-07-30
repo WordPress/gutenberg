@@ -36,6 +36,7 @@
 					"packages/escape-html",
 					"packages/fields",
 					"packages/format-library",
+					"packages/global-styles-ui",
 					"packages/hooks",
 					"packages/i18n",
 					"packages/interface",
