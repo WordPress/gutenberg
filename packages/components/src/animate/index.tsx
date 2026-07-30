@@ -4,6 +4,11 @@
 import clsx from 'clsx';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import type { AnimateProps, GetAnimateOptions } from './types';
@@ -46,6 +51,8 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
 /**
  * Simple interface to introduce animations to components.
  *
+ * @deprecated 7.2
+ *
  * ```jsx
  * import { Animate, Notice } from '@wordpress/components';
  *
@@ -61,6 +68,11 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
  * ```
  */
 export function Animate( { type, options = {}, children }: AnimateProps ) {
+	deprecated( 'wp.components.Animate', {
+		since: '7.2',
+		version: '7.4',
+	} );
+
 	return children( {
 		className: getAnimateClassName( {
 			type,
