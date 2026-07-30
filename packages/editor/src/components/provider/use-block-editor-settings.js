@@ -59,6 +59,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',
+	'blockStatesEnabled',
 	'maxUploadFileSize',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
