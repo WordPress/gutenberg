@@ -916,6 +916,20 @@ test.describe( 'Copy/cut/paste', () => {
 				attributes: { content: 'existing A heading' },
 			},
 		] );
+
+		// Pasting over an entirely selected block replaces it, like
+		// pasting into an empty block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
 	} );
 
 } );
