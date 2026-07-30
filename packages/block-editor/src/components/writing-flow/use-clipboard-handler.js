@@ -5,9 +5,7 @@ import {
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
-	getBlockType,
 	hasBlockSupport,
-	isUnmodifiedDefaultBlock,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import {
@@ -238,23 +236,6 @@ export default function useClipboardHandler() {
 						false
 					) &&
 					! event.__deprecatedOnSplit
-				) {
-					return;
-				}
-
-				// A single pasted block with mergeable text content, like a
-				// copied heading, pastes into existing text as inline
-				// content rather than splitting it: let rich text handle
-				// the paste. A block whose content is untouched is still
-				// replaced by the pasted block.
-				if (
-					! hasMultiSelection() &&
-					blocks.length === 1 &&
-					getBlockType( blocks[ 0 ].name )?.merge &&
-					! isUnmodifiedDefaultBlock(
-						getBlocksByClientId( selectedBlockClientIds )[ 0 ],
-						'content'
-					)
 				) {
 					return;
 				}
