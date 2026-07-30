@@ -46,5 +46,10 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"lint:jsx-extensions": "node ./validate-jsx-extensions.mjs",
+		"prelint:js": "npm run lint:jsx-extensions",
+		"update:jsx-extensions-baseline": "node ./validate-jsx-extensions.mjs --update-baseline"
 	}
 }
