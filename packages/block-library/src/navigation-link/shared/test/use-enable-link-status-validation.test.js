@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -9,12 +15,10 @@ import { renderHook } from '@testing-library/react';
 import { useEnableLinkStatusValidation } from '../use-enable-link-status-validation';
 
 // Mock useSelect directly at the implementation level to avoid loading complex dependencies
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	const mock = jest.fn();
-	return mock;
-} );
-
-const { useSelect } = require( '@wordpress/data' );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'useEnableLinkStatusValidation', () => {
 	const mockClientId = 'test-client-id';
@@ -22,7 +26,7 @@ describe( 'useEnableLinkStatusValidation', () => {
 	const mockSelectedBlockId = 'selected-block-id';
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should return true when root navigation block is selected', () => {

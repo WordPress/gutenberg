@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -13,7 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import PlaylistEdit from '../edit';
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: {},
 	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
@@ -34,19 +35,19 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	} ),
 } ) );
 
-jest.mock( '@wordpress/blocks', () => ( {
-	createBlock: jest.fn( ( name, attributes ) => ( {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
+	createBlock: vi.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
 		clientId: 'new-track',
 	} ) ),
 } ) );
 
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn( () => 'blob:track' ),
+vi.mock( import( '@wordpress/blob' ), () => ( {
+	createBlobURL: vi.fn( () => 'blob:track' ),
 } ) );
 
-jest.mock( '@wordpress/components', () => ( {
+vi.mock( import( '@wordpress/components' ), () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
 	SelectControl: () => <div />,
 	ToggleControl: () => <div />,
@@ -54,33 +55,33 @@ jest.mock( '@wordpress/components', () => ( {
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/i18n', () => ( {
+vi.mock( import( '@wordpress/i18n' ), () => ( {
 	__: ( text ) => text,
 	_x: ( text ) => text,
 } ) );
 
-jest.mock( '@wordpress/icons', () => ( {
+vi.mock( import( '@wordpress/icons' ), () => ( {
 	playlist: 'playlist',
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( import( '@wordpress/notices' ), () => ( {
 	store: {},
 } ) );
 
-jest.mock( '../../utils/caption', () => ( {
+vi.mock( import( '../../utils/caption' ), () => ( {
 	Caption: () => <figcaption />,
 } ) );
 
-jest.mock( '../../utils/hooks', () => ( {
+vi.mock( import( '../../utils/hooks' ), () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
-jest.mock( '../../utils/waveform-player', () => ( {
+vi.mock( import( '../../utils/waveform-player' ), () => ( {
 	WaveformPlayer: () => <div />,
 } ) );
 
@@ -97,9 +98,9 @@ const defaultAttributes = {
 describe( 'PlaylistEdit', () => {
 	beforeEach( () => {
 		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-			replaceInnerBlocks: jest.fn(),
-			selectBlock: jest.fn(),
+			createErrorNotice: vi.fn(),
+			replaceInnerBlocks: vi.fn(),
+			selectBlock: vi.fn(),
 		} );
 		useSelect.mockReturnValue( {
 			innerBlockTracks: [
@@ -123,9 +124,9 @@ describe( 'PlaylistEdit', () => {
 					showTracklist: false,
 				} }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 

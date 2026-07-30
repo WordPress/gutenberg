@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 /**
@@ -9,16 +10,16 @@ import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 
 // Mock useRemoteUrlData from block-editor
-const mockUseRemoteUrlData = jest.fn();
+const mockUseRemoteUrlData = vi.fn();
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	privateApis: {},
 	store: {},
 } ) );
 
 // Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
+vi.mock( import( '../../../lock-unlock' ), () => ( {
+	unlock: vi.fn( () => ( {
 		useRemoteUrlData: ( ...args ) => mockUseRemoteUrlData( ...args ),
 		isHashLink: ( url ) => url?.startsWith( '#' ),
 		isRelativePath: ( url ) =>
@@ -37,12 +38,12 @@ import {
 } from '../use-link-preview';
 
 // Mock @wordpress/data
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
 } ) );
 
 // Mock @wordpress/core-data
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
@@ -462,7 +463,7 @@ it( 'should show "Page" badge for internal custom links', () => {
 
 describe( 'useLinkPreview', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockUseRemoteUrlData.mockReturnValue( { richData: null } );
 		useSelect.mockReturnValue( null );
 	} );

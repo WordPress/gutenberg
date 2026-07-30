@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, test } from 'vitest';
 import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { act, render } from '@testing-library/react';
 
 /**
@@ -14,11 +15,11 @@ import {
 	setupPlayButtonArtwork,
 } from '../waveform-utils';
 
-jest.mock( '../waveform-utils', () => ( {
-	applyWaveformPlayerStyles: jest.fn(),
-	initWaveformPlayer: jest.fn(),
-	setupPlayButtonArtwork: jest.fn(),
-	updateSeekControlLabel: jest.fn(),
+vi.mock( import( '../waveform-utils' ), () => ( {
+	applyWaveformPlayerStyles: vi.fn(),
+	initWaveformPlayer: vi.fn(),
+	setupPlayButtonArtwork: vi.fn(),
+	updateSeekControlLabel: vi.fn(),
 } ) );
 
 /**
@@ -58,8 +59,8 @@ function createFakePlayer( options, element ) {
 		titleEl,
 		artistEl: artistEl || null,
 		artworkEl: artworkEl || null,
-		pause: jest.fn(),
-		syncArtist: jest.fn( ( artist ) => {
+		pause: vi.fn(),
+		syncArtist: vi.fn( ( artist ) => {
 			if ( ! artist ) {
 				instance.artistEl?.remove();
 				instance.artistEl = null;
@@ -72,7 +73,7 @@ function createFakePlayer( options, element ) {
 			instance.artistEl.textContent = artist;
 			instance.artistEl.style.display = '';
 		} ),
-		syncArtwork: jest.fn( ( image, imageAlt = '' ) => {
+		syncArtwork: vi.fn( ( image, imageAlt = '' ) => {
 			if ( ! image ) {
 				instance.artworkEl?.remove();
 				instance.artworkEl = null;
@@ -85,7 +86,7 @@ function createFakePlayer( options, element ) {
 			instance.artworkEl.src = image;
 			instance.artworkEl.alt = imageAlt || '';
 		} ),
-		loadTrack: jest.fn( async ( src, title, artist, trackOptions ) => {
+		loadTrack: vi.fn( async ( src, title, artist, trackOptions ) => {
 			titleEl.textContent = title;
 			instance.syncArtist( artist );
 			instance.syncArtwork(
@@ -98,21 +99,21 @@ function createFakePlayer( options, element ) {
 	return {
 		instance,
 		container: element,
-		destroy: jest.fn(),
+		destroy: vi.fn(),
 	};
 }
 
 describe( 'WaveformPlayer', () => {
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		initWaveformPlayer.mockImplementation( ( element, options ) =>
 			createFakePlayer( options, element )
 		);
 	} );
 
 	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
+		vi.runOnlyPendingTimers();
+		vi.useRealTimers();
 		applyWaveformPlayerStyles.mockReset();
 		initWaveformPlayer.mockReset();
 		setupPlayButtonArtwork.mockReset();
@@ -131,7 +132,7 @@ describe( 'WaveformPlayer', () => {
 		render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
@@ -152,7 +153,7 @@ describe( 'WaveformPlayer', () => {
 		render( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( initWaveformPlayer ).toHaveBeenCalledWith(
@@ -176,7 +177,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( initWaveformPlayer ).toHaveBeenCalledWith(
@@ -197,7 +198,7 @@ describe( 'WaveformPlayer', () => {
 		render( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -211,7 +212,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -235,7 +236,7 @@ describe( 'WaveformPlayer', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -269,7 +270,7 @@ describe( 'WaveformPlayer', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -282,7 +283,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( player.destroy ).not.toHaveBeenCalled();
@@ -304,7 +305,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -312,7 +313,7 @@ describe( 'WaveformPlayer', () => {
 		rerender( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
@@ -333,7 +334,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -341,7 +342,7 @@ describe( 'WaveformPlayer', () => {
 		rerender( <WaveformPlayer { ...baseProps } color="#0000ff" /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
@@ -360,7 +361,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -392,7 +393,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -405,7 +406,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
@@ -425,7 +426,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
@@ -440,7 +441,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( firstPlayer.destroy ).not.toHaveBeenCalled();
@@ -455,7 +456,7 @@ describe( 'WaveformPlayer', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
@@ -463,7 +464,7 @@ describe( 'WaveformPlayer', () => {
 		rerender( <WaveformPlayer { ...baseProps } image="" /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		expect( player.destroy ).not.toHaveBeenCalled();
@@ -477,7 +478,7 @@ describe( 'WaveformPlayer', () => {
 		);
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
@@ -499,7 +500,7 @@ describe( 'WaveformPlayer', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;

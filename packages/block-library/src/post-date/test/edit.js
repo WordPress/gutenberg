@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, test } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { is12HourFormat } from '../edit';

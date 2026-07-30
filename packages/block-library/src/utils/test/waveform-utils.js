@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 /**
  * Internal dependencies
@@ -462,7 +463,7 @@ describe( 'Waveform utilities', () => {
 			const instance = {
 				container,
 				options: {},
-				applySeekLabel: jest.fn( ( label ) => {
+				applySeekLabel: vi.fn( ( label ) => {
 					seekControl.setAttribute( 'aria-label', label );
 				} ),
 			};
@@ -691,19 +692,19 @@ describe( 'Waveform utilities', () => {
 			// from running so the test only exercises the synchronous
 			// construction path, where the crossOrigin behavior is decided
 			// before any request is made.
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 
 			// jsdom does not implement canvas rendering or media playback;
 			// stub them out so the library's construction and destroy paths
 			// do not emit "Not implemented" console errors.
 			jsdomStubs = [
-				jest
+				vi
 					.spyOn( window.HTMLCanvasElement.prototype, 'getContext' )
 					.mockReturnValue( null ),
-				jest
+				vi
 					.spyOn( window.HTMLMediaElement.prototype, 'pause' )
 					.mockImplementation( () => {} ),
-				jest
+				vi
 					.spyOn( window.HTMLMediaElement.prototype, 'load' )
 					.mockImplementation( () => {} ),
 			];
@@ -711,7 +712,7 @@ describe( 'Waveform utilities', () => {
 
 		afterEach( () => {
 			jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
-			jest.useRealTimers();
+			vi.useRealTimers();
 			document.body.innerHTML = '';
 		} );
 
@@ -747,7 +748,7 @@ describe( 'Waveform utilities', () => {
 		let consoleErrorSpy;
 
 		beforeEach( () => {
-			consoleErrorSpy = jest
+			consoleErrorSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 		} );

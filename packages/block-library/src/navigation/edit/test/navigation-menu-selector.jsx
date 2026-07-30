@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -15,15 +16,15 @@ import { useEntityRecords } from '@wordpress/core-data';
 import NavigationMenuSelector from '../navigation-menu-selector';
 import useNavigationMenu from '../../use-navigation-menu';
 
-jest.mock( '../../use-navigation-menu', () => {
+vi.mock( import( '../../use-navigation-menu' ), () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
+	const mock = vi.fn();
+	return { default: mock };
 } );
 
-jest.mock( '@wordpress/core-data', () => ( {
-	...jest.requireActual( '@wordpress/core-data' ),
-	useEntityRecords: jest.fn(),
+vi.mock( import( '@wordpress/core-data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useEntityRecords: vi.fn(),
 } ) );
 
 useEntityRecords.mockReturnValue( {
@@ -224,7 +225,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should call handler callback and close popover when create menu button is clicked', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = vi.fn();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
@@ -251,7 +252,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should handle disabled state of the create menu button during the creation process', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = vi.fn();
 
 				// at the start we have the menus and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {
@@ -451,7 +452,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should call the handler when the Navigation Menu is selected', async () => {
 				const user = userEvent.setup();
 
-				const handler = jest.fn();
+				const handler = vi.fn();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
@@ -558,7 +559,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should call the handler when the classic menu item is selected and disable all options during the import/creation process', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn( async () => {} );
+				const handler = vi.fn( async () => {} );
 
 				// initially we have the menus, and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {

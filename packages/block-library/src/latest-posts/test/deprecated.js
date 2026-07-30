@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 // Load block support registration filters.

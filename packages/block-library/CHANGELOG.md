@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   Migrate unit tests from Jest to Vitest.
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Image: Check only `window.__clientSideMediaProcessing` for sideloading status, following the removal of the redundant `window.__heicUploadSupport` flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 
