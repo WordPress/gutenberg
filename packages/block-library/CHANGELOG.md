@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
+-   Table of Contents: Show an explanatory placeholder when the block is placed in a template that does not render a single post or page (e.g. Archive, Search, 404), instead of the generic empty-headings message.
 
 ### Internal
 
