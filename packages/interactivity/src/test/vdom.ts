@@ -2,12 +2,21 @@
  * External dependencies
  */
 import { h } from 'preact';
-import type { VNode } from 'preact';
+import type { ComponentChild } from 'preact';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Internal dependencies
  */
 import { toVdom, hydratedIslands } from '../vdom';
+
+declare module 'vitest' {
+	// Must match Vitest's generic declaration for module augmentation.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	interface Assertion< T = any > {
+		toMatchVNode: ( expected: ComponentChild ) => void;
+	}
+}
 
 function createElementFromHTML( html: string ): HTMLElement {
 	const div = document.createElement( 'div' );
@@ -15,11 +24,11 @@ function createElementFromHTML( html: string ): HTMLElement {
 	return div.firstChild as HTMLElement;
 }
 
-const normalizeVNode = ( obj: object ) =>
+const normalizeVNode = ( obj: ComponentChild ) =>
 	JSON.stringify( obj ).replace( /"__v":\d+/g, '"__v":null' );
 
 expect.extend( {
-	toMatchVNode( received: VNode, expected: VNode ) {
+	toMatchVNode( received: ComponentChild, expected: ComponentChild ) {
 		const pass = normalizeVNode( received ) === normalizeVNode( expected );
 		return {
 			pass,
@@ -206,7 +215,7 @@ describe( 'toVdom', () => {
 		it( 'should warn about malformed directive names', () => {
 			const console = global.console;
 			const originalWarn = console.warn;
-			console.warn = jest.fn();
+			console.warn = vi.fn();
 
 			toVdom(
 				createElementFromHTML( `<div data-wp-invalid[name]></div>` )

@@ -2,11 +2,17 @@
  * External dependencies
  */
 import { effect } from '@preact/signals';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Internal dependencies
  */
 import { proxifyContext, proxifyState, deepMerge } from '../';
+
+const trackEffect = ( callback: () => unknown ) =>
+	effect( () => {
+		callback();
+	} );
 
 describe( 'Interactivity API', () => {
 	describe( 'context proxy', () => {
@@ -168,8 +174,8 @@ describe( 'Interactivity API', () => {
 					fallback
 				);
 
-				const spy = jest.fn( () => context.fromContext );
-				effect( spy );
+				const spy = vi.fn( () => context.fromContext );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( context.fromContext ).toBe( 'context' );
@@ -190,8 +196,8 @@ describe( 'Interactivity API', () => {
 					fallback
 				);
 
-				const spy = jest.fn( () => context.fromFallback );
-				effect( spy );
+				const spy = vi.fn( () => context.fromFallback );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( context.fromFallback ).toBe( 'fallback' );
@@ -212,8 +218,8 @@ describe( 'Interactivity API', () => {
 					fallback
 				);
 
-				const spy = jest.fn( () => context.fromContext );
-				effect( spy );
+				const spy = vi.fn( () => context.fromContext );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( context.fromContext ).toBeUndefined();
@@ -234,8 +240,8 @@ describe( 'Interactivity API', () => {
 					fallback
 				);
 
-				const spy = jest.fn( () => context.fromFallback );
-				effect( spy );
+				const spy = vi.fn( () => context.fromFallback );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( context.fromFallback ).toBeUndefined();
@@ -253,8 +259,8 @@ describe( 'Interactivity API', () => {
 				const contextState: any = proxifyState( 'test', {} );
 				const context: any = proxifyContext( contextState, fallback );
 
-				const spy = jest.fn( () => context.prop );
-				effect( spy );
+				const spy = vi.fn( () => context.prop );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( context.prop ).toBeUndefined();
@@ -280,8 +286,8 @@ describe( 'Interactivity API', () => {
 					fallback
 				);
 
-				const spy = jest.fn( () => Object.keys( context ) );
-				effect( spy );
+				const spy = vi.fn( () => Object.keys( context ) );
+				trackEffect( spy );
 
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( Object.keys( context ) ).toEqual( [] );
@@ -307,10 +313,10 @@ describe( 'Interactivity API', () => {
 				);
 
 				let deepValue: any;
-				const spy = jest.fn( () => {
+				const spy = vi.fn( () => {
 					deepValue = context.a?.b?.c?.d;
 				} );
-				effect( spy );
+				trackEffect( spy );
 
 				// Initial call, the deep value is undefined
 				expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -334,10 +340,10 @@ describe( 'Interactivity API', () => {
 				const context: any = proxifyContext( contextState, fallback );
 
 				let deepValue: any;
-				const spy = jest.fn( () => {
+				const spy = vi.fn( () => {
 					deepValue = context.a?.b?.c?.d;
 				} );
-				effect( spy );
+				trackEffect( spy );
 
 				// Initial call, the deep value is undefined
 				expect( spy ).toHaveBeenCalledTimes( 1 );

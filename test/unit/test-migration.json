@@ -39,6 +39,7 @@
 					"packages/hooks",
 					"packages/i18n",
 					"packages/interface",
+					"packages/interactivity",
 					"packages/is-shallow-equal",
 					"packages/keycodes",
 					"packages/media-fields",
