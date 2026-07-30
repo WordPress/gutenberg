@@ -2,13 +2,9 @@
 /**
  * External dependencies
  */
-const util = require( 'util' );
+const fs = require( 'fs' );
+const path = require( 'path' );
 const { v2: dockerCompose } = require( 'docker-compose' );
-
-/**
- * Promisified dependencies
- */
-const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * Internal dependencies
@@ -287,20 +283,28 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * @param {string} toPath   Destination path.
  */
 async function copyCoreFiles( fromPath, toPath ) {
-	await copyDir( fromPath, toPath, {
-		filter( stat, filepath, filename ) {
-			if ( stat === 'symbolicLink' ) {
+	await fs.promises.cp( fromPath, toPath, {
+		recursive: true,
+		filter( source ) {
+			const stat = fs.lstatSync( source );
+
+			if ( stat.isSymbolicLink() ) {
 				return false;
 			}
-			if ( stat === 'directory' && filename === '.git' ) {
+
+			const name = path.basename( source );
+
+			if (
+				stat.isDirectory() &&
+				( name === '.git' || name === 'node_modules' )
+			) {
 				return false;
 			}
-			if ( stat === 'directory' && filename === 'node_modules' ) {
+
+			if ( stat.isFile() && name === 'wp-config.php' ) {
 				return false;
 			}
-			if ( stat === 'file' && filename === 'wp-config.php' ) {
-				return false;
-			}
+
 			return true;
 		},
 	} );
