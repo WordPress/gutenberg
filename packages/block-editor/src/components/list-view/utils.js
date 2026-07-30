@@ -4,6 +4,11 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
 
+// List View renders a fixed number of items and relies on each item having this
+// fixed height. It is also the height set for `.block-editor-list-view-block-contents`.
+// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+export const BLOCK_LIST_ITEM_HEIGHT = 32;
+
 export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 	sprintf(
 		/* translators: 1: The numerical position of the block. 2: The total number of blocks. 3. The level of nesting for the block. */
