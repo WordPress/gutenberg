@@ -180,6 +180,39 @@ describe( 'PlaylistTrackEdit', () => {
 		);
 	} );
 
+	it( 'allows tracks to be added from the track toolbar', () => {
+		const addTracks = jest.fn();
+		renderEdit( { addTracks } );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
+
+		expect( addTracks ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'renders the add track control in a different toolbar group from replace', () => {
+		renderEdit( { addTracks: jest.fn() } );
+
+		expect(
+			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
+				'button',
+				{ name: 'Replace' }
+			)
+		).toBeInTheDocument();
+		expect(
+			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
+				'button',
+				{ name: 'Add' }
+			)
+		).toBeInTheDocument();
+	} );
+
+	it( 'lets users select additional audio tracks individually from the Media Library', () => {
+		renderEdit( { addTracks: jest.fn() } );
+
+		expect( mockMediaReplaceFlowProps.name ).toBe( 'Add' );
+		expect( mockMediaReplaceFlowProps.multiple ).toBe( 'add' );
+	} );
+
 	it( 'preserves the current track source when a replacement upload fails', () => {
 		const { setAttributes } = renderEdit();
 

@@ -156,6 +156,20 @@ const PlaylistTrackEdit = ( {
 					variant="toolbar"
 				/>
 			</BlockControls>
+			{ !! addTracks && (
+				<BlockControls group="block">
+					<MediaReplaceFlow
+						name={ __( 'Add' ) }
+						onSelect={ addTracks }
+						accept="audio/*"
+						multiple="add"
+						handleUpload={ false }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
