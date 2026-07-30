@@ -67,14 +67,16 @@ test.describe( 'Quote', () => {
 			},
 		] );
 
-		// The emptied quote offers the default appender to refill it.
-		// Click the left side of the prompt; the citation's floating
-		// toolbar covers its right half.
-		const appender = editor.canvas.locator(
-			'.wp-block-quote .block-editor-default-block-appender'
-		);
-		await expect( appender ).toBeVisible();
-		await appender.click( { position: { x: 30, y: 8 } } );
+		// The emptied quote offers the default appender to refill it:
+		// arrowing up from the citation onto the appender inserts a fresh
+		// paragraph inside the quote.
+		await expect(
+			editor.canvas.getByRole( 'button', {
+				name: 'Add default block',
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( 'refilled' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
