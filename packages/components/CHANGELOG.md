@@ -33,7 +33,7 @@
 
 ### Internal
 
--   Run the custom-select interaction tests in Vitest Browser Mode.
+-   Run the custom-select interaction tests in Vitest Browser Mode ([#80985](https://github.com/WordPress/gutenberg/pull/80985)).
 -   Run the first interaction-test batch in Vitest Browser Mode ([#80983](https://github.com/WordPress/gutenberg/pull/80983)).
 -   Rename the JSX-bearing context system provider source file from `.js` to `.jsx`.
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
