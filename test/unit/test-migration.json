@@ -81,6 +81,7 @@
 					"packages/redux-routine",
 					"packages/stylelint-config",
 					"packages/video-conversion",
+					"packages/vips",
 					"packages/views",
 					"packages/worker-threads",
 					"packages/wp-build"
