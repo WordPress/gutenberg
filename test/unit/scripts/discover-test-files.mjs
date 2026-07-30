@@ -29,6 +29,48 @@ export const TEST_IGNORES = [
 	'vendor/**',
 ];
 
+export const VITEST_PROJECT_NAMES = [ 'browser', 'jsdom', 'node' ];
+
+export function assertVitestProjectNames( label, projects ) {
+	const actualProjectNames = Object.keys( projects ).sort();
+	const expectedProjectNames = [ ...VITEST_PROJECT_NAMES ].sort();
+
+	if (
+		actualProjectNames.length !== expectedProjectNames.length ||
+		actualProjectNames.some(
+			( projectName, index ) =>
+				projectName !== expectedProjectNames[ index ]
+		)
+	) {
+		throw new Error(
+			`${ label } must define exactly these projects: ${ VITEST_PROJECT_NAMES.join(
+				', '
+			) }.`
+		);
+	}
+}
+
+export function findOverlappingVitestProjectTests( testsByProject ) {
+	const projectOwners = new Map();
+
+	for ( const [ projectName, projectTests ] of Object.entries(
+		testsByProject
+	) ) {
+		for ( const testPath of projectTests ) {
+			const owners = projectOwners.get( testPath ) ?? [];
+			owners.push( projectName );
+			projectOwners.set( testPath, owners );
+		}
+	}
+
+	return [ ...projectOwners ]
+		.filter( ( [ , owners ] ) => owners.length > 1 )
+		.map(
+			( [ testPath, owners ] ) =>
+				`${ testPath }: ${ owners.join( ', ' ) }`
+		);
+}
+
 function normalizeTestPath( testPath ) {
 	return testPath.split( path.sep ).join( '/' );
 }
@@ -48,10 +90,11 @@ export function discoverTestFiles( rootDir ) {
 	].sort();
 }
 
-export function getVitestTests( rootDir, manifest ) {
+export function getVitestTestsForProject( rootDir, manifest, projectName ) {
 	const discoveredTests = discoverTestFiles( rootDir );
+	const project = manifest.vitest.projects[ projectName ];
 	const directoryTests = discoveredTests.filter( ( testPath ) =>
-		manifest.vitest.directories.some(
+		project.directories.some(
 			( directoryPath ) =>
 				testPath === directoryPath ||
 				testPath.startsWith( `${ directoryPath }/` )
@@ -60,10 +103,30 @@ export function getVitestTests( rootDir, manifest ) {
 
 	return [
 		...new Set( [
-			...manifest.vitest.files,
+			...project.files,
 			...directoryTests,
-			...manifest.added.vitest,
+			...manifest.added.vitest[ projectName ],
 		] ),
+	].sort();
+}
+
+export function getVitestTestsByProject( rootDir, manifest ) {
+	assertVitestProjectNames( 'vitest.projects', manifest.vitest.projects );
+	assertVitestProjectNames( 'added.vitest', manifest.added.vitest );
+
+	return Object.fromEntries(
+		VITEST_PROJECT_NAMES.map( ( projectName ) => [
+			projectName,
+			getVitestTestsForProject( rootDir, manifest, projectName ),
+		] )
+	);
+}
+
+export function getVitestTests( rootDir, manifest ) {
+	return [
+		...new Set(
+			Object.values( getVitestTestsByProject( rootDir, manifest ) ).flat()
+		),
 	].sort();
 }
 

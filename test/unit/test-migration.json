@@ -4,52 +4,68 @@
 		"sha256": "72316673c4f35ec4d55ec15ba4dbf3435dd2f57b3b54dc5258d9c75b340ad243"
 	},
 	"vitest": {
-		"files": [ "packages/html-entities/src/test/entities.ts" ],
-		"directories": [
-			"packages/abilities",
-			"packages/annotations",
-			"packages/autop",
-			"packages/blob",
-			"packages/block-directory",
-			"packages/connectors",
-			"packages/components",
-			"packages/compose",
-			"packages/core-commands",
-			"packages/date",
-			"packages/deprecated",
-			"packages/dom-ready",
-			"packages/edit-post",
-			"packages/edit-site",
-			"packages/escape-html",
-			"packages/fields",
-			"packages/hooks",
-			"packages/i18n",
-			"packages/is-shallow-equal",
-			"packages/keycodes",
-			"packages/priority-queue",
-			"packages/private-apis",
-			"packages/server-side-render",
-			"packages/shortcode",
-			"packages/style-engine",
-			"packages/sync",
-			"packages/theme",
-			"packages/token-list",
-			"packages/ui",
-			"packages/undo-manager",
-			"packages/url",
-			"packages/warning",
-			"packages/widget-dashboard",
-			"packages/wordcount"
-		]
+		"projects": {
+			"browser": {
+				"files": [],
+				"directories": []
+			},
+			"jsdom": {
+				"files": [ "packages/html-entities/src/test/entities.ts" ],
+				"directories": [
+					"packages/abilities",
+					"packages/annotations",
+					"packages/autop",
+					"packages/blob",
+					"packages/block-directory",
+					"packages/connectors",
+					"packages/components",
+					"packages/compose",
+					"packages/core-commands",
+					"packages/date",
+					"packages/deprecated",
+					"packages/dom-ready",
+					"packages/edit-post",
+					"packages/edit-site",
+					"packages/escape-html",
+					"packages/fields",
+					"packages/hooks",
+					"packages/i18n",
+					"packages/is-shallow-equal",
+					"packages/keycodes",
+					"packages/priority-queue",
+					"packages/private-apis",
+					"packages/server-side-render",
+					"packages/shortcode",
+					"packages/style-engine",
+					"packages/sync",
+					"packages/theme",
+					"packages/token-list",
+					"packages/ui",
+					"packages/undo-manager",
+					"packages/url",
+					"packages/warning",
+					"packages/widget-dashboard",
+					"packages/wordcount"
+				]
+			},
+			"node": {
+				"files": [],
+				"directories": []
+			}
+		}
 	},
 	"retired": [],
 	"added": {
 		"jest": [],
-		"vitest": [
-			"test/unit/config/console.vitest.test.js",
-			"test/unit/config/emotion-serializer.vitest.test.jsx",
-			"test/unit/config/matchers/test/to-match-diff-snapshot.vitest.test.js",
-			"test/unit/config/setup.vitest.test.jsx"
-		]
+		"vitest": {
+			"browser": [],
+			"jsdom": [
+				"test/unit/config/console.vitest.test.js",
+				"test/unit/config/emotion-serializer.vitest.test.jsx",
+				"test/unit/config/matchers/test/to-match-diff-snapshot.vitest.test.js",
+				"test/unit/config/setup.vitest.test.jsx"
+			],
+			"node": [ "test/unit/scripts/test/discover-test-files.js" ]
+		}
 	}
 }

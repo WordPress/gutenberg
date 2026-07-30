@@ -21,13 +21,17 @@ const testMigration = require( './test-migration.json' );
 
 const escapeRegExp = ( value ) =>
 	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+const vitestProjects = Object.values( testMigration.vitest.projects );
 const vitestTestPathIgnorePatterns = [
-	...[ ...testMigration.vitest.files, ...testMigration.added.vitest ].map(
-		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
-	),
-	...testMigration.vitest.directories.map(
-		( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
-	),
+	...[
+		...vitestProjects.flatMap( ( project ) => project.files ),
+		...Object.values( testMigration.added.vitest ).flat(),
+	].map( ( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$` ),
+	...vitestProjects
+		.flatMap( ( project ) => project.directories )
+		.map(
+			( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
+		),
 ];
 
 // Ensure Babel config resolution works from the repo root,

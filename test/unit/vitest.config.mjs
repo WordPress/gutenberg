@@ -16,7 +16,7 @@ import { defineConfig } from 'vitest/config';
 /**
  * Internal dependencies
  */
-import { getVitestTests } from './scripts/discover-test-files.mjs';
+import { getVitestTestsByProject } from './scripts/discover-test-files.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -28,7 +28,7 @@ const testMigration = JSON.parse(
 		'utf8'
 	)
 );
-const vitestTests = getVitestTests( ROOT_DIR, testMigration );
+const vitestTests = getVitestTestsByProject( ROOT_DIR, testMigration );
 const { sync: glob } = globPackage;
 const reporters = [ 'default' ];
 
@@ -186,29 +186,67 @@ export default defineConfig( {
 		},
 	},
 	test: {
-		environment: 'jsdom',
-		environmentOptions: {
-			jsdom: {
-				url: 'http://localhost/',
-			},
-		},
 		globals: false,
-		include: vitestTests,
 		includeTaskLocation: true,
 		passWithNoTests: false,
+		projects: [
+			{
+				extends: true,
+				test: {
+					// The Flakiness.io reporter uses the project name as part
+					// of its environment identity. Preserve the historical
+					// default while the manifest records explicit jsdom
+					// ownership.
+					name: 'vitest',
+					environment: 'jsdom',
+					environmentOptions: {
+						jsdom: {
+							url: 'http://localhost/',
+						},
+					},
+					include: vitestTests.jsdom,
+					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/setup-globals.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/global-mocks.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/testing-library.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/mocks/match-media.vitest.js'
+						),
+					],
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: 'node',
+					environment: 'node',
+					include: vitestTests.node,
+				},
+			},
+		],
 		reporters,
 		sequence: {
 			hooks: 'list',
 			setupFiles: 'list',
 		},
-		setupFiles: [
-			path.join( ROOT_DIR, 'test/unit/config/setup-globals.vitest.js' ),
-			path.join( ROOT_DIR, 'test/unit/config/global-mocks.vitest.js' ),
-			path.join( ROOT_DIR, 'test/unit/config/gutenberg-env.js' ),
-			path.join( ROOT_DIR, 'test/unit/config/console.vitest.js' ),
-			path.join( ROOT_DIR, 'test/unit/config/testing-library.vitest.js' ),
-			path.join( ROOT_DIR, 'test/unit/mocks/match-media.vitest.js' ),
-		],
 		snapshotFormat: {
 			escapeString: false,
 			printBasicPrototype: false,
