@@ -9,6 +9,7 @@ import path from 'node:path';
  * External dependencies
  */
 import glob from 'fast-glob';
+import { afterEach, describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies

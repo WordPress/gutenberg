@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { transformSync } from '@babel/core';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies

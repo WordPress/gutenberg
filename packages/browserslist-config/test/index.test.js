@@ -2,6 +2,7 @@
  * External dependencies
  */
 import browserslist from 'browserslist';
+import { expect, it } from 'vitest';
 
 /**
  * Internal dependencies

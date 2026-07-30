@@ -3,6 +3,7 @@
  */
 import { transformSync } from '@babel/core';
 import traverse from '@babel/traverse';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Internal dependencies
