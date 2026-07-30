@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,11 +5,8 @@ import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import globPackage from 'glob';
 import { defineConfig } from 'vitest/config';
-import {
-	discoverTestFiles,
-	getVitestTestsByProject,
-} from './scripts/discover-test-files.mjs';
 import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
+import { getVitestTestsByProject } from './scripts/test-projects.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -19,16 +15,7 @@ const ROOT_DIR = path.resolve(
 const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const flakinessReporter = nodeRequire.resolve( '@flakiness/vitest' );
-const testMigration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
-const vitestTests = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	testMigration
-);
+const vitestTests = getVitestTestsByProject( ROOT_DIR );
 const { sync: glob } = globPackage;
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,

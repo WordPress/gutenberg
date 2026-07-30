@@ -89,7 +89,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `jsdoc` – rules for JSDoc comments.
 -   `jsx-a11y` – rules for accessibility in JSX.
 -   `react` – rules for React components.
--   `test-e2e` – rules for end-to-end tests written in Puppeteer.
+-   `test-e2e` – browser globals for legacy end-to-end helper code.
 -   `test-unit`– rules for unit tests written in Vitest.
 -   `test-playwright` – rules for end-to-end tests written in Playwright.
 

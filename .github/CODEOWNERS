@@ -69,8 +69,6 @@
 /packages/e2e-tests                             @ntwb @ajitbohra
 /packages/e2e-test-utils-playwright             @kevin940726
 /packages/eslint-plugin                         @ntwb @ajitbohra
-/packages/jest-console                          @ntwb @ajitbohra
-/packages/jest-preset-default                   @ntwb @ajitbohra
 /packages/vitest-console                        @ntwb @ajitbohra
 /packages/vitest-preset-default                 @ntwb @ajitbohra
 /packages/npm-package-json-lint-config          @ntwb @ajitbohra

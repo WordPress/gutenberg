@@ -131,11 +131,12 @@ Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](http
 1. `git checkout wp/latest`
 2. `npx lerna updated`
    Example:
+
    ```shell
    npx lerna updated
    @wordpress/e2e-tests
-   @wordpress/jest-preset-default
    @wordpress/scripts
+   @wordpress/vitest-preset-default
    lerna success found 3 packages ready to publish
    ```
 

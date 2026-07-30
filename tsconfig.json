@@ -47,7 +47,6 @@
 		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/interactivity/tsconfig.test.json" },
 		{ "path": "packages/is-shallow-equal" },
-		{ "path": "packages/jest-console" },
 		{ "path": "packages/kebab-case" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/keyboard-shortcuts" },

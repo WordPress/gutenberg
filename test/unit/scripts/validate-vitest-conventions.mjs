@@ -17,7 +17,7 @@ import {
 	getVitestProjectName,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
-} from './discover-test-files.mjs';
+} from './test-projects.mjs';
 import { validateVitestPolicy } from './vitest-policy-rules.mjs';
 
 const { sync: glob } = globPackage;
@@ -25,12 +25,6 @@ const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
-);
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
 );
 const policyExceptions = JSON.parse(
 	readFileSync(
@@ -40,10 +34,7 @@ const policyExceptions = JSON.parse(
 );
 const renderedUiBaseline = new Set( policyExceptions.renderedUi );
 const discoveredTests = discoverTestFiles( ROOT_DIR );
-const vitestTestsByProject = getVitestTestsByProject(
-	discoveredTests,
-	migration
-);
+const vitestTestsByProject = getVitestTestsByProject( ROOT_DIR );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );

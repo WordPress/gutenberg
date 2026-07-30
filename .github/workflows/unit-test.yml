@@ -24,8 +24,8 @@ concurrency:
 permissions: {}
 
 jobs:
-    unit-js-routing:
-        name: JavaScript test routing
+    unit-js-invariants:
+        name: JavaScript test invariants
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -43,9 +43,6 @@ jobs:
               with:
                   node-version: '20'
 
-            - name: Validate JavaScript test routing
-              run: npm run test:unit:routing
-
             - name: Build workspaces and package TypeScript declarations
               run: |
                   npm exec -- lerna run build
@@ -54,6 +51,9 @@ jobs:
 
             - name: Validate Vitest conventions and TypeScript test graph
               run: npm run test:unit:conventions
+
+            - name: Validate Jest removal
+              run: npm run test:unit:no-jest
 
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
@@ -92,7 +92,7 @@ jobs:
               # Some packages have custom build tasks that their tests consume.
               run: npm exec -- lerna run build
 
-            - name: Run the remaining Jest partition
+            - name: Run the Node and jsdom Vitest projects
               env:
                   SHARD: ${{ matrix.shard }}
                   # Record the Node.js major as a custom flakiness environment
@@ -101,20 +101,6 @@ jobs:
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
-                    --ci \
-                    --maxWorkers="$(nproc)" \
-                    --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache" \
-                    --passWithNoTests
-
-            - name: Run the migrated Vitest partition
-              env:
-                  SHARD: ${{ matrix.shard }}
-                  # Preserve the same Flakiness.io environment identity used
-                  # by the Jest partition.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
-              run: |
-                  npm run test:unit:vitest -- \
                     --project=node \
                     --project=jsdom \
                     --shard="$SHARD" \
@@ -191,9 +177,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
+              # It is not necessary to run the full build because Vite transforms
+              # source modules. Some packages have custom build tasks, however.
               run: npx lerna run build
 
             - name: Run the date tests

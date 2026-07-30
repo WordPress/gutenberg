@@ -4,10 +4,13 @@
 
 ### Breaking Changes
 
--   Run `test-unit-js` with Vitest 4 instead of Jest, add the `test-unit-vitest`
-    alias, require Node.js 20.19 or newer, and use ESM Vitest configuration.
-    The explicit `test-unit-jest` command remains available during the
-    Gutenberg migration ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
+-   Run `test-unit-js` with Vitest 4 instead of Jest, replace the
+    `test-unit-jest` alias with `test-unit-vitest`, require Node.js 20.19 or
+    newer, and use ESM Vitest configuration
+    ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
+-   Remove the bundled Jest configuration, transforms, reporters, and runtime
+    dependencies
+    ([#80999](https://github.com/WordPress/gutenberg/pull/80999)).
 
 ### Enhancements
 
