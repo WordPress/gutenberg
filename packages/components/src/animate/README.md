@@ -1,5 +1,9 @@
 # Animate
 
+<div class="callout callout-alert">
+This component is deprecated. Write your own CSS animations instead.
+</div>
+
 Simple interface to introduce animations to components.
 
 ## Usage
