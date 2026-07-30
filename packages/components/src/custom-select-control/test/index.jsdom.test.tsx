@@ -1,7 +1,19 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
-import { click, press, sleep, type, waitFor } from '@ariakit/test';
-import { render } from '@ariakit/test/react';
+import { render } from 'vitest-browser-react';
+
+/**
+ * WordPress dependencies
+ */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import _CustomSelectControl from '..';
 
 const UncontrolledCustomSelectControl = (
@@ -78,7 +90,7 @@ const ControlledCustomSelectControl = ( {
 };
 
 it( 'Should apply external controlled updates', async () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const { rerender } = await render(
 		<UncontrolledCustomSelectControl
 			{ ...props }
@@ -104,9 +116,6 @@ it( 'Should apply external controlled updates', async () => {
 
 	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
 
-	// Necessary to wait for onChange to potentially fire
-	await sleep();
-
 	expect( mockOnChange ).not.toHaveBeenCalled();
 } );
 
@@ -117,7 +126,7 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		expect(
@@ -126,14 +135,11 @@ describe.each( [
 			} )
 		).toHaveTextContent( props.options[ 0 ].name );
 
-		// Necessary to wait for onChange to potentially fire
-		await sleep();
-
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 		await render(
 			<Component
 				{ ...props }
@@ -148,22 +154,20 @@ describe.each( [
 			} )
 		).toHaveTextContent( props.options[ 3 ].name );
 
-		// Necessary to wait for onChange to potentially fire
-		await sleep();
-
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'option', {
 				name: 'crimson clover',
 			} )
@@ -171,9 +175,9 @@ describe.each( [
 
 		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'option', {
 				name: 'poppy',
 			} )
@@ -183,26 +187,31 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await press.Tab();
-		await press.Enter();
-		expect(
-			screen.getByRole( 'listbox', {
-				name: props.label,
-			} )
-		).toBeVisible();
+		await user.tab();
+		await user.keyboard( '{Enter}' );
+		await expect
+			.element(
+				page.getByRole( 'listbox', {
+					name: props.label,
+				} )
+			)
+			.toBeVisible();
 
-		await press.Escape();
-		expect(
-			screen.queryByRole( 'listbox', {
-				name: props.label,
-			} )
-		).not.toBeInTheDocument();
+		await user.keyboard( '{Escape}' );
+		await expect
+			.element(
+				page.getByRole( 'listbox', {
+					name: props.label,
+				} )
+			)
+			.not.toBeInTheDocument();
 
 		expect( currentSelectedItem ).toHaveTextContent(
 			props.options[ 0 ].name
@@ -210,9 +219,10 @@ describe.each( [
 	} );
 
 	it( 'Should apply class only to options that have a className defined', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...props } /> );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
@@ -244,9 +254,10 @@ describe.each( [
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
+		const user = userEvent.setup();
 		await render( <Component { ...props } /> );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
@@ -291,11 +302,9 @@ describe.each( [
 				] }
 			/>
 		);
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'combobox', { name: 'Custom select' } )
-			).not.toHaveTextContent( 'Hint' )
-		);
+		await expect
+			.element( page.getByRole( 'combobox', { name: 'Custom select' } ) )
+			.not.toHaveTextContent( 'Hint' );
 	} );
 
 	it( 'shows selected hint when showSelectedHint is set', async () => {
@@ -314,16 +323,17 @@ describe.each( [
 			/>
 		);
 
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'combobox', {
+		await expect
+			.element(
+				page.getByRole( 'combobox', {
 					expanded: false,
 				} )
-			).toHaveTextContent( 'Hint' )
-		);
+			)
+			.toHaveTextContent( 'Hint' );
 	} );
 
 	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
+		const user = userEvent.setup();
 		await render(
 			<Component
 				{ ...props }
@@ -338,25 +348,28 @@ describe.each( [
 			/>
 		);
 
-		await click(
+		await user.click(
 			screen.getByRole( 'combobox', { name: 'Custom select' } )
 		);
 
-		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
+		await expect
+			.element( page.getByRole( 'option', { name: /hint/i } ) )
+			.toBeVisible();
 	} );
 
 	it( 'Should return object onChange', async () => {
-		const mockOnChange = jest.fn();
+		const user = userEvent.setup();
+		const mockOnChange = vi.fn();
 
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
-		await click(
+		await user.click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
 		);
 
-		await click(
+		await user.click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
@@ -376,19 +389,20 @@ describe.each( [
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const mockOnChange = jest.fn();
+		const user = userEvent.setup();
+		const mockOnChange = vi.fn();
 
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
-		await press.Tab();
+		await user.tab();
 		expect(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
 		).toHaveFocus();
 
-		await type( 'p' );
-		await press.Enter();
+		await user.keyboard( 'p' );
+		await user.keyboard( '{Enter}' );
 
 		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 		expect( mockOnChange ).toHaveBeenLastCalledWith(
@@ -402,7 +416,8 @@ describe.each( [
 	} );
 
 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
-		const onChangeMock = jest.fn();
+		const user = userEvent.setup();
+		const onChangeMock = vi.fn();
 
 		await render( <Component { ...props } onChange={ onChangeMock } /> );
 
@@ -410,7 +425,7 @@ describe.each( [
 			expanded: false,
 		} );
 
-		await click( currentSelectedItem );
+		await user.click( currentSelectedItem );
 
 		const optionWithCustomAttributes = screen.getByRole( 'option', {
 			name: 'tomato (with custom props)',
@@ -424,7 +439,7 @@ describe.each( [
 			'aria-label'
 		);
 
-		await click( optionWithCustomAttributes );
+		await user.click( optionWithCustomAttributes );
 
 		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeMock ).toHaveBeenCalledWith(
@@ -453,7 +468,8 @@ describe.each( [
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
-			const onKeyDown = jest.fn();
+			const user = userEvent.setup();
+			const onKeyDown = vi.fn();
 
 			await render(
 				<div
@@ -467,36 +483,40 @@ describe.each( [
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
-			const customSelect = screen.getByRole( 'listbox', {
-				name: props.label,
-			} );
-			await waitFor( () => expect( customSelect ).toHaveFocus() );
-			await press.Enter();
+			await expect
+				.element(
+					page.getByRole( 'listbox', {
+						name: props.label,
+					} )
+				)
+				.toHaveFocus();
+			await user.keyboard( '{Enter}' );
 
 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
 		} );
 
 		it( 'Should be able to change selection using keyboard', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
-			await press.Enter();
+			await user.keyboard( '{Enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
 					name: props.label,
 				} )
 			).toHaveFocus();
 
-			await press.ArrowDown();
-			await press.Enter();
+			await user.keyboard( '{ArrowDown}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( currentSelectedItem ).toHaveTextContent(
 				props.options[ 1 ].name
@@ -504,40 +524,42 @@ describe.each( [
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
-			await press.Enter();
+			await user.tab();
+			await user.keyboard( '{Enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
 					name: props.label,
 				} )
 			).toHaveFocus();
 
-			await type( 'a' );
-			await press.Enter();
+			await user.keyboard( 'a' );
+			await user.keyboard( '{Enter}' );
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
 				props.options[ 0 ].name
 			);
 
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
-			await type( 'a' );
+			await user.keyboard( 'a' );
 
 			expect(
 				screen.queryByRole( 'listbox', {
@@ -546,27 +568,31 @@ describe.each( [
 				} )
 			).not.toBeInTheDocument();
 
-			// This Enter is a workaround for flakiness, and shouldn't be necessary in an actual browser
-			await press.Enter();
-
-			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+			await expect
+				.element(
+					page.getByRole( 'combobox', {
+						expanded: false,
+					} )
+				)
+				.toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
 				props.options[ 0 ].name
 			);
 
-			await press.ArrowDown();
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.queryByRole( 'listbox', {
 					name: props.label,
@@ -579,13 +605,14 @@ describe.each( [
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
+			const user = userEvent.setup();
 			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			// get all items except for first option
 			const unselectedItems = props.options.filter(
@@ -593,46 +620,58 @@ describe.each( [
 			);
 
 			// assert that all other items have aria-selected="false"
-			unselectedItems.map( ( { name } ) =>
-				expect(
-					screen.getByRole( 'option', { name, selected: false } )
-				).toBeVisible()
-			);
+			for ( const { name } of unselectedItems ) {
+				await expect
+					.element(
+						page.getByRole( 'option', {
+							name,
+							selected: false,
+						} )
+					)
+					.toBeVisible();
+			}
 
 			// assert that first item has aria-selected="true"
-			expect(
-				screen.getByRole( 'option', {
-					name: props.options[ 0 ].name,
-					selected: true,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: props.options[ 0 ].name,
+						selected: true,
+					} )
+				)
+				.toBeVisible();
 
 			// change the current selection
-			await click( screen.getByRole( 'option', { name: 'poppy' } ) );
+			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
 
 			// click combobox to mount listbox with options again
-			await click( currentSelectedItem );
+			await user.click( currentSelectedItem );
 
 			// check that first item is has aria-selected="false" after new selection
-			expect(
-				screen.getByRole( 'option', {
-					name: props.options[ 0 ].name,
-					selected: false,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: props.options[ 0 ].name,
+						selected: false,
+					} )
+				)
+				.toBeVisible();
 
 			// check that new selected item now has aria-selected="true"
-			expect(
-				screen.getByRole( 'option', {
-					name: 'poppy',
-					selected: true,
-				} )
-			).toBeVisible();
+			await expect
+				.element(
+					page.getByRole( 'option', {
+						name: 'poppy',
+						selected: true,
+					} )
+				)
+				.toBeVisible();
 		} );
 
 		it( 'Should call custom event handlers', async () => {
-			const onFocusMock = jest.fn();
-			const onBlurMock = jest.fn();
+			const user = userEvent.setup();
+			const onFocusMock = vi.fn();
+			const onBlurMock = vi.fn();
 
 			await render(
 				<>
@@ -649,12 +688,12 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await press.Tab();
+			await user.tab();
 
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
 
-			await press.Tab();
+			await user.tab();
 			expect( currentSelectedItem ).not.toHaveFocus();
 			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
@@ -707,7 +746,6 @@ describe( 'Legacy size support', () => {
 } );
 
 describe( 'Type checking', () => {
-	// eslint-disable-next-line jest/expect-expect
 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
 		const options = [
 			{

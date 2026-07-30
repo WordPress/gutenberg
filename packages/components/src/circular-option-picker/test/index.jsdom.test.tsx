@@ -1,6 +1,13 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { press } from '@ariakit/test';
+
+/**
+ * Internal dependencies
+ */
 import CircularOptionPicker from '..';
 
 const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
@@ -65,11 +72,11 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
@@ -84,11 +91,11 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
@@ -103,11 +110,11 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
 		} );
 	} );

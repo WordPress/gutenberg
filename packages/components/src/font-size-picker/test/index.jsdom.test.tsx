@@ -1,14 +1,13 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it, test, vi } from 'vitest';
-import { screen, fireEvent } from '@testing-library/react';
+
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { render } from '@ariakit/test/react';
 import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
-
-globalThis.wpVitest.mockResizeObserver();
 
 const ControlledFontSizePicker = ( {
 	onChange,

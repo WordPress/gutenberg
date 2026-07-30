@@ -1,11 +1,14 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it, vi } from 'vitest';
-import { screen } from '@testing-library/react';
-import { click, render } from '@ariakit/test/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * Internal dependencies
+ */
 import ColorGradientControl from '../control';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
-
-globalThis.wpVitest.mockResizeObserver();
 
 const noop = () => {};
 
@@ -182,7 +185,7 @@ describe( 'ColorPaletteControl', () => {
 
 			const options = screen.getAllByRole( 'option' );
 			// Click the second swatch: color='#000', slug='dark-text'.
-			await click( options[ 1 ] );
+			await userEvent.setup().click( options[ 1 ] );
 
 			expect( onColorChange ).toHaveBeenCalledWith( '#000', 'dark-text' );
 		} );
@@ -214,7 +217,7 @@ describe( 'ColorPaletteControl', () => {
 			// When both colors and gradients are available the color tab is shown
 			// by default (no gradientValue). Click the first color swatch.
 			const options = screen.getAllByRole( 'option' );
-			await click( options[ 0 ] );
+			await userEvent.setup().click( options[ 0 ] );
 
 			// First entry: color='#000', slug='dark-background'.
 			expect( onColorChange ).toHaveBeenCalledWith(

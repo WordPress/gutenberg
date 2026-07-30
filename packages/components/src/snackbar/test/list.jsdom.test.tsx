@@ -1,6 +1,13 @@
+/**
+ * External dependencies
+ */
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { click } from '@ariakit/test';
+
+/**
+ * Internal dependencies
+ */
 import SnackbarList from '../list';
 
 window.scrollTo = vi.fn();
@@ -29,7 +36,7 @@ describe( 'SnackbarList', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getAllByRole( 'button', {
 				name: 'Dismiss this notice',
 			} )[ 0 ]

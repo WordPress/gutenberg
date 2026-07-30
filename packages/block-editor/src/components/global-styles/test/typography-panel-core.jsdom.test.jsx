@@ -1,6 +1,13 @@
+/**
+ * External dependencies
+ */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { click, render as renderAriakit } from '@ariakit/test/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * Internal dependencies
+ */
 import TypographyPanel from '../typography-panel';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -96,7 +103,7 @@ describe( 'TypographyPanel — experiment off', () => {
 	} );
 
 	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
-		await renderAriakit(
+		await render(
 			<TypographyPanel
 				value={ { color: { text: 'var:preset|color|blue' } } }
 				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
@@ -120,7 +127,8 @@ describe( 'TypographyPanel — experiment off', () => {
 describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
 		const onChange = vi.fn();
-		await renderAriakit(
+		const user = userEvent.setup();
+		await render(
 			<TypographyPanel
 				value={ value }
 				inheritedValue={ inheritedValue }
@@ -129,13 +137,13 @@ describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 				onChange={ onChange }
 			/>
 		);
-		await click(
+		await user.click(
 			screen.getByRole( 'button', { name: /Color/, expanded: false } )
 		);
 		// `findAllByRole` waits for the Popover/portal content to appear.
 		const swatches = await screen.findAllByRole( 'option' );
 		// swatch[0] = 'Blue', swatch[1] = 'Red'
-		await click( swatches[ 1 ] );
+		await user.click( swatches[ 1 ] );
 		return onChange.mock.calls[ 0 ][ 0 ];
 	}
 

@@ -1,6 +1,18 @@
+/**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { click, type } from '@ariakit/test';
+
+/**
+ * WordPress dependencies
+ */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import SearchControl from '..';
 
 function ControlledSearchControl( {
@@ -30,17 +42,17 @@ describe( 'SearchControl', () => {
 		const [ , Component ] = modeAndComponent;
 
 		it( 'should call onChange with input value when value is changed', async () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 			expect( searchInput ).toHaveValue( 'test' );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( 'test' );
 		} );
 
 		it( 'should render a Reset search button if no onClose function is provided', async () => {
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
@@ -51,7 +63,7 @@ describe( 'SearchControl', () => {
 			const paddingInlineEndWithoutSuffix =
 				getComputedStyle( searchInput ).paddingInlineEnd;
 
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 			const resetButton = screen.getByRole( 'button', {
 				name: 'Reset search',
 			} );
@@ -60,7 +72,7 @@ describe( 'SearchControl', () => {
 				paddingInlineEndWithoutSuffix
 			);
 
-			await click( resetButton );
+			await userEvent.click( resetButton );
 			expect( searchInput ).toHaveValue( '' );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '' );
 			expect( getComputedStyle( searchInput ).paddingInlineEnd ).toBe(
@@ -69,8 +81,8 @@ describe( 'SearchControl', () => {
 		} );
 
 		it( 'should render a Close button (instead of Reset) when onClose function is provided', async () => {
-			const onChangeSpy = jest.fn();
-			const onCloseSpy = jest.fn();
+			const onChangeSpy = vi.fn();
+			const onCloseSpy = vi.fn();
 			render(
 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
 			);
@@ -86,7 +98,7 @@ describe( 'SearchControl', () => {
 			).not.toBeInTheDocument();
 
 			const searchInput = screen.getByRole( 'searchbox' );
-			await type( 'test', searchInput );
+			await userEvent.type( searchInput, 'test' );
 
 			expect(
 				screen.queryByRole( 'button', { name: 'Close search' } )
@@ -96,7 +108,7 @@ describe( 'SearchControl', () => {
 			).not.toBeInTheDocument();
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 'test'.length );
 
-			await click(
+			await userEvent.click(
 				screen.getByRole( 'button', { name: 'Close search' } )
 			);
 			expect( onCloseSpy ).toHaveBeenCalledTimes( 1 );

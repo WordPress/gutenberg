@@ -1,7 +1,19 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { press, hover, click } from '@ariakit/test';
+import { page, userEvent } from 'vitest/browser';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+
+/**
+ * WordPress dependencies
+ */
 import { wordpress, category, media } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
 import TabPanel from '..';
 
 const TABS = [
@@ -22,8 +34,13 @@ const TABS = [
 	},
 ];
 
-const getSelectedTab = async () =>
-	await screen.findByRole( 'tab', { selected: true } );
+const getSelectedTab = async () => {
+	await expect
+		.element( page.getByRole( 'tab', { selected: true } ) )
+		.toBeInTheDocument();
+
+	return screen.getByRole( 'tab', { selected: true } );
+};
 
 describe.each( [
 	[ 'uncontrolled', TabPanel ],
@@ -37,7 +54,7 @@ describe.each( [
 		it( 'should use the correct aria attributes', async () => {
 			const panelRenderFunction = vi.fn();
 
-			render(
+			await render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
 			);
 
@@ -67,6 +84,7 @@ describe.each( [
 		} );
 
 		it( 'should display a tooltip when hovering tabs provided with an icon', async () => {
+			const user = userEvent.setup();
 			const panelRenderFunction = vi.fn();
 
 			const TABS_WITH_ICON = [
@@ -75,7 +93,7 @@ describe.each( [
 				{ ...TABS[ 2 ], icon: media },
 			];
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS_WITH_ICON }
 					children={ panelRenderFunction }
@@ -85,24 +103,21 @@ describe.each( [
 			const allTabs = screen.getAllByRole( 'tab' );
 
 			for ( let i = 0; i < allTabs.length; i++ ) {
-				expect(
-					screen.queryByText( TABS_WITH_ICON[ i ].title )
-				).not.toBeInTheDocument();
+				const tooltip = page.getByText( TABS_WITH_ICON[ i ].title );
+				await expect.element( tooltip ).not.toBeInTheDocument();
 
-				await hover( allTabs[ i ] );
+				await user.hover( allTabs[ i ] );
 
-				await waitFor( () =>
-					expect(
-						screen.getByText( TABS_WITH_ICON[ i ].title )
-					).toBeVisible()
-				);
+				await expect.element( tooltip ).toBeVisible();
 
 				// Trigger closing the tooltip
-				await click( document.body );
+				await user.click( document.body );
+				await expect.element( tooltip ).not.toBeInTheDocument();
 			}
 		} );
 
 		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 			const panelRenderFunction = vi.fn();
 
@@ -112,7 +127,7 @@ describe.each( [
 				{ ...TABS[ 2 ], icon: media },
 			];
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS_WITH_ICON }
 					children={ panelRenderFunction }
@@ -127,37 +142,45 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
-			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
-			await press.Tab();
+			await expect
+				.element( page.getByText( 'Alpha' ) )
+				.not.toBeInTheDocument();
+			await user.tab();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+			await expect.element( page.getByText( 'Alpha' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
-			await press.ArrowRight();
+			await expect
+				.element( page.getByText( 'Beta' ) )
+				.not.toBeInTheDocument();
+			await user.keyboard( '{ArrowRight}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect.element( page.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure gamma is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
-			await press.ArrowRight();
+			await expect
+				.element( page.getByText( 'Gamma' ) )
+				.not.toBeInTheDocument();
+			await user.keyboard( '{ArrowRight}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+			await expect.element( page.getByText( 'Gamma' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
-			await press.ArrowLeft();
+			await expect
+				.element( page.getByText( 'Beta' ) )
+				.not.toBeInTheDocument();
+			await user.keyboard( '{ArrowLeft}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect.element( page.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 		} );
 	} );
@@ -166,7 +189,7 @@ describe.each( [
 		it( 'should render first tab', async () => {
 			const panelRenderFunction = vi.fn();
 
-			render(
+			await render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
 			);
 
@@ -178,7 +201,7 @@ describe.each( [
 
 		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
 			const mockOnSelect = vi.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -186,7 +209,7 @@ describe.each( [
 				/>
 			);
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS.slice( 1 ) /* remove alpha */ }
 					children={ () => undefined }
@@ -199,7 +222,7 @@ describe.each( [
 
 	describe( 'With `initialTabName`', () => {
 		it( 'should render the tab set by initialTabName prop', async () => {
-			render(
+			await render(
 				<Component
 					initialTabName="beta"
 					tabs={ TABS }
@@ -210,8 +233,8 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
-			render(
+		it( 'should not select a tab when `initialTabName` does not match any known tab', async () => {
+			await render(
 				<Component
 					initialTabName="does-not-exist"
 					tabs={ TABS }
@@ -220,15 +243,17 @@ describe.each( [
 			);
 
 			// No tab should be selected i.e. it doesn't fall back to first tab.
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).not.toBeInTheDocument();
+			await expect
+				.element( page.getByRole( 'tab', { selected: true } ) )
+				.not.toBeInTheDocument();
 
 			// No tabpanel should be rendered either
-			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+			await expect
+				.element( page.getByRole( 'tabpanel' ) )
+				.not.toBeInTheDocument();
 		} );
 		it( 'should not change tabs when initialTabName is changed', async () => {
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="beta"
 					tabs={ TABS }
@@ -236,7 +261,7 @@ describe.each( [
 				/>
 			);
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="alpha"
 					tabs={ TABS }
@@ -248,9 +273,10 @@ describe.each( [
 		} );
 
 		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -262,11 +288,11 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			await click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS.slice( 1 ) } // Remove alpha
@@ -282,7 +308,7 @@ describe.each( [
 		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', async () => {
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -295,7 +321,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS.slice( 0, 2 ) } // Remove gamma
@@ -305,15 +331,15 @@ describe.each( [
 			);
 
 			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).not.toBeInTheDocument();
+			await expect
+				.element( page.getByRole( 'tab', { selected: true } ) )
+				.not.toBeInTheDocument();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', async () => {
 			const mockOnSelect = vi.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="delta"
 					tabs={ TABS }
@@ -323,11 +349,11 @@ describe.each( [
 			);
 
 			// There should be no selected tab yet.
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).not.toBeInTheDocument();
+			await expect
+				.element( page.getByRole( 'tab', { selected: true } ) )
+				.not.toBeInTheDocument();
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="delta"
 					tabs={ [
@@ -350,9 +376,10 @@ describe.each( [
 
 	describe( 'Disabled Tab', () => {
 		it( 'should disable the tab when `disabled` is `true`', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ [
 						...TABS,
@@ -377,14 +404,14 @@ describe.each( [
 
 			// onSelect should not be called since the disabled tab is
 			// highlighted, but not selected.
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'should select first enabled tab when the initial tab is disabled', async () => {
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					// Disable alpha
 					tabs={ TABS.map( ( tab ) => {
@@ -403,7 +430,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 			// Re-enable all tabs
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -419,7 +446,7 @@ describe.each( [
 		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', async () => {
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS.map( ( tab ) => {
 						if ( tab.name === 'gamma' ) {
@@ -438,7 +465,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 			// Re-enable all tabs
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					initialTabName="beta"
@@ -454,7 +481,7 @@ describe.each( [
 
 		it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
 			const mockOnSelect = vi.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -466,7 +493,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS.map( ( tab ) => {
 						if ( tab.name === 'alpha' ) {
@@ -483,7 +510,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -499,7 +526,7 @@ describe.each( [
 		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', async () => {
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -512,7 +539,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ [
@@ -529,7 +556,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -545,10 +572,11 @@ describe.each( [
 
 	describe( 'Tab Activation', () => {
 		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
+			const user = userEvent.setup();
 			const panelRenderFunction = vi.fn();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ panelRenderFunction }
@@ -564,7 +592,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Click on Beta, make sure beta is the selected tab
-			await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			expect(
@@ -573,7 +601,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 			// Click on Alpha, make sure beta is the selected tab
-			await click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect(
@@ -583,9 +611,10 @@ describe.each( [
 		} );
 
 		it( 'defaults to automatic tab activation (arrow keys)', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -599,12 +628,12 @@ describe.each( [
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await press.Tab();
+			await user.tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Navigate forward with arrow keys and make sure the Beta tab is
 			// selected automatically.
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
@@ -612,7 +641,7 @@ describe.each( [
 
 			// Navigate backwards with arrow keys. Make sure alpha is
 			// selected automatically.
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
@@ -620,9 +649,10 @@ describe.each( [
 		} );
 
 		it( 'wraps around the last/first tab when using arrow keys', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -636,12 +666,12 @@ describe.each( [
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await press.Tab();
+			await user.tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Navigate backwards with arrow keys and make sure that the Gamma tab
 			// (the last tab) is selected automatically.
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
@@ -649,7 +679,7 @@ describe.each( [
 
 			// Navigate forward with arrow keys. Make sure alpha (the first tab) is
 			// selected automatically.
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
@@ -657,9 +687,10 @@ describe.each( [
 		} );
 
 		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -673,18 +704,18 @@ describe.each( [
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await press.Tab();
+			await user.tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Press the arrow up key, nothing happens.
-			await press.ArrowUp();
+			await user.keyboard( '{ArrowUp}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Press the arrow down key, nothing happens
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
@@ -692,7 +723,7 @@ describe.each( [
 
 			// Change orientation to `vertical`. When the orientation is vertical,
 			// left/right arrow keys are replaced by up/down arrow keys.
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -712,7 +743,7 @@ describe.each( [
 
 			// Navigate forward with arrow keys and make sure the Beta tab is
 			// selected automatically.
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
@@ -720,7 +751,7 @@ describe.each( [
 
 			// Navigate backwards with arrow keys. Make sure alpha is
 			// selected automatically.
-			await press.ArrowUp();
+			await user.keyboard( '{ArrowUp}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
@@ -728,7 +759,7 @@ describe.each( [
 
 			// Navigate backwards with arrow keys. Make sure alpha is
 			// selected automatically.
-			await press.ArrowUp();
+			await user.keyboard( '{ArrowUp}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
@@ -736,7 +767,7 @@ describe.each( [
 
 			// Navigate backwards with arrow keys. Make sure alpha is
 			// selected automatically.
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
@@ -744,9 +775,10 @@ describe.each( [
 		} );
 
 		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ [
 						...TABS,
@@ -768,7 +800,7 @@ describe.each( [
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await press.Tab();
+			await user.tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
@@ -777,9 +809,9 @@ describe.each( [
 			//   it was the tab that was last selected before delta. Therefore, the
 			//   `mockOnSelect` function gets called only twice (and not three times)
 			// - it will receive focus, when using arrow keys
-			await press.ArrowRight();
-			await press.ArrowRight();
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
+			await user.keyboard( '{ArrowRight}' );
+			await user.keyboard( '{ArrowRight}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect(
 				screen.getByRole( 'tab', { name: 'Delta' } )
@@ -790,7 +822,7 @@ describe.each( [
 			// Navigate backwards with arrow keys. The gamma tab receives focus.
 			// The `mockOnSelect` callback doesn't fire, since the gamma tab was
 			// already selected.
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
@@ -798,34 +830,43 @@ describe.each( [
 			// Click on the disabled tab. Compared to using arrow keys to move the
 			// focus, disabled tabs ignore pointer clicks — and therefore, they don't
 			// receive focus, nor they cause the `mockOnSelect` function to fire.
-			await click( screen.getByRole( 'tab', { name: 'Delta' } ) );
+			await user.click(
+				screen.getByRole( 'tab', { name: 'Delta' } ),
+				// Real users cannot activate an aria-disabled tab. Force the
+				// pointer event to retain coverage for the component guard.
+				{ force: true }
+			);
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 		} );
 
 		it( 'should not focus the next tab when the Tab key is pressed', async () => {
-			render( <Component tabs={ TABS } children={ () => undefined } /> );
+			const user = userEvent.setup();
+			await render(
+				<Component tabs={ TABS } children={ () => undefined } />
+			);
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
-			await press.Tab();
+			await user.tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
-			await press.Tab();
+			await user.tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )
 			).not.toHaveFocus();
 		} );
 
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = vi.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -840,33 +881,33 @@ describe.each( [
 
 			// Click on Alpha and make sure it is selected.
 			// onSelect shouldn't fire since the selected tab didn't change.
-			await click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Navigate forward with arrow keys. Make sure Beta is focused, but
 			// that the tab selection happens only when pressing the spacebar
 			// or enter key.
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )
 			).toHaveFocus();
 
-			await press.Enter();
+			await user.keyboard( '{Enter}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 			// Navigate forward with arrow keys. Make sure Gamma (last tab) is
 			// focused, but that tab selection happens only when pressing the
 			// spacebar or enter key.
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect(
 				screen.getByRole( 'tab', { name: 'Gamma' } )
 			).toHaveFocus();
 
-			await press.Space();
+			await user.keyboard( ' ' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
@@ -874,7 +915,9 @@ describe.each( [
 
 	describe( 'Tab Attributes', () => {
 		it( "should apply the tab's `className` to the tab button", async () => {
-			render( <Component tabs={ TABS } children={ () => undefined } /> );
+			await render(
+				<Component tabs={ TABS } children={ () => undefined } />
+			);
 
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -888,9 +931,10 @@ describe.each( [
 		} );
 
 		it( 'should apply the `activeClass` to the selected tab', async () => {
+			const user = userEvent.setup();
 			const activeClass = 'my-active-tab';
 
-			render(
+			await render(
 				<Component
 					activeClass={ activeClass }
 					tabs={ TABS }
@@ -908,7 +952,7 @@ describe.each( [
 				} );
 
 			// Click the 'Beta' tab
-			await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
 			// Make sure that only the selected tab has the active class
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );

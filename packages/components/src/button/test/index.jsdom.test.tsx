@@ -1,8 +1,19 @@
+/**
+ * External dependencies
+ */
 import { describe, expect, it, vi } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { press } from '@ariakit/test';
+
+/**
+ * WordPress dependencies
+ */
 import { createRef, forwardRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
 import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
@@ -76,7 +87,7 @@ describe( 'Button', () => {
 			render( <Button icon={ plusCircle }>Children</Button> );
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
 		} );
@@ -124,7 +135,7 @@ describe( 'Button', () => {
 				name: 'Tooltip anchor',
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( anchor ).toHaveFocus();
 
@@ -134,17 +145,19 @@ describe( 'Button', () => {
 
 			expect( tooltip ).toBeVisible();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
 			).toHaveFocus();
 
-			expect(
-				screen.queryByRole( 'tooltip', {
-					name: 'Tooltip text',
-				} )
-			).not.toBeInTheDocument();
+			await expect
+				.element(
+					page.getByRole( 'tooltip', {
+						name: 'Tooltip text',
+					} )
+				)
+				.not.toBeInTheDocument();
 		} );
 
 		it( 'should render correctly as a tooltip anchor, ignoring its internal tooltip in favour of the external tooltip', async () => {
@@ -161,7 +174,7 @@ describe( 'Button', () => {
 				name: 'Button label',
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( anchor ).toHaveFocus();
 
@@ -178,17 +191,19 @@ describe( 'Button', () => {
 				} )
 			).not.toBeInTheDocument();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
 			).toHaveFocus();
 
-			expect(
-				screen.queryByRole( 'tooltip', {
-					name: 'Tooltip text',
-				} )
-			).not.toBeInTheDocument();
+			await expect
+				.element(
+					page.getByRole( 'tooltip', {
+						name: 'Tooltip text',
+					} )
+				)
+				.not.toBeInTheDocument();
 		} );
 
 		it( 'should not trash the rendered HTML elements when toggling between showing and not showing a tooltip', async () => {
@@ -202,7 +217,7 @@ describe( 'Button', () => {
 
 			expect( button ).toBeVisible();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( button ).toHaveFocus();
 
@@ -303,7 +318,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
@@ -338,7 +353,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.getByText( 'Label' ) ).toBeVisible();
 
@@ -363,7 +378,7 @@ describe( 'Button', () => {
 				} )
 			).toBeVisible();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			expect(
 				screen.getByRole( 'tooltip', {
@@ -390,7 +405,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
@@ -403,7 +418,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
@@ -420,7 +435,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
@@ -435,7 +450,7 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await press.Tab();
+			await userEvent.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
@@ -616,23 +631,23 @@ describe( 'Button', () => {
 			expect( button ).toHaveAttribute( 'aria-disabled' );
 		} );
 	} );
-
-	it( 'supports the expected static types', () => {
-		<>
-			<Button href="foo" />
-			{ /* @ts-expect-error - `target` requires `href` */ }
-			<Button target="foo" />
-
-			{ /* @ts-expect-error - `disabled` is only for buttons */ }
-			<Button href="foo" disabled />
-
-			<Button href="foo" type="image/png" />
-			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
-			<Button type="image/png" />
-			{ /* @ts-expect-error `type` must be submit, reset or button. */ }
-			<Button type="invalidtype" />
-			{ /* @ts-expect-error `accessibleWhenDisabled` is not supported on a link button. */ }
-			<Button disabled accessibleWhenDisabled href="foo" />
-		</>;
-	} );
 } );
+
+// These expressions are checked by TypeScript without registering an empty
+// runtime suite, which Vitest treats as an error.
+<>
+	<Button href="foo" />
+	{ /* @ts-expect-error - `target` requires `href` */ }
+	<Button target="foo" />
+
+	{ /* @ts-expect-error - `disabled` is only for buttons */ }
+	<Button href="foo" disabled />
+
+	<Button href="foo" type="image/png" />
+	{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
+	<Button type="image/png" />
+	{ /* @ts-expect-error */ }
+	<Button type="invalidtype" />
+	{ /* @ts-expect-error */ }
+	<Button disabled accessibleWhenDisabled href="foo" />
+</>;

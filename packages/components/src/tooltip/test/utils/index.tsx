@@ -1,4 +1,7 @@
-import { click, press } from '@ariakit/test';
+/**
+ * External dependencies
+ */
+import { userEvent } from 'vitest/browser';
 
 // TODO: may need to be tested with Playwright; further context:
 // https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
@@ -11,7 +14,7 @@ import { click, press } from '@ariakit/test';
  *
  */
 export default async function cleanupTooltip() {
-	await press.Tab();
-	await press.Tab();
-	await click( document.body );
+	await userEvent.tab();
+	await userEvent.tab();
+	await userEvent.click( document.body );
 }
