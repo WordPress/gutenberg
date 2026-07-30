@@ -41,7 +41,7 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
  * Simple interface to introduce animations to components.
  *
  * This component is deprecated. Write your own CSS animations instead,
- * preferably using the [motion tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-motion--docs)
+ * preferably using the [motion tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs)
  * available in `@wordpress/theme`.
  *
  * @deprecated

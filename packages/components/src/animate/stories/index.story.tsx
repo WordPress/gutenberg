@@ -12,7 +12,7 @@ const meta: Meta< typeof Animate > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated. Write your own CSS animations instead, preferably using the [`motion tokens`](?path=/docs/design-system-tokens-motion--docs) available in `@wordpress/theme`.',
+			notes: 'Deprecated. Write your own CSS animations instead, preferably using the [`motion tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
 	},
 };
