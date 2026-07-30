@@ -25,6 +25,20 @@ export type ActiveViewOverrides = {
 	layout?: Record< string, unknown >;
 };
 
+/**
+ * The overrides resolved at runtime: the developer-provided
+ * `activeViewOverrides`, the defaults of the effective layout type, and the
+ * URL-managed values.
+ *
+ * `page` and `search` are absent from `ActiveViewOverrides` on purpose: the URL
+ * is their only source and developers cannot configure them. They are part of
+ * this type so the merge/strip logic treats them like any other override.
+ */
+export type Overrides = ActiveViewOverrides & {
+	page?: View[ 'page' ];
+	search?: View[ 'search' ];
+};
+
 export interface ViewConfig {
 	/**
 	 * Entity kind (e.g. postType, root).

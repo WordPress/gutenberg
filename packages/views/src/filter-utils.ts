@@ -11,7 +11,7 @@ import type { View, Filter } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { ActiveViewOverrides } from './types';
+import type { Overrides } from './types';
 
 const SCALAR_VALUES = [
 	'titleField',
@@ -24,26 +24,34 @@ const SCALAR_VALUES = [
 	'infiniteScrollEnabled',
 ] as const;
 
+// Values managed by the URL: they behave like scalar values (they always win
+// over the persisted view and are never persisted), but they are never
+// configured by the developer — the URL is their only source.
+const URL_MANAGED_VALUES = [ 'page', 'search' ] as const;
+
 // Values that act as developer-provided defaults: the override applies only
 // while the view still matches the default view, so an explicit user
 // modification wins over the override (and gets persisted).
 const DEFAULT_BOUND_VALUES = [ 'type', 'perPage', 'fields' ] as const;
 
+const ALWAYS_WINS_VALUES = [ ...SCALAR_VALUES, ...URL_MANAGED_VALUES ] as const;
+
 /**
- * Merges activeViewOverrides into a view.
+ * Merges the resolved overrides into a view.
  * Filters: Locked filters always replace same-field filters; unlocked filters
  * apply only while the user has no filter of their own for the field.
  * Sort, type, perPage, fields: Applied only if the current value matches the
  * default, so user modifications win.
+ * Page, search: always win, whatever the view carries.
  *
  * @param view                The view to merge overrides into.
- * @param activeViewOverrides The tab-specific overrides to apply.
+ * @param activeViewOverrides The overrides to apply.
  * @param defaultView         The default view configuration.
  * @return A new view with merged overrides, or the original view if no overrides.
  */
 export function mergeOverrides(
 	view: View,
-	activeViewOverrides?: ActiveViewOverrides,
+	activeViewOverrides?: Overrides,
 	defaultView?: View
 ): View {
 	if ( ! activeViewOverrides ) {
@@ -52,8 +60,8 @@ export function mergeOverrides(
 
 	let result = view;
 
-	// Merge scalar overrides — always win over persisted values
-	for ( const key of SCALAR_VALUES ) {
+	// Merge scalar and URL-managed overrides — always win over persisted values
+	for ( const key of ALWAYS_WINS_VALUES ) {
 		if ( key in activeViewOverrides ) {
 			result = { ...result, [ key ]: activeViewOverrides[ key ] };
 		}
@@ -148,15 +156,16 @@ export function mergeOverrides(
  * to the default view's filter unless the user modified them.
  * Sort, type, perPage, fields: If the value matches the override, restores
  * the default value.
+ * Page, search: never persisted.
  *
  * @param view                The view to strip overrides from.
- * @param activeViewOverrides The tab-specific override definitions.
+ * @param activeViewOverrides The override definitions.
  * @param defaultView         The default view configuration.
  * @return A new view with overrides stripped, or the original view if no overrides.
  */
 export function stripOverrides(
 	view: View,
-	activeViewOverrides?: ActiveViewOverrides,
+	activeViewOverrides?: Overrides,
 	defaultView?: View
 ): View {
 	if ( ! activeViewOverrides ) {
@@ -165,8 +174,8 @@ export function stripOverrides(
 
 	let result = view;
 
-	// Strip scalar keys managed by overrides
-	for ( const key of SCALAR_VALUES ) {
+	// Strip scalar and URL-managed keys managed by overrides
+	for ( const key of ALWAYS_WINS_VALUES ) {
 		if ( key in activeViewOverrides ) {
 			const { [ key ]: _, ...rest } = result;
 			result = rest as View;

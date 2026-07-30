@@ -46,15 +46,15 @@ export async function loadView( config: ViewConfig ) {
 	// are never persisted, and neither the default view nor the active view
 	// overrides may configure them — an absent URL param is indistinguishable
 	// from the user having cleared the value, so any fallback would resurrect
-	// a cleared search on the next read. These win over whatever `baseView`
-	// carries below.
+	// a cleared search on the next read. They join the overrides below, which
+	// makes them win over whatever `baseView` carries.
 	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
 	// Resolve the effective layout type first: a `type` override changes
 	// which layout's defaults apply.
 	const { type: effectiveType } = mergeOverrides(
-		{ ...baseView },
+		baseView,
 		activeViewOverrides,
 		defaultView
 	);
@@ -62,15 +62,12 @@ export async function loadView( config: ViewConfig ) {
 		defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
 	const layoutTypeDefaults =
 		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
-	const overrides = { ...layoutTypeDefaults, ...activeViewOverrides };
+	const overrides = {
+		...layoutTypeDefaults,
+		...activeViewOverrides,
+		page,
+		search,
+	};
 
-	return mergeOverrides(
-		{
-			...baseView,
-			page,
-			search,
-		},
-		overrides,
-		defaultView
-	);
+	return mergeOverrides( baseView, overrides, defaultView );
 }

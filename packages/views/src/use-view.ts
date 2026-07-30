@@ -26,17 +26,6 @@ interface UseViewReturn {
 	resetToDefault: () => void;
 }
 
-function omit< T extends object, K extends keyof T >(
-	obj: T,
-	keys: K[]
-): Omit< T, K > {
-	const result = { ...obj };
-	for ( const key of keys ) {
-		delete result[ key ];
-	}
-	return result;
-}
-
 /**
  * Hook for managing DataViews view state with local persistence.
  *
@@ -76,8 +65,9 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	// are never persisted, and neither the default view nor the active view
 	// overrides may configure them — an absent URL param is indistinguishable
 	// from the user having cleared the value, so any fallback would resurrect
-	// a cleared search on the next read. These win over whatever `baseView`
-	// carries below.
+	// a cleared search on the next read. They join the overrides below, which
+	// makes them win over `baseView` when merging and drops them when
+	// stripping.
 	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
@@ -93,40 +83,28 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
 		const layoutTypeDefaults =
 			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
-		return { ...layoutTypeDefaults, ...activeViewOverrides };
-	}, [ defaultLayouts, baseView, activeViewOverrides, defaultView ] );
+		return { ...layoutTypeDefaults, ...activeViewOverrides, page, search };
+	}, [
+		baseView,
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
+		page,
+		search,
+	] );
 
-	// Merge URL query parameters (page, search) and activeViewOverrides into the view
 	const view: View = useMemo( () => {
-		return mergeOverrides(
-			{
-				...baseView,
-				page,
-				search,
-			},
-			overrides,
-			defaultView
-		);
-	}, [ baseView, page, search, overrides, defaultView ] );
+		return mergeOverrides( baseView, overrides, defaultView );
+	}, [ baseView, overrides, defaultView ] );
 
 	const isModified = !! persistedView;
 
 	const updateView = useCallback(
 		( newView: View ) => {
-			// Extract URL params (page, search) from the new view
 			const urlParams: { page?: number; search?: string } = {
 				page: newView?.page,
 				search: newView?.search,
 			};
-			// Strip activeViewOverrides and URL params before persisting
-			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
-			const preferenceView = stripOverrides(
-				omit( newView, [ 'page', 'search' ] ) as View,
-				overrides,
-				defaultView
-			);
-
-			// If we have URL handling enabled, separate URL state from preference state
 			if (
 				onChangeQueryParams &&
 				! dequal( urlParams, { page, search } )
@@ -134,26 +112,27 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				onChangeQueryParams( urlParams );
 			}
 
-			// Compare with baseView and defaultView after stripping
-			// activeViewOverrides and the URL params (page, search), which the
-			// preference view never carries.
+			const comparableNewView = stripOverrides(
+				newView,
+				overrides,
+				defaultView
+			);
 			const comparableBaseView = stripOverrides(
-				omit( baseView, [ 'page', 'search' ] ) as View,
+				baseView,
 				overrides,
 				defaultView
 			);
 			const comparableDefaultView = stripOverrides(
-				omit( defaultView ?? {}, [ 'page', 'search' ] ) as View,
+				defaultView ?? {},
 				overrides,
 				defaultView
 			);
 
-			// Only persist non-URL preferences if different from baseView
-			if ( ! dequal( comparableBaseView, preferenceView ) ) {
-				if ( dequal( preferenceView, comparableDefaultView ) ) {
+			if ( ! dequal( comparableBaseView, comparableNewView ) ) {
+				if ( dequal( comparableNewView, comparableDefaultView ) ) {
 					set( 'core/views', preferenceKey, undefined );
 				} else {
-					set( 'core/views', preferenceKey, preferenceView );
+					set( 'core/views', preferenceKey, comparableNewView );
 				}
 			}
 		},

@@ -6,10 +6,7 @@ import type { View } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import {
-	mergeActiveViewOverrides,
-	stripActiveViewOverrides,
-} from '../filter-utils';
+import { mergeOverrides, stripOverrides } from '../filter-utils';
 
 const baseView: View = {
 	type: 'table',
@@ -24,38 +21,36 @@ const defaultView: View = {
 	sort: { field: 'date', direction: 'desc' },
 };
 
-describe( 'mergeActiveViewOverrides', () => {
+describe( 'mergeOverrides', () => {
 	it( 'should return the view unchanged when no overrides are provided', () => {
-		expect( mergeActiveViewOverrides( baseView ) ).toBe( baseView );
-		expect( mergeActiveViewOverrides( baseView, undefined ) ).toBe(
-			baseView
-		);
+		expect( mergeOverrides( baseView ) ).toBe( baseView );
+		expect( mergeOverrides( baseView, undefined ) ).toBe( baseView );
 	} );
 
 	describe( 'scalar overrides', () => {
 		it( 'should merge titleField override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				titleField: 'name',
 			} );
 			expect( result.titleField ).toBe( 'name' );
 		} );
 
 		it( 'should merge mediaField override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				mediaField: 'thumbnail',
 			} );
 			expect( result.mediaField ).toBe( 'thumbnail' );
 		} );
 
 		it( 'should merge descriptionField override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				descriptionField: 'excerpt',
 			} );
 			expect( result.descriptionField ).toBe( 'excerpt' );
 		} );
 
 		it( 'should merge showTitle override', () => {
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				{ ...baseView, showTitle: true },
 				{ showTitle: false }
 			);
@@ -63,28 +58,28 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should merge showMedia override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				showMedia: true,
 			} );
 			expect( result.showMedia ).toBe( true );
 		} );
 
 		it( 'should merge showDescription override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				showDescription: false,
 			} );
 			expect( result.showDescription ).toBe( false );
 		} );
 
 		it( 'should merge showLevels override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				showLevels: true,
 			} );
 			expect( result.showLevels ).toBe( true );
 		} );
 
 		it( 'should merge infiniteScrollEnabled override', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				infiniteScrollEnabled: true,
 			} );
 			expect( result.infiniteScrollEnabled ).toBe( true );
@@ -92,14 +87,14 @@ describe( 'mergeActiveViewOverrides', () => {
 
 		it( 'should override existing scalar value on the view', () => {
 			const view: View = { ...baseView, titleField: 'old-title' };
-			const result = mergeActiveViewOverrides( view, {
+			const result = mergeOverrides( view, {
 				titleField: 'new-title',
 			} );
 			expect( result.titleField ).toBe( 'new-title' );
 		} );
 
 		it( 'should merge multiple scalar overrides at once', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				titleField: 'name',
 				showTitle: true,
 				showMedia: false,
@@ -114,7 +109,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 	describe( 'default-bound overrides (type, perPage, fields)', () => {
 		it( 'should apply type override when current type matches the default', () => {
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				baseView,
 				{ type: 'grid' },
 				defaultView
@@ -124,7 +119,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 		it( 'should not apply type override when the user has changed the type', () => {
 			const userView: View = { ...baseView, type: 'list' };
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				userView,
 				{ type: 'grid' },
 				defaultView
@@ -133,14 +128,14 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should not apply type override when no default view is provided', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				type: 'grid',
 			} );
 			expect( result.type ).toBe( 'table' );
 		} );
 
 		it( 'should apply perPage override when current perPage matches the default', () => {
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				baseView,
 				{ perPage: 10 },
 				{ ...defaultView, perPage: 25 }
@@ -150,7 +145,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 		it( 'should not apply perPage override when the user has changed perPage', () => {
 			const userView: View = { ...baseView, perPage: 50 };
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				userView,
 				{ perPage: 10 },
 				{ ...defaultView, perPage: 25 }
@@ -160,7 +155,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 		it( 'should apply fields override when current fields match the default', () => {
 			const view: View = { ...baseView, fields: [ 'author' ] };
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				view,
 				{ fields: [ 'date' ] },
 				{ ...defaultView, fields: [ 'author' ] }
@@ -170,7 +165,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 		it( 'should not apply fields override when the user has changed fields', () => {
 			const view: View = { ...baseView, fields: [ 'author', 'status' ] };
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				view,
 				{ fields: [ 'date' ] },
 				{ ...defaultView, fields: [ 'author' ] }
@@ -181,7 +176,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 	describe( 'filter overrides', () => {
 		it( 'should add override filters', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				filters: [
 					{ field: 'status', operator: 'isAny', value: 'publish' },
 				],
@@ -200,7 +195,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should always replace same-field filters when the override is locked', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				filters: [
 					{
 						field: 'author',
@@ -222,7 +217,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		it( 'should not replace a user-modified same-field filter when the override is unlocked', () => {
 			// The view's author filter differs from the default view's, meaning
 			// the user has modified it: the unlocked override must not win.
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				baseView,
 				{
 					filters: [
@@ -250,7 +245,7 @@ describe( 'mergeActiveViewOverrides', () => {
 					{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
 				],
 			};
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				baseView,
 				{
 					filters: [
@@ -272,7 +267,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should handle empty override filters array', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				filters: [],
 			} );
 			// Empty filters array is treated as no override.
@@ -282,7 +277,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 	describe( 'sort overrides', () => {
 		it( 'should apply sort override when current sort matches default', () => {
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				baseView,
 				{ sort: { field: 'title', direction: 'asc' } },
 				defaultView
@@ -298,7 +293,7 @@ describe( 'mergeActiveViewOverrides', () => {
 				...baseView,
 				sort: { field: 'title', direction: 'asc' },
 			};
-			const result = mergeActiveViewOverrides(
+			const result = mergeOverrides(
 				userView,
 				{ sort: { field: 'modified', direction: 'desc' } },
 				defaultView
@@ -310,7 +305,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should not apply sort override when no default view is provided', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				sort: { field: 'title', direction: 'asc' },
 			} );
 			expect( result.sort ).toEqual( baseView.sort );
@@ -323,7 +318,7 @@ describe( 'mergeActiveViewOverrides', () => {
 				...baseView,
 				layout: { density: 'compact' },
 			};
-			const result = mergeActiveViewOverrides( view, {
+			const result = mergeOverrides( view, {
 				layout: { styles: { author: { align: 'end' } } },
 			} );
 			expect( result.layout ).toEqual( {
@@ -333,7 +328,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should set layout when view has no existing layout', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				layout: { styles: { title: { width: '50%' } } },
 			} );
 			expect( result.layout ).toEqual( {
@@ -349,7 +344,7 @@ describe( 'mergeActiveViewOverrides', () => {
 					styles: { old: { width: '10%' } },
 				},
 			};
-			const result = mergeActiveViewOverrides( view, {
+			const result = mergeOverrides( view, {
 				layout: { styles: { new: { width: '20%' } } },
 			} );
 			// Shallow merge: styles key is replaced entirely.
@@ -370,7 +365,7 @@ describe( 'mergeActiveViewOverrides', () => {
 					showLabel: false,
 				},
 			};
-			const result = mergeActiveViewOverrides( view, {
+			const result = mergeOverrides( view, {
 				groupBy: { field: 'category', direction: 'desc' },
 			} );
 			expect( result.groupBy ).toEqual( {
@@ -380,7 +375,7 @@ describe( 'mergeActiveViewOverrides', () => {
 		} );
 
 		it( 'should set groupBy when view has none', () => {
-			const result = mergeActiveViewOverrides( baseView, {
+			const result = mergeOverrides( baseView, {
 				groupBy: { field: 'category', direction: 'desc' },
 			} );
 			expect( result.groupBy ).toEqual( {
@@ -392,7 +387,7 @@ describe( 'mergeActiveViewOverrides', () => {
 
 	it( 'should not mutate the original view', () => {
 		const original = { ...baseView };
-		mergeActiveViewOverrides( original, {
+		mergeOverrides( original, {
 			titleField: 'name',
 			filters: [
 				{ field: 'status', operator: 'isAny', value: 'publish' },
@@ -403,18 +398,16 @@ describe( 'mergeActiveViewOverrides', () => {
 	} );
 } );
 
-describe( 'stripActiveViewOverrides', () => {
+describe( 'stripOverrides', () => {
 	it( 'should return the view unchanged when no overrides are provided', () => {
-		expect( stripActiveViewOverrides( baseView ) ).toBe( baseView );
-		expect( stripActiveViewOverrides( baseView, undefined ) ).toBe(
-			baseView
-		);
+		expect( stripOverrides( baseView ) ).toBe( baseView );
+		expect( stripOverrides( baseView, undefined ) ).toBe( baseView );
 	} );
 
 	describe( 'scalar stripping', () => {
 		it( 'should strip a scalar key managed by overrides', () => {
 			const view: View = { ...baseView, titleField: 'name' };
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				titleField: 'name',
 			} );
 			expect( result ).not.toHaveProperty( 'titleField' );
@@ -427,7 +420,7 @@ describe( 'stripActiveViewOverrides', () => {
 				showTitle: true,
 				mediaField: 'thumb',
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				titleField: 'name',
 				showTitle: true,
 				mediaField: 'thumb',
@@ -443,7 +436,7 @@ describe( 'stripActiveViewOverrides', () => {
 				titleField: 'name',
 				descriptionField: 'excerpt',
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				titleField: 'name',
 			} );
 			expect( result ).not.toHaveProperty( 'titleField' );
@@ -454,7 +447,7 @@ describe( 'stripActiveViewOverrides', () => {
 	describe( 'default-bound stripping (type, perPage, fields)', () => {
 		it( 'should restore the default type when current matches the override', () => {
 			const view: View = { ...baseView, type: 'grid' };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ type: 'grid' },
 				defaultView
@@ -464,7 +457,7 @@ describe( 'stripActiveViewOverrides', () => {
 
 		it( 'should keep a user-modified type that differs from the override', () => {
 			const view: View = { ...baseView, type: 'list' };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ type: 'grid' },
 				defaultView
@@ -474,7 +467,7 @@ describe( 'stripActiveViewOverrides', () => {
 
 		it( 'should restore the default perPage when current matches the override', () => {
 			const view: View = { ...baseView, perPage: 10 };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ perPage: 10 },
 				{ ...defaultView, perPage: 25 }
@@ -484,7 +477,7 @@ describe( 'stripActiveViewOverrides', () => {
 
 		it( 'should keep a user-modified perPage that differs from the override', () => {
 			const view: View = { ...baseView, perPage: 50 };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ perPage: 10 },
 				{ ...defaultView, perPage: 25 }
@@ -494,7 +487,7 @@ describe( 'stripActiveViewOverrides', () => {
 
 		it( 'should restore the default fields when current matches the override', () => {
 			const view: View = { ...baseView, fields: [ 'date' ] };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ fields: [ 'date' ] },
 				{ ...defaultView, fields: [ 'author' ] }
@@ -504,7 +497,7 @@ describe( 'stripActiveViewOverrides', () => {
 
 		it( 'should keep user-modified fields that differ from the override', () => {
 			const view: View = { ...baseView, fields: [ 'author', 'status' ] };
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ fields: [ 'date' ] },
 				{ ...defaultView, fields: [ 'author' ] }
@@ -530,7 +523,7 @@ describe( 'stripActiveViewOverrides', () => {
 					},
 				],
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				filters: [
 					{
 						field: 'status',
@@ -544,7 +537,7 @@ describe( 'stripActiveViewOverrides', () => {
 		} );
 
 		it( 'should handle empty override filters', () => {
-			const result = stripActiveViewOverrides( baseView, {
+			const result = stripOverrides( baseView, {
 				filters: [],
 			} );
 			expect( result.filters ).toEqual( baseView.filters );
@@ -557,7 +550,7 @@ describe( 'stripActiveViewOverrides', () => {
 					{ field: 'status', operator: 'isAny', value: 'draft' },
 				],
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				filters: [
 					{ field: 'status', operator: 'isAny', value: 'publish' },
 				],
@@ -574,7 +567,7 @@ describe( 'stripActiveViewOverrides', () => {
 					{ field: 'status', operator: 'isAny', value: 'draft' },
 				],
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				filters: [
 					{
 						field: 'status',
@@ -600,7 +593,7 @@ describe( 'stripActiveViewOverrides', () => {
 					{ field: 'status', operator: 'isAny', value: 'publish' },
 				],
 			};
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{
 					filters: [
@@ -625,7 +618,7 @@ describe( 'stripActiveViewOverrides', () => {
 				...baseView,
 				sort: { field: 'title', direction: 'asc' },
 			};
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ sort: { field: 'title', direction: 'asc' } },
 				defaultView
@@ -638,7 +631,7 @@ describe( 'stripActiveViewOverrides', () => {
 				...baseView,
 				sort: { field: 'author', direction: 'asc' },
 			};
-			const result = stripActiveViewOverrides(
+			const result = stripOverrides(
 				view,
 				{ sort: { field: 'title', direction: 'asc' } },
 				defaultView
@@ -659,7 +652,7 @@ describe( 'stripActiveViewOverrides', () => {
 					styles: { author: { align: 'end' } },
 				},
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				layout: { styles: { author: { align: 'end' } } },
 			} );
 			expect( result.layout ).toEqual( { density: 'compact' } );
@@ -672,14 +665,14 @@ describe( 'stripActiveViewOverrides', () => {
 					styles: { author: { align: 'end' } },
 				},
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				layout: { styles: { author: { align: 'end' } } },
 			} );
 			expect( result.layout ).toBeUndefined();
 		} );
 
 		it( 'should not touch layout when view has no layout', () => {
-			const result = stripActiveViewOverrides( baseView, {
+			const result = stripOverrides( baseView, {
 				layout: { styles: {} },
 			} );
 			expect( result ).not.toHaveProperty( 'layout' );
@@ -696,14 +689,14 @@ describe( 'stripActiveViewOverrides', () => {
 					showLabel: true,
 				},
 			};
-			const result = stripActiveViewOverrides( view, {
+			const result = stripOverrides( view, {
 				groupBy: { field: 'category', direction: 'desc' },
 			} );
 			expect( result ).not.toHaveProperty( 'groupBy' );
 		} );
 
 		it( 'should not touch groupBy when view has no groupBy', () => {
-			const result = stripActiveViewOverrides( baseView, {
+			const result = stripOverrides( baseView, {
 				groupBy: { field: 'category', direction: 'asc' },
 			} );
 			expect( result ).not.toHaveProperty( 'groupBy' );
@@ -717,7 +710,7 @@ describe( 'stripActiveViewOverrides', () => {
 			layout: { density: 'compact', styles: { a: { width: '1px' } } },
 		};
 		const original = { ...view, layout: { ...view.layout } };
-		stripActiveViewOverrides( view, {
+		stripOverrides( view, {
 			titleField: 'name',
 			layout: { styles: {} },
 		} );
@@ -731,8 +724,8 @@ describe( 'merge + strip round-trip', () => {
 			titleField: 'name' as const,
 			showMedia: true as const,
 		};
-		const merged = mergeActiveViewOverrides( baseView, overrides );
-		const stripped = stripActiveViewOverrides( merged, overrides );
+		const merged = mergeOverrides( baseView, overrides );
+		const stripped = stripOverrides( merged, overrides );
 		expect( stripped ).not.toHaveProperty( 'titleField' );
 		expect( stripped ).not.toHaveProperty( 'showMedia' );
 		// Original fields remain.
@@ -748,8 +741,8 @@ describe( 'merge + strip round-trip', () => {
 			...baseView,
 			layout: { density: 'compact' },
 		};
-		const merged = mergeActiveViewOverrides( view, overrides );
-		const stripped = stripActiveViewOverrides( merged, overrides );
+		const merged = mergeOverrides( view, overrides );
+		const stripped = stripOverrides( merged, overrides );
 		expect( stripped.layout ).toEqual( { density: 'compact' } );
 	} );
 
@@ -763,8 +756,8 @@ describe( 'merge + strip round-trip', () => {
 				},
 			],
 		};
-		const merged = mergeActiveViewOverrides( baseView, overrides );
-		const stripped = stripActiveViewOverrides( merged, overrides );
+		const merged = mergeOverrides( baseView, overrides );
+		const stripped = stripOverrides( merged, overrides );
 		// Only the original author filter should remain.
 		expect( stripped.filters ).toEqual( [
 			{ field: 'author', operator: 'isAny', value: [ 'admin' ] },
