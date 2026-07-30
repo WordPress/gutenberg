@@ -1,7 +1,7 @@
 # Animate
 
 <div class="callout callout-alert">
-This component is deprecated. Write your own CSS animations instead.
+This component is deprecated. Write your own CSS animations instead, preferably using the <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-motion--docs">motion tokens</a> available in <code>@wordpress/theme</code>.
 </div>
 
 Simple interface to introduce animations to components.
