@@ -1,11 +1,3 @@
-// Mock memoization as identity function. Inline since Jest errors on
-// out-of-scope references in a mock callback.
-interface MemizeMock {
-	< T extends ( ...args: any[] ) => any >( fn: T ): T;
-}
-
-jest.mock( 'memize', (): MemizeMock => ( fn ) => fn );
-
 /**
  * Internal dependencies
  */
