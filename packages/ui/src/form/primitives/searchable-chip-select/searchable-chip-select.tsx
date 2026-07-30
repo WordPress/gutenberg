@@ -114,23 +114,21 @@ export const SearchableChipSelect = forwardRef<
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ ( item: Item, ...args ) => {
-								if ( item.value === creatableItem?.value ) {
-									return null;
-								}
-								if ( children ) {
-									return children( item, ...args );
-								}
-								return (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										disabled={ item.disabled }
-									>
-										{ item.label }
-									</Combobox.Item>
-								);
-							} }
+							{ children ??
+								( ( item: Item ) => {
+									if ( item.value === creatableItem?.value ) {
+										return null;
+									}
+									return (
+										<Combobox.Item
+											key={ item.value }
+											value={ item }
+											disabled={ item.disabled }
+										>
+											{ item.label }
+										</Combobox.Item>
+									);
+								} ) }
 						</Combobox.Collection>
 					</Combobox.ListBody>
 					{ creatableItem && (

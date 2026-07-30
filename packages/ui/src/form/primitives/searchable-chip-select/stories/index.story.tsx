@@ -2,15 +2,23 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableChipSelect } from '../';
+import {
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
 	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.Group': SearchableChipSelect.Group,
+		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
+		'SearchableChipSelect.Collection': SearchableChipSelect.Collection,
 	},
 	argTypes: {
 		items: { control: false },
@@ -123,6 +131,38 @@ export const WithCustomEmptyContent: Story = {
 	args: {
 		...Default.args,
 		emptyContent: 'No fruit found 🥺',
+	},
+};
+
+/**
+ * Options can be organized into labeled groups with `SearchableChipSelect.Group`,
+ * `SearchableChipSelect.GroupLabel`, and `SearchableChipSelect.Collection`.
+ * Pass an array of groups to `items` (each with `label` and `items` properties),
+ * and use `children` to render each group.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableChipSelect.Group
+				key={ group.label }
+				items={ group.items }
+			>
+				<SearchableChipSelect.GroupLabel>
+					{ group.label }
+				</SearchableChipSelect.GroupLabel>
+				<SearchableChipSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableChipSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableChipSelect.Item>
+					) }
+				</SearchableChipSelect.Collection>
+			</SearchableChipSelect.Group>
+		),
 	},
 };
 

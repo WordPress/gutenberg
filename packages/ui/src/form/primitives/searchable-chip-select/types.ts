@@ -12,6 +12,11 @@ export type Item = {
 	disabled?: boolean;
 };
 
+export type ItemGroup = {
+	label: string;
+	items: Item[];
+};
+
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
 	'children' | 'items' | 'multiple'
@@ -23,9 +28,10 @@ export type SearchableChipSelectProps = Omit<
 		>
 	> & {
 		/**
-		 * The array of option items.
+		 * The array of option items. When using grouped `children`, pass an
+		 * array of groups instead of a flat list of items.
 		 */
-		items?: Item[];
+		items?: Item[] | ItemGroup[];
 		/**
 		 * A render function for custom rendering the list of matching items.
 		 */
