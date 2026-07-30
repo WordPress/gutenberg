@@ -1,6 +1,6 @@
-/**
- * @jest-environment node
- */
+// @vitest-environment node
+
+import { beforeAll, describe, expect, it } from 'vitest';
 import plugin from '../../../stylelint-plugins/no-unknown-ds-tokens.mjs';
 import { getStylelintResult } from './utils';
 

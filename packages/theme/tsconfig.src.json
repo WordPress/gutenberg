@@ -3,12 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [
-			"jest",
-			"node",
-			"style-imports",
-			"react-css-custom-properties"
-		]
+		"types": [ "node", "style-imports", "react-css-custom-properties" ]
 	},
 	"exclude": [ "**/stories/**", "**/test/**", "**/*.story.*" ],
 	"references": [

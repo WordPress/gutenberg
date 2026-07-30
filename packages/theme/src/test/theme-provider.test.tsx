@@ -5,14 +5,17 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
 
 // Give the wrapper a stable class so tests can locate it and read its
 // computed custom properties.
-jest.mock( '../style.module.css', () => ( {
-	root: 'theme-provider-root',
+vi.mock( import( '../style.module.css' ), () => ( {
+	default: {
+		root: 'theme-provider-root',
+	},
 } ) );
 
 // The "strong" brand background resolves to the `color.primary` seed itself, and
@@ -229,7 +232,7 @@ describe( 'ThemeProvider', () => {
 		} );
 
 		it( 'warns when multiple root providers share a document', () => {
-			const warn = jest
+			const warn = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
 
@@ -252,7 +255,7 @@ describe( 'ThemeProvider', () => {
 		} );
 
 		it( 'does not warn for a single root provider', () => {
-			const warn = jest
+			const warn = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
 

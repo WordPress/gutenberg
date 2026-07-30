@@ -27,6 +27,7 @@
 			"packages/shortcode",
 			"packages/style-engine",
 			"packages/sync",
+			"packages/theme",
 			"packages/token-list",
 			"packages/ui",
 			"packages/undo-manager",
