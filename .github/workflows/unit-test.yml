@@ -48,6 +48,7 @@ jobs:
 
             - name: Build package TypeScript declarations
               run: |
+                  npx lerna run build
                   npm run --workspace @wordpress/build-scripts generate-worker-placeholders
                   npx tsc --build
 
