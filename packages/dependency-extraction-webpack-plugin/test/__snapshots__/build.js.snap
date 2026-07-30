@@ -451,7 +451,13 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-singl
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`style-cache-group\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '05ab538fc7abc794bf3a', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob'
+	),
+	'version' => '05ab538fc7abc794bf3a',
+	'type' => 'module'
+);
 "
 `;
 
@@ -1043,7 +1049,12 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-singl
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-cache-group\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'fe584d4d3343f27d9d98');
+"<?php return array(
+	'dependencies' => array(
+		'wp-blob'
+	),
+	'version' => 'fe584d4d3343f27d9d98'
+);
 "
 `;
 
