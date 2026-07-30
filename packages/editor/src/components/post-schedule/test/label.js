@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import { getSettings, setSettings } from '@wordpress/date';
@@ -62,7 +67,7 @@ describe( 'getPostScheduleLabel', () => {
 
 	it( "should show full date if user timezone does not equal site's timezone", () => {
 		const now = new Date( '2022-04-28T13:00:00.000Z' );
-		jest.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
+		vi.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
 			() => 10 * -60 // UTC+10
 		);
 
@@ -79,7 +84,7 @@ describe( 'getPostScheduleLabel', () => {
 		} );
 
 		const now = new Date( '2022-04-28T03:00:00.000Z' );
-		jest.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
+		vi.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
 			() => 10 * -60 // UTC+10
 		);
 
@@ -100,7 +105,7 @@ describe( 'getPostScheduleLabel', () => {
 		} );
 
 		const now = new Date( '2022-04-28T03:00:00.000Z' );
-		jest.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
+		vi.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
 			() => 10 * -60 // UTC+10
 		);
 
@@ -121,7 +126,7 @@ describe( 'getPostScheduleLabel', () => {
 		} );
 
 		const now = new Date( '2022-04-28T03:00:00.000Z' );
-		jest.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
+		vi.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
 			() => 10 * -60 // UTC+10
 		);
 
@@ -142,7 +147,7 @@ describe( 'getPostScheduleLabel', () => {
 		} );
 
 		const now = new Date( '2022-04-28T03:00:00.000Z' );
-		jest.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
+		vi.spyOn( now, 'getTimezoneOffset' ).mockImplementationOnce(
 			() => 10 * -60 // UTC+10
 		);
 

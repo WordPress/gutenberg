@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -14,12 +15,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
-jest.useRealTimers();
+vi.useRealTimers();
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
-	jest.fn()
-);
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
+} ) );
 
 function mockUseSelect( overrides ) {
 	useSelect.mockImplementation( ( map ) =>
@@ -39,14 +41,14 @@ function mockUseSelect( overrides ) {
 }
 
 describe( 'PostPreviewButton', () => {
-	const documentWrite = jest.fn();
-	const documentTitle = jest.fn();
-	const documentClose = jest.fn();
-	const setLocation = jest.fn();
+	const documentWrite = vi.fn();
+	const documentTitle = vi.fn();
+	const documentClose = vi.fn();
+	const setLocation = vi.fn();
 
 	beforeEach( () => {
-		global.open = jest.fn( () => ( {
-			focus: jest.fn(),
+		global.open = vi.fn( () => ( {
+			focus: vi.fn(),
 			document: {
 				write: documentWrite,
 				close: documentClose,

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 
 /**
@@ -14,26 +15,23 @@ import { useSelect } from '@wordpress/data';
 import UploadProgressSnackbar from '../';
 import { addFiles, advance, reset } from '../tracker';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	const mock = jest.fn();
-	return mock;
-} );
+const mockCreateNotice = vi.fn();
+const mockRemoveNotice = vi.fn();
 
-const mockCreateNotice = jest.fn();
-const mockRemoveNotice = jest.fn();
-
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	return {
-		useDispatch: jest.fn( () => ( {
+		...( await importOriginal() ),
+		useDispatch: vi.fn( () => ( {
 			createNotice: mockCreateNotice,
 			removeNotice: mockRemoveNotice,
 		} ) ),
-		useDispatchWithMap: jest.fn(),
+		useDispatchWithMap: vi.fn(),
+		useSelect: vi.fn(),
 	};
 } );
 
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
+vi.mock( import( '@wordpress/a11y' ), () => ( {
+	speak: vi.fn(),
 } ) );
 
 function mockQueue( items ) {
@@ -56,7 +54,7 @@ function makeItem( id, name, { parentId } = {} ) {
 
 describe( 'UploadProgressSnackbar', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		reset();
 	} );
 
@@ -126,7 +124,7 @@ describe( 'UploadProgressSnackbar', () => {
 	} );
 
 	it( 'shows a completion notice and then removes it when uploads finish', () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		try {
 			mockQueue( [] );
 			act( () => {
@@ -153,14 +151,14 @@ describe( 'UploadProgressSnackbar', () => {
 			expect( mockRemoveNotice ).not.toHaveBeenCalled();
 
 			act( () => {
-				jest.runAllTimers();
+				vi.runAllTimers();
 			} );
 
 			expect( mockRemoveNotice ).toHaveBeenCalledWith(
 				'upload-progress'
 			);
 		} finally {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		}
 	} );
 

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
+exports[`PostPublishPanel > should render the post-publish panel if the post is published 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -204,7 +204,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 </div>
 `;
 
-exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
+exports[`PostPublishPanel > should render the post-publish panel if the post is scheduled 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -386,7 +386,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 </div>
 `;
 
-exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
+exports[`PostPublishPanel > should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -518,7 +518,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 </div>
 `;
 
-exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
+exports[`PostPublishPanel > should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 .emotion-0 {
   font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -650,7 +650,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 </div>
 `;
 
-exports[`PostPublishPanel should render the spinner if the post is being saved 1`] = `
+exports[`PostPublishPanel > should render the spinner if the post is being saved 1`] = `
 @keyframes animation-0 {
   from {
     -webkit-transform: rotate(0deg);

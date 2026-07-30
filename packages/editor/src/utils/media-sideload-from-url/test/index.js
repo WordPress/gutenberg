@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -10,9 +15,11 @@ import { transformAttachment } from '@wordpress/media-utils';
  */
 import mediaSideloadFromUrl from '..';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/data' ), () => ( {
+	select: vi.fn(),
 } ) );
 /*
  * The store and transformAttachment are mocked so this unit test does not pull
@@ -21,9 +28,9 @@ jest.mock( '@wordpress/data', () => ( {
  * @wordpress/media-utils; here we only verify mediaSideloadFromUrl forwards
  * whatever it returns.
  */
-jest.mock( '../../../store', () => ( { store: 'core/editor' } ) );
-jest.mock( '@wordpress/media-utils', () => ( {
-	transformAttachment: jest.fn( ( attachment ) => ( {
+vi.mock( import( '../../../store' ), () => ( { store: 'core/editor' } ) );
+vi.mock( import( '@wordpress/media-utils' ), () => ( {
+	transformAttachment: vi.fn( ( attachment ) => ( {
 		id: attachment.id,
 		url: attachment.source_url,
 		alt: attachment.alt_text,
@@ -51,7 +58,7 @@ function mockCurrentPost( post ) {
 
 describe( 'mediaSideloadFromUrl', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockCurrentPost( { id: 42 } );
 	} );
 

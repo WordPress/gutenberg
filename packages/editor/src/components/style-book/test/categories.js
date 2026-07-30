@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,7 +12,7 @@ import {
 } from '../categories';
 import { STYLE_BOOK_CATEGORIES } from '../constants';
 
-jest.mock( '@wordpress/blocks', () => {
+vi.mock( import( '@wordpress/blocks' ), () => {
 	return {
 		getCategories() {
 			return [

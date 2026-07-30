@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import {
@@ -30,7 +35,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		actions: [],
 		type: 'snackbar',
 	};
-	[
+	it.each( [
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
@@ -81,25 +86,23 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ 'publish', 'trash', true ],
 			[ 'trash', defaultExpectedAction ],
 		],
-	].forEach(
-		( [
-			description,
+	] )(
+		'%s',
+		(
+			_,
 			[ previousPostStatus, postStatus, isViewable ],
-			expectedValue,
-		] ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				previousPost.status = previousPostStatus;
-				post.status = postStatus;
-				postType.viewable = isViewable;
-				expect(
-					getNotificationArgumentsForSaveSuccess( {
-						previousPost,
-						post,
-						postType,
-					} )
-				).toEqual( expectedValue );
-			} );
+			expectedValue
+		) => {
+			previousPost.status = previousPostStatus;
+			post.status = postStatus;
+			postType.viewable = isViewable;
+			expect(
+				getNotificationArgumentsForSaveSuccess( {
+					previousPost,
+					post,
+					postType,
+				} )
+			).toEqual( expectedValue );
 		}
 	);
 } );
@@ -108,7 +111,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
 	const defaultExpectedAction = { id: 'editor-save' };
-	[
+	it.each( [
 		[
 			'when error code is `rest_autosave_no_changes`',
 			'rest_autosave_no_changes',
@@ -148,31 +151,21 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ 'publish', 'publish' ],
 			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
 		],
-	].forEach(
-		( [
-			description,
-			errorCode,
-			[ postStatus, editsStatus ],
-			expectedValue,
-		] ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				post.status = postStatus;
-				error.code = errorCode;
-				edits.status = editsStatus;
-				expect(
-					getNotificationArgumentsForSaveFail( {
-						post,
-						edits,
-						error,
-					} )
-				).toEqual( expectedValue );
-			} );
-		}
-	);
+	] )( '%s', ( _, errorCode, [ postStatus, editsStatus ], expectedValue ) => {
+		post.status = postStatus;
+		error.code = errorCode;
+		edits.status = editsStatus;
+		expect(
+			getNotificationArgumentsForSaveFail( {
+				post,
+				edits,
+				error,
+			} )
+		).toEqual( expectedValue );
+	} );
 } );
 describe( 'getNotificationArgumentsForTrashFail()', () => {
-	[
+	it.each( [
 		[
 			'when there is an error message and the error code is not "unknown_error"',
 			{ message: 'foo', code: '' },
@@ -188,13 +181,10 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			{ code: 42 },
 			'Trashing failed',
 		],
-	].forEach( ( [ description, error, message ] ) => {
-		// eslint-disable-next-line jest/valid-title
-		it( description, () => {
-			const expectedValue = [ message, { id: 'editor-trash-fail' } ];
-			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(
-				expectedValue
-			);
-		} );
+	] )( '%s', ( _, error, message ) => {
+		const expectedValue = [ message, { id: 'editor-trash-fail' } ];
+		expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(
+			expectedValue
+		);
 	} );
 } );

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -439,8 +444,8 @@ describe( 'Post actions', () => {
 				status: 'publish',
 			};
 
-			const dispatch = Object.assign( jest.fn(), {
-				savePost: jest.fn(),
+			const dispatch = Object.assign( vi.fn(), {
+				savePost: vi.fn(),
 			} );
 			const select = {
 				getCurrentPostType: () => 'post',
@@ -448,8 +453,8 @@ describe( 'Post actions', () => {
 			};
 			const registry = {
 				dispatch: () => ( {
-					removeNotice: jest.fn(),
-					createErrorNotice: jest.fn(),
+					removeNotice: vi.fn(),
+					createErrorNotice: vi.fn(),
 				} ),
 				resolveSelect: () => ( {
 					getPostType: () => ( {

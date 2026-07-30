@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 /**
@@ -13,29 +14,40 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
 
+type NoticesStore = ( typeof import('@wordpress/notices') )[ 'store' ];
+type PreferencesStore = ( typeof import('@wordpress/preferences') )[ 'store' ];
+type EditorStore = ( typeof import('../../../store') )[ 'store' ];
+type Unlock = ( typeof import('../../../lock-unlock') )[ 'unlock' ];
+
 // --- Mocks ---
 //
 // These mocks isolate the hook from `@wordpress/data`, the editor store, and
 // the core-data private APIs it unlocks, so tests can drive the join/leave/
 // save callbacks directly instead of simulating real awareness events.
 
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	useDispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( { store: 'core/notices' } ) );
+vi.mock( import( '@wordpress/notices' ), () => ( {
+	store: 'core/notices' as unknown as NoticesStore,
+} ) );
 
-jest.mock( '@wordpress/preferences', () => ( { store: 'core/preferences' } ) );
+vi.mock( import( '@wordpress/preferences' ), () => ( {
+	store: 'core/preferences' as unknown as PreferencesStore,
+} ) );
 
 // Avoids pulling in the full editor store (blocks, rich-text, etc.).
-jest.mock( '../../../store', () => ( { store: 'core/editor' } ) );
+vi.mock( import( '../../../store' ), () => ( {
+	store: 'core/editor' as unknown as EditorStore,
+} ) );
 
-jest.mock( '@wordpress/core-data', () => ( { privateApis: {} } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( { privateApis: {} } ) );
 
 // Captures the callbacks and postIds the hook registers with each of the
 // three core-data subscriptions it unlocks. Must be prefixed with `mock`
-// so jest's module factory hoisting allows referencing it below.
+// so Vitest's module factory hoisting allows referencing it below.
 const mockRegistered: {
 	join: Function | null;
 	leave: Function | null;
@@ -52,8 +64,8 @@ const mockRegistered: {
 	savePostId: undefined,
 };
 
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( ( value: unknown ) => ( {
+vi.mock( import( '../../../lock-unlock' ), () => {
+	const unlock = vi.fn( ( value: unknown ) => ( {
 		...( value as object ),
 		useOnCollaboratorJoin: (
 			postId: unknown,
@@ -75,8 +87,10 @@ jest.mock( '../../../lock-unlock', () => ( {
 			mockRegistered.savePostId = postId;
 			mockRegistered.save = cb;
 		},
-	} ) ),
-} ) );
+	} ) ) as unknown as Unlock;
+
+	return { unlock };
+} );
 
 // --- Fixtures ---
 
@@ -113,7 +127,7 @@ const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000 );
 
 // --- Setup ---
 
-const mockCreateNotice = jest.fn();
+const mockCreateNotice = vi.fn();
 
 type PreferenceState = {
 	postStatus: string | undefined;
@@ -169,10 +183,10 @@ beforeEach( () => {
 	mockRegistered.leavePostId = undefined;
 	mockRegistered.savePostId = undefined;
 	mockCreateNotice.mockClear();
-	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
+	( useSelect as Mock ).mockImplementation( ( selector: Function ) =>
 		selector( mockSelect )
 	);
-	( useDispatch as jest.Mock ).mockReturnValue( {
+	( useDispatch as Mock ).mockReturnValue( {
 		createNotice: mockCreateNotice,
 	} );
 } );

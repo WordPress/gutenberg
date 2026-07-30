@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { createBoardStore } from '../board-store';

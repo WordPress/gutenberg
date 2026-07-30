@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -14,8 +15,14 @@ import { useSelect } from '@wordpress/data';
  */
 import PostPublishButtonOrToggle from '../post-publish-button-or-toggle';
 
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match' );
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useViewportMatch: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'PostPublishButtonOrToggle should render a', () => {
 	afterEach( () => {

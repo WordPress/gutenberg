@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { beforeAll, describe, expect, it } from 'vitest';
+
+/**
  * Internal dependencies
  */
 import { lock } from '../../lock-unlock';

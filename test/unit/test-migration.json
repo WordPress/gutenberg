@@ -42,6 +42,7 @@
 					"packages/edit-post",
 					"packages/edit-site",
 					"packages/edit-widgets",
+					"packages/editor",
 					"packages/element",
 					"packages/escape-html",
 					"packages/fields",

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -8,7 +9,10 @@ import { render, screen } from '@testing-library/react';
  */
 import { useSelect } from '@wordpress/data';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 /**
  * Internal dependencies
