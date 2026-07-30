@@ -4,6 +4,7 @@
 
 ```bash
 # Setup
+nvm use                    # Use the required node version
 npm install && composer install
 npm run wp-env status      # Always check status first.
 npm run wp-env start       # Only start if not already running.
@@ -31,7 +32,6 @@ npm run build # Production build
 Read only what your task needs, when it needs it:
 
 -   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
--   **Task procedures (skills)**: before starting a matching task, read the relevant `skills/<domain>/SKILL.md` (e.g. `skills/testing/SKILL.md` for writing, running, or debugging tests).
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
 ## Code quality
@@ -59,7 +59,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 ## Common pitfalls
 
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
--   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+-   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.

@@ -2616,12 +2616,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/jest-puppeteer-axe",
-		"slug": "packages-jest-puppeteer-axe",
-		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/keyboard-shortcuts",
 		"slug": "packages-keyboard-shortcuts",
 		"markdown_source": "../packages/keyboard-shortcuts/README.md",
