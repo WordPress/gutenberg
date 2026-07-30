@@ -4,15 +4,6 @@
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 
-/*
- * Resolve the directory of `@wordpress/jest-preset-default` from this
- * workspace's `node_modules`. Jest's `preset` option expects a directory
- * containing a `jest-preset.js` or `jest-preset.json` file.
- */
-const jestPresetDefaultDir = path.dirname(
-	require.resolve( '@wordpress/jest-preset-default/jest-preset.js' )
-);
-
 /**
  * Path to root project directory.
  */
@@ -59,7 +50,7 @@ module.exports = {
 			'<rootDir>/packages/block-library/src/$1.js',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
-	preset: jestPresetDefaultDir,
+	preset: require.resolve( '@wordpress/jest-preset-default' ),
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
