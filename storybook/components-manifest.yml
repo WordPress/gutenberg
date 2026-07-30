@@ -256,6 +256,7 @@
       - isOpen
       - onCancel
       - onConfirm
+      - size
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
@@ -350,6 +351,7 @@
   subcomponents:
       - name: DropdownContentWrapper
         props:
+            - children
             - paddingSize
 - name: DropZone
   props:
@@ -801,6 +803,7 @@
       - style
 - name: SandBox
   props:
+      - allowPopups
       - allowSameOrigin
       - html
       - onFocus
@@ -981,6 +984,7 @@
       - __next40pxDefaultSize
       - __nextHasNoMarginBottom
       - children
+      - disabled
       - help
       - hideLabelFromVision
       - isAdaptiveWidth
