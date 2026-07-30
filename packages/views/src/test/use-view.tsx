@@ -15,7 +15,6 @@ import type { View } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import { useView } from '../use-view';
-import type { ActiveViewOverrides } from '../types';
 
 const PREFERENCE_KEY = 'dataviews-postType-page-default';
 
@@ -109,11 +108,11 @@ describe( 'useView', () => {
 				slug: 'default',
 				defaultView: { type: 'table', perPage: 20 },
 				activeViewOverrides: {
-					// Not part of `ActiveViewOverrides`; a server-provided
-					// `view_list` entry may still carry them at runtime.
+					// A server-provided `view_list` entry may carry them, but
+					// they are URL-managed and must never take effect.
 					search: 'override',
 					page: 3,
-				} as ActiveViewOverrides,
+				},
 			} );
 			expect( result.current.view.search ).toBe( '' );
 			expect( result.current.view.page ).toBe( 1 );

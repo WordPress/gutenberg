@@ -127,10 +127,8 @@ describe( 'mergeOverrides', () => {
 			expect( result.type ).toBe( 'list' );
 		} );
 
-		it( 'should not apply type override when no default view is provided', () => {
-			const result = mergeOverrides( baseView, {
-				type: 'grid',
-			} );
+		it( 'should not apply type override when the default view has no type', () => {
+			const result = mergeOverrides( baseView, { type: 'grid' }, {} );
 			expect( result.type ).toBe( 'table' );
 		} );
 
@@ -304,10 +302,12 @@ describe( 'mergeOverrides', () => {
 			} );
 		} );
 
-		it( 'should not apply sort override when no default view is provided', () => {
-			const result = mergeOverrides( baseView, {
-				sort: { field: 'title', direction: 'asc' },
-			} );
+		it( 'should not apply sort override when the default view has no sort', () => {
+			const result = mergeOverrides(
+				baseView,
+				{ sort: { field: 'title', direction: 'asc' } },
+				{}
+			);
 			expect( result.sort ).toEqual( baseView.sort );
 		} );
 	} );
@@ -356,7 +356,7 @@ describe( 'mergeOverrides', () => {
 	} );
 
 	describe( 'groupBy overrides', () => {
-		it( 'should replace groupBy with override', () => {
+		it( 'should replace the overridden groupBy keys, leaving the others', () => {
 			const view: View = {
 				...baseView,
 				groupBy: {
@@ -371,6 +371,7 @@ describe( 'mergeOverrides', () => {
 			expect( result.groupBy ).toEqual( {
 				field: 'category',
 				direction: 'desc',
+				showLabel: false,
 			} );
 		} );
 
@@ -680,7 +681,7 @@ describe( 'stripOverrides', () => {
 	} );
 
 	describe( 'groupBy stripping', () => {
-		it( 'should remove groupBy when managed by overrides', () => {
+		it( 'should remove the overridden groupBy keys, leaving the others', () => {
 			const view: View = {
 				...baseView,
 				groupBy: {
@@ -692,7 +693,18 @@ describe( 'stripOverrides', () => {
 			const result = stripOverrides( view, {
 				groupBy: { field: 'category', direction: 'desc' },
 			} );
-			expect( result ).not.toHaveProperty( 'groupBy' );
+			expect( result.groupBy ).toEqual( { showLabel: true } );
+		} );
+
+		it( 'should remove groupBy entirely when every key is managed by overrides', () => {
+			const view: View = {
+				...baseView,
+				groupBy: { field: 'status', direction: 'asc' },
+			};
+			const result = stripOverrides( view, {
+				groupBy: { field: 'category', direction: 'desc' },
+			} );
+			expect( result.groupBy ).toBeUndefined();
 		} );
 
 		it( 'should not touch groupBy when view has no groupBy', () => {

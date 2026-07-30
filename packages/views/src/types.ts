@@ -3,40 +3,18 @@
  */
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
-export type ActiveViewOverrides = {
-	// scalar values — always win over the persisted view
-	titleField?: View[ 'titleField' ];
-	showTitle?: View[ 'showTitle' ];
-	mediaField?: View[ 'mediaField' ];
-	showMedia?: View[ 'showMedia' ];
-	descriptionField?: View[ 'descriptionField' ];
-	showDescription?: View[ 'showDescription' ];
-	showLevels?: View[ 'showLevels' ];
-	infiniteScrollEnabled?: View[ 'infiniteScrollEnabled' ];
-	// default-bound values — applied only while the view still matches the
-	// default view, so explicit user modifications win and get persisted
-	type?: View[ 'type' ];
-	perPage?: View[ 'perPage' ];
-	fields?: View[ 'fields' ];
-	// array & object values
-	filters?: View[ 'filters' ];
-	sort?: View[ 'sort' ];
-	groupBy?: View[ 'groupBy' ];
-	layout?: Record< string, unknown >;
-};
-
 /**
- * The overrides resolved at runtime: the developer-provided
- * `activeViewOverrides`, the defaults of the effective layout type, and the
- * URL-managed values.
+ * A patch applied on top of a view.
  *
- * `page` and `search` are absent from `ActiveViewOverrides` on purpose: the URL
- * is their only source and developers cannot configure them. They are part of
- * this type so the merge/strip logic treats them like any other override.
+ * It is derived from `View` so it stays in sync with it, but every property is
+ * optional — including `type`, which `View` requires as the discriminant of its
+ * layout union. Overrides only ever carry the subset of properties they mean to
+ * override, and `layout` is loosened to a plain record because a `type`
+ * override may change which layout shape applies.
  */
-export type Overrides = ActiveViewOverrides & {
-	page?: View[ 'page' ];
-	search?: View[ 'search' ];
+export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
+	layout?: Record< string, unknown >;
 };
 
 export interface ViewConfig {
@@ -68,7 +46,7 @@ export interface ViewConfig {
 	 * developer-defined view defaults that should override the persisted
 	 * view settings.
 	 */
-	activeViewOverrides?: ActiveViewOverrides;
+	activeViewOverrides?: ViewOverrides;
 
 	/**
 	 * Default layout configurations keyed by layout type.
