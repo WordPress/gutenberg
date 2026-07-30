@@ -54,11 +54,9 @@ let dsTokenFallbacks;
 let dsTokenFallbacksJs;
 try {
 	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
 		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
 	);
 	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
 		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
 	);
 	dsTokenFallbacks = postcssPlugin;
@@ -2625,7 +2623,7 @@ async function watchMode() {
 	const watcher = chokidar.watch( watchPaths, {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
-			'**/*.{spec,test}.{js,ts,tsx}',
+			getSourceFileGlob( '**/*.{spec,test}' ),
 			// Avoid rebuild loops: worker packages write bundled WASM/JS back
 			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
 			'**/worker-code.ts',

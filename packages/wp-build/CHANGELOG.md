@@ -26,7 +26,7 @@
 
 ### Enhancements
 
--   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions.
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds.
 -   Widgets: carry an action's `icon` and `relevance` from `widget.json`
     into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`

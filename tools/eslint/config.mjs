@@ -55,7 +55,7 @@ function dedupePlugins( configs ) {
  * @type {string[]}
  */
 const developmentFiles = [
-	'**/benchmark/**/*.js',
+	'**/benchmark/**/*.{js,jsx}',
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
@@ -67,7 +67,7 @@ const developmentFiles = [
 const glob = require( 'glob' ).sync;
 const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -454,9 +454,9 @@ export default dedupePlugins( [
 
 	// Override: Package source files — forbid raw SVG elements.
 	{
-		files: [ 'packages/**/*.js' ],
+		files: [ 'packages/**/*.{js,jsx}' ],
 		ignores: [
-			'packages/block-library/src/*/save.js',
+			'packages/block-library/src/*/save.{js,jsx}',
 			...developmentFiles,
 		],
 		rules: {
@@ -500,11 +500,11 @@ export default dedupePlugins( [
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
 		files: [
-			'packages/jest*/**/*.js',
-			'**/test/**/*.js',
-			'**/__tests__/**/*.js',
+			'packages/jest*/**/*.{js,jsx}',
+			'**/test/**/*.{js,jsx}',
+			'**/__tests__/**/*.{js,jsx}',
 		],
-		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
+		ignores: [ 'test/e2e/**/*.{js,jsx}', 'test/performance/**/*.{js,jsx}' ],
 	} ) ),
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
@@ -987,7 +987,7 @@ export default dedupePlugins( [
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
 			'packages/block-editor/src/components/use-paste-styles/index.js',
-			'packages/block-library/src/pattern/edit.js',
+			'packages/block-library/src/pattern/edit.jsx',
 			'packages/components/src/sandbox/index.tsx',
 		],
 		rules: {
