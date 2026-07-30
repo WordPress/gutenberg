@@ -45,6 +45,9 @@
 	"dependencies": {
 		"@wordpress/i18n": "file:../i18n"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19"
 	},
