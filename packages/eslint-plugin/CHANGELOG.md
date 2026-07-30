@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Update the `test-unit` configuration to lint Vitest tests instead of Jest tests.
+
 ## 25.9.0 (2026-08-12)
 
 ### Enhancements

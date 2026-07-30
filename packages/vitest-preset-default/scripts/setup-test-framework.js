@@ -1,0 +1,1 @@
+import '@wordpress/vitest-console';

@@ -153,6 +153,9 @@ jobs:
               # build tasks, however. These must be run.
               run: npx lerna run build
 
+            - name: Validate packed Vitest package consumers
+              run: npm run test:unit:packages
+
             - name: Run the Vitest Browser project
               env:
                   FK_ENV_NODEJS: '20'

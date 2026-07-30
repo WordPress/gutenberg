@@ -90,7 +90,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `jsx-a11y` – rules for accessibility in JSX.
 -   `react` – rules for React components.
 -   `test-e2e` – rules for end-to-end tests written in Puppeteer.
--   `test-unit`– rules for unit tests written in Jest.
+-   `test-unit`– rules for unit tests written in Vitest.
 -   `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could use only the ESNext rules:

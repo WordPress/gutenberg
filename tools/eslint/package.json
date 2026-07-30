@@ -26,6 +26,7 @@
 	"dependencies": {
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
 		"@eslint/js": "^10.0.0",
+		"@vitest/eslint-plugin": "^1.6.24",
 		"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"eslint": "^10.0.0",

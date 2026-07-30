@@ -30,6 +30,7 @@ const {
 	hasArgInCLI,
 	hasProjectFile,
 	getJestOverrideConfigFile,
+	getVitestOverrideConfigFile,
 	getWebpackArgs,
 	spawnScript,
 } = require( '../' );
@@ -157,6 +158,67 @@ describe( 'utils', () => {
 
 			expect( getJestOverrideConfigFile( 'unit' ) ).toBe(
 				'/c/jest-unit.config.js'
+			);
+		} );
+	} );
+
+	describe( 'getVitestOverrideConfigFile', () => {
+		beforeEach( () => {
+			getArgsFromCLIMock.mockReturnValue( [] );
+			hasProjectFileMock.mockReturnValue( false );
+			fromProjectRootMock.mockImplementation(
+				( filePath ) => '/p/' + filePath
+			);
+			fromConfigRootMock.mockImplementation(
+				( filePath ) => '/c/' + filePath
+			);
+		} );
+
+		afterEach( () => {
+			getArgsFromCLIMock.mockReset();
+			hasProjectFileMock.mockReset();
+			fromProjectRootMock.mockReset();
+			fromConfigRootMock.mockReset();
+		} );
+
+		it.each( [ '--config=test', '-c=test' ] )(
+			'returns undefined when %s is present',
+			( argument ) => {
+				getArgsFromCLIMock.mockReturnValue( [ argument ] );
+
+				expect( getVitestOverrideConfigFile( 'unit' ) ).toBeUndefined();
+			}
+		);
+
+		it.each( [ 'js', 'mjs', 'cjs', 'ts', 'mts', 'cts' ] )(
+			'returns a project vitest-unit.config.%s file',
+			( extension ) => {
+				hasProjectFileMock.mockImplementation(
+					( file ) => file === `vitest-unit.config.${ extension }`
+				);
+
+				expect( getVitestOverrideConfigFile( 'unit' ) ).toBe(
+					`/p/vitest-unit.config.${ extension }`
+				);
+			}
+		);
+
+		it.each( [
+			'vitest.config.js',
+			'vitest.config.mts',
+			'vite.config.ts',
+			'vite.config.cjs',
+		] )( 'allows Vitest to discover %s', ( configFile ) => {
+			hasProjectFileMock.mockImplementation(
+				( file ) => file === configFile
+			);
+
+			expect( getVitestOverrideConfigFile( 'unit' ) ).toBeUndefined();
+		} );
+
+		it( 'returns the default configuration when none is available', () => {
+			expect( getVitestOverrideConfigFile( 'unit' ) ).toBe(
+				'/c/vitest-unit.config.mjs'
 			);
 		} );
 	} );

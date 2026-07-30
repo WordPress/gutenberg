@@ -71,6 +71,43 @@ const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.ts' ) ||
 	hasPackageProp( 'jest' );
 
+const VITE_CONFIG_EXTENSIONS = [ 'js', 'mjs', 'cjs', 'ts', 'mts', 'cts' ];
+
+const hasConfigFile = ( name ) =>
+	VITE_CONFIG_EXTENSIONS.some( ( extension ) =>
+		hasProjectFile( `${ name }.config.${ extension }` )
+	);
+
+// See https://vitest.dev/config/.
+const hasVitestConfig = () =>
+	hasConfigFile( 'vitest' ) || hasConfigFile( 'vite' );
+
+/**
+ * Returns a project-specific Vitest configuration or the default unit-test
+ * configuration when Vitest cannot discover one in the project.
+ *
+ * @param {string} suffix Suffix of a project-specific configuration file.
+ *
+ * @return {string= | undefined} Override or fallback configuration file path.
+ */
+function getVitestOverrideConfigFile( suffix ) {
+	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
+		return;
+	}
+
+	const variantConfig = VITE_CONFIG_EXTENSIONS.map(
+		( extension ) => `vitest-${ suffix }.config.${ extension }`
+	).find( hasProjectFile );
+
+	if ( variantConfig ) {
+		return fromProjectRoot( variantConfig );
+	}
+
+	if ( ! hasVitestConfig() ) {
+		return fromConfigRoot( `vitest-${ suffix }.config.mjs` );
+	}
+}
+
 // See https://prettier.io/docs/en/configuration.html.
 const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.js' ) ||
@@ -441,6 +478,7 @@ function getPhpFilePaths( context, props ) {
 
 module.exports = {
 	getJestOverrideConfigFile,
+	getVitestOverrideConfigFile,
 	getPhpFilePaths,
 	getProjectSourcePath,
 	getWebpackArgs,
@@ -448,6 +486,7 @@ module.exports = {
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
+	hasVitestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 };

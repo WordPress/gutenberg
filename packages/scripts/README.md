@@ -446,9 +446,13 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-unit-js`
 
-_Alias_: `test-unit-jest`
+_Alias_: `test-unit-vitest`
 
-Launches the unit test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api).
+The explicit `test-unit-jest` command remains available for projects that
+need a temporary migration path. `test-unit-js` no longer selects Jest.
+
+Launches the unit test runner with [Vitest](https://vitest.dev/). Tests should
+import the APIs they use from `vitest`; globals are disabled by default.
 
 _Example:_
 
@@ -458,7 +462,7 @@ _Example:_
 		"test:unit": "wp-scripts test-unit-js",
 		"test:unit:help": "wp-scripts test-unit-js --help",
 		"test:unit:watch": "wp-scripts test-unit-js --watch",
-		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache"
+		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --no-file-parallelism --maxWorkers=1"
 	}
 }
 ```
@@ -470,21 +474,53 @@ This is how you execute those scripts using the presented setup:
 -   `npm run test:unit:watch` - runs all unit tests in the watch mode.
 -   `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
 
-Jest will look for test files with any of the following popular naming conventions:
+The default configuration looks for test files with these naming conventions:
 
 -   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix located at any level of depth in `__tests__` folders.
 -   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix directly located in `test` folders.
 -   Files with `.test.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
 
+Ordinary test names run in Node.js. Use `*.jsdom.test.*` for tests that require
+jsdom. Use `*.browser.test.*` for tests that require a real Chromium browser,
+real CSS, or native browser APIs.
+
 #### Advanced information
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+The command accepts [Vitest CLI options](https://vitest.dev/guide/cli.html).
+Run `wp-scripts test-unit-js --help` to see the options installed in your
+project. The default ESM configuration comes from
+[`@wordpress/vitest-preset-default`](https://www.npmjs.com/package/@wordpress/vitest-preset-default).
+It uses Vite and esbuild for ordinary JavaScript, TypeScript, and modules. It
+uses SWC for React and Emotion. It does not run Babel.
 
-Should there be any situation where you want to provide your own Jest config, you can do so.
+Provide a project configuration in one of these ways:
 
--   the command receives a `--config` argument. Example: `wp-scripts test-unit --config my-jest-config.js`.
--   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
--   a `jest` object can be provided in the `package.json` file with the test configuration.
+-   Pass `--config`, for example `wp-scripts test-unit-js --config vitest.config.js`.
+-   Add `vitest-unit.config.js` (or `.mjs`, `.cjs`, `.ts`, `.mts`, or `.cts`)
+    at the project root.
+-   Add a standard `vitest.config.*` or `vite.config.*` file at the project
+    root and let Vitest discover it.
+
+<details>
+<summary>Jest command and flag migration</summary>
+
+| Jest                        | Vitest                                      |
+| --------------------------- | ------------------------------------------- |
+| `test-unit-js`              | `test-unit-js` or `test-unit-vitest`        |
+| `--runInBand`               | `--no-file-parallelism --maxWorkers=1`      |
+| `--updateSnapshot`          | `--update`                                  |
+| `--watchAll`                | `--watch`                                   |
+| `--selectProjects name`     | `--project name`                            |
+| `--listTests`               | `list --filesOnly`                          |
+| `--verbose`                 | `--reporter=verbose`                        |
+| `--testNamePattern pattern` | `--testNamePattern pattern` or `-t pattern` |
+| `--shard index/count`       | `--shard index/count`                       |
+
+Jest configuration objects are not compatible with Vitest. Move runner
+options into the `test` property of an ESM `vitest.config.*` file and use
+`vi` instead of the `jest` helper object.
+
+</details>
 
 ### `test-e2e`
 
@@ -549,17 +585,26 @@ Google Chrome and Visual Studio Code are used as examples below.
 
 #### Debugging in Google Chrome
 
-Place `debugger;` statements in any test and run `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` (or `npm run test:unit:debug` from above).
+Place `debugger;` statements in any test and run
+`wp-scripts --inspect-brk test-unit-js --no-file-parallelism --maxWorkers=1`
+(or `npm run test:unit:debug` from above).
 
 Then open `about:inspect` in Google Chrome and select `inspect` on your process.
 
-A breakpoint will be set at the first line of the script (this is done to give you time to open the developer tools and to prevent Jest from executing before you have time to do so). Click the resume button in the upper right panel of the dev tools to continue execution. When Jest executes the test that contains the debugger statement, execution will pause and you can examine the current scope and call stack.
+A breakpoint will be set at the first line of the script. Click the resume
+button in the upper-right panel of the developer tools to continue execution.
+When Vitest executes the test containing the `debugger` statement, execution
+will pause so you can examine the current scope and call stack.
 
 #### Debugging in Visual Studio Code
 
-Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
+Debugging npm scripts is supported out of the box for Visual Studio Code as of
+[version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging)
+and can be used to debug Vitest unit tests.
 
-Make sure `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
+Save
+`wp-scripts --inspect-brk test-unit-js --no-file-parallelism --maxWorkers=1`
+as `test:unit:debug` in `package.json` to run tests in Visual Studio Code.
 
 When debugging, set a breakpoint in your tests by clicking on a line in the editor’s left margin by the line numbers.
 
