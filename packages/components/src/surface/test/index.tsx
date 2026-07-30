@@ -12,6 +12,10 @@ describe( 'props', () => {
 	test( 'should render children in a Surface wrapper', () => {
 		render( <Surface>Surface</Surface> );
 
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__experimentalSurface is deprecated since version 7.2 and will be removed in version 7.4.'
+		);
+
 		const surface = screen.getByText( 'Surface' );
 
 		expect( surface ).toHaveClass( 'components-surface' );
