@@ -53,7 +53,7 @@ const ariakitUtilsDir = path.dirname(
 );
 
 module.exports = {
-	rootDir: '../../',
+	rootDir: ROOT_DIR,
 	moduleNameMapper: {
 		/**
 		 * Specific mappings first (before generic patterns)
