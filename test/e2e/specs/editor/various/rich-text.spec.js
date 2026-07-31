@@ -694,6 +694,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Paste paragraph contents.
 		await pageUtils.pressKeys( 'primary+v' );
 
+		// The soft line break becomes an item break: line breaks entering
+		// a list follow the paragraph-to-list conversion, like other
+		// editors pasting text with line breaks over list items.
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -704,7 +707,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: '1<br>2' },
+						attributes: { content: '1' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: '2' },
 					},
 				],
 			},

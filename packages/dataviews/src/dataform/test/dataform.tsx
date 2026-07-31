@@ -1,13 +1,22 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import Dataform from '../index';
+import useFormValidity from '../../hooks/use-form-validity';
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 const noop = () => {};
 
@@ -518,6 +527,396 @@ describe( 'DataForm component', () => {
 				'This is the Title Field'
 			);
 			expect( titleEditField ).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'in card mode', () => {
+		const fieldsWithRequiredTitle = fields.map( ( field ) =>
+			field.id === 'title'
+				? { ...field, isValid: { required: true } }
+				: field
+		);
+
+		const formCardMode = {
+			layout: { type: 'card' } as const,
+			fields: [
+				{
+					id: 'mainCard',
+					label: 'Main card',
+					children: [ 'title', 'order', 'author' ],
+				},
+			],
+		};
+
+		it( 'should preserve the natural tab order when a field inside the card is blurred', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithRequiredTitle }
+					form={ formCardMode }
+					// Empty title makes the required field invalid.
+					data={ { ...data, title: '' } }
+				/>
+			);
+
+			const titleInput = screen.getByRole( 'textbox', {
+				name: /title/i,
+			} );
+			const orderInput = fieldsSelector.order.edit();
+			await user.click( orderInput );
+			await user.tab();
+
+			// Focus is not hijacked by the invalid field...
+			expect( titleInput ).not.toHaveFocus();
+			// ...and moving focus within the card doesn't show errors
+			// for fields the user hasn't interacted with.
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should show errors for invalid fields when focus leaves the card, without moving focus', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formCardMode }
+						data={ { ...data, title: '' } }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			const orderInput = fieldsSelector.order.edit();
+			await user.click( orderInput );
+
+			const outsideButton = screen.getByRole( 'button', {
+				name: 'Outside',
+			} );
+			await user.click( outsideButton );
+
+			// The required error for the untouched title field is shown...
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			// ...but focus is not moved back into the card.
+			expect( outsideButton ).toHaveFocus();
+		} );
+
+		it( 'should not show errors when tabbing past the header of a collapsed card', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ {
+							...formCardMode,
+							fields: [
+								{
+									...formCardMode.fields[ 0 ],
+									layout: {
+										type: 'card' as const,
+										isOpened: false,
+									},
+								},
+							],
+						} }
+						data={ { ...data, title: '' } }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Tab to the collapse toggle, then past it, without ever
+			// expanding the card.
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: /main card/i } )
+			).toHaveFocus();
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			).toHaveFocus();
+			expect(
+				screen.queryByText( /needs? attention/ )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should show errors for fields that become invalid after focus already left the card once', async () => {
+			const user = userEvent.setup();
+
+			// The title is only valid while the order is 1, so it can become
+			// invalid without the user ever focusing it.
+			const fieldsWithCrossFieldRule = fields.map( ( field ) =>
+				field.id === 'title'
+					? {
+							...field,
+							isValid: {
+								custom: ( item: typeof data ) =>
+									item.order === 1
+										? null
+										: 'Title is not allowed for this order.',
+							},
+					  }
+					: field
+			);
+
+			function ControlledForm() {
+				const [ item, setItem ] = useState( data );
+				const { validity } = useFormValidity(
+					item,
+					fieldsWithCrossFieldRule,
+					formCardMode
+				);
+				return (
+					<>
+						<Dataform
+							onChange={ ( edits ) =>
+								setItem( ( prev ) => ( {
+									...prev,
+									...edits,
+								} ) )
+							}
+							fields={ fieldsWithCrossFieldRule }
+							form={ formCardMode }
+							data={ item }
+							validity={ validity }
+						/>
+						<button type="button">Outside</button>
+					</>
+				);
+			}
+
+			render( <ControlledForm /> );
+
+			const outsideButton = screen.getByRole( 'button', {
+				name: 'Outside',
+			} );
+			const errorText = 'Title is not allowed for this order.';
+
+			// Leave the card once while every field is still valid.
+			await user.click( fieldsSelector.order.edit() );
+			await user.click( outsideButton );
+			expect( screen.queryByText( errorText ) ).not.toBeInTheDocument();
+
+			// Invalidate the never-focused title field, then leave again.
+			await user.type( fieldsSelector.order.edit(), '2' );
+			await user.click( outsideButton );
+
+			expect( await screen.findByText( errorText ) ).toBeVisible();
+		} );
+
+		it( 'should announce how many fields need attention when focus leaves the card', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formCardMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							mainCard: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			await user.click( fieldsSelector.order.edit() );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'1 field needs attention',
+				'polite'
+			);
+		} );
+
+		it( 'should not announce when focus leaves the card while it is collapsed', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formCardMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							mainCard: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Focus a field inside the card, then collapse it. The toggle is
+			// inside the card, so focus hasn't left it yet.
+			await user.click( fieldsSelector.order.edit() );
+			await user.click(
+				screen.getByRole( 'button', { name: /main card/i } )
+			);
+			jest.mocked( speak ).mockClear();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should show errors for invalid fields after the card is collapsed and expanded', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithRequiredTitle }
+					form={ formCardMode }
+					data={ { ...data, title: '' } }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
+
+			const toggle = screen.getByRole( 'button', {
+				name: /main card/i,
+			} );
+			await user.click( toggle );
+			await user.click( toggle );
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+		} );
+	} );
+
+	describe( 'in details mode', () => {
+		const fieldsWithRequiredTitle = fields.map( ( field ) =>
+			field.id === 'title'
+				? { ...field, isValid: { required: true } }
+				: field
+		);
+
+		const formDetailsMode = {
+			layout: { type: 'details' as const },
+			fields: [
+				{
+					id: 'moreDetails',
+					label: 'More details',
+					children: [ 'title', 'order' ],
+				},
+			],
+		};
+
+		it( 'should show errors for invalid fields once focus leaves it', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formDetailsMode }
+						data={ { ...data, title: '' } }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Expand the disclosure so its fields, and any error they show,
+			// are visible.
+			await user.click( screen.getByText( 'More details' ) );
+			await waitFor( () =>
+				expect( fieldsSelector.order.edit() ).toBeVisible()
+			);
+			await user.click( fieldsSelector.order.edit() );
+
+			// Leave by keyboard: a click would re-assign focus afterwards and
+			// mask a focus steal.
+			await user.tab();
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			).toHaveFocus();
+		} );
+
+		it( 'should not announce when focus leaves it while collapsed', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Dataform
+						onChange={ noop }
+						fields={ fieldsWithRequiredTitle }
+						form={ formDetailsMode }
+						data={ { ...data, title: '' } }
+						validity={ {
+							moreDetails: {
+								children: {
+									title: {
+										required: {
+											type: 'invalid' as const,
+											message: 'Title is required.',
+										},
+									},
+								},
+							},
+						} }
+					/>
+					<button type="button">Outside</button>
+				</>
+			);
+
+			// Expand the disclosure and focus a field inside it.
+			const summary = screen.getByText( 'More details' );
+			await user.click( summary );
+			await waitFor( () =>
+				expect( fieldsSelector.order.edit() ).toBeVisible()
+			);
+			await user.click( fieldsSelector.order.edit() );
+
+			// Close it while focus is still inside, as when the summary is
+			// clicked in a browser, where it receives focus. jsdom leaves
+			// focus where it was, so close programmatically instead.
+			// eslint-disable-next-line testing-library/no-node-access
+			const details = summary.closest( 'details' );
+			await act( async () => {
+				details!.open = false;
+			} );
+			jest.mocked( speak ).mockClear();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
