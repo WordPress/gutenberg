@@ -32,6 +32,12 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * Registered icon name (`collection/icon-name`), resolved into a
+ * `WidgetIcon` by the application's resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
+
+/**
  * A link in a widget's help note.
  */
 export interface WidgetHelpLink {
@@ -323,4 +329,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
+
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 * `null`/absent means the module's icon stands.
+	 */
+	icon?: WidgetIconReference | null;
 }
