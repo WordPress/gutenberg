@@ -58,12 +58,12 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 		return focusNode;
 	}
 
-	if ( focusOffset === focusNode.childNodes.length ) {
-		return focusNode;
-	}
-
-	const endNode = focusNode.childNodes[ focusOffset ];
+	const endNode =
+		focusOffset === focusNode.childNodes.length
+			? focusNode
+			: focusNode.childNodes[ focusOffset ];
 	const range = selection.getRangeAt( 0 );
+	const clientId = getBlockClientId( selection.anchorNode );
 
 	// A triple click extends the forward selection past the block, which would
 	// trigger multi selection. Move the end back to the last text position
@@ -74,7 +74,9 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 	if (
 		range.endContainer === focusNode &&
 		range.endOffset === focusOffset &&
-		isTripleClick
+		isTripleClick &&
+		clientId &&
+		getBlockClientId( endNode ) !== clientId
 	) {
 		const { ownerDocument } = focusNode;
 		const walker = ownerDocument.createTreeWalker(
@@ -83,9 +85,8 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 		);
 		walker.currentNode = endNode;
 		const previousTextNode = walker.previousNode();
-		const clientId = getBlockClientId( selection.anchorNode );
 
-		if ( clientId && getBlockClientId( previousTextNode ) === clientId ) {
+		if ( getBlockClientId( previousTextNode ) === clientId ) {
 			return previousTextNode;
 		}
 	}
