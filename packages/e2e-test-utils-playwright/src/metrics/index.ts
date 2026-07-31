@@ -24,6 +24,7 @@ type EventType =
 interface TraceEvent {
 	cat: string;
 	name: string;
+	ts: number;
 	dur?: number;
 	args: {
 		data?: {
@@ -31,6 +32,13 @@ interface TraceEvent {
 		};
 	};
 }
+
+// A traced `EventDispatch`, once filtered down to the events that carry both a
+// duration and an event type.
+type EventDispatch = TraceEvent & {
+	dur: number;
+	args: { data: { type: EventType } };
+};
 
 interface Trace {
 	traceEvents: TraceEvent[];
@@ -306,16 +314,43 @@ export class Metrics {
 	 * types that did not fire are left out: callers sum the durations, and an
 	 * empty list sums to `undefined`, which would poison the total.
 	 *
-	 * @return Durations of the traced `focus`, `focusin`, `pointerup`, and
-	 * `selectionchange` events that fired.
+	 * The dispatches also nest — a click that moves focus into the editing
+	 * host dispatches `focus`/`focusin` inside the `pointerup` dispatch — so
+	 * each dispatch is clipped to the time not already covered by an earlier
+	 * one. Summing then measures the wall clock instead of counting the
+	 * nested work once per enclosing dispatch.
+	 *
+	 * @return Non-overlapping durations of the traced `focus`, `focusin`,
+	 * `pointerup`, and `selectionchange` dispatches that fired, grouped by
+	 * event type.
 	 */
 	getSelectionEventDurations() {
-		return [
-			this.getEventDurations( 'focus' ),
-			this.getEventDurations( 'focusin' ),
-			this.getEventDurations( 'pointerup' ),
-			this.getEventDurations( 'selectionchange' ),
-		].filter( ( durations ) => durations.length );
+		const eventTypes: EventType[] = [
+			'focus',
+			'focusin',
+			'pointerup',
+			'selectionchange',
+		];
+		const durations = new Map< EventType, number[] >(
+			eventTypes.map( ( type ): [ EventType, number[] ] => [ type, [] ] )
+		);
+		const dispatches = this.getEventDispatches( eventTypes ).sort(
+			( a, b ) => a.ts - b.ts
+		);
+
+		let coveredUntil = -Infinity;
+		for ( const item of dispatches ) {
+			const end = item.ts + item.dur;
+			const from = Math.max( item.ts, coveredUntil );
+			coveredUntil = Math.max( coveredUntil, end );
+			durations
+				.get( item.args.data.type )!
+				.push( Math.max( 0, end - from ) / 1000 );
+		}
+
+		return [ ...durations.values() ].filter(
+			( eventDurations ) => eventDurations.length
+		);
 	}
 
 	/**
@@ -340,21 +375,30 @@ export class Metrics {
 	 * @return Durations of all events of a given type.
 	 */
 	getEventDurations( eventType: EventType ) {
+		return this.getEventDispatches( [ eventType ] ).map(
+			( item ) => item.dur / 1000
+		);
+	}
+
+	/**
+	 * @param eventTypes Types of event to filter.
+	 * @return The `EventDispatch` trace events of the given types.
+	 */
+	private getEventDispatches( eventTypes: EventType[] ) {
 		if ( this.trace.traceEvents.length === 0 ) {
 			throw new Error(
 				'No trace events found. Did you forget to call stopTracing()?'
 			);
 		}
 
-		return this.trace.traceEvents
-			.filter(
-				( item: TraceEvent ): boolean =>
-					item.cat === 'devtools.timeline' &&
-					item.name === 'EventDispatch' &&
-					item?.args?.data?.type === eventType &&
-					!! item.dur
-			)
-			.map( ( item ) => ( item.dur ? item.dur / 1000 : 0 ) );
+		return this.trace.traceEvents.filter(
+			( item: TraceEvent ): item is EventDispatch =>
+				item.cat === 'devtools.timeline' &&
+				item.name === 'EventDispatch' &&
+				!! item.dur &&
+				!! item.args?.data &&
+				eventTypes.includes( item.args.data.type )
+		);
 	}
 
 	/**
