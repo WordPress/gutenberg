@@ -79,8 +79,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/widgets": "file:../widgets",
-		"clsx": "^2.1.1",
-		"memize": "^2.1.0"
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",

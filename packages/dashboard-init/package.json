@@ -34,7 +34,11 @@
 	"dependencies": {
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/widget-primitives": "file:../widget-primitives",
+		"html-react-parser": "^5.2.11"
 	},
 	"publishConfig": {
 		"access": "public"

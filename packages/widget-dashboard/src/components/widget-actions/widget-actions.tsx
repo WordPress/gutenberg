@@ -27,9 +27,9 @@ type WidgetActionsProps = {
 
 /**
  * Materializes a widget type's declared `actions` as a "more" menu in the
- * chrome: a three-dots trigger surfacing each action as a link. Each action
- * is a declarative link target; the host renders it as an anchor and owns
- * placement.
+ * chrome: a three-dots trigger surfacing each action. This host mounts a real
+ * anchor for the link fulfillment, so middle-click and copy address survive;
+ * the menu exposes it as a menu item rather than as a link.
  *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.

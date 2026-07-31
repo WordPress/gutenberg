@@ -18,7 +18,12 @@ import {
 } from './components/entities-saved-states';
 import { useIsDirty as useEntitiesSavedStatesIsDirty } from './components/entities-saved-states/hooks/use-is-dirty';
 import { lock } from './lock-unlock';
-import { retrySyncConnection } from './sync';
+import {
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
+	entityContainsSnapshot,
+	getEntitySnapshot,
+	retrySyncConnection,
+} from './sync';
 import {
 	SelectionType,
 	SelectionDirection,
@@ -32,6 +37,9 @@ const lockedApis = {
 	useEntitiesSavedStatesIsDirty,
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
+	entityContainsSnapshot,
+	getEntitySnapshot,
 	retrySyncConnection,
 	useActiveCollaborators,
 	useResolvedSelection,

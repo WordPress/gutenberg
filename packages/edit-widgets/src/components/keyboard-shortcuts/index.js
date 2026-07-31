@@ -10,22 +10,32 @@ import { isAppleOS } from '@wordpress/keycodes';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editWidgetsStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { usesNativeUndo } = unlock( blockEditorPrivateApis );
 
 function KeyboardShortcuts() {
 	const { redo, undo } = useDispatch( coreStore );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	useShortcut( 'core/edit-widgets/undo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		undo();
 		event.preventDefault();
 	} );
 
 	useShortcut( 'core/edit-widgets/redo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		redo();
 		event.preventDefault();
 	} );
