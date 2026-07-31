@@ -229,6 +229,137 @@ describe( 'useView', () => {
 			} );
 		} );
 
+		// These overrides yield to a value of the user's own. A value the user
+		// picks that happens to be the one the default view carries is still
+		// their pick, so the override may not bounce it back.
+		it.each( [
+			{
+				property: 'type',
+				defaultView: { type: 'table' },
+				activeViewOverrides: { type: 'grid' },
+				overridden: 'grid',
+				picked: 'table',
+			},
+			{
+				property: 'perPage',
+				defaultView: { type: 'table', perPage: 20 },
+				activeViewOverrides: { perPage: 50 },
+				overridden: 50,
+				picked: 20,
+			},
+			{
+				property: 'fields',
+				defaultView: { type: 'table', fields: [ 'author' ] },
+				activeViewOverrides: { fields: [ 'date' ] },
+				overridden: [ 'date' ],
+				picked: [ 'author' ],
+			},
+			{
+				property: 'sort',
+				defaultView: {
+					type: 'table',
+					sort: { field: 'title', direction: 'asc' },
+				},
+				activeViewOverrides: {
+					sort: { field: 'date', direction: 'desc' },
+				},
+				overridden: { field: 'date', direction: 'desc' },
+				picked: { field: 'title', direction: 'asc' },
+			},
+			{
+				property: 'filters',
+				defaultView: {
+					type: 'table',
+					filters: [
+						{ field: 'status', operator: 'is', value: 'draft' },
+					],
+				},
+				activeViewOverrides: {
+					filters: [
+						{ field: 'status', operator: 'is', value: 'publish' },
+					],
+				},
+				overridden: [
+					{ field: 'status', operator: 'is', value: 'publish' },
+				],
+				picked: [ { field: 'status', operator: 'is', value: 'draft' } ],
+			},
+		] )(
+			'should let the user pick the $property the default view carries while an override is active',
+			( {
+				property,
+				defaultView: propsDefaultView,
+				activeViewOverrides,
+				overridden,
+				picked,
+			} ) => {
+				const registry = createTestRegistry();
+				const props = {
+					kind: 'postType',
+					name: 'page',
+					slug: 'default',
+					defaultView: propsDefaultView,
+					activeViewOverrides,
+				} as Parameters< typeof useView >[ 0 ];
+				const { result, rerender } = renderUseView( registry, props );
+				// The override wins while the user has not picked a value.
+				expect( ( result.current.view as any )[ property ] ).toEqual(
+					overridden
+				);
+
+				act( () => {
+					result.current.updateView( {
+						...result.current.view,
+						[ property ]: picked,
+					} );
+				} );
+				rerender( props );
+
+				// It must stick: the override may not bounce the pick back.
+				expect( ( result.current.view as any )[ property ] ).toEqual(
+					picked
+				);
+				expect( result.current.isModified ).toBe( true );
+			}
+		);
+
+		it( 'should let the user remove a filter an unlocked override provides', () => {
+			const registry = createTestRegistry();
+			const props = {
+				kind: 'postType',
+				name: 'page',
+				slug: 'default',
+				defaultView: {
+					type: 'table',
+					filters: [
+						{ field: 'status', operator: 'is', value: 'draft' },
+					],
+				},
+				activeViewOverrides: {
+					filters: [
+						{ field: 'status', operator: 'is', value: 'publish' },
+					],
+				},
+			} as Parameters< typeof useView >[ 0 ];
+			const { result, rerender } = renderUseView( registry, props );
+			expect( result.current.view.filters ).toEqual( [
+				{ field: 'status', operator: 'is', value: 'publish' },
+			] );
+
+			// Removing the filter is a pick too: an absent filter must not
+			// read as "the user has not picked".
+			act( () => {
+				result.current.updateView( {
+					...result.current.view,
+					filters: [],
+				} );
+			} );
+			rerender( props );
+
+			expect( result.current.view.filters ).toEqual( [] );
+			expect( result.current.isModified ).toBe( true );
+		} );
+
 		it( 'should not apply a type override when the user has persisted a different type', () => {
 			const registry = createTestRegistry();
 			registry
