@@ -165,10 +165,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
-	 * whether, to render it. A reference in `widget.json`, or a rendered
-	 * element in the module.
+	 * whether, to render it.
 	 */
-	icon?: WidgetIcon | WidgetIconReference;
+	icon?: WidgetIcon;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
@@ -244,12 +243,6 @@ export interface WidgetTypeMetadata< Item = unknown > {
  */
 export interface WidgetType< Item = unknown >
 	extends WidgetTypeMetadata< Item > {
-	/**
-	 * Always renderable: references are resolved before a `WidgetType`
-	 * reaches a host.
-	 */
-	icon?: WidgetIcon;
-
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time, produced from the conventional `render.*` entry point.
