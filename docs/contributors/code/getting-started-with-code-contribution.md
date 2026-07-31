@@ -274,7 +274,7 @@ You can start with this workspace settings file:
 		"editor.formatOnSave": false,
 		"editor.defaultFormatter": "stylelint.vscode-stylelint"
 	},
-	"stylelint.validate": [ "css", "scss" ],
+	"stylelint.validate": [ "css", "postcss", "scss" ],
 	"js/ts.experimental.useTsgo": true
 }
 ```
