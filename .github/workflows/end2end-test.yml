@@ -21,7 +21,7 @@ permissions: {}
 
 jobs:
     build:
-        name: Playwright - Build
+        name: Build
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
