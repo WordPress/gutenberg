@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core.
+
 ## 6.51.0 (2026-07-14)
 
 ## 6.50.0 (2026-07-01)
