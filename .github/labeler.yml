@@ -62,7 +62,9 @@
 
 '[Package] DataViews':
     - changed-files:
-          - any-glob-to-any-file: 'packages/dataviews/**'
+          - any-glob-to-any-file:
+                - 'packages/dataviews/**'
+                - 'packages/dataviews-i18n/**'
 
 '[Package] Date':
     - changed-files:

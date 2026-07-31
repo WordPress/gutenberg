@@ -23,6 +23,7 @@
 		{ "path": "packages/data" },
 		{ "path": "packages/data-controls" },
 		{ "path": "packages/dataviews" },
+		{ "path": "packages/dataviews-i18n" },
 		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
 		{ "path": "packages/design-system-mcp" },

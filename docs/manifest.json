@@ -2412,6 +2412,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dataviews-i18n",
+		"slug": "packages-dataviews-i18n",
+		"markdown_source": "../packages/dataviews-i18n/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/dataviews",
 		"slug": "packages-dataviews",
 		"markdown_source": "../packages/dataviews/README.md",

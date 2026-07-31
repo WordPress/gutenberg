@@ -9,6 +9,7 @@ on:
             - 'packages/admin-ui/**'
             - 'packages/components/**'
             - 'packages/dataviews/**'
+            - 'packages/dataviews-i18n/**'
             - 'packages/fields/**'
             - 'packages/grid/**'
             - 'packages/icons/**'
@@ -53,6 +54,7 @@ jobs:
                     - undo-manager
                     - views
                     # Message catalogs for the bundled packages
+                    - dataviews-i18n
                     - ui-i18n
                     # Other packages
                     - theme
