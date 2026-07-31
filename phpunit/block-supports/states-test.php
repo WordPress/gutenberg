@@ -934,6 +934,146 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that a responsive writing mode switches off the stylesheet rule that
+	 * flips vertical text upside down.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_writing_mode_cancels_text_orientation_rotation() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph has-text-align-right" style="writing-mode:vertical-rl">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textAlign'   => 'right',
+						'writingMode' => 'vertical-rl',
+					),
+					'@mobile'    => array(
+						'typography' => array(
+							'writingMode' => 'horizontal-tb',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{writing-mode:horizontal-tb !important;rotate:none !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive writing mode switches on the rotation when the
+	 * breakpoint values are the combination the stylesheet rule flips, but the
+	 * default state's values are not.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_writing_mode_adds_text_orientation_rotation() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph has-text-align-right">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textAlign' => 'right',
+					),
+					'@mobile'    => array(
+						'typography' => array(
+							'writingMode' => 'vertical-rl',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{writing-mode:vertical-rl !important;rotate:180deg !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that no rotation is emitted when the breakpoint does not change
+	 * whether the block is flipped.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_omits_rotation_when_orientation_is_unchanged() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph has-text-align-right" style="writing-mode:vertical-rl">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textAlign'   => 'right',
+						'writingMode' => 'vertical-rl',
+					),
+					'@mobile'    => array(
+						'typography' => array(
+							'textAlign' => 'right',
+						),
+					),
+				),
+			),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringNotContainsString( 'rotate:', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that no rotation is emitted when the breakpoint changes neither the
+	 * writing mode nor the text alignment.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_omits_rotation_when_typography_orientation_untouched() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph has-text-align-right" style="writing-mode:vertical-rl">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textAlign'   => 'right',
+						'writingMode' => 'vertical-rl',
+					),
+					'@mobile'    => array(
+						'color' => array(
+							'text' => '#ff0000',
+						),
+					),
+				),
+			),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringNotContainsString( 'rotate:', $actual_stylesheet );
+	}
+
 	public function test_legacy_responsive_root_state_generates_media_query_scoped_css() {
 		$this->ensure_block_registered( 'core/paragraph' );
 

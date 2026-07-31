@@ -329,6 +329,65 @@ function gutenberg_get_block_state_element_selectors( $root_selector ) {
 }
 
 /**
+ * Returns whether a writing mode and text alignment are the combination that
+ * block stylesheets flip upside down.
+ *
+ * Blocks that support vertical text are rotated half a turn when the text is
+ * aligned to the end of its inline axis, so that it reads bottom to top rather
+ * than top to bottom. See the `rotate` rules in the paragraph, heading, and post
+ * navigation link stylesheets.
+ *
+ * @param string|null $writing_mode Writing mode value, e.g. `vertical-rl`.
+ * @param string|null $text_align   Text alignment value, e.g. `right`.
+ * @return bool Whether the two values together flip the block.
+ */
+function gutenberg_is_text_orientation_flipped( $writing_mode, $text_align ) {
+	return ( 'vertical-rl' === $writing_mode && 'right' === $text_align )
+		|| ( 'vertical-lr' === $writing_mode && 'left' === $text_align );
+}
+
+/**
+ * Returns the `rotate` value a state needs so vertical text is not left facing
+ * the wrong way at a breakpoint.
+ *
+ * The stylesheet rules that flip vertical text match the block's
+ * `has-text-align-*` class and its inline `style` attribute. Both of those come
+ * from the default state and stay in the markup at every breakpoint, so a state
+ * that changes the writing mode or the text alignment cannot turn the flip off,
+ * or on, through the cascade. The state has to say so with its own declaration.
+ *
+ * @param array $base_typography  Typography styles from the block's default state.
+ * @param array $state_typography Typography styles the state applies on top.
+ * @return string|null `180deg` or `none`, or null when the state does not change
+ *                     whether the block is flipped.
+ */
+function gutenberg_get_state_text_orientation_rotation( $base_typography, $state_typography ) {
+	if (
+		! array_key_exists( 'writingMode', $state_typography ) &&
+		! array_key_exists( 'textAlign', $state_typography )
+	) {
+		return null;
+	}
+
+	$base_is_flipped = gutenberg_is_text_orientation_flipped(
+		$base_typography['writingMode'] ?? null,
+		$base_typography['textAlign'] ?? null
+	);
+
+	// Values the state does not set keep applying from the default state.
+	$state_is_flipped = gutenberg_is_text_orientation_flipped(
+		$state_typography['writingMode'] ?? $base_typography['writingMode'] ?? null,
+		$state_typography['textAlign'] ?? $base_typography['textAlign'] ?? null
+	);
+
+	if ( $base_is_flipped === $state_is_flipped ) {
+		return null;
+	}
+
+	return $state_is_flipped ? '180deg' : 'none';
+}
+
+/**
  * Adds a compiled state style rule to a rule list.
  *
  * @param array       $css_rules   Style rules.
@@ -336,8 +395,11 @@ function gutenberg_get_block_state_element_selectors( $root_selector ) {
  * @param string|null $selector    Block, feature, or element selector.
  * @param array       $style       Style object.
  * @param string|null $rules_group Optional CSS grouping rule, e.g. a media query.
+ * @param array|null  $base_style  Optional style object for the block's default
+ *                                 state, used to work out whether the state
+ *                                 changes the text orientation rotation.
  */
-function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null ) {
+function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null, $base_style = null ) {
 	if ( empty( $style ) || ! is_array( $style ) ) {
 		return;
 	}
@@ -352,6 +414,18 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 	// Base text alignment is class-based, so state styles need a declaration.
 	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
 		$declarations['text-align'] = $text_align;
+	}
+
+	// The base rotation comes from stylesheet rules that match markup, which a
+	// breakpoint cannot change, so state styles need a declaration for that too.
+	if ( is_array( $base_style ) ) {
+		$rotation = gutenberg_get_state_text_orientation_rotation(
+			$base_style['typography'] ?? array(),
+			$style['typography'] ?? array()
+		);
+		if ( null !== $rotation ) {
+			$declarations['rotate'] = $rotation;
+		}
 	}
 
 	if ( empty( $declarations ) ) {
@@ -374,9 +448,12 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
  * @param array         $state_styles Map of state to style array.
  * @param WP_Block_Type $block_type   Block type.
  * @param string|null   $rules_group  Optional CSS grouping rule, e.g. a media query.
+ * @param array|null    $base_style   Optional style object for the block's default
+ *                                    state, used to work out whether a state
+ *                                    changes the text orientation rotation.
  * @return array[] State style rules.
  */
-function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null ) {
+function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null, $base_style = null ) {
 	$css_rules       = array();
 	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
 		? $block_type->selectors
@@ -393,7 +470,8 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 				$state,
 				$group['selector'],
 				$group['style'],
-				$rules_group
+				$rules_group,
+				$base_style
 			);
 		}
 	}
@@ -553,12 +631,19 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 
 		if ( ! empty( $root_state_style ) ) {
+			/*
+			 * The default state's styles are passed alongside so the rule can carry
+			 * a `rotate` declaration when the breakpoint changes whether vertical
+			 * text should be flipped. Pseudo states are not given the same
+			 * treatment because no block that flips vertical text supports one.
+			 */
 			$css_rules = array_merge(
 				$css_rules,
 				gutenberg_get_block_state_style_rules(
 					array( '' => $root_state_style ),
 					$block_type,
-					$media_query
+					$media_query,
+					$style
 				)
 			);
 		}

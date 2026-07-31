@@ -21,6 +21,7 @@
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace`.
+-   Viewport style states that change a block's writing mode or text alignment now emit a `rotate` declaration, so the stylesheet rule that flips vertical text upside down is turned off, or on, at that breakpoint. Previously the rule kept applying from the default state, because it matches the block's `has-text-align-*` class and inline `style` attribute and neither of those changes at a breakpoint.
 
 ## 16.0.0 (2026-07-14)
 

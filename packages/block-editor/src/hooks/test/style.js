@@ -443,6 +443,63 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'cancels the vertical text rotation when a viewport changes the writing mode', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					typography: {
+						textAlign: 'right',
+						writingMode: 'vertical-rl',
+					},
+					'@mobile': {
+						typography: { writingMode: 'horizontal-tb' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { writing-mode: horizontal-tb !important; }\n.wp-elements-1 { rotate: none !important; }}',
+		] );
+	} );
+
+	it( 'applies the vertical text rotation when a viewport introduces the flipped combination', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					typography: { textAlign: 'right' },
+					'@mobile': {
+						typography: { writingMode: 'vertical-rl' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { writing-mode: vertical-rl !important; }\n.wp-elements-1 { rotate: 180deg !important; }}',
+		] );
+	} );
+
+	it( 'omits the rotation when a viewport does not change whether text is flipped', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					typography: {
+						textAlign: 'right',
+						writingMode: 'vertical-rl',
+					},
+					'@mobile': {
+						typography: { textAlign: 'right' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { text-align: right !important; }}',
+		] );
+	} );
+
 	it( 'routes viewport styles through feature selectors', () => {
 		expect(
 			getResponsiveStateCSSRules(

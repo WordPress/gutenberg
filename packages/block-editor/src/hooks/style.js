@@ -232,6 +232,81 @@ function getStateTextAlignCSS( stateStyles, selector ) {
 }
 
 /**
+ * Returns whether a writing mode and text alignment are the combination that
+ * block stylesheets flip upside down.
+ *
+ * Blocks that support vertical text are rotated half a turn when the text is
+ * aligned to the end of its inline axis, so that it reads bottom to top rather
+ * than top to bottom. See the `rotate` rules in the paragraph, heading, and post
+ * navigation link stylesheets.
+ *
+ * @param {string} [writingMode] Writing mode value, e.g. `vertical-rl`.
+ * @param {string} [textAlign]   Text alignment value, e.g. `right`.
+ * @return {boolean} Whether the two values together flip the block.
+ */
+function isTextOrientationFlipped( writingMode, textAlign ) {
+	return (
+		( writingMode === 'vertical-rl' && textAlign === 'right' ) ||
+		( writingMode === 'vertical-lr' && textAlign === 'left' )
+	);
+}
+
+/**
+ * Returns CSS that keeps vertical text from facing the wrong way in a block
+ * instance state style object.
+ *
+ * The stylesheet rules that flip vertical text match the block's
+ * `has-text-align-*` class and its inline `style` attribute. Both of those come
+ * from the default state and stay in the markup at every breakpoint, so a state
+ * that changes the writing mode or the text alignment cannot turn the flip off,
+ * or on, through the cascade. The state needs its own declaration.
+ *
+ * @param {Object} baseStyle   Style object for the block's default state.
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string|undefined} CSS string with the rotation declaration, or
+ *                            undefined when the state does not change whether
+ *                            the block is flipped.
+ */
+function getStateTextOrientationRotationCSS(
+	baseStyle,
+	stateStyles,
+	selector
+) {
+	const baseTypography = baseStyle?.typography;
+	const stateTypography = stateStyles?.typography;
+
+	if (
+		stateTypography?.writingMode === undefined &&
+		stateTypography?.textAlign === undefined
+	) {
+		return undefined;
+	}
+
+	const baseIsFlipped = isTextOrientationFlipped(
+		baseTypography?.writingMode,
+		baseTypography?.textAlign
+	);
+
+	// Values the state does not set keep applying from the default state.
+	const stateIsFlipped = isTextOrientationFlipped(
+		stateTypography?.writingMode ?? baseTypography?.writingMode,
+		stateTypography?.textAlign ?? baseTypography?.textAlign
+	);
+
+	if ( baseIsFlipped === stateIsFlipped ) {
+		return undefined;
+	}
+
+	const declaration = `rotate: ${
+		stateIsFlipped ? '180deg' : 'none'
+	} !important`;
+	return selector
+		? `${ selector } { ${ declaration }; }`
+		: `${ declaration };`;
+}
+
+/**
  * Generates CSS for a block instance state style object.
  *
  * State declarations need to win over preset utility classes, but fallback
@@ -240,9 +315,12 @@ function getStateTextAlignCSS( stateStyles, selector ) {
  *
  * @param {Object} stateStyles State style object.
  * @param {string} selector    CSS selector for the generated style.
+ * @param {Object} [baseStyle] Style object for the block's default state, used to
+ *                             work out whether the state changes the text
+ *                             orientation rotation.
  * @return {string} Generated stylesheet.
  */
-export function getStateStylesCSS( stateStyles, selector ) {
+export function getStateStylesCSS( stateStyles, selector, baseStyle ) {
 	const fallbackDimensionStyles =
 		getStateFallbackDimensionStyles( stateStyles );
 	const stylesWithDimensionFallbacks = fallbackDimensionStyles
@@ -255,12 +333,23 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		? compileCSS( fallbackBorderStyles, { selector } )
 		: undefined;
 	const textAlignCSS = getStateTextAlignCSS( stateStyles, selector );
+	const rotationCSS = getStateTextOrientationRotationCSS(
+		baseStyle,
+		stateStyles,
+		selector
+	);
 	const backgroundResetCSS = getStateBackgroundResetCSS(
 		stateStyles,
 		selector
 	);
 
-	return [ importantCSS, textAlignCSS, fallbackCSS, backgroundResetCSS ]
+	return [
+		importantCSS,
+		textAlignCSS,
+		rotationCSS,
+		fallbackCSS,
+		backgroundResetCSS,
+	]
 		.filter( Boolean )
 		.join( '\n' );
 }
@@ -364,12 +453,13 @@ function getStateStyleGroups( stateStyles, name ) {
  * @return {string|undefined} Generated stylesheet.
  */
 export function getBlockStateStylesCSS( stateStyles, options ) {
-	const { name, baseSelector, state = '' } = options;
+	const { name, baseSelector, state = '', baseStyle } = options;
 	const rules = getStateStyleGroups( stateStyles, name )
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector( baseSelector, blockSelector, state ),
+				baseStyle
 			)
 		)
 		.filter( Boolean );
@@ -467,11 +557,18 @@ export function getResponsiveStateCSSRules(
 			}
 
 			const viewportCSSRules = [];
+			/*
+			 * The default state's styles are passed alongside so the rule can carry
+			 * a `rotate` declaration when the breakpoint changes whether vertical
+			 * text should be flipped. Pseudo states are not given the same
+			 * treatment because no block that flips vertical text supports one.
+			 */
 			const rootCSS = getBlockStateStylesCSS(
 				getRootStateStyles( viewportStyles, nestedStateKeys ),
 				{
 					name,
 					baseSelector,
+					baseStyle: style,
 				}
 			);
 			if ( rootCSS ) {
