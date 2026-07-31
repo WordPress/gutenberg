@@ -898,6 +898,7 @@ _Properties_
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _blockStatesEnabled_ `boolean`: Whether or not block style states editing is enabled
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
 -   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
