@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
-import { globSync } from 'glob';
+import fastGlob from 'fast-glob';
 import { defineConfig } from 'vitest/config';
 import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 import { getVitestTestsByProject } from './scripts/test-projects.mjs';
@@ -23,6 +23,7 @@ const isolationSetupFile = path.join(
 	'test/unit/config/isolation.vitest.js'
 );
 const vitestTests = getVitestTestsByProject( ROOT_DIR );
+const { sync: glob } = fastGlob;
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: fileURLToPath(
@@ -81,7 +82,7 @@ if (
 process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
-const transpiledPackageNames = globSync(
+const transpiledPackageNames = glob(
 	'packages/*/src/index.{js,jsx,ts,tsx}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
