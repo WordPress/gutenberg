@@ -213,10 +213,22 @@ export default defineConfig( {
 			},
 			{
 				extends: true,
+				optimizeDeps: {
+					entries: vitestTests.browser,
+				},
 				test: {
 					name: 'browser',
+					attachmentsDir: 'test-results/vitest-browser-attachments',
 					include: vitestTests.browser,
 					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/browser.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
@@ -228,6 +240,13 @@ export default defineConfig( {
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: playwright(),
+						screenshotDirectory:
+							'test-results/vitest-browser-screenshots',
+						screenshotFailures: true,
+						trace: {
+							mode: 'retain-on-failure',
+							tracesDir: 'test-results/vitest-browser-traces',
+						},
 					},
 				},
 			},

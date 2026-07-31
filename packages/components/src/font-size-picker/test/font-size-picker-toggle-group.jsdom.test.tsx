@@ -1,15 +1,10 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
+import { render } from '@ariakit/test/react';
 import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
 import type { FontSize } from '../types';
+globalThis.wpVitest.mockResizeObserver();
 
 describe( 'FontSizePickerToggleGroup', () => {
 	const fontSizes: FontSize[] = [
