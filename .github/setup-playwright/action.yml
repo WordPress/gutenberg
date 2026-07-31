@@ -36,7 +36,8 @@ runs:
         # The key carries a fingerprint of the packages, so a cache entry is
         # never stale: when apt fetches a newer package the fingerprint changes
         # and the save step writes a new entry. Cache entries are immutable, so
-        # refreshing one is not an option.
+        # refreshing one is not an option. `key` therefore never matches on its
+        # own; the prefix search restores the newest entry.
         - name: Restore the cached packages
           if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' }}
           uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -51,10 +52,13 @@ runs:
               BROWSERS: ${{ inputs.browsers }}
           run: |
               fingerprint() {
-                  find "$HOME/apt-cache" -maxdepth 1 -name '*.deb' -printf '%f\n' | sort | sha256sum | cut -c1-16
+                  find "$HOME/apt-cache" -maxdepth 1 -name '*.deb' -printf '%f\n' | LC_ALL=C sort | sha256sum | cut -c1-16
               }
               BEFORE="$(fingerprint)"
 
+              # apt looks packages up by name, version and arch, re-downloading
+              # any whose size does not match its own index, so a stale package
+              # here is never used. It does not re-checksum what it finds cached.
               # `--update=none` needs coreutils 9.3+, so ubuntu-24.04 or newer.
               sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
 
