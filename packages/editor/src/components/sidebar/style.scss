@@ -15,6 +15,11 @@
 	}
 }
 
+// The `Tabs` root's children all render into the sidebar's slot.
+.editor-sidebar__tabs {
+	display: contents;
+}
+
 .editor-post-summary .components-v-stack:empty {
 	display: none;
 }

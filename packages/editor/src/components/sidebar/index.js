@@ -6,12 +6,12 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
+import { Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -34,8 +34,6 @@ import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { Tabs } = unlock( componentsPrivateApis );
-
 const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 const SidebarContent = ( {
@@ -44,37 +42,9 @@ const SidebarContent = ( {
 	onActionPerformed,
 	extraPanels,
 } ) => {
-	const tabListRef = useRef( null );
 	const isRevisionsMode = useSelect( ( select ) => {
 		return unlock( select( editorStore ) ).isRevisionsMode();
 	} );
-
-	// This effect addresses a race condition caused by tabbing from the last
-	// block in the editor into the settings sidebar. Without this effect, the
-	// selected tab and browser focus can become separated in an unexpected way
-	// (e.g the "block" tab is focused, but the "post" tab is selected).
-	useEffect( () => {
-		const tabsElements = Array.from(
-			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
-		);
-		const selectedTabElement = tabsElements.find(
-			// We are purposefully using a custom `data-tab-id` attribute here
-			// because we don't want rely on any assumptions about `Tabs`
-			// component internals.
-			( element ) => element.getAttribute( 'data-tab-id' ) === tabName
-		);
-		const activeElement = selectedTabElement?.ownerDocument.activeElement;
-		const tabsHasFocus = tabsElements.some( ( element ) => {
-			return activeElement && activeElement.id === element.id;
-		} );
-		if (
-			tabsHasFocus &&
-			selectedTabElement &&
-			selectedTabElement.id !== activeElement?.id
-		) {
-			selectedTabElement?.focus();
-		}
-	}, [ tabName ] );
 
 	let tabContent;
 	if ( isRevisionsMode ) {
@@ -106,7 +76,7 @@ const SidebarContent = ( {
 	return (
 		<PluginSidebar
 			identifier={ tabName }
-			header={ <SidebarHeader ref={ tabListRef } /> }
+			header={ <SidebarHeader /> }
 			closeLabel={ __( 'Close Settings' ) }
 			// This classname is added so we can apply a corrective negative
 			// margin to the panel.
@@ -121,13 +91,13 @@ const SidebarContent = ( {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+			<Tabs.Panel value={ sidebars.document } tabIndex={ -1 }>
 				{ tabContent }
-			</Tabs.TabPanel>
-			<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+			</Tabs.Panel>
+			<Tabs.Panel value={ sidebars.block } tabIndex={ -1 }>
 				<BlockInspector />
 				{ isRevisionsMode && <RevisionBlockDiffPanel /> }
-			</Tabs.TabPanel>
+			</Tabs.Panel>
 		</PluginSidebar>
 	);
 };
@@ -170,10 +140,14 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	);
 
 	return (
-		<Tabs
-			selectedTabId={ tabName }
-			onSelect={ onTabSelect }
-			selectOnMove={ false }
+		// `PluginSidebar` takes the tab list and the panels as separate props,
+		// so this is the lowest place that can hold both. They portal into the
+		// sidebar slot, leaving this div empty; `Tabs` only needs to be their
+		// ancestor in the React tree, not in the DOM.
+		<Tabs.Root
+			className="editor-sidebar__tabs"
+			value={ tabName }
+			onValueChange={ onTabSelect }
 		>
 			<SidebarContent
 				tabName={ tabName }
@@ -181,7 +155,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 			/>
-		</Tabs>
+		</Tabs.Root>
 	);
 };
 
