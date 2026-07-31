@@ -54,6 +54,7 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/theme": "file:../theme",
+		"@wordpress/ui-i18n": "file:../ui-i18n",
 		"clsx": "^2.1.1",
 		"tabbable": "^6.4.0"
 	},

@@ -81,6 +81,7 @@
 		{ "path": "packages/theme/tsconfig.test.json" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/ui" },
+		{ "path": "packages/ui-i18n" },
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
 		{ "path": "packages/url" },

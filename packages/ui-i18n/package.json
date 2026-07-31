@@ -1,0 +1,53 @@
+{
+	"name": "@wordpress/ui-i18n",
+	"version": "1.0.0-prerelease",
+	"description": "Translated UI message catalog for the WordPress Design System components.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"i18n",
+		"components"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui-i18n/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui-i18n"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpScriptDefaultExport": true,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/i18n": "file:../i18n"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

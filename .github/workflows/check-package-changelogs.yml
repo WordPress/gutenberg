@@ -17,6 +17,7 @@ on:
             - 'packages/style-runtime/**'
             - 'packages/theme/**'
             - 'packages/ui/**'
+            - 'packages/ui-i18n/**'
             - 'packages/undo-manager/**'
             - 'packages/views/**'
             - 'packages/widget-dashboard/**'
@@ -51,6 +52,8 @@ jobs:
                     - ui
                     - undo-manager
                     - views
+                    # Message catalogs for the bundled packages
+                    - ui-i18n
                     # Other packages
                     - theme
                     - components

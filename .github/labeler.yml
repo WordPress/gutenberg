@@ -238,7 +238,9 @@
 
 '[Package] UI':
     - changed-files:
-          - any-glob-to-any-file: 'packages/ui/**'
+          - any-glob-to-any-file:
+                - 'packages/ui/**'
+                - 'packages/ui-i18n/**'
 
 '[Package] Url':
     - changed-files:
