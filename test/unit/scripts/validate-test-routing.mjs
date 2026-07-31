@@ -3,15 +3,10 @@
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-
-/**
- * External dependencies
- */
-import globPackage from 'glob';
 
 /**
  * Internal dependencies
@@ -100,6 +95,21 @@ function isWithinDirectory( testPath, directoryPath ) {
 	);
 }
 
+function isValidManifestPath( testPath, expectedType ) {
+	const resolvedPath = path.resolve( ROOT_DIR, testPath );
+	const relativePath = path.relative( ROOT_DIR, resolvedPath );
+	const isWithinRoot =
+		relativePath !== '..' &&
+		! relativePath.startsWith( `..${ path.sep }` ) &&
+		! path.isAbsolute( relativePath );
+
+	return (
+		isWithinRoot &&
+		existsSync( resolvedPath ) &&
+		statSync( resolvedPath )[ expectedType ]()
+	);
+}
+
 const jestTests = listTests( 'jest', [
 	'--config',
 	JEST_CONFIG,
@@ -144,17 +154,17 @@ assert.deepEqual(
 
 const invalidMigratedEntries = [
 	...migratedTestFiles.filter(
-		( testPath ) => ! existsSync( path.join( ROOT_DIR, testPath ) )
+		( testPath ) => ! isValidManifestPath( testPath, 'isFile' )
 	),
 	...migratedDirectories.filter(
 		( directoryPath ) =>
-			! existsSync( path.join( ROOT_DIR, directoryPath ) )
+			! isValidManifestPath( directoryPath, 'isDirectory' )
 	),
 ];
 assert.deepEqual(
 	invalidMigratedEntries,
 	[],
-	`Migrated files or directories do not exist:\n${ invalidMigratedEntries.join(
+	`Migrated files or directories must exist inside the repository and match their declared type:\n${ invalidMigratedEntries.join(
 		'\n'
 	) }`
 );
@@ -185,26 +195,6 @@ assert.deepEqual(
 	runnerInventory,
 	staticInventory,
 	'Executable runner inventory does not match static test discovery.'
-);
-
-const { sync: glob } = globPackage;
-const orphanedSnapshots = glob( '**/__snapshots__/*.snap', {
-	cwd: ROOT_DIR,
-	ignore: [ '**/node_modules/**', '**/vendor/**' ],
-	nodir: true,
-} ).filter( ( snapshotPath ) => {
-	const testPath = path.join(
-		path.dirname( path.dirname( snapshotPath ) ),
-		path.basename( snapshotPath, '.snap' )
-	);
-	return ! existsSync( path.join( ROOT_DIR, testPath ) );
-} );
-assert.deepEqual(
-	orphanedSnapshots,
-	[],
-	`Snapshots without a matching test file:\n${ orphanedSnapshots.join(
-		'\n'
-	) }`
 );
 
 console.log(

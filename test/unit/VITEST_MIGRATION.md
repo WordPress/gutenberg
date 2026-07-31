@@ -19,5 +19,4 @@ When changing test ownership:
 
 The routing validator fails when a test is missing, owned by both runners, or
 not assigned to the expected Vitest migration entry. It also rejects invalid
-manifest entries, static/executable discovery mismatches, and orphaned
-snapshots.
+manifest entries and static/executable discovery mismatches.
