@@ -50,7 +50,7 @@ jobs:
                           - '!{phpcs,phpunit}*'
                           - '!{changelog,readme}.txt'
                           - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
-                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(end2end-test.yml)}'
+                          - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(end2end-test.yml)}'
 
     build:
         name: Build
@@ -336,9 +336,9 @@ jobs:
                   label: '[Type] Flaky Test'
                   artifact-path: flaky-tests
 
-    # Always runs, so it can be the required check while the shards above are path-filtered
+    # Always runs, so it can be the required check while the jobs above are path-filtered
     # away. `needs` must list every job that would otherwise still be running: the gate fails
-    # rather than pass a job it never evaluated.
+    # rather than pass a job it never evaluated. `build` settles before the shards do.
     e2e-gate:
         timeout-minutes: 5
         name: End-to-End Tests Gate
