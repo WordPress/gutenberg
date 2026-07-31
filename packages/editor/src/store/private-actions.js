@@ -542,6 +542,15 @@ export const setRevisionPage =
 		} );
 	};
 
+function createRevisionsLoadFailedNotice( registry ) {
+	registry
+		.dispatch( noticesStore )
+		.createNotice( 'warning', __( 'Revisions could not be loaded.' ), {
+			type: 'snackbar',
+			id: 'editor-revisions-load-failed',
+		} );
+}
+
 /**
  * Open a revision from a shared URL and select the page that contains it.
  *
@@ -581,16 +590,7 @@ export const openRevision =
 		// core-data swallows request errors, so a missing result means the
 		// request failed. Keep the selection so a reload can try again.
 		if ( ! revisions ) {
-			registry
-				.dispatch( noticesStore )
-				.createNotice(
-					'warning',
-					__( 'Revisions could not be loaded.' ),
-					{
-						type: 'snackbar',
-						id: 'editor-revisions-load-failed',
-					}
-				);
+			createRevisionsLoadFailedNotice( registry );
 			return;
 		}
 
@@ -598,25 +598,47 @@ export const openRevision =
 			( revision ) => revision[ revisionKey ] === revisionId
 		);
 		if ( index === -1 ) {
-			// With `WP_POST_REVISIONS` disabled, autosaves are missing from
-			// this collection but still resolve through the individual endpoint.
-			const revision = await registry
-				.resolveSelect( coreStore )
-				.getRevision( 'postType', postType, postId, revisionId, {
-					context: 'edit',
+			// Autosaves can be missing from the collection when revisions are
+			// disabled. Fetch the record directly so a request failure is not
+			// mistaken for a 404.
+			let revision;
+			try {
+				revision = await apiFetch( {
+					path: addQueryArgs(
+						entityConfig.getRevisionsUrl( postId, revisionId ),
+						{ context: 'edit' }
+					),
 				} );
+			} catch ( error ) {
+				if ( select.getCurrentRevisionId() !== revisionId ) {
+					return;
+				}
+				if ( error?.data?.status !== 404 ) {
+					createRevisionsLoadFailedNotice( registry );
+					return;
+				}
+
+				dispatch.setCurrentRevisionId( null );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'warning', __( 'Invalid revision ID.' ), {
+						type: 'snackbar',
+						id: 'editor-revision-invalid',
+					} );
+				return;
+			}
+
 			if ( select.getCurrentRevisionId() !== revisionId ) {
 				return;
 			}
-			if ( revision ) {
+			if ( ! revision ) {
+				createRevisionsLoadFailedNotice( registry );
 				return;
 			}
-			dispatch.setCurrentRevisionId( null );
-			registry
-				.dispatch( noticesStore )
-				.createNotice( 'warning', __( 'Invalid revision ID.' ), {
-					type: 'snackbar',
-					id: 'editor-revision-invalid',
+			await registry
+				.dispatch( coreStore )
+				.receiveRevisions( 'postType', postType, postId, revision, {
+					context: 'edit',
 				} );
 			return;
 		}

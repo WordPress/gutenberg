@@ -765,6 +765,63 @@ test.describe( 'Post revisions shareable URLs', () => {
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
 			.toBe( null );
 	} );
+
+	test( 'should keep the URL revision when the request fails', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Failing revision test',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		const revisionId = 99999999;
+
+		// Do not treat a server error as a missing revision.
+		await page.route(
+			( url ) =>
+				url.href.includes( `revisions/${ revisionId }` ) ||
+				url.href.includes( `revisions%2F${ revisionId }` ),
+			async ( route ) => {
+				await route.fulfill( {
+					status: 500,
+					json: {
+						code: 'internal_server_error',
+						message: 'Server error.',
+						data: { status: 500 },
+					},
+				} );
+			}
+		);
+
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ revisionId }`
+		);
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Revisions could not be loaded.' } )
+		).toBeVisible();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Invalid revision ID.' } )
+		).toBeHidden();
+
+		// The selection survives so a reload can try again.
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( String( revisionId ) );
+	} );
 } );
 
 test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
