@@ -5,5 +5,5 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [],
-	"exclude": [ "src/loader.ts", "src/test/**" ]
+	"exclude": [ "src/loader.ts" ]
 }
