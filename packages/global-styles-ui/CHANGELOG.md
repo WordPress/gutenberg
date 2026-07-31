@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add support for hiding state controls for blocks in Global Styles ([#80850](https://github.com/WordPress/gutenberg/issues/80850)).
+-   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
 
 ### Bug Fixes
 

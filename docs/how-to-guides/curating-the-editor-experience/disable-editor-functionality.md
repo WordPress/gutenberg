@@ -134,7 +134,7 @@ function example_disable_block_states_editing( $settings ) {
 add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
 ```
 
-State styles already defined in block attributes continue to be applied in the editor and on the front end. This setting does not affect viewport state controls, which are controlled by `responsiveEditingEnabled`.
+State styles already saved in `theme.json`, in Global Styles, or in a block's `style` attribute continue to be applied in the editor and on the front end. This setting does not affect viewport state controls, which are controlled by `responsiveEditingEnabled`.
 
 ## Disable formatting options for RichText blocks
 
