@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/math",
+		"attrs": {
+			"latex": "\\begin{vmatrix}\n1 & 2 \\\\\n3 & 4\n\\end{vmatrix}"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-math\"><math display=\"block\"><semantics><mrow><mo fence=\"true\" form=\"prefix\">|</mo><mtable columnalign=\"center center\"><mtr><mtd style=\"padding-left:0em;\"><mn>1</mn></mtd><mtd style=\"padding-right:0em;\"><mn>2</mn></mtd></mtr><mtr><mtd style=\"padding-left:0em;\"><mn>3</mn></mtd><mtd style=\"padding-right:0em;\"><mn>4</mn></mtd></mtr></mtable><mo fence=\"true\" form=\"postfix\">|</mo></mrow><annotation encoding=\"application/x-tex\">\\begin{vmatrix}\n1 &amp; 2 \\\\\n3 &amp; 4\n\\end{vmatrix}</annotation></semantics></math></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-math\"><math display=\"block\"><semantics><mrow><mo fence=\"true\" form=\"prefix\">|</mo><mtable columnalign=\"center center\"><mtr><mtd style=\"padding-left:0em;\"><mn>1</mn></mtd><mtd style=\"padding-right:0em;\"><mn>2</mn></mtd></mtr><mtr><mtd style=\"padding-left:0em;\"><mn>3</mn></mtd><mtd style=\"padding-right:0em;\"><mn>4</mn></mtd></mtr></mtable><mo fence=\"true\" form=\"postfix\">|</mo></mrow><annotation encoding=\"application/x-tex\">\\begin{vmatrix}\n1 &amp; 2 \\\\\n3 &amp; 4\n\\end{vmatrix}</annotation></semantics></math></div>\n"
+		]
+	}
+]
