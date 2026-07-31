@@ -133,27 +133,19 @@ function ScreenBlock( {
 		() => getValidViewportStates( viewportSettings ),
 		[ viewportSettings ]
 	);
-	const hasValidSelectedViewport =
+	const effectiveSelectedViewport =
 		selectedViewport === 'default' ||
 		validViewportStates.some(
 			( state ) => state.value === selectedViewport
-		);
-	const effectiveSelectedViewport =
-		showResponsiveStateControls && hasValidSelectedViewport
+		)
 			? selectedViewport
 			: 'default';
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
-	const effectiveSelectedPseudoState = showBlockStateControls
-		? selectedPseudoState
-		: 'default';
 
-	const stateParam = [
-		effectiveSelectedViewport,
-		effectiveSelectedPseudoState,
-	]
+	const stateParam = [ effectiveSelectedViewport, selectedPseudoState ]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -377,19 +369,16 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
-				pseudoStates={ validPseudoStates }
+				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
-				selectedPseudoState={ effectiveSelectedPseudoState }
+				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={
 					showResponsiveStateControls
 						? setSelectedViewport
 						: undefined
 				}
-				onChangePseudoState={
-					showBlockStateControls ? setSelectedPseudoState : undefined
-				}
+				onChangePseudoState={ setSelectedPseudoState }
 				showResponsiveStateControls={ showResponsiveStateControls }
-				showBlockStateControls={ showBlockStateControls }
 			/>
 			<BlockPreviewPanel
 				name={ name }
