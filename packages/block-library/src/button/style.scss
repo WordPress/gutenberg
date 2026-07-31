@@ -7,7 +7,7 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
+	overflow-wrap: break-word;
 	box-sizing: border-box;
 	height: 100%;
 	align-content: center;

@@ -5,7 +5,7 @@ pre.wp-block-verse {
 
 	// Prevent text overflow off-screen when the previous block has float.
 	min-width: 1em;
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
 
 :where(pre.wp-block-verse) {

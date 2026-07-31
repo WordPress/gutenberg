@@ -132,7 +132,7 @@
 	// clip boundary for focus rings of inner controls.
 	padding-inline: var(--wpds-border-width-focus);
 	margin-inline: calc(-1 * var(--wpds-border-width-focus));
-	word-break: break-word;
+	overflow-wrap: break-word;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 
 	// Keep summary links and buttons in front of the edit button's stretched

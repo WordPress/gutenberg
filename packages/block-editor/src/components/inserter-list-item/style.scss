@@ -44,7 +44,7 @@
 	justify-content: center;
 	cursor: var(--wpds-cursor-control);
 	background: transparent;
-	word-break: break-word;
+	overflow-wrap: break-word;
 	@media not ( prefers-reduced-motion ) {
 		transition: all 0.05s ease-in-out;
 	}

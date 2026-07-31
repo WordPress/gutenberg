@@ -41,7 +41,7 @@
 		@include break-small() {
 			grid-template-columns: 1fr 1fr;
 		}
-		grid-gap: $grid-unit-15;
+		gap: $grid-unit-15;
 		min-width: $break-zoomed-in;
 		@include break-small() {
 			min-width: $break-mobile;
