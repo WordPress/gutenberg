@@ -231,7 +231,7 @@ You can start with this workspace settings file:
 		"**/build/**": true,
 		"**/build-module/**": true,
 		"**/build-types/**": true,
-		"**/build-styles/**": true,
+		"**/build-style/**": true,
 		"**/node_modules/**": true,
 		"**/vendor/**": true
 	},
@@ -247,7 +247,7 @@ You can start with this workspace settings file:
 		"**/build/**",
 		"**/build-module/**",
 		"**/build-types/**",
-		"**/build-styles/**",
+		"**/build-style/**",
 		"**/node_modules/**",
 		"**/vendor/**"
 	],
