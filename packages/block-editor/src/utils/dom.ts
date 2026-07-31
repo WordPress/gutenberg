@@ -55,7 +55,13 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	const editable = element?.closest( '[contenteditable="true"]' );
+	// While the wrapper is the editing host, the editable element within the
+	// selected block is editable by inheritance (`contenteditable="inherit"`),
+	// not an editing host of its own, so accept any explicit editable marker
+	// except an opt-out.
+	const editable = element?.closest(
+		'[contenteditable]:not([contenteditable="false"])'
+	);
 
 	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
 		return;

@@ -150,7 +150,14 @@ export function getClosestTabbable(
 		if (
 			node.isContentEditable &&
 			node.contentEditable !== 'true' &&
-			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
+			// The editable element within the block may be editable by
+			// inheritance under an editing host (`contenteditable="inherit"`),
+			// so accept any explicit editable marker except an opt-out.
+			getBlockClientId(
+				node.closest(
+					'[contenteditable]:not([contenteditable="false"])'
+				)
+			)
 		) {
 			return false;
 		}
