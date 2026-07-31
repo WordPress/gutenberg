@@ -30,6 +30,14 @@
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
+-   Further improved `WordPressComponent` typecheck performance: intrinsic `as` values use a shared attribute bag instead of remapping props per HTML tag ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ConfirmDialog`: Type the `size` prop forwarded to `Modal` ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ToggleGroupControl`: Type the `disabled` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `DropdownContentWrapper`: Type the `children` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+
+### Documentation
+
+-   `ConfirmDialog`: Opt into auto-generated README documentation from types and JSDoc ([#80866](https://github.com/WordPress/gutenberg/pull/80866)).
 
 ### Internal
 

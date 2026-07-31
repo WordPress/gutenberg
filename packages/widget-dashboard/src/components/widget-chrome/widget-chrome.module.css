@@ -1,3 +1,12 @@
+/*
+ * Keep the structural layout local to the widget chrome. Host styles may reset
+ * `section` elements and override the layered Card styles.
+ */
+.widget-chrome {
+	display: flex;
+	flex-direction: column;
+}
+
 /* Outward tile focus ring; paint space reserved on `.grid`. */
 .widget-chrome:has(:focus-visible) {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
