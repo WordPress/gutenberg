@@ -33,7 +33,9 @@ Linting is static code analysis used to enforce coding standards and to avoid po
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test:unit` instead.
+During the Jest-to-Vitest migration, run both `npm run test:unit` and
+`npm run test:unit:vitest` to execute all JavaScript unit tests without the
+linter. The runner-specific commands continue to accept their own CLI options.
 
 ### Folder structure
 
