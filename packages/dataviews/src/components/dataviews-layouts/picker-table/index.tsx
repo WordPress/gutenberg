@@ -267,11 +267,12 @@ function ViewPickerTable< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
+		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		pickerMultiselect: isMultiselect,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
 	} );
 
 	const tableNoticeId = useId();

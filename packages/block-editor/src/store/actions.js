@@ -1253,10 +1253,16 @@ export const mergeBlocks =
 		}
 
 		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
+			const isASelected = select.isBlockSelected( clientIdA );
+
+			if ( isASelected ) {
+				registry.batch( () => {
+					dispatch.removeBlock( clientIdA, false );
+					dispatch.selectBlock( clientIdB, 0 );
+				} );
+			} else {
+				dispatch.removeBlock( clientIdA, false );
+			}
 			return;
 		}
 

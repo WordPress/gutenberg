@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade the bundled Jest packages from v29 to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
 ### Enhancements
 
 -   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).

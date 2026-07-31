@@ -15,6 +15,17 @@ import BackgroundPanel, {
 	hasLegacyColorGradientValue,
 } from '../background-panel';
 
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
 describe( 'hasBackgroundImageValue', () => {
 	it( 'should return `true` when id and url exist', () => {
 		expect(

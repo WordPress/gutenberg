@@ -39,6 +39,7 @@ interface BlockStylesNavigationScreensProps {
 	blockName: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function BlockStylesNavigationScreens( {
@@ -47,6 +48,7 @@ function BlockStylesNavigationScreens( {
 	blockName,
 	selectedViewport,
 	showResponsiveStateControls,
+	showBlockStateControls,
 }: BlockStylesNavigationScreensProps ) {
 	return (
 		<>
@@ -62,6 +64,7 @@ function BlockStylesNavigationScreens( {
 						showResponsiveStateControls={
 							showResponsiveStateControls
 						}
+						showBlockStateControls={ showBlockStateControls }
 					/>
 				</Navigator.Screen>
 			) ) }
@@ -74,6 +77,7 @@ interface ContextScreensProps {
 	parentMenu?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 interface GlobalStylesNavigationScreenProps {
@@ -86,6 +90,7 @@ function ContextScreens( {
 	parentMenu = '',
 	selectedViewport,
 	showResponsiveStateControls,
+	showBlockStateControls,
 }: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
@@ -109,6 +114,7 @@ function ContextScreens( {
 			blockName={ name || '' }
 			selectedViewport={ selectedViewport }
 			showResponsiveStateControls={ showResponsiveStateControls }
+			showBlockStateControls={ showBlockStateControls }
 		/>
 	);
 }
@@ -134,6 +140,8 @@ interface GlobalStylesUIProps {
 	selectedViewport?: string;
 	/** Whether to show responsive state controls (optional) */
 	showResponsiveStateControls?: boolean;
+	/** Whether to show block state controls (optional) */
+	showBlockStateControls?: boolean;
 }
 
 export function GlobalStylesUI( {
@@ -147,6 +155,7 @@ export function GlobalStylesUI( {
 	serverSettings,
 	selectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -264,6 +273,9 @@ export function GlobalStylesUI( {
 									showResponsiveStateControls={
 										showResponsiveStateControls
 									}
+									showBlockStateControls={
+										showBlockStateControls
+									}
 								/>
 							</GlobalStylesNavigationScreen>
 							<ContextScreens
@@ -275,6 +287,9 @@ export function GlobalStylesUI( {
 								selectedViewport={ selectedViewport }
 								showResponsiveStateControls={
 									showResponsiveStateControls
+								}
+								showBlockStateControls={
+									showBlockStateControls
 								}
 							/>
 						</Fragment>

@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -30,9 +34,14 @@ import {
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
 	getStyleOverrides,
+	canHostEditableRoot,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
+import reducer from '../reducer';
+import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -2548,6 +2557,134 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'canHostEditableRoot', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/test-editable-root', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Editable root',
+				[ editableRootKey ]: true,
+			} );
+			registerBlockType( 'core/test-plain', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Plain',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/test-editable-root' );
+			unregisterBlockType( 'core/test-plain' );
+		} );
+
+		const createState = () => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'a', { name: 'core/test-editable-root' } ],
+					[ 'b', { name: 'core/test-editable-root' } ],
+				] ),
+				attributes: new Map( [
+					[ 'a', { content: 'a' } ],
+					[ 'b', { content: 'b' } ],
+				] ),
+				order: new Map( [
+					[ '', [ 'a', 'b' ] ],
+					[ 'a', [] ],
+					[ 'b', [] ],
+				] ),
+				parents: new Map( [
+					[ 'a', '' ],
+					[ 'b', '' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			derivedBlockEditingModes: new Map(),
+			blocksMode: {},
+		} );
+
+		it( 'should return true for a block supporting editableRoot with editable siblings', () => {
+			expect( canHostEditableRoot( createState(), 'a' ) ).toBe( true );
+		} );
+
+		it( 'should return false for a lone block', () => {
+			const state = createState();
+			state.blocks.order = new Map( [
+				[ '', [ 'a' ] ],
+				[ 'a', [] ],
+			] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false when a sibling is not editable', () => {
+			const state = createState();
+			state.derivedBlockEditingModes = new Map( [ [ 'b', 'disabled' ] ] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		// The sibling scan is O(siblings) and runs in every rich text instance.
+		it( 'should not recompute when only block attributes change', () => {
+			const state = createState();
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( true );
+
+			// Change the uncached result without touching a dependant.
+			state.blocks.byClientId.set( 'a', { name: 'core/test-plain' } );
+
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( [
+						[ 'a', { content: 'typed' } ],
+						[ 'b', { content: 'b' } ],
+					] ),
+				},
+			};
+
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( true );
+
+			nextState.blocks.byClientId = new Map( state.blocks.byClientId );
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( false );
+		} );
+
+		// The memoization above is only reachable if the reducer preserves
+		// these references through a keystroke.
+		it( 'should keep its dependants referentially stable while typing', () => {
+			const block = ( clientId ) => ( {
+				clientId,
+				name: 'core/test-editable-root',
+				attributes: { content: clientId },
+				innerBlocks: [],
+			} );
+			const state = reducer( reducer( undefined, { type: '@@init' } ), {
+				type: 'RESET_BLOCKS',
+				blocks: [ block( 'a' ), block( 'b' ) ],
+			} );
+
+			const next = reducer( state, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'a' ],
+				attributes: { content: 'typed' },
+			} );
+
+			// Guards against the assertions below passing vacuously.
+			expect( next.blocks.attributes ).not.toBe(
+				state.blocks.attributes
+			);
+
+			const before = canHostEditableRoot.getDependants( state );
+			const after = canHostEditableRoot.getDependants( next );
+
+			expect( after ).toHaveLength( before.length );
+			after.forEach( ( dependant, index ) => {
+				expect( dependant ).toBe( before[ index ] );
+			} );
 		} );
 	} );
 } );
