@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `pasteHandler`: Split multi-line URL-only pastes into separate blocks so each link can become its own embed. ([#81032](https://github.com/WordPress/gutenberg/issues/81032))
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

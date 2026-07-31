@@ -36,6 +36,8 @@ import slackParagraphCorrector from './slack-paragraph-corrector';
 import isLatexMathMode from './latex-to-math';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
+import multilineUrlParagraphSplitter from './multiline-url-paragraph-splitter';
+import { plainTextToMultilineUrlHTML } from './plain-text-multiline-urls';
 import type { Block } from '../../types';
 
 const log = ( ...args: unknown[] ): void => window?.console?.log?.( ...args );
@@ -154,11 +156,17 @@ export function pasteHandler( {
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
 	if ( isPlainText ) {
-		HTML = plainText;
+		const multilineUrlHTML = plainTextToMultilineUrlHTML( plainText );
 
-		// The markdown converter (Showdown) trims whitespace.
-		if ( ! /^\s+$/.test( plainText ) ) {
-			HTML = markdownConverter( HTML );
+		if ( multilineUrlHTML ) {
+			HTML = multilineUrlHTML;
+		} else {
+			HTML = plainText;
+
+			// The markdown converter (Showdown) trims whitespace.
+			if ( ! /^\s+$/.test( plainText ) ) {
+				HTML = markdownConverter( HTML );
+			}
 		}
 	}
 
@@ -222,6 +230,7 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser(),
 				divNormaliser,
+				multilineUrlParagraphSplitter,
 				headingTransformer,
 			];
 
