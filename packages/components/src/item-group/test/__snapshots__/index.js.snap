@@ -11,8 +11,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-item style-size-medium style-spaced-around components-item"
-+         class="style-item style-size-large style-spaced-around components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -24,8 +24,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-item style-size-medium style-spaced-around components-item"
-+         class="style-item style-size-large style-spaced-around components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -44,8 +44,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="style-item style-size-medium components-item"
-+       class="style-item style-size-large components-item"
+-       class="style-item style-is-size-medium components-item"
++       class="style-item style-is-size-large components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -66,7 +66,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
       role="listitem"
     >
       <div
-        class="style-item style-size-medium style-spaced-around components-item"
+        class="style-item style-is-size-medium style-is-spaced-around components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -96,8 +96,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-item style-size-medium style-spaced-around components-item"
-+         class="style-item style-size-medium components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -124,8 +124,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="style-item style-size-medium style-spaced-around components-item"
-+         class="style-item style-size-medium components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >

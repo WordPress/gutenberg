@@ -95,21 +95,21 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	&.is-unstyled-link {
 		text-decoration: none;
 	}
-}
 
-.spaced-around {
-	border-radius: var(--wpds-border-radius-sm);
-}
+	&.is-spaced-around {
+		border-radius: var(--wpds-border-radius-sm);
+	}
 
-.size-small {
-	padding: $padding-y-small 8px;
-}
+	&.is-size-small {
+		padding: $padding-y-small 8px;
+	}
 
-.size-medium {
-	padding: $padding-y 12px;
-}
+	&.is-size-medium {
+		padding: $padding-y 12px;
+	}
 
-.size-large {
-	// Matches CONFIG.controlPaddingXLarge (`12 * 1.3334`).
-	padding: $padding-y-large 16.0008px;
+	&.is-size-large {
+		// Matches CONFIG.controlPaddingXLarge (`12 * 1.3334`).
+		padding: $padding-y-large 16.0008px;
+	}
 }

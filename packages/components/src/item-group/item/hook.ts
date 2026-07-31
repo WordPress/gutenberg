@@ -7,9 +7,9 @@ import type { ItemProps } from '../types';
 import styles from '../style.module.scss';
 
 const sizeClassName = {
-	small: styles[ 'size-small' ],
-	medium: styles[ 'size-medium' ],
-	large: styles[ 'size-large' ],
+	small: styles[ 'is-size-small' ],
+	medium: styles[ 'is-size-medium' ],
+	large: styles[ 'is-size-large' ],
 };
 
 export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
@@ -33,7 +33,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		as === 'button' && styles[ 'is-unstyled-button' ],
 		as === 'a' && styles[ 'is-unstyled-link' ],
 		sizeClassName[ size ] || sizeClassName.medium,
-		spacedAround && styles[ 'spaced-around' ],
+		spacedAround && styles[ 'is-spaced-around' ],
 		className
 	);
 
