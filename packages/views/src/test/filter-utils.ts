@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { dequal } from 'dequal';
+
+/**
  * WordPress dependencies
  */
 import type { View } from '@wordpress/dataviews';
@@ -815,6 +820,75 @@ describe( 'stripOverrides', () => {
 				groupBy: { field: 'category', direction: 'asc' },
 			} );
 			expect( result ).not.toHaveProperty( 'groupBy' );
+		} );
+	} );
+
+	describe( 'stripped keys are removed, not set to undefined', () => {
+		// `dequal` compares own keys, so a key left with an explicit
+		// `undefined` value keeps the stripped view different from the
+		// base view: the view stays marked as modified after a
+		// change-and-revert cycle, and the persisted preference carries
+		// `{ groupBy: undefined }`.
+		it( 'should remove groupBy when every key is managed by overrides', () => {
+			const view: View = {
+				...baseView,
+				groupBy: { field: 'status', direction: 'asc' },
+			};
+			const result = stripOverrides( view, {
+				groupBy: { field: 'category', direction: 'desc' },
+			} );
+			expect( result ).not.toHaveProperty( 'groupBy' );
+		} );
+
+		it( 'should remove layout when every key is managed by overrides', () => {
+			const view: View = {
+				...baseView,
+				layout: { styles: { title: { align: 'end' } } },
+			};
+			const result = stripOverrides( view, {
+				layout: { styles: { title: { align: 'end' } } },
+			} );
+			expect( result ).not.toHaveProperty( 'layout' );
+		} );
+
+		it( 'should remove default-bound keys the default view does not have', () => {
+			const defaultViewWithoutPerPage: View = { type: 'table' };
+			const view: View = { ...baseView, perPage: 50 };
+			const result = stripOverrides(
+				view,
+				{ perPage: 50 },
+				defaultViewWithoutPerPage
+			);
+			expect( result ).not.toHaveProperty( 'perPage' );
+		} );
+
+		it( 'should remove sort when the default view does not have one', () => {
+			const defaultViewWithoutSort: View = { type: 'table' };
+			const view: View = {
+				...baseView,
+				sort: { field: 'title', direction: 'asc' },
+			};
+			const result = stripOverrides(
+				view,
+				{ sort: { field: 'title', direction: 'asc' } },
+				defaultViewWithoutSort
+			);
+			expect( result ).not.toHaveProperty( 'sort' );
+		} );
+
+		it( 'should return a view equal to the base view after a change-and-revert cycle', () => {
+			const overrides = {
+				groupBy: {
+					field: 'status' as const,
+					direction: 'asc' as const,
+				},
+			};
+			const merged = mergeOverrides( baseView, overrides, defaultView );
+			// The user changes perPage and reverts it back.
+			const changed = { ...merged, perPage: 50 };
+			const reverted = { ...changed, perPage: baseView.perPage };
+			const stripped = stripOverrides( reverted, overrides, defaultView );
+			expect( dequal( stripped, baseView ) ).toBe( true );
 		} );
 	} );
 
