@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Writing flow: Move the end of a triple click selection back to the last text position before the boundary the browser overshoots to, instead of only correcting a next sibling reported at an offset of 0, so triple clicking a paragraph followed by a separator or a container block no longer starts a multi selection ([#81022](https://github.com/WordPress/gutenberg/pull/81022)).
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
