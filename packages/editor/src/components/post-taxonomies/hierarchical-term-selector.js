@@ -113,6 +113,36 @@ export function findTerm( terms, parent, name ) {
 }
 
 /**
+ * Returns selected term IDs with a default-category fallback.
+ *
+ * @param {Object}   args                 Selection arguments.
+ * @param {number[]} args.terms           Selected term IDs from post attributes.
+ * @param {string}   args.slug            Taxonomy slug.
+ * @param {boolean}  args.isNewPost       Whether the post is new.
+ * @param {number}   args.defaultCategory Default category ID from editor settings.
+ *
+ * @return {number[]} Selected term IDs.
+ */
+export function getSelectedTermIds( {
+	terms,
+	slug,
+	isNewPost,
+	defaultCategory,
+} ) {
+	if (
+		slug !== 'category' ||
+		! isNewPost ||
+		terms.length > 0 ||
+		! Number.isInteger( defaultCategory ) ||
+		defaultCategory <= 0
+	) {
+		return terms;
+	}
+
+	return [ defaultCategory ];
+}
+
+/**
  * Get filter matcher function.
  *
  * @param {string} filterValue Filter value.
@@ -177,18 +207,29 @@ export function HierarchicalTermSelector( { slug } ) {
 	const {
 		hasCreateAction,
 		hasAssignAction,
-		terms,
+		selectedTerms,
 		loading,
 		availableTerms,
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } =
-				select( editorStore );
+			const {
+				getCurrentPost,
+				getEditedPostAttribute,
+				getEditorSettings,
+				isEditedPostNew,
+			} = select( editorStore );
 			const { getEntityRecord, getEntityRecords, isResolving } =
 				select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
+			const postTerms = _taxonomy
+				? getEditedPostAttribute( _taxonomy.rest_base ) || EMPTY_ARRAY
+				: EMPTY_ARRAY;
+			const defaultCategory = parseInt(
+				getEditorSettings()?.defaultCategory,
+				10
+			);
 
 			return {
 				hasCreateAction: _taxonomy
@@ -201,9 +242,12 @@ export function HierarchicalTermSelector( { slug } ) {
 							'wp:action-assign-' + _taxonomy.rest_base
 					  ]
 					: false,
-				terms: _taxonomy
-					? getEditedPostAttribute( _taxonomy.rest_base )
-					: EMPTY_ARRAY,
+				selectedTerms: getSelectedTermIds( {
+					terms: postTerms,
+					slug,
+					isNewPost: isEditedPostNew(),
+					defaultCategory,
+				} ),
 				loading: isResolving( 'getEntityRecords', [
 					'taxonomy',
 					slug,
@@ -222,10 +266,10 @@ export function HierarchicalTermSelector( { slug } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const availableTermsTree = useMemo(
-		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
+		() => sortBySelected( buildTermsTree( availableTerms ), selectedTerms ),
 		// Remove `terms` from the dependency list to avoid reordering every time
 		// checking or unchecking a term.
-		[ availableTerms ]
+		[ availableTerms, selectedTerms ]
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -261,10 +305,10 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @param {number} termId
 	 */
 	const onChange = ( termId ) => {
-		const hasTerm = terms.includes( termId );
+		const hasTerm = selectedTerms.includes( termId );
 		const newTerms = hasTerm
-			? terms.filter( ( id ) => id !== termId )
-			: [ ...terms, termId ];
+			? selectedTerms.filter( ( id ) => id !== termId )
+			: [ ...selectedTerms, termId ];
 		onUpdateTerms( newTerms );
 	};
 
@@ -295,8 +339,10 @@ export function HierarchicalTermSelector( { slug } ) {
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// If the term we are adding exists but is not selected select it.
-			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
-				onUpdateTerms( [ ...terms, existingTerm.id ] );
+			if (
+				! selectedTerms.some( ( term ) => term === existingTerm.id )
+			) {
+				onUpdateTerms( [ ...selectedTerms, existingTerm.id ] );
 			}
 
 			setFormName( '' );
@@ -328,7 +374,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		setAdding( false );
 		setFormName( '' );
 		setFormParent( '' );
-		onUpdateTerms( [ ...terms, newTerm.id ] );
+		onUpdateTerms( [ ...selectedTerms, newTerm.id ] );
 	};
 
 	const setFilter = ( value ) => {
@@ -367,7 +413,7 @@ export function HierarchicalTermSelector( { slug } ) {
 					className="editor-post-taxonomies__hierarchical-terms-choice"
 				>
 					<CheckboxControl
-						checked={ terms.indexOf( term.id ) !== -1 }
+						checked={ selectedTerms.indexOf( term.id ) !== -1 }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
