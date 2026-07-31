@@ -9,7 +9,7 @@ import parse from 'html-react-parser';
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
-import { isValidElement } from '@wordpress/element';
+import { cloneElement, isValidElement } from '@wordpress/element';
 import { registerIconResolver } from '@wordpress/widget-primitives';
 import type { WidgetIcon } from '@wordpress/widget-primitives';
 
@@ -34,10 +34,22 @@ export function registerDashboardIconResolver() {
 		 * array; take the element.
 		 */
 		const parsed = parse( safeHTML( record.content.trim() ) );
-		const element = Array.isArray( parsed )
+		const found = Array.isArray( parsed )
 			? parsed.find( isValidElement )
 			: parsed;
 
-		return isValidElement( element ) ? ( element as WidgetIcon ) : null;
+		if ( ! isValidElement( found ) ) {
+			return null;
+		}
+
+		const element = found as WidgetIcon;
+
+		/*
+		 * The registry sanitizer strips `fill` from the root `<svg>`;
+		 * restore inheritance so icons follow the surrounding color.
+		 */
+		return element.props.fill
+			? element
+			: cloneElement( element, { fill: 'currentColor' } );
 	} );
 }
