@@ -4,7 +4,7 @@ import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
 import { Icon } from '../../../icon';
-import focusStyles from '../../../utils/css/focus.module.css';
+import focusStyles from '../../../utils/css/focus.module.scss';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
 import { InputLayout } from '../input-layout';
 import type { ComboboxTriggerProps } from './types';
