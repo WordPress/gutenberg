@@ -827,7 +827,7 @@ export const WithActions: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`, and a link \`href\`); the host decides where to put it and materializes it.
+Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`) and how it is fulfilled, through the key it writes (today a link \`href\`); the host mounts the primitive and decides where to put it.
 
 **In this demo**
 
@@ -836,7 +836,7 @@ Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, lik
 
 **Takeaway**
 
-The widget names the intent and a link target; navigation and download are the browser's, so the widget never knows its surface.
+The widget names the intent and how it is fulfilled; the host mounts the primitive and places it, so the widget never knows its surface.
 `,
 			},
 		},

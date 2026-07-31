@@ -64,11 +64,11 @@ Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may pro
 
 ### `WidgetAction`
 
-It's a declarative action a widget type exposes.
-Each carries `id`, `label`, `href`, and optional `download` / `openInNewTab`.
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`) plus exactly one fulfillment, named by the key carrying it.
+Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
 `data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 
-The widget names the intent and a link target; the host renders it as an anchor and owns placement.
+The widget names the intent and how it is fulfilled; the host mounts the primitive and owns placement.
 
 ### Field types
 

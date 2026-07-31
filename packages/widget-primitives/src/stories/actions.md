@@ -8,9 +8,9 @@ A widget declares its data through `attributes`; it declares the verbs a user ca
 
 An action is something to _do_: open a report, download a file, etc. Like other widgets' props, it's declarative and serializable, so it can ride in `widget.json`.
 
-The widget names the intent and a target. Everything else is the host's, and it splits into three decisions worth keeping apart.
+The widget names the intent and, through the key it writes, how the action is fulfilled. Two decisions are left, and both are the host's: which primitive to mount, and where to put it.
 
-![One action declaration, and the three decisions the host makes from it: the fulfillment, what triggering means, inferred from the key present; the materialization, which primitive the host mounts; and the placement, where the affordance goes.](./assets/action-axes.svg)
+![One action declaration. The key the widget writes fixes the fulfillment, what triggering the action means. The host is left with two decisions: the materialization, which primitive it mounts, and the placement, where the affordance goes.](./assets/action-axes.svg)
 
 ## Envelope and fulfillment
 
@@ -52,9 +52,11 @@ The fulfillment says what triggering means. It does not say which control the us
 
 ![The same action declaring a link target, materialized by three surfaces: a More menu and a footer mount a real anchor and keep link semantics, while a command palette has no anchor to mount and degrades to a command.](./assets/action-surfaces.svg)
 
-A link fulfillment carries one obligation: **where the surface allows a link primitive, the host must mount one**. A real link keeps middle-click, copy address, and the anchor's accessible role. Routing the same target through a click handler destroys all three, so a link is a first-class fulfillment rather than a shorthand for one.
+A link fulfillment carries one obligation: **where the surface allows a link primitive, the host must mount one**. A real link keeps middle-click and copy address, which routing the same target through a click handler destroys. That is why a link is a first-class fulfillment rather than a shorthand for one.
 
-Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and still keeps those semantics; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time.
+Its accessible role follows the surface rather than the element: mounted inside the dashboard's "More" menu, the anchor is exposed as a menu item, not as a link.
+
+Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time.
 
 Where no link primitive fits, as in a command palette, the host mounts what the surface offers and those semantics degrade. That is a real cost of reaching beyond the widget, not an oversight.
 
