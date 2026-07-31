@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.6.2",
+	"version": "23.7.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -98,6 +98,7 @@
 		"jsdom": "26.1.0"
 	},
 	"scripts": {
+		"agents:setup": "node ./tools/agents/setup-skills.mjs",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
@@ -144,7 +145,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package",
+		"postinstall": "patch-package && npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
