@@ -6,7 +6,8 @@ import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
@@ -74,13 +75,11 @@ function getRelativeDate( value: number, unit: string ): Date {
 
 // Shared operator definition for IS_NONE and IS_NOT_ALL (deprecated).
 const isNoneOperatorDefinition = {
-	/* translators: DataViews operator name */
-	label: __( 'Is none of' ),
+	label: i18n.OPERATOR_IS_NONE_OF(),
 	filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 		createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
-				__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+				i18n.FILTER_SUMMARY_IS_NONE_OF(),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -118,13 +117,11 @@ const OPERATORS: {
 }[] = [
 	{
 		name: OPERATOR_IS_ANY,
-		/* translators: DataViews operator name */
-		label: __( 'Includes' ),
+		label: i18n.OPERATOR_INCLUDES(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor". */
-					__( '<Name>%1$s includes: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_INCLUDES(),
 					filter.name,
 					activeElements
 						.map( ( element ) => element.label )
@@ -156,13 +153,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_IS_ALL,
-		/* translators: DataViews operator name */
-		label: __( 'Includes all' ),
+		label: i18n.OPERATOR_INCLUDES_ALL(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor". */
-					__( '<Name>%1$s includes all: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_INCLUDES_ALL(),
 					filter.name,
 					activeElements
 						.map( ( element ) => element.label )
@@ -187,15 +182,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_BETWEEN,
-		/* translators: DataViews operator name */
-		label: __( 'Between (inc)' ),
+		label: i18n.OPERATOR_BETWEEN_INC(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180". */
-					__(
-						'<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_BETWEEN_INC(),
 					filter.name,
 					activeElements[ 0 ].label[ 0 ],
 					activeElements[ 0 ].label[ 1 ]
@@ -231,15 +222,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_IN_THE_PAST,
-		/* translators: DataViews operator name */
-		label: __( 'In the past' ),
+		label: i18n.OPERATOR_IN_THE_PAST(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days". */
-					__(
-						'<Name>%1$s is in the past: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_IN_THE_PAST(),
 					filter.name,
 					`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
 				),
@@ -265,13 +252,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_OVER,
-		/* translators: DataViews operator name */
-		label: __( 'Over' ),
+		label: i18n.OPERATOR_OVER(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days". */
-					__( '<Name>%1$s is over: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_OVER(),
 					filter.name,
 					`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
 				),
@@ -297,13 +282,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_IS,
-		/* translators: DataViews operator name */
-		label: __( 'Is' ),
+		label: i18n.OPERATOR_IS(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is: Admin". */
-					__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_IS(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -319,13 +302,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_IS_NOT,
-		/* translators: DataViews operator name */
-		label: __( 'Is not' ),
+		label: i18n.OPERATOR_IS_NOT(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is not: Admin". */
-					__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_IS_NOT(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -338,13 +319,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_LESS_THAN,
-		/* translators: DataViews operator name */
-		label: __( 'Less than' ),
+		label: i18n.OPERATOR_LESS_THAN(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10". */
-					__( '<Name>%1$s is less than: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_LESS_THAN(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -363,15 +342,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_GREATER_THAN,
-		/* translators: DataViews operator name */
-		label: __( 'Greater than' ),
+		label: i18n.OPERATOR_GREATER_THAN(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10". */
-					__(
-						'<Name>%1$s is greater than: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_GREATER_THAN(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -390,15 +365,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_LESS_THAN_OR_EQUAL,
-		/* translators: DataViews operator name */
-		label: __( 'Less than or equal' ),
+		label: i18n.OPERATOR_LESS_THAN_OR_EQUAL(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10". */
-					__(
-						'<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_LESS_THAN_OR_EQUAL(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -417,15 +388,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_GREATER_THAN_OR_EQUAL,
-		/* translators: DataViews operator name */
-		label: __( 'Greater than or equal' ),
+		label: i18n.OPERATOR_GREATER_THAN_OR_EQUAL(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10". */
-					__(
-						'<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_GREATER_THAN_OR_EQUAL(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -444,13 +411,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_BEFORE,
-		/* translators: DataViews operator name */
-		label: __( 'Before' ),
+		label: i18n.OPERATOR_BEFORE(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01". */
-					__( '<Name>%1$s is before: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_BEFORE(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -470,13 +435,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_AFTER,
-		/* translators: DataViews operator name */
-		label: __( 'After' ),
+		label: i18n.OPERATOR_AFTER(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01". */
-					__( '<Name>%1$s is after: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_AFTER(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -496,15 +459,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_BEFORE_INC,
-		/* translators: DataViews operator name */
-		label: __( 'Before (inc)' ),
+		label: i18n.OPERATOR_BEFORE_INC(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01". */
-					__(
-						'<Name>%1$s is on or before: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_ON_OR_BEFORE(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -524,15 +483,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_AFTER_INC,
-		/* translators: DataViews operator name */
-		label: __( 'After (inc)' ),
+		label: i18n.OPERATOR_AFTER_INC(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01". */
-					__(
-						'<Name>%1$s is on or after: </Name><Value>%2$s</Value>'
-					),
+					i18n.FILTER_SUMMARY_ON_OR_AFTER(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -552,13 +507,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_CONTAINS,
-		/* translators: DataViews operator name */
-		label: __( 'Contains' ),
+		label: i18n.OPERATOR_CONTAINS(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello". */
-					__( '<Name>%1$s contains: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_CONTAINS(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -583,15 +536,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_NOT_CONTAINS,
-		/* translators: DataViews operator name */
-		label: __( "Doesn't contain" ),
+		label: i18n.OPERATOR_DOESNT_CONTAIN(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello". */
-					__(
-						"<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>"
-					),
+					i18n.FILTER_SUMMARY_DOESNT_CONTAIN(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -616,13 +565,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_STARTS_WITH,
-		/* translators: DataViews operator name */
-		label: __( 'Starts with' ),
+		label: i18n.OPERATOR_STARTS_WITH(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello". */
-					__( '<Name>%1$s starts with: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_STARTS_WITH(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -647,13 +594,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_ON,
-		/* translators: DataViews operator name */
-		label: __( 'On' ),
+		label: i18n.OPERATOR_ON(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01". */
-					__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_IS(),
 					filter.name,
 					activeElements[ 0 ].label
 				),
@@ -673,13 +618,11 @@ const OPERATORS: {
 	},
 	{
 		name: OPERATOR_NOT_ON,
-		/* translators: DataViews operator name */
-		label: __( 'Not on' ),
+		label: i18n.OPERATOR_NOT_ON(),
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01". */
-					__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
+					i18n.FILTER_SUMMARY_IS_NOT(),
 					filter.name,
 					activeElements[ 0 ].label
 				),

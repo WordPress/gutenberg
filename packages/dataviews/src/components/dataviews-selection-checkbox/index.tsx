@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { CheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 
 	// Fallback label to ensure accessibility
 	const selectionLabel =
-		titleField?.getValue?.( { item } ) || __( '(no title)' );
+		titleField?.getValue?.( { item } ) || i18n.NO_TITLE();
 
 	return (
 		<CheckboxControl

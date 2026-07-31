@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -77,7 +77,7 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 	const value = field.getValue( { item } );
 
 	if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
-		return __( 'Value must be a number.' );
+		return i18n.VALUE_MUST_BE_A_NUMBER();
 	}
 
 	return null;

@@ -10,7 +10,8 @@ import clsx from 'clsx';
 import { Spinner, Composite } from '@wordpress/components';
 import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -209,8 +210,7 @@ function PickerActivityGroup< Item >( {
 			>
 				{ showLabel
 					? sprintf(
-							// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-							__( '%1$s: %2$s' ),
+							i18n.FIELD_LABEL_AND_VALUE(),
 							groupField.label,
 							groupName
 					  )

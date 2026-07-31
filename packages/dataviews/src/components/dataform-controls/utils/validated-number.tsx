@@ -8,7 +8,7 @@ import {
 	privateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -56,12 +56,10 @@ function BetweenControls( {
 	);
 
 	return (
-		<BaseControl
-			help={ __( 'The max. value must be greater than the min. value.' ) }
-		>
+		<BaseControl help={ i18n.MAX_MUST_BE_GREATER_THAN_MIN() }>
 			<Flex direction="row" gap={ 4 }>
 				<NumberControl
-					label={ __( 'Min.' ) }
+					label={ i18n.MIN() }
 					value={ min }
 					max={ max ? Number( max ) - step : undefined }
 					onChange={ onChangeMin }
@@ -69,7 +67,7 @@ function BetweenControls( {
 					step={ step }
 				/>
 				<NumberControl
-					label={ __( 'Max.' ) }
+					label={ i18n.MAX() }
 					value={ max }
 					min={ min ? Number( min ) + step : undefined }
 					onChange={ onChangeMax }

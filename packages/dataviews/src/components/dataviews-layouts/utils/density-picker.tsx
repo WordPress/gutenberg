@@ -5,7 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -29,7 +29,7 @@ export default function DensityPicker() {
 		| ViewPickerGrid;
 	return (
 		<ToggleGroupControl
-			label={ __( 'Density' ) }
+			label={ i18n.DENSITY() }
 			value={ view.layout?.density || 'balanced' }
 			onChange={ ( value ) => {
 				context.onChangeView( {
@@ -45,20 +45,17 @@ export default function DensityPicker() {
 			<ToggleGroupControlOption
 				key="comfortable"
 				value="comfortable"
-				label={ _x(
-					'Comfortable',
-					'Density option for DataView layout'
-				) }
+				label={ i18n.COMFORTABLE() }
 			/>
 			<ToggleGroupControlOption
 				key="balanced"
 				value="balanced"
-				label={ _x( 'Balanced', 'Density option for DataView layout' ) }
+				label={ i18n.BALANCED() }
 			/>
 			<ToggleGroupControlOption
 				key="compact"
 				value="compact"
-				label={ _x( 'Compact', 'Density option for DataView layout' ) }
+				label={ i18n.COMPACT() }
 			/>
 		</ToggleGroupControl>
 	);

@@ -9,7 +9,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { speak } from '@wordpress/a11y';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -130,7 +130,7 @@ export default function FormDetailsField< Item >( {
 		);
 	} else {
 		// Fall back to the label
-		summaryContent = field.label || __( 'More details' );
+		summaryContent = field.label || i18n.MORE_DETAILS();
 	}
 
 	return (

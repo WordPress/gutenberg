@@ -16,7 +16,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -45,7 +45,7 @@ const ColorPickerDropdown = ( {
 			renderToggle={ ( { onToggle } ) => (
 				<Button
 					onClick={ onToggle }
-					aria-label={ __( 'Open color picker' ) }
+					aria-label={ i18n.OPEN_COLOR_PICKER() }
 					size="small"
 					disabled={ disabled }
 					accessibleWhenDisabled

@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 
@@ -28,8 +29,10 @@ export default function ActivityGroup< Item >( {
 	// Render group header content - either with or without field label
 	const groupHeader = showLabel ? (
 		createInterpolateElement(
-			// translators: %s: The label of the field e.g. "Status".
-			sprintf( __( '%s: <groupName />' ), groupField.label ).trim(),
+			sprintf(
+				i18n.FIELD_LABEL_WITH_GROUP_NAME_ELEMENT(),
+				groupField.label
+			).trim(),
 			{
 				groupName: (
 					<groupField.render

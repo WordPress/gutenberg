@@ -5,7 +5,7 @@ import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -56,7 +56,7 @@ function BulkSelectionCheckbox< Item >( {
 				onChange={ () => {
 					onChangeSelection( [] );
 				} }
-				aria-label={ __( 'Deselect all' ) }
+				aria-label={ i18n.DESELECT_ALL() }
 			/>
 		);
 	}
@@ -87,7 +87,7 @@ function BulkSelectionCheckbox< Item >( {
 				}
 			} }
 			aria-label={
-				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+				areAllSelected ? i18n.DESELECT_ALL() : i18n.SELECT_ALL()
 			}
 		/>
 	);

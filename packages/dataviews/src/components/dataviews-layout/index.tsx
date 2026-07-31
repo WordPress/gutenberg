@@ -8,7 +8,7 @@ import type { ComponentType } from 'react';
  */
 import { useContext } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -41,7 +41,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		renderItemLink,
 		defaultLayouts,
 		containerRef,
-		empty = <p>{ __( 'No results' ) }</p>,
+		empty = <p>{ i18n.NO_RESULTS() }</p>,
 	} = useContext( DataViewsContext );
 
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {

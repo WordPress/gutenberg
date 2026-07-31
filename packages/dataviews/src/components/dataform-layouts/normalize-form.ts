@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -65,14 +65,14 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		if ( typeof openAs === 'object' && openAs.type === 'modal' ) {
 			normalizedOpenAs = {
 				type: 'modal',
-				applyLabel: openAs.applyLabel?.trim() || __( 'Apply' ),
-				cancelLabel: openAs.cancelLabel?.trim() || __( 'Cancel' ),
+				applyLabel: openAs.applyLabel?.trim() || i18n.APPLY(),
+				cancelLabel: openAs.cancelLabel?.trim() || i18n.CANCEL(),
 			};
 		} else if ( openAs === 'modal' ) {
 			normalizedOpenAs = {
 				type: 'modal',
-				applyLabel: __( 'Apply' ),
-				cancelLabel: __( 'Cancel' ),
+				applyLabel: i18n.APPLY(),
+				cancelLabel: i18n.CANCEL(),
 			};
 		} else {
 			normalizedOpenAs = { type: 'dropdown' };

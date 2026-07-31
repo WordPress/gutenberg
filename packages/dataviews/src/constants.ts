@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { arrowDown, arrowUp } from '@wordpress/icons';
 
 /**
@@ -37,8 +37,8 @@ export const SORTING_DIRECTIONS = [ 'asc', 'desc' ] as const;
 export const sortArrows = { asc: '↑', desc: '↓' };
 export const sortValues = { asc: 'ascending', desc: 'descending' } as const;
 export const sortLabels = {
-	asc: __( 'Sort ascending' ),
-	desc: __( 'Sort descending' ),
+	asc: i18n.SORT_ASCENDING(),
+	desc: i18n.SORT_DESCENDING(),
 };
 export const sortIcons = {
 	asc: arrowUp,

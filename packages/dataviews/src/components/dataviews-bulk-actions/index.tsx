@@ -7,7 +7,7 @@ import type { ReactElement } from 'react';
  * WordPress dependencies
  */
 import { Button, CheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
@@ -133,7 +133,7 @@ export function BulkSelectionCheckbox< Item >( {
 				onChange={ () => {
 					onChangeSelection( [] );
 				} }
-				aria-label={ __( 'Deselect all' ) }
+				aria-label={ i18n.DESELECT_ALL() }
 			/>
 		);
 	}
@@ -153,7 +153,7 @@ export function BulkSelectionCheckbox< Item >( {
 				}
 			} }
 			aria-label={
-				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+				areAllSelected ? i18n.DESELECT_ALL() : i18n.SELECT_ALL()
 			}
 		/>
 	);
@@ -319,7 +319,7 @@ function renderFooterContent< Item >(
 						showTooltip
 						tooltipPosition="top"
 						size="compact"
-						label={ __( 'Cancel' ) }
+						label={ i18n.CANCEL() }
 						disabled={ !! actionInProgress }
 						accessibleWhenDisabled={ false }
 						onClick={ () => {

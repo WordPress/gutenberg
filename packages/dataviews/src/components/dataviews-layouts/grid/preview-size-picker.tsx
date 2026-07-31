@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { RangeControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -85,7 +85,7 @@ export default function PreviewSizePicker() {
 	return (
 		<RangeControl
 			showTooltip={ false }
-			label={ __( 'Preview size' ) }
+			label={ i18n.PREVIEW_SIZE() }
 			value={ previewSizeToUse }
 			min={ 0 }
 			max={ breakValues.length - 1 }

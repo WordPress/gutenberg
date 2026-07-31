@@ -14,7 +14,8 @@ import {
 	privateApis as componentsPrivateApis,
 	Composite,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
@@ -103,7 +104,7 @@ function GridItem< Item >( {
 			ref={ elementRef }
 			aria-label={
 				titleField
-					? titleField.getValue( { item } ) || __( '(no title)' )
+					? titleField.getValue( { item } ) || i18n.NO_TITLE()
 					: undefined
 			}
 			key={ id }
@@ -248,8 +249,7 @@ function GridGroup< Item >( {
 			>
 				{ showLabel
 					? sprintf(
-							// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-							__( '%1$s: %2$s' ),
+							i18n.FIELD_LABEL_AND_VALUE(),
 							groupField.label,
 							groupName
 					  )

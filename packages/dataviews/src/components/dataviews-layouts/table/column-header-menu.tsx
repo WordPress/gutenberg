@@ -6,7 +6,8 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { isRTL } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -200,7 +201,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} }
 							>
 								<Menu.ItemLabel>
-									{ __( 'Add filter' ) }
+									{ i18n.ADD_FILTER() }
 								</Menu.ItemLabel>
 							</Menu.Item>
 						</Menu.Group>
@@ -237,7 +238,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									} }
 								>
 									<Menu.ItemLabel>
-										{ __( 'Move left' ) }
+										{ i18n.MOVE_LEFT() }
 									</Menu.ItemLabel>
 								</Menu.Item>
 							) }
@@ -271,7 +272,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									} }
 								>
 									<Menu.ItemLabel>
-										{ __( 'Move right' ) }
+										{ i18n.MOVE_RIGHT() }
 									</Menu.ItemLabel>
 								</Menu.Item>
 							) }
@@ -279,7 +280,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								<Menu>
 									<Menu.SubmenuTriggerItem>
 										<Menu.ItemLabel>
-											{ __( 'Insert left' ) }
+											{ i18n.INSERT_LEFT() }
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
@@ -319,7 +320,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								<Menu>
 									<Menu.SubmenuTriggerItem>
 										<Menu.ItemLabel>
-											{ __( 'Insert right' ) }
+											{ i18n.INSERT_RIGHT() }
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
@@ -369,7 +370,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									} }
 								>
 									<Menu.ItemLabel>
-										{ __( 'Hide column' ) }
+										{ i18n.HIDE_COLUMN() }
 									</Menu.ItemLabel>
 								</Menu.Item>
 							) }

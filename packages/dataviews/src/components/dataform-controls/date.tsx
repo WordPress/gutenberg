@@ -30,7 +30,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -65,12 +65,12 @@ const DATE_PRESETS: {
 }[] = [
 	{
 		id: 'today',
-		label: __( 'Today' ),
+		label: i18n.TODAY(),
 		getValue: () => getDate( null ),
 	},
 	{
 		id: 'yesterday',
-		label: __( 'Yesterday' ),
+		label: i18n.YESTERDAY(),
 		getValue: () => {
 			const today = getDate( null );
 			return subDays( today, 1 );
@@ -78,7 +78,7 @@ const DATE_PRESETS: {
 	},
 	{
 		id: 'past-week',
-		label: __( 'Past week' ),
+		label: i18n.PAST_WEEK(),
 		getValue: () => {
 			const today = getDate( null );
 			return subDays( today, 7 );
@@ -86,7 +86,7 @@ const DATE_PRESETS: {
 	},
 	{
 		id: 'past-month',
-		label: __( 'Past month' ),
+		label: i18n.PAST_MONTH(),
 		getValue: () => {
 			const today = getDate( null );
 			return subMonths( today, 1 );
@@ -97,7 +97,7 @@ const DATE_PRESETS: {
 const DATE_RANGE_PRESETS = [
 	{
 		id: 'last-7-days',
-		label: __( 'Last 7 days' ),
+		label: i18n.LAST_7_DAYS(),
 		getValue: () => {
 			const today = getDate( null );
 			return [ subDays( today, 7 ), today ];
@@ -105,7 +105,7 @@ const DATE_RANGE_PRESETS = [
 	},
 	{
 		id: 'last-30-days',
-		label: __( 'Last 30 days' ),
+		label: i18n.LAST_30_DAYS(),
 		getValue: () => {
 			const today = getDate( null );
 			return [ subDays( today, 30 ), today ];
@@ -113,7 +113,7 @@ const DATE_RANGE_PRESETS = [
 	},
 	{
 		id: 'month-to-date',
-		label: __( 'Month to date' ),
+		label: i18n.MONTH_TO_DATE(),
 		getValue: () => {
 			const today = getDate( null );
 			return [ startOfMonth( today ), today ];
@@ -121,7 +121,7 @@ const DATE_RANGE_PRESETS = [
 	},
 	{
 		id: 'last-year',
-		label: __( 'Last year' ),
+		label: i18n.LAST_YEAR(),
 		getValue: () => {
 			const today = getDate( null );
 			return [ subYears( today, 1 ), today ];
@@ -129,7 +129,7 @@ const DATE_RANGE_PRESETS = [
 	},
 	{
 		id: 'year-to-date',
-		label: __( 'Year to date' ),
+		label: i18n.YEAR_TO_DATE(),
 		getValue: () => {
 			const today = getDate( null );
 			return [ startOfYear( today ), today ];
@@ -380,9 +380,9 @@ function CalendarDateControl< Item >( {
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional ) {
-		displayLabel = `${ label } (${ __( 'Required' ) })`;
+		displayLabel = `${ label } (${ i18n.REQUIRED() })`;
 	} else if ( ! isValid?.required && markWhenOptional ) {
-		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+		displayLabel = `${ label } (${ i18n.OPTIONAL() })`;
 	}
 
 	return (
@@ -435,7 +435,7 @@ function CalendarDateControl< Item >( {
 							disabled={ !! selectedPresetId || disabled }
 							accessibleWhenDisabled
 						>
-							{ __( 'Custom' ) }
+							{ i18n.CUSTOM() }
 						</Button>
 					</Stack>
 
@@ -443,7 +443,7 @@ function CalendarDateControl< Item >( {
 					<InputControl
 						ref={ validityTargetRef }
 						type="date"
-						label={ __( 'Date' ) }
+						label={ i18n.DATE() }
 						hideLabelFromVision
 						value={ value }
 						onChange={ handleManualDateChange }
@@ -611,9 +611,9 @@ function CalendarDateRangeControl< Item >( {
 
 	let displayLabel = label;
 	if ( field.isValid?.required && ! markWhenOptional ) {
-		displayLabel = `${ label } (${ __( 'Required' ) })`;
+		displayLabel = `${ label } (${ i18n.REQUIRED() })`;
 	} else if ( ! field.isValid?.required && markWhenOptional ) {
-		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+		displayLabel = `${ label } (${ i18n.OPTIONAL() })`;
 	}
 
 	return (
@@ -666,7 +666,7 @@ function CalendarDateRangeControl< Item >( {
 							accessibleWhenDisabled
 							disabled={ !! selectedPresetId || disabled }
 						>
-							{ __( 'Custom' ) }
+							{ i18n.CUSTOM() }
 						</Button>
 					</Stack>
 
@@ -680,7 +680,7 @@ function CalendarDateRangeControl< Item >( {
 						<InputControl
 							ref={ fromInputRef }
 							type="date"
-							label={ __( 'From' ) }
+							label={ i18n.FROM() }
 							hideLabelFromVision
 							value={ value?.[ 0 ] }
 							onChange={ ( newValue ) =>
@@ -694,7 +694,7 @@ function CalendarDateRangeControl< Item >( {
 						<InputControl
 							ref={ toInputRef }
 							type="date"
-							label={ __( 'To' ) }
+							label={ i18n.TO() }
 							hideLabelFromVision
 							value={ value?.[ 1 ] }
 							onChange={ ( newValue ) =>

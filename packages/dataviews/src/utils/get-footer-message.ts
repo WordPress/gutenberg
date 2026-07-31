@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { _n, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Get the footer message for the DataViews footer.
@@ -19,26 +20,13 @@ export default function getFooterMessage(
 	onlyTotalCount = false
 ): string {
 	if ( selectionCount > 0 ) {
-		return sprintf(
-			/* translators: %d: number of items. */
-			_n( '%d Item selected', '%d Items selected', selectionCount ),
-			selectionCount
-		);
+		return sprintf( i18n.ITEMS_SELECTED( selectionCount ), selectionCount );
 	}
 
 	// No selection - show item count
 	if ( onlyTotalCount || totalItems <= itemsCount ) {
-		return sprintf(
-			/* translators: %d: number of items. */
-			_n( '%d Item', '%d Items', totalItems ),
-			totalItems
-		);
+		return sprintf( i18n.ITEM_COUNT( totalItems ), totalItems );
 	}
 
-	return sprintf(
-		/* translators: %1$d: number of items. %2$d: total number of items. */
-		_n( '%1$d of %2$d Item', '%1$d of %2$d Items', totalItems ),
-		itemsCount,
-		totalItems
-	);
+	return sprintf( i18n.ITEMS_OF_TOTAL( totalItems ), itemsCount, totalItems );
 }

@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, _n } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -51,13 +52,5 @@ export default function getValidationMessage(
 		return undefined;
 	}
 
-	return sprintf(
-		/* translators: %d: Number of fields that need attention */
-		_n(
-			'%d field needs attention',
-			'%d fields need attention',
-			invalidCount
-		),
-		invalidCount
-	);
+	return sprintf( i18n.FIELDS_NEED_ATTENTION( invalidCount ), invalidCount );
 }

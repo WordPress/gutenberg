@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -44,12 +44,12 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 		! [ undefined, '', null ].includes( value ) &&
 		! Array.isArray( value )
 	) {
-		return __( 'Value must be an array.' );
+		return i18n.VALUE_MUST_BE_AN_ARRAY();
 	}
 
 	// Only allow strings for now. Can be extended to other types in the future.
 	if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
-		return __( 'Every value must be a string.' );
+		return i18n.EVERY_VALUE_MUST_BE_A_STRING();
 	}
 
 	return null;

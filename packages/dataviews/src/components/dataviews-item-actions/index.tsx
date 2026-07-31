@@ -11,7 +11,7 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
@@ -256,7 +256,7 @@ function CompactItemActions< Item >( {
 						<Button
 							size={ isSmall ? 'small' : 'compact' }
 							icon={ moreVertical }
-							label={ __( 'Actions' ) }
+							label={ i18n.ACTIONS() }
 							accessibleWhenDisabled
 							disabled={ ! actions.length }
 							className="dataviews-all-actions-button"

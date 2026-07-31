@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useEffect, useRef, memo, useContext } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 import { useDebouncedInput } from '@wordpress/compose';
@@ -41,7 +41,7 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 			} );
 		}
 	}, [ debouncedSearch ] );
-	const searchLabel = label || __( 'Search' );
+	const searchLabel = label || i18n.SEARCH();
 	return (
 		<SearchControl
 			className="dataviews-search"

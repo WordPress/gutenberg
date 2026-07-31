@@ -7,7 +7,7 @@ import {
 	Dropdown,
 	Button,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
@@ -49,7 +49,7 @@ function DropdownHeader( {
 				<Spacer style={ { flex: 1 } } />
 				{ onClose && (
 					<Button
-						label={ __( 'Close' ) }
+						label={ i18n.CLOSE() }
 						icon={ closeSmall }
 						onClick={ onClose }
 						size="small"

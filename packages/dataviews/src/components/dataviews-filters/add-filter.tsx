@@ -10,7 +10,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Button,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -92,7 +92,7 @@ function AddFilter(
 						ref={ ref }
 					/>
 				),
-				children: __( 'Add filter' ),
+				children: i18n.ADD_FILTER(),
 			} }
 			{ ...{ filters, view, onChangeView, setOpenedFilter } }
 		/>

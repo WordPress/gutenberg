@@ -8,7 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -226,7 +226,7 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: __( 'Could not validate elements.' ),
+								message: i18n.COULD_NOT_VALIDATE_ELEMENTS(),
 							},
 						},
 						[ ...path, formField.id ]
@@ -249,9 +249,8 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: __(
-									'Value must be one of the elements.'
-								),
+								message:
+									i18n.VALUE_MUST_BE_ONE_OF_THE_ELEMENTS(),
 							},
 						},
 						[ ...path, formField.id ]
@@ -280,9 +279,7 @@ function handleElementsValidationAsync< Item >(
 			} else {
 				errorMessage =
 					String( error ) ||
-					__(
-						'Unknown error when running elements validation asynchronously.'
-					);
+					i18n.UNKNOWN_ASYNC_ELEMENTS_VALIDATION_ERROR();
 			}
 
 			setFormValidity( ( prev ) => {
@@ -351,7 +348,7 @@ function handleCustomValidationAsync< Item >(
 					{
 						custom: {
 							type: 'invalid',
-							message: __( 'Validation could not be processed.' ),
+							message: i18n.VALIDATION_COULD_NOT_BE_PROCESSED(),
 						},
 					},
 					[ ...path, formField.id ]
@@ -370,9 +367,7 @@ function handleCustomValidationAsync< Item >(
 			} else {
 				errorMessage =
 					String( error ) ||
-					__(
-						'Unknown error when running custom validation asynchronously.'
-					);
+					i18n.UNKNOWN_ASYNC_CUSTOM_VALIDATION_ERROR();
 			}
 
 			setFormValidity( ( prev ) => {
@@ -422,7 +417,7 @@ function validateFormField< Item >(
 		return {
 			pattern: {
 				type: 'invalid',
-				message: __( 'Value does not match the required pattern.' ),
+				message: i18n.VALUE_DOES_NOT_MATCH_PATTERN(),
 			},
 		};
 	}
@@ -435,7 +430,7 @@ function validateFormField< Item >(
 		return {
 			min: {
 				type: 'invalid',
-				message: __( 'Value is below the minimum.' ),
+				message: i18n.VALUE_BELOW_MINIMUM(),
 			},
 		};
 	}
@@ -448,7 +443,7 @@ function validateFormField< Item >(
 		return {
 			max: {
 				type: 'invalid',
-				message: __( 'Value is above the maximum.' ),
+				message: i18n.VALUE_ABOVE_MAXIMUM(),
 			},
 		};
 	}
@@ -461,7 +456,7 @@ function validateFormField< Item >(
 		return {
 			minLength: {
 				type: 'invalid',
-				message: __( 'Value is too short.' ),
+				message: i18n.VALUE_TOO_SHORT(),
 			},
 		};
 	}
@@ -474,7 +469,7 @@ function validateFormField< Item >(
 		return {
 			maxLength: {
 				type: 'invalid',
-				message: __( 'Value is too long.' ),
+				message: i18n.VALUE_TOO_LONG(),
 			},
 		};
 	}
@@ -490,7 +485,7 @@ function validateFormField< Item >(
 		return {
 			elements: {
 				type: 'invalid',
-				message: __( 'Value must be one of the elements.' ),
+				message: i18n.VALUE_MUST_BE_ONE_OF_THE_ELEMENTS(),
 			},
 		};
 	}
@@ -516,8 +511,7 @@ function validateFormField< Item >(
 				errorMessage = error.message;
 			} else {
 				errorMessage =
-					String( error ) ||
-					__( 'Unknown error when running custom validation.' );
+					String( error ) || i18n.UNKNOWN_CUSTOM_VALIDATION_ERROR();
 			}
 
 			return {
@@ -554,7 +548,7 @@ function validateFormField< Item >(
 		);
 		fieldValidity.elements = {
 			type: 'validating',
-			message: __( 'Validating…' ),
+			message: i18n.VALIDATING(),
 		};
 	}
 
@@ -564,7 +558,7 @@ function validateFormField< Item >(
 
 		fieldValidity.custom = {
 			type: 'validating',
-			message: __( 'Validating…' ),
+			message: i18n.VALIDATING(),
 		};
 	}
 

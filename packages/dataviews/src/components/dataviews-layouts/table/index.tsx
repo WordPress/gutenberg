@@ -7,7 +7,8 @@ import type { ComponentProps, ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { isRTL, sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
@@ -566,7 +567,7 @@ function ViewTable< Item >( {
 								) }
 							>
 								<span className="dataviews-view-table-header">
-									{ __( 'Actions' ) }
+									{ i18n.ACTIONS() }
 								</span>
 							</th>
 						) }
@@ -590,8 +591,7 @@ function ViewTable< Item >( {
 										{ view.groupBy?.showLabel === false
 											? groupName
 											: sprintf(
-													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-													__( '%1$s: %2$s' ),
+													i18n.FIELD_LABEL_AND_VALUE(),
 													groupField.label,
 													groupName
 											  ) }

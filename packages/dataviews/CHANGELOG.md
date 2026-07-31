@@ -6,6 +6,7 @@
 
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
+-   Move the built-in DataViews and DataForms strings out to the new non-bundled [`@wordpress/dataviews-i18n`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dataviews-i18n) package, which gives them a script handle WordPress can load translations for.
 
 ### Bug Fix
 

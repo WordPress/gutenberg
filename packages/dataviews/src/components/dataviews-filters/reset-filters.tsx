@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -48,7 +48,7 @@ export default function ResetFilter( {
 				} );
 			} }
 		>
-			{ __( 'Reset' ) }
+			{ i18n.RESET() }
 		</Button>
 	);
 }

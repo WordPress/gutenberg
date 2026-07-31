@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToggleControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -17,10 +17,8 @@ export default function InfiniteScrollToggle() {
 
 	return (
 		<ToggleControl
-			label={ __( 'Enable infinite scroll' ) }
-			help={ __(
-				'Automatically load more content as you scroll, instead of showing pagination links.'
-			) }
+			label={ i18n.ENABLE_INFINITE_SCROLL() }
+			help={ i18n.ENABLE_INFINITE_SCROLL_HELP() }
 			checked={ infiniteScrollEnabled }
 			onChange={ ( newValue ) => {
 				onChangeView( {

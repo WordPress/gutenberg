@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { isRTL } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import {
 	blockTable,
 	category,
@@ -35,35 +36,35 @@ import GridConfigOptions from './utils/grid-config-options';
 export const VIEW_LAYOUTS = [
 	{
 		type: LAYOUT_TABLE,
-		label: __( 'Table' ),
+		label: i18n.TABLE(),
 		component: ViewTable,
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_GRID,
-		label: __( 'Grid' ),
+		label: i18n.GRID(),
 		component: ViewGrid,
 		icon: category,
 		viewConfigOptions: GridConfigOptions,
 	},
 	{
 		type: LAYOUT_LIST,
-		label: __( 'List' ),
+		label: i18n.LIST(),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
 		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_ACTIVITY,
-		label: __( 'Activity' ),
+		label: i18n.ACTIVITY(),
 		component: ViewActivity,
 		icon: scheduled,
 		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_PICKER_GRID,
-		label: __( 'Grid' ),
+		label: i18n.GRID(),
 		component: ViewPickerGrid,
 		icon: category,
 		viewConfigOptions: GridConfigOptions,
@@ -71,7 +72,7 @@ export const VIEW_LAYOUTS = [
 	},
 	{
 		type: LAYOUT_PICKER_TABLE,
-		label: __( 'Table' ),
+		label: i18n.TABLE(),
 		component: ViewPickerTable,
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
@@ -79,7 +80,7 @@ export const VIEW_LAYOUTS = [
 	},
 	{
 		type: LAYOUT_PICKER_ACTIVITY,
-		label: __( 'Activity' ),
+		label: i18n.ACTIVITY(),
 		component: ViewPickerActivity,
 		icon: scheduled,
 		viewConfigOptions: DensityPicker,

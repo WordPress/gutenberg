@@ -13,7 +13,8 @@ import {
 	SelectControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
@@ -69,11 +70,7 @@ const FilterText = ( {
 		return operator.filterText( filter, activeElements );
 	}
 
-	return sprintf(
-		/* translators: 1: Filter name e.g.: "Unknown status for Author". */
-		__( 'Unknown status for %1$s' ),
-		filter.name
-	);
+	return sprintf( i18n.UNKNOWN_STATUS_FOR_FILTER(), filter.name );
 };
 
 function OperatorSelector( {
@@ -104,7 +101,7 @@ function OperatorSelector( {
 
 				<SelectControl
 					className="dataviews-filters__summary-operators-filter-select"
-					label={ __( 'Conditions' ) }
+					label={ i18n.CONDITIONS() }
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
@@ -259,7 +256,7 @@ export default function Filter( {
 	// TODO: revisit once `@wordpress/ui`'s `IconButton` is ready — it should
 	// collapse the manual icon-only `<button>` + `aria-label` + Tooltip
 	// composition below into a single primitive.
-	const resetOrRemoveLabel = isPrimary ? __( 'Reset' ) : __( 'Remove' );
+	const resetOrRemoveLabel = isPrimary ? i18n.RESET() : i18n.REMOVE();
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -315,8 +312,7 @@ export default function Filter( {
 						/>
 						<Tooltip.Popup>
 							{ sprintf(
-								/* translators: 1: Filter name. */
-								__( 'Filter by: %1$s' ),
+								i18n.FILTER_BY(),
 								filter.name.toLowerCase()
 							) }
 						</Tooltip.Popup>

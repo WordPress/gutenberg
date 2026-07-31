@@ -4,7 +4,7 @@
 import { useContext, useRef, useCallback, useEffect } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { funnel } from '@wordpress/icons';
-import { __, _x } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -39,12 +39,12 @@ function FiltersToggle() {
 	const hasVisibleFilters = filters.some( ( filter ) => filter.isVisible );
 
 	const addFilterButtonProps = {
-		label: __( 'Add filter' ),
+		label: i18n.ADD_FILTER(),
 		'aria-expanded': false,
 		isPressed: false,
 	};
 	const toggleFiltersButtonProps = {
-		label: _x( 'Filter', 'verb' ),
+		label: i18n.FILTER(),
 		'aria-expanded': isShowingFilter,
 		isPressed: isShowingFilter,
 		onClick: () => {

@@ -21,7 +21,8 @@ import {
 	useState,
 	useContext,
 } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
@@ -248,7 +249,7 @@ function ListItem< Item >( {
 										<Button
 											size="small"
 											icon={ moreVertical }
-											label={ __( 'Actions' ) }
+											label={ i18n.ACTIONS() }
 											accessibleWhenDisabled
 											disabled={ ! actions.length }
 											onKeyDown={
@@ -592,8 +593,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 									{ view.groupBy?.showLabel === false
 										? groupName
 										: sprintf(
-												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-												__( '%1$s: %2$s' ),
+												i18n.FIELD_LABEL_AND_VALUE(),
 												groupField.label,
 												groupName
 										  ) }

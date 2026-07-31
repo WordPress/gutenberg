@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -23,11 +23,11 @@ function getValueFormatted< Item >( {
 	const value = field.getValue( { item } );
 
 	if ( value === true ) {
-		return __( 'True' );
+		return i18n.TRUE();
 	}
 
 	if ( value === false ) {
-		return __( 'False' );
+		return i18n.FALSE();
 	}
 
 	return '';
@@ -40,7 +40,7 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 		! [ undefined, '', null ].includes( value ) &&
 		! [ true, false ].includes( value )
 	) {
-		return __( 'Value must be true, false, or undefined' );
+		return i18n.VALUE_MUST_BE_BOOLEAN();
 	}
 
 	return null;

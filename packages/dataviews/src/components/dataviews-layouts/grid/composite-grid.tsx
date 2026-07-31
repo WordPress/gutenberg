@@ -14,7 +14,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack, Tooltip } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	useCallback,
@@ -165,7 +166,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 				};
 			} else {
 				mediaA11yProps = {
-					'aria-label': __( 'Navigate to item' ),
+					'aria-label': i18n.NAVIGATE_TO_ITEM(),
 				};
 			}
 		}
@@ -545,8 +546,7 @@ export default function CompositeGrid< Item >( {
 										role="row"
 										aria-rowindex={ i + 1 }
 										aria-label={ sprintf(
-											/* translators: %d: The row number in the grid */
-											__( 'Row %d' ),
+											i18n.ROW_NUMBER(),
 											i + 1
 										) }
 										className="dataviews-view-grid__row"

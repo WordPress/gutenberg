@@ -3,7 +3,8 @@
  */
 import { Button, SelectControl } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
+import { isRTL, sprintf } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 
@@ -42,12 +43,7 @@ export function DataViewsPagination() {
 				label: page.toString(),
 				'aria-label':
 					currentPage === page
-						? sprintf(
-								// translators: 1: current page number. 2: total number of pages.
-								__( 'Page %1$d of %2$d' ),
-								currentPage,
-								totalPages
-						  )
+						? sprintf( i18n.PAGE_X_OF_Y(), currentPage, totalPages )
 						: page.toString(),
 			};
 		}
@@ -70,8 +66,7 @@ export function DataViewsPagination() {
 			>
 				{ createInterpolateElement(
 					sprintf(
-						// translators: 1: Current page number, 2: Total number of pages.
-						_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
+						i18n.PAGE_X_OF_Y_WITH_INPUT(),
 						'<CurrentPage />',
 						totalPages
 					),
@@ -80,7 +75,7 @@ export function DataViewsPagination() {
 						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 						CurrentPage: (
 							<SelectControl
-								aria-label={ __( 'Current page' ) }
+								aria-label={ i18n.CURRENT_PAGE() }
 								value={ currentPage.toString() }
 								options={ pageSelectOptions }
 								onChange={ ( newValue ) => {
@@ -106,7 +101,7 @@ export function DataViewsPagination() {
 					}
 					disabled={ currentPage === 1 }
 					accessibleWhenDisabled
-					label={ __( 'Previous page' ) }
+					label={ i18n.PREVIOUS_PAGE() }
 					icon={ isRTL() ? next : previous }
 					showTooltip
 					size="compact"
@@ -118,7 +113,7 @@ export function DataViewsPagination() {
 					}
 					disabled={ currentPage >= totalPages }
 					accessibleWhenDisabled
-					label={ __( 'Next page' ) }
+					label={ i18n.NEXT_PAGE() }
 					icon={ isRTL() ? previous : next }
 					showTooltip
 					size="compact"

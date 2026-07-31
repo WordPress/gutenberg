@@ -6,7 +6,7 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -63,7 +63,7 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 		! [ undefined, '', null ].includes( value ) &&
 		! colord( value ).isValid()
 	) {
-		return __( 'Value must be a valid color.' );
+		return i18n.VALUE_MUST_BE_A_VALID_COLOR();
 	}
 
 	return null;

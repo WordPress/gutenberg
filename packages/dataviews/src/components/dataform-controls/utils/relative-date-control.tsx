@@ -12,7 +12,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -30,16 +30,16 @@ interface TimeUnitOption {
 
 const TIME_UNITS_OPTIONS: Record< VALID_OPERATORS, TimeUnitOption[] > = {
 	[ OPERATOR_IN_THE_PAST ]: [
-		{ value: 'days', label: __( 'Days' ) },
-		{ value: 'weeks', label: __( 'Weeks' ) },
-		{ value: 'months', label: __( 'Months' ) },
-		{ value: 'years', label: __( 'Years' ) },
+		{ value: 'days', label: i18n.DAYS() },
+		{ value: 'weeks', label: i18n.WEEKS() },
+		{ value: 'months', label: i18n.MONTHS() },
+		{ value: 'years', label: i18n.YEARS() },
 	],
 	[ OPERATOR_OVER ]: [
-		{ value: 'days', label: __( 'Days ago' ) },
-		{ value: 'weeks', label: __( 'Weeks ago' ) },
-		{ value: 'months', label: __( 'Months ago' ) },
-		{ value: 'years', label: __( 'Years ago' ) },
+		{ value: 'days', label: i18n.DAYS_AGO() },
+		{ value: 'weeks', label: i18n.WEEKS_AGO() },
+		{ value: 'months', label: i18n.MONTHS_AGO() },
+		{ value: 'years', label: i18n.YEARS_AGO() },
 	],
 };
 
@@ -106,7 +106,7 @@ export default function RelativeDateControl< Item >( {
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
-					label={ __( 'Unit' ) }
+					label={ i18n.UNIT() }
 					value={ unit }
 					options={ options }
 					onChange={ onChangeUnit }

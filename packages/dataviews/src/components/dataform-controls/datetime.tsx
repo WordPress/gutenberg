@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Stack } from '@wordpress/ui';
 
@@ -156,13 +156,13 @@ function CalendarDateTimeControl< Item >( {
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
-		displayLabel = `${ label } (${ __( 'Required' ) })`;
+		displayLabel = `${ label } (${ i18n.REQUIRED() })`;
 	} else if (
 		! isValid?.required &&
 		markWhenOptional &&
 		! hideLabelFromVision
 	) {
-		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+		displayLabel = `${ label } (${ i18n.OPTIONAL() })`;
 	}
 
 	return (
@@ -179,7 +179,7 @@ function CalendarDateTimeControl< Item >( {
 					required={ !! isValid?.required }
 					customValidity={ getCustomValidity( isValid, validity ) }
 					type="datetime-local"
-					label={ __( 'Date time' ) }
+					label={ i18n.DATE_TIME() }
 					hideLabelFromVision
 					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }

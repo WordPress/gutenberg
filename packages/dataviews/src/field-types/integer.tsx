@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 
 /**
  * Internal dependencies
@@ -74,7 +74,7 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 		! [ undefined, '', null ].includes( value ) &&
 		! Number.isInteger( value )
 	) {
-		return __( 'Value must be an integer.' );
+		return i18n.VALUE_MUST_BE_AN_INTEGER();
 	}
 	return null;
 }

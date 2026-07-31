@@ -17,7 +17,7 @@ import {
 	__experimentalHeading as Heading,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
@@ -57,7 +57,7 @@ export function ViewTypeMenu() {
 					<Button
 						size="compact"
 						icon={ activeView?.icon }
-						label={ __( 'Layout' ) }
+						label={ i18n.LAYOUT() }
 					/>
 				}
 			/>
@@ -125,7 +125,7 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			label={ __( 'Sort by' ) }
+			label={ i18n.SORT_BY() }
 			value={ view.sort?.field }
 			options={ orderOptions }
 			onChange={ ( value: string ) => {
@@ -160,7 +160,7 @@ function SortDirectionControl() {
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
 			isBlock
-			label={ __( 'Order' ) }
+			label={ i18n.ORDER() }
 			value={ value }
 			onChange={ ( newDirection ) => {
 				if ( newDirection === 'asc' || newDirection === 'desc' ) {
@@ -213,7 +213,7 @@ function ItemsPerPageControl() {
 	return (
 		<ToggleGroupControl
 			isBlock
-			label={ __( 'Items per page' ) }
+			label={ i18n.ITEMS_PER_PAGE() }
 			value={ view.perPage || 10 }
 			disabled={ ! view?.sort?.field }
 			onChange={ ( newItemsPerPage ) => {
@@ -265,7 +265,7 @@ function ResetViewButton() {
 				}
 			} }
 		>
-			{ __( 'Reset view' ) }
+			{ i18n.RESET_VIEW() }
 		</Button>
 	);
 }
@@ -293,10 +293,7 @@ export function DataviewsViewConfigDropdown() {
 						<Button
 							size="compact"
 							icon={ cog }
-							label={ _x(
-								'View options',
-								'View is used as a noun'
-							) }
+							label={ i18n.VIEW_OPTIONS() }
 							onClick={ onToggle }
 							aria-expanded={ isOpen ? 'true' : 'false' }
 							aria-controls={ popoverId }
@@ -327,7 +324,7 @@ export function DataviewsViewConfigDropdown() {
 								level={ 2 }
 								className="dataviews-settings-section__title"
 							>
-								{ __( 'Appearance' ) }
+								{ i18n.APPEARANCE() }
 							</Heading>
 							<ResetViewButton />
 						</Stack>

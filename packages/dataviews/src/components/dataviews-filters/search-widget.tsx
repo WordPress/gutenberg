@@ -10,7 +10,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
 import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
@@ -110,11 +111,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 			setActiveId={ setActiveCompositeId }
 			role="listbox"
 			className="dataviews-filters__search-widget-listbox"
-			aria-label={ sprintf(
-				/* translators: List of items for a filter. 1: Filter name. e.g.: "List of: Author". */
-				__( 'List of: %1$s' ),
-				filter.name
-			) }
+			aria-label={ sprintf( i18n.LIST_OF(), filter.name ) }
 			onFocusVisible={ () => {
 				// `onFocusVisible` needs the `Composite` component to be focusable,
 				// which is implicitly achieved via the `virtualFocus` prop.
@@ -264,11 +261,11 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 		>
 			<div className="dataviews-filters__search-widget-filter-combobox__wrapper">
 				<VisuallyHidden render={ <Ariakit.ComboboxLabel /> }>
-					{ __( 'Search items' ) }
+					{ i18n.SEARCH_ITEMS() }
 				</VisuallyHidden>
 				<Ariakit.Combobox
 					autoSelect="always"
-					placeholder={ __( 'Search' ) }
+					placeholder={ i18n.SEARCH() }
 					className="dataviews-filters__search-widget-filter-combobox__input"
 				/>
 				<div className="dataviews-filters__search-widget-filter-combobox__icon">
@@ -319,7 +316,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 						</Ariakit.ComboboxItem>
 					);
 				} ) }
-				{ ! matches.length && <p>{ __( 'No results found' ) }</p> }
+				{ ! matches.length && <p>{ i18n.NO_RESULTS_FOUND() }</p> }
 			</Ariakit.ComboboxList>
 		</Ariakit.ComboboxProvider>
 	);
@@ -342,7 +339,7 @@ export default function SearchWidget( props: SearchWidgetProps ) {
 	if ( elements.length === 0 ) {
 		return (
 			<div className="dataviews-filters__search-widget-no-elements">
-				{ __( 'No elements found' ) }
+				{ i18n.NO_ELEMENTS_FOUND() }
 			</div>
 		);
 	}

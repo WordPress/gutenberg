@@ -7,7 +7,7 @@ import {
 	BaseControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -103,7 +103,7 @@ export function PropertiesSection( {
 		<Stack direction="column" className="dataviews-field-control">
 			{ showLabel && (
 				<BaseControl.VisualLabel>
-					{ __( 'Properties' ) }
+					{ i18n.PROPERTIES() }
 				</BaseControl.VisualLabel>
 			) }
 			<Stack

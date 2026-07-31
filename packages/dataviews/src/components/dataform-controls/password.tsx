@@ -6,7 +6,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/dataviews-i18n';
 import { seen, unseen } from '@wordpress/icons';
 /**
  * Internal dependencies
@@ -47,8 +47,8 @@ export default function Password< Item >( {
 							size="small"
 							label={
 								isVisible
-									? __( 'Hide password' )
-									: __( 'Show password' )
+									? i18n.HIDE_PASSWORD()
+									: i18n.SHOW_PASSWORD()
 							}
 							disabled={ disabled }
 							accessibleWhenDisabled
