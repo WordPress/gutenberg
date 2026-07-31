@@ -91,4 +91,43 @@ test.describe( 'Math Block', () => {
 			},
 		] );
 	} );
+
+	test( 'should apply the layout CSS matrices and aligned environments need to render correctly', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/math' } );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type(
+			'\\begin{aligned}\nA &= B \\\\[8pt]\nC &= D\n\\end{aligned}'
+		);
+		await page.keyboard.press( 'Escape' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The `aligned` environment renders as an `mtable` with a `tml-jot`
+		// class, and cells with `tml-right`/`tml-left` classes. Temml relies
+		// on CSS targeting these classes to correctly align columns and
+		// space out rows; without it the layout is wrong even though the
+		// underlying MathML is valid. See
+		// https://github.com/WordPress/gutenberg/issues/80732
+		const rightAlignedCell = page
+			.locator( '.wp-block-math mtd.tml-right' )
+			.first();
+		await expect( rightAlignedCell ).toBeVisible();
+
+		const textAlign = await rightAlignedCell.evaluate(
+			( element ) => window.getComputedStyle( element ).textAlign
+		);
+		expect( textAlign ).toBe( 'right' );
+
+		const jotCell = page
+			.locator( '.wp-block-math mtable.tml-jot mtd' )
+			.first();
+		const paddingTop = await jotCell.evaluate(
+			( element ) => window.getComputedStyle( element ).paddingTop
+		);
+		expect( paddingTop ).not.toBe( '0px' );
+	} );
 } );
