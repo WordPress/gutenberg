@@ -16,8 +16,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { generatePreferenceKey } from './preference-keys';
-import { mergeOverrides, stripOverrides } from './filter-utils';
-import type { ViewConfig } from './types';
+import { getUserModifications, resolveView } from './resolve-view';
+import type { ViewConfig, ViewOverrides } from './types';
 
 interface UseViewReturn {
 	view: View;
@@ -28,6 +28,11 @@ interface UseViewReturn {
 
 /**
  * Hook for managing DataViews view state with local persistence.
+ *
+ * Only the properties the user actually modified are persisted: every other
+ * property keeps resolving out of the layers below, so a change to the default
+ * view, to the layout defaults or to the active view overrides keeps showing
+ * through.
  *
  * @param config Configuration object for loading the view.
  *
@@ -46,94 +51,67 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	} = config;
 
 	const preferenceKey = generatePreferenceKey( kind, name, slug );
-	const persistedView: View | undefined = useSelect(
+	const persistedView: ViewOverrides | undefined = useSelect(
 		( select ) => {
 			return select( preferencesStore ).get(
 				'core/views',
 				preferenceKey
-			) as View | undefined;
+			) as ViewOverrides | undefined;
 		},
 		[ preferenceKey ]
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = useMemo(
-		() => persistedView ?? defaultView ?? {},
-		[ persistedView, defaultView ]
-	);
-	// `page` and `search` are URL-managed: the URL is their only source. They
-	// are never persisted, and neither the default view nor the active view
-	// overrides may configure them — an absent URL param is indistinguishable
-	// from the user having cleared the value, so any fallback would resurrect
-	// a cleared search on the next read. They join the overrides below, which
-	// makes them win over `baseView` when merging and drops them when
-	// stripping.
 	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
-	const overrides = useMemo( () => {
-		// Resolve the effective layout type first: a `type` override changes
-		// which layout's defaults apply.
-		const { type: effectiveType } = mergeOverrides(
-			baseView,
+	const { view, baseView } = useMemo(
+		() =>
+			resolveView( {
+				defaultView,
+				defaultLayouts,
+				activeViewOverrides,
+				persistedView,
+				page,
+				search,
+			} ),
+		[
+			defaultView,
+			defaultLayouts,
 			activeViewOverrides,
-			defaultView
-		);
-		const rawDefaults =
-			defaultLayouts?.[ effectiveType as keyof typeof defaultLayouts ];
-		const layoutTypeDefaults =
-			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
-		return { ...layoutTypeDefaults, ...activeViewOverrides, page, search };
-	}, [
-		baseView,
-		defaultView,
-		defaultLayouts,
-		activeViewOverrides,
-		page,
-		search,
-	] );
+			persistedView,
+			page,
+			search,
+		]
+	);
 
-	const view: View = useMemo( () => {
-		return mergeOverrides( baseView, overrides, defaultView );
-	}, [ baseView, overrides, defaultView ] );
-
-	const isModified = !! persistedView;
+	const isModified =
+		!! persistedView && Object.keys( persistedView ).length > 0;
 
 	const updateView = useCallback(
 		( newView: View ) => {
-			const urlParams: { page?: number; search?: string } = {
-				page: newView?.page,
-				search: newView?.search,
+			// `page` and `search` live in the URL, not in the preference: they
+			// are reported back to the consumer instead of being persisted.
+			const newQueryParams = {
+				page: Number( newView?.page ?? 1 ),
+				search: newView?.search ?? '',
 			};
 			if (
 				onChangeQueryParams &&
-				! dequal( urlParams, { page, search } )
+				! dequal( newQueryParams, { page, search } )
 			) {
-				onChangeQueryParams( urlParams );
+				onChangeQueryParams( newQueryParams );
 			}
 
-			const comparableNewView = stripOverrides(
+			const modifications = getUserModifications(
 				newView,
-				overrides,
-				defaultView
-			);
-			const comparableBaseView = stripOverrides(
 				baseView,
-				overrides,
-				defaultView
+				activeViewOverrides
 			);
-			const comparableDefaultView = stripOverrides(
-				defaultView ?? {},
-				overrides,
-				defaultView
-			);
-
-			if ( ! dequal( comparableBaseView, comparableNewView ) ) {
-				if ( dequal( comparableNewView, comparableDefaultView ) ) {
-					set( 'core/views', preferenceKey, undefined );
-				} else {
-					set( 'core/views', preferenceKey, comparableNewView );
-				}
+			if ( ! dequal( modifications, persistedView ) ) {
+				// `undefined` clears the preference: the user reverted every
+				// property they had modified.
+				set( 'core/views', preferenceKey, modifications );
 			}
 		},
 		[
@@ -141,8 +119,8 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			page,
 			search,
 			baseView,
-			defaultView,
-			overrides,
+			activeViewOverrides,
+			persistedView,
 			set,
 			preferenceKey,
 		]

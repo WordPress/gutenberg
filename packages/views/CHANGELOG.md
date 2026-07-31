@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `useView`, `loadView`. Fix merge/strip algorithm: `page` and `search` never have fallbacks; `type`, `perPage`, and `fields` can be provided as overrides; let users modify unlocked filters provided by active view overrides; a partial `sort` override no longer leaks the completed sort into the preference, which marked the view as modified forever; `layout` and `groupBy` overrides merge and strip per leaf, so an override for one field's styles no longer wipes the other fields' and no longer blocks persisting them. [#80832](https://github.com/WordPress/gutenberg/pull/80832)
+-   `useView`, `loadView`. Resolve the view as a stack of layers — `defaultView`, `defaultLayouts` (for the effective type), `activeViewOverrides`, the user's preference, and the URL query params — and persist only the properties the user actually modified. Previously the whole view was persisted, so a later change to any of the lower layers stopped showing through, an override could bounce back a value the user had picked, and a partial `sort` or `layout` override marked the view as modified forever. `page` and `search` are now sourced from the URL alone, and `layout`, `groupBy` and `sort` merge leaf by leaf, so an override for one field's styles no longer wipes the other fields'. [#80832](https://github.com/WordPress/gutenberg/pull/80832)
 
 ## 1.18.0 (2026-07-14)
 

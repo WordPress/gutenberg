@@ -4,11 +4,12 @@
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
 /**
- * A patch applied on top of a view.
+ * A layer merged on top of a view: the active view overrides, and the user's
+ * persisted modifications.
  *
  * It is derived from `View` so it stays in sync with it, but every property is
  * optional — including `type`, which `View` requires as the discriminant of its
- * layout union. Overrides only ever carry the subset of properties they mean to
+ * layout union. A layer only ever carries the subset of properties it means to
  * override, and `layout` is loosened to a plain record because a `type`
  * override may change which layout shape applies.
  */
@@ -41,10 +42,11 @@ export interface ViewConfig {
 	defaultView: View;
 
 	/**
-	 * View overrides applied on top of the persisted view but never persisted.
-	 * These represent tab-specific configuration (filters, sort) and
-	 * developer-defined view defaults that should override the persisted
-	 * view settings.
+	 * View overrides applied on top of the default view and the default
+	 * layouts, but never persisted. These represent tab-specific configuration
+	 * (filters, sort) and developer-defined view defaults. The properties the
+	 * user modified take precedence over them; the ones they never touched
+	 * resolve out of them.
 	 */
 	activeViewOverrides?: ViewOverrides;
 
