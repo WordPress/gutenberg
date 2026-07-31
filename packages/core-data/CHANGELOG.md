@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   Show Global Styles viewport/pseudo state badges (e.g. Mobile, Tablet) beside each changed block or element name in the save confirmation panel ([#80836](https://github.com/WordPress/gutenberg/issues/80836)).
+-   Show Global Styles viewport/pseudo state badges (e.g. Mobile, Tablet) beside each changed block or element name in the save confirmation panel ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
 
 ## 7.51.0 (2026-07-14)
 
