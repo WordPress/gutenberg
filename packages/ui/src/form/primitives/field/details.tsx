@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Field as _Field } from '@base-ui/react/field';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import fieldStyles from '../../../utils/css/field.module.css';
 import type { FieldDetailsProps } from './types';
 import { VisuallyHidden } from '../../../visually-hidden';
@@ -25,7 +25,7 @@ export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
 				{ /* VisuallyHidden is the host so that _Field.Description's
 				   semantic element is preserved. See VisuallyHidden docs. */ }
 				<VisuallyHidden render={ <_Field.Description /> }>
-					{ __( 'More details follow the field.' ) }
+					{ i18n.MORE_DETAILS_FOLLOW_THE_FIELD() }
 				</VisuallyHidden>
 				<div
 					ref={ ref }

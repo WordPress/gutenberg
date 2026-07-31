@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { Stack } from '../../../stack';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import focusStyles from '../../../utils/css/focus.module.css';
@@ -21,12 +21,12 @@ export const SearchableChipSelect = forwardRef<
 		children,
 		creatableItem,
 		disabled,
-		emptyContent = __( 'No results found.' ),
+		emptyContent = i18n.NO_RESULTS_FOUND(),
 		items,
 		chipsContent,
-		searchPlaceholder = __( 'Search' ),
+		searchPlaceholder = i18n.SEARCH(),
 		showClearButton = true,
-		clearButtonLabel = __( 'Clear all' ),
+		clearButtonLabel = i18n.CLEAR_ALL(),
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
 		'aria-describedby': ariaDescribedby,

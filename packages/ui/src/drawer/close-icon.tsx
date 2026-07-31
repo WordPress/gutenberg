@@ -1,6 +1,6 @@
 import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { close } from '@wordpress/icons';
 import { IconButton } from '../icon-button';
 import type { CloseIconProps } from './types';
@@ -21,7 +21,7 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 						tone="neutral"
 						{ ...props }
 						icon={ icon ?? close }
-						label={ label ?? __( 'Close' ) }
+						label={ label ?? i18n.CLOSE() }
 						data-wp-ui-drawer-close-icon=""
 					/>
 				}

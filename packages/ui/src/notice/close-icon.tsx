@@ -1,5 +1,5 @@
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { closeSmall } from '@wordpress/icons';
 import clsx from 'clsx';
 import { IconButton } from '../icon-button';
@@ -11,7 +11,7 @@ import styles from './style.module.css';
  */
 export const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 	function NoticeCloseIcon(
-		{ className, icon = closeSmall, label = __( 'Dismiss' ), ...props },
+		{ className, icon = closeSmall, label = i18n.DISMISS(), ...props },
 		ref
 	) {
 		return (

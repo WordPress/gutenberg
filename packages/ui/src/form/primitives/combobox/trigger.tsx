@@ -1,7 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { chevronDown } from '@wordpress/icons';
 import { Icon } from '../../../icon';
 import focusStyles from '../../../utils/css/focus.module.css';
@@ -15,7 +15,7 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 			className,
 			children,
 			size = 'default',
-			placeholder = __( 'Select' ),
+			placeholder = i18n.SELECT(),
 			...restProps
 		},
 		ref

@@ -1,7 +1,7 @@
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { type LinkProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
@@ -49,10 +49,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 						<span
 							className={ styles[ 'link-icon' ] }
 							role="img"
-							aria-label={
-								/* translators: accessibility text appended to link text */
-								__( '(opens in a new tab)' )
-							}
+							aria-label={ i18n.OPENS_IN_A_NEW_TAB() }
 						/>
 					) }
 				</>

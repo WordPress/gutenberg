@@ -2,7 +2,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import focusStyles from '../../../utils/css/focus.module.css';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
 import { InputLayout } from '../input-layout';
@@ -16,7 +16,7 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 			size,
 			variant,
 			children,
-			placeholder = __( 'Select' ),
+			placeholder = i18n.SELECT(),
 			...restProps
 		},
 		ref

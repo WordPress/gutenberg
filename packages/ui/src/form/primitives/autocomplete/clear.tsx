@@ -1,13 +1,13 @@
 import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import { forwardRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { IconButton } from '../../../icon-button';
 import type { AutocompleteClearProps } from './types';
 
 const DEFAULT_RENDER = (
 	{
-		'aria-label': ariaLabel = __( 'Clear' ),
+		'aria-label': ariaLabel = i18n.CLEAR(),
 		...props
 	}: AutocompleteClearProps,
 	{ disabled }: _Autocomplete.Clear.State

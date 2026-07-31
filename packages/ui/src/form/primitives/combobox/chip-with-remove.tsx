@@ -1,7 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 import { closeSmall } from '@wordpress/icons';
 import { IconButton } from '../../../icon-button';
 import type { ComboboxChipWithRemoveProps } from './types';
@@ -15,7 +15,7 @@ export const ChipWithRemove = forwardRef<
 	HTMLDivElement,
 	ComboboxChipWithRemoveProps
 >( function ChipWithRemove(
-	{ className, children, prefix, removeLabel = __( 'Remove' ), ...restProps },
+	{ className, children, prefix, removeLabel = i18n.REMOVE(), ...restProps },
 	ref
 ) {
 	return (

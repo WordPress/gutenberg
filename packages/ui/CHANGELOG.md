@@ -12,6 +12,7 @@
 -   `Popover`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so popovers stack reliably above other overlays in mixed-library compositions. A caller-supplied `Popover.Portal` `container` prop continues to take precedence ([#80278](https://github.com/WordPress/gutenberg/pull/80278)).
 -   `Button`: Add Storybook example demonstrating manual keyboard shortcut composition with `Tooltip`, `aria-keyshortcuts`, and an accessible description ([#80353](https://github.com/WordPress/gutenberg/pull/80353)).
 -   `Dialog`: Add Storybook usage guidelines for choosing between `Dialog` and `Drawer` ([#80783](https://github.com/WordPress/gutenberg/pull/80783)).
+-   Move the built-in component labels out to the new non-bundled [`@wordpress/ui-i18n`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui-i18n) package, which gives them a script handle WordPress can load translations for.
 
 ### Bug Fixes
 

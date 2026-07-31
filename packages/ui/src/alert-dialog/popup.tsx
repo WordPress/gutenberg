@@ -2,7 +2,7 @@ import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import i18n from '@wordpress/ui-i18n';
 
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { Button } from '../button';
@@ -31,8 +31,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			title,
 			description,
 			children,
-			confirmButtonText = __( 'OK' ),
-			cancelButtonText = __( 'Cancel' ),
+			confirmButtonText = i18n.OK(),
+			cancelButtonText = i18n.CANCEL(),
 			stickyHeader = true,
 			stickyFooter = true,
 			initialFocus,
