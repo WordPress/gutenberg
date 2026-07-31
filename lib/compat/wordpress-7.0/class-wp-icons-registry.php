@@ -183,6 +183,8 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			$allowed_tags = array(
 				'svg'     => array(
 					'class'       => true,
+					'fill'        => true,
+					'stroke'      => true,
 					'xmlns'       => true,
 					'width'       => true,
 					'height'      => true,

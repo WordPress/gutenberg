@@ -230,6 +230,44 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Modified to keep `fill` and `stroke` on the root element, so icon
+	 * content inherits the surrounding color via `currentColor`.
+	 *
+	 * @param string $icon_content The icon SVG content to sanitize.
+	 * @return string The sanitized icon SVG content.
+	 */
+	protected function sanitize_icon_content( $icon_content ) {
+		$allowed_tags = array(
+			'svg'     => array(
+				'class'       => true,
+				'fill'        => true,
+				'stroke'      => true,
+				'xmlns'       => true,
+				'width'       => true,
+				'height'      => true,
+				'viewbox'     => true,
+				'aria-hidden' => true,
+				'role'        => true,
+				'focusable'   => true,
+			),
+			'path'    => array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'd'         => true,
+				'transform' => true,
+			),
+			'polygon' => array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'points'    => true,
+				'transform' => true,
+				'focusable' => true,
+			),
+		);
+		return wp_kses( $icon_content, $allowed_tags );
+	}
+
+	/**
 	 * Modified to also search in icon labels
 	 */
 	public function get_registered_icons( $search = '' ) {

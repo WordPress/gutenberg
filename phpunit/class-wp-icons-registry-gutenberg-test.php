@@ -319,6 +319,24 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should keep the root `fill` and `stroke` attributes so sanitized
+	 * content still inherits the surrounding color via `currentColor`.
+	 */
+	public function test_register_icon_keeps_root_color_attributes() {
+		$this->register(
+			'test-collection/current-color',
+			array(
+				'label'   => 'Current Color',
+				'content' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"><path d="M12 3v18" /></svg>',
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( 'test-collection/current-color' );
+		$this->assertStringContainsString( 'fill="currentColor"', $icon['content'] );
+		$this->assertStringContainsString( 'stroke="currentColor"', $icon['content'] );
+	}
+
+	/**
 	 * Provides icon files that cannot yield valid content.
 	 *
 	 * @return array<string, array{0: string|null, 1: string}> Data sets of [ $contents, $extension ].
