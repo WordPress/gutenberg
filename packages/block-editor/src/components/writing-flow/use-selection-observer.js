@@ -7,7 +7,6 @@ import {
 	create,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-import { isSelectionForward } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -63,22 +62,35 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 		return focusNode;
 	}
 
-	// A triple click selects the paragraph, but the browser extends the
-	// forward selection into the next element at an offset of 0. This may
-	// trigger multi selection even though the selection does not visually end
-	// in the next block. Keyboard selections that legitimately extend to the
-	// same boundary (e.g. Shift+ArrowDown into a focusable block, where the
-	// browser reports the boundary at the element instead of its first text
-	// position) must not be corrected, so only do this for triple clicks.
+	const endNode = focusNode.childNodes[ focusOffset ];
+	const range = selection.getRangeAt( 0 );
+
+	// A triple click extends the forward selection past the block, which would
+	// trigger multi selection. Move the end back to the last text position
+	// before it, but only within the block the selection starts in, so a drag
+	// across blocks is left alone. The focus is the range end for a forward
+	// selection; node positions can't tell, as the focus may be an ancestor of
+	// the anchor.
 	if (
-		focusOffset === 0 &&
-		isSelectionForward( selection ) &&
+		range.endContainer === focusNode &&
+		range.endOffset === focusOffset &&
 		isTripleClick
 	) {
-		return focusNode.previousSibling ?? focusNode.parentElement;
+		const { ownerDocument } = focusNode;
+		const walker = ownerDocument.createTreeWalker(
+			ownerDocument.body,
+			ownerDocument.defaultView.NodeFilter.SHOW_TEXT
+		);
+		walker.currentNode = endNode;
+		const previousTextNode = walker.previousNode();
+		const clientId = getBlockClientId( selection.anchorNode );
+
+		if ( clientId && getBlockClientId( previousTextNode ) === clientId ) {
+			return previousTextNode;
+		}
 	}
 
-	return focusNode.childNodes[ focusOffset ];
+	return endNode;
 }
 
 function findDepth( a, b ) {
