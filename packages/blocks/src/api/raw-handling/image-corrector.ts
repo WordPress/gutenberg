@@ -3,6 +3,9 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 
+// Counter for generating unique filenames for pasted data-URI images.
+let uniqueImageId = 0;
+
 export default function imageCorrector( img: Node ): void {
 	if ( img.nodeName !== 'IMG' ) {
 		return;
@@ -40,7 +43,9 @@ export default function imageCorrector( img: Node ): void {
 			uint8Array[ i ] = decoded.charCodeAt( i );
 		}
 
-		const name = type.replace( '/', '.' );
+		// Use a unique filename per image for pasted images.
+		const subtype = type.slice( type.indexOf( '/' ) + 1 );
+		const name = `image-${ ++uniqueImageId }.${ subtype }`;
 		const file = new window.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );
