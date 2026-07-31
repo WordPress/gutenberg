@@ -6,7 +6,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
+import { createElement, isValidElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -76,6 +76,10 @@ const stringIconRecords: WidgetModuleRecord[] = [
 		widget_module: 'test-widget/string-icon-module',
 		render_module: 'test-widget/render-module',
 	},
+];
+
+const pendingIconRecords: WidgetModuleRecord[] = [
+	{ ...stringIconRecords[ 0 ], icon: 'core/pending' },
 ];
 
 describe( 'useWidgetTypes', () => {
@@ -149,6 +153,31 @@ describe( 'useWidgetTypes', () => {
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
 		expect( result.current[ 0 ][ 0 ].icon ).toBe( mockModuleIcon );
+	} );
+
+	it( 'holds the icon slot with a stand-in while the reference resolves', async () => {
+		registerIconResolver(
+			() => new Promise< WidgetIcon | null >( () => {} )
+		);
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( pendingIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( isValidElement( result.current[ 0 ][ 0 ].icon ) ).toBe( true );
+	} );
+
+	it( 'clears the stand-in when the reference does not resolve', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( pendingIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].icon ).toBeUndefined()
+		);
 	} );
 
 	it( 'drops a module icon that is not an element', async () => {
