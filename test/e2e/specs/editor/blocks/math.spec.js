@@ -106,22 +106,11 @@ test.describe( 'Math Block', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		// The `aligned` environment renders as an `mtable` with a `tml-jot`
-		// class, and cells with `tml-right`/`tml-left` classes. Temml relies
-		// on CSS targeting these classes to correctly align columns and
-		// space out rows; without it the layout is wrong even though the
-		// underlying MathML is valid. See
-		// https://github.com/WordPress/gutenberg/issues/80732
 		const rightAlignedCell = page
 			.locator( '.wp-block-math mtd.tml-right' )
 			.first();
 		await expect( rightAlignedCell ).toBeVisible();
 
-		// Chromium accepts the legacy `-webkit-right`/`-webkit-left` values
-		// Temml's CSS also sets (for older WebKit/Blink compatibility), so
-		// the computed value can legitimately be either the standard or the
-		// `-webkit-` prefixed keyword depending on the engine. Both render
-		// as right-aligned text.
 		const textAlign = await rightAlignedCell.evaluate(
 			( element ) => window.getComputedStyle( element ).textAlign
 		);
