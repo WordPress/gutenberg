@@ -1001,10 +1001,11 @@ export const __unstableSplitSelection =
 		let head = {
 			// Preserve the original client ID.
 			...blockA,
-			// If both start and end are the same, should only copy innerBlocks
-			// once.
-			innerBlocks:
-				blockA.clientId === blockB.clientId ? [] : blockA.innerBlocks,
+			// The first block's inner blocks sit after its text, so within
+			// a ranged selection they are deleted with it; for a collapsed
+			// selection they belong to the trailing half. Either way the
+			// head carries none. See also `__unstableDeleteSelection`.
+			innerBlocks: [],
 			attributes: {
 				...blockA.attributes,
 				[ attributeKeyA ]: toHTMLString( { value: valueA } ),
@@ -1073,7 +1074,7 @@ export const __unstableSplitSelection =
 				// The merge only joins attributes; carry over the inner
 				// blocks of the merged block so they are not lost, e.g. the
 				// nested list of a pasted list item.
-				innerBlocks: [ ...head.innerBlocks, ...first.innerBlocks ],
+				innerBlocks: first.innerBlocks,
 			};
 			output.push( head );
 			selection = {
@@ -1084,7 +1085,7 @@ export const __unstableSplitSelection =
 			};
 			clonedBlocks.unshift( ...firstBlocks );
 		} else {
-			if ( ! isUnmodifiedBlock( head ) || head.innerBlocks.length ) {
+			if ( ! isUnmodifiedBlock( head ) ) {
 				output.push( head );
 			}
 			output.push( firstBlock );
