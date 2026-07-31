@@ -83,6 +83,7 @@ function Edit( {
 		() =>
 			tabPanels.map( ( tab ) => ( {
 				label: tab.attributes.label || '',
+				placeholder: tab.attributes.placeholder || __( 'Tab title' ),
 				clientId: tab.clientId,
 			} ) ),
 		[ tabPanels ]
@@ -224,7 +225,7 @@ function Edit( {
 							<RichText
 								tagName="span"
 								withoutInteractiveFormatting
-								placeholder={ __( 'Tab title' ) }
+								placeholder={ tab.placeholder }
 								value={ tab.label }
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )

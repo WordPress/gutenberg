@@ -8,6 +8,7 @@
 -   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
 -   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
+-   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab", and add a `placeholder` attribute to Tab Panel so patterns and templates can customize the prompt ([#](https://github.com/WordPress/gutenberg/pull/)).
 
 ### Bug Fixes
 

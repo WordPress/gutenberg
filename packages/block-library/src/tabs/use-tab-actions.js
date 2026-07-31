@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useRegistry } from '@wordpress/data';
@@ -58,8 +57,10 @@ export default function useTabActions( tabsClientId ) {
 		}
 
 		const newIndex = atIndex ?? tabPanelBlocks.length;
+
+		// The label is left empty so the new tab prompts for a title.
 		insertBlock(
-			createBlock( 'core/tab-panel', { label: __( 'Tab' ) } ),
+			createBlock( 'core/tab-panel' ),
 			newIndex,
 			tabPanelsClientId,
 			false
