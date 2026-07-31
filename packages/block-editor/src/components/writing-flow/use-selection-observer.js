@@ -62,36 +62,66 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 		focusOffset === focusNode.childNodes.length
 			? focusNode
 			: focusNode.childNodes[ focusOffset ];
+
+	if ( ! isTripleClick ) {
+		return endNode;
+	}
+
+	// A triple click extends the forward selection to the start edge of the
+	// following block, which would trigger multi selection even though no
+	// content of that block is selected. When the selection ends at the mere
+	// edge of another block, end it at the last text position of the block
+	// it starts in instead. Keyboard selections that legitimately extend to
+	// the same boundary must not be corrected, hence the triple click gate.
 	const range = selection.getRangeAt( 0 );
-	const clientId = getBlockClientId( selection.anchorNode );
 
-	// A triple click extends the forward selection past the block, which would
-	// trigger multi selection. Move the end back to the last text position
-	// before it, but only within the block the selection starts in, so a drag
-	// across blocks is left alone. The focus is the range end for a forward
-	// selection; node positions can't tell, as the focus may be an ancestor of
-	// the anchor.
-	if (
-		range.endContainer === focusNode &&
-		range.endOffset === focusOffset &&
-		isTripleClick &&
-		clientId &&
-		getBlockClientId( endNode ) !== clientId
-	) {
-		const { ownerDocument } = focusNode;
-		const walker = ownerDocument.createTreeWalker(
-			ownerDocument.body,
-			ownerDocument.defaultView.NodeFilter.SHOW_TEXT
+	// The focus is the range end for a forward selection; node positions
+	// cannot tell, as the focus may be an ancestor of the anchor.
+	if ( range.endContainer !== focusNode || range.endOffset !== focusOffset ) {
+		return endNode;
+	}
+
+	const { ownerDocument } = focusNode;
+	const startBlockClientId = getBlockClientId( selection.anchorNode );
+	const endBlockClientId = getBlockClientId( endNode );
+
+	if ( ! startBlockClientId || endBlockClientId === startBlockClientId ) {
+		return endNode;
+	}
+
+	// Whether the selection merely touches the edge of the end block: none
+	// of its content lies before the selection end.
+	if ( endBlockClientId ) {
+		const endBlockRange = ownerDocument.createRange();
+		endBlockRange.selectNodeContents(
+			ownerDocument.getElementById( `block-${ endBlockClientId }` )
 		);
-		walker.currentNode = endNode;
-		const previousTextNode = walker.previousNode();
 
-		if ( getBlockClientId( previousTextNode ) === clientId ) {
-			return previousTextNode;
+		// Compares the end of the selection with the start of the end
+		// block's content.
+		if (
+			range.compareBoundaryPoints( range.START_TO_END, endBlockRange ) > 0
+		) {
+			return endNode;
 		}
 	}
 
-	return endNode;
+	// End the selection at the last text position within the block it
+	// starts in.
+	const startBlockElement = ownerDocument.getElementById(
+		`block-${ startBlockClientId }`
+	);
+	const walker = ownerDocument.createTreeWalker(
+		startBlockElement,
+		ownerDocument.defaultView.NodeFilter.SHOW_TEXT
+	);
+	let lastTextNode;
+
+	while ( walker.nextNode() ) {
+		lastTextNode = walker.currentNode;
+	}
+
+	return lastTextNode ?? endNode;
 }
 
 function findDepth( a, b ) {
