@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useReducer,
+	useRef,
+} from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
@@ -119,32 +125,97 @@ export default function useBlockColorContrastWarning( {
 		[ name, enabled ]
 	);
 
-	// There are so many things that can change the color of a block
-	// So we perform this check on every render.
+	// Re-read the block's rendered colors and update state. The FIRST read
+	// (e.g. opening the picker on an already-poor color) runs immediately.
+	// While a pointer is held down — most importantly dragging in the color
+	// picker, which changes the block's color on every pointer move — the read
+	// is deferred and then runs the instant the pointer is released. This keeps
+	// the contrast notice from flashing on and off mid-drag (which resizes the
+	// color popover and makes the picker handle jump), while still showing the
+	// result the moment the user settles on a color, with no timer-based delay.
+	const hasReadRef = useRef( false );
+	const isPointerDownRef = useRef( false );
+	const pendingReadRef = useRef( false );
+
+	const readColors = useCallback( () => {
+		if ( ! blockEl || ! blockType ) {
+			return;
+		}
+		setColors( getBlockElementColors( blockEl, blockType ) );
+	}, [ blockEl, blockType ] );
+
+	const scheduleRead = useCallback( () => {
+		if ( ! hasReadRef.current ) {
+			hasReadRef.current = true;
+			readColors();
+			return;
+		}
+		// A drag is in progress; hold off until the pointer is released.
+		if ( isPointerDownRef.current ) {
+			pendingReadRef.current = true;
+			return;
+		}
+		readColors();
+	}, [ readColors ] );
+
+	// Track whether a pointer is pressed anywhere (e.g. a color-picker drag),
+	// and flush any deferred read the instant it is released.
+	useEffect( () => {
+		const handlePointerDown = () => {
+			isPointerDownRef.current = true;
+		};
+		const handlePointerUp = () => {
+			isPointerDownRef.current = false;
+			if ( ! pendingReadRef.current ) {
+				return;
+			}
+			pendingReadRef.current = false;
+			// Let the final color commit to the DOM before reading it.
+			window.requestAnimationFrame( () => readColors() );
+		};
+		window.addEventListener( 'pointerdown', handlePointerDown, true );
+		window.addEventListener( 'pointerup', handlePointerUp, true );
+		window.addEventListener( 'pointercancel', handlePointerUp, true );
+		return () => {
+			window.removeEventListener(
+				'pointerdown',
+				handlePointerDown,
+				true
+			);
+			window.removeEventListener( 'pointerup', handlePointerUp, true );
+			window.removeEventListener(
+				'pointercancel',
+				handlePointerUp,
+				true
+			);
+		};
+	}, [ readColors ] );
+
+	// There are so many things that can change the color of a block, so we
+	// re-check on every render (deferred to after the current paint but before
+	// the next, via two rAFs).
 	useLayoutEffect( () => {
 		if ( ! enabled || ! blockEl || ! blockType ) {
 			return;
 		}
 
-		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
-		// after the current paint but before the next paint.
 		window.requestAnimationFrame( () =>
-			window.requestAnimationFrame( () =>
-				setColors( getBlockElementColors( blockEl, blockType ) )
-			)
+			window.requestAnimationFrame( () => scheduleRead() )
 		);
 	} );
 
-	// Runs in its own effect with dependencies so the observer is only
-	// recreated when the block element or block type changes.
+	// Watch the block element for the class/style changes a live edit makes.
+	// Recreated only when the block element or block type changes; on that
+	// change the next read is immediate again, while the observer's own
+	// mid-drag churn is deferred to pointer release through `scheduleRead`.
 	useLayoutEffect( () => {
 		if ( ! enabled || ! blockEl || ! blockType ) {
 			return;
 		}
 
-		const observer = new window.MutationObserver( () => {
-			setColors( getBlockElementColors( blockEl, blockType ) );
-		} );
+		hasReadRef.current = false;
+
+		const observer = new window.MutationObserver( () => scheduleRead() );
 
 		observer.observe( blockEl, {
 			attributes: true,
@@ -155,7 +226,7 @@ export default function useBlockColorContrastWarning( {
 		return () => {
 			observer.disconnect();
 		};
-	}, [ enabled, blockEl, blockType ] );
+	}, [ enabled, blockEl, blockType, scheduleRead ] );
 
 	const warning = enabled
 		? getContrastWarning( {
