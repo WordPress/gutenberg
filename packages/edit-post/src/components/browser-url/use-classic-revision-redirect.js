@@ -70,9 +70,13 @@ export default function useClassicRevisionRedirect() {
 					return;
 				}
 
-				window.location.href = addQueryArgs( 'revision.php', {
-					revision: currentRevisionId,
-				} );
+				// Replace the editor URL so Back does not reopen it and trigger
+				// the redirect again.
+				window.location.replace(
+					addQueryArgs( 'revision.php', {
+						revision: currentRevisionId,
+					} )
+				);
 			} );
 
 		return () => {
