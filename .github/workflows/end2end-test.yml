@@ -338,7 +338,7 @@ jobs:
 
     # Always runs, so it can be the required check while the shards above are path-filtered
     # away. `needs` must list every job that would otherwise still be running: the gate fails
-    # rather than pass a job it never judged.
+    # rather than pass a job it never evaluated.
     e2e-gate:
         timeout-minutes: 5
         name: End-to-End Tests Gate
@@ -355,10 +355,10 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # This job is still running while it judges the rest, so it exempts itself. The
+            # This job is still running while it evaluates the rest, so it exempts itself. The
             # other two run alongside it and are housekeeping, not test signal — and `Report
             # to GitHub` cannot write with a fork pull request's read-only token.
-            - name: Fail the job if any job in this run did not pass
+            - name: Fail if any required job did not pass
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: node .github/workflows/scripts/ci-gate.js --ignore 'End-to-End Tests Gate,Merge Artifacts,Report to GitHub'

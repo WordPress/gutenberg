@@ -12,7 +12,8 @@
  *
  * `--ignore` exempts a job, and must name the job running this script plus any
  * job still running alongside it; repeat the flag for a name containing a
- * comma. Anything else left unfinished fails the gate rather than pass unjudged.
+ * comma. Anything else left unfinished fails the gate rather than pass
+ * unevaluated.
  */
 
 const { parseArgs } = require( 'node:util' );
@@ -90,7 +91,7 @@ async function fetchJobs() {
 			return jobs;
 		}
 
-		// A short list would mean judging a run on only some of its jobs.
+		// A short list would mean evaluating a run on only some of its jobs.
 		if ( body.jobs.length === 0 ) {
 			throw new Error(
 				`Run ${ GITHUB_RUN_ID } listed ${ jobs.length } of its ${ body.total_count } jobs before running out of pages.`
@@ -100,12 +101,12 @@ async function fetchJobs() {
 }
 
 /**
- * Fetches the jobs this run has to be judged on, once none of them is still
+ * Fetches the jobs this run is evaluated on, once none of them is still
  * running.
  *
  * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs.
  */
-async function fetchJudgedJobs() {
+async function fetchEvaluatedJobs() {
 	for ( let attempt = 1; ; attempt++ ) {
 		const lastAttempt = attempt === ATTEMPTS;
 		let jobs;
@@ -139,7 +140,7 @@ async function fetchJudgedJobs() {
 
 			for ( const job of running ) {
 				console.log(
-					`::error::${ job.name } is still ${ job.status }, so it was never judged. Add it to this job's \`needs\`, or pass it as \`--ignore\`.`
+					`::error::${ job.name } is still ${ job.status }, so it was never evaluated. Add it to this job's \`needs\`, or pass it as \`--ignore\`.`
 				);
 			}
 			throw new Error( `${ running.length } job(s) had not finished.` );
@@ -164,7 +165,7 @@ async function main() {
 		);
 	}
 
-	const jobs = await fetchJudgedJobs();
+	const jobs = await fetchEvaluatedJobs();
 	const failed = jobs.filter(
 		( job ) => ! PASSING_CONCLUSIONS.includes( job.conclusion )
 	);
@@ -179,7 +180,7 @@ async function main() {
 	}
 
 	console.log(
-		`All ${ jobs.length } judged job(s) in run ${ GITHUB_RUN_ID } passed.`
+		`All ${ jobs.length } evaluated job(s) in run ${ GITHUB_RUN_ID } passed.`
 	);
 }
 
