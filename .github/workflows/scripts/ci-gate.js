@@ -23,7 +23,7 @@ const PASSING_CONCLUSIONS = [ 'success', 'skipped' ];
 const ATTEMPTS = 5;
 const RETRY_DELAY_MS = 10000;
 
-const { REPOSITORY, RUN_ID, GITHUB_TOKEN } = process.env;
+const { GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
 
 let ignoredJobs = [];
 
@@ -66,7 +66,7 @@ async function fetchJobs() {
 	const jobs = [];
 
 	for ( let page = 1; ; page++ ) {
-		const url = `https://api.github.com/repos/${ REPOSITORY }/actions/runs/${ RUN_ID }/jobs?per_page=100&page=${ page }`;
+		const url = `https://api.github.com/repos/${ GITHUB_REPOSITORY }/actions/runs/${ GITHUB_RUN_ID }/jobs?per_page=100&page=${ page }`;
 		const response = await fetch( url, {
 			headers: {
 				accept: 'application/vnd.github+json',
@@ -77,7 +77,7 @@ async function fetchJobs() {
 
 		if ( ! response.ok ) {
 			const error = new Error(
-				`Could not list the jobs of run ${ RUN_ID }: ${ response.status } ${ response.statusText }.`
+				`Could not list the jobs of run ${ GITHUB_RUN_ID }: ${ response.status } ${ response.statusText }.`
 			);
 			error.retryable = response.status >= 500 || response.status === 429;
 			throw error;
@@ -93,7 +93,7 @@ async function fetchJobs() {
 		// A short list would mean judging a run on only some of its jobs.
 		if ( body.jobs.length === 0 ) {
 			throw new Error(
-				`Run ${ RUN_ID } listed ${ jobs.length } of its ${ body.total_count } jobs before running out of pages.`
+				`Run ${ GITHUB_RUN_ID } listed ${ jobs.length } of its ${ body.total_count } jobs before running out of pages.`
 			);
 		}
 	}
@@ -133,7 +133,7 @@ async function fetchJudgedJobs() {
 			// This job is in its own run, so an empty list is not that run.
 			if ( jobs.length === 0 ) {
 				throw new Error(
-					`Run ${ RUN_ID } reported no jobs beyond the ignored ones.`
+					`Run ${ GITHUB_RUN_ID } reported no jobs beyond the ignored ones.`
 				);
 			}
 
@@ -150,9 +150,9 @@ async function fetchJudgedJobs() {
 }
 
 async function main() {
-	if ( ! REPOSITORY || ! RUN_ID || ! GITHUB_TOKEN ) {
+	if ( ! GITHUB_REPOSITORY || ! GITHUB_RUN_ID || ! GITHUB_TOKEN ) {
 		throw new Error(
-			'REPOSITORY, RUN_ID and GITHUB_TOKEN must all be set.'
+			'GITHUB_REPOSITORY, GITHUB_RUN_ID and GITHUB_TOKEN must all be set.'
 		);
 	}
 
@@ -179,7 +179,7 @@ async function main() {
 	}
 
 	console.log(
-		`All ${ jobs.length } judged job(s) in run ${ RUN_ID } passed.`
+		`All ${ jobs.length } judged job(s) in run ${ GITHUB_RUN_ID } passed.`
 	);
 }
 

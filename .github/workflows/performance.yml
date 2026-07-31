@@ -206,7 +206,5 @@ jobs:
             # This job is still running while it judges the rest, so it exempts itself.
             - name: Fail the job if any job in this run did not pass
               env:
-                  REPOSITORY: ${{ github.repository }}
-                  RUN_ID: ${{ github.run_id }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: node .github/workflows/scripts/ci-gate.js --ignore 'Performance Tests Gate'
