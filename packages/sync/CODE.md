@@ -119,9 +119,10 @@ Awareness provides ephemeral presence information (cursor positions, user identi
 
 ## Undo / redo
 
-The `SyncUndoManager` (`src/undo-manager.ts`) replaces the default WordPress undo manager when synced entities are in use. It wraps Yjs's built-in undo functionality.
+The `SyncUndoManager` (`src/undo-manager.ts`) coordinates undo history when synced entities are in use. It combines Yjs's built-in undo functionality with the default WordPress undo manager.
 
 -   **Lazy creation**: The undo manager is created when the first entity is loaded. If no entities are synced, the default WordPress undo manager is used.
 -   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked.
+-   **Fallback tracking**: Changes to entities that are not in the Yjs scope are delegated to the default WordPress undo manager.
+-   **Global ordering**: A source stack records whether each undo level belongs to Yjs or the fallback manager so interleaved edits are undone and redone chronologically.
 -   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks.
--   **Limitation**: Once created, the `SyncUndoManager` only tracks synced entities. Edits to non-synced entities are not included in the undo stack.

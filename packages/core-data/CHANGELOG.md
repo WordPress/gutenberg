@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Preserve undo and redo history for non-synced entities while real-time collaboration is active ([#80722](https://github.com/WordPress/gutenberg/issues/80722)).
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

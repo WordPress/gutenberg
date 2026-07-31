@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Preserve undo and redo history for non-synced entities while real-time collaboration is active ([#80722](https://github.com/WordPress/gutenberg/issues/80722)).
+
 ## 1.51.0 (2026-07-14)
 
 ## 1.50.0 (2026-07-01)
