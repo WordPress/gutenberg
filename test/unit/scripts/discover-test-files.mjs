@@ -1,7 +1,6 @@
 /**
  * Node dependencies
  */
-import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 /**
@@ -59,16 +58,6 @@ export function getVitestTests( rootDir, manifest ) {
 	);
 
 	return [
-		...new Set( [
-			...manifest.vitest.files,
-			...directoryTests,
-			...manifest.added.vitest,
-		] ),
+		...new Set( [ ...manifest.vitest.files, ...directoryTests ] ),
 	].sort();
-}
-
-export function hashTestFiles( testFiles ) {
-	return createHash( 'sha256' )
-		.update( [ ...testFiles ].sort().join( '\n' ) )
-		.digest( 'hex' );
 }

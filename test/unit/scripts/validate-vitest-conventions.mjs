@@ -16,6 +16,7 @@ import {
 	rmSync,
 	writeFileSync,
 } from 'node:fs';
+import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +28,7 @@ import { getVitestTests } from './discover-test-files.mjs';
 
 const traverse = traverseModule.default ?? traverseModule;
 const { sync: glob } = globPackage;
+const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -68,6 +70,17 @@ const vitestApiNames = new Set( [
 	'vi',
 ] );
 const violations = [];
+
+function resolvePackageBin( packageName ) {
+	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	const binPath =
+		typeof packageJson.bin === 'string'
+			? packageJson.bin
+			: Object.values( packageJson.bin )[ 0 ];
+
+	return path.resolve( path.dirname( packageJsonPath ), binPath );
+}
 
 function isCommonJsExport( node ) {
 	if ( node?.type !== 'MemberExpression' ) {
@@ -287,11 +300,7 @@ if ( typescriptTests.length ) {
 		);
 		writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
 		execFileSync(
-			path.join(
-				ROOT_DIR,
-				'node_modules/.bin',
-				process.platform === 'win32' ? 'tsc.cmd' : 'tsc'
-			),
+			resolvePackageBin( 'typescript' ),
 			[ '--project', configPath, '--pretty', 'false' ],
 			{ cwd: ROOT_DIR, stdio: 'inherit' }
 		);

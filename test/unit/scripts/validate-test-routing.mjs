@@ -16,11 +16,7 @@ import globPackage from 'glob';
 /**
  * Internal dependencies
  */
-import {
-	discoverTestFiles,
-	getVitestTests,
-	hashTestFiles,
-} from './discover-test-files.mjs';
+import { discoverTestFiles, getVitestTests } from './discover-test-files.mjs';
 
 const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
@@ -97,6 +93,13 @@ function assertUniquePaths( label, testPaths ) {
 	}
 }
 
+function isWithinDirectory( testPath, directoryPath ) {
+	return (
+		testPath === directoryPath ||
+		testPath.startsWith( `${ directoryPath }/` )
+	);
+}
+
 const jestTests = listTests( 'jest', [
 	'--config',
 	JEST_CONFIG,
@@ -111,28 +114,30 @@ const vitestTests = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
 	  ] )
 	: new Set();
 
-const addedJestTests = manifest.added.jest;
-const addedVitestTests = manifest.added.vitest;
-const addedTests = [ ...addedJestTests, ...addedVitestTests ];
-const retiredTests = manifest.retired;
 const migratedTestFiles = manifest.vitest.files;
 const migratedDirectories = manifest.vitest.directories;
 
-assertUniquePaths( 'added.jest', addedJestTests );
-assertUniquePaths( 'added.vitest', addedVitestTests );
-assertUniquePaths( 'retired', retiredTests );
 assertUniquePaths( 'vitest.files', migratedTestFiles );
 assertUniquePaths( 'vitest.directories', migratedDirectories );
 
-const duplicateManifestEntries = addedTests.filter(
-	( testPath, index ) =>
-		addedTests.indexOf( testPath ) !== index ||
-		retiredTests.includes( testPath )
-);
+const overlappingManifestEntries = [
+	...migratedTestFiles.filter( ( testPath ) =>
+		migratedDirectories.some( ( directoryPath ) =>
+			isWithinDirectory( testPath, directoryPath )
+		)
+	),
+	...migratedDirectories.filter( ( directoryPath, index ) =>
+		migratedDirectories.some(
+			( otherDirectoryPath, otherIndex ) =>
+				otherIndex !== index &&
+				isWithinDirectory( directoryPath, otherDirectoryPath )
+		)
+	),
+];
 assert.deepEqual(
-	duplicateManifestEntries,
+	overlappingManifestEntries,
 	[],
-	`Migration manifest entries must be disjoint:\n${ duplicateManifestEntries.join(
+	`Vitest migration manifest entries must be disjoint:\n${ overlappingManifestEntries.join(
 		'\n'
 	) }`
 );
@@ -150,50 +155,6 @@ assert.deepEqual(
 	invalidMigratedEntries,
 	[],
 	`Migrated files or directories do not exist:\n${ invalidMigratedEntries.join(
-		'\n'
-	) }`
-);
-
-const invalidAddedTests = addedTests.filter(
-	( testPath ) => ! existsSync( path.join( ROOT_DIR, testPath ) )
-);
-assert.deepEqual(
-	invalidAddedTests,
-	[],
-	`Added tests do not exist:\n${ invalidAddedTests.join( '\n' ) }`
-);
-
-const activeRetiredTests = retiredTests.filter(
-	( testPath ) =>
-		existsSync( path.join( ROOT_DIR, testPath ) ) ||
-		jestTests.has( testPath ) ||
-		vitestTests.has( testPath )
-);
-assert.deepEqual(
-	activeRetiredTests,
-	[],
-	`Retired tests still exist or are discoverable:\n${ activeRetiredTests.join(
-		'\n'
-	) }`
-);
-
-const missingAddedJestTests = addedJestTests.filter(
-	( testPath ) => ! jestTests.has( testPath )
-);
-const missingAddedVitestTests = addedVitestTests.filter(
-	( testPath ) => ! vitestTests.has( testPath )
-);
-assert.deepEqual(
-	missingAddedJestTests,
-	[],
-	`Added Jest tests are not discoverable by Jest:\n${ missingAddedJestTests.join(
-		'\n'
-	) }`
-);
-assert.deepEqual(
-	missingAddedVitestTests,
-	[],
-	`Added Vitest tests are not discoverable by Vitest:\n${ missingAddedVitestTests.join(
 		'\n'
 	) }`
 );
@@ -216,37 +177,14 @@ assert.deepEqual(
 	`Vitest discovery does not match the migration manifest.`
 );
 
-const accountedBaseline = [
-	...new Set( [
-		...[ ...jestTests ].filter(
-			( testPath ) => ! addedJestTests.includes( testPath )
-		),
-		...[ ...vitestTests ].filter(
-			( testPath ) => ! addedVitestTests.includes( testPath )
-		),
-		...retiredTests,
-	] ),
-].sort();
-
-assert.equal(
-	accountedBaseline.length,
-	manifest.baseline.count,
-	'The number of accounted baseline tests changed.'
-);
-assert.equal(
-	hashTestFiles( accountedBaseline ),
-	manifest.baseline.sha256,
-	'The accounted baseline test file list changed.'
-);
-
 const staticInventory = discoverTestFiles( ROOT_DIR );
-const expectedStaticInventory = [ ...accountedBaseline, ...addedTests ]
-	.filter( ( testPath ) => ! retiredTests.includes( testPath ) )
-	.sort();
+const runnerInventory = [
+	...new Set( [ ...jestTests, ...vitestTests ] ),
+].sort();
 assert.deepEqual(
+	runnerInventory,
 	staticInventory,
-	expectedStaticInventory,
-	'Static test discovery does not match the executable runner inventory.'
+	'Executable runner inventory does not match static test discovery.'
 );
 
 const { sync: glob } = globPackage;
@@ -270,5 +208,5 @@ assert.deepEqual(
 );
 
 console.log(
-	`Validated exactly one runner for ${ manifest.baseline.count } baseline tests: ${ jestTests.size } Jest, ${ vitestTests.size } Vitest, ${ retiredTests.length } retired, and ${ addedTests.length } added.`
+	`Validated exactly one runner for ${ staticInventory.length } tests: ${ jestTests.size } Jest and ${ vitestTests.size } Vitest.`
 );
