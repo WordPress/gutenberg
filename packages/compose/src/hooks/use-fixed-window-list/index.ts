@@ -13,7 +13,7 @@ import { debounce } from '../../utils/debounce';
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
 interface FixedWindowList {
-	/** Items visible in the current viewport */
+	/** Items visible in the viewport, as of the last rendered window */
 	visibleItems: number;
 	/** Start index of the window */
 	start: number;
@@ -69,6 +69,10 @@ export default function useFixedWindowList(
 	// re-render. Only the rendered window does that.
 	const visibleItemsRef = useRef( initWindowSize );
 
+	// The measuring effect re-runs whenever the list changes, so `initRender`
+	// alone can't tell the very first measurement from later ones.
+	const isFirstMeasurementRef = useRef( true );
+
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {
 			return;
@@ -88,6 +92,8 @@ export default function useFixedWindowList(
 				scrollContainer.clientHeight / itemHeight
 			);
 			visibleItemsRef.current = visibleItems;
+			const isFirstMeasurement = isFirstMeasurementRef.current;
+			isFirstMeasurementRef.current = false;
 			// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 			const windowOverscan = initRender
 				? visibleItems
@@ -106,7 +112,7 @@ export default function useFixedWindowList(
 				// add, and re-rendering would only force a second style
 				// recalculation before the list is first painted.
 				if (
-					initRender &&
+					isFirstMeasurement &&
 					lastWindow.start <= firstViewableIndex &&
 					lastWindow.end >= firstViewableIndex + visibleItems
 				) {
@@ -136,10 +142,6 @@ export default function useFixedWindowList(
 			measureWindow();
 		}, 16 );
 		scrollContainer?.addEventListener( 'scroll', debounceMeasureList );
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'resize',
-			debounceMeasureList
-		);
 		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
 			'resize',
 			debounceMeasureList

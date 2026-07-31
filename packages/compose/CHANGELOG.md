@@ -6,6 +6,10 @@
 
 -   `useFixedWindowList`: Skip the re-render triggered by the initial measurement when the already rendered window covers the visible items. This avoids a second style recalculation before the list is first painted ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
 
+### Bug Fixes
+
+-   `useFixedWindowList`: Remove a duplicate `resize` listener registration ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
+
 ## 8.4.0 (2026-07-14)
 
 ### Enhancements
