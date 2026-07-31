@@ -61,24 +61,32 @@
 
 .entities-saved-states__changes {
 	font-size: $default-font-size;
-	margin: $grid-unit-05 $grid-unit-20 0 $grid-unit-30;
-	list-style: disc;
+	margin: $grid-unit-05 $grid-unit-20 0 $grid-unit-20;
+	list-style: none;
 
 	li {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: $grid-unit-05;
 		margin-bottom: $grid-unit-05;
+
+		// The bullet is drawn as a flex item so that it shares one centered
+		// axis with the change text and its state badges.
+		&::before {
+			content: "";
+			flex: 0 0 auto;
+			width: 4px;
+			height: 4px;
+			margin-right: $grid-unit-05;
+			border-radius: 50%;
+			background-color: currentColor;
+		}
 	}
 }
 
-.entities-saved-states__change-item {
-	display: inline-flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: $grid-unit-05;
-	vertical-align: middle;
-}
-
 .entities-saved-states__change-states {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
 	gap: $grid-unit-05;

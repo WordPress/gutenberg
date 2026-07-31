@@ -11,6 +11,7 @@ export { mergeGlobalStyles } from './core/merge';
 export {
 	default as getGlobalStylesChanges,
 	getGlobalStylesChangeGroups,
+	getGlobalStylesChangeGroupSummary,
 } from './utils/get-global-styles-changes';
 export type {
 	GlobalStylesChangeGroup,

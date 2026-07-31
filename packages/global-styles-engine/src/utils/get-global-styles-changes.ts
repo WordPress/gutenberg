@@ -30,6 +30,8 @@ type ChangeEntry = {
 	group: string;
 	label: string;
 	stateKeys: string[];
+	// Whether the same block or element also changed in the default state.
+	hasDefaultState: boolean;
 };
 
 const globalStylesChangesCache = new Map< string, ChangeEntry[] >();
@@ -67,6 +69,7 @@ const styleStateLabelMap: TranslationMap = {
 	':active': __( 'Active' ),
 };
 const styleStateOrder = Object.keys( styleStateLabelMap );
+const defaultStateLabel = __( 'Default' );
 
 /**
  * Whether a theme.json key represents a style state (viewport or pseudo).
@@ -157,12 +160,12 @@ const isObject = ( obj: any ): obj is Record< string, any > =>
  * @return A translated label or undefined if no translation exists.
  */
 function getBaseLabel( key: string ): string | undefined {
-	const keyArray = key.split( '.' );
-	const twoPartKey = keyArray.slice( 0, 2 ).join( '.' );
-
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
+
+	const keyArray = key.split( '.' );
+	const twoPartKey = keyArray.slice( 0, 2 ).join( '.' );
 
 	if ( translationMap[ twoPartKey ] ) {
 		return translationMap[ twoPartKey ];
@@ -296,9 +299,11 @@ export function getGlobalStylesChangelist(
 			continue;
 		}
 
-		const group = path.split( '.' )[ 0 ];
+		const pathParts = path.split( '.' );
+		const group = pathParts[ 0 ]!;
 		const itemKey = `${ group }\0${ label }`;
-		const stateKeys = path.split( '.' ).slice( 2 ).filter( isStyleStateKey );
+		const stateKeys = pathParts.slice( 2 ).filter( isStyleStateKey );
+		const isDefaultState = ! stateKeys.length;
 		const existing = itemsByKey.get( itemKey );
 
 		if ( existing ) {
@@ -306,6 +311,8 @@ export function getGlobalStylesChangelist(
 				...existing.stateKeys,
 				...stateKeys,
 			] );
+			existing.hasDefaultState =
+				existing.hasDefaultState || isDefaultState;
 			continue;
 		}
 
@@ -313,6 +320,7 @@ export function getGlobalStylesChangelist(
 			group,
 			label,
 			stateKeys: sortStyleStateKeys( stateKeys ),
+			hasDefaultState: isDefaultState,
 		} );
 	}
 
@@ -351,9 +359,20 @@ export function getGlobalStylesChangeGroups(
 	const groupIndexByName = new Map< string, number >();
 
 	for ( const entry of changeList ) {
+		const states = getStyleStateLabels( entry.stateKeys );
+
+		/*
+		 * A block or element edited in both the default state and a viewport or
+		 * pseudo state needs the default state spelled out, otherwise its
+		 * default-state changes would read as viewport-only changes.
+		 */
+		if ( states.length && entry.hasDefaultState ) {
+			states.unshift( defaultStateLabel );
+		}
+
 		const item: GlobalStylesChangeItem = {
 			label: entry.label,
-			states: getStyleStateLabels( entry.stateKeys ),
+			states,
 		};
 		const existingIndex = groupIndexByName.get( entry.group );
 
@@ -394,6 +413,60 @@ function formatChangeItemLabel( item: GlobalStylesChangeItem ): string {
 }
 
 /**
+ * Returns the translated summary sentence for a group of changes.
+ * UIs that render the change names themselves, for example as elements with
+ * state badges, can pass a placeholder as `names` and interpolate it.
+ *
+ * @param group Change group: 'blocks', 'elements', 'settings' or 'styles'.
+ * @param names The group's change names, already joined into a single string.
+ * @param count Number of change names, used to pluralize the sentence.
+ * @return The translated sentence for the group.
+ */
+export function getGlobalStylesChangeGroupSummary(
+	group: string,
+	names: string,
+	count: number
+): string {
+	switch ( group ) {
+		case 'blocks': {
+			return sprintf(
+				// translators: %s: a list of block names separated by a comma.
+				_n( '%s block.', '%s blocks.', count ),
+				names
+			);
+		}
+		case 'elements': {
+			return sprintf(
+				// translators: %s: a list of element names separated by a comma.
+				_n( '%s element.', '%s elements.', count ),
+				names
+			);
+		}
+		case 'settings': {
+			return sprintf(
+				// translators: %s: a list of theme.json setting labels separated by a comma.
+				__( '%s settings.' ),
+				names
+			);
+		}
+		case 'styles': {
+			return sprintf(
+				// translators: %s: a list of theme.json top-level styles labels separated by a comma.
+				__( '%s styles.' ),
+				names
+			);
+		}
+		default: {
+			return sprintf(
+				// translators: %s: a list of global styles changes separated by a comma.
+				__( '%s.' ),
+				names
+			);
+		}
+	}
+}
+
+/**
  * From a getGlobalStylesChangelist() result, returns an array of translated global styles changes, grouped by type.
  * The types are 'blocks', 'elements', 'settings', and 'styles'.
  * Each block/element is listed once; non-default states are appended in parentheses for plain text.
@@ -416,48 +489,14 @@ export default function getGlobalStylesChanges(
 
 	return groups.map( ( { group, items } ) => {
 		const changeValues = items.map( formatChangeItemLabel );
-		const changeValuesLength = changeValues.length;
-		const joinedChangesValue = changeValues.join(
-			/* translators: Used between list items, there is a space after the comma. */
-			__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
-		);
 
-		switch ( group ) {
-			case 'blocks': {
-				return sprintf(
-					// translators: %s: a list of block names separated by a comma.
-					_n( '%s block.', '%s blocks.', changeValuesLength ),
-					joinedChangesValue
-				);
-			}
-			case 'elements': {
-				return sprintf(
-					// translators: %s: a list of element names separated by a comma.
-					_n( '%s element.', '%s elements.', changeValuesLength ),
-					joinedChangesValue
-				);
-			}
-			case 'settings': {
-				return sprintf(
-					// translators: %s: a list of theme.json setting labels separated by a comma.
-					__( '%s settings.' ),
-					joinedChangesValue
-				);
-			}
-			case 'styles': {
-				return sprintf(
-					// translators: %s: a list of theme.json top-level styles labels separated by a comma.
-					__( '%s styles.' ),
-					joinedChangesValue
-				);
-			}
-			default: {
-				return sprintf(
-					// translators: %s: a list of global styles changes separated by a comma.
-					__( '%s.' ),
-					joinedChangesValue
-				);
-			}
-		}
+		return getGlobalStylesChangeGroupSummary(
+			group,
+			changeValues.join(
+				/* translators: Used between list items, there is a space after the comma. */
+				__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			),
+			changeValues.length
+		);
 	} );
 }
