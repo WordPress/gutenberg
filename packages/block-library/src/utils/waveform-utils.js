@@ -618,6 +618,25 @@ export function initWaveformPlayer(
 	container.addEventListener( 'waveformplayer:ready', handlers.ready );
 	container.addEventListener( 'waveformplayer:ended', handlers.ended );
 
+	// Use the library's onLoad callback to automatically switch waveformStyle
+	// to 'seekbar' if waveform analysis fails and falls back to a placeholder waveform.
+	const originalWaveformStyle = waveformStyle;
+	instance.options.onLoad = ( player ) => {
+		const isPlaceholder = container.classList.contains(
+			'waveform-is-placeholder'
+		);
+		if ( isPlaceholder ) {
+			if ( player.options.waveformStyle !== 'seekbar' ) {
+				player.options.waveformStyle = 'seekbar';
+				player.drawWaveform();
+			}
+		} else if ( player.options.waveformStyle !== originalWaveformStyle ) {
+			// Found a functional waveform track, restore the original style.
+			player.options.waveformStyle = originalWaveformStyle;
+			player.drawWaveform();
+		}
+	};
+
 	// Return instance, container, and cleanup function.
 	return {
 		instance,
