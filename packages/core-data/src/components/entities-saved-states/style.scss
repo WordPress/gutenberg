@@ -68,3 +68,23 @@
 		margin-bottom: $grid-unit-05;
 	}
 }
+
+.entities-saved-states__change-item {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+	vertical-align: middle;
+}
+
+.entities-saved-states__change-states {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+}
+
+.entities-saved-states__change-state {
+	// Match the compact state badges used in Global Styles.
+	font-size: $font-size-x-small;
+}

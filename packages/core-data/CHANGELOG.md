@@ -7,6 +7,10 @@
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
 
+### Enhancements
+
+-   Show Global Styles viewport/pseudo state badges (e.g. Mobile, Tablet) beside each changed block or element name in the save confirmation panel ([#80836](https://github.com/WordPress/gutenberg/issues/80836)).
+
 ## 7.51.0 (2026-07-14)
 
 ### Enhancements

@@ -3,6 +3,7 @@
  */
 import getGlobalStylesChanges, {
 	getGlobalStylesChangelist,
+	getGlobalStylesChangeGroups,
 } from '../utils/get-global-styles-changes';
 
 /**
@@ -200,6 +201,20 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			title: 'Test pumpkin flowers',
 			edit: () => {},
 		} );
+		registerBlockType( 'core/test-title', {
+			apiVersion: 3,
+			save: () => {},
+			category: 'text',
+			title: 'Title',
+			edit: () => {},
+		} );
+		registerBlockType( 'core/test-button', {
+			apiVersion: 3,
+			save: () => {},
+			category: 'text',
+			title: 'Button',
+			edit: () => {},
+		} );
 	} );
 
 	afterEach( () => {
@@ -264,6 +279,161 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			);
 			expect( result ).toEqual( [] );
 		} );
+
+		it( 'includes viewport state in block change labels', () => {
+			const result = getGlobalStylesChanges(
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {
+								'@mobile': {
+									color: {
+										text: '#111111',
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {},
+						},
+					},
+				}
+			);
+
+			expect( result ).toEqual( [ 'Title (Mobile) block.' ] );
+		} );
+
+		it( 'lists a block once with all changed viewport states', () => {
+			const result = getGlobalStylesChanges(
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {
+								color: {
+									text: '#000000',
+								},
+								'@mobile': {
+									typography: {
+										fontSize: '1rem',
+									},
+								},
+								'@tablet': {
+									color: {
+										text: '#222222',
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {},
+						},
+					},
+				}
+			);
+
+			expect( result ).toEqual( [
+				'Title (Tablet, Mobile) block.',
+			] );
+		} );
+
+		it( 'includes combined viewport and pseudo state labels', () => {
+			const result = getGlobalStylesChanges(
+				{
+					styles: {
+						blocks: {
+							'core/test-button': {
+								'@mobile': {
+									':hover': {
+										color: {
+											text: '#333333',
+										},
+									},
+								},
+							},
+						},
+						elements: {
+							link: {
+								':hover': {
+									color: {
+										text: '#444444',
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					styles: {
+						blocks: {
+							'core/test-button': {},
+						},
+						elements: {
+							link: {},
+						},
+					},
+				}
+			);
+
+			expect( result ).toEqual( [
+				'Button (Mobile, Hover) block.',
+				'Link (Hover) element.',
+			] );
+		} );
+	} );
+
+	describe( 'getGlobalStylesChangeGroups()', () => {
+		it( 'groups a block once with separate state labels for badges', () => {
+			const result = getGlobalStylesChangeGroups(
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {
+								color: {
+									text: '#000000',
+								},
+								'@mobile': {
+									typography: {
+										fontSize: '1rem',
+									},
+								},
+								'@tablet': {
+									color: {
+										text: '#222222',
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					styles: {
+						blocks: {
+							'core/test-title': {},
+						},
+					},
+				}
+			);
+
+			expect( result ).toEqual( [
+				{
+					group: 'blocks',
+					items: [
+						{
+							label: 'Title',
+							states: [ 'Tablet', 'Mobile' ],
+						},
+					],
+				},
+			] );
+		} );
 	} );
 
 	describe( 'getGlobalStylesChangelist()', () => {
@@ -271,16 +441,20 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			const resultA = getGlobalStylesChangelist( next, previous );
 
 			expect( resultA ).toEqual( [
-				[ 'styles', 'Background' ],
-				[ 'styles', 'Colors' ],
-				[ 'styles', 'Typography' ],
-				[ 'blocks', 'Test pumpkin flowers' ],
-				[ 'elements', 'H3' ],
-				[ 'elements', 'Caption' ],
-				[ 'elements', 'H6' ],
-				[ 'elements', 'Link' ],
-				[ 'settings', 'Color' ],
-				[ 'settings', 'Typography' ],
+				{ group: 'styles', label: 'Background', stateKeys: [] },
+				{ group: 'styles', label: 'Colors', stateKeys: [] },
+				{ group: 'styles', label: 'Typography', stateKeys: [] },
+				{
+					group: 'blocks',
+					label: 'Test pumpkin flowers',
+					stateKeys: [],
+				},
+				{ group: 'elements', label: 'H3', stateKeys: [] },
+				{ group: 'elements', label: 'Caption', stateKeys: [] },
+				{ group: 'elements', label: 'H6', stateKeys: [] },
+				{ group: 'elements', label: 'Link', stateKeys: [] },
+				{ group: 'settings', label: 'Color', stateKeys: [] },
+				{ group: 'settings', label: 'Typography', stateKeys: [] },
 			] );
 
 			const resultB = getGlobalStylesChangelist( next, previous );
