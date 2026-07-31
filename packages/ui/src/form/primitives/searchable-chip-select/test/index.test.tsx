@@ -99,13 +99,23 @@ describe( 'SearchableChipSelect', () => {
 			label: 'Create new item',
 		};
 
-		it( 'renders the creatable item in the list footer, not in the main list', async () => {
+		it( 'renders the creatable item in the list footer when included in items', async () => {
 			const user = userEvent.setup();
 
 			render(
 				<SearchableChipSelect
-					items={ ITEMS }
+					items={ [ ...ITEMS, creatableItem ] }
 					creatableItem={ creatableItem }
+					children={ ( item: ( typeof ITEMS )[ 0 ] ) =>
+						item.value !== creatableItem.value && (
+							<SearchableChipSelect.Item
+								key={ item.value }
+								value={ item }
+							>
+								{ item.label }
+							</SearchableChipSelect.Item>
+						)
+					}
 				/>
 			);
 
@@ -118,6 +128,76 @@ describe( 'SearchableChipSelect', () => {
 			expect(
 				screen.getAllByRole( 'option', { name: 'Create new item' } )
 			).toHaveLength( 1 );
+		} );
+
+		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
+			const user = userEvent.setup();
+			const onValueChange = jest.fn();
+			const groupedCreatableItem = {
+				value: 'create',
+				label: 'Create new item: zzzzz',
+			};
+			const items = [
+				...GROUPED_ITEMS,
+				{ label: '', items: [ groupedCreatableItem ] },
+			];
+
+			render(
+				<SearchableChipSelect
+					items={ items }
+					creatableItem={ groupedCreatableItem }
+					inputValue="zzzzz"
+					onValueChange={ onValueChange }
+					children={ ( group: FixtureGroup ) => {
+						if (
+							group.items[ 0 ]?.value ===
+							groupedCreatableItem.value
+						) {
+							return null;
+						}
+
+						return (
+							<SearchableChipSelect.Group
+								key={ group.label }
+								items={ group.items }
+							>
+								<SearchableChipSelect.GroupLabel>
+									{ group.label }
+								</SearchableChipSelect.GroupLabel>
+								<SearchableChipSelect.Collection>
+									{ ( item: FixtureItem ) => (
+										<SearchableChipSelect.Item
+											key={ item.value }
+											value={ item }
+										>
+											{ item.label }
+										</SearchableChipSelect.Item>
+									) }
+								</SearchableChipSelect.Collection>
+							</SearchableChipSelect.Group>
+						);
+					} }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', {
+						name: 'Create new item: zzzzz',
+					} )
+				).toBeVisible();
+			} );
+
+			await user.keyboard( '{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					expect.objectContaining( { value: 'create' } ),
+				] ),
+				expect.anything()
+			);
 		} );
 	} );
 } );

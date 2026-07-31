@@ -44,11 +44,9 @@ export const Default: Story = {
 };
 
 /**
- * The `creatableItem` prop is used to add some kind of "Create new item"
- * action item to the footer of the list.
- *
- * In the `onValueChange` function, add some logic to handle the creation of a new item
- * whenever the `creatableItem` is selected.
+ * The `creatableItem` prop renders a creatable action in the list footer.
+ * The same item must also be included in `items`, excluded from the main
+ * list via `children`, and handled in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
@@ -69,6 +67,7 @@ export const Creatable: Story = {
 		return (
 			<SearchableChipSelect
 				{ ...args }
+				items={ [ ...ITEMS, creatableItem ] }
 				creatableItem={ creatableItem }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
@@ -85,6 +84,16 @@ export const Creatable: Story = {
 					}
 					args.onValueChange?.( values, event );
 				} }
+				children={ ( item: ( typeof ITEMS )[ 0 ] ) =>
+					item.value !== creatableItem.value && (
+						<SearchableChipSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableChipSelect.Item>
+					)
+				}
 			/>
 		);
 	},
@@ -163,6 +172,79 @@ export const Grouped: Story = {
 				</SearchableChipSelect.Collection>
 			</SearchableChipSelect.Group>
 		),
+	},
+};
+
+/**
+ * Grouped items with a creatable footer item. Include the creatable item in
+ * `items` as a group, exclude it from the main list in `children`, and handle
+ * creation in `onValueChange`.
+ */
+export const GroupedCreatable: Story = {
+	render: function Template( args ) {
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ value, setValue ] = useState< FixtureItem[] >( [
+			GROUPED_ITEMS[ 0 ].items[ 0 ],
+			GROUPED_ITEMS[ 1 ].items[ 0 ],
+		] );
+		const creatableItem = {
+			value: 'create',
+			label:
+				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+		};
+		const items = [
+			...GROUPED_ITEMS,
+			{ label: '', items: [ creatableItem ] },
+		];
+
+		return (
+			<SearchableChipSelect
+				{ ...args }
+				items={ items }
+				creatableItem={ creatableItem }
+				inputValue={ inputValue }
+				onInputValueChange={ setInputValue }
+				value={ value }
+				onValueChange={ ( values: FixtureItem[], event ) => {
+					if ( values.some( ( item ) => item.value === 'create' ) ) {
+						// eslint-disable-next-line no-alert
+						alert( `Create new item: '${ inputValue }'` );
+						setValue(
+							values.filter( ( item ) => item.value !== 'create' )
+						);
+					} else {
+						setValue( values );
+					}
+					args.onValueChange?.( values, event );
+				} }
+				children={ ( group: FixtureGroup ) => {
+					if ( group.items[ 0 ]?.value === creatableItem.value ) {
+						return null;
+					}
+
+					return (
+						<SearchableChipSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableChipSelect.GroupLabel>
+								{ group.label }
+							</SearchableChipSelect.GroupLabel>
+							<SearchableChipSelect.Collection>
+								{ ( item: FixtureItem ) => (
+									<SearchableChipSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableChipSelect.Item>
+								) }
+							</SearchableChipSelect.Collection>
+						</SearchableChipSelect.Group>
+					);
+				} }
+			/>
+		);
 	},
 };
 

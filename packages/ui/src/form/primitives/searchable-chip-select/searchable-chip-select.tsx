@@ -7,7 +7,8 @@ import focusStyles from '../../../utils/css/focus.module.css';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
 import styles from './style.module.css';
-import type { Item, SearchableChipSelectProps } from './types';
+import type { Item, ItemGroup, SearchableChipSelectProps } from './types';
+import { isItem } from './types';
 
 /**
  * A searchable multi-selection component with chips, with support for
@@ -36,9 +37,7 @@ export const SearchableChipSelect = forwardRef<
 ) {
 	return (
 		<Combobox.Root
-			items={
-				! creatableItem ? items : [ ...( items ?? [] ), creatableItem ]
-			}
+			items={ items }
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
@@ -115,8 +114,8 @@ export const SearchableChipSelect = forwardRef<
 					<Combobox.ListBody>
 						<Combobox.Collection>
 							{ children ??
-								( ( item: Item ) => {
-									if ( item.value === creatableItem?.value ) {
+								( ( item: Item | ItemGroup ) => {
+									if ( ! isItem( item ) ) {
 										return null;
 									}
 									return (

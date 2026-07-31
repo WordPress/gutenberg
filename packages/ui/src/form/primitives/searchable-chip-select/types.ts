@@ -17,6 +17,14 @@ export type ItemGroup = {
 	items: Item[];
 };
 
+export function isItemGroup( item: Item | ItemGroup ): item is ItemGroup {
+	return 'items' in item;
+}
+
+export function isItem( item: Item | ItemGroup ): item is Item {
+	return ! isItemGroup( item );
+}
+
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
 	'children' | 'items' | 'multiple'
@@ -37,7 +45,10 @@ export type SearchableChipSelectProps = Omit<
 		 */
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
-		 * The item that triggers the creation of a new item.
+		 * Renders a creatable action in the list footer. The same item must
+		 * also be included in `items` (as a flat item, or inside a group for
+		 * grouped lists) so keyboard navigation works. Exclude it from the
+		 * main list via `children`, and handle selection in `onValueChange`.
 		 */
 		creatableItem?: Item;
 		/**
