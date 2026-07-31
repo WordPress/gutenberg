@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { group, row, stack, grid } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
@@ -12,6 +12,7 @@ import { _x } from '@wordpress/i18n';
  */
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 
 const layouts = {
 	group: { type: 'constrained' },
@@ -42,10 +43,7 @@ function BlockGroupToolbar() {
 	);
 
 	const onConvertToGroup = ( layout ) => {
-		const newBlocks = switchToBlockType(
-			blocksSelection,
-			groupingBlockName
-		);
+		const newBlocks = groupBlocks( blocksSelection, groupingBlockName );
 
 		if ( typeof layout !== 'string' ) {
 			layout = 'group';
