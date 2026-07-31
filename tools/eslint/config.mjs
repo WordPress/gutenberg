@@ -136,6 +136,18 @@ const useIsomorphicLayoutEffectRestrictedImport = {
 		'Use `useIsomorphicLayoutEffect` from `@wordpress/compose` instead. It keeps layout effect behavior in the browser while avoiding SSR warnings.',
 };
 
+// Bundled packages are compiled into whichever script imports them instead of
+// being registered as a WordPress script, so gettext calls made in them are
+// attributed to the handle of the consuming bundle and never get translations
+// loaded. Their strings belong in a companion message catalog package, which
+// does have a handle of its own. `isRTL` and `sprintf` are not gettext calls and
+// stay allowed.
+const gettextRestrictedImport = ( catalog ) => ( {
+	name: '@wordpress/i18n',
+	importNames: [ '__', '_x', '_n', '_nx' ],
+	message: `A bundled package cannot ship translatable strings, because WordPress has no script handle to load its translations for. Add the string to ${ catalog } and call it from there instead.`,
+} );
+
 // Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
 // which occur across multiple override configs. The exclusion here allows
 // Base UI to be imported directly in `@wordpress/ui`, which is the intended
@@ -146,6 +158,7 @@ const UI_RESTRICTED_IMPORTS = {
 			( { name } ) => name !== '@base-ui/react'
 		),
 		useIsomorphicLayoutEffectRestrictedImport,
+		gettextRestrictedImport( '@wordpress/ui-i18n' ),
 	],
 	patterns: [],
 };
@@ -748,6 +761,24 @@ export default dedupePlugins( [
 		files: [ 'packages/ui/src/**' ],
 		rules: {
 			'no-restricted-imports': [ 'error', UI_RESTRICTED_IMPORTS ],
+		},
+	},
+
+	// Override: DataViews src — strings belong in the message catalog. Stories
+	// are demo code that ships nowhere, so they are exempt.
+	{
+		files: [ 'packages/dataviews/src/**' ],
+		ignores: [ '**/@(test|stories)/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						gettextRestrictedImport( '@wordpress/dataviews-i18n' ),
+					],
+				},
+			],
 		},
 	},
 
