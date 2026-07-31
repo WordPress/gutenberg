@@ -9,7 +9,7 @@ import {
 import { createRequire, isBuiltin } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { globSync } from 'glob';
+import fastGlob from 'fast-glob';
 import typescript from 'typescript';
 import {
 	discoverTestFiles,
@@ -28,6 +28,7 @@ import {
 	validateVitestPolicyExceptions,
 } from './vitest-policy-rules.mjs';
 
+const { sync: glob } = fastGlob;
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -46,13 +47,13 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
+	...glob( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
 		cwd: ROOT_DIR,
-		nodir: true,
+		onlyFiles: true,
 	} ),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...glob( 'test/unit/scripts/*.mjs', {
 		cwd: ROOT_DIR,
-		nodir: true,
+		onlyFiles: true,
 	} ),
 ];
 const files = [
