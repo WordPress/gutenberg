@@ -27,7 +27,12 @@ const EMPTY_OBJECT = {};
  */
 export function getUndoManager( state: State ) {
 	// undoManager is undefined until the first sync-enabled entity is loaded.
-	return getSyncManager()?.undoManager ?? state.undoManager;
+	const syncUndoManager = getSyncManager()?.undoManager;
+	if ( syncUndoManager ) {
+		syncUndoManager.setFallbackUndoManager( state.undoManager );
+		return syncUndoManager;
+	}
+	return state.undoManager;
 }
 
 /**

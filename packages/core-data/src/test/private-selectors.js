@@ -19,6 +19,7 @@ describe( 'getUndoManager', () => {
 			hasRedo: jest.fn(),
 			hasUndo: jest.fn(),
 			redo: jest.fn(),
+			setFallbackUndoManager: jest.fn(),
 			undo: jest.fn(),
 		};
 		const fallbackUndoManager = {
@@ -41,6 +42,9 @@ describe( 'getUndoManager', () => {
 		};
 
 		expect( getUndoManager( state ) ).toBe( syncUndoManager );
+		expect( syncUndoManager.setFallbackUndoManager ).toHaveBeenCalledWith(
+			fallbackUndoManager
+		);
 	} );
 
 	it( 'returns the default undo manager when there is no sync undo manager', () => {
