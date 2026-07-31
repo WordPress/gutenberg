@@ -16,6 +16,10 @@
 -   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
 -   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
 
+### Internal
+
+-   Replace the abandoned `esbuild-plugin-babel` dependency with an equivalent inline esbuild plugin backed by a direct `@babel/core` dependency ([#81033](https://github.com/WordPress/gutenberg/pull/81033)).
+
 ## 0.19.0 (2026-07-14)
 
 ### Enhancements
