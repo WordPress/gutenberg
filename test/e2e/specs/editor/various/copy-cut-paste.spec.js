@@ -865,6 +865,68 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should delete nested blocks within a selection pasted over across blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'ab' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'x' },
+								},
+							],
+						},
+					],
+				},
+				{ name: 'core/list-item', attributes: { content: 'cd' } },
+			],
+		} );
+
+		pageUtils.setClipboardData( {
+			html: '<!-- wp:paragraph --><p>X</p><!-- /wp:paragraph -->',
+		} );
+
+		// Select from within the first item's text into the second item's
+		// text, and paste over the selection.
+		await editor.canvas
+			.getByText( 'ab', { exact: true } )
+			.click( { position: { x: 1, y: 8 } } );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The first item's nested list sat within the deleted selection
+		// and is removed with it, like deleting the selection would.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'aX' },
+						innerBlocks: [],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'd' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should not lose nested blocks when pasting a block into text', async ( {
 		editor,
 		page,
