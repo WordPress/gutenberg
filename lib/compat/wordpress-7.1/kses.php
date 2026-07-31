@@ -99,6 +99,33 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 add_filter( 'safe_style_css', 'gutenberg_add_svg_to_safe_style_css' );
 
 /**
+ * Adds the `rotate` property to the list of safe CSS properties.
+ *
+ * Block stylesheets flip vertical text upside down with `rotate` when the text is
+ * aligned to the end of its inline axis. Those rules match the block's class and
+ * inline `style` attribute, neither of which changes at a breakpoint, so the state
+ * block support has to emit `rotate` as a declaration to turn the flip off (or on)
+ * for a viewport. {@see safecss_filter_attr()} allows the `transform` shorthand but
+ * none of the individual transform properties, so without this the declaration is
+ * stripped from the frontend stylesheet while still working in the editor.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_rotate_to_safe_style_css( $attr ) {
+	if ( ! is_array( $attr ) ) {
+		return $attr;
+	}
+
+	if ( ! in_array( 'rotate', $attr, true ) ) {
+		$attr[] = 'rotate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_rotate_to_safe_style_css' );
+
+/**
  * Allow gradient background-image values, including gradients combined with a
  * url() image, in inline styles.
  *
