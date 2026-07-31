@@ -21,11 +21,12 @@
 			min-height: 100vh;
 		}
 	}
+}
 
-	img {
-		max-width: 100%;
-		height: auto;
-	}
+// `:where()` so components can still size their own images.
+:where(.boot-layout) img {
+	max-width: 100%;
+	height: auto;
 }
 
 .boot-layout .boot-notices__snackbar {

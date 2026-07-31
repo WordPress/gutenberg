@@ -19,10 +19,8 @@
 
 ### Documentation
 
--   Add an Icons doc page and a `WithIconReference` story, cover
-    `registerIconResolver` in the README, and update the architecture doc
-    for declarative icon references
-    ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Add an Icons doc page and a `WithIconReference` story ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Describe actions as verbs ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add an Actions doc page and a `WithActions` story, and cover `actions`
     in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
