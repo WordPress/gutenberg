@@ -173,6 +173,15 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
