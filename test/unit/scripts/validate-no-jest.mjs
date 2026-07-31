@@ -1,16 +1,9 @@
-/**
- * Node dependencies
- */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fastGlob from 'fast-glob';
 
-/**
- * External dependencies
- */
-import globPackage from 'glob';
-
-const { sync: glob } = globPackage;
+const { sync: glob } = fastGlob;
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'

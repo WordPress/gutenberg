@@ -1,7 +1,7 @@
 import path from 'node:path';
-import globPackage from 'glob';
+import fastGlob from 'fast-glob';
 
-const { sync: glob } = globPackage;
+const { sync: glob } = fastGlob;
 
 export const TEST_PATTERNS = [
 	'**/__tests__/**/*.[jt]s?(x)',
@@ -31,18 +31,15 @@ function normalizeTestPath( testPath ) {
 }
 
 export function discoverTestFiles( rootDir ) {
-	return [
-		...new Set(
-			TEST_PATTERNS.flatMap( ( pattern ) =>
-				glob( pattern, {
-					absolute: false,
-					cwd: rootDir,
-					ignore: TEST_IGNORES,
-					nodir: true,
-				} )
-			).map( normalizeTestPath )
-		),
-	].sort();
+	return glob( TEST_PATTERNS, {
+		absolute: false,
+		cwd: rootDir,
+		ignore: TEST_IGNORES,
+		onlyFiles: true,
+		unique: true,
+	} )
+		.map( normalizeTestPath )
+		.sort();
 }
 
 export function getVitestProjectName( testPath ) {

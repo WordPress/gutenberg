@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
-import globPackage from 'glob';
+import fastGlob from 'fast-glob';
 import { defineConfig } from 'vitest/config';
 import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 import { getVitestTestsByProject } from './scripts/test-projects.mjs';
@@ -16,7 +16,7 @@ const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const flakinessReporter = nodeRequire.resolve( '@flakiness/vitest' );
 const vitestTests = getVitestTestsByProject( ROOT_DIR );
-const { sync: glob } = globPackage;
+const { sync: glob } = fastGlob;
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: fileURLToPath(

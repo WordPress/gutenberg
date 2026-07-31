@@ -36,7 +36,7 @@
 		"@wordpress/vitest-console": "file:../../packages/vitest-console",
 		"@wordpress/vitest-preset-default": "file:../../packages/vitest-preset-default",
 		"client-zip": "^2.4.5",
-		"glob": "^7.1.2",
+		"fast-glob": "^3.2.7",
 		"jsdom": "^26.1.0",
 		"playwright": "^1.62.1",
 		"resize-observer-polyfill": "^1.5.1",
