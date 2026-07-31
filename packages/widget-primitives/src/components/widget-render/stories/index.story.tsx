@@ -14,7 +14,13 @@ import '@wordpress/components/build-style/style.css';
 import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
-import { Suspense, useId, useMemo, useState } from '@wordpress/element';
+import {
+	Suspense,
+	useEffect,
+	useId,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
 /* eslint-disable @wordpress/use-recommended-components */
@@ -26,9 +32,11 @@ import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
  */
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
+import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
 import type {
 	WidgetAction,
 	WidgetAttributeField,
+	WidgetIcon,
 	WidgetRenderProps,
 	WidgetType,
 } from '../../../types';
@@ -837,6 +845,94 @@ Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, lik
 **Takeaway**
 
 The widget names the intent and how it is fulfilled; the host mounts the primitive and places it, so the widget never knows its surface.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The application's icon vocabulary: one resolver, registered once.
+ * Records reference icons by name; the resolver returns elements.
+ */
+const STORY_ICONS: Record< string, WidgetIcon > = {
+	'demo/planet': globe,
+};
+
+registerIconResolver( async ( reference ) => STORY_ICONS[ reference ] ?? null );
+
+const referencedIconWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	icon: undefined,
+};
+
+function WidgetWithIconReference() {
+	const titleId = useId();
+	const [ attributes ] = useState< DemoAttributes >( {
+		...referencedIconWidgetType.example?.attributes,
+	} );
+	const [ icon, setIcon ] = useState< WidgetIcon | null >( null );
+
+	// Hosts get the resolved icon through `useWidgetTypes`; the story
+	// resolves the reference itself.
+	useEffect( () => {
+		let cancelled = false;
+		void resolveIcon( 'demo/planet' ).then( ( resolved ) => {
+			if ( ! cancelled ) {
+				setIcon( resolved );
+			}
+		} );
+		return () => {
+			cancelled = true;
+		};
+	}, [] );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ icon && (
+							<span aria-hidden="true">
+								<Icon icon={ icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ referencedIconWidgetType.title }
+						</Card.Title>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ referencedIconWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithIconReference: StoryObj = {
+	render: () => <WidgetWithIconReference />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares its icon as a **registered icon name** instead of a rendered element:
+
+1. The application registers one **icon resolver** (\`registerIconResolver\`), closing over its icon source. On WordPress that source is the \`icon\` REST entity; here, a local catalog.
+2. The widget declares \`"icon": "demo/planet"\` in \`widget.json\`. Pure data: no imports, no elements.
+3. \`useWidgetTypes\` resolves the reference while assembling each \`WidgetType\` (the story calls the resolver itself), so the host receives a renderable element and never sees the name.
+
+An unresolvable reference degrades to no icon. See the **Icons** doc for the full pipeline.
 `,
 			},
 		},

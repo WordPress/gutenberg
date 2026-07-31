@@ -3,6 +3,7 @@
  */
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
+import * as buffer from 'lib0/buffer';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -757,6 +758,58 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
+		it( 'applies queued solo updates before a synchronous collaborative update', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			// With no remote peers present, the first update is deferred.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'First' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+
+			// Simulate a remote peer joining before the deferred update has
+			// been applied.
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
+			// The collaborative update is applied synchronously, after the
+			// queued update.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Second' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const appliedChanges =
+				mockSyncConfig.applyChangesToCRDTDoc.mock.calls.map(
+					( call ) => call[ 1 ]
+				);
+			expect( appliedChanges ).toEqual( [
+				{ title: 'First' },
+				{ title: 'Second' },
+			] );
+		} );
+
 		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
@@ -855,6 +908,128 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+		} );
+	} );
+
+	describe( 'autosave snapshots', () => {
+		async function loadEntityCapturingDoc() {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			return { manager, ydoc: capturedDoc as unknown as Y.Doc };
+		}
+
+		it( 'encodes a snapshot the same document satisfies', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+
+			const stateVectorBefore = Y.encodeStateVector( ydoc );
+
+			const snapshot = manager.getEntitySnapshot( 'post', '123' );
+
+			expect( typeof snapshot ).toBe( 'string' );
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', snapshot ?? '' )
+			).toBe( true );
+
+			// Neither call writes to the document, so the state vector is
+			// unchanged and nothing enters the undo scope.
+			expect( Y.encodeStateVector( ydoc ) ).toEqual( stateVectorBefore );
+			expect( manager.undoManager?.hasUndo() ).toBe( false );
+		} );
+
+		it( 'includes updates issued in the same tick in the snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			jest.clearAllMocks();
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const snapshotBefore = manager.getEntitySnapshot( 'post', '123' );
+
+			// With no remote peers present, this update is deferred to the
+			// next tick.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Updated Title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const snapshotAfter = manager.getEntitySnapshot( 'post', '123' );
+
+			// The deferred update was applied before the snapshot was
+			// encoded, so the snapshot describes state the earlier snapshot
+			// does not.
+			expect( snapshotAfter ).not.toEqual( snapshotBefore );
+		} );
+
+		it( 'still matches after the document moves ahead of the snapshot', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+			const snapshot = manager.getEntitySnapshot( 'post', '123' ) ?? '';
+
+			ydoc.getText( 'later' ).insert( 0, 'more content' );
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', snapshot )
+			).toBe( true );
+		} );
+
+		it( 'does not match a snapshot describing content the document lacks', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			// A snapshot from an unrelated document, i.e. content this
+			// document never received.
+			const otherDoc = new Y.Doc();
+			otherDoc.getText( 'text' ).insert( 0, 'content from elsewhere' );
+			const otherSnapshot = buffer.toBase64(
+				Y.encodeSnapshotV2( Y.snapshot( otherDoc ) )
+			);
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', otherSnapshot )
+			).toBe( false );
+		} );
+
+		it( 'fails open for an undecodable snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			expect(
+				manager.entityContainsSnapshot(
+					'post',
+					'123',
+					'not a snapshot!'
+				)
+			).toBe( false );
+		} );
+
+		it( 'fails open for entities that are not loaded', async () => {
+			const manager = createSyncManager();
+
+			expect(
+				manager.getEntitySnapshot( 'post', '456' )
+			).toBeUndefined();
+			expect(
+				manager.entityContainsSnapshot( 'post', '456', 'anything' )
+			).toBe( false );
 		} );
 	} );
 

@@ -6,6 +6,11 @@
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
     user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Widgets can reference their icon declaratively: `WidgetModuleRecord`
+    carries a registered icon name and `useWidgetTypes` resolves it through
+    the application-registered resolver (`registerIconResolver`), so
+    `WidgetType.icon` always reaches hosts renderable
+    ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 
 ### Enhancements
 
@@ -14,7 +19,8 @@
 
 ### Documentation
 
--   Describe actions as verbs with one fulfillment, not as links ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+-   Add an Icons doc page and a `WithIconReference` story ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Describe actions as verbs ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add an Actions doc page and a `WithActions` story, and cover `actions`
     in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).

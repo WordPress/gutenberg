@@ -15,6 +15,34 @@
 class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 
 	/**
+	 * Meta key holding the CRDT snapshot describing an autosave's content.
+	 *
+	 * @var string
+	 */
+	public const CRDT_SNAPSHOT_META_KEY = '_crdt_autosave_snapshot';
+
+	/**
+	 * Request parameter holding the CRDT snapshot describing an autosave's
+	 * content.
+	 *
+	 * This string must match CRDT_AUTOSAVE_SNAPSHOT_KEY in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
+
+	/**
+	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
+	 *
+	 * A snapshot is a state vector plus a delete set, so it grows with the
+	 * much slower than content. Unlikely to exceed 1 MB, but use as a safety
+	 * backstop.
+	 *
+	 * @var int
+	 */
+	private const MAX_CRDT_SNAPSHOT_LENGTH = MB_IN_BYTES;
+
+	/**
 	 * Parent post controller.
 	 *
 	 * @since 5.0.0
@@ -126,6 +154,11 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $autosave_id;
 		}
 
+		// Only save a CRDT snapshot with an autosave (not with parent post)
+		if ( $autosave_id !== $post->ID ) {
+			$this->store_crdt_snapshot( $autosave_id, $request );
+		}
+
 		$autosave = get_post( $autosave_id );
 		$request->set_param( 'context', 'edit' );
 
@@ -133,6 +166,44 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Stores the CRDT snapshot describing the content an autosave captured.
+	 *
+	 * The snapshot allows an editor session verify that a shared document
+	 * already contains everything the autosave holds, so the "more recent
+	 * autosave" notice can be suppressed as redundant.
+	 *
+	 * Anything invalid is dropped rather than erroring, and any previously
+	 * stored snapshot is cleared, because a missing snapshot only means the
+	 * editor falls back to showing the "newer autosave" notice.
+	 *
+	 * @param int             $autosave_id Autosave revision ID.
+	 * @param WP_REST_Request $request     Full details about the request.
+	 * @return void
+	 */
+	private function store_crdt_snapshot( $autosave_id, $request ) {
+		$snapshot = $request->get_param( self::CRDT_SNAPSHOT_PARAM );
+
+		$is_valid_snapshot = (
+			is_string( $snapshot ) &&
+			'' !== $snapshot &&
+			strlen( $snapshot ) <= self::MAX_CRDT_SNAPSHOT_LENGTH
+		);
+
+		if ( ! $is_valid_snapshot ) {
+			/*
+			 * The autosave revision is reused across autosaves, so a snapshot
+			 * stored by an earlier request would otherwise remain attached to
+			 * this request's newer content and could wrongly vouch for it.
+			 * Clear it so the editor falls back to showing the notice.
+			 */
+			delete_metadata( 'post', $autosave_id, self::CRDT_SNAPSHOT_META_KEY );
+			return;
+		}
+
+		update_metadata( 'post', $autosave_id, self::CRDT_SNAPSHOT_META_KEY, wp_slash( $snapshot ) );
 	}
 
 	/**
