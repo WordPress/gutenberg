@@ -267,11 +267,28 @@ export default defineConfig( {
 				 * dependencies are declared so resolution stays layout agnostic.
 				 */
 				root: CONFIG_DIR,
+				optimizeDeps: {
+					entries: vitestTests.browser.map( ( testPath ) =>
+						path.join( ROOT_DIR, testPath )
+					),
+				},
 				test: {
 					name: 'browser',
 					dir: ROOT_DIR,
+					attachmentsDir: path.join(
+						ROOT_DIR,
+						'test-results/vitest-browser-attachments'
+					),
 					include: vitestTests.browser,
 					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/browser.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
@@ -283,6 +300,18 @@ export default defineConfig( {
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: playwright(),
+						screenshotDirectory: path.join(
+							ROOT_DIR,
+							'test-results/vitest-browser-screenshots'
+						),
+						screenshotFailures: true,
+						trace: {
+							mode: 'retain-on-failure',
+							tracesDir: path.join(
+								ROOT_DIR,
+								'test-results/vitest-browser-traces'
+							),
+						},
 					},
 				},
 			},

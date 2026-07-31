@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SearchControl from '..';
 
 function ControlledSearchControl( {
