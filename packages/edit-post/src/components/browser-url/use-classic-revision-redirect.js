@@ -13,8 +13,9 @@ import { addQueryArgs } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Redirects the selected revision to the classic revisions screen when visual
- * revisions are disabled.
+ * Redirects an editor URL that already contains a revision ID to the classic
+ * screen when visual revisions are disabled. Revision buttons already link
+ * there, but the URL can load before the editor finishes checking for meta boxes.
  */
 export default function useClassicRevisionRedirect() {
 	const registry = useRegistry();
