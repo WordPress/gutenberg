@@ -121,8 +121,24 @@ describe( 'useWidgetTypes', () => {
 		);
 
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].icon ).toBe( resolvedIcon )
+		);
+	} );
 
-		expect( result.current[ 0 ][ 0 ].icon ).toBe( resolvedIcon );
+	it( 'emits widget types before icon references settle', async () => {
+		registerIconResolver(
+			() => new Promise< WidgetIcon | null >( () => {} )
+		);
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( iconReferenceRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ] ).toHaveLength( 1 );
+		expect( result.current[ 0 ][ 0 ].icon ).toBe( mockModuleIcon );
 	} );
 
 	it( 'keeps the module element when the reference does not resolve', async () => {

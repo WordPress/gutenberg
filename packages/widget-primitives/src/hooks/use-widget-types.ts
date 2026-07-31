@@ -21,8 +21,9 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * module's default export with the runtime fields (`name`, `renderModule`).
  * Attribute schemas pass through `resolveFields`, so attributes referencing
  * registered field types reach hosts as plain DataViews fields. Icon
- * references resolve through the registered icon resolver, so hosts only
- * receive renderable icons.
+ * references resolve through the registered icon resolver, off the loading
+ * flag: widget types emit as soon as their modules land, and each resolved
+ * icon patches in afterwards.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -67,17 +68,12 @@ export function useWidgetTypes(
 					const metadata = module.default as Partial< WidgetType >;
 
 					/*
-					 * The record's resolved reference wins; the module's
-					 * element stands when there is none or it does not
-					 * resolve. Non-elements are dropped.
+					 * Only a renderable element may enter; the record's
+					 * reference resolves after the gate and patches in.
 					 */
-					const resolvedIcon = record.icon
-						? await resolveIcon( record.icon )
-						: null;
 					const moduleIcon = isValidElement( metadata.icon )
 						? metadata.icon
 						: undefined;
-					const icon = resolvedIcon ?? moduleIcon;
 
 					return {
 						...metadata,
@@ -90,7 +86,7 @@ export function useWidgetTypes(
 							: {} ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
-						icon,
+						icon: moduleIcon,
 						/*
 						 * `title` is required:
 						 * - Server-side title wins
@@ -128,6 +124,31 @@ export function useWidgetTypes(
 				results.filter( ( t ): t is WidgetType => t !== null )
 			);
 			setIsResolvingWidgetTypes( false );
+
+			/*
+			 * Icons resolve off the loading gate. The resolved reference
+			 * wins; the module's element stands when the reference does
+			 * not resolve.
+			 */
+			for ( const record of records ) {
+				if ( ! record.icon ) {
+					continue;
+				}
+
+				void resolveIcon( record.icon ).then( ( resolved ) => {
+					if ( cancelled || ! resolved ) {
+						return;
+					}
+
+					setWidgetTypes( ( prev ) =>
+						prev.map( ( widgetType ) =>
+							widgetType.name === record.name
+								? { ...widgetType, icon: resolved }
+								: widgetType
+						)
+					);
+				} );
+			}
 		} );
 
 		return () => {
