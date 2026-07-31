@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import _CustomSelectControl from '..';
 
 const UncontrolledCustomSelectControl = (

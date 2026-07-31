@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import SnackbarList from '../list';
 
 window.scrollTo = vi.fn();

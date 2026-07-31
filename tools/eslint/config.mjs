@@ -35,6 +35,14 @@ const vitestJsdomTestPatterns = [
 		( directory ) => `${ directory }/**/*.jsdom.test.[cm]?[jt]s?(x)`
 	),
 ];
+const vitestBrowserTestPatterns = [
+	...testMigration.vitest.files.filter( ( file ) =>
+		/\.browser\.test\.[cm]?[jt]sx?$/.test( file )
+	),
+	...testMigration.vitest.directories.map(
+		( directory ) => `${ directory }/**/*.browser.test.[cm]?[jt]s?(x)`
+	),
+];
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -491,6 +499,25 @@ export default dedupePlugins( [
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
 		files: vitestJsdomTestPatterns,
+	},
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
 	},
 
 	// Override: Jest test files (unit tests).

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	getInheritanceProps,
 	InheritanceResetButton,

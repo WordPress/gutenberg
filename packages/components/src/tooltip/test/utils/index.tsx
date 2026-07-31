@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { userEvent } from 'vitest/browser';
 
 // TODO: may need to be tested with Playwright; further context:

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import Snackbar from '../index';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {

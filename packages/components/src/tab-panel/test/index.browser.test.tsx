@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, category, media } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TabPanel from '..';
 
 const TABS = [

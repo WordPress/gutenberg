@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { render, renderHook, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
+import { click, render as renderAriakit } from '@ariakit/test/react';
 import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
@@ -17,6 +10,7 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+globalThis.wpVitest.mockResizeObserver();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -241,7 +235,7 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 	};
 
 	it( 'marks only the local link preset as selected when another preset shares its hex', async () => {
-		await render(
+		await renderAriakit(
 			<ColorPanel
 				value={ {
 					elements: {
@@ -256,9 +250,7 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 			/>
 		);
 
-		await userEvent
-			.setup()
-			.click( screen.getByRole( 'button', { name: /^Link/ } ) );
+		await click( screen.getByRole( 'button', { name: /^Link/ } ) );
 		const swatches = await screen.findAllByRole( 'option' );
 
 		// swatch[0] = 'Dark background', swatch[1] = 'Dark text'. Selection

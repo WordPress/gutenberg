@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
+import { click, type, press } from '@ariakit/test';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
@@ -18,11 +11,14 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const noop = () => {};
 
-async function clearInput(
-	user: ReturnType< typeof userEvent.setup >,
-	input: HTMLInputElement
-) {
-	await user.clear( input );
+async function clearInput( input: HTMLInputElement ) {
+	await click( input );
+
+	// Press backspace as many times as the input's current value
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	for ( const _ of Array( input.value.length ) ) {
+		await press.Backspace();
+	}
 }
 
 describe( 'getNameAndSlugForPosition', () => {
@@ -212,10 +208,9 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows an option to remove all colors', async () => {
-		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -231,12 +226,11 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
-		const user = userEvent.setup();
 		render(
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -251,10 +245,9 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
-		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -268,7 +261,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'calls the `onChange` with the new color appended', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -278,7 +270,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Add color',
 			} )
@@ -298,7 +290,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'calls the `onChange` with the new gradient appended', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -308,7 +299,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Add gradient',
 			} )
@@ -339,7 +330,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can remove a color', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -349,20 +339,18 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await user.click(
-			screen.getByRole( 'button', { name: 'Edit: Primary' } )
-		);
-		await user.click(
+		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Remove color: Primary',
 			} )
@@ -375,7 +363,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can update palette name', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -385,24 +372,22 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await user.click(
-			screen.getByRole( 'button', { name: 'Edit: Primary' } )
-		);
+		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
 		const nameInput = screen.getByDisplayValue( 'Primary' );
 
-		await clearInput( user, nameInput as HTMLInputElement );
+		await clearInput( nameInput as HTMLInputElement );
 
-		await user.type( nameInput, 'Primary Updated' );
+		await type( 'Primary Updated' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -418,7 +403,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can update color palette value', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -428,14 +412,14 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Primary' ) );
+		await click( screen.getByLabelText( 'Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );
 
-		await clearInput( user, hexInput as HTMLInputElement );
+		await clearInput( hexInput as HTMLInputElement );
 
-		await user.type( hexInput, '000000' );
+		await type( '000000' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -450,7 +434,6 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can update gradient palette value', async () => {
 		const onChange = vi.fn();
-		const user = userEvent.setup();
 
 		render(
 			<PaletteEdit
@@ -460,15 +443,15 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
+		await click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
 
 		// Select radial gradient option
-		await user.selectOptions(
+		await click(
 			screen.getByRole( 'combobox', {
 				name: 'Type',
-			} ),
-			'radial-gradient'
+			} )
 		);
+		await click( screen.getByRole( 'option', { name: 'Radial' } ) );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
