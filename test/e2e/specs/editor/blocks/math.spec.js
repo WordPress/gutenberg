@@ -117,10 +117,15 @@ test.describe( 'Math Block', () => {
 			.first();
 		await expect( rightAlignedCell ).toBeVisible();
 
+		// Chromium accepts the legacy `-webkit-right`/`-webkit-left` values
+		// Temml's CSS also sets (for older WebKit/Blink compatibility), so
+		// the computed value can legitimately be either the standard or the
+		// `-webkit-` prefixed keyword depending on the engine. Both render
+		// as right-aligned text.
 		const textAlign = await rightAlignedCell.evaluate(
 			( element ) => window.getComputedStyle( element ).textAlign
 		);
-		expect( textAlign ).toBe( 'right' );
+		expect( [ 'right', '-webkit-right' ] ).toContain( textAlign );
 
 		const jotCell = page
 			.locator( '.wp-block-math mtable.tml-jot mtd' )
