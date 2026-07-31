@@ -12,7 +12,7 @@
 /**
  * Registers a style according to `wp_register_style`. Honors this request by
  * deregistering any style by the same handler before registration.
- *
+ *{{SINCE_TAG}}
  * @param WP_Styles        $styles WP_Styles instance.
  * @param string           $handle Name of the stylesheet. Should be unique.
  * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
@@ -36,7 +36,7 @@ function {{PREFIX}}_override_style( $styles, $handle, $src, $deps = array(), $ve
 /**
  * Register all package styles (simple cases only).
  * Complex cases should be manually registered in lib/client-assets.php.
- *
+ *{{SINCE_TAG}}
  * @param WP_Styles $styles WP_Styles instance.
  */
 function {{PREFIX}}_register_package_styles( $styles ) {
