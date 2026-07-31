@@ -19,7 +19,10 @@ When writing tests consider the following:
 
 ## JavaScript testing
 
-JavaScript unit tests are partitioned between Jest and Vitest during the [Vitest migration](/test/unit/VITEST_MIGRATION.md). Jest-owned tests use the Jest API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on), [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname), and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
+Tests for JavaScript use [Vitest](https://vitest.dev/) for assertions,
+mocks, spies, and test lifecycle APIs. Vitest globals are disabled. Import the
+APIs used by each test from `vitest`. React component tests continue to use
+[React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
 
 _It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
@@ -33,13 +36,44 @@ Linting is static code analysis used to enforce coding standards and to avoid po
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run test:unit:vitest` to execute all JavaScript unit tests without the linter. The runner-specific commands continue to accept their own CLI options.
+To run unit tests only, without the linter, use `npm run test:unit`. Pass a file
+or directory to run a focused subset:
+
+```sh
+npm run test:unit -- packages/components/src/button/test
+```
+
+### Browser Mode
+
+Node.js is the default test environment. Use `*.jsdom.test.*` for component
+tests that need a DOM and React Testing Library. Use
+[Vitest Browser Mode](https://vitest.dev/guide/browser/) when behavior depends
+on a real browser, such as native focus, keyboard or pointer events, portals,
+layout, real CSS, or browser APIs.
+
+Keep Browser Mode tests beside the component and opt in with a
+`*.browser.test.js`, `*.browser.test.jsx`, `*.browser.test.ts`, or
+`*.browser.test.tsx` filename. The suffix selects the Browser project
+automatically; do not add the test to a central list or move it to a separate
+test tree. Browser tests can use `vitest-browser-react` for rendering and
+`vitest/browser` for locators and user interactions.
+
+Browser coverage is intentionally adopted incrementally. Existing jsdom tests
+do not need to move unless real-browser behavior materially improves what the
+test verifies.
 
 ### Folder structure
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for DOM structure, semantics, events, state, and other behavior that does not depend on browser rendering. Use `*.browser.test.*` for generated styles, computed styles, cascade, responsive behavior, layout, geometry, rendered visibility, animation, scrolling, `ResizeObserver`, and media queries. Browser Mode loads real CSS and uses browser APIs. Keep deterministic browser API mocks local to nonvisual tests and restore them afterwards. Leave Node-compatible test names without an environment suffix. During the Jest-to-Vitest migration, the filename selects the Vitest project after the migration manifest assigns the test to Vitest.
+Use `*.jsdom.test.*` for DOM structure, semantics, events, state, and other
+behavior that does not depend on browser rendering. Use `*.browser.test.*` for
+generated or computed styles, cascade, responsive behavior, layout, geometry,
+rendered visibility, animation, scrolling, observers, and media queries.
+Browser Mode loads real CSS and uses browser APIs. Keep deterministic browser
+API mocks local to nonvisual tests and restore them afterwards. Leave
+Node-compatible test names without an environment suffix. The filename selects
+the Vitest project.
 
 ```
 +-- test
@@ -75,6 +109,8 @@ In test cases, try to describe in plain words the expected behaviour. For UI com
 **Good**
 
 ```javascript
+import { describe, test } from 'vitest';
+
 describe( 'CheckboxWithLabel', () => {
     test( 'checking checkbox should disable the form submit button', () => {
         ...
@@ -85,6 +121,8 @@ describe( 'CheckboxWithLabel', () => {
 **Not so good**
 
 ```javascript
+import { describe, test } from 'vitest';
+
 describe( 'CheckboxWithLabel', () => {
     test( 'checking checkbox should set this.state.disableButton to `true`', () => {
         ...
@@ -94,11 +132,15 @@ describe( 'CheckboxWithLabel', () => {
 
 ### Setup and teardown methods
 
-The Jest API includes some nifty [setup and teardown methods](https://jestjs.io/docs/en/setup-teardown.html) that allow you to perform tasks _before_ and _after_ each or all of your tests, or tests within a specific `describe` block.
+Vitest includes [setup and teardown methods](https://vitest.dev/api/#setup-and-teardown)
+that run before or after each test, file, or `describe` block.
 
-These methods can handle asynchronous code to allow setup that you normally cannot do inline. As with [individual test cases](https://jestjs.io/docs/en/asynchronous.html#promises), you can return a Promise and Jest will wait for it to resolve:
+These methods support asynchronous code. Return a Promise and Vitest will wait
+for it to resolve:
 
 ```javascript
+import { afterAll, beforeAll } from 'vitest';
+
 // one-time setup for *all* tests
 beforeAll( () =>
 	someAsyncAction().then( ( resp ) => {
@@ -160,7 +202,9 @@ Because we're passing the list as an argument, we can pass mock `validValuesList
 
 #### Imported dependencies
 
-Often our code will use methods and properties from imported external and internal libraries in multiple places, which makes passing around arguments messy and impracticable. For these cases `jest.mock` offers a neat way to stub these dependencies.
+Often our code will use methods and properties from imported external and
+internal libraries in multiple places, which makes passing around arguments
+messy and impracticable. For these cases `vi.mock` can stub the dependency.
 
 For instance, lets assume we have `config` module to control a great deal of functionality via feature flags.
 
@@ -171,16 +215,18 @@ export const isBilboVisible = () =>
 	config.isEnabled( 'the-ring' ) ? false : true;
 ```
 
-To test the behaviour under each condition, we stub the config object and use a jest mocking function to control the return value of `isEnabled`.
+To test the behaviour under each condition, stub the config object and use a
+Vitest mock function to control the return value of `isEnabled`.
 
 ```javascript
 // test/bilbo.js
+import { describe, expect, test, vi } from 'vitest';
 import { isEnabled } from 'config';
 import { isBilboVisible } from '../bilbo';
 
-jest.mock( 'config', () => ( {
+vi.mock( 'config', () => ( {
 	// bilbo is visible by default
-	isEnabled: jest.fn( () => false ),
+	isEnabled: vi.fn( () => false ),
 } ) );
 
 describe( 'The bilbo module', () => {
@@ -197,14 +243,16 @@ describe( 'The bilbo module', () => {
 
 ### Testing globals
 
-We can use [Jest spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) to test code that calls global methods.
+Use [Vitest spies](https://vitest.dev/api/vi.html#vi-spyon) to test code that
+calls global methods.
 
 ```javascript
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { myModuleFunctionThatOpensANewWindow } from '../my-module';
 
 describe( 'my module', () => {
 	beforeAll( () => {
-		jest.spyOn( global, 'open' ).mockImplementation( () => true );
+		vi.spyOn( global, 'open' ).mockImplementation( () => true );
 	} );
 
 	test( 'something', () => {
@@ -232,10 +280,11 @@ For the above reasons, **the `user-event` library is recommended when writing te
 **Not so good**: using `fireEvent` to dispatch DOM events.
 
 ```javascript
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { expect, test, vi } from 'vitest';
 
 test( 'fires onChange when a new value is typed', () => {
-	const spyOnChange = jest.fn();
+	const spyOnChange = vi.fn();
 
 	// A component with one `input` and one `select`.
 	render( <MyComponent onChange={ spyOnChange } /> );
@@ -261,11 +310,12 @@ test( 'fires onChange when a new value is typed', () => {
 ```javascript
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { expect, test, vi } from 'vitest';
 
 test( 'fires onChange when a new value is typed', async () => {
 	const user = userEvent.setup();
 
-	const spyOnChange = jest.fn();
+	const spyOnChange = vi.fn();
 
 	// A component with one `input` and one `select`.
 	render( <MyComponent onChange={ spyOnChange } /> );
@@ -293,13 +343,13 @@ test( 'fires onChange when a new value is typed', async () => {
 
 ### Integration testing for block UI
 
-Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using Vitest. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
 
 The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
 
 [`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.browser.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
 
-To set up a jest file for integration tests:
+To set up a test file for integration tests:
 
 ```js
 import { initializeEditor } from 'test/integration/helpers/integration-test-editor';
@@ -402,15 +452,16 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
+CI fails when snapshots do not match. Review each change and, when the new
+output is intentional, update the focused snapshot with Vitest:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+npm run test:unit -- path/to/tests --update
 ```
 
-`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
-
-It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+Keep `npm run test:unit:watch` running in the background while you work.
+Vitest reruns affected tests and supports pressing `u` to update a failed
+snapshot.
 
 #### Pain points
 
@@ -448,7 +499,10 @@ test( 'should contain mars if planets is true', () => {
 } );
 ```
 
-Another good technique is to use the `toMatchDiffSnapshot` matcher, which snapshots only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, like in this example:
+Another good technique is to use Gutenberg's `toMatchDiffSnapshot` matcher,
+which snapshots only the difference between two states of the DOM. This is
+useful for testing the effect of a prop change while producing a smaller
+snapshot:
 
 ```jsx
 test( 'should render a darker background when isShady is true', () => {
@@ -477,11 +531,12 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 
 -   Why we need to use [Mocking Refs for Snapshot Testing](https://reactjs.org/blog/2016/11/16/react-v15.4.0.html#mocking-refs-for-snapshot-testing) with React.
 
-In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`.
+In that case, you might see test failures and `TypeError` messages on lines
+that access a property from `ref.current`.
 
-### Debugging Jest unit tests
+### Debugging Vitest unit tests
 
-Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-tests).
 
 ## End-to-end testing
 
@@ -545,7 +600,7 @@ Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If yo
 npm run test:php
 ```
 
-To re-run tests automatically when files change (similar to Jest), run:
+To re-run tests automatically when files change, run:
 
 ```
 npm run test:php:watch
@@ -589,8 +644,8 @@ class My_Block_Test extends WP_UnitTestCase {
 
 For more detailed information about the build system and function prefixing, see the [Build System: Function Prefixing and Block Loading](/docs/contributors/code/build-system-function-prefixing.md) documentation.
 
-[snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
-[update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
+[snapshot testing]: https://vitest.dev/guide/snapshot.html
+[update snapshots]: https://vitest.dev/guide/snapshot.html#updating-snapshots
 
 ## Performance testing
 

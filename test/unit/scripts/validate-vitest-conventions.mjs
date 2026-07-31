@@ -11,7 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import typescriptEslintParser from '@typescript-eslint/parser';
-import globPackage from 'glob';
+import fastGlob from 'fast-glob';
 import {
 	discoverTestFiles,
 	getVitestProjectName,
@@ -20,7 +20,7 @@ import {
 } from './test-projects.mjs';
 import { validateVitestPolicy } from './vitest-policy-rules.mjs';
 
-const { sync: glob } = globPackage;
+const { sync: glob } = fastGlob;
 const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -52,11 +52,11 @@ const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
 	...glob( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
 		cwd: ROOT_DIR,
-		nodir: true,
+		onlyFiles: true,
 	} ),
 	...glob( 'test/unit/scripts/*.mjs', {
 		cwd: ROOT_DIR,
-		nodir: true,
+		onlyFiles: true,
 	} ),
 ];
 const files = [
