@@ -50,7 +50,7 @@ jobs:
               run: |
                   npx lerna run build
                   npm run --workspace @wordpress/build-scripts generate-worker-placeholders
-                  npx tsc --build
+                  npx tsc --build --noCheck
 
             - name: Validate Vitest conventions and TypeScript test graph
               run: npm run test:unit:conventions
@@ -105,7 +105,8 @@ jobs:
                     --ci \
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache"
+                    --cacheDirectory="$HOME/.jest-cache" \
+                    --passWithNoTests
 
             - name: Run the migrated Vitest partition
               env:

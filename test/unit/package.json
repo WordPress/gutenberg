@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.29.7",
+		"@babel/core": "^7.25.7",
 		"@babel/traverse": "^7.25.7",
 		"@emotion/jest": "^11.14.2",
 		"@emotion/styled": "^11.14.1",
