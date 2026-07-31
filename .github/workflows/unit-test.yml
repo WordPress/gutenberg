@@ -1,7 +1,5 @@
 name: Unit Tests
 
-# Since Unit Tests are required to pass for each PR,
-# we cannot disable them for documentation-only changes.
 on:
     pull_request:
     push:
@@ -24,12 +22,41 @@ concurrency:
 permissions: {}
 
 jobs:
+    changes:
+        timeout-minutes: 5
+        name: Detect changes relevant to the unit tests
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check whether the diff can change a test result
+              id: filter
+              if: github.event_name == 'pull_request'
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              with:
+                  # True as soon as one changed file matches no pattern, so an unrecognised
+                  # path always runs the suite.
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          - '**'
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,storybook}/**'
+                          - '!tools/{docs,eslint,stylelint}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(unit-test.yml)}'
+
     unit-js-routing:
         name: JavaScript test routing
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
 
         steps:
             - name: Checkout repository
@@ -49,10 +76,11 @@ jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
         permissions:
             contents: read
             id-token: write
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -101,10 +129,11 @@ jobs:
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
         permissions:
             contents: read
             id-token: write
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -146,6 +175,8 @@ jobs:
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
+        if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' }}
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -173,6 +204,8 @@ jobs:
     build-assets:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
+        if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' }}
         permissions:
             contents: read
         steps:
@@ -196,12 +229,12 @@ jobs:
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
-        needs: [compute-previous-wordpress-version, build-assets]
+        needs: [changes, compute-previous-wordpress-version, build-assets]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: true
             matrix:
@@ -341,10 +374,11 @@ jobs:
     phpcs:
         name: PHP coding standards
         runs-on: 'ubuntu-24.04'
+        needs: [changes]
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
 
         steps:
             - name: Checkout repository
@@ -393,22 +427,32 @@ jobs:
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
 
-    # This job is deprecated but be present for compatibility reasons.
-    unit-php:
-        name: PHP
+    # Always runs, so it can be the required check while the jobs above are path-filtered
+    # away. `needs` must list every job that would otherwise still be running: the gate fails
+    # rather than pass a job it never judged. `compute-previous-wordpress-version` and
+    # `build-assets` settle before `test-php` does.
+    unit-gate:
+        timeout-minutes: 5
+        name: Unit Tests Gate
         runs-on: 'ubuntu-24.04'
-        permissions: {}
-        needs: [test-php, phpcs]
-        if: ${{ always() }}
+        needs:
+            [changes, unit-js-routing, unit-js, unit-js-date, test-php, phpcs]
+        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        permissions:
+            contents: read
+            actions: read
         steps:
-            - name: Fail the job if the PHPUnit tests fail
-              if: ${{ needs.test-php.result != 'success' }}
-              run: exit 1
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-            - name: "Fail the job if the code doesn't conform to the coding standards"
-              if: ${{ needs.phpcs.result != 'success' }}
-              run: exit 1
-
-            - name: Mark the job as passed if all the checks pass
-              if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
-              run: exit 0
+            # This job is still running while it judges the rest, so it exempts itself.
+            - name: Fail the job if any job in this run did not pass
+              env:
+                  REPOSITORY: ${{ github.repository }}
+                  RUN_ID: ${{ github.run_id }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-gate.js --ignore 'Unit Tests Gate'

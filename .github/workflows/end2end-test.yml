@@ -20,12 +20,45 @@ concurrency:
 permissions: {}
 
 jobs:
+    changes:
+        timeout-minutes: 5
+        name: Detect changes relevant to the end-to-end tests
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check whether the diff can change a test result
+              id: filter
+              if: github.event_name == 'pull_request'
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              with:
+                  # True as soon as one changed file matches no pattern, so an unrecognised
+                  # path always runs the suite.
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          - '**'
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,phpunit,storybook}/**'
+                          - '!test/{integration,performance,php,storybook-playwright,unit}/**'
+                          - '!{packages,tools}/**/{test,tests}/**'
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{phpcs,phpunit}*'
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(end2end-test.yml)}'
+
     build:
         name: Build
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [changes]
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         timeout-minutes: 30
 
         steps:
@@ -211,8 +244,8 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() }}
-        needs: [e2e-playwright, e2e-playwright-rtc-websocket]
+        if: ${{ !cancelled() && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
+        needs: [changes, e2e-playwright, e2e-playwright-rtc-websocket]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -302,3 +335,32 @@ jobs:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   label: '[Type] Flaky Test'
                   artifact-path: flaky-tests
+
+    # Always runs, so it can be the required check while the shards above are path-filtered
+    # away. `needs` must list every job that would otherwise still be running: the gate fails
+    # rather than pass a job it never judged.
+    e2e-gate:
+        timeout-minutes: 5
+        name: End-to-End Tests Gate
+        runs-on: 'ubuntu-24.04'
+        needs: [changes, e2e-playwright, e2e-playwright-rtc-websocket]
+        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        permissions:
+            contents: read
+            actions: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # This job is still running while it judges the rest, so it exempts itself. The
+            # other two run alongside it and are housekeeping, not test signal — and `Report
+            # to GitHub` cannot write with a fork pull request's read-only token.
+            - name: Fail the job if any job in this run did not pass
+              env:
+                  REPOSITORY: ${{ github.repository }}
+                  RUN_ID: ${{ github.run_id }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-gate.js --ignore 'End-to-End Tests Gate,Merge Artifacts,Report to GitHub'

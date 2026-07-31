@@ -28,13 +28,49 @@ concurrency:
 permissions: {}
 
 jobs:
+    changes:
+        timeout-minutes: 5
+        name: Detect performance-relevant changes
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check whether the diff can move a performance metric
+              id: filter
+              if: github.event_name == 'pull_request'
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              with:
+                  # True as soon as one changed file matches no pattern, so an unrecognised
+                  # path always runs the suite.
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          - '**'
+                          - '!**/*.md'
+                          - '!**/*.native.*'
+                          - '!{backport-changelog,bin,docs,phpunit,schemas,skills,storybook,typings}/**'
+                          - '!test/{integration,native,php,storybook-playwright,unit}/**'
+                          - '!test/e2e/{*,!(assets)/**}'
+                          - '!{packages,tools}/**/{test,tests}/**'
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
+                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{phpcs,phpunit}*'
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(performance.yml)}'
+
     performance:
         timeout-minutes: 60
         name: Run performance tests
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [changes]
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && ( github.event_name != 'pull_request' || needs.changes.outputs.relevant == 'true' ) }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
@@ -147,3 +183,30 @@ jobs:
                   name: failures-artifacts
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+
+    # Always runs, so it can be the required check while the comparison above is path-filtered
+    # away. `needs` must list every job that would otherwise still be running: the gate fails
+    # rather than pass a job it never judged.
+    performance-gate:
+        timeout-minutes: 5
+        name: Performance Tests Gate
+        runs-on: 'ubuntu-24.04'
+        needs: [changes, performance]
+        if: ${{ !cancelled() && github.repository == 'WordPress/gutenberg' }}
+        permissions:
+            contents: read
+            actions: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # This job is still running while it judges the rest, so it exempts itself.
+            - name: Fail the job if any job in this run did not pass
+              env:
+                  REPOSITORY: ${{ github.repository }}
+                  RUN_ID: ${{ github.run_id }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-gate.js --ignore 'Performance Tests Gate'
