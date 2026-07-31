@@ -71,6 +71,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 						),
 					),
 				),
+				'icon'          => 'core/calendar',
 				'actions'       => array(
 					array(
 						'id'    => 'open-settings',
@@ -159,6 +160,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 			),
 			$data['help']
 		);
+		$this->assertSame( 'core/calendar', $data['icon'] );
 		$this->assertSame(
 			array(
 				array(
@@ -219,6 +221,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'help', $properties );
+		$this->assertArrayHasKey( 'icon', $properties );
 		$this->assertArrayHasKey( 'actions', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
@@ -228,6 +231,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'string', 'null' ), $properties['title']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['description']['type'] );
 		$this->assertSame( array( 'object', 'null' ), $properties['help']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['icon']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['actions']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
 	}

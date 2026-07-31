@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { audio as icon } from '@wordpress/icons';
+import { playlistTrack as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

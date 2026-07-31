@@ -58,6 +58,7 @@ describe( 'Combobox', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const positionerRef = createRef< HTMLDivElement >();
+		const inputGroupRef = createRef< HTMLDivElement >();
 		const inputRef = createRef< HTMLInputElement >();
 		const listRef = createRef< HTMLDivElement >();
 		const listBodyRef = createRef< HTMLDivElement >();
@@ -75,7 +76,9 @@ describe( 'Combobox', () => {
 					ref={ popupRef }
 					positioner={ <Combobox.Positioner ref={ positionerRef } /> }
 				>
-					<Combobox.Input ref={ inputRef } placeholder="Search" />
+					<Combobox.InputGroup ref={ inputGroupRef }>
+						<Combobox.Input ref={ inputRef } placeholder="Search" />
+					</Combobox.InputGroup>
 					<Combobox.Value>
 						<Combobox.Chips ref={ chipsRef }>
 							<Combobox.ChipWithRemove
@@ -122,6 +125,7 @@ describe( 'Combobox', () => {
 			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
 		expect( positionerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( inputGroupRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
 		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
