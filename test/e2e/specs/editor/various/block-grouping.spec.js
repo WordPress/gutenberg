@@ -97,6 +97,52 @@ test.describe( 'Block Grouping', () => {
 			] );
 		} );
 
+		test( 'wraps a block with its own transform to the group block, instead of transforming it', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/quote',
+				attributes: { citation: 'someone' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'quoted words' },
+					},
+				],
+			} );
+
+			// The quote is also ungroupable, so an exact name is needed:
+			// the block options menu contains both Group and Ungroup.
+			await editor.clickBlockToolbarButton( 'Options' );
+			await page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Group', exact: true } )
+				.click();
+
+			// The quote survives whole inside the group; its transform to
+			// the group block (which dissolves it) must not be used.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: { citation: 'someone' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'quoted words',
+									},
+								},
+							],
+						},
+					],
+				},
+			] );
+		} );
+
 		test( 'creates a group from multiple blocks of the same type via options toolbar', async ( {
 			editor,
 			pageUtils,
@@ -315,18 +361,20 @@ test.describe( 'Block Grouping', () => {
 				name: 'core/heading',
 				attributes: { content: 'Heading', level: 2 },
 			} );
-			const alignOptions = page.getByRole( 'menu', { name: 'Align' } );
+			const alignOptions = page.getByRole( 'menu', {
+				name: 'Align block',
+			} );
 
 			// Full width image.
 			await editor.insertBlock( { name: 'core/image' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await alignOptions
 				.getByRole( 'menuitemradio', { name: 'Full width' } )
 				.click();
 
 			// Wide width image.
 			await editor.insertBlock( { name: 'core/image' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await alignOptions
 				.getByRole( 'menuitemradio', {
 					name: 'Wide width',
@@ -344,7 +392,7 @@ test.describe( 'Block Grouping', () => {
 
 			// We expect Group block align setting to match that
 			// of the widest of it's "child" innerBlocks
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				alignOptions.getByRole( 'menuitemradio', { checked: true } )
 			).toHaveText( 'Full width' );

@@ -112,7 +112,9 @@ async function build() {
 				'@wordpress/validation-tools',
 				'--silent',
 			] ).catch( () => {
-				throw new Error( 'Run `npm install` to update.' );
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
 			} );
 		}
 

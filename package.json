@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.5.2",
+	"version": "23.7.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -17,6 +17,16 @@
 	"engines": {
 		"node": ">=20.19.0",
 		"npm": ">=10.2.3"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=20.19.0"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=10.2.3"
+		}
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -65,7 +75,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.61.1",
+		"@playwright/test": "^1.62.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native": "npm:typescript@^7.0.2",
@@ -88,6 +98,7 @@
 		"jsdom": "26.1.0"
 	},
 	"scripts": {
+		"agents:setup": "node ./tools/agents/setup-skills.mjs",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
@@ -120,6 +131,7 @@
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
+		"lint:package-contents": "npm run --if-present --workspaces lint:package-contents",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"prelint:php": "npm run other:update-packages:php",
@@ -133,7 +145,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package",
+		"postinstall": "patch-package && npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",

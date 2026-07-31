@@ -182,6 +182,7 @@ export default function PostFeaturedImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
+	const aspectRatioStyle = aspectRatio === 'auto' ? undefined : aspectRatio;
 
 	const placeholder = ( content ) => {
 		return (
@@ -192,7 +193,7 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					aspectRatio,
+					aspectRatio: aspectRatioStyle,
 					height: hasDimensionValue( height )
 						? height
 						: hasDimensionValue( width ) && 'auto',
@@ -426,7 +427,7 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
-		aspectRatio,
+		aspectRatio: aspectRatioStyle,
 		height: hasDimensionValue( height )
 			? height
 			: hasDimensionValue( width ) && 'auto',

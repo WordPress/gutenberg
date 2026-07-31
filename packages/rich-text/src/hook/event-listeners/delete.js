@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { remove } from '../../remove';
-import { unlock } from '../../lock-unlock';
-
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
@@ -35,5 +32,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
+	return subscribeOwnedListener( element, 'keydown', onKeyDown );
 };

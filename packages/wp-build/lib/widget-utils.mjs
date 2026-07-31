@@ -36,11 +36,21 @@ export function getAllWidgets( rootDir ) {
  */
 
 /**
+ * @typedef {Object} WidgetActionMetadata
+ * @property {string}         id             Stable identifier, local to the widget type.
+ * @property {string}         label          Human-readable label. Translatable.
+ * @property {string}         href           Destination the action points at.
+ * @property {string|boolean} [download]     Download the destination; a string sets the filename.
+ * @property {boolean}        [openInNewTab] Open the destination in a new browser tab.
+ */
+
+/**
  * @typedef {Object} WidgetMetadata
  * @property {string}                                    name           Widget namespaced identifier.
  * @property {string}                                    [title]        Human-readable title.
  * @property {string}                                    [description]  Short description.
  * @property {WidgetHelpMetadata}                        [help]         Contextual help note for compact surfaces.
+ * @property {WidgetActionMetadata[]}                    [actions]      Declarative actions the widget exposes.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
  * @property {string[]}                                  [keywords]     Search aliases used to match the widget.

@@ -136,6 +136,7 @@
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
 			},
+			{ "docs/how-to-guides/client-side-media.md": [] },
 			{ "docs/how-to-guides/thunks.md": [] },
 			{
 				"docs/how-to-guides/widgets/README.md": [
@@ -356,6 +357,9 @@
 					},
 					{ "docs/explanations/architecture/styles.md": [] },
 					{
+						"docs/explanations/architecture/client-side-media-architecture.md": []
+					},
+					{
 						"docs/explanations/architecture/dashboard-widgets.md": []
 					}
 				]
@@ -395,6 +399,7 @@
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{ "docs/contributors/code/workspace-development.md": [] },
+					{ "docs/contributors/code/agents-and-skills.md": [] },
 					{
 						"docs/contributors/code/release/README.md": [
 							{

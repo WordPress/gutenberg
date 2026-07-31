@@ -4,6 +4,22 @@
 
 ### Enhancements
 
+-   Widgets: carry a widget's declarative `actions` from `widget.json` into
+    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Bug Fixes
+
+-   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
+-   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
+-   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
+-   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+
+
+## 0.19.0 (2026-07-14)
+
+### Enhancements
+
+-   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widgets: carry the optional metadata fields from `widget.json` into
     the generated PHP registry: `title`, `description`, `category`,
     `keywords`, `textdomain`, and the `help` note, so hosts can translate

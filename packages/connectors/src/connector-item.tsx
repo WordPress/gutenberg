@@ -46,7 +46,7 @@ export function ConnectorItem( {
 					<FlexBlock>
 						<VStack spacing={ 0 }>
 							<WCText
-								weight={ 600 }
+								weight="var(--wpds-typography-font-weight-emphasis)"
 								size={ 15 }
 								id={ headingId }
 								as="h2"

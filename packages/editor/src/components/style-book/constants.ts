@@ -274,7 +274,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 
 	.editor-style-book__subcategory-title,
 	.editor-style-book__example-title {
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 		font-size: 13px;
 		font-weight: normal;
 		line-height: normal;

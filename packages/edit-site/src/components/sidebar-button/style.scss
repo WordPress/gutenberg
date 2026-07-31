@@ -2,6 +2,10 @@
 	color: var(--wpds-color-foreground-interactive-neutral);
 	flex-shrink: 0;
 
+	&:focus:not(:focus-visible) {
+		outline: none;
+	}
+
 	&:hover:not(:disabled,[aria-disabled="true"]),
 	&:focus-visible,
 	&:focus,

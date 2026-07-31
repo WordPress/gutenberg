@@ -24,11 +24,26 @@ module.exports = {
 		],
 		'declaration-property-value-disallowed-list': [
 			{
-				'/.*/': [ '/--wp-components-color-/' ],
+				'/.*/': [
+					'/--wp-components-color-/',
+					'/\\$font-weight-regular/',
+					'/\\$font-weight-medium/',
+				],
 				cursor: [ 'pointer' ],
 			},
 			{
 				message: ( property, value ) => {
+					if (
+						value.includes( '$font-weight-regular' ) ||
+						value.includes( '$font-weight-medium' )
+					) {
+						const variable = value.includes(
+							'$font-weight-regular'
+						)
+							? '$font-weight-regular'
+							: '$font-weight-medium';
+						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}

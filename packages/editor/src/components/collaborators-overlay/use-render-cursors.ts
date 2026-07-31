@@ -13,7 +13,10 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { computeSelectionVisual } from './compute-selection';
-import { useDebouncedRecompute } from './use-debounced-recompute';
+import {
+	useDebouncedRecompute,
+	useRequestAnimationFrameRecompute,
+} from './use-debounced-recompute';
 import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
 
@@ -56,7 +59,11 @@ export function useRenderCursors(
 	postId: number | null,
 	postType: string | null,
 	delayMs: number
-): { cursors: CursorData[]; rerenderCursorsAfterDelay: () => () => void } {
+): {
+	cursors: CursorData[];
+	rerenderCursorsAfterDelay: () => () => void;
+	rerenderCursorsOnResize: () => void;
+} {
 	const sortedUsers = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
@@ -79,6 +86,10 @@ export function useRenderCursors(
 	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
 	const [ recomputeToken, rerenderCursorsAfterDelay ] =
 		useDebouncedRecompute( delayMs );
+	// Separate token for resize events: fires on the next animation frame so
+	// getBoundingClientRect() reflects the post-resize layout immediately.
+	const [ resizeToken, rerenderCursorsOnResize ] =
+		useRequestAnimationFrameRecompute();
 
 	// All DOM position computations live inside useEffect.
 	useEffect( () => {
@@ -237,7 +248,12 @@ export function useRenderCursors(
 		sortedUsers,
 		showOwnCursor,
 		recomputeToken,
+		resizeToken,
 	] );
 
-	return { cursors: cursorPositions, rerenderCursorsAfterDelay };
+	return {
+		cursors: cursorPositions,
+		rerenderCursorsAfterDelay,
+		rerenderCursorsOnResize,
+	};
 }

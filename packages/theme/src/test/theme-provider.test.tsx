@@ -279,7 +279,7 @@ describe( 'ThemeProvider', () => {
 				prebuiltStyle.textContent = readFileSync(
 					join(
 						import.meta.dirname,
-						'../prebuilt/css/design-tokens.css'
+						'../../prebuilt/css/design-tokens.css'
 					),
 					'utf8'
 				);

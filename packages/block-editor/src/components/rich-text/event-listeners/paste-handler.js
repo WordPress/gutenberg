@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { pasteHandler } from '@wordpress/blocks';
-import { isEmpty, insert, create } from '@wordpress/rich-text';
+import {
+	isEmpty,
+	insert,
+	create,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 
@@ -15,6 +20,7 @@ import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { ownsSelection } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -34,8 +40,14 @@ export default ( props ) => ( element ) => {
 		} = props.current;
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element or inside the element.
-		if ( ! element.contains( event.target ) ) {
+		// the target is the element or inside the element. When the editable
+		// wrapper holds focus (the selected block supports `editableRoot`),
+		// the event targets the wrapper instead; the element then owns the
+		// paste when it contains the selection.
+		if (
+			! element.contains( event.target ) &&
+			! ownsSelection( element )
+		) {
 			return;
 		}
 
@@ -43,9 +55,22 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { plainText, html } = getPasteEventData( event );
+		const pasteData = getPasteEventData( event );
+
+		// Some browsers don't support `clipboardData` and paste plain text on
+		// their own, so the event has to be left alone for them.
+		if ( ! pasteData ) {
+			return;
+		}
 
 		event.preventDefault();
+
+		const { plainText, html, files } = pasteData;
+
+		// Rich text can only paste text; files are placed by the writing flow.
+		if ( files.length ) {
+			return;
+		}
 
 		// Allows us to ask for this information when we get a report.
 		// `pasteHandler` also logs this, but we're not using `pasteHandler` in

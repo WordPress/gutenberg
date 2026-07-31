@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/video-conversion",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Client-side video conversion for WordPress. Currently converts animated GIFs to MP4/WebM via WebCodecs.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

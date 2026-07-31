@@ -2,14 +2,29 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
+### Enhancements
+
+- Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+
+### Bug Fixes
+
+- `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+- `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
+
+## 2.4.0 (2026-07-14)
+
 ## 2.3.0 (2026-07-01)
 
 ## 2.2.0 (2026-06-24)
 
 ### Enhancements
 
-- Bump `wasm-vips` to `^0.0.18`, adding native decoding of 10- and 12-bit (high bit depth) AVIF images ([#79179](https://github.com/WordPress/gutenberg/pull/79179)).
-- Preserve the bit depth of high-bit-depth (10/12-bit) AVIF images through `resizeImage`, `compressImage`, and `convertImageFormat` so HDR sub-sizes are no longer flattened to 8-bit.
+-   Bump `wasm-vips` to `^0.0.18`, adding native decoding of 10- and 12-bit (high bit depth) AVIF images ([#79179](https://github.com/WordPress/gutenberg/pull/79179)).
+-   Preserve the bit depth of high-bit-depth (10/12-bit) AVIF images through `resizeImage`, `compressImage`, and `convertImageFormat` so HDR sub-sizes are no longer flattened to 8-bit.
 
 ## 2.1.1 (2026-06-16)
 
@@ -17,9 +32,9 @@
 
 ### New Features
 
-- Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
-- Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
-- Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+-   Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+-   Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+-   Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
 ## 2.0.0 (2026-05-27)
 

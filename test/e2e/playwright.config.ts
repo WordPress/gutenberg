@@ -28,10 +28,18 @@ const config = defineConfig( {
 				[ 'github' ],
 				[ './config/flaky-tests-reporter.ts' ],
 				[ 'blob' ],
-				[
-					'@flakiness/playwright',
-					{ flakinessProject: 'WordPress/gutenberg' },
-				],
+				/*
+				 * Only interact with flakiness.io for the official WordPress/Gutenberg
+				 * repository. Forks and private mirrors are not configured on the service.
+				 */
+				...( process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
+					? ( [
+							[
+								'@flakiness/playwright',
+								{ flakinessProject: 'WordPress/gutenberg' },
+							],
+					  ] as const )
+					: [] ),
 		  ]
 		: 'list',
 	workers: 1,

@@ -9,6 +9,55 @@ export interface ImageSizeCrop {
 }
 
 /**
+ * Options for converting or compressing an image.
+ */
+export interface ConvertImageOptions {
+	/**
+	 * Desired quality (0-1). Defaults to 0.82.
+	 */
+	quality?: number;
+	/**
+	 * Whether to use interlaced/progressive mode. Only used if the output type
+	 * supports it. Defaults to false.
+	 */
+	interlaced?: boolean;
+	/**
+	 * Whether to strip metadata (except color profiles), from the
+	 * `image_strip_meta` filter. Defaults to true.
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth, from the `image_max_bit_depth` filter.
+	 * Defaults to 16.
+	 */
+	maxBitdepth?: number;
+}
+
+/**
+ * Options for resizing an image.
+ */
+export interface ResizeImageOptions {
+	/**
+	 * Whether to use smart cropping (i.e. saliency-aware). Defaults to false.
+	 */
+	smartCrop?: boolean;
+	/**
+	 * Desired quality (0-1). Defaults to 0.82.
+	 */
+	quality?: number;
+	/**
+	 * Whether to strip metadata (except color profiles), from the
+	 * `image_strip_meta` filter. Defaults to true.
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth, from the `image_max_bit_depth` filter.
+	 * Defaults to 16.
+	 */
+	maxBitdepth?: number;
+}
+
+/**
  * none: Do nothing. Same as low.
  * centre: Just take the centre.
  * entropy: Use an entropy measure

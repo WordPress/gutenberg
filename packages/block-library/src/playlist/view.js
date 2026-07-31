@@ -9,6 +9,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 import {
 	initWaveformPlayer,
 	logPlayError,
+	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
 
@@ -103,11 +104,13 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
+	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
+	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
 		const shouldRecreatePlayer =
-			!! existing.instance.artworkEl !== !! track.image;
+			!! existing.instance.artworkEl !== !! playerArtwork;
 
 		if ( shouldRecreatePlayer ) {
 			existing.destroy?.();
@@ -116,7 +119,8 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			playlistPlayerState.set( context.playlistId, existing );
 			existing.instance
 				.loadTrack( track.url, track.title, track.artist, {
-					artwork: track.image,
+					artwork: playerArtwork,
+					artworkAlt: playerArtwork ? track.imageAlt : '',
 				} )
 				.then( () => {
 					existing.url = track.url;
@@ -128,6 +132,12 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 						existing.instance,
 						track.title || ref.dataset.labelSeek
 					);
+					if ( showPlayButtonArtwork ) {
+						setupPlayButtonArtwork(
+							existing.container,
+							track.image
+						);
+					}
 					if ( shouldAutoPlay ) {
 						existing.instance.play()?.catch( logPlayError );
 					}
@@ -152,9 +162,14 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		artist: track.artist,
 		image: track.image,
 		imageAlt: track.imageAlt,
+		waveformColor: ref.dataset.waveformPlayerColor,
+		waveformGradient: ref.dataset.waveformPlayerGradient,
+		backgroundColor: ref.dataset.waveformPlayerBackgroundColor,
+		backgroundGradient: ref.dataset.waveformPlayerBackgroundGradient,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
@@ -185,6 +200,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const nextState = {
 		url: track.url,
 		instance: player.instance,
+		container: player.container,
 		destroy,
 	};
 	playerState.set( ref, nextState );

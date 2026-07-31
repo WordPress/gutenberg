@@ -11,6 +11,7 @@ import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
+import { ownsSelection } from '../../owns-selection';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -20,8 +21,13 @@ export default ( props ) => ( element ) => {
 		const { record, handleChange } = props.current;
 		const { ownerDocument } = element;
 		if (
+			// Another handler may have already claimed the clipboard, e.g.
+			// the block editor copying the whole block when its entire
+			// text is selected.
+			event.defaultPrevented ||
 			isCollapsed( record.current ) ||
-			! element.contains( ownerDocument.activeElement )
+			( ! element.contains( ownerDocument.activeElement ) &&
+				! ownsSelection( element ) )
 		) {
 			return;
 		}

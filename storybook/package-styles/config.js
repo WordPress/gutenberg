@@ -101,6 +101,11 @@ const CONFIG = [
 		rtl: [ designTokens ],
 	},
 	{
+		componentIdMatcher: /^tokens-/,
+		ltr: [ designTokens ],
+		rtl: [ designTokens ],
+	},
+	{
 		componentIdMatcher: /^mediaeditor-/,
 		ltr: [ componentsLtr ],
 		rtl: [ componentsRtl ],

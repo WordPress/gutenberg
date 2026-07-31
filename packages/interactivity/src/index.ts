@@ -11,7 +11,8 @@ import { batch, effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import registerDirectives, { routerRegions } from './directives';
+import './directives'; // Registers all the core directives.
+import { routerRegions } from './directives/router-region';
 import {
 	initialVdomPromise,
 	hydrateRegions,
@@ -100,10 +101,8 @@ export const privateApis = (
 	throw new Error( 'Forbidden access.' );
 };
 
-// Parses and populates the initial state and config. All the core directives
-// are registered at this point as well.
+// Parses and populates the initial state and config.
 populateServerData( parseServerData() );
-registerDirectives();
 
 // Hydrates all interactive regions when `DOMContentLoaded` is dispatched, or as
 // soon as the `@wordpress/interactivity` module is evaluated in the case that

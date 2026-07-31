@@ -1,9 +1,5 @@
 # Theme
 
-<div class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 A theming package that's part of the WordPress Design System. It has two parts:
 
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
@@ -106,7 +102,7 @@ function App() {
 The `color` prop accepts an object with the following optional properties:
 
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `background`: The background seed color (default: `'#f8f8f8'`).
+-   `background`: The background seed color (default: `'#fcfcfc'`).
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 24.0.0 (2026-07-14)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to 20.19.0 || 22.13.0, i.e. versions supporting require(esm) ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
