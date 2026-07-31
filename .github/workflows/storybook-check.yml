@@ -49,19 +49,11 @@ jobs:
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 
-            - name: Install test-runner
-              run: |
-                  npm install --no-save @storybook/test-runner@0.24.2
-
             # The Storybook test runner only launches Chromium.
-            - name: Install Playwright dependencies
+            - name: Install Playwright browsers
               uses: ./.github/setup-playwright
               with:
                   browsers: chromium
 
             - name: Serve Storybook and run tests
-              run: |
-                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-                  "npx http-server ./storybook/build --port 50240 --silent" \
-                  "npx wait-on tcp:127.0.0.1:50240 && \
-                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
+              run: npm run --workspace @wordpress/storybook test:smoke

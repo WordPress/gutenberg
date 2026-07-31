@@ -7,6 +7,7 @@
  * @covers ::gutenberg_translate_widget_metadata
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
+ * @covers ::gutenberg_sanitize_widget_icon
  * @covers ::gutenberg_sanitize_widget_actions
  * @covers ::gutenberg_resolve_widget_action_href
  */
@@ -110,6 +111,25 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	public function test_sanitize_widget_help_requires_content() {
 		$this->assertNull( gutenberg_sanitize_widget_help( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_help( array( 'links' => array() ) ) );
+	}
+
+	/**
+	 * Only names shaped `collection/icon-name` pass; markup, files, and
+	 * anything malformed normalize to null.
+	 */
+	public function test_sanitize_widget_icon_requires_a_registered_name_shape() {
+		$this->assertSame( 'core/calendar', gutenberg_sanitize_widget_icon( 'core/calendar' ) );
+		$this->assertSame( 'my-plugin/arrow-left', gutenberg_sanitize_widget_icon( 'my-plugin/arrow-left' ) );
+
+		$this->assertNull( gutenberg_sanitize_widget_icon( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( '' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/a/b' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'Core/Calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/-calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/calendar-' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'icon.svg' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( '<svg viewBox="0 0 24 24"></svg>' ) );
 	}
 
 	/**
