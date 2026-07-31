@@ -6,7 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -45,10 +45,6 @@ const SidebarContent = ( {
 	extraPanels,
 } ) => {
 	const tabListRef = useRef( null );
-	// Because `PluginSidebar` renders a `ComplementaryArea`, we
-	// need to forward the `Tabs` context so it can be passed through the
-	// underlying slot/fill.
-	const tabsContextValue = useContext( Tabs.Context );
 	const isRevisionsMode = useSelect( ( select ) => {
 		return unlock( select( editorStore ) ).isRevisionsMode();
 	} );
@@ -110,11 +106,7 @@ const SidebarContent = ( {
 	return (
 		<PluginSidebar
 			identifier={ tabName }
-			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
-				</Tabs.Context.Provider>
-			}
+			header={ <SidebarHeader ref={ tabListRef } /> }
 			closeLabel={ __( 'Close Settings' ) }
 			// This classname is added so we can apply a corrective negative
 			// margin to the panel.
@@ -129,15 +121,13 @@ const SidebarContent = ( {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ tabContent }
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-					{ isRevisionsMode && <RevisionBlockDiffPanel /> }
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
+			<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+				{ tabContent }
+			</Tabs.TabPanel>
+			<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+				<BlockInspector />
+				{ isRevisionsMode && <RevisionBlockDiffPanel /> }
+			</Tabs.TabPanel>
 		</PluginSidebar>
 	);
 };

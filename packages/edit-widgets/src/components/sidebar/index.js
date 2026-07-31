@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext, useCallback } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
@@ -82,17 +82,13 @@ function SidebarContent( {
 		// block selection changes, not sidebar state changes.
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
 
-	const tabsContextValue = useContext( Tabs.Context );
-
 	return (
 		<ComplementaryArea
 			className="edit-widgets-sidebar"
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader
-						selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
-					/>
-				</Tabs.Context.Provider>
+				<SidebarHeader
+					selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
+				/>
 			}
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
@@ -103,32 +99,30 @@ function SidebarContent( {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel
-					tabId={ WIDGET_AREAS_IDENTIFIER }
-					focusable={ false }
-				>
-					<WidgetAreas
-						selectedWidgetAreaId={
-							selectedWidgetAreaBlock?.attributes.id
-						}
-					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel
-					tabId={ BLOCK_INSPECTOR_IDENTIFIER }
-					focusable={ false }
-				>
-					{ hasSelectedNonAreaBlock ? (
-						<BlockInspector />
-					) : (
-						// Pretend that Widget Areas are part of the UI by not
-						// showing the Block Inspector when one is selected.
-						<span className="block-editor-block-inspector__no-blocks">
-							{ __( 'No block selected.' ) }
-						</span>
-					) }
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
+			<Tabs.TabPanel
+				tabId={ WIDGET_AREAS_IDENTIFIER }
+				focusable={ false }
+			>
+				<WidgetAreas
+					selectedWidgetAreaId={
+						selectedWidgetAreaBlock?.attributes.id
+					}
+				/>
+			</Tabs.TabPanel>
+			<Tabs.TabPanel
+				tabId={ BLOCK_INSPECTOR_IDENTIFIER }
+				focusable={ false }
+			>
+				{ hasSelectedNonAreaBlock ? (
+					<BlockInspector />
+				) : (
+					// Pretend that Widget Areas are part of the UI by not
+					// showing the Block Inspector when one is selected.
+					<span className="block-editor-block-inspector__no-blocks">
+						{ __( 'No block selected.' ) }
+					</span>
+				) }
+			</Tabs.TabPanel>
 		</ComplementaryArea>
 	);
 }

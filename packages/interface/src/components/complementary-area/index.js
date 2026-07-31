@@ -39,7 +39,15 @@ import { store as interfaceStore } from '../../store';
 const ANIMATION_DURATION = 0.3;
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
-	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
+	// Portaled, so fills keep the `Fill`'s React context, not the `Slot`'s.
+	return (
+		<Slot
+			name={ `ComplementaryArea/${ scope }` }
+			bubblesVirtually
+			className="interface-complementary-area-slot"
+			{ ...props }
+		/>
+	);
 }
 
 const SIDEBAR_WIDTH = 280;

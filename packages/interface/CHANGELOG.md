@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComplementaryArea`: Render fills through a portal (`bubblesVirtually`), so they keep the React context of the `Fill` instead of inheriting the one at the `Slot`. Sidebar content no longer needs to forward context across the slot boundary by hand ([#81005](https://github.com/WordPress/gutenberg/pull/81005)).
+
 ### Internal
 
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
