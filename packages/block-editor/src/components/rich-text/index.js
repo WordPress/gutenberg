@@ -445,7 +445,14 @@ export function RichTextWrapper(
 	// focusability.
 	let tabIndex = props.tabIndex;
 	if ( isEditingHost ) {
-		tabIndex = props.tabIndex ?? 0;
+		// Do NOT make the child a focusable editing area under the host. iOS
+		// focuses a focusable child on tap, thrashing focus with the host and
+		// canceling native selection gestures (double-tap to select a word).
+		// Focus must stay on the host, which owns editing for the whole canvas;
+		// the child is editable by inheritance (contentEditable="inherit"
+		// below), not on its own. Block props pass tabIndex 0, so it must be
+		// explicitly removed here.
+		tabIndex = null;
 	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
 		tabIndex = null;
 	}
@@ -526,7 +533,12 @@ export function RichTextWrapper(
 					anchorRef,
 					setAnchorElement,
 				] ) }
-				contentEditable={ ! shouldDisableEditing }
+				contentEditable={
+					// Under the editing host the child is editable by
+					// inheritance, not a nested editing host of its own, so iOS
+					// keeps focus on the host and native word selection works.
+					isEditingHost ? 'inherit' : ! shouldDisableEditing
+				}
 				suppressContentEditableWarning
 				className={ clsx(
 					'block-editor-rich-text__editable',
