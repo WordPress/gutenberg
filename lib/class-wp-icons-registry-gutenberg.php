@@ -796,25 +796,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					'viewbox',
 				)
 			),
-			// Animation elements.
-			'animate'             => array_merge(
-				$core_attributes,
-				$this->get_allowed_attribute_list(
-					'accumulate',
-					'additive',
-					'attributename',
-					'begin',
-					'calcmode',
-					'dur',
-					'end',
-					'from',
-					'keysplines',
-					'keytimes',
-					'repeatcount',
-					'to',
-					'values',
-				)
-			),
+			// Animation elements. `<animate>` and `<set>` are excluded: their
+			// `attributeName` targets any attribute at runtime, letting them
+			// replace a value wp_kses() already validated, such as `href`.
 			'animatemotion'       => array_merge(
 				$core_attributes,
 				$this->get_allowed_attribute_list(
@@ -852,17 +836,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					'to',
 					'type',
 					'values',
-				)
-			),
-			'set'                 => array_merge(
-				$core_attributes,
-				$this->get_allowed_attribute_list(
-					'attributename',
-					'begin',
-					'dur',
-					'end',
-					'repeatcount',
-					'to',
 				)
 			),
 		);

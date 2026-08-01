@@ -571,6 +571,10 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><a xlink:href="javascript:alert(1)"><path d="M0 0" /></a></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . '><a xlink:href="alert(1)"><path d="M0 0" /></a></svg>',
 			),
+			'strips animate and set elements'             => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="#icon"><animate attributeName="href" to="javascript:alert(1)" dur="1s" /><set attributeName="href" to="javascript:alert(1)" begin="1s" /><path d="M0 0" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="#icon"><path d="M0 0" /></a></svg>',
+			),
 			'strips disallowed tags'                      => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/><iframe src="evil"></iframe><object data="x" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
@@ -634,8 +638,8 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><marker id="arrow" refx="10" refy="5"><path d="M0,0 L10,5 L0,10" /></marker><path d="M0,12 L24,12" marker-start="url(#arrow)" /></svg>',
 			),
 			'preserves animation elements'                => array(
-				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributeName="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributeName="opacity" to="0.5" begin="1s" /></path></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributename="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributename="opacity" to="0.5" begin="1s" /></path></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path></svg>',
 			),
 		);
 	}
