@@ -41,6 +41,10 @@ import { Stack } from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
+	formatDateValue,
+	getDatePlaceholder,
+} from '../dataviews-filters/utils';
+import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
@@ -442,10 +446,11 @@ function CalendarDateControl< Item >( {
 					{ /* Manual date input */ }
 					<InputControl
 						ref={ validityTargetRef }
-						type="date"
+						type="text"
 						label={ __( 'Date' ) }
 						hideLabelFromVision
-						value={ value }
+						placeholder={ getDatePlaceholder() }
+						value={ value ? formatDateValue( value ) : '' }
 						onChange={ handleManualDateChange }
 						required={ !! field.isValid?.required }
 						disabled={ disabled }
@@ -679,10 +684,15 @@ function CalendarDateRangeControl< Item >( {
 					>
 						<InputControl
 							ref={ fromInputRef }
-							type="date"
+							type="text"
 							label={ __( 'From' ) }
 							hideLabelFromVision
-							value={ value?.[ 0 ] }
+							placeholder={ getDatePlaceholder() }
+							value={
+								value?.[ 0 ]
+									? formatDateValue( value[ 0 ] )
+									: ''
+							}
 							onChange={ ( newValue ) =>
 								handleManualDateChange( 'from', newValue )
 							}
@@ -693,10 +703,15 @@ function CalendarDateRangeControl< Item >( {
 						/>
 						<InputControl
 							ref={ toInputRef }
-							type="date"
+							type="text"
 							label={ __( 'To' ) }
 							hideLabelFromVision
-							value={ value?.[ 1 ] }
+							placeholder={ getDatePlaceholder() }
+							value={
+								value?.[ 1 ]
+									? formatDateValue( value[ 1 ] )
+									: ''
+							}
 							onChange={ ( newValue ) =>
 								handleManualDateChange( 'to', newValue )
 							}
