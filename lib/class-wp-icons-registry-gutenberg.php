@@ -173,12 +173,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Sanitizes an SVG embedded in an HTML fragment.
 	 *
-	 * The input must be an inline SVG as found in an HTML document, NOT raw XML
-	 * from a standalone `.svg` file: parsed as HTML, XML-only constructs (CDATA,
-	 * `<foreignObject>` integration points) are mis-parsed. WP_HTML_Processor
-	 * extracts the whole SVG element before wp_kses runs, so inner HTML tags
-	 * like <p> don't terminate the SVG and self-closing tags are handled
-	 * correctly.
+	 * The input SVG must have been extracted as HTML from a broader HTML
+	 * document, NOT as an entire XML document from an external file or JSON
+	 * value. Parsed as HTML, XML-only constructs (CDATA, `<foreignObject>`
+	 * integration points) are mis-parsed. WP_HTML_Processor extracts the whole
+	 * SVG element before wp_kses runs, so inner HTML tags like <p> don't
+	 * terminate the SVG and self-closing tags are handled correctly.
 	 *
 	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
 	 * @return string The sanitized SVG, or an empty string when no valid SVG is found.
