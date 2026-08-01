@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { __experimentalText as WCText } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
+import { Text, Skeleton } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -14,6 +19,10 @@ import {
 	getFamilyPreviewStyle,
 } from './utils/preview-styles';
 import type { FontDemoProps } from './types';
+
+// Previews already loaded this session, so reopening the library doesn't flash
+// a placeholder for images the browser already has.
+const loadedPreviews = new Set< string >();
 
 function getPreviewUrl( fontFace: FontFace ): string | undefined {
 	if ( fontFace.preview ) {
@@ -54,19 +63,29 @@ function getDisplayFontFace( font: FontFamily | FontFace ): FontFace {
 
 function FontDemo( { font, text }: FontDemoProps ) {
 	const ref = useRef< HTMLDivElement >( null );
+	const imgRef = useRef< HTMLImageElement >( null );
 
 	const fontFace = getDisplayFontFace( font );
 	const style = getFamilyPreviewStyle( font );
 	text = text || ( 'name' in font ? font.name : '' );
 	const customPreviewUrl = font.preview;
 
+	const previewUrl = customPreviewUrl ?? getPreviewUrl( fontFace );
+	const isPreviewImage = Boolean(
+		previewUrl && /\.(png|jpg|jpeg|gif|svg)$/i.test( previewUrl )
+	);
+
 	const [ isIntersecting, setIsIntersecting ] = useState< boolean >( false );
-	const [ isAssetLoaded, setIsAssetLoaded ] = useState< boolean >( false );
+	const [ isAssetLoaded, setIsAssetLoaded ] = useState< boolean >(
+		() => !! previewUrl && loadedPreviews.has( previewUrl )
+	);
 	const { loadFontFaceAsset } = useContext( FontLibraryContext );
 
-	const previewUrl = customPreviewUrl ?? getPreviewUrl( fontFace );
-	const isPreviewImage =
-		previewUrl && previewUrl.match( /\.(png|jpg|jpeg|gif|svg)$/i );
+	// The previews scale with the label, so estimate ~12px per character.
+	const estimatedImageWidth = Math.min(
+		Math.max( text.length * 12, 48 ),
+		300
+	);
 
 	const faceStyles = getFacePreviewStyle( fontFace );
 	const textDemoStyle = {
@@ -78,6 +97,11 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	};
 
 	useEffect( () => {
+		// Only font files need the viewport check. Image previews are lazy
+		// loaded by the browser, and every row in the collection has one.
+		if ( isPreviewImage ) {
+			return;
+		}
 		const observer = new window.IntersectionObserver( ( [ entry ] ) => {
 			setIsIntersecting( entry.isIntersecting );
 		}, {} );
@@ -85,12 +109,21 @@ function FontDemo( { font, text }: FontDemoProps ) {
 			observer.observe( ref.current );
 		}
 		return () => observer.disconnect();
-	}, [ ref ] );
+	}, [ isPreviewImage ] );
+
+	// Re-check on preview change, since an already complete image won't fire
+	// onLoad and the component is reused across fonts.
+	useEffect( () => {
+		setIsAssetLoaded(
+			( !! previewUrl && loadedPreviews.has( previewUrl ) ) ||
+				!! imgRef.current?.complete
+		);
+	}, [ previewUrl ] );
 
 	useEffect( () => {
 		const loadAsset = async () => {
-			if ( isIntersecting ) {
-				if ( ! isPreviewImage && fontFace.src ) {
+			if ( isIntersecting && ! isPreviewImage ) {
+				if ( fontFace.src ) {
 					await loadFontFaceAsset( fontFace );
 				}
 				setIsAssetLoaded( true );
@@ -100,21 +133,41 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
-		<div ref={ ref }>
+		<div ref={ ref } className="font-library__font-demo">
 			{ isPreviewImage ? (
-				<img
-					src={ previewUrl }
-					loading="lazy"
-					alt={ text }
-					className="font-library__font-variant_demo-image"
-				/>
+				<>
+					{ ! isAssetLoaded && (
+						<Skeleton
+							className="font-library__font-variant-demo-skeleton"
+							style={ { width: estimatedImageWidth } }
+						/>
+					) }
+					<img
+						ref={ imgRef }
+						src={ previewUrl }
+						loading="lazy"
+						alt={ text }
+						onLoad={ () => {
+							if ( previewUrl ) {
+								loadedPreviews.add( previewUrl );
+							}
+							setIsAssetLoaded( true );
+						} }
+						// Also on failure, otherwise it pulses forever.
+						onError={ () => setIsAssetLoaded( true ) }
+						className={ clsx(
+							'font-library__font-variant_demo-image',
+							{ 'is-loading': ! isAssetLoaded }
+						) }
+					/>
+				</>
 			) : (
-				<WCText
+				<Text
 					style={ textDemoStyle }
 					className="font-library__font-variant_demo-text"
 				>
 					{ text }
-				</WCText>
+				</Text>
 			) }
 		</div>
 	);
