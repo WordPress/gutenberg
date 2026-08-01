@@ -861,18 +861,22 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return '';
 		}
 
-		$svg   = $processor->serialize_token();
-		$depth = $processor->get_current_depth();
-		while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
-			$svg .= $processor->serialize_token();
+		// A self-closing `<svg />` has no descendants and no closing tag. Scanning
+		// past it would swallow the next sibling and hide it from the check below.
+		$svg = $processor->serialize_token();
+		if ( $processor->expects_closer() ) {
+			$depth = $processor->get_current_depth();
+			while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
+				$svg .= $processor->serialize_token();
+			}
+			// An early stop inside an SVG means truncated input, not unsupported
+			// markup. Reject it: the parser can synthesize closing tags that were
+			// never written, so no valid document remains to trust.
+			if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+				return '';
+			}
+			$svg .= '</svg>';
 		}
-		// An early stop inside an SVG means truncated input, not unsupported
-		// markup. Reject it: the parser can synthesize closing tags that were
-		// never written, so no valid document remains to trust.
-		if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
-			return '';
-		}
-		$svg .= '</svg>';
 
 		// Reject more than one top-level SVG. Nested SVGs were extracted above,
 		// so only sibling roots remain to be found.

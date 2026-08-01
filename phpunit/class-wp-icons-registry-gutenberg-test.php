@@ -493,6 +493,18 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<math><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg></math>',
 				'',
 			),
+			'allows a self-closing svg root'              => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+			),
+			'rejects a sibling after a self-closing root' => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" /><svg xmlns="http://www.w3.org/2000/svg"><path d="second" /></svg>',
+				'',
+			),
+			'ignores markup after a self-closing root'    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" /><path d="orphan" />',
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+			),
 
 			// Content surrounding the SVG root is ignored.
 			'ignores content preceding the svg'           => array(
