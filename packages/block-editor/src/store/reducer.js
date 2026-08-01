@@ -1442,19 +1442,19 @@ export function selection( state = {}, action ) {
 				selectionEnd,
 			};
 		case 'MULTI_SELECT':
-			const { start, end } = action;
+			const nextSelection = {
+				selectionStart: { clientId: action.start },
+				selectionEnd: { clientId: action.end },
+			};
 
-			if (
-				start === state.selectionStart?.clientId &&
-				end === state.selectionEnd?.clientId
-			) {
+			// A text selection between the same blocks is not the same
+			// selection: it carries attribute keys and offsets, making it
+			// partial rather than a block multi-selection.
+			if ( fastDeepEqual( state, nextSelection ) ) {
 				return state;
 			}
 
-			return {
-				selectionStart: { clientId: start },
-				selectionEnd: { clientId: end },
-			};
+			return nextSelection;
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;

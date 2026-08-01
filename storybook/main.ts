@@ -16,9 +16,7 @@ import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fall
  */
 function getAbsolutePath( packageName: string ) {
 	return path.dirname(
-		fileURLToPath(
-			import.meta.resolve( path.join( packageName, 'package.json' ) )
-		)
+		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
 	);
 }
 
@@ -30,6 +28,7 @@ const stories = [
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -44,6 +43,7 @@ const stories = [
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
 	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
@@ -127,7 +127,6 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react( {
-					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 					},

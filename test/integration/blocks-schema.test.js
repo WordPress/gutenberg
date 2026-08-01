@@ -12,6 +12,10 @@ import blockSchema from '../../schemas/json/block.json';
 describe( 'block.json schema', () => {
 	const jsonFiles = glob.sync(
 		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
+		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
+	);
+	const invalidFiles = glob.sync(
+		[ 'test/integration/fixtures/block-schemas/*.json' ],
 		{ onlyFiles: true }
 	);
 	const ajv = new Ajv();
@@ -40,4 +44,15 @@ describe( 'block.json schema', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	test.each( invalidFiles )(
+		'rejects invalid block metadata in `%s`',
+		( filepath ) => {
+			const { $schema, ...blockMetadata } = require( filepath );
+
+			const result = ajv.validate( blockSchema, blockMetadata );
+
+			expect( result ).toBe( false );
+		}
+	);
 } );

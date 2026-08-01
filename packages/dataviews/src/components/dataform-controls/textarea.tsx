@@ -51,7 +51,6 @@ export default function Textarea< Item >( {
 			maxLength={
 				isValid.maxLength ? isValid.maxLength.constraint : undefined
 			}
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
