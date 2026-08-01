@@ -1006,9 +1006,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		} );
 		await editor.insertBlock( { name: 'core/separator' } );
 
-		// Move the caret into the paragraph so its block toolbar repositions
-		// above it and stops overlapping the text.
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
 
 		// Triple click selects the paragraph. The browser extends the forward
 		// selection to the separator instead of into it at offset 0; that
@@ -1046,9 +1046,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		} );
 		await editor.insertBlock( { name: 'core/image' } );
 
-		// Move the caret into the paragraph so its block toolbar repositions
-		// above it and stops overlapping the text.
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
 
 		// Triple click selects the paragraph. The browser extends the forward
 		// selection into an empty element of the placeholder, where the offset
@@ -1091,9 +1091,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			],
 		} );
 
-		// Move the caret into the first paragraph so its block toolbar
-		// repositions above it and stops overlapping the text.
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+		);
 
 		// Triple click selects the paragraph. The browser extends the forward
 		// selection into the group, where the boundary has no preceding
@@ -1149,9 +1151,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		} );
 		await editor.insertBlock( { name: 'core/separator' } );
 
-		// Move the caret into the last paragraph of the group so its block
-		// toolbar repositions above it and stops overlapping the text.
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+		);
 
 		// Triple click selects the paragraph. The browser extends the forward
 		// selection past the group, to the separator after it; that overshoot
