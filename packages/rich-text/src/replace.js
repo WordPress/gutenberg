@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 
-import { normaliseFormats } from './normalise-formats';
+import { insert } from './insert';
+import { create } from './create';
+import {
+	defineFormatsAccessor,
+	getFormatsAtSelection,
+	mapFromFormats,
+} from './format-ranges';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -22,50 +28,47 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {RichTextValue} A new value with replacements applied.
  */
-export function replace(
-	{ formats, replacements, text, start, end },
-	pattern,
-	replacement
-) {
-	text = text.replace( pattern, ( match, ...rest ) => {
-		const offset = rest[ rest.length - 2 ];
-		let newText = replacement;
-		let newFormats;
-		let newReplacements;
+export function replace( value, pattern, replacement ) {
+	let newValue = value;
+	if ( ! newValue._formats ) {
+		newValue = defineFormatsAccessor( {
+			...newValue,
+			_formats: mapFromFormats( newValue.formats ),
+		} );
+	}
 
-		if ( typeof newText === 'function' ) {
-			newText = replacement( match, ...rest );
+	newValue.text.replace( pattern, ( match, ...rest ) => {
+		const offset = rest[ rest.length - 2 ];
+		let valueToInsert = replacement;
+
+		if ( typeof valueToInsert === 'function' ) {
+			valueToInsert = replacement( match, ...rest );
 		}
 
-		if ( typeof newText === 'object' ) {
-			newFormats = newText.formats;
-			newReplacements = newText.replacements;
-			newText = newText.text;
-		} else {
-			newFormats = Array( newText.length );
-			newReplacements = Array( newText.length );
-
-			if ( formats[ offset ] ) {
-				newFormats = newFormats.fill( formats[ offset ] );
+		if ( typeof valueToInsert === 'string' ) {
+			const inheritedFormats = getFormatsAtSelection(
+				newValue._formats,
+				offset
+			);
+			valueToInsert = create( { text: valueToInsert } );
+			if ( inheritedFormats.length > 0 ) {
+				for ( const format of inheritedFormats ) {
+					valueToInsert._formats.set( format, [
+						0,
+						valueToInsert.text.length,
+					] );
+				}
 			}
 		}
 
-		formats = formats
-			.slice( 0, offset )
-			.concat( newFormats, formats.slice( offset + match.length ) );
-		replacements = replacements
-			.slice( 0, offset )
-			.concat(
-				newReplacements,
-				replacements.slice( offset + match.length )
-			);
-
-		if ( start ) {
-			start = end = offset + newText.length;
-		}
-
-		return newText;
+		newValue = insert(
+			newValue,
+			valueToInsert,
+			offset,
+			offset + match.length
+		);
+		return match;
 	} );
 
-	return normaliseFormats( { formats, replacements, text, start, end } );
+	return newValue;
 }

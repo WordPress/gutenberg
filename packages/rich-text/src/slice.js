@@ -1,3 +1,12 @@
+/**
+ * Internal dependencies
+ */
+import {
+	defineFormatsAccessor,
+	mapFromFormats,
+	sliceFormats,
+} from './format-ranges';
+
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
@@ -12,15 +21,24 @@
  * @return {RichTextValue} A new extracted value.
  */
 export function slice( value, startIndex = value.start, endIndex = value.end ) {
-	const { formats, replacements, text } = value;
+	const { replacements, text } = value;
 
 	if ( startIndex === undefined || endIndex === undefined ) {
-		return { ...value };
+		return defineFormatsAccessor( {
+			...value,
+			_formats: new Map(
+				value._formats || mapFromFormats( value.formats )
+			),
+		} );
 	}
 
-	return {
-		formats: formats.slice( startIndex, endIndex ),
+	return defineFormatsAccessor( {
+		_formats: sliceFormats(
+			value._formats || mapFromFormats( value.formats ),
+			startIndex,
+			endIndex
+		),
 		replacements: replacements.slice( startIndex, endIndex ),
 		text: text.slice( startIndex, endIndex ),
-	};
+	} );
 }

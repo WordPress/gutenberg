@@ -4,6 +4,11 @@
 
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
+import {
+	defineFormatsAccessor,
+	mapFromFormats,
+	mergeFormatsInto,
+} from './format-ranges';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -22,14 +27,33 @@ export function join( values, separator = '' ) {
 		separator = create( { text: separator } );
 	}
 
-	return normaliseFormats(
-		values.reduce( ( accumulator, { formats, replacements, text } ) => ( {
-			formats: accumulator.formats.concat( separator.formats, formats ),
-			replacements: accumulator.replacements.concat(
-				separator.replacements,
-				replacements
-			),
-			text: accumulator.text + separator.text + text,
-		} ) )
-	);
+	if ( ! separator._formats ) {
+		separator = defineFormatsAccessor( {
+			...separator,
+			_formats: mapFromFormats( separator.formats ),
+		} );
+	}
+
+	const accumulator = defineFormatsAccessor( {
+		_formats: new Map(),
+		replacements: [],
+		text: '',
+	} );
+
+	values.forEach( ( value, index ) => {
+		if ( index > 0 ) {
+			mergeFormatsInto( accumulator, separator );
+			accumulator.replacements = accumulator.replacements.concat(
+				separator.replacements
+			);
+			accumulator.text += separator.text;
+		}
+		mergeFormatsInto( accumulator, value );
+		accumulator.replacements = accumulator.replacements.concat(
+			value.replacements
+		);
+		accumulator.text += value.text;
+	} );
+
+	return normaliseFormats( accumulator );
 }
