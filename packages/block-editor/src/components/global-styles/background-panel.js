@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -23,6 +22,7 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -142,7 +142,7 @@ export function BackgroundToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -155,7 +155,7 @@ export function BackgroundToolsPanel( {
 			<div className="background-block-support-panel__inner-wrapper">
 				{ children }
 			</div>
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -366,6 +366,7 @@ export default function BackgroundImagePanel( {
 					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
+					stylePaths={ [ 'background.backgroundImage' ] }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
@@ -386,6 +387,7 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundColorControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Color' ) }
+					stylePaths={ [ 'color.background' ] }
 					hasValue={ () => hasBackgroundColorValue( value ) }
 					resetValue={ resetBackgroundColor }
 					isShownByDefault={ defaultControls.backgroundColor }
@@ -433,6 +435,7 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
+					stylePaths={ [ 'color.gradient' ] }
 					hasValue={ () => hasBackgroundGradientValue( value ) }
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
@@ -478,6 +481,7 @@ export default function BackgroundImagePanel( {
 			{ showLegacyColorGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
+					stylePaths={ [ 'color.gradient' ] }
 					hasValue={ () => hasLegacyColorGradientValue( value ) }
 					resetValue={ resetLegacyColorGradient }
 					isShownByDefault={ defaultControls.gradient }

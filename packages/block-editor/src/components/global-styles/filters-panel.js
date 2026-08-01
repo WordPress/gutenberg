@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack, // eslint-disable-line @wordpress/use-recommended-components
 	__experimentalZStack as ZStack, // eslint-disable-line @wordpress/use-recommended-components
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -33,9 +32,9 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 const EMPTY_ARRAY = [];
 function useMultiOriginColorPresets(
@@ -85,14 +84,14 @@ function FiltersToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -130,7 +129,7 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 
 const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, onReset } = resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -160,21 +159,15 @@ const renderToggle = ( duotone, resetConfig ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							size="small"
-							icon={ resetIcon }
-							label={ __( 'Reset' ) }
-							className="block-editor-panel-duotone-settings__reset"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-duotone-settings__reset"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};
@@ -272,6 +265,7 @@ export default function FiltersPanel( {
 							inheritedDuotone !== undefined
 					) }
 					label={ __( 'Duotone' ) }
+					stylePaths={ [ 'filter.duotone' ] }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }

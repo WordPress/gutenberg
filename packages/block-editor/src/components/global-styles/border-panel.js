@@ -5,7 +5,6 @@ import {
 	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalIsDefinedBorder as isDefinedBorder,
-	__experimentalToolsPanel as ToolsPanel,
 	BaseControl,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -26,6 +25,7 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
@@ -80,14 +80,14 @@ function BorderToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ label }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -399,6 +399,11 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
+					stylePaths={ [
+						'border.color',
+						'border.style',
+						'border.width',
+					] }
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -446,6 +451,7 @@ export default function BorderPanel( {
 					) }
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
+					stylePaths={ [ 'border.radius' ] }
 					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
@@ -467,6 +473,7 @@ export default function BorderPanel( {
 						hasShadow() && inheritedShadow !== undefined
 					) }
 					label={ __( 'Shadow' ) }
+					stylePaths={ [ 'shadow' ] }
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }

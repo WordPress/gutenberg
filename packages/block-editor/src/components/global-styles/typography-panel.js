@@ -4,7 +4,6 @@
 import {
 	FontSizePicker,
 	__experimentalNumberControl as NumberControl,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	Notice,
 	ToggleControl,
@@ -43,6 +42,7 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -196,7 +196,7 @@ export function TypographyToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -204,7 +204,7 @@ export function TypographyToolsPanel( {
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -815,6 +815,7 @@ export default function TypographyPanel( {
 			{ hasTextColorEnabled && (
 				<ColorGradientDropdownItem
 					label={ __( 'Color' ) }
+					stylePaths={ [ 'color.text' ] }
 					hasValue={ hasTextColorValue }
 					resetValue={ resetTextColor }
 					isShownByDefault={ defaultControls.textColor }
@@ -861,6 +862,7 @@ export default function TypographyPanel( {
 						hasFontFamily() && inheritedFontFamily !== undefined
 					) }
 					label={ __( 'Font' ) }
+					stylePaths={ [ 'typography.fontFamily' ] }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
 					isShownByDefault={ defaultControls.fontFamily }
@@ -880,6 +882,7 @@ export default function TypographyPanel( {
 						hasFontSize() && rawInheritedFontSize !== undefined
 					) }
 					label={ __( 'Size' ) }
+					stylePaths={ [ 'typography.fontSize' ] }
 					hasValue={ hasFontSize }
 					hasInlineEndToggle
 					onDeselect={ resetFontSize }
@@ -906,6 +909,10 @@ export default function TypographyPanel( {
 								inheritedFontWeight !== undefined )
 					) }
 					label={ appearanceControlLabel }
+					stylePaths={ [
+						'typography.fontStyle',
+						'typography.fontWeight',
+					] }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
 					isShownByDefault={ defaultControls.fontAppearance }
@@ -931,6 +938,7 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Line height' ) }
+					stylePaths={ [ 'typography.lineHeight' ] }
 					hasValue={ hasLineHeight }
 					onDeselect={ resetLineHeight }
 					isShownByDefault={ defaultControls.lineHeight }
@@ -964,6 +972,7 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Letter spacing' ) }
+					stylePaths={ [ 'typography.letterSpacing' ] }
 					hasValue={ hasLetterSpacing }
 					onDeselect={ resetLetterSpacing }
 					isShownByDefault={ defaultControls.letterSpacing }
@@ -997,6 +1006,7 @@ export default function TypographyPanel( {
 						hasTextIndent() && inheritedTextIndent !== undefined
 					) }
 					label={ __( 'Line indent' ) }
+					stylePaths={ [ 'typography.textIndent' ] }
 					hasValue={ hasTextIndent }
 					onDeselect={ resetTextIndent }
 					isShownByDefault={ defaultControls.textIndent }
@@ -1038,6 +1048,7 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Columns' ) }
+					stylePaths={ [ 'typography.textColumns' ] }
 					hasValue={ hasTextColumns }
 					onDeselect={ resetTextColumns }
 					isShownByDefault={ defaultControls.textColumns }
@@ -1068,6 +1079,7 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Decoration' ) }
+					stylePaths={ [ 'typography.textDecoration' ] }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
 					isShownByDefault={ defaultControls.textDecoration }
@@ -1088,6 +1100,7 @@ export default function TypographyPanel( {
 						'single-column'
 					) }
 					label={ __( 'Orientation' ) }
+					stylePaths={ [ 'typography.writingMode' ] }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }
@@ -1107,6 +1120,7 @@ export default function TypographyPanel( {
 							inheritedTextTransform !== undefined
 					) }
 					label={ __( 'Letter case' ) }
+					stylePaths={ [ 'typography.textTransform' ] }
 					hasValue={ hasTextTransform }
 					onDeselect={ resetTextTransform }
 					isShownByDefault={ defaultControls.textTransform }
@@ -1127,6 +1141,7 @@ export default function TypographyPanel( {
 						hasTextAlign() && inheritedTextAlign !== undefined
 					) }
 					label={ __( 'Text alignment' ) }
+					stylePaths={ [ 'typography.textAlign' ] }
 					hasValue={ hasTextAlign }
 					onDeselect={ resetTextAlign }
 					isShownByDefault={ defaultControls.textAlign }
