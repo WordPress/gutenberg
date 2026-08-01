@@ -153,7 +153,7 @@ function FontDemo( { font, text }: FontDemoProps ) {
 							}
 							setIsAssetLoaded( true );
 						} }
-						// Also on failure, otherwise it pulses forever.
+						// Also on failure, otherwise skeleton will pulse forever.
 						onError={ () => setIsAssetLoaded( true ) }
 						className={ clsx(
 							'font-library__font-variant_demo-image',
