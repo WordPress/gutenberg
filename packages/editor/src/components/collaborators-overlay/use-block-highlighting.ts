@@ -100,6 +100,7 @@ export function useBlockHighlighting(
 		type BlockEntry = {
 			blockId: string;
 			clientId: number;
+			userId: string;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -141,6 +142,7 @@ export function useBlockHighlighting(
 						{
 							blockId: localClientId,
 							clientId: userState.clientId,
+							userId: userState.collaboratorInfo.id,
 							color: getAvatarBorderColor(
 								userState.collaboratorInfo.id
 							),
@@ -252,6 +254,7 @@ export function useBlockHighlighting(
 				].map( ( blockId ) => ( {
 					blockId,
 					clientId: userState.clientId,
+					userId: userState.collaboratorInfo.id,
 					color,
 					userName,
 					avatarUrl,
@@ -293,10 +296,8 @@ export function useBlockHighlighting(
 		const results: BlockHighlightData[] = [];
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
-		// Track which users already have an avatar placed. We key by color
-		// because getAvatarBorderColor returns a deterministic value per
-		// collaborator ID, making it a cheap unique identifier here.
-		// Blocks arrive in document order (top to bottom) so the first
+		// Track which users already have an avatar placed, keyed by WordPress
+		// user ID. Blocks arrive in document order (top to bottom) so the first
 		// block encountered per user is always the topmost visible one.
 		const usersWithAvatar = new Set< string >();
 
@@ -334,8 +335,8 @@ export function useBlockHighlighting(
 				currentHighlightedIds.add( blockId );
 			}
 
-			if ( overlayRect && ! usersWithAvatar.has( color ) ) {
-				usersWithAvatar.add( color );
+			if ( overlayRect && ! usersWithAvatar.has( block.userId ) ) {
+				usersWithAvatar.add( block.userId );
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,
