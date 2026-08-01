@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
+-   Font Library: Add a skeleton loader for the font preview images ([#81047](https://github.com/WordPress/gutenberg/pull/81047)).
 
 ### Bug Fixes
 
