@@ -29,6 +29,7 @@ const UnconnectedToolsPanel = (
 		toggleItem,
 		headingLevel,
 		dropdownMenuProps,
+		__experimentalMenuItemDescription,
 		...toolsPanelProps
 	} = useToolsPanel( props );
 
@@ -49,6 +50,9 @@ const UnconnectedToolsPanel = (
 					toggleItem={ toggleItem }
 					headingLevel={ headingLevel }
 					dropdownMenuProps={ dropdownMenuProps }
+					__experimentalMenuItemDescription={
+						__experimentalMenuItemDescription
+					}
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>

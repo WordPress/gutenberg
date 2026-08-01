@@ -115,3 +115,88 @@
 		opacity: 0.3;
 	}
 }
+
+// Consumer-supplied description sitting beneath a menu item. Indented to the
+// item's label so it reads as belonging to that row rather than to the group,
+// and `aria-hidden` — the item's `aria-describedby` is what carries it to
+// assistive technology.
+// No negative offset pulling it toward the item: the item is a full-height
+// button carrying a focus ring, and any overlap puts that ring through the
+// first line of the description.
+// An item carrying a description is bracketed by a rule above and below, so the
+// pair reads as one unit rather than as a row followed by loose text.
+//
+// Drawn as a pseudo-element rather than a border because the rule has to reach
+// the dropdown edges, while the item's own background and focus ring must keep
+// their normal inset width — a negative margin on the item itself would drag
+// both out with it.
+.menu-item-described {
+	position: relative;
+
+	// The rule sits in a gap rather than against the item, so the focus ring of
+	// whatever is above it has room to draw without the two colliding.
+	margin-top: $grid-unit-20;
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset-block-start: -#{$grid-unit-10};
+		inset-inline: -$grid-unit-10;
+		border-top: $border-width solid $gray-400;
+	}
+
+	// First in its group, the group's own label is already the top boundary and
+	// a rule directly beneath it reads as a stray line.
+	&:first-child {
+		margin-top: 0;
+
+		&::before {
+			content: none;
+		}
+	}
+}
+
+// Where two described items sit back to back, the first one's closing rule is
+// already the second one's opening rule.
+.menu-item-description + .menu-item-described {
+	margin-top: 0;
+
+	&::before {
+		content: none;
+	}
+}
+
+.menu-item-description {
+	// The item above is a full-height button whose focus ring is drawn 1.5px
+	// wide at a 1.5px offset, so it paints 3px outside its box. This is the
+	// tightest step on the grid that still clears it — any less and a focused
+	// control's ring cuts through the first line of its own description.
+	padding-block: $grid-unit-05 $grid-unit-15;
+	font-size: var(--wpds-typography-font-size-xs);
+	line-height: 1.5;
+
+	// Closes the described item off from the next one with the same rule that
+	// sits above `Reset all` — which inside a dropdown is `$gray-400`, not the
+	// `$gray-900` the bare `MenuGroup` uses (see `dropdown/style.scss`).
+	border-bottom: $border-width solid $gray-400;
+
+	// That rule spans the dropdown edge to edge, because it belongs to the
+	// `MenuGroup` itself. This sits one level deeper, inside the group's
+	// content box, so it has to give back the group's own inline padding to
+	// reach the same width — then take it again as padding, plus the menu
+	// item's, before any indent.
+	margin-inline: -$grid-unit-10;
+
+	// One step further in than the labels above, so the description reads as
+	// hanging off its own item rather than as a sibling row. The end side stays
+	// level with the item's own padding, keeping values right-aligned with the
+	// `Reset` beside the label.
+	padding-inline-start: $grid-unit-30;
+	padding-inline-end: $grid-unit-20;
+
+	// Unless it is the last thing in the group, where the following group's own
+	// top border would double it up.
+	&:last-child {
+		border-bottom: none;
+	}
+}
