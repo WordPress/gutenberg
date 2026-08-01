@@ -28,6 +28,72 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
+	test( 'shows an appender to refill the quote after its last block is removed', async ( {
+		editor,
+		page,
+	} ) => {
+		// Give the floating block toolbar room above the quote, so it does
+		// not clamp down over the appender.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'above' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/quote',
+			attributes: { citation: 'cite' },
+			innerBlocks: [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: { content: '' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Backspace in the sole empty list item removes the list, leaving
+		// the quote without inner blocks.
+		await editor.canvas.locator( '[data-type="core/list-item"]' ).click();
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'above' } },
+			{
+				name: 'core/quote',
+				attributes: { citation: 'cite' },
+				innerBlocks: [],
+			},
+		] );
+
+		// The emptied quote offers the default appender to refill it:
+		// arrowing up from the citation onto the appender inserts a fresh
+		// paragraph inside the quote.
+		await expect(
+			editor.canvas.getByRole( 'button', {
+				name: 'Add default block',
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'refilled' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'above' } },
+			{
+				name: 'core/quote',
+				attributes: { citation: 'cite' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'refilled' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'can be created by using > at the start of a paragraph block', async ( {
 		editor,
 		page,

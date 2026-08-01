@@ -3,7 +3,6 @@
  */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,77 +13,6 @@ import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Returns true when the writing flow wrapper can host editing for the given
- * block: it supports `editableRoot`, is edited visually in the default
- * editing mode, and has sibling blocks for a native selection to extend
- * into, all of them editable.
- *
- * @param {Object} select   Bound block editor store selectors.
- * @param {string} clientId Block client ID.
- *
- * @return {boolean} Whether an editing host can host the block.
- */
-export function canHostEditableRoot( select, clientId ) {
-	const {
-		getBlockName,
-		getBlockEditingMode,
-		getBlockMode,
-		getBlockRootClientId,
-		getBlockOrder,
-	} = select;
-
-	if (
-		! clientId ||
-		getBlockEditingMode( clientId ) !== 'default' ||
-		// Not when the block is edited as HTML: there is no rich text to
-		// host then, only a textarea, which the editing host would
-		// interfere with.
-		getBlockMode( clientId ) !== 'visual' ||
-		! hasBlockSupport( getBlockName( clientId ), 'editableRoot', false )
-	) {
-		return false;
-	}
-
-	// Only host when the block has sibling blocks for a native selection to
-	// extend into, all of them editable. A lone block (e.g. a single
-	// paragraph nested in an HTML block) is edited on its own element, and
-	// read-only siblings (e.g. pattern content without overrides enabled)
-	// must not become editable by inheriting from the host.
-	const siblings = getBlockOrder( getBlockRootClientId( clientId ) );
-	return (
-		siblings.length > 1 &&
-		siblings.every(
-			( siblingClientId ) =>
-				getBlockEditingMode( siblingClientId ) === 'default'
-		)
-	);
-}
-
-/**
- * Returns true when the writing flow wrapper should be contentEditable: the
- * selected block supports `editableRoot`.
- *
- * @return {boolean} Whether the wrapper should be editable.
- */
-export function useHasEditableRoot() {
-	return useSelect( ( select ) => {
-		const selectors = select( blockEditorStore );
-		return canHostEditableRoot(
-			selectors,
-			selectors.getSelectedBlockClientId()
-		);
-	}, [] );
-}
-
-/**
- * Keeps the writing flow wrapper contentEditable while the selected block
- * supports `editableRoot`, so the native selection can extend across blocks.
- * While the wrapper is editable it must also hold focus: a nested editable
- * element cannot retain focus once an ancestor becomes an editing host (the
- * first DOM mutation moves focus to the host, inconsistently across
- * browsers).
- */
-/**
  * Keeps the writing flow wrapper contentEditable while the selected block
  * supports `editableRoot`, so the native selection can extend across blocks.
  * While the wrapper is editable it must also hold focus: a nested editable
@@ -94,11 +22,13 @@ export function useHasEditableRoot() {
  */
 export default function useEditableRoot() {
 	const registry = useRegistry();
-	const isZoomOut = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
-	const enabled = useHasEditableRoot() && ! isZoomOut;
+	const enabled = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
+			unlock( select( blockEditorStore ) );
+		return (
+			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
+		);
+	}, [] );
 
 	return useRefEffect(
 		( node ) => {

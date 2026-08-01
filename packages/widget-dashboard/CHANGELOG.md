@@ -9,6 +9,8 @@
 
 ### Enhancements
 
+-   Widget chrome and picker preview chrome: preserve their flex-column layout
+    when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
 -   Widget settings: use the `drawerRight` icon for the per-tile settings
     trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Widget toolbar: when the tile header lacks room for the inline attribute
@@ -17,6 +19,7 @@
 
 ### Documentation
 
+-   Describe what the "More" menu mounts for a link fulfillment ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
 -   Prefer a static CSV asset over a `data:` URL in the goal-progress story ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add/improve default story and documentation ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
 -   Document how attribute `relevance` maps to surfaces: the prominent
