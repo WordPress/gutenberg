@@ -42,6 +42,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
+		"@testing-library/react": "^16.3.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",

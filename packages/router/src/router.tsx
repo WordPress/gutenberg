@@ -65,6 +65,7 @@ interface Config {
 export interface NavigationOptions {
 	transition?: string;
 	state?: Record< string, any >;
+	replace?: boolean;
 }
 
 const RoutesContext = createContext< Match | null >( null );
@@ -106,6 +107,18 @@ export function useHistory() {
 				const result = beforeNavigate
 					? beforeNavigate( { path, query } )
 					: { path, query };
+
+				if ( options.replace ) {
+					return history.replace(
+						{
+							search: buildQueryString( {
+								[ pathArg ]: result.path,
+								...result.query,
+							} ),
+						},
+						options.state
+					);
+				}
 				return history.push(
 					{
 						search: buildQueryString( {
