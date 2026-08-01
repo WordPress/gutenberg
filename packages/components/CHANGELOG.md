@@ -11,6 +11,10 @@
     -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
+### Deprecations
+
+-   `Surface`: Deprecate the component, planned for removal in WordPress 7.4 ([#80943](https://github.com/WordPress/gutenberg/pull/80943)).
+
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
