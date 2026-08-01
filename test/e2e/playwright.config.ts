@@ -17,6 +17,13 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
 
+const flakinessOptions = {
+	flakinessProject: 'WordPress/gutenberg',
+	shardBalancing: {
+		timingsFile: './timings.json',
+	},
+};
+
 const config = defineConfig( {
 	...baseConfig,
 	webServer: {
@@ -34,14 +41,11 @@ const config = defineConfig( {
 				 */
 				...( process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
 					? ( [
-							[
-								'@flakiness/playwright',
-								{ flakinessProject: 'WordPress/gutenberg' },
-							],
+							[ '@flakiness/playwright', flakinessOptions ],
 					  ] as const )
 					: [] ),
 		  ]
-		: 'list',
+		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
