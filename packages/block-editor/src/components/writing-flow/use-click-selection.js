@@ -1,7 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
-import { setContentEditableWrapper } from './utils';
+import { setContentEditableWrapper, setLastClickPoint } from './utils';
 import { getBlockClientId } from '../../utils/dom';
 
 export default function useClickSelection() {
@@ -15,6 +15,12 @@ export default function useClickSelection() {
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
+				// Remember the pointer position: when selecting the block
+				// turns its editable into an inert part of the editing host
+				// mid-click, the browser drops the caret this mousedown
+				// placed, and `useEditableRoot` restores it from this point.
+				setLastClickPoint( node, event );
+
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
