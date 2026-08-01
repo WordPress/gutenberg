@@ -28,7 +28,6 @@ import type {
 	SelectionInMultipleBlocks,
 	SelectionWholeBlock,
 	CursorPosition,
-	WholeBlockEndpoint,
 	SelectionEndpoint,
 } from '../types';
 
@@ -232,7 +231,7 @@ function getSelectionEndpoint(
 ): SelectionEndpoint | null {
 	const cursorPosition = getCursorPosition( selection, blocks );
 	if ( cursorPosition ) {
-		return { kind: 'cursor', cursorPosition };
+		return { type: SelectionType.Cursor, cursorPosition };
 	}
 
 	// No character offset available — anchor to the block's slot in its
@@ -242,7 +241,7 @@ function getSelectionEndpoint(
 		? createRelativePositionForBlockPath( path, blocks )
 		: null;
 	if ( blockPosition ) {
-		return { kind: 'whole-block', blockPosition };
+		return { type: SelectionType.WholeBlock, blockPosition };
 	}
 	return null;
 }
@@ -425,19 +424,22 @@ function areEndpointsEqual(
 	ep1: SelectionEndpoint,
 	ep2: SelectionEndpoint
 ): boolean {
-	if ( ep1.kind !== ep2.kind ) {
+	if ( ep1.type !== ep2.type ) {
 		return false;
 	}
-	if ( ep1.kind === 'cursor' && ep2.kind === 'cursor' ) {
+	if (
+		ep1.type === SelectionType.Cursor &&
+		ep2.type === SelectionType.Cursor
+	) {
 		return areCursorPositionsEqual(
 			ep1.cursorPosition,
 			ep2.cursorPosition
 		);
 	}
-	// Both 'whole-block'.
+	// Both SelectionType.WholeBlock.
 	return Y.compareRelativePositions(
-		( ep1 as WholeBlockEndpoint ).blockPosition,
-		( ep2 as WholeBlockEndpoint ).blockPosition
+		( ep1 as SelectionWholeBlock ).blockPosition,
+		( ep2 as SelectionWholeBlock ).blockPosition
 	);
 }
 

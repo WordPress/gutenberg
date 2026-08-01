@@ -157,16 +157,7 @@ export function useRenderCursors(
 				// end uses the right Yjs anchor regardless of block type.
 				const resolveEndpoint = (
 					endpoint: SelectionEndpoint
-				): ResolvedSelection =>
-					endpoint.kind === 'cursor'
-						? resolveSelection( {
-								type: SelectionType.Cursor,
-								cursorPosition: endpoint.cursorPosition,
-						  } )
-						: resolveSelection( {
-								type: SelectionType.WholeBlock,
-								blockPosition: endpoint.blockPosition,
-						  } );
+				): ResolvedSelection => resolveSelection( endpoint );
 				try {
 					start = resolveEndpoint( selection.startEndpoint );
 					end = resolveEndpoint( selection.endEndpoint );

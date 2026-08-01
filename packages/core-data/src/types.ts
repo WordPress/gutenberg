@@ -161,44 +161,12 @@ export type SelectionInOneBlock = {
 };
 
 /**
- * A selection endpoint where the cursor lands inside a RichText field.
- *
- * WHY this shape exists: Yjs tracks text positions via Y.RelativePosition
- * anchored to a Y.Text node. When the sender's block has an attributeKey and
- * offset we can create this precise anchor, letting us render the cursor at
- * the exact character on the receiver's screen even after concurrent edits
- * shift surrounding text.
- *
- * Any block type can produce a CursorEndpoint — a paragraph mid-word, a
- * table cell, a heading — as long as the selection carries a character offset.
+ * One end of a multi-block selection. Uses SelectionCursor when the endpoint
+ * lands inside a RichText field (character-level anchor) or SelectionWholeBlock
+ * when the entire block is selected (block-slot anchor). The type discriminant
+ * tells the receiver how to resolve this endpoint.
  */
-export type CursorEndpoint = {
-	kind: 'cursor';
-	cursorPosition: CursorPosition;
-};
-
-/**
- * A selection endpoint where an entire block is selected, with no character
- * offset (e.g. an image, a spacer, or a paragraph selected as a whole block
- * via keyboard block-selection mode).
- *
- * WHY a different shape: blocks without a RichText field have no Y.Text node
- * to anchor a relative position to. Instead we pin to the block's slot in its
- * parent Y.Array, which survives concurrent insertions and deletions of sibling
- * blocks in the same way a text anchor survives edits to the text.
- */
-export type WholeBlockEndpoint = {
-	kind: 'whole-block';
-	blockPosition: Y.RelativePosition;
-};
-
-/**
- * One end of a multi-block selection. The kind discriminant tells the receiver
- * whether to resolve this endpoint as a precise in-text cursor (CursorEndpoint)
- * or as a block-level anchor (WholeBlockEndpoint), so each end is handled
- * correctly regardless of the block types involved.
- */
-export type SelectionEndpoint = CursorEndpoint | WholeBlockEndpoint;
+export type SelectionEndpoint = SelectionCursor | SelectionWholeBlock;
 
 export type SelectionInMultipleBlocks = {
 	// The user's selection spans more than one block. Each endpoint is resolved

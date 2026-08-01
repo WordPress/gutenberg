@@ -100,7 +100,7 @@ export function useBlockHighlighting(
 		type BlockEntry = {
 			blockId: string;
 			clientId: number;
-			userId: string;
+			userId: number;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -160,15 +160,7 @@ export function useBlockHighlighting(
 					endpoint: SelectionEndpoint
 				): string | null => {
 					try {
-						return endpoint.kind === 'cursor'
-							? resolveSelection( {
-									type: SelectionType.Cursor,
-									cursorPosition: endpoint.cursorPosition,
-							  } ).localClientId
-							: resolveSelection( {
-									type: SelectionType.WholeBlock,
-									blockPosition: endpoint.blockPosition,
-							  } ).localClientId;
+						return resolveSelection( endpoint ).localClientId;
 					} catch {
 						return null;
 					}
@@ -226,6 +218,8 @@ export function useBlockHighlighting(
 					return [
 						{
 							blockId: effectiveFirstId,
+							clientId: userState.clientId,
+							userId: userState.collaboratorInfo.id,
 							color,
 							userName,
 							avatarUrl,
@@ -299,7 +293,7 @@ export function useBlockHighlighting(
 		// Track which users already have an avatar placed, keyed by WordPress
 		// user ID. Blocks arrive in document order (top to bottom) so the first
 		// block encountered per user is always the topmost visible one.
-		const usersWithAvatar = new Set< string >();
+		const usersWithAvatar = new Set< number >();
 
 		blocksToHighlight.forEach( ( block ) => {
 			const { color, blockId, userName, avatarUrl } = block;
