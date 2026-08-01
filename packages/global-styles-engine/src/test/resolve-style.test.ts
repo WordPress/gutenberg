@@ -899,3 +899,106 @@ describe( 'resolveStyle – non-cascading root drop', () => {
 		);
 	} );
 } );
+
+describe( 'resolveStyle – per-path cascade', () => {
+	// Root and block both set fontSize; block wins. Root alone sets fontFamily.
+	const gs = {
+		styles: {
+			typography: { fontSize: '16px', fontFamily: 'Inter' },
+			blocks: {
+				'core/paragraph': {
+					typography: { fontSize: '18px' },
+				},
+			},
+		},
+	};
+
+	test( 'records every contributing layer, ordered low to high', () => {
+		const { cascade } = resolveStyle( gs, {
+			blockName: 'core/paragraph',
+		} );
+		expect(
+			cascade[ 'typography.fontSize' ].map( ( entry ) => [
+				entry.layer,
+				entry.value,
+			] )
+		).toEqual( [
+			[ 'root', '16px' ],
+			[ 'block', '18px' ],
+		] );
+	} );
+
+	test( 'marks exactly one winner, the highest-precedence layer', () => {
+		const { cascade, sources } = resolveStyle( gs, {
+			blockName: 'core/paragraph',
+		} );
+		const entries = cascade[ 'typography.fontSize' ];
+		expect( entries.filter( ( entry ) => entry.isWinner ) ).toHaveLength(
+			1
+		);
+		const winner = entries.find( ( entry ) => entry.isWinner );
+		// The cascade's winner must agree with the existing source map.
+		expect( winner.layer ).toBe( sources[ 'typography.fontSize' ].layer );
+		expect( winner.value ).toBe( '18px' );
+	} );
+
+	test( 'an uncontested leaf is a single winning entry', () => {
+		const { cascade } = resolveStyle( gs, {
+			blockName: 'core/paragraph',
+		} );
+		expect( cascade[ 'typography.fontFamily' ] ).toEqual( [
+			{ layer: 'root', value: 'Inter', isWinner: true },
+		] );
+	} );
+
+	test( 'carries structural metadata for composing an origin label', () => {
+		const withVariation = {
+			styles: {
+				blocks: {
+					'core/group': {
+						typography: { fontSize: '16px' },
+						variations: {
+							subtitle: { typography: { fontSize: '20px' } },
+						},
+					},
+				},
+			},
+		};
+		const { cascade } = resolveStyle( withVariation, {
+			blockName: 'core/group',
+			variationName: 'subtitle',
+		} );
+		const entries = cascade[ 'typography.fontSize' ];
+		expect( entries.at( -1 ) ).toMatchObject( {
+			layer: 'blockVariation',
+			blockName: 'core/group',
+			variation: 'subtitle',
+			value: '20px',
+			isWinner: true,
+		} );
+	} );
+
+	test( 'omits root layers at non-cascading paths, which never reach the block', () => {
+		const nonCascading = {
+			styles: {
+				spacing: { padding: { top: '10px' } },
+				blocks: {
+					'core/group': { spacing: { padding: { top: '30px' } } },
+				},
+			},
+		};
+		const { cascade } = resolveStyle( nonCascading, {
+			blockName: 'core/group',
+		} );
+		// Root padding paints the root element only, so it must not appear as
+		// a layer the block's own padding overrode.
+		expect( cascade[ 'spacing.padding.top' ] ).toEqual( [
+			{
+				layer: 'block',
+				blockName: 'core/group',
+				value: '30px',
+				isWinner: true,
+			},
+		] );
+	} );
+} );

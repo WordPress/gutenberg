@@ -254,7 +254,7 @@ describe( 'useResolvedStyle hook', () => {
 		mockStores( { typography: { fontSize: '16px' } } );
 		render( <Probe /> );
 		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
-			'{"value":{},"sources":{}}'
+			'{"value":{},"sources":{},"cascade":{}}'
 		);
 	} );
 
@@ -262,7 +262,7 @@ describe( 'useResolvedStyle hook', () => {
 		mockStores( null );
 		render( <Probe blockName="core/heading" /> );
 		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
-			'{"value":{},"sources":{}}'
+			'{"value":{},"sources":{},"cascade":{}}'
 		);
 	} );
 
