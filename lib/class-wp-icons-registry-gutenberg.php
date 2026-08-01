@@ -867,6 +867,16 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			),
 		);
 
+		/*
+		 * `xlink:href` holds a URI but is missing from Core's
+		 * wp_kses_uri_attributes(), so wp_kses() would not run it through
+		 * wp_kses_bad_protocol(). Add it for this call only.
+		 */
+		$allow_xlink_href = static function ( $uri_attributes ) {
+			$uri_attributes[] = 'xlink:href';
+			return $uri_attributes;
+		};
+
 		$processor = WP_HTML_Processor::create_fragment( $html_containing_svg );
 		if ( ! $processor ) {
 			return '';
@@ -899,7 +909,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			}
 		}
 
-		return wp_kses( $svg, $allowed_tags );
+		add_filter( 'wp_kses_uri_attributes', $allow_xlink_href );
+		$sanitized_svg = wp_kses( $svg, $allowed_tags );
+		remove_filter( 'wp_kses_uri_attributes', $allow_xlink_href );
+
+		return $sanitized_svg;
 	}
 
 	/**

@@ -567,6 +567,10 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><use href="data:text/html,<script>alert(1)</script>" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><use href="text/html,&lt;script&gt;alert(1)&lt;/script&gt;" /></svg>',
 			),
+			'strips javascript protocol in xlink:href'    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><a xlink:href="javascript:alert(1)"><path d="M0 0" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . '><a xlink:href="alert(1)"><path d="M0 0" /></a></svg>',
+			),
 			'strips disallowed tags'                      => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/><iframe src="evil"></iframe><object data="x" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
