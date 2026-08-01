@@ -32,6 +32,7 @@ jest.mock( '../batch', () => {
 
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
+	CRDT_AUTOSAVE_SNAPSHOT_KEY: 'crdt_snapshot',
 	LOCAL_EDITOR_ORIGIN: 'local-editor',
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
@@ -1632,6 +1633,176 @@ describe( 'saveEntityRecord', () => {
 		);
 
 		expect( result ).toBe( postType );
+	} );
+
+	describe( 'autosave CRDT snapshots', () => {
+		const persistedRecord = {
+			id: 10,
+			title: 'Test post',
+			content: 'Test content',
+		};
+		let select;
+		let resolveSelect;
+		let syncManager;
+
+		beforeEach( () => {
+			dispatch.receiveAutosaves = jest.fn();
+			select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			syncManager = {
+				getEntitySnapshot: jest.fn( () => 'ENCODED_SNAPSHOT' ),
+				update: jest.fn(),
+			};
+			getSyncManager.mockReturnValue( syncManager );
+			apiFetch.mockImplementation( () => ( {
+				id: 20,
+				parent: 10,
+				author: 2,
+				modified_gmt: '2026-07-21T10:00:00',
+			} ) );
+		} );
+
+		afterEach( () => {
+			getSyncManager.mockReset();
+		} );
+
+		function makeResolveSelect( entityConfig ) {
+			return {
+				getEntitiesConfig: jest.fn( () => [ entityConfig ] ),
+			};
+		}
+
+		function getAutosaveRequestData() {
+			return apiFetch.mock.calls[ 0 ][ 0 ].data;
+		}
+
+		it( 'sends the current CRDT snapshot with the autosave request', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.getEntitySnapshot ).toHaveBeenCalledWith(
+				'postType/post',
+				10
+			);
+			expect( getAutosaveRequestData() ).toEqual(
+				expect.objectContaining( {
+					crdt_snapshot: 'ENCODED_SNAPSHOT',
+				} )
+			);
+		} );
+
+		it( 'omits the snapshot for entities without a sync config', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+			} );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.getEntitySnapshot ).not.toHaveBeenCalled();
+			expect( getAutosaveRequestData() ).not.toHaveProperty(
+				'crdt_snapshot'
+			);
+			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
+		} );
+
+		it( 'omits the snapshot when the entity is not loaded in the sync manager', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+			syncManager.getEntitySnapshot.mockReturnValue( undefined );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( getAutosaveRequestData() ).not.toHaveProperty(
+				'crdt_snapshot'
+			);
+		} );
+
+		it( 'captures the snapshot before the request is sent', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			// A snapshot captured after the request would describe content
+			// the autosave did not include, which could wrongly suppress the
+			// notice. Assert the ordering directly.
+			const callOrder = [];
+			syncManager.getEntitySnapshot.mockImplementation( () => {
+				callOrder.push( 'snapshot' );
+				return 'ENCODED_SNAPSHOT';
+			} );
+			apiFetch.mockImplementation( () => {
+				callOrder.push( 'fetch' );
+				return { id: 20, parent: 10 };
+			} );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( callOrder ).toEqual( [ 'snapshot', 'fetch' ] );
+		} );
+
+		it( 'applies direct record changes to the CRDT before capturing the snapshot', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			// A direct caller can pass content that never went through
+			// `editEntityRecord`, so it is not yet in the CRDT. If the
+			// snapshot were captured first, it would describe a state
+			// without this content and wrongly suppress the recovery
+			// notice on reload.
+			const callOrder = [];
+			syncManager.update = jest.fn( () => {
+				callOrder.push( 'update' );
+			} );
+			syncManager.getEntitySnapshot.mockImplementation( () => {
+				callOrder.push( 'snapshot' );
+				return 'ENCODED_SNAPSHOT';
+			} );
+
+			const record = {
+				id: 10,
+				content: 'Directly autosaved content',
+			};
+
+			await saveEntityRecord( 'postType', 'post', record, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.update ).toHaveBeenCalledWith(
+				'postType/post',
+				10,
+				record,
+				'local-undo-ignored'
+			);
+			expect( callOrder ).toEqual( [ 'update', 'snapshot' ] );
+		} );
 	} );
 } );
 

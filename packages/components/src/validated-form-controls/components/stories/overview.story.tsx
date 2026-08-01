@@ -366,6 +366,57 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 };
 
 /**
+ * A synthetic `invalid` event can be dispatched to reveal an existing error
+ * without moving focus.
+ */
+export const ShowingErrorsWithoutMovingFocus: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	decorators: [],
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const ref = useRef< HTMLInputElement >( null );
+
+		return (
+			<VStack spacing={ 4 } alignment="left">
+				<ValidatedInputControl
+					ref={ ref }
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () =>
+						ref.current?.dispatchEvent(
+							new Event( 'invalid', {
+								cancelable: true,
+							} )
+						)
+					}
+				>
+					Show errors
+				</Button>
+			</VStack>
+		);
+	},
+};
+
+/**
  * A `form` wrapper and `type="submit"` button can be used to force validation when
  * the user tries to commit their changes, while still allowing the modal to be closed by canceling.
  * Optionally, the `shouldCloseOnClickOutside`, `isDismissible`, and `shouldCloseOnEsc` props

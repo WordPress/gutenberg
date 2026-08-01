@@ -124,46 +124,55 @@ const UnconnectedConfirmDialog = (
 };
 
 /**
- * `ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md)
+ * `ConfirmDialog` is built on top of [`Modal`](/packages/components/src/modal/README.md)
  * and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
+ *
  * The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key.
  * It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by
- * clicking outside the dialog focus (i.e, the overlay).
+ * clicking outside the dialog focus (i.e. the overlay).
  *
- * `ConfirmDialog` has two main implicit modes: controlled and uncontrolled.
+ * `ConfirmDialog` has two main modes: controlled and uncontrolled.
  *
- * UnControlled:
+ * ### Uncontrolled mode
  *
- * Allows the component to be used standalone, just by declaring it as part of another React's component render method:
- * -   It will be automatically open (displayed) upon mounting;
- * -   It will be automatically closed when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
- * -   `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
+ * Allows the component to be used standalone, just by declaring it as part of another React
+ * component's render method:
  *
- * Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
+ * - It will be automatically open (displayed) upon mounting.
+ * - It will be automatically closed when clicking the _cancel_ button, by pressing the `ESC`
+ *   key, or by clicking outside the dialog focus (i.e. the overlay).
+ * - `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be
+ *   able to close itself.
+ *
+ * Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop
+ * in this case is the `onConfirm` callback. The message is passed as the `children`.
  *
  * ```jsx
  * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
  *
  * function Example() {
  * 	return (
- * 		<ConfirmDialog onConfirm={ () => console.debug( ' Confirmed! ' ) }>
+ * 		<ConfirmDialog onConfirm={ () => console.debug( 'Confirmed!' ) }>
  * 			Are you sure? <strong>This action cannot be undone!</strong>
  * 		</ConfirmDialog>
  * 	);
  * }
  * ```
  *
+ * ### Controlled mode
  *
- * Controlled mode:
- *  Let the parent component control when the dialog is open/closed. It's activated when a
+ * Let the parent component control when the dialog is open/closed. It's activated when a
  * boolean value is passed to `isOpen`:
- * -   It will not be automatically closed. You need to let it know when to open/close by updating the value of the `isOpen` prop;
- * -   Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
- * -   You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
  *
- *```jsx
- * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+ * - It will not be automatically closed. You need to let it know when to open/close by
+ *   updating the value of the `isOpen` prop.
+ * - Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode.
+ * - You'll want to update the state that controls `isOpen` from the `onCancel` and
+ *   `onConfirm` callbacks.
+ *
+ * ```jsx
  * import { useState } from '@wordpress/element';
+ * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
  *
  * function Example() {
  * 	const [ isOpen, setIsOpen ] = useState( true );

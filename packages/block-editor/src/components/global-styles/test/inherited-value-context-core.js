@@ -14,13 +14,19 @@ import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
-// Core-build coverage for `useResolvedStyle`. Tests run with
-// `IS_GUTENBERG_PLUGIN` true, so the core path needs a mock. `jest.mock` is
-// file-scoped, so these tests live apart from `inherited-value-context.js`.
-jest.mock( '../inheritance', () => ( {
-	...jest.requireActual( '../inheritance' ),
-	ENABLE_GLOBAL_STYLES_INHERITANCE: false,
-} ) );
+// Coverage for `useResolvedStyle` with the `gutenberg-global-styles-inheritance-ui`
+// experiment off, which is what WordPress Core gets. Deleted rather than set to
+// `false`, because an experiment that was never turned on leaves the global
+// unset, and `undefined` is the value that fires a receiving component's own
+// default parameter. Setting `false` here would test a state that does not
+// occur.
+beforeEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 // Only `useSelect` is called by the hook. The other four are needed at import
 // time by the store modules this file pulls in transitively.
@@ -52,7 +58,7 @@ jest.mock( '../../../hooks/block-style-variation', () => ( {
 	},
 } ) );
 
-describe( 'useResolvedStyle — core build', () => {
+describe( 'useResolvedStyle — experiment off', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 		useSelect.mockImplementation( ( mapSelect ) =>

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Report flaky tests should report flaky tests to issue on pull request: Updated existing flaky issue 1`] = `
 "<!-- __META_DATA__:{"failedTimes":58,"totalCommits":134,"baseCommit":"32bb60d08b75486341d8a63b9e786152889aa02d"} -->
