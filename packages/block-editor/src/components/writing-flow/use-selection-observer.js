@@ -204,6 +204,19 @@ export default function useSelectionObserver() {
 								collapsedClientId
 						) {
 							node.focus();
+						} else if (
+							// The selected block's editable is an inert part
+							// of the host (contenteditable="inherit"): when it
+							// held focus and turned inert, the browser dropped
+							// focus, leaving the wrapper as the default
+							// activeElement without actually focusing it. The
+							// collapsed selection is in the selected block
+							// here, so reclaim focus for the host.
+							activeElement === node &&
+							ownerDocument.hasFocus() &&
+							! node.matches( ':focus' )
+						) {
+							node.focus( { preventScroll: true } );
 						}
 						return;
 					}

@@ -206,7 +206,15 @@ export function useTypewriter() {
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			return element?.closest( '[contenteditable="true"]' ) ?? null;
+			// The editable element within the block may be editable by
+			// inheritance from the editing host (contenteditable="inherit"),
+			// so accept any explicit editable marker except an opt-out. The
+			// host itself (outside `node`) must not be the result.
+			return (
+				element?.closest(
+					'[contenteditable]:not([contenteditable="false"])'
+				) ?? null
+			);
 		}
 
 		/**
@@ -225,7 +233,7 @@ export function useTypewriter() {
 
 		function isLastEditableNode() {
 			const editableNodes = node.querySelectorAll(
-				'[contenteditable="true"]'
+				'[contenteditable]:not([contenteditable="false"])'
 			);
 			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
 			return lastEditableNode === getActiveEditableElement();
