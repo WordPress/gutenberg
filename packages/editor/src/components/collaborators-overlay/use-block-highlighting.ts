@@ -34,6 +34,7 @@ const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
 
 export interface BlockHighlightData {
 	blockId: string;
+	clientId: number;
 	userName: string;
 	avatarUrl?: string;
 	color: string;
@@ -98,6 +99,7 @@ export function useBlockHighlighting(
 
 		type BlockEntry = {
 			blockId: string;
+			clientId: number;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -138,6 +140,7 @@ export function useBlockHighlighting(
 					return [
 						{
 							blockId: localClientId,
+							clientId: userState.clientId,
 							color: getAvatarBorderColor(
 								userState.collaboratorInfo.id
 							),
@@ -248,6 +251,7 @@ export function useBlockHighlighting(
 					effectiveLastId,
 				].map( ( blockId ) => ( {
 					blockId,
+					clientId: userState.clientId,
 					color,
 					userName,
 					avatarUrl,
@@ -335,6 +339,7 @@ export function useBlockHighlighting(
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,
+					clientId: block.clientId,
 					userName,
 					avatarUrl,
 					color,
