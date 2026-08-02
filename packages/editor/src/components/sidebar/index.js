@@ -6,7 +6,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -36,16 +35,44 @@ import { store as editorStore } from '../../store';
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
-const SidebarContent = ( {
-	tabName,
-	keyboardShortcut,
-	onTabSelect,
-	onActionPerformed,
-	extraPanels,
-} ) => {
-	const isRevisionsMode = useSelect( ( select ) => {
-		return unlock( select( editorStore ) ).isRevisionsMode();
-	} );
+function Sidebar( { extraPanels, onActionPerformed } ) {
+	useAutoSwitchEditorSidebars();
+
+	const { tabName, keyboardShortcut, isRevisionsMode } = useSelect(
+		( select ) => {
+			const shortcut = select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
+			const _isEditorSidebarOpened = [
+				sidebars.block,
+				sidebars.document,
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = select( blockEditorStore ).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document;
+			}
+
+			return {
+				tabName: _tabName,
+				keyboardShortcut: shortcut,
+				isRevisionsMode: unlock(
+					select( editorStore )
+				).isRevisionsMode(),
+			};
+		},
+		[]
+	);
+
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
+	function onTabSelect( newSelectedTabId ) {
+		enableComplementaryArea( 'core', newSelectedTabId );
+	}
 
 	let tabContent;
 	if ( isRevisionsMode ) {
@@ -103,54 +130,6 @@ const SidebarContent = ( {
 			</Tabs.Panel>
 		</PluginSidebar>
 	);
-};
-
-const Sidebar = ( { extraPanels, onActionPerformed } ) => {
-	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut } = useSelect( ( select ) => {
-		const shortcut = select(
-			keyboardShortcutsStore
-		).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
-
-		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
-		const _isEditorSidebarOpened = [
-			sidebars.block,
-			sidebars.document,
-		].includes( sidebar );
-		let _tabName = sidebar;
-		if ( ! _isEditorSidebarOpened ) {
-			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? sidebars.block
-				: sidebars.document;
-		}
-
-		return {
-			tabName: _tabName,
-			keyboardShortcut: shortcut,
-		};
-	}, [] );
-
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	const onTabSelect = useCallback(
-		( newSelectedTabId ) => {
-			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( 'core', newSelectedTabId );
-			}
-		},
-		[ enableComplementaryArea ]
-	);
-
-	return (
-		<SidebarContent
-			tabName={ tabName }
-			keyboardShortcut={ keyboardShortcut }
-			onTabSelect={ onTabSelect }
-			onActionPerformed={ onActionPerformed }
-			extraPanels={ extraPanels }
-		/>
-	);
-};
+}
 
 export default Sidebar;
