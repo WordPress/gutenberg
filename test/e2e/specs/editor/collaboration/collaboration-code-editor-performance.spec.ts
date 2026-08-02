@@ -41,8 +41,7 @@ const test = base.extend< Fixtures >( {
 			try {
 				await use( true );
 			} finally {
-				// Collaboration is enabled by default; restore the shared baseline.
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			}
 		},
 		{ auto: true },
