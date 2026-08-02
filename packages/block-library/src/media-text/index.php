@@ -29,6 +29,11 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 /**
  * Renders the featured image into the Media & Text block content.
  *
+ * @since 6.6.0
+ *
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
+ *
  * @return string The updated block content.
  */
 function block_core_media_text_render_featured_image( $attributes, $content ) {
