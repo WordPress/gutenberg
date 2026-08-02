@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"align": "none",
+			"caption": "",
 			"mediaAlt": "My alt text",
 			"mediaPosition": "left",
 			"mediaType": "image",

@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"align": "wide",
+			"caption": "",
 			"mediaAlt": "",
 			"mediaPosition": "left",
 			"mediaType": "image",

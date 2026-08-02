@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"align": "full",
+			"caption": "",
 			"mediaAlt": "",
 			"mediaPosition": "right",
 			"mediaType": "video",
