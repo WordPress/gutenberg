@@ -74,7 +74,6 @@ interface RegisterRoomOptions {
 	awareness: Awareness;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	onSync: () => void;
 }
 
 interface RoomState {
@@ -351,14 +350,9 @@ function processAwarenessUpdate(
  *
  * @param update The typed update received
  * @param doc    The Yjs document
- * @param onSync Callback when sync is complete
  * @return A response update if needed (e.g., sync_step2 in response to sync_step1)
  */
-function processDocUpdate(
-	update: SyncUpdate,
-	doc: Y.Doc,
-	onSync: () => void
-): SyncUpdate | void {
+function processDocUpdate( update: SyncUpdate, doc: Y.Doc ): SyncUpdate | void {
 	const data = base64ToUint8Array( update.data );
 
 	switch ( update.type ) {
@@ -377,7 +371,6 @@ function processDocUpdate(
 				doc,
 				POLLING_MANAGER_ORIGIN
 			);
-			onSync();
 			return;
 		}
 
@@ -953,7 +946,6 @@ function registerRoom( {
 	doc,
 	awareness,
 	log,
-	onSync,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
@@ -1054,7 +1046,7 @@ function registerRoom( {
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
-			processDocUpdate( update, doc, onSync ),
+			processDocUpdate( update, doc ),
 		room,
 		unregister,
 		updateQueue,

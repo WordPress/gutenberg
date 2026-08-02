@@ -62,7 +62,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
@@ -110,7 +110,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -132,7 +132,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -163,7 +163,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Change the title and preview to trigger an autosave.
 		await editor.canvas
@@ -212,7 +212,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Change the title and preview again.
 		await editor.canvas
@@ -303,7 +303,7 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage();
@@ -357,7 +357,7 @@ test.describe( 'Preview with private custom post type', () => {
 		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="View"i]' );
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
@@ -379,7 +379,9 @@ class PreviewUtils {
 			await previewToggle.click();
 		}
 
-		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+			.click();
 		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
@@ -387,15 +389,19 @@ class PreviewUtils {
 	async toggleCustomFieldsOption( shouldBeChecked ) {
 		// Open preferences dialog.
 
-		await this.page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-		);
-		await this.page.click( 'role=menuitem[name="Preferences"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preferences' } )
+			.click();
 
 		// Navigate to general section.
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'tab', { name: 'General' } )
+			.click();
 
 		// Find custom fields checkbox.
 		const customFieldsCheckbox = this.page.locator(
@@ -420,8 +426,9 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'button', { name: 'Close' } )
+			.click();
 	}
 }
