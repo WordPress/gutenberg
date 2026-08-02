@@ -87,25 +87,31 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return parent::create_item( $request );
 		}
 
-		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && ! defined( 'DOING_AUTOSAVE' ) ) {
-			define( 'DOING_AUTOSAVE', true );
-		}
-
 		$post = $this->get_parent( $request['id'] );
 
 		if ( is_wp_error( $post ) ) {
 			return $post;
 		}
 
+		// Autosave creation may fire this callback for revisioned post meta.
+		if ( ! function_exists( 'wp_autosave_post_revisioned_meta_fields' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/post.php';
+		}
+
+		// Post-type collaboration support is determined after the autosaves
+		// controller is selected, so disabled post types must delegate to Core.
+		if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			return parent::create_item( $request );
+		}
+
+		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && ! defined( 'DOING_AUTOSAVE' ) ) {
+			define( 'DOING_AUTOSAVE', true );
+		}
+
 		$prepared_post     = $this->gutenberg_parent_controller->prepare_item_for_database( $request );
 		$prepared_post->ID = $post->ID;
 		$post_data         = (array) $prepared_post;
 		$meta              = (array) $request->get_param( 'meta' );
-
-		// create_post_autosave() may fire this callback for revisioned post meta.
-		if ( ! function_exists( 'wp_autosave_post_revisioned_meta_fields' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/post.php';
-		}
 
 		/*
 		 * Regular draft autosaves must not update the parent post directly under

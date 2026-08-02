@@ -120,6 +120,9 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 			$body_params['meta'] = $meta;
 		}
 		$request->set_body_params( $body_params );
+		if ( null !== $crdt_snapshot ) {
+			$request->set_param( 'crdt_snapshot', $crdt_snapshot );
+		}
 
 		/*
 		 * Individual tests toggle RTC after post types have been registered and
@@ -134,11 +137,26 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		if ( is_wp_error( $response ) ) {
 			return rest_convert_error_to_response( $response );
 		}
-		if ( null !== $crdt_snapshot ) {
-			$request->set_param( 'crdt_snapshot', $crdt_snapshot );
-		}
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Asserts that the custom controller uses Core autosave behavior.
+	 */
+	private function assert_custom_controller_uses_core_autosave_behavior(): void {
+		$post_id = $this->create_draft( 'Original title', 'Original content' );
+		$title   = 'Updated title';
+		$content = '<!-- wp:paragraph --><p>Updated content</p><!-- /wp:paragraph -->';
+
+		$response = $this->dispatch_autosave( $post_id, $title, $content );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $title, get_post( $post_id )->post_title );
+		$this->assertFalse(
+			wp_get_post_autosave( $post_id, self::$author_id ),
+			'Core should update the author draft directly instead of creating an RTC revision.'
+		);
 	}
 
 	/**
@@ -337,18 +355,21 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	public function test_custom_controller_delegates_to_core_when_collaboration_is_disabled() {
 		update_option( 'wp_collaboration_enabled', 0 );
 
-		$post_id = $this->create_draft( 'Original title', 'Original content' );
-		$title   = 'Updated title';
-		$content = '<!-- wp:paragraph --><p>Updated content</p><!-- /wp:paragraph -->';
+		$this->assert_custom_controller_uses_core_autosave_behavior();
+	}
 
-		$response = $this->dispatch_autosave( $post_id, $title, $content );
+	public function test_custom_controller_delegates_to_core_when_post_type_collaboration_is_disabled() {
+		add_filter( 'wp_is_post_type_collaboration_disabled', array( $this, 'disable_post_collaboration' ), 10, 2 );
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( $title, get_post( $post_id )->post_title );
-		$this->assertFalse(
-			wp_get_post_autosave( $post_id, self::$author_id ),
-			'Core should update the author draft directly instead of creating an RTC revision.'
-		);
+		try {
+			$this->assert_custom_controller_uses_core_autosave_behavior();
+		} finally {
+			remove_filter( 'wp_is_post_type_collaboration_disabled', array( $this, 'disable_post_collaboration' ) );
+		}
+	}
+
+	public function disable_post_collaboration( $disabled, $post_type ) {
+		return 'post' === $post_type ? true : $disabled;
 	}
 
 	public function test_autosave_compares_against_parent_when_parent_is_newer_than_latest_revision() {
