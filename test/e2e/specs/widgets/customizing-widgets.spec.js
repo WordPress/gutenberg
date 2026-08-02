@@ -685,10 +685,7 @@ class WidgetsCustomizerPage {
 			.click();
 
 		await this.page
-			.getByRole( 'heading', {
-				name: new RegExp( widgetAreaName, 'i' ),
-				level: 3,
-			} )
+			.getByRole( 'heading', { name: widgetAreaName, level: 3 } )
 			.click();
 	}
 
