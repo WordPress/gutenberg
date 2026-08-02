@@ -210,12 +210,13 @@ function block_core_media_text_render_lightbox( $attributes, $content, $block ) 
 	// Lightbox overlay and trigger styles live in the Image block stylesheet.
 	wp_enqueue_style( 'wp-block-image' );
 
-	$parsed_block = $block->parsed_block;
+	$parsed_block                             = $block->parsed_block;
 	$parsed_block['attrs']['linkDestination'] = 'none';
-	$parsed_block['attrs']['id'] = $attributes['mediaId'] ?? null;
+	$parsed_block['attrs']['id']              = $attributes['mediaId'] ?? null;
 
 	if ( empty( $parsed_block['attrs']['id'] ) && ! empty( $attributes['useFeaturedImage'] ) ) {
-		$parsed_block['attrs']['id'] = get_post_thumbnail_id() ?: null;
+		$thumbnail_id                 = get_post_thumbnail_id();
+		$parsed_block['attrs']['id'] = ! empty( $thumbnail_id ) ? $thumbnail_id : null;
 	}
 
 	return block_core_image_render_lightbox( $content, $parsed_block, $block );
