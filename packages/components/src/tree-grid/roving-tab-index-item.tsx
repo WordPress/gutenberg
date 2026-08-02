@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, forwardRef } from '@wordpress/element';
+import { useRef, forwardRef, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,9 +17,19 @@ export const RovingTabIndexItem = forwardRef(
 		const localRef = useRef< any >( null );
 		const ref = forwardedRef || localRef;
 		// @ts-expect-error - We actually want to throw an error if this is undefined.
-		const { lastFocusedElement, setLastFocusedElement } =
+		const { lastFocusedElement, setLastFocusedElement, registerItem } =
 			useRovingTabIndexContext();
 		let tabIndex;
+
+		const getElement = useMemo(
+			() => () => ( 'current' in ref ? ref.current : undefined ),
+			[ ref ]
+		);
+
+		// Register this item with the RovingTabIndex parent on mount.
+		useEffect( () => {
+			registerItem( getElement() );
+		}, [ registerItem, getElement ] );
 
 		if ( lastFocusedElement ) {
 			tabIndex =
@@ -31,11 +41,20 @@ export const RovingTabIndexItem = forwardRef(
 				( 'current' in ref ? ref.current : undefined )
 					? 0
 					: -1;
+		} else {
+			// On initial render, ensure all items have tabIndex="-1" by default.
+			tabIndex = -1;
 		}
 
 		const onFocus: React.FocusEventHandler< HTMLElement > = ( event ) =>
 			setLastFocusedElement?.( event.target );
-		const allProps = { ref, tabIndex, onFocus, ...props };
+
+		const allProps = {
+			ref,
+			tabIndex,
+			onFocus,
+			...props,
+		};
 
 		if ( typeof children === 'function' ) {
 			return children( allProps );

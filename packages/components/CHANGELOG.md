@@ -690,6 +690,7 @@
 
 -   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
 -   `ColorPicker`: Add a visual cue when the value is copied ([#70083](https://github.com/WordPress/gutenberg/pull/70083)).
+-   `TreeGrid`: Add proper initial tabindex for roving tabindex implementation ([#70125](https://github.com/WordPress/gutenberg/pull/70125)).
 
 ### Internal
 

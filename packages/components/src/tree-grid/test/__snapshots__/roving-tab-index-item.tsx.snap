@@ -2,7 +2,9 @@
 
 exports[`RovingTabIndexItem allows another component to be specified as the rendered component using the \`as\` prop 1`] = `
 <div>
-  <button />
+  <button
+    tabindex="-1"
+  />
 </div>
 `;
 
@@ -10,6 +12,7 @@ exports[`RovingTabIndexItem allows children to be declared using a child render 
 <div>
   <button
     class="my-button"
+    tabindex="-1"
   >
     Click Me!
   </button>
@@ -20,6 +23,7 @@ exports[`RovingTabIndexItem forwards props to the \`as\` component 1`] = `
 <div>
   <button
     class="my-button"
+    tabindex="-1"
   >
     Click Me!
   </button>

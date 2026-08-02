@@ -15,6 +15,7 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
           >
             <button
               class="my-button"
+              tabindex="-1"
             >
               Click Me!
             </button>

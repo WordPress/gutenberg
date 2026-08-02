@@ -9,6 +9,8 @@ const RovingTabIndexContext = createContext<
 			setLastFocusedElement: React.Dispatch<
 				React.SetStateAction< HTMLElement | undefined >
 			>;
+			isInitialRender: boolean;
+			registerItem: ( element: HTMLElement | null ) => void;
 	  }
 	| undefined
 >( undefined );
