@@ -36,11 +36,7 @@ function Layout( { blockEditorSettings } ) {
 
 	return (
 		<ErrorBoundary>
-			<div
-				className={ navigateRegionsProps.className }
-				{ ...navigateRegionsProps }
-				ref={ navigateRegionsProps.ref }
-			>
+			<div { ...navigateRegionsProps }>
 				<WidgetAreasBlockEditorProvider
 					blockEditorSettings={ blockEditorSettings }
 				>
