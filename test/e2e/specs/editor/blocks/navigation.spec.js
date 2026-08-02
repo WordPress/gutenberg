@@ -1088,10 +1088,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select the Post name permalink structure (/%postname%/)
-			await page.click( '#permalink-input-post-name' );
+			await page.locator( '#permalink-input-post-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
@@ -1129,10 +1129,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select Plain permalinks
-			await page.click( '#permalink-input-plain' );
+			await page.locator( '#permalink-input-plain' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );

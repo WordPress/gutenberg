@@ -86,7 +86,7 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 
-		await page.click( 'role=link[name="Older Comments"i]' );
+		await page.getByRole( 'link', { name: 'Older Comments' } ).click();
 
 		// We check that there are a previous and a next link.
 		await expect(
@@ -96,7 +96,7 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeVisible();
 
-		await page.click( 'role=link[name="Older Comments"i]' );
+		await page.getByRole( 'link', { name: 'Older Comments' } ).click();
 
 		// We check that there is only have a next link
 		await expect(
@@ -356,10 +356,12 @@ class CommentsBlockUtils {
 	 */
 	async setOption( setting, value ) {
 		await this.admin.visitAdminPage( 'options.php', '' );
-		const previousValue = await this.page.inputValue( `#${ setting }` );
+		const previousValue = await this.page
+			.locator( `#${ setting }` )
+			.inputValue();
 
-		await this.page.fill( `#${ setting }`, value );
-		await this.page.click( '#Update' );
+		await this.page.locator( `#${ setting }` ).fill( value );
+		await this.page.locator( '#Update' ).click();
 
 		return previousValue;
 	}
