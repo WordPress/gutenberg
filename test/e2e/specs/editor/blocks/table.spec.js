@@ -101,9 +101,10 @@ test.describe( 'Table', () => {
 			.click();
 
 		// Expect the header and footer switches to be present now that the table has been created.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
 		await expect( headerSwitch ).toBeVisible();
 		await expect( footerSwitch ).toBeVisible();
 
@@ -156,9 +157,10 @@ test.describe( 'Table', () => {
 			.click();
 
 		// Toggle on the switches and add some content.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
 		await page.locator( 'role=checkbox[name="Header section"i]' ).check();
 		await page.locator( 'role=checkbox[name="Footer section"i]' ).check();
 		await editor.canvas
@@ -167,7 +169,9 @@ test.describe( 'Table', () => {
 
 		// Add a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
-		await page.click( 'role=menuitem[name="Insert column after"i]' );
+		await page
+			.getByRole( 'menuitem', { name: 'Insert column after' } )
+			.click();
 
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -178,7 +182,7 @@ test.describe( 'Table', () => {
 
 		// Delete a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
-		await page.click( 'role=menuitem[name="Delete column"i]' );
+		await page.getByRole( 'menuitem', { name: 'Delete column' } ).click();
 
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -209,19 +213,25 @@ test.describe( 'Table', () => {
 		await cells.nth( 1 ).click();
 		await page.keyboard.type( 'To the left' );
 		await editor.clickBlockToolbarButton( 'Align column content' );
-		await page.click( 'role=menuitemradio[name="Align column left"i]' );
+		await page
+			.getByRole( 'menuitemradio', { name: 'Align column left' } )
+			.click();
 
 		// Click the next cell and add some text. Align center.
 		await cells.nth( 2 ).click();
 		await page.keyboard.type( 'Centered' );
 		await editor.clickBlockToolbarButton( 'Align column content' );
-		await page.click( 'role=menuitemradio[name="Align column center"i]' );
+		await page
+			.getByRole( 'menuitemradio', { name: 'Align column center' } )
+			.click();
 
 		// Tab to the next cell and add some text. Align right.
 		await cells.nth( 3 ).click();
 		await page.keyboard.type( 'Right aligned' );
 		await editor.clickBlockToolbarButton( 'Align column content' );
-		await page.click( 'role=menuitemradio[name="Align column right"i]' );
+		await page
+			.getByRole( 'menuitemradio', { name: 'Align column right' } )
+			.click();
 
 		// Expect the post to have the correct alignment classes inside the table.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -241,9 +251,10 @@ test.describe( 'Table', () => {
 			.click();
 
 		// Enable fixed width as it exacerbates the amount of empty space around the RichText.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
 		await page
 			.locator( 'role=checkbox[name="Fixed width table cells"i]' )
 			.check();
