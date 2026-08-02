@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget Group: Apply additional CSS classes on the frontend.
+
 ## 4.51.0 (2026-07-14)
 
 ### Enhancements
