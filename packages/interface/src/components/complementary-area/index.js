@@ -17,7 +17,13 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	cloneElement,
+	isValidElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -49,6 +55,33 @@ const variants = {
 	mobileOpen: { width: '100vw' },
 };
 
+/**
+ * Renders the complementary area container, replacing the default `div` with
+ * the element (or element factory) given via the `render` prop.
+ *
+ * `className` and `style` are composed rather than overwritten, since the
+ * container is also the scroll container for the sidebar.
+ *
+ * @param {Function|Object} [render] Replacement element, or a function
+ *                                   returning one.
+ * @param {Object}          props    Props for the container.
+ */
+function renderContainer( render, props ) {
+	if ( typeof render === 'function' ) {
+		return render( props );
+	}
+
+	if ( isValidElement( render ) ) {
+		return cloneElement( render, {
+			...props,
+			className: clsx( render.props.className, props.className ),
+			style: { ...render.props.style, ...props.style },
+		} );
+	}
+
+	return <div { ...props } />;
+}
+
 function ComplementaryAreaFill( {
 	activeArea,
 	isActive,
@@ -56,6 +89,7 @@ function ComplementaryAreaFill( {
 	children,
 	className,
 	id,
+	render,
 } ) {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -94,17 +128,16 @@ function ComplementaryAreaFill( {
 						transition={ transition }
 						className="interface-complementary-area__fill"
 					>
-						<div
-							id={ id }
-							className={ className }
-							style={ {
+						{ renderContainer( render, {
+							id,
+							className,
+							style: {
 								width: isMobileViewport
 									? '100vw'
 									: SIDEBAR_WIDTH,
-							} }
-						>
-							{ children }
-						</div>
+							},
+							children,
+						} ) }
 					</motion.div>
 				) }
 			</AnimatePresence>
@@ -177,6 +210,7 @@ function ComplementaryArea( {
 	icon: iconProp,
 	isPinnable = true,
 	panelClassName,
+	render,
 	scope,
 	name,
 	title,
@@ -302,6 +336,7 @@ function ComplementaryArea( {
 				className={ clsx( 'interface-complementary-area', className ) }
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
+				render={ render }
 			>
 				<ComplementaryAreaHeader
 					className={ headerClassName }
