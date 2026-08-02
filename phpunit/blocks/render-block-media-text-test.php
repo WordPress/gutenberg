@@ -182,7 +182,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'useFeaturedImage' => true,
 			'mediaPosition'    => 'right',
 		);
-		$block = self::build_block( $attributes );
+		$block      = self::build_block( $attributes );
 
 		$rendered = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
@@ -194,7 +194,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'mediaPosition'    => 'right',
 			'imageFill'        => true,
 		);
-		$block = self::build_block( $attributes );
+		$block      = self::build_block( $attributes );
 
 		$rendered = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
