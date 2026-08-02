@@ -176,7 +176,7 @@ function BlockInspector() {
 		selectedBlockStyleState,
 		showStateOnCanvas,
 		isResponsiveEditing,
-		blockStatesEnabled,
+		blockStatesEditingEnabled,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -231,7 +231,7 @@ function BlockInspector() {
 				_renderedBlockClientId
 			),
 			isResponsiveEditing: _isResponsiveEditing(),
-			blockStatesEnabled: getSettings().blockStatesEnabled,
+			blockStatesEditingEnabled: getSettings().blockStatesEditingEnabled,
 		};
 	}, [] );
 
@@ -367,7 +367,7 @@ function BlockInspector() {
 				selectedBlockStyleState={ selectedBlockStyleState }
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
-				blockStatesEnabled={ blockStatesEnabled }
+				blockStatesEditingEnabled={ blockStatesEditingEnabled }
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
@@ -424,7 +424,7 @@ const BlockInspectorSingleBlock = ( {
 	selectedBlockStyleState,
 	showStateOnCanvas,
 	isResponsiveEditing,
-	blockStatesEnabled = true,
+	blockStatesEditingEnabled = true,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -473,7 +473,7 @@ const BlockInspectorSingleBlock = ( {
 				clientId={ renderedBlockClientId }
 				controls={
 					blockEditingMode === 'default' &&
-					blockStatesEnabled && (
+					blockStatesEditingEnabled && (
 						<BlockStatesControl
 							name={ blockName }
 							value={ selectedBlockStyleState }
