@@ -109,7 +109,14 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'image';
 			},
-			transform: ( { mediaAlt, mediaId, mediaUrl, anchor, caption, lightbox } ) => {
+			transform: ( {
+				mediaAlt,
+				mediaId,
+				mediaUrl,
+				anchor,
+				caption,
+				lightbox,
+			} ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
 					id: mediaId,
