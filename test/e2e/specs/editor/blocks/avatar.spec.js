@@ -52,9 +52,10 @@ test.describe( 'Avatar', () => {
 		);
 
 		await expect( blockInspectorControls ).toBeVisible();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
 
 		const userInput = page.locator(
 			'role=region[name="Editor settings"i] >> role=combobox[name="User"i]'

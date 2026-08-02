@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 async function getFootnotes( page, withoutSave = false ) {
 	// Save post so we can check meta.
 	if ( ! withoutSave ) {
-		await page.click( 'button:text("Save draft")' );
+		await page.getByRole( 'button', { name: 'Save draft' } ).click();
 	}
 	await page.waitForSelector( 'button:text("Saved")' );
 	const footnotes = await page.evaluate( () => {
