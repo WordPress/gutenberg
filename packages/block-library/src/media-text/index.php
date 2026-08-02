@@ -215,7 +215,7 @@ function block_core_media_text_render_lightbox( $attributes, $content, $block ) 
 	$parsed_block['attrs']['id']              = $attributes['mediaId'] ?? null;
 
 	if ( empty( $parsed_block['attrs']['id'] ) && ! empty( $attributes['useFeaturedImage'] ) ) {
-		$thumbnail_id                 = get_post_thumbnail_id();
+		$thumbnail_id                = get_post_thumbnail_id();
 		$parsed_block['attrs']['id'] = ! empty( $thumbnail_id ) ? $thumbnail_id : null;
 	}
 
