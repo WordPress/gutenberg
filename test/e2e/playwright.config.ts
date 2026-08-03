@@ -32,7 +32,6 @@ const flakinessOptions = {
 	/*
 	 * Only upload to Flakiness.io for the official WordPress/Gutenberg
 	 * repository. Forks and private mirrors are not configured on the service.
-	 * We want to keep the reporter to drive shard balancing on forks too.
 	 */
 	disableUpload: process.env.GITHUB_REPOSITORY !== 'WordPress/gutenberg',
 };
