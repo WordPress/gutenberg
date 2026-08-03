@@ -557,7 +557,7 @@ function Layout( {
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ThemeProvider color={ { primary: adminPrimary } }>
+				<ThemeProvider isRoot color={ { primary: adminPrimary } }>
 					<ErrorBoundary canCopyContent>
 						<WelcomeGuide postType={ currentPostType } />
 						<div { ...navigateRegionsProps }>
