@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Wrap the post editor layout in `ThemeProvider`, seeded with the active admin color scheme via `getAdminThemeColors`, so WPDS components follow the user's chosen admin colors.
+
 ## 8.51.0 (2026-07-14)
 
 ### Enhancements
