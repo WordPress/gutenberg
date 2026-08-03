@@ -55,7 +55,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	width: 100%;
 	display: block;
 	margin: 0;
-	color: inherit;
+	color: var(--wpds-color-foreground-content-neutral);
 
 	&.is-unstyled-button,
 	&.is-unstyled-link {
