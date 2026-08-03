@@ -62,7 +62,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
 		await ToolbarRovingTabindexUtils.focusBlockToolbar();
-		await page.click( `role=button[name="Select parent block: List"i]` );
+		await page
+			.getByRole( 'button', { name: 'Select parent block: List' } )
+			.click();
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: List',
@@ -175,8 +177,12 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
-		await this.page.click( `role=button[name="${ currentBlockTitle }"i]` );
-		await this.page.click( `role=menuitem[name="Group"]` );
+		await this.page
+			.getByRole( 'button', { name: currentBlockTitle, exact: true } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Group', exact: true } )
+			.click();
 	}
 
 	async testGroupKeyboardNavigation(

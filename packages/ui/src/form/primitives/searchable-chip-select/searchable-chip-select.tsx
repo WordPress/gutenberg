@@ -3,7 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '../../../stack';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
-import focusStyles from '../../../utils/css/focus.module.css';
+import focusStyles from '../../../utils/css/focus.module.scss';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
 import styles from './style.module.css';

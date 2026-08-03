@@ -105,6 +105,6 @@ function gutenberg_test_customize_page_view_config( $data ) {
 	return $data;
 }
 add_filter(
-	'get_entity_view_config_postType_page',
+	'get_entity_view_config_posttype_page',
 	'gutenberg_test_customize_page_view_config'
 );
