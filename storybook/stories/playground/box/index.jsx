@@ -12,8 +12,10 @@ import {
 /**
  * Internal dependencies
  */
-import { editorStyles } from '../editor-styles';
+import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
 import './style.css';
+
+const contentStyles = [ ...blockLibraryContentStyles, ...editorStyles ];
 
 export default function EditorBox() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -37,7 +39,7 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockCanvas height="500px" styles={ editorStyles } />
+				<BlockCanvas height="500px" styles={ contentStyles } />
 			</BlockEditorProvider>
 		</div>
 	);
