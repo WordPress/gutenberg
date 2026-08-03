@@ -13,7 +13,10 @@ import { defineConfig } from 'vitest/config';
 /**
  * Internal dependencies
  */
-import { getVitestTests } from './scripts/discover-test-files.mjs';
+import {
+	discoverTestFiles,
+	getVitestTests,
+} from './scripts/discover-test-files.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -25,7 +28,10 @@ const testMigration = JSON.parse(
 		'utf8'
 	)
 );
-const vitestTests = getVitestTests( ROOT_DIR, testMigration );
+const vitestTests = getVitestTests(
+	discoverTestFiles( ROOT_DIR ),
+	testMigration
+);
 
 // Preserve Jest's repository-root configuration discovery and default timezone.
 process.chdir( ROOT_DIR );
