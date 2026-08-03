@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	AutosaveMonitor,
@@ -51,10 +44,6 @@ import {
 } from '@wordpress/compose';
 import { ThemeProvider } from '@wordpress/theme';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BackButton from '../back-button';
 import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
