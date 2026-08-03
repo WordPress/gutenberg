@@ -6,16 +6,16 @@ multi-session and multi-agent: the docs in this folder are the shared state.
 
 ## Branches
 
-- `feature/widget-type-composer`, the integration branch. Every step merges
-  here. Built up from `trunk`; not proposed to `trunk` until the feature
-  graduates.
-- `wtc/NN-<slug>`, one branch per atomic step (e.g. `wtc/03-code-registered`),
-  branched from the **current tip of the feature branch** and merged back when
-  done (hub-and-spoke). Independent steps run in parallel; a step waits only for
-  the steps listed in its `Depends on` to be on the feature branch first.
-- `recovered/widget-type-composer`, the **oracle**: a complete,
-  working-but-unstructured version of the whole vertical. Consult it for the
-  target shape of any piece. Never merge from it; re-derive cleanly.
+-   `feature/widget-type-composer`, the integration branch. Every step merges
+    here. Built up from `trunk`; not proposed to `trunk` until the feature
+    graduates.
+-   `wtc/NN-<slug>`, one branch per atomic step (e.g. `wtc/03-code-registered`),
+    branched from the **current tip of the feature branch** and merged back when
+    done (hub-and-spoke). Independent steps run in parallel; a step waits only for
+    the steps listed in its `Depends on` to be on the feature branch first.
+-   `recovered/widget-type-composer`, the **oracle**: a complete,
+    working-but-unstructured version of the whole vertical. Consult it for the
+    target shape of any piece. Never merge from it; re-derive cleanly.
 
 ## A step's lifecycle (one agent, one step, one branch)
 
@@ -32,27 +32,36 @@ multi-session and multi-agent: the docs in this folder are the shared state.
 
 ## Gates (a step is not done until all pass)
 
-- Typecheck clean: `node_modules/.bin/tsgo --noEmit -p <package>/tsconfig.json`.
-- Lint clean on touched files: `npm run lint:js`, `vendor/bin/phpcs <files>`.
-- PHP: `php -l` on touched files; `vendor/bin/phpunit` for the step's tests.
-- The step's **acceptance criteria** in `PLAN.md` hold, demonstrated in the
-  step doc.
+-   Typecheck clean: `node_modules/.bin/tsgo --noEmit -p <package>/tsconfig.json`.
+-   Lint clean on touched files: `npm run lint:js`, `vendor/bin/phpcs <files>`.
+-   PHP: `php -l` on touched files; `vendor/bin/phpunit` for the step's tests.
+-   The step's **acceptance criteria** in `PLAN.md` hold, demonstrated in the
+    step doc.
 
 ## Scope discipline
 
-- One step changes one concern. Work discovered outside the step becomes a
-  follow-up in the step doc and, if it blocks, a new step in `PLAN.md`. Do not
-  widen the branch.
-- Edit `trunk`-shared files (REST controllers, package `index.ts`,
-  `lib/load.php`, `experiments/load.php`) additively and behind the experiment
-  gate, so the feature is inert when the flag is off.
+-   One step changes one concern. Work discovered outside the step becomes a
+    follow-up in the step doc and, if it blocks, a new step in `PLAN.md`. Do not
+    widen the branch.
+-   Edit `trunk`-shared files (REST controllers, package `index.ts`,
+    `lib/load.php`, `experiments/load.php`) additively and behind the experiment
+    gate, so the feature is inert when the flag is off.
+-   `@wordpress/widget-primitives` stays host-agnostic. A step that needs a
+    capability the package cannot provide (a network call, a store, a router)
+    **declares a seam** and lets the caller fill it, the way
+    `ResolveWidgetModule` does. Do not add `api-fetch`, `core-data`, `notices`,
+    or `route` to its dependencies.
+-   A seam's WordPress implementation goes in the dashboard's grouped adapter
+    module, not loose in a component or a route. See _Who provides what_ in
+    `ARCHITECTURE.md` for which seams are WordPress-generic and which are genuine
+    host decisions.
 
 ## Style
 
-- Experiment flag: `gutenberg-widget-type-composer`, built on the
-  `gutenberg-dashboard-widgets` experience. PHP under
-  `lib/experimental/widget-type-composer/`; JS in `packages/widget-primitives`
-  and `packages/widget-dashboard`.
-- Commits and branch names in English; imperative, concise; no ticket codes.
-- Every behavior-bearing step updates docs. A step that does not touch its
-  `PLAN.md` status or its step doc is incomplete.
+-   Experiment flag: `gutenberg-widget-type-composer`, built on the
+    `gutenberg-dashboard-widgets` experience. PHP under
+    `lib/experimental/widget-type-composer/`; JS in `packages/widget-primitives`
+    and `packages/widget-dashboard`.
+-   Commits and branch names in English; imperative, concise; no ticket codes.
+-   Every behavior-bearing step updates docs. A step that does not touch its
+    `PLAN.md` status or its step doc is incomplete.

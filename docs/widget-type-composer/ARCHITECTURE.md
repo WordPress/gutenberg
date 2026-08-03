@@ -12,15 +12,43 @@ It builds on the existing widget framework (`@wordpress/widget-primitives` +
 `WP_Widget_Type_Registry` + `/wp/v2/widget-modules`). A widget type gains an
 `origin`:
 
-- `built-in`, a build-discovered render module. The existing path, unchanged.
-- `code-registered`, declared in PHP via `gutenberg_register_widget_def()`,
-  held in an in-memory registry, carrying its composition `content` inline.
-- `cpt`, a `widget_def` post; editable, persistent, queryable.
+-   `built-in`, a build-discovered render module. The existing path, unchanged.
+-   `code-registered`, declared in PHP via `gutenberg_register_widget_def()`,
+    held in an in-memory registry, carrying its composition `content` inline.
+-   `cpt`, a `widget_def` post; editable, persistent, queryable.
 
 `built-in` renders client-side from its module; `code-registered` and `cpt`
 render through the **admin block renderer**.
 
 ![Origin resolution: built-in, code-registered, and CPT origins converge through the registration helper into the widget type registry, then over REST to the client renderer. Solid boxes are shipped; dashed boxes are planned.](assets/origin-resolution.svg)
+
+## What it extends
+
+This is not a parallel system. Each piece is an existing WordPress API used for
+what it already does, and the shape it lands on is a familiar one.
+
+A widget definition is closest to a **synced pattern with overrides, rendered
+in the admin instead of the front end**.
+
+-   **Composition as content.** A definition carries block markup as a `content`
+    string, registered from PHP with no build step. Same substrate as
+    `register_block_pattern()`.
+-   **The same dual origin.** Patterns are code-registered plus a CPT (`wp_block`
+    for synced ones). Definitions are code-registered
+    (`gutenberg_register_widget_def()`) plus a CPT (`widget_def`).
+-   **A type, not a template.** A regular pattern is copied on insert and its
+    identity disappears. A definition stays the identity of every instance, so it
+    behaves like a synced pattern, not a loose one.
+-   **Per-instance values through the Bindings API.** `core/instance-attribute` is
+    registered with `register_block_bindings_source()`, the same core extension
+    point behind `core/pattern-overrides`. Instances vary through
+    `metadata.bindings` exactly as pattern overrides do; only the source differs.
+-   **Rendering is `do_blocks()`.** Dynamic blocks work without a client
+    reimplementation.
+
+The one thing core does not provide is a way to render blocks **in the admin**
+as a live React tree. That gap is what the admin block renderer fills, and why
+blocks with no admin component need a per-block SSR fallback.
 
 ## Layers (bottom to top)
 
@@ -52,6 +80,47 @@ render through the **admin block renderer**.
    (`host.navigate`/`host.notify`, silent no-ops if the host omits them), so a
    widget stays host-agnostic. Shipped actions: `save-entity`, `refetch`,
    `navigate`, `notify`.
+
+## Who provides what
+
+`@wordpress/widget-primitives` is host-agnostic on purpose: it depends on
+`@wordpress/element`, `@wordpress/dataviews`, and the grammar parser, and
+nothing else. Everything it cannot do itself, it **declares as a seam** and a
+caller fills in. `ResolveWidgetModule` is the original example.
+
+Those seams split into two kinds, and the difference decides where the
+implementation belongs.
+
+**WordPress implementations.** The host is not choosing anything; it is writing
+the way WordPress does it, and every WordPress host would write the same code.
+
+| Seam                  | The WordPress way                                |
+| --------------------- | ------------------------------------------------ |
+| `resolveWidgetModule` | dynamic `import()` against the page's import map |
+| `renderBlocks`        | `POST /wp/v2/widget-defs/render`                 |
+| widget-type records   | the `widgetModule` core-data entity              |
+
+**Host decisions.** These legitimately differ between hosts, and no shared
+implementation would be correct.
+
+| Concern               | Why it varies                                |
+| --------------------- | -------------------------------------------- |
+| `navigate`            | depends on the host's router, or its absence |
+| `notify`              | depends on the host's notice surface         |
+| field-type vocabulary | the application owns what a type name means  |
+| placement and chrome  | the host owns its surfaces                   |
+
+The first table is duplication waiting to happen: written once by the dashboard,
+written again by a sidebar, again by a plugin panel. It belongs in a **WordPress
+adapter layer** between the contract and the hosts, not inside either.
+
+`@wordpress/dashboard-init` is already an unnamed piece of that layer: a package
+whose only job is registering the `widgetModule` entity before the page renders.
+
+Until a second WordPress host exists, the adapter is not its own package. The
+implementations live grouped in one module in the dashboard, named for what they
+are, so extraction is mechanical rather than archaeology. Extract on the second
+WordPress host, or once the set reaches three or four seams.
 
 ## Reference
 
