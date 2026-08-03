@@ -26,7 +26,10 @@ test.describe( 'Tabs', () => {
 							},
 							{
 								name: 'core/tab-panel',
-								attributes: { label: 'Tab 2' },
+								attributes: {
+									label: 'Tab 2',
+									placeholder: 'Section name',
+								},
 								innerBlocks: [
 									{
 										name: 'core/paragraph',
@@ -162,6 +165,9 @@ test.describe( 'Tabs', () => {
 			await expect(
 				newTab.locator( '[contenteditable="true"]' )
 			).toBeFocused();
+			await expect(
+				newTab.locator( '[data-rich-text-placeholder]' )
+			).toHaveAttribute( 'data-rich-text-placeholder', 'Tab title' );
 
 			// The new tab's panel is the active one and is visible.
 			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
@@ -192,6 +198,10 @@ test.describe( 'Tabs', () => {
 			// Empty the tab label, then delete again to remove the tab.
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
+			await expect(
+				tab2.locator( '[data-rich-text-placeholder]' )
+			).toHaveAttribute( 'data-rich-text-placeholder', 'Section name' );
+
 			await page.keyboard.press( 'Backspace' );
 
 			const tabs = editor.canvas.getByRole( 'tab' );
@@ -276,96 +286,6 @@ test.describe( 'Tabs', () => {
 				'Tab 1',
 				'Tab 2',
 			] );
-		} );
-	} );
-
-	test.describe( 'Tab labels', () => {
-		const placeholders = ( editor, text ) =>
-			editor.canvas.locator(
-				`[role="tab"] [data-rich-text-placeholder="${ text }"]`
-			);
-
-		const panelAttribute = async ( editor, attribute ) =>
-			( await editor.getBlocks() )[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
-				( panel ) => panel.attributes[ attribute ]
-			);
-
-		test.beforeEach( async ( { admin } ) => {
-			await admin.createNewPost();
-		} );
-
-		test( 'start empty and prompt for a title', async ( { editor } ) => {
-			await editor.insertBlock( { name: 'core/tabs' } );
-
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveCount( 2 );
-			await expect
-				.poll( () => panelAttribute( editor, 'label' ) )
-				.toEqual( [ '', '' ] );
-			await expect( placeholders( editor, 'Tab title' ) ).toHaveCount(
-				2
-			);
-		} );
-
-		test( "use the tab panel's placeholder attribute when set", async ( {
-			editor,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/tabs',
-				innerBlocks: [
-					{ name: 'core/tab-list' },
-					{
-						name: 'core/tab-panels',
-						innerBlocks: [
-							{
-								name: 'core/tab-panel',
-								attributes: { placeholder: 'Section name' },
-							},
-						],
-					},
-				],
-			} );
-
-			await expect( placeholders( editor, 'Section name' ) ).toHaveCount(
-				1
-			);
-			await expect( placeholders( editor, 'Tab title' ) ).toHaveCount(
-				0
-			);
-		} );
-
-		test( 'stay empty on tabs added from the toolbar', async ( {
-			editor,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/tabs',
-				innerBlocks: [
-					{ name: 'core/tab-list' },
-					{
-						name: 'core/tab-panels',
-						innerBlocks: [
-							{
-								name: 'core/tab-panel',
-								attributes: { label: 'Overview' },
-							},
-						],
-					},
-				],
-			} );
-
-			await editor.canvas
-				.getByRole( 'tab', { name: 'Overview' } )
-				.click();
-			await editor.clickBlockToolbarButton( 'Add tab' );
-
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveCount( 2 );
-			await expect
-				.poll( () => panelAttribute( editor, 'label' ) )
-				.toEqual( [ 'Overview', '' ] );
-
-			// Only the new, untitled tab prompts for a title.
-			await expect( placeholders( editor, 'Tab title' ) ).toHaveCount(
-				1
-			);
 		} );
 	} );
 
