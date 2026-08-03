@@ -77,7 +77,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		}
 
 		&:hover {
-			color: $components-color-accent;
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 
 		&:focus {
