@@ -55,10 +55,15 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	// editing host, which adopts the selection placed within it. The order
 	// matters: focusing an editing host without a selection makes Safari
 	// asynchronously reveal a caret, scrolling the viewport.
+	// Within an engaged editing host every element inherits editability, so
+	// the properties alone would also match focusable block wrappers, which
+	// must take the focus path below. Only rich text elements are caret
+	// targets that cannot hold focus themselves.
 	const isInheritedEditable =
 		container.nodeType === container.ELEMENT_NODE &&
 		!! container.isContentEditable &&
-		container.contentEditable !== 'true';
+		container.contentEditable !== 'true' &&
+		container.matches( '.rich-text' );
 
 	if ( ! isInheritedEditable ) {
 		container.focus();
