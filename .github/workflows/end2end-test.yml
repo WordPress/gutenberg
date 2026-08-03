@@ -22,7 +22,7 @@ permissions: {}
 jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ${{ vars.PHPUNIT_RUNNER || 'ubuntu-24.04' }}
+        runs-on: ${{ vars.RUNNER_GROUP || 'ubuntu-24.04' }}
         permissions:
             contents: read
             id-token: write
@@ -78,7 +78,7 @@ jobs:
 
     e2e-playwright-rtc-websocket:
         name: Playwright - RTC WebSocket
-        runs-on: ${{ vars.PHPUNIT_RUNNER || 'ubuntu-24.04' }}
+        runs-on: ${{ vars.RUNNER_GROUP || 'ubuntu-24.04' }}
         permissions:
             contents: read
             id-token: write
