@@ -73,25 +73,44 @@ function mergeLayer( lower: PlainObject, upper: PlainObject ): PlainObject {
  * The leaves of `value` that differ from `base`. Mirrors `mergeLayer`:
  * `mergeLayer( base, diffLayer( value, base ) )` resolves back to `value`.
  *
- * @param value The layer to compare.
- * @param base  The layer to compare it against.
+ * A persisted leaf that equals both `value` and `base` is kept even though it
+ * is not a difference: the preference is shared by every view of the same
+ * entity, and such a leaf may only differ from the base of *another* view. In
+ * this one, where it coincides with the base, a revert is unobservable — so
+ * equality cannot mean the user reverted it. Dropping a persisted leaf
+ * requires `value` to actually move away from it, back to `base`.
+ *
+ * @param value     The layer to compare.
+ * @param base      The layer to compare it against.
+ * @param persisted The previously persisted leaves.
  * @return The leaves that differ, as a layer of its own.
  */
-function diffLayer( value: PlainObject, base: PlainObject ): PlainObject {
+function diffLayer(
+	value: PlainObject,
+	base: PlainObject,
+	persisted: PlainObject = {}
+): PlainObject {
 	const result: PlainObject = {};
 	for ( const key of Object.keys( value ) ) {
 		const next = value[ key ];
 		const current = base[ key ];
+		const prev = persisted[ key ];
 		if ( next === undefined ) {
 			continue;
 		}
 		if ( isPlainObject( next ) && isPlainObject( current ) ) {
-			const nested = diffLayer( next, current );
+			const nested = diffLayer(
+				next,
+				current,
+				isPlainObject( prev ) ? prev : {}
+			);
 			if ( Object.keys( nested ).length > 0 ) {
 				result[ key ] = nested;
 			}
 		} else if ( ! dequal( next, current ) ) {
 			result[ key ] = next;
+		} else if ( prev !== undefined && dequal( next, prev ) ) {
+			result[ key ] = prev;
 		}
 	}
 	return result;
@@ -204,19 +223,26 @@ export function resolveView( args: ResolveViewArgs ): {
  * that a change to any of those layers keeps showing through the properties the
  * user never touched.
  *
+ * Previously persisted leaves that coincide with the base of the current view
+ * are carried over rather than dropped: they may still make a difference in
+ * another view sharing the preference. See `diffLayer`.
+ *
  * @param newView             The view the user produced.
  * @param baseView            The view the layers below resolve to.
  * @param activeViewOverrides The active view overrides.
+ * @param persistedView       The user's previously persisted modifications.
  * @return The modified properties, or `undefined` when the user modified none.
  */
 export function getUserModifications(
 	newView: View,
 	baseView: View,
-	activeViewOverrides?: ViewOverrides
+	activeViewOverrides?: ViewOverrides,
+	persistedView?: ViewOverrides
 ): ViewOverrides | undefined {
 	const modifications = diffLayer(
 		withoutQueryParams( newView ),
-		withoutQueryParams( baseView )
+		withoutQueryParams( baseView ),
+		withoutQueryParams( persistedView )
 	);
 
 	// Locked filters are pinned on every read, so persisting them would only

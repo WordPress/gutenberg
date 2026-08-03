@@ -818,6 +818,68 @@ describe( 'useView', () => {
 			expect( result.current.isModified ).toBe( false );
 		} );
 
+		// The preference key is shared by every tab of a screen: the tabs are
+		// the same kind/name/slug and differ only in `activeViewOverrides`.
+		// See https://github.com/WordPress/gutenberg/pull/80832#discussion_r3692195664.
+		it( 'should keep a modification persisted from another tab when updating an unrelated property', () => {
+			const registry = createTestRegistry();
+			const defaultView = {
+				type: 'table',
+				perPage: 20,
+				sort: { field: 'title', direction: 'asc' },
+			};
+			// Tab A overrides the sort; Tab B has no overrides.
+			const tabAProps = {
+				...BASE_PROPS,
+				defaultView,
+				activeViewOverrides: {
+					sort: { field: 'date', direction: 'desc' },
+				},
+			} as Parameters< typeof useView >[ 0 ];
+			const tabBProps = {
+				...BASE_PROPS,
+				defaultView,
+			} as Parameters< typeof useView >[ 0 ];
+			const { result, rerender } = renderUseView( registry, tabAProps );
+
+			// In Tab A, the user explicitly picks the sort back to the
+			// default the override replaced. The pick is persisted.
+			act( () => {
+				result.current.updateView( {
+					...result.current.view,
+					sort: { field: 'title', direction: 'asc' },
+				} );
+			} );
+			rerender( tabAProps );
+			expect( getPreference( registry ) ).toEqual( {
+				sort: { field: 'title', direction: 'asc' },
+			} );
+
+			// In Tab B — where that sort equals the base — the user changes
+			// only `perPage`.
+			rerender( tabBProps );
+			act( () => {
+				result.current.updateView( {
+					...result.current.view,
+					perPage: 50,
+				} );
+			} );
+			rerender( tabBProps );
+			expect( result.current.view.perPage ).toBe( 50 );
+
+			// Back in Tab A, the sort pick must survive: the update made in
+			// Tab B touched an unrelated property.
+			rerender( tabAProps );
+			expect( result.current.view.sort ).toEqual( {
+				field: 'title',
+				direction: 'asc',
+			} );
+			expect( getPreference( registry ) ).toEqual( {
+				perPage: 50,
+				sort: { field: 'title', direction: 'asc' },
+			} );
+		} );
+
 		it( 'should reset to the resolved default', () => {
 			const registry = createTestRegistry();
 			setPreference( registry, { perPage: 100, type: 'grid' } );

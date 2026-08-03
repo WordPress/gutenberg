@@ -106,7 +106,8 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			const modifications = getUserModifications(
 				newView,
 				baseView,
-				activeViewOverrides
+				activeViewOverrides,
+				persistedView
 			);
 			if ( ! dequal( modifications, persistedView ) ) {
 				// `undefined` clears the preference: the user reverted every
