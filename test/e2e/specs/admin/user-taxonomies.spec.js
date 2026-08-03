@@ -319,6 +319,14 @@ test.describe( 'User taxonomies', () => {
 		const PLURAL = 'Xyzzies';
 		const SINGULAR = 'Xyzzy';
 
+		// Checkbox assertions below match by state (`checked: true`) instead
+		// of calling `toBeChecked()` on a name-only locator: WP creates a
+		// missing default term inside `register_taxonomy()` on every
+		// request's `init`, so two requests racing right after the taxonomy
+		// record is created can both insert it (same name, deduped slug). A
+		// name-only locator then resolves to two checkboxes and trips
+		// Playwright's strict mode.
+
 		// Outer `afterEach` deletes the wp_user_taxonomy record; this
 		// additionally cleans up the posts the tests publish. The terms
 		// auto-created by WP's default-term mechanism are intentionally
@@ -421,8 +429,11 @@ test.describe( 'User taxonomies', () => {
 			await expandTaxonomyPanel( page );
 			const genresGroup = page.getByRole( 'group', { name: PLURAL } );
 			await expect(
-				genresGroup.getByRole( 'checkbox', { name: 'Default Xyzzy A' } )
-			).toBeChecked();
+				genresGroup.getByRole( 'checkbox', {
+					name: 'Default Xyzzy A',
+					checked: true,
+				} )
+			).toBeVisible();
 
 			// Disable the default-term toggle via the edit page.
 			const taxonomyId = await getTaxonomyId( requestUtils );
@@ -480,8 +491,11 @@ test.describe( 'User taxonomies', () => {
 			await expandTaxonomyPanel( page );
 			const postAGroup = page.getByRole( 'group', { name: PLURAL } );
 			await expect(
-				postAGroup.getByRole( 'checkbox', { name: 'Original Xyzzy' } )
-			).toBeChecked();
+				postAGroup.getByRole( 'checkbox', {
+					name: 'Original Xyzzy',
+					checked: true,
+				} )
+			).toBeVisible();
 
 			// Rename the default term via the edit page.
 			const taxonomyId = await getTaxonomyId( requestUtils );
@@ -512,11 +526,22 @@ test.describe( 'User taxonomies', () => {
 			await expandTaxonomyPanel( page );
 			const postBGroup = page.getByRole( 'group', { name: PLURAL } );
 			await expect(
-				postBGroup.getByRole( 'checkbox', { name: 'Renamed Xyzzy' } )
-			).toBeChecked();
+				postBGroup.getByRole( 'checkbox', {
+					name: 'Renamed Xyzzy',
+					checked: true,
+				} )
+			).toBeVisible();
 			await expect(
-				postBGroup.getByRole( 'checkbox', { name: 'Original Xyzzy' } )
-			).not.toBeChecked();
+				postBGroup
+					.getByRole( 'checkbox', { name: 'Original Xyzzy' } )
+					.first()
+			).toBeVisible();
+			await expect(
+				postBGroup.getByRole( 'checkbox', {
+					name: 'Original Xyzzy',
+					checked: true,
+				} )
+			).toHaveCount( 0 );
 		} );
 	} );
 } );
