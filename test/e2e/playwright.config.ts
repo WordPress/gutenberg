@@ -18,10 +18,23 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 }
 
 const flakinessOptions = {
+	/*
+	 * Tests dashboard is available at https://flakiness.io/WordPress/gutenberg
+	 */
 	flakinessProject: 'WordPress/gutenberg',
+	/*
+	 * Use historical test-duration data to balance shards.
+	 * Documentation is available at https://github.com/flakiness/playwright
+	 */
 	shardBalancing: {
 		timingsFile: './timings.json',
 	},
+	/*
+	 * Only upload to Flakiness.io for the official WordPress/Gutenberg
+	 * repository. Forks and private mirrors are not configured on the service.
+	 * We want to keep the reporter to drive shard balancing on forks too.
+	 */
+	disableUpload: process.env.GITHUB_REPOSITORY !== 'WordPress/gutenberg',
 };
 
 const config = defineConfig( {
@@ -35,15 +48,7 @@ const config = defineConfig( {
 				[ 'github' ],
 				[ './config/flaky-tests-reporter.ts' ],
 				[ 'blob' ],
-				/*
-				 * Only interact with flakiness.io for the official WordPress/Gutenberg
-				 * repository. Forks and private mirrors are not configured on the service.
-				 */
-				...( process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
-					? ( [
-							[ '@flakiness/playwright', flakinessOptions ],
-					  ] as const )
-					: [] ),
+				[ '@flakiness/playwright', flakinessOptions ],
 		  ]
 		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
