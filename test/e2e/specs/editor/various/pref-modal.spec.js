@@ -12,10 +12,11 @@ test.describe( 'Preferences modal', () => {
 		test( 'Enable pre-publish checks is visible on desktop', async ( {
 			page,
 		} ) => {
-			await page.click(
-				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-			);
-			await page.click( 'role=menuitem[name="Preferences"i]' );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
 
 			const prePublishToggle = page.locator(
 				'role=checkbox[name="Enable pre-publish checks"i]'
@@ -31,10 +32,11 @@ test.describe( 'Preferences modal', () => {
 		} ) => {
 			await page.setViewportSize( { width: 500, height: 800 } );
 
-			await page.click(
-				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-			);
-			await page.click( 'role=menuitem[name="Preferences"i]' );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
 
 			const generalButton = page.locator(
 				'role=button[name="General"i]'

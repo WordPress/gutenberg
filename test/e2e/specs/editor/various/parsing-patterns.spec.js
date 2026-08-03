@@ -43,10 +43,10 @@ test.describe( 'Parsing patterns', () => {
 			editor.canvas.locator( 'role=document[name="Block: Button"i]' )
 		);
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'whitespace'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'whitespace' );
 		await page
 			.locator( 'role=option[name="Pattern with top-level whitespace"i]' )
 			.click();

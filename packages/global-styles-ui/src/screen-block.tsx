@@ -99,6 +99,7 @@ interface ScreenBlockProps {
 	variation?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function ScreenBlock( {
@@ -106,6 +107,7 @@ function ScreenBlock( {
 	variation,
 	selectedViewport: controlledSelectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -367,7 +369,7 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
-				pseudoStates={ validPseudoStates }
+				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={

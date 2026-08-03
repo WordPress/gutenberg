@@ -24,9 +24,10 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -34,16 +35,34 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
-import {
-	convertDescription,
-	ConvertToLinksModal,
-} from './convert-to-links-modal';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-// We only show the edit option when page count is <= MAX_PAGE_COUNT
+// We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+
+// Shown from both the block toolbar and the Settings panel so the two entry
+// points explain the change identically.
+function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
+	return (
+		<ConfirmDialog
+			isOpen
+			title={ __( 'Detach Page List' ) }
+			__experimentalHideHeader={ false }
+			confirmButtonText={ __( 'Detach' ) }
+			onConfirm={ onConfirm }
+			onCancel={ onCancel }
+			isBusy={ isBusy }
+			size="medium"
+		>
+			{ __(
+				"This Navigation Menu displays your website's pages. Detaching will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
+			) }
+		</ConfirmDialog>
+	);
+}
+
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -122,9 +141,7 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = useCallback( () => setOpen( true ), [] );
-	const closeModal = () => setOpen( false );
+	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
@@ -300,16 +317,10 @@ export default function PageListEdit( {
 
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
-			openModal();
+			setIsConfirmingDetach( true );
 			selectBlock( parentClientId );
 		}
-	}, [
-		hasSelectedChild,
-		hasDraggedChild,
-		parentClientId,
-		selectBlock,
-		openModal,
-	] );
+	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
 
 	return (
 		<>
@@ -349,18 +360,21 @@ export default function PageListEdit( {
 						) }
 
 						{ allowConvertToLinks && (
-							<div style={ { gridColumn: '1 / -1' } }>
-								<p>{ convertDescription }</p>
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									accessibleWhenDisabled
-									disabled={ ! hasResolvedPages }
-									onClick={ convertToNavigationLinks }
-								>
-									{ __( 'Edit' ) }
-								</Button>
-							</div>
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								accessibleWhenDisabled
+								disabled={ ! hasResolvedPages }
+								onClick={ () => setIsConfirmingDetach( true ) }
+								// Not a ToolsPanelItem, so it needs to opt into
+								// spanning the panel's two-column grid.
+								style={ {
+									gridColumn: '1 / -1',
+									justifyContent: 'center',
+								} }
+							>
+								{ __( 'Detach Page List' ) }
+							</Button>
 						) }
 					</ToolsPanel>
 				</InspectorControls>
@@ -369,17 +383,23 @@ export default function PageListEdit( {
 				<>
 					<BlockControls group="other">
 						<ToolbarButton
-							title={ __( 'Edit' ) }
-							onClick={ openModal }
+							title={ __( 'Detach' ) }
+							disabled={ ! hasResolvedPages }
+							onClick={ () => setIsConfirmingDetach( true ) }
 						>
-							{ __( 'Edit' ) }
+							{ __( 'Detach' ) }
 						</ToolbarButton>
 					</BlockControls>
-					{ isOpen && (
-						<ConvertToLinksModal
-							onClick={ convertToNavigationLinks }
-							onClose={ closeModal }
-							disabled={ ! hasResolvedPages }
+					{ isConfirmingDetach && (
+						<DetachPageListDialog
+							// Converting a still-resolving list would map over
+							// an incomplete (or empty) set of pages.
+							isBusy={ ! hasResolvedPages }
+							onConfirm={ () => {
+								convertToNavigationLinks();
+								setIsConfirmingDetach( false );
+							} }
+							onCancel={ () => setIsConfirmingDetach( false ) }
 						/>
 					) }
 				</>

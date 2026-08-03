@@ -8,9 +8,11 @@ test.describe( 'toVdom', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/tovdom' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/tovdom' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();

@@ -66,7 +66,7 @@ const { actions, state } = store(
 			 * @param {KeyboardEvent} event The keydown event.
 			 */
 			handleTabKeyDown: withSyncEvent( ( event ) => {
-				const { tabIndex } = state;
+				const { tabIndex, tabsList } = state;
 
 				if ( tabIndex === null ) {
 					return;
@@ -78,6 +78,12 @@ const { actions, state } = store(
 				} else if ( event.key === 'ArrowLeft' ) {
 					event.preventDefault();
 					actions.moveFocus( tabIndex - 1 );
+				} else if ( event.key === 'Home' ) {
+					event.preventDefault();
+					actions.moveFocus( 0 );
+				} else if ( event.key === 'End' ) {
+					event.preventDefault();
+					actions.moveFocus( tabsList.length - 1 );
 				}
 			} ),
 			/**

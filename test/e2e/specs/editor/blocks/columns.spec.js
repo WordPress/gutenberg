@@ -62,9 +62,9 @@ test.describe( 'Columns', () => {
 			)
 		);
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Lock"i]' );
+		await page.getByRole( 'menuitem', { name: 'Lock' } ).click();
 		await page.locator( 'role=checkbox[name="Lock removal"i]' ).check();
-		await page.click( 'role=button[name="Apply"i]' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Select columns block
 		await editor.selectBlocks(
@@ -80,7 +80,7 @@ test.describe( 'Columns', () => {
 		await expect( columnsChangeInput ).toHaveAttribute( 'min', '3' );
 
 		// Changing the number of columns should take into account locked columns
-		await page.fill( 'role=spinbutton[name="Columns"i]', '1' );
+		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '1' );
 		await pageUtils.pressKeys( 'Tab' );
 		await expect( columnsChangeInput ).toHaveValue( '3' );
 	} );

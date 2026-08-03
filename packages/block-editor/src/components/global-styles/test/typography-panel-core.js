@@ -9,13 +9,19 @@ import { click, render as renderAriakit } from '@ariakit/test/react';
  */
 import TypographyPanel from '../typography-panel';
 
-// Core-build coverage for `TypographyPanel`. Tests run with
-// `IS_GUTENBERG_PLUGIN` true, so the core path needs a mock. `jest.mock` is
-// file-scoped, so these tests live apart from `typography-panel.js`.
-jest.mock( '../inheritance', () => ( {
-	...jest.requireActual( '../inheritance' ),
-	ENABLE_GLOBAL_STYLES_INHERITANCE: false,
-} ) );
+// Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
+// experiment off, which is what WordPress Core gets. Deleted rather than set to
+// `false`, because an experiment that was never turned on leaves the global
+// unset, and `undefined` is the value that fires a receiving component's own
+// default parameter. Setting `false` here would test a state that does not
+// occur.
+beforeEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 const baseSettings = {
 	typography: {
@@ -60,10 +66,10 @@ const getItem = ( name ) => {
 	return control.closest( '.components-tools-panel-item' );
 };
 
-describe( 'TypographyPanel — core build defaults', () => {
-	// `showInheritanceLabelIndicators` defaults to the build constant, so a
-	// caller that passes no prop gets no inheritance treatment in core. The
-	// layout className must still come through.
+describe( 'TypographyPanel — experiment off', () => {
+	// `showInheritanceLabelIndicators` defaults to the experiment flag, so a
+	// caller that passes no prop gets no inheritance treatment. The layout
+	// className must still come through.
 	it( 'applies no inherited treatment by default, even when an inherited value is present', () => {
 		renderPanel( {
 			value: {},
@@ -92,9 +98,30 @@ describe( 'TypographyPanel — core build defaults', () => {
 			} )
 		).not.toBeInTheDocument();
 	} );
+
+	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
+		await renderAriakit(
+			<TypographyPanel
+				value={ { color: { text: 'var:preset|color|blue' } } }
+				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
+				settings={ PALETTE_SETTINGS }
+				panelId="test"
+				onChange={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', {
+				name: /reset to inherited value/i,
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /^reset$/i } )
+		).toBeInTheDocument();
+	} );
 } );
 
-describe( 'TypographyPanel — core build setTextColor link sync', () => {
+describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
 		const onChange = jest.fn();
 		await renderAriakit(
@@ -117,10 +144,10 @@ describe( 'TypographyPanel — core build setTextColor link sync', () => {
 	}
 
 	it( 'leaves an unset link color alone when a text color is already set', async () => {
-		// The plugin falls back to the inherited link color here and syncs.
-		// Core compares the inherited text and link colors directly, which on
-		// this path is the block's own pair, so a link color that was never
-		// set does not start tracking.
+		// With the experiment on this falls back to the inherited link color
+		// and syncs. Off, it compares the inherited text and link colors
+		// directly, which on this path is the block's own pair, so a link
+		// color that was never set does not start tracking.
 		const result = await pickRed( {
 			color: { text: 'var:preset|color|blue' },
 		} );

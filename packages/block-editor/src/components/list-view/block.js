@@ -6,11 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	hasBlockSupport,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -48,6 +44,7 @@ import {
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import { useBlockRename, BlockRenameModal } from '../block-rename';
@@ -385,10 +382,7 @@ function ListViewBlock( {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( blocksToUpdate );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = switchToBlockType(
-					blocks,
-					groupingBlockName
-				);
+				const newBlocks = groupBlocks( blocks, groupingBlockName );
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
