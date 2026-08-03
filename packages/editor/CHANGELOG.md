@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Document tools: Use the design system `outset-ring__focus` mixin for icon button focus styles.
 -   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
