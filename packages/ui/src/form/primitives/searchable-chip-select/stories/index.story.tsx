@@ -144,10 +144,10 @@ export const WithCustomEmptyContent: Story = {
 };
 
 /**
- * Options can be organized into labeled groups with `SearchableChipSelect.Group`,
- * `SearchableChipSelect.GroupLabel`, and `SearchableChipSelect.Collection`.
- * Pass an array of groups to `items` (each with `label` and `items` properties),
- * and use `children` to render each group.
+ * To render grouped items, pass an array of groups to `items` (each with
+ * `label` and `items` properties) and provide `children` that renders each
+ * group using `SearchableChipSelect.Group`, `SearchableChipSelect.GroupLabel`,
+ * and `SearchableChipSelect.Collection`.
  */
 export const Grouped: Story = {
 	args: {
