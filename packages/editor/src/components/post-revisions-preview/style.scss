@@ -86,6 +86,17 @@ $revision-code-diff-marker-width: 3ch;
 	}
 }
 
+// Use a stronger tint for word-level changes than for the surrounding line.
+.editor-revisions-code-diff__segment {
+	&.is-added {
+		background: rgba($revision-diff-added-color, 0.3);
+	}
+
+	&.is-removed {
+		background: rgba($revision-diff-removed-color, 0.3);
+	}
+}
+
 .editor-revisions-code-diff__line-number,
 .editor-revisions-code-diff__marker {
 	position: sticky;
