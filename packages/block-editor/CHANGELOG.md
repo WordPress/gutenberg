@@ -23,7 +23,7 @@
 -   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
 -   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
--   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json`.
+-   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
 
 ## 16.0.0 (2026-07-14)
 
