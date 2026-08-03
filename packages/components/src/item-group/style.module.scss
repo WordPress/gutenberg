@@ -59,10 +59,11 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 
 	&.is-unstyled-button,
 	&.is-unstyled-link {
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
 		font-family: inherit;
 		appearance: none;
-		border: 1px solid transparent;
+		border: var(--wpds-border-width-xs) solid transparent;
 		cursor: var(--wpds-cursor-control);
 		background: none;
 		text-align: start;
