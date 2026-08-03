@@ -7,7 +7,7 @@
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
 -   Inherited Global Styles now resolve per-level heading element styles for the heading-family blocks (`core/heading`, `core/site-title`, `core/post-title`, `core/query-title`, `core/comments-title`, `core/term-name`, `core/site-tagline`, `core/accordion-heading`), so inspector controls reflect values set on a specific heading level (`styles.elements.h1`–`h6`) in addition to the shared `heading` element. A block rendered at level 0 (a paragraph) folds no heading element styles; `core/accordion-heading` has no level-0 state and takes its level from the parent Accordion's block context ([#80495](https://github.com/WordPress/gutenberg/pull/80495)).
 -   Inherited Global Styles now resolve the `link` element (`styles.elements.link`) for whole-block link blocks — those that render as a link — so their inspector controls reflect inherited link styles, mirroring the `button` element treatment for `core/button`. Covers `core/read-more`, `core/loginout`, `core/post-navigation-link`, `core/query-pagination-next`, `core/query-pagination-previous`, `core/query-pagination-numbers`, `core/comments-pagination-next`, `core/comments-pagination-previous`, `core/comments-pagination-numbers`, `core/comment-edit-link`, `core/comment-reply-link`, and `core/post-comments-link` [#80607](https://github.com/WordPress/gutenberg/pull/80607)).
--   Add support for the `blockStatesEnabled` editor setting, which hides state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
+-   Add support for the `blockStatesEditingEnabled` editor setting, which hides state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
 
 ### Internal
 
@@ -23,6 +23,7 @@
 -   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
 -   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
+-   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
 
 ## 16.0.0 (2026-07-14)
 
