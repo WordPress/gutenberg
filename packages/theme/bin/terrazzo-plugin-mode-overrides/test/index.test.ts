@@ -6,11 +6,13 @@ const cwd = new URL( 'file:///virtual/' );
 async function buildModeOverrides( {
 	sourceDocuments,
 	modeTokens,
+	resolvedModeTokens = modeTokens,
 	sourceByToken,
 	removeTokensBeforeBuild = false,
 }: {
 	sourceDocuments: Record< string, Record< string, unknown > >;
 	modeTokens: Record< string, Record< string, unknown > >;
+	resolvedModeTokens?: Record< string, Record< string, unknown > >;
 	sourceByToken: Record< string, string >;
 	removeTokensBeforeBuild?: boolean;
 } ) {
@@ -26,10 +28,25 @@ async function buildModeOverrides( {
 			{ source: { filename: new URL( filename, cwd ).href } },
 		] )
 	);
+	const modifierName = 'themeMode';
 	const resolver = {
-		listPermutations: () => [ { tzMode: '.' }, { tzMode: 'compact' } ],
-		apply: jest.fn( ( input: { tzMode: string } ) =>
-			input.tzMode === 'compact' ? modeTokens : {}
+		listPermutations: () => [
+			{ [ modifierName ]: '.' },
+			{ [ modifierName ]: 'compact' },
+		],
+		apply: jest.fn(
+			(
+				input: Record< string, string >,
+				options?: { resolveAliases?: boolean }
+			) => {
+				if ( input[ modifierName ] !== 'compact' ) {
+					return {};
+				}
+
+				return options?.resolveAliases === false
+					? modeTokens
+					: resolvedModeTokens;
+			}
 		),
 	};
 	const outputFiles = new Map< string, string >();
@@ -46,7 +63,7 @@ async function buildModeOverrides( {
 		tokens,
 		sources,
 		resolver,
-		outputFile: ( filename, contents ) => {
+		outputFile: ( filename: string, contents: string | Buffer ) => {
 			outputFiles.set( filename, contents.toString() );
 		},
 	} as never );
@@ -172,6 +189,12 @@ describe( 'pluginModeOverrides', () => {
 				'wpds-dimension.gap': {
 					$type: 'dimension',
 					$value: '{wpds-dimension.base}',
+				},
+			},
+			resolvedModeTokens: {
+				'wpds-dimension.gap': {
+					$type: 'dimension',
+					$value: { value: 8, unit: 'px' },
 				},
 			},
 			sourceByToken: {
