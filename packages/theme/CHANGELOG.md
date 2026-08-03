@@ -35,7 +35,7 @@
 
 ### Code Quality
 
--   Update Terrazzo packages to 2.5.0.
+-   Update Terrazzo packages to 2.5.0 ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
 -   Update `colorjs.io` to 0.7.1 ([#80762](https://github.com/WordPress/gutenberg/pull/80762)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
