@@ -48,6 +48,23 @@ export function getSelectionHistory( ydoc: CRDTDoc ): YFullSelection[] {
 	return getBlockSelectionHistory( ydoc ).getSelectionHistory();
 }
 
+/**
+ * Convert a selection to Y.Doc-relative anchors now, against the current
+ * Y.Doc text, and return a callback that publishes it to the selection
+ * history. See BlockSelectionHistory.captureSelection for why conversion
+ * and publishing are separate steps.
+ *
+ * @param ydoc        The Y.Doc the selection belongs to
+ * @param wpSelection The selection to capture
+ * @return A callback that publishes the captured selection to history.
+ */
+export function captureSelectionHistory(
+	ydoc: CRDTDoc,
+	wpSelection: WPSelection
+): () => void {
+	return getBlockSelectionHistory( ydoc ).captureSelection( wpSelection );
+}
+
 export function updateSelectionHistory(
 	ydoc: CRDTDoc,
 	wpSelection: WPSelection

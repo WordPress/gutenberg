@@ -37,9 +37,9 @@ import { type Post } from '../entity-types/post';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
 import {
+	captureSelectionHistory,
 	getSelectionHistory,
 	getShiftedSelection,
-	updateSelectionHistory,
 } from './crdt-selection';
 import {
 	asRichTextOffset,
@@ -279,15 +279,26 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		const selection = changes.selection;
-		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the current selection before
-		// it is overwritten by the new selection from Gutenberg.
-		// Without this, selection history will already contain the latest
-		// selection (after this change) when the undo stack is saved.
-		setTimeout( () => {
-			updateSelectionHistory( ydoc, selection );
-		}, 0 );
+		// Convert the selection to Y.RelativePosition anchors synchronously,
+		// so they are anchored to the Y.Doc text exactly as this change left
+		// it. A remote update can be applied as soon as the next task; if the
+		// conversion happens after one lands (as with the previous
+		// setTimeout( fn, 0 ) approach), the absolute offsets are resolved
+		// against the shifted text and the anchors point at the wrong
+		// characters. getShiftedSelection then reports "nothing moved", the
+		// caret correction for that remote insert is silently dropped, and
+		// subsequent typing lands out of order.
+		//
+		// Publishing the entry into the history is still deferred, because
+		// undo meta is captured synchronously during this Yjs transaction's
+		// cleanup and must read the selection as it was before this change.
+		// A microtask runs after that cleanup but before any provider
+		// message task can apply a remote update.
+		const publishSelectionHistory = captureSelectionHistory(
+			ydoc,
+			changes.selection
+		);
+		queueMicrotask( publishSelectionHistory );
 	}
 }
 

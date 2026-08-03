@@ -1097,6 +1097,61 @@ describe( 'crdt', () => {
 				expect( changes.selection?.selectionStart.offset ).toBe( 3 ); // 8 - 5
 			} );
 
+			it( 'anchors the selection at capture time even when a remote update lands before the history publish', async () => {
+				const ytext = addBlockToDoc( map, 'block-1', 'Hello world' );
+
+				// A local edit records its selection through
+				// applyPostChangesToCRDTDoc. The relative-position anchors
+				// must be created synchronously against the text as this
+				// change left it; only the history publish is deferred (so
+				// undo meta can still read the previous selection).
+				applyPostChangesToCRDTDoc(
+					doc,
+					{
+						selection: {
+							selectionStart: {
+								clientId: 'block-1',
+								attributeKey: 'content',
+								offset: 5,
+							},
+							selectionEnd: {
+								clientId: 'block-1',
+								attributeKey: 'content',
+								offset: 5,
+							},
+						},
+					},
+					defaultSyncedProperties
+				);
+
+				// A remote insert is applied before the deferred publish
+				// runs, as a provider message task would be. When the
+				// anchor conversion itself was deferred, the anchors were
+				// computed against this shifted text and the caret
+				// correction asserted below was silently dropped.
+				ytext.insert( 0, 'XXX' );
+
+				// Flush the deferred history publish.
+				jest.runAllTimers();
+				await Promise.resolve();
+
+				const editedRecord = {
+					title: 'CRDT Title',
+					status: 'draft',
+					blocks: [],
+				} as unknown as Post;
+
+				const changes = getPostChangesFromCRDTDoc(
+					doc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.selection ).toBeDefined();
+				expect( changes.selection?.selectionStart.offset ).toBe( 8 ); // 5 + 3
+				expect( changes.selection?.selectionEnd.offset ).toBe( 8 );
+			} );
+
 			it( 'does not include selection when selection history is empty', () => {
 				addBlockToDoc( map, 'block-1', 'Hello world' );
 

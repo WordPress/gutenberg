@@ -51,6 +51,7 @@ export interface YSelectionHistory {
 }
 
 export interface BlockSelectionHistory {
+	captureSelection: ( newSelection: WPSelection ) => () => void;
 	getSelectionHistory: () => YFullSelection[];
 	updateSelection: ( newSelection: WPSelection ) => void;
 }
@@ -78,15 +79,24 @@ export function createBlockSelectionHistory(
 	};
 
 	/**
-	 * Update the selection history with a new selection.
+	 * Convert a new selection to Y.Doc-relative anchors immediately, but
+	 * defer adding it to the history until the returned callback is invoked.
+	 *
+	 * The conversion must happen against the Y.Doc text exactly as the
+	 * edit that produced this selection left it. The publish step can be
+	 * deferred (e.g. until after the current Yjs transaction's cleanup so
+	 * undo meta still reads the previous selection), but converting later
+	 * mis-anchors the selection when a remote update lands in between.
+	 *
 	 * @param newSelection
+	 * @return A callback that publishes the captured selection to history.
 	 */
-	const updateSelection = ( newSelection: WPSelection ): void => {
+	const captureSelection = ( newSelection: WPSelection ): ( () => void ) => {
 		if (
 			! newSelection?.selectionStart?.clientId ||
 			! newSelection?.selectionEnd?.clientId
 		) {
-			return;
+			return () => {};
 		}
 
 		const { selectionStart, selectionEnd } = newSelection;
@@ -96,7 +106,15 @@ export function createBlockSelectionHistory(
 		);
 		const end = convertWPBlockSelectionToSelection( selectionEnd, ydoc );
 
-		addToHistory( { start, end } );
+		return () => addToHistory( { start, end } );
+	};
+
+	/**
+	 * Update the selection history with a new selection.
+	 * @param newSelection
+	 */
+	const updateSelection = ( newSelection: WPSelection ): void => {
+		captureSelection( newSelection )();
 	};
 
 	/**
@@ -128,6 +146,7 @@ export function createBlockSelectionHistory(
 	};
 
 	return {
+		captureSelection,
 		getSelectionHistory,
 		updateSelection,
 	};
