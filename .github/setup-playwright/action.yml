@@ -1,0 +1,85 @@
+name: 'Install Playwright browsers'
+description: 'Install Playwright browsers and their system dependencies, caching the Debian packages that WebKit needs.'
+
+inputs:
+    browsers:
+        description: 'Optional. Space separated list of browsers to install. When not specified, all browsers are installed.'
+        required: false
+
+runs:
+    using: 'composite'
+    steps:
+        # Only WebKit pulls system dependencies on the runner images, and the
+        # Ubuntu mirror throttles them often enough to stall a job for tens of
+        # minutes.
+        - name: Prepare the package cache
+          id: prepare
+          env:
+              BROWSERS: ${{ inputs.browsers }}
+          run: |
+              VERSION="$(node -p "require('playwright-core/package.json').version")"
+              BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
+              # Packages cached under another runner image mostly miss.
+              IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
+              echo "PREFIX=playwright-apt-${RUNNER_OS}-${RUNNER_ARCH}-${IMAGE}-${VERSION}-${BROWSERS_KEY}-" >> "$GITHUB_OUTPUT"
+
+              if [ -z "$BROWSERS" ] || [ "${BROWSERS#*webkit}" != "$BROWSERS" ]; then
+                  echo "CACHE_DEPS=true" >> "$GITHUB_OUTPUT"
+              else
+                  echo "CACHE_DEPS=false" >> "$GITHUB_OUTPUT"
+              fi
+
+              echo 'APT::Keep-Downloaded-Packages "true";' | sudo tee /etc/apt/apt.conf.d/99keep-downloaded-packages > /dev/null
+              mkdir -p "$HOME/apt-cache"
+          shell: bash
+
+        # The key carries a fingerprint of the packages, so a cache entry is
+        # never stale: when apt fetches a newer package the fingerprint changes
+        # and the save step writes a new entry. Cache entries are immutable, so
+        # refreshing one is not an option. `key` therefore never matches on its
+        # own; the prefix search restores the newest entry.
+        - name: Restore the cached packages
+          if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' }}
+          uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ~/apt-cache
+              key: ${{ steps.prepare.outputs.PREFIX }}
+              restore-keys: ${{ steps.prepare.outputs.PREFIX }}
+
+        - name: Install Playwright browsers and system dependencies
+          id: install
+          env:
+              BROWSERS: ${{ inputs.browsers }}
+          run: |
+              fingerprint() {
+                  find "$HOME/apt-cache" -maxdepth 1 -name '*.deb' -printf '%f\n' | LC_ALL=C sort | sha256sum | cut -c1-16
+              }
+              BEFORE="$(fingerprint)"
+
+              # apt looks packages up by name, version and arch, re-downloading
+              # any whose size does not match its own index, so a stale package
+              # here is never used. It does not re-checksum what it finds cached.
+              # `--update=none` needs coreutils 9.3+, so ubuntu-24.04 or newer.
+              sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
+
+              # shellcheck disable=SC2086 # The browser list is intentionally split into separate arguments.
+              npx playwright install $BROWSERS --with-deps
+
+              sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
+              sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
+
+              AFTER="$(fingerprint)"
+              echo "FINGERPRINT=$AFTER" >> "$GITHUB_OUTPUT"
+              if [ "$BEFORE" != "$AFTER" ]; then
+                  echo "CHANGED=true" >> "$GITHUB_OUTPUT"
+              else
+                  echo "CHANGED=false" >> "$GITHUB_OUTPUT"
+              fi
+          shell: bash
+
+        - name: Save the packages
+          if: ${{ steps.prepare.outputs.CACHE_DEPS == 'true' && steps.install.outputs.CHANGED == 'true' }}
+          uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ~/apt-cache
+              key: ${{ steps.prepare.outputs.PREFIX }}${{ steps.install.outputs.FINGERPRINT }}

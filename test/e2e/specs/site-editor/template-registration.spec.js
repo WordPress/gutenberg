@@ -109,6 +109,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -136,6 +137,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -323,6 +325,8 @@ test.describe( 'Block template registration', () => {
 		await page
 			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
 			.click();
+		// The Actions button lives in the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();

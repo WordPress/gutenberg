@@ -83,16 +83,16 @@ The filter receives an instance of the `WP_Theme_JSON_Data class` with the data 
 
 ## Server-side view configuration filter
 
-DataViews-powered screens (such as the Pages list and its Quick Edit form) take their configuration from the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
+DataViews-powered screens (such as the Pages list and its Quick Edit form) take their configuration from the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`), lowercased — so the `postType`/`page` entity maps to the `get_entity_view_config_posttype_page` filter.
 
 Right now, the filter is in use by the following Site Editor screens:
 
 | Page | Filter name |
 | --- | --- |
-| Pages | `get_entity_view_config_postType_page` |
-| Templates | `get_entity_view_config_postType_wp_template` |
-| Parts | `get_entity_view_config_postType_wp_template_part` |
-| Patterns | `get_entity_view_config_postType_wp_block` |
+| Pages | `get_entity_view_config_posttype_page` |
+| Templates | `get_entity_view_config_posttype_wp_template` |
+| Parts | `get_entity_view_config_posttype_wp_template_part` |
+| Patterns | `get_entity_view_config_posttype_wp_block` |
 
 There are four aspects to configure for each entity (and screen):
 
@@ -111,7 +111,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ### Update entries with `merge`
@@ -142,7 +142,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ### Remove entries with `remove`
@@ -168,7 +168,7 @@ function example_page_view_config_remove( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_page_view_config_remove' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_page_view_config_remove' );
 ```
 
 ### Update entries with `replace`
@@ -191,7 +191,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 However, this code uses `replace` to substitute the list of visible fields with just `date`, and the Quick Edit form's entire field list with `date` and `my_custom_field`:
@@ -210,7 +210,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ### Set entries with `set`
@@ -242,7 +242,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ## Client-side (Editor) filters
