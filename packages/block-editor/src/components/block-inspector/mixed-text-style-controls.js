@@ -36,10 +36,17 @@ const PANEL_WRAPPERS = {
 	typography: TypographyToolsPanel,
 };
 
+export const SECTION_TEXT_STYLE_PANELS = [
+	'typography',
+	'border',
+	'dimensions',
+];
+
 function MixedTextStylePanels( {
 	blockTypes,
 	clientIds,
 	commonSupportedStyles,
+	panels,
 	settingsByTarget,
 	sourceClientId,
 	sourceName,
@@ -126,6 +133,7 @@ function MixedTextStylePanels( {
 		<BlockStylePanels
 			clientId={ sourceClientId }
 			name={ sourceName }
+			panels={ panels }
 			panelWrappers={ PANEL_WRAPPERS }
 			setAttributes={ setAttributes }
 			settings={ settings }
@@ -133,7 +141,7 @@ function MixedTextStylePanels( {
 	);
 }
 
-export default function MixedTextStyleControls( { clientIds } ) {
+export default function MixedTextStyleControls( { clientIds, panels } ) {
 	const {
 		blockTypes,
 		commonSupportedStyles,
@@ -204,6 +212,7 @@ export default function MixedTextStyleControls( { clientIds } ) {
 				blockTypes={ blockTypes }
 				clientIds={ targetClientIds }
 				commonSupportedStyles={ commonSupportedStyles }
+				panels={ panels }
 				settingsByTarget={ settingsByTarget }
 				sourceClientId={ sourceClientId }
 				sourceName={ sourceName }

@@ -4,12 +4,21 @@ import { DimensionsPanel } from '../../hooks/dimensions';
 import { ElementsEdit } from '../../hooks/elements';
 import { TypographyPanel } from '../../hooks/typography';
 
+const DEFAULT_PANELS = [
+	'elements',
+	'background',
+	'typography',
+	'border',
+	'dimensions',
+];
+
 export default function BlockStylePanels( {
 	clientId,
 	name,
 	setAttributes,
 	settings,
 	panelWrappers = {},
+	panels = DEFAULT_PANELS,
 } ) {
 	const panelSettings = {
 		...settings,
@@ -30,26 +39,36 @@ export default function BlockStylePanels( {
 
 	return (
 		<>
-			<ElementsEdit
-				{ ...passedProps }
-				asWrapper={ panelWrappers.elements }
-			/>
-			<BackgroundImagePanel
-				{ ...passedProps }
-				asWrapper={ panelWrappers.background }
-			/>
-			<TypographyPanel
-				{ ...passedProps }
-				asWrapper={ panelWrappers.typography }
-			/>
-			<BorderPanel
-				{ ...passedProps }
-				asWrapper={ panelWrappers.border }
-			/>
-			<DimensionsPanel
-				{ ...passedProps }
-				asWrapper={ panelWrappers.dimensions }
-			/>
+			{ panels.includes( 'elements' ) && (
+				<ElementsEdit
+					{ ...passedProps }
+					asWrapper={ panelWrappers.elements }
+				/>
+			) }
+			{ panels.includes( 'background' ) && (
+				<BackgroundImagePanel
+					{ ...passedProps }
+					asWrapper={ panelWrappers.background }
+				/>
+			) }
+			{ panels.includes( 'typography' ) && (
+				<TypographyPanel
+					{ ...passedProps }
+					asWrapper={ panelWrappers.typography }
+				/>
+			) }
+			{ panels.includes( 'border' ) && (
+				<BorderPanel
+					{ ...passedProps }
+					asWrapper={ panelWrappers.border }
+				/>
+			) }
+			{ panels.includes( 'dimensions' ) && (
+				<DimensionsPanel
+					{ ...passedProps }
+					asWrapper={ panelWrappers.dimensions }
+				/>
+			) }
 		</>
 	);
 }

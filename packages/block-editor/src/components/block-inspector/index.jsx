@@ -179,7 +179,6 @@ function BlockInspector() {
 		blockStatesEditingEnabled,
 		isMixedSelection,
 		selectedBlockClientIds,
-		selectedSectionClientIds,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -214,9 +213,6 @@ function BlockInspector() {
 			getBlockName( clientId )
 		);
 		const _isMixedSelection = new Set( selectedBlockNames ).size > 1;
-		const _selectedSectionClientIds = _selectedBlockClientIds.filter(
-			( id ) => _isSectionBlock( id )
-		);
 		const blockStyles =
 			_renderedBlockName && getBlockStyles( _renderedBlockName );
 		const _hasBlockStyles = blockStyles && blockStyles.length > 0;
@@ -226,8 +222,9 @@ function BlockInspector() {
 			renderedBlockClientId: _renderedBlockClientId,
 			renderedBlockName: _renderedBlockName,
 			blockType: _blockType,
-			isSectionBlockInSelection: _selectedSectionClientIds.length > 0,
-			selectedSectionClientIds: _selectedSectionClientIds,
+			isSectionBlockInSelection: _selectedBlockClientIds.some( ( id ) =>
+				_isSectionBlock( id )
+			),
 			isSectionBlock: _isSectionBlock( _renderedBlockClientId ),
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
@@ -245,76 +242,85 @@ function BlockInspector() {
 		};
 	}, [] );
 
-	// Resolve content-only descendants and expanded mixed-selection targets with
-	// the selection-specific dependencies kept out of the primary selector.
-	const {
-		contentClientIds,
-		contentTextStyleClientIds,
-		mixedSelectionTextStyleClientIds,
-	} = useSelect(
+	const contentClientIds = useSelect(
 		( select ) => {
-			const shouldCollectSelectedTextStyleTargets =
+			if ( ! isSectionBlock || ! renderedBlockClientId ) {
+				return EMPTY_ARRAY;
+			}
+
+			const {
+				getClientIdsOfDescendants,
+				getBlockEditingMode,
+				shouldRenderBlockListView,
+			} = unlock( select( blockEditorStore ) );
+
+			return getContentOnlySectionClientIds(
+				[ renderedBlockClientId ],
+				getClientIdsOfDescendants,
+				getBlockEditingMode,
+				shouldRenderBlockListView
+			);
+		},
+		[ isSectionBlock, renderedBlockClientId ]
+	);
+
+	const contentTextStyleClientIds = useSelect(
+		( select ) => {
+			if ( ! contentClientIds.length ) {
+				return EMPTY_ARRAY;
+			}
+
+			const { getBlockName } = unlock( select( blockEditorStore ) );
+			return getTextStyleTargetClientIds(
+				contentClientIds,
+				getBlockName,
+				getBlockType
+			);
+		},
+		[ contentClientIds ]
+	);
+
+	// Keep the derived array as the direct selector result so useSelect can
+	// shallow-compare its client IDs without treating the array as unstable.
+	const mixedSelectionTextStyleClientIds = useSelect(
+		( select ) => {
+			const shouldCollectTextStyleTargets =
 				selectedBlockCount > 1 &&
-				( isMixedSelection || selectedSectionClientIds.length > 0 );
-			if (
-				( ! isSectionBlock || ! renderedBlockClientId ) &&
-				! shouldCollectSelectedTextStyleTargets
-			) {
-				return {
-					contentClientIds: EMPTY_ARRAY,
-					contentTextStyleClientIds: EMPTY_ARRAY,
-					mixedSelectionTextStyleClientIds: EMPTY_ARRAY,
-				};
+				( isMixedSelection || isSectionBlockInSelection );
+			if ( ! shouldCollectTextStyleTargets ) {
+				return EMPTY_ARRAY;
 			}
 
 			const {
 				getClientIdsOfDescendants,
 				getBlockEditingMode,
 				getBlockName,
+				isSectionBlock: _isSectionBlock,
 				shouldRenderBlockListView,
 			} = unlock( select( blockEditorStore ) );
+			const selectedSectionClientIds = selectedBlockClientIds.filter(
+				( clientId ) => _isSectionBlock( clientId )
+			);
 
-			const representedClientIds =
-				isSectionBlock && renderedBlockClientId
-					? getContentOnlySectionClientIds(
-							[ renderedBlockClientId ],
-							getClientIdsOfDescendants,
-							getBlockEditingMode,
-							shouldRenderBlockListView
-					  )
-					: EMPTY_ARRAY;
-			return {
-				contentClientIds: representedClientIds,
-				contentTextStyleClientIds: getTextStyleTargetClientIds(
-					representedClientIds,
-					getBlockName,
-					getBlockType
-				),
-				mixedSelectionTextStyleClientIds:
-					shouldCollectSelectedTextStyleTargets
-						? getExpandedTextStyleTargetClientIds(
-								selectedBlockClientIds,
-								selectedSectionClientIds,
-								( sectionClientId ) =>
-									getContentOnlySectionClientIds(
-										[ sectionClientId ],
-										getClientIdsOfDescendants,
-										getBlockEditingMode,
-										shouldRenderBlockListView
-									),
-								getBlockName,
-								getBlockType
-						  )
-						: EMPTY_ARRAY,
-			};
+			return getExpandedTextStyleTargetClientIds(
+				selectedBlockClientIds,
+				selectedSectionClientIds,
+				( sectionClientId ) =>
+					getContentOnlySectionClientIds(
+						[ sectionClientId ],
+						getClientIdsOfDescendants,
+						getBlockEditingMode,
+						shouldRenderBlockListView
+					),
+				getBlockName,
+				getBlockType
+			);
 		},
 		[
 			isMixedSelection,
-			isSectionBlock,
-			renderedBlockClientId,
+			isSectionBlockInSelection,
 			selectedBlockClientIds,
 			selectedBlockCount,
-			selectedSectionClientIds,
 		]
 	);
 

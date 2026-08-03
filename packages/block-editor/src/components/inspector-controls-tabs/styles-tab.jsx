@@ -12,7 +12,9 @@ import { BackgroundImagePanel } from '../../hooks/background';
 import { ColorToolsPanel } from '../global-styles/color-panel';
 import { TypographyToolsPanel } from '../global-styles/typography-panel';
 import { BackgroundToolsPanel } from '../global-styles/background-panel';
-import MixedTextStyleControls from '../block-inspector/mixed-text-style-controls';
+import MixedTextStyleControls, {
+	SECTION_TEXT_STYLE_PANELS,
+} from '../block-inspector/mixed-text-style-controls';
 
 // Section blocks present a curated subset of the normal block style panels.
 // Their block-support fills are gated off by editing mode (see
@@ -26,6 +28,7 @@ export function SectionStyleControls( {
 	blockName,
 	clientId,
 	contentClientIds,
+	showTypography = true,
 } ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -66,13 +69,15 @@ export function SectionStyleControls( {
 
 	return (
 		<>
-			<TypographyPanel
-				clientId={ clientId }
-				name={ blockName }
-				settings={ typographySettings }
-				setAttributes={ setAttributes }
-				asWrapper={ TypographyToolsPanel }
-			/>
+			{ showTypography && (
+				<TypographyPanel
+					clientId={ clientId }
+					name={ blockName }
+					settings={ typographySettings }
+					setAttributes={ setAttributes }
+					asWrapper={ TypographyToolsPanel }
+				/>
+			) }
 			<BackgroundImagePanel
 				clientId={ clientId }
 				name={ blockName }
@@ -104,6 +109,8 @@ const StylesTab = ( {
 	contentClientIds,
 	textStyleClientIds,
 } ) => {
+	const hasTextStyleControls = !! textStyleClientIds?.length;
+
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
@@ -112,10 +119,16 @@ const StylesTab = ( {
 					blockName={ blockName }
 					clientId={ clientId }
 					contentClientIds={ contentClientIds }
+					showTypography={ ! hasTextStyleControls }
 				/>
 			) }
-			{ !! textStyleClientIds?.length && (
-				<MixedTextStyleControls clientIds={ textStyleClientIds } />
+			{ hasTextStyleControls && (
+				<MixedTextStyleControls
+					clientIds={ textStyleClientIds }
+					panels={
+						isSectionBlock ? SECTION_TEXT_STYLE_PANELS : undefined
+					}
+				/>
 			) }
 			{
 				// Extenders have in the past always been allowed to add controls to group
