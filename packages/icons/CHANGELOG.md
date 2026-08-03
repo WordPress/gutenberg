@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the `playlistTrack` icon. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
+
 ## 15.2.0 (2026-07-14)
 
 ### Enhancements
