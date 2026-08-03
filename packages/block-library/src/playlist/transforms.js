@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { getFilename } from '@wordpress/url';
 
 const transforms = {
 	from: [
@@ -23,6 +24,7 @@ const transforms = {
 						createBlock( 'core/playlist-track', {
 							blob,
 							src,
+							...( src && { title: getFilename( src ) } ),
 							...( id !== undefined && { id } ),
 						} ),
 					]

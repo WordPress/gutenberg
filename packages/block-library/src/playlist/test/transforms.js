@@ -54,6 +54,7 @@ describe( 'Playlist transforms', () => {
 					blob: 'blob:https://example.com/track',
 					id: 123,
 					src: 'https://example.com/track.mp3',
+					title: 'track.mp3',
 				} ),
 			} ),
 		] );
