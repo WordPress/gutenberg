@@ -76,3 +76,8 @@
 .interface-complementary-area__fill {
 	height: 100%;
 }
+
+.interface-complementary-area__resize-handle {
+	position: absolute;
+	z-index: 10;
+}

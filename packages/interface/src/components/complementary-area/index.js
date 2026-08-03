@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState, useCallback } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -43,6 +43,8 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 }
 
 const SIDEBAR_WIDTH = 280;
+const SIDEBAR_MAX_WIDTH = 800;
+const SIDEBAR_MIN_WIDTH = 250;
 const variants = {
 	open: { width: SIDEBAR_WIDTH },
 	closed: { width: 0 },
@@ -69,25 +71,102 @@ function ComplementaryAreaFill( {
 	useEffect( () => {
 		setState( {} );
 	}, [ isActive ] );
-	const transition = {
-		type: 'tween',
-		duration:
-			disableMotion ||
-			isMobileViewport ||
-			( !! previousActiveArea &&
-				!! activeArea &&
-				activeArea !== previousActiveArea )
-				? 0
-				: ANIMATION_DURATION,
-		ease: [ 0.6, 0, 0.4, 1 ],
+
+	const [ isResizing, setResizing ] = useState( false );
+	const [ startX, setStartX ] = useState( 0 );
+	const [ startWidth, setStartWidth ] = useState( SIDEBAR_WIDTH );
+
+	const width = useSelect(
+		( select ) =>
+			select( interfaceStore ).getComplementaryAreaWidth( scope ) ??
+			SIDEBAR_WIDTH,
+		[ scope ]
+	);
+	const { setComplementaryAreaWidth } = useDispatch( interfaceStore );
+
+	const transition = ! isResizing
+		? {
+				type: 'tween',
+				duration:
+					disableMotion ||
+					isMobileViewport ||
+					( !! previousActiveArea &&
+						!! activeArea &&
+						activeArea !== previousActiveArea )
+						? 0
+						: ANIMATION_DURATION,
+				ease: [ 0.6, 0, 0.4, 1 ],
+		  }
+		: {
+				duration: 0,
+		  };
+
+	const handleMouseMove = useCallback(
+		( event ) => {
+			if ( ! isResizing ) {
+				return;
+			}
+
+			const deltaX = event.clientX - startX;
+			const newWidth = startWidth - deltaX;
+
+			const constrainedWidth = Math.max(
+				SIDEBAR_MIN_WIDTH,
+				Math.min( SIDEBAR_MAX_WIDTH, newWidth )
+			);
+
+			setComplementaryAreaWidth( scope, constrainedWidth );
+		},
+		[ isResizing, scope ]
+	);
+
+	const handleMouseUp = useCallback( () => {
+		setResizing( false );
+	}, [] );
+
+	const handleMouseDown = ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		setResizing( true );
+
+		setStartX( event.clientX );
+		setStartWidth( width );
 	};
+
+	const handleKeyDown = ( event ) => {
+		let newWidth = width;
+		if ( event.key === 'ArrowLeft' ) {
+			newWidth = Math.max( SIDEBAR_MIN_WIDTH, width + 10 );
+		} else if ( event.key === 'ArrowRight' ) {
+			newWidth = Math.min( SIDEBAR_MAX_WIDTH, width - 10 );
+		} else {
+			return;
+		}
+		setComplementaryAreaWidth( scope, newWidth );
+	};
+
+	useEffect( () => {
+		if ( isResizing ) {
+			window.addEventListener( 'mousemove', handleMouseMove );
+			window.addEventListener( 'mouseup', handleMouseUp );
+		} else {
+			window.removeEventListener( 'mousemove', handleMouseMove );
+			window.removeEventListener( 'mouseup', handleMouseUp );
+		}
+
+		return () => {
+			window.removeEventListener( 'mousemove', handleMouseMove );
+			window.removeEventListener( 'mouseup', handleMouseUp );
+		};
+	}, [ isResizing, handleMouseMove, handleMouseUp ] );
 
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
 			<AnimatePresence initial={ false }>
 				{ ( previousIsActive || isActive ) && (
 					<motion.div
-						variants={ variants }
+						variants={ { ...variants, open: { width } } }
 						initial="closed"
 						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
 						exit="closed"
@@ -98,12 +177,35 @@ function ComplementaryAreaFill( {
 							id={ id }
 							className={ className }
 							style={ {
-								width: isMobileViewport
-									? '100vw'
-									: SIDEBAR_WIDTH,
+								width: isMobileViewport ? '100vw' : '100%',
+								height: '100%',
+								display: 'flex',
+								flexDirection: 'row',
 							} }
 						>
-							{ children }
+							<button
+								className="interface-complementary-area__resize-handle"
+								onMouseDown={ handleMouseDown }
+								tabIndex={ 0 }
+								aria-label="Resize sidebar"
+								onKeyDown={ handleKeyDown }
+								style={ {
+									width: '8px',
+									height: '100vh',
+									border: '0',
+									background: 'none',
+									cursor: 'ew-resize',
+									flexShrink: 0,
+									padding: 0,
+								} }
+							></button>
+
+							<div
+								style={ { flexGrow: 1, overflowY: 'auto' } }
+								transition={ transition }
+							>
+								{ children }
+							</div>
 						</div>
 					</motion.div>
 				) }

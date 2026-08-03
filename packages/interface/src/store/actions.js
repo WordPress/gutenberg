@@ -143,6 +143,22 @@ export const unpinItem =
 	};
 
 /**
+ * Set the complementary area width for a scope.
+ *
+ * @param {string} scope Complementary area scope.
+ * @param {number} width The width to set.
+ */
+export const setComplementaryAreaWidth =
+	( scope, width ) =>
+	( { registry } ) => {
+		scope = normalizeComplementaryAreaScope( scope );
+
+		registry
+			.dispatch( preferencesStore )
+			.set( scope, 'complementaryAreaWidth', width );
+	};
+
+/**
  * Returns an action object used in signalling that a feature should be toggled.
  *
  * @param {string} scope       The feature scope (e.g. core/edit-post).

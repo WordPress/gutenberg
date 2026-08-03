@@ -114,3 +114,21 @@ export const isFeatureActive = createRegistrySelector(
 export function isModalActive( state, modalName ) {
 	return state.activeModal === modalName;
 }
+
+/**
+ * Returns the complementary area width for a given scope.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} scope Item scope.
+ *
+ * @return {number | undefined} The complementary area width.
+ */
+export const getComplementaryAreaWidth = createRegistrySelector(
+	( select ) => ( state, scope ) => {
+		scope = normalizeComplementaryAreaScope( scope );
+		return select( preferencesStore ).get(
+			scope,
+			'complementaryAreaWidth'
+		);
+	}
+);
