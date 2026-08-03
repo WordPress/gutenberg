@@ -1,13 +1,19 @@
 /**
  * External dependencies
  */
-import { h } from 'preact';
+import { h, hydrate } from 'preact';
 import type { VNode } from 'preact';
 
 /**
  * Internal dependencies
  */
-import { toVdom, hydratedIslands } from '../vdom';
+import {
+	toVdom,
+	hydratedIslands,
+	restoreRemovedNodes,
+	type RemovedNode,
+} from '../vdom';
+import { createRootFragment } from '../utils';
 
 function createElementFromHTML( html: string ): HTMLElement {
 	const div = document.createElement( 'div' );
@@ -1244,6 +1250,133 @@ describe( 'toVdom', () => {
 				[ 'b', 'a' ],
 				[ 'b', 'z' ],
 			] );
+		} );
+	} );
+
+	describe( 'Removed node tracking and restoration', () => {
+		it( 'should not track removed nodes when no array is passed', () => {
+			const container = createElementFromHTML(
+				'<div>Test 1<!-- a comment --><div>Test 2</div></div>'
+			);
+			// Should not throw, and comments are removed as usual.
+			toVdom( container );
+			expect( container.outerHTML ).toBe(
+				'<div>Test 1<div>Test 2</div></div>'
+			);
+		} );
+
+		it( 'should record removed comment nodes with enough information to restore them', () => {
+			const container = createElementFromHTML(
+				'<div>Test 1<!-- a comment --><div>Test 2</div></div>'
+			);
+			const removedNodes: RemovedNode[] = [];
+			toVdom( container, removedNodes );
+
+			expect( container.outerHTML ).toBe(
+				'<div>Test 1<div>Test 2</div></div>'
+			);
+			expect( removedNodes ).toHaveLength( 1 );
+			expect( removedNodes[ 0 ].node.nodeType ).toBe( Node.COMMENT_NODE );
+			expect( removedNodes[ 0 ].node.nodeValue ).toBe( ' a comment ' );
+			expect( removedNodes[ 0 ].parent ).toBe( container );
+		} );
+
+		it( 'should restore removed comments to their original position', () => {
+			const container = createElementFromHTML(
+				'<div>Test 1<!-- a comment --><div>Test 2</div></div>'
+			);
+			const removedNodes: RemovedNode[] = [];
+			toVdom( container, removedNodes );
+
+			expect( container.outerHTML ).toBe(
+				'<div>Test 1<div>Test 2</div></div>'
+			);
+
+			restoreRemovedNodes( removedNodes );
+
+			expect( container.outerHTML ).toBe(
+				'<div>Test 1<!-- a comment --><div>Test 2</div></div>'
+			);
+		} );
+
+		it( 'should restore multiple comments in their original relative order', () => {
+			const container = createElementFromHTML(
+				'<div><!-- first --><!-- second --><div>Test</div><!-- third --></div>'
+			);
+			const removedNodes: RemovedNode[] = [];
+			toVdom( container, removedNodes );
+
+			expect( container.outerHTML ).toBe( '<div><div>Test</div></div>' );
+
+			restoreRemovedNodes( removedNodes );
+
+			expect( container.outerHTML ).toBe(
+				'<div><!-- first --><!-- second --><div>Test</div><!-- third --></div>'
+			);
+		} );
+
+		it( 'should restore a trailing comment with no following sibling', () => {
+			const container = createElementFromHTML(
+				'<div><div>Test</div><!-- trailing --></div>'
+			);
+			const removedNodes: RemovedNode[] = [];
+			toVdom( container, removedNodes );
+
+			expect( container.outerHTML ).toBe( '<div><div>Test</div></div>' );
+
+			restoreRemovedNodes( removedNodes );
+
+			expect( container.outerHTML ).toBe(
+				'<div><div>Test</div><!-- trailing --></div>'
+			);
+		} );
+
+		it( 'should restore comments removed from inside templates', () => {
+			const container = createElementFromHTML(
+				'<div><template><div>Test 1<!-- inner comment --></div></template></div>'
+			);
+			const removedNodes: RemovedNode[] = [];
+			toVdom( container, removedNodes );
+
+			expect( removedNodes ).toHaveLength( 1 );
+
+			const template = container.querySelector(
+				'template'
+			) as HTMLTemplateElement;
+			expect( template.content.firstElementChild?.innerHTML ).toBe(
+				'Test 1'
+			);
+
+			restoreRemovedNodes( removedNodes );
+
+			expect( template.content.firstElementChild?.innerHTML ).toBe(
+				'Test 1<!-- inner comment -->'
+			);
+		} );
+
+		it( 'should keep comments in the live DOM after a full hydration cycle', () => {
+			// This mirrors what `hydrateRegions()` does in `hydration.ts`:
+			// build the vDOM while tracking removed nodes, hydrate with
+			// Preact, then restore the removed nodes. Comments have no vDOM
+			// representation, so Preact would otherwise strip them out
+			// itself while reconciling the region during hydration.
+			const parent = document.createElement( 'div' );
+			parent.innerHTML =
+				'<div data-wp-interactive="test"><!-- marker --><p>Hello</p></div>';
+			const region = parent.firstElementChild as HTMLElement;
+
+			const removedNodes: RemovedNode[] = [];
+			const vdom = toVdom( region, removedNodes );
+
+			// The comment has already been removed from the live DOM, as
+			// `toVdom` always does, regardless of hydration.
+			expect( region.innerHTML ).toBe( '<p>Hello</p>' );
+
+			const fragment = createRootFragment( parent, region );
+			hydrate( vdom, fragment );
+			restoreRemovedNodes( removedNodes );
+
+			expect( region.innerHTML ).toBe( '<!-- marker --><p>Hello</p>' );
 		} );
 	} );
 } );

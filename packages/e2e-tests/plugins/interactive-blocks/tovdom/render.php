@@ -11,7 +11,7 @@ $src_cdata    = $plugin_url . 'tovdom/cdata.js';
 ?>
 
 <div data-wp-interactive="tovdom">
-	<div data-testid="it should delete comments">
+	<div data-testid="it should keep comments">
 		<div>Comment is <!-- ##last-child## --></div>
 		<!-- ##1## -->
 		<div data-testid="it should keep this node between comments">
@@ -20,7 +20,7 @@ $src_cdata    = $plugin_url . 'tovdom/cdata.js';
 		</div>
 	</div>
 
-	<div data-testid="it should delete processing instructions">
+	<div data-testid="it should keep processing instructions">
 		<div id="replace-with-processing-instructions"></div>
 	</div>
 
