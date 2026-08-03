@@ -42,8 +42,10 @@ test.describe( 'Site editor url navigation', () => {
 		} );
 
 		await admin.visitSiteEditor();
-		await page.click( 'role=button[name="Templates"]' );
-		await page.click( 'role=button[name="Add Template"i]' );
+		await page
+			.getByRole( 'button', { name: 'Templates', exact: true } )
+			.click();
+		await page.getByRole( 'button', { name: 'Add Template' } ).click();
 		const singleItemPost = page.getByRole( 'button', {
 			name: 'Single item: Post',
 		} );
@@ -63,14 +65,17 @@ test.describe( 'Site editor url navigation', () => {
 		page,
 	} ) => {
 		await admin.visitSiteEditor();
-		await page.click( 'role=button[name="Patterns"i]' );
-		await page.click( 'role=button[name="add pattern"i]' );
+		await page.getByRole( 'button', { name: 'Patterns' } ).click();
+		await page.getByRole( 'button', { name: 'add pattern' } ).click();
 		await page
 			.getByRole( 'menu', { name: 'add pattern' } )
 			.getByRole( 'menuitem', { name: 'add template part' } )
 			.click();
 		// Fill in a name in the dialog that pops up.
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Demo' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'Demo' );
 		await page.keyboard.press( 'Enter' );
 		await expect( page ).toHaveURL(
 			'/wp-admin/site-editor.php?p=%2Fwp_template_part%2Femptytheme%2F%2Fdemo&canvas=edit'
