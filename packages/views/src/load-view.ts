@@ -4,55 +4,51 @@
 import { select } from '@wordpress/data';
 // @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
-import type { View } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import { generatePreferenceKey } from './preference-keys';
-import { mergeActiveViewOverrides } from './filter-utils';
-import type { ViewConfig } from './types';
+import { resolveView } from './resolve-view';
+import type { ViewConfig, ViewOverrides } from './types';
 
 /**
  * Async function for loading view state in route loaders.
+ *
+ * Resolves the same layers `useView` does, so a route loader and the hook that
+ * takes over from it agree on the view.
  *
  * @param config                     Configuration object for loading the view.
  * @param config.kind                Entity kind (e.g., 'postType', 'taxonomy', 'root').
  * @param config.name                Specific entity name.
  * @param config.slug                View identifier.
  * @param config.defaultView         Default view configuration.
+ * @param config.defaultLayouts      Default layout configurations keyed by layout type.
  * @param config.activeViewOverrides View overrides applied on top but never persisted.
  * @param config.queryParams         Object with `page` and/or `search` from URL.
  * @return Promise resolving to the loaded view object.
  */
 export async function loadView( config: ViewConfig ) {
-	const { kind, name, slug, defaultView, activeViewOverrides, queryParams } =
-		config;
+	const {
+		kind,
+		name,
+		slug,
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
+		queryParams,
+	} = config;
 	const preferenceKey = generatePreferenceKey( kind, name, slug );
-	const persistedView: View | undefined = select( preferencesStore ).get(
-		'core/views',
-		preferenceKey
-	) as View | undefined;
+	const persistedView: ViewOverrides | undefined = select(
+		preferencesStore
+	).get( 'core/views', preferenceKey ) as ViewOverrides | undefined;
 
-	const baseView = persistedView ?? defaultView;
-	const page = queryParams?.page ?? 1;
-	const search = queryParams?.search ?? '';
-
-	const rawDefaults =
-		config.defaultLayouts?.[
-			baseView?.type as keyof typeof config.defaultLayouts
-		];
-	const layoutTypeDefaults =
-		! rawDefaults || rawDefaults === true ? {} : rawDefaults;
-	const combinedOverrides = { ...layoutTypeDefaults, ...activeViewOverrides };
-
-	return mergeActiveViewOverrides(
-		{
-			...baseView,
-			page,
-			search,
-		},
-		combinedOverrides,
-		defaultView
-	);
+	return resolveView( {
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
+		persistedView,
+		page: queryParams?.page,
+		search: queryParams?.search,
+	} );
 }
