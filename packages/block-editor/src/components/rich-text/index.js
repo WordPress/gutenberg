@@ -247,25 +247,40 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// Whether the wrapper is the editing host, which depends on the selected
-	// block, not necessarily this one. Only the selected, default-mode block
-	// can be it, so others skip the subscription entirely.
+	// Whether the wrapper is the editing host for this block: its block is
+	// the selected block, or part of a multi-selection, while the wrapper
+	// hosts editing. The child must not revert to an editing area of its own
+	// when a single selection grows into a multi-selection: that rewrites
+	// the element under the pointer mid-gesture (breaking the native
+	// selection drag) and reintroduces a nested editable inside the host.
 	const isEditingHost = useSelect(
 		( select ) => {
-			if (
-				shouldDisableEditing ||
-				! hasDefaultEditingMode ||
-				! isBlockSelected
-			) {
+			if ( shouldDisableEditing || ! hasDefaultEditingMode ) {
 				return false;
 			}
 
-			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
-				select( blockEditorStore )
-			);
-			return canHostEditableRoot( getSelectedBlockClientId() );
+			const {
+				getSelectedBlockClientId,
+				canHostEditableRoot,
+				isBlockMultiSelected,
+			} = unlock( select( blockEditorStore ) );
+
+			if ( isBlockSelected ) {
+				return canHostEditableRoot( getSelectedBlockClientId() );
+			}
+
+			if ( isBlockMultiSelected( clientId ) ) {
+				return canHostEditableRoot( clientId );
+			}
+
+			return false;
 		},
-		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+		[
+			shouldDisableEditing,
+			hasDefaultEditingMode,
+			isBlockSelected,
+			clientId,
+		]
 	);
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
