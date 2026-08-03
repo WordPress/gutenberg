@@ -2580,7 +2580,7 @@
 				"core/navigation-link": {
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+							"$ref": "#/definitions/stylesProperties"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
@@ -2589,7 +2589,61 @@
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesBlocksCustomStatesProperties"
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"variations": {
+									"$ref": "#/definitions/stylesVariationsPropertiesComplete"
+								},
+								"-current": {
+									"allOf": [
+										{
+											"$ref": "#/definitions/stylesProperties"
+										},
+										{
+											"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+										},
+										{
+											"type": "object",
+											"propertyNames": {
+												"anyOf": [
+													{
+														"$ref": "#/definitions/stylesPropertyNames"
+													},
+													{
+														"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									},
+									{
+										"enum": [
+											"elements",
+											"variations",
+											"-current"
+										]
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2767,10 +2821,21 @@
 			},
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"$ref": "#/definitions/stylesBlockPropertiesFallback"
 				}
 			},
 			"additionalProperties": false
+		},
+		"stylesBlockPropertiesFallback": {
+			"description": "Permissive style schema for blocks not explicitly listed, so the stricter per-block definitions in properties are the authority. In particular this avoids treating arbitrary colon-prefixed keys as valid for blocks that do not support pseudo-classes.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				}
+			]
 		},
 		"stylesPropertiesAndElementsComplete": {
 			"allOf": [
@@ -3073,7 +3138,67 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"-current": {
+									"allOf": [
+										{
+											"$ref": "#/definitions/stylesProperties"
+										},
+										{
+											"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+										},
+										{
+											"type": "object",
+											"propertyNames": {
+												"anyOf": [
+													{
+														"$ref": "#/definitions/stylesPropertyNames"
+													},
+													{
+														"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									},
+									{
+										"enum": [ "elements", "-current" ]
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
@@ -3249,10 +3374,21 @@
 			},
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"$ref": "#/definitions/stylesVariationBlockPropertiesFallback"
 				}
 			},
 			"additionalProperties": false
+		},
+		"stylesVariationBlockPropertiesFallback": {
+			"description": "Permissive style schema for variation blocks not explicitly listed, so the stricter per-block definitions in properties are the authority. In particular this avoids treating arbitrary colon-prefixed keys as valid for blocks that do not support pseudo-classes.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				}
+			]
 		},
 		"stylesVariationBlockPropertiesComplete": {
 			"allOf": [
