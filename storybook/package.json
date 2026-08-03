@@ -85,6 +85,6 @@
 		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json",
 		"storybook:dev": "storybook dev -c . -p 50240",
 		"test:smoke": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"http-server ./build --port 50240 --silent\" \"wait-on tcp:127.0.0.1:50240 && test-storybook --url http://localhost:50240 --config-dir .\"",
-		"test:smoke:setup": "playwright install --with-deps"
+		"test:smoke:setup": "playwright install chromium --with-deps"
 	}
 }
