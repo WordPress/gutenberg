@@ -8,11 +8,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import {
-	setContentEditableWrapper,
-	getRecentClickPoint,
-	caretRangeFromPoint,
-} from './utils';
+import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
@@ -77,53 +73,24 @@ export default function useEditableRoot() {
 			} else if (
 				activeElement === node &&
 				node.ownerDocument.hasFocus() &&
-				! node.matches( ':focus' )
+				! node.matches( ':focus' ) &&
+				selection.anchorNode &&
+				node.contains( selection.anchorNode ) &&
+				getBlockClientId( selection.anchorNode ) ===
+					getSelectedBlockClientId()
 			) {
-				// Focus must genuinely be within the document: the wrapper is
-				// also the default activeElement while the user works in the
-				// top document (e.g. the block toolbar), and stealing focus
-				// from there is never right.
 				// Becoming the editing host turns the selected block's
 				// editable into an inert part of the host
 				// (contenteditable="inherit"): if it held focus, the browser
 				// dropped focus, leaving the wrapper as the default
-				// activeElement without actually focusing it.
-				const selectedClientId = getSelectedBlockClientId();
-
-				if (
-					selection.anchorNode &&
-					node.contains( selection.anchorNode ) &&
-					getBlockClientId( selection.anchorNode ) ===
-						selectedClientId
-				) {
-					// The caret survived: reclaim focus for the host so it
-					// keeps an editing context.
-					node.focus( { preventScroll: true } );
-				} else {
-					// A mousedown placed the caret in the block's editable
-					// and selected the block, and the flip to inert dropped
-					// the caret mid-click. Restore it from the pointer
-					// position, then focus the host, which adopts it.
-					const point = getRecentClickPoint( node );
-					const range =
-						point &&
-						caretRangeFromPoint(
-							node.ownerDocument,
-							point.x,
-							point.y
-						);
-
-					if (
-						range &&
-						node.contains( range.startContainer ) &&
-						getBlockClientId( range.startContainer ) ===
-							selectedClientId
-					) {
-						selection.removeAllRanges();
-						selection.addRange( range );
-						node.focus( { preventScroll: true } );
-					}
-				}
+				// activeElement without actually focusing it. The caret
+				// survived in the selected block, so reclaim focus for the
+				// host to keep an editing context. Focus must genuinely be
+				// within the document (`hasFocus`): the wrapper is also the
+				// default activeElement while the user works in the top
+				// document (e.g. the block toolbar), and stealing focus from
+				// there is never right.
+				node.focus( { preventScroll: true } );
 			}
 
 			return () => {
