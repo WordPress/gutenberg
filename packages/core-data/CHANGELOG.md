@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
 ## 7.51.0 (2026-07-14)
 
 ### Enhancements
