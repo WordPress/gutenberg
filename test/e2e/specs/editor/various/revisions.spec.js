@@ -601,23 +601,22 @@ test.describe( 'Post revisions slider pagination', () => {
 		await slider.focus();
 		await page.keyboard.press( 'Home' );
 
-		// We created revision contents as sequential integers ending at 105,
-		// and page 1 shows the newest 100 revisions, so the oldest revision
-		// on page 1 renders "6" and its previous revision (the newest on
-		// page 2) renders "5". Assert the exact pair with retrying matchers:
-		// right after pressing Home the canvas still shows the previously
-		// selected revision's diff, and while the adjacent page loads the
-		// removed mark is briefly absent, so one-shot `textContent()` reads
-		// race those re-renders (see #80154).
+		// Adjacent revision contents differ by exactly 1 (we created them
+		// as sequential integers), so the boundary diff must show N as
+		// added and N-1 as removed inside a modified paragraph.
+		// Retrying matchers wait out the canvas re-renders that follow the
+		// Home keypress (see #80154).
+		const oldestOnPageOne = 105 - ( 100 - 1 );
 		const canvas = page
 			.locator( 'iframe[name="editor-canvas"]' )
 			.contentFrame()
 			.locator( '.is-revision-modified' );
+		await expect( canvas ).toBeVisible();
 		await expect( canvas.locator( '.revision-diff-added' ) ).toHaveText(
-			'6'
+			String( oldestOnPageOne )
 		);
 		await expect( canvas.locator( '.revision-diff-removed' ) ).toHaveText(
-			'5'
+			String( oldestOnPageOne - 1 )
 		);
 
 		// Navigate to page 2 via the chevron.
