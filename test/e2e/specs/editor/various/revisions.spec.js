@@ -3,6 +3,15 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function defer() {
+	let resolve;
+	const deferred = new Promise( ( res ) => {
+		resolve = res;
+	} );
+	deferred.resolve = resolve;
+	return deferred;
+}
+
 test.describe( 'Post revisions', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -84,6 +93,111 @@ test.describe( 'Post revisions', () => {
 				attributes: { content: 'Original content' },
 			},
 		] );
+	} );
+
+	test( 'should show revision changes in the code editor (@webkit)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Original content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Updated content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		const revisionsRequestStarted = defer();
+		const releaseRevisionsRequest = defer();
+		let shouldDelayRevisionsRequest = true;
+		await page.route(
+			( url ) => {
+				const restRoute = url.searchParams.get( 'rest_route' );
+				return ( restRoute ?? url.pathname ).includes( '/revisions' );
+			},
+			async ( route, request ) => {
+				if (
+					shouldDelayRevisionsRequest &&
+					request.method() === 'GET'
+				) {
+					shouldDelayRevisionsRequest = false;
+					revisionsRequestStarted.resolve();
+					await releaseRevisionsRequest;
+				}
+				await route.continue();
+			}
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
+
+		await revisionsRequestStarted;
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const optionsButton = page.getByRole( 'button', { name: 'Options' } );
+		const codeEditorMenuItem = page.getByRole( 'menuitemradio', {
+			name: 'Code editor',
+		} );
+		try {
+			await optionsButton.click();
+			await expect( codeEditorMenuItem ).toBeVisible();
+		} finally {
+			releaseRevisionsRequest.resolve();
+		}
+
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toBeVisible();
+		await expect( codeEditorMenuItem ).toBeVisible();
+		await codeEditorMenuItem.click();
+
+		const codeDiff = page.getByRole( 'region', { name: 'Code changes' } );
+		await expect(
+			codeDiff.locator( 'tr.is-removed' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Updated content</p>',
+			} )
+		).toBeVisible();
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect( codeDiff ).not.toContainText( '<p>Updated content</p>' );
+
+		await page.getByRole( 'button', { name: 'Show changes' } ).click();
+		const revisionCode = page.getByRole( 'region', {
+			name: 'Revision code',
+		} );
+		await expect( revisionCode ).toContainText( '<p>Original content</p>' );
+		await expect( revisionCode.locator( 'tr.is-removed' ) ).toHaveCount(
+			0
+		);
+
+		await optionsButton.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Visual editor' } )
+			.click();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'Original content' );
 	} );
 
 	test( 'should preserve block clientId when sliding between revisions', async ( {
