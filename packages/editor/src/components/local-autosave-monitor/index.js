@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -14,9 +14,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import AutosaveMonitor from '../autosave-monitor';
 import {
 	localAutosaveGet,
+	localAutosaveGetSnapshot,
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
+import useEntityContainsSnapshot from '../provider/use-entity-contains-snapshot';
 
 const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
@@ -51,27 +53,63 @@ const hasSessionStorageSupport = () => {
 /**
  * Custom hook which manages the creation of a notice prompting the user to
  * restore a local autosave, if one exists.
+ *
+ * Under real-time collaboration, the backup records a Yjs snapshot of the
+ * shared document it captured. The notice decision is deferred until the
+ * shared document is checked against that snapshot (see
+ * `useEntityContainsSnapshot`): a positive result proves the shared
+ * document already accounts for everything the backup captured (even when
+ * the post content has since moved on, e.g. after a revision restore), so
+ * the backup is redundant and is cleared without a notice.
  */
 function useAutosaveNotice() {
 	const registry = useRegistry();
-	const { postId, isEditedPostNew } = useSelect(
+	const { postId, postType, isEditedPostNew } = useSelect(
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
+			postType: select( editorStore ).getCurrentPostType(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
 		} ),
 		[]
 	);
 
+	// Read and parse the backup once per post, so that its snapshot (if any)
+	// can drive the snapshot status decision below.
+	const localAutosave = useMemo( () => {
+		const backup = localAutosaveGet( postId, isEditedPostNew );
+		if ( ! backup ) {
+			return null;
+		}
+
+		try {
+			return JSON.parse( backup );
+		} catch {
+			// Not usable if it can't be parsed.
+			return null;
+		}
+	}, [ postId, isEditedPostNew ] );
+
+	const snapshotStatus = useEntityContainsSnapshot( {
+		postType,
+		postId,
+		snapshot: localAutosaveGetSnapshot( localAutosave ),
+	} );
+
 	useEffect( () => {
-		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
 		if ( ! localAutosave ) {
 			return;
 		}
 
-		try {
-			localAutosave = JSON.parse( localAutosave );
-		} catch {
-			// Not usable if it can't be parsed.
+		// Keep waiting for the snapshot status to resolve.
+		if ( 'pending' === snapshotStatus ) {
+			return;
+		}
+
+		if ( 'present' === snapshotStatus ) {
+			// The shared document provably holds everything the backup
+			// captured, so the backup is redundant even when its content
+			// differs from the current post (e.g. after a revision restore).
+			localAutosaveClear( postId, isEditedPostNew );
 			return;
 		}
 
@@ -127,7 +165,7 @@ function useAutosaveNotice() {
 				],
 			}
 		);
-	}, [ registry, postId, isEditedPostNew ] );
+	}, [ registry, postId, isEditedPostNew, localAutosave, snapshotStatus ] );
 }
 
 /**

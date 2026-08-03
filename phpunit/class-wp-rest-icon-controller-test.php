@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_REST_Icons_Controller functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	protected static $admin_id;

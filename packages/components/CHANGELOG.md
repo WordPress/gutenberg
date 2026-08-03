@@ -10,6 +10,10 @@
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
+### Deprecations
+
+-   `Surface`: Deprecate the component, planned for removal in WordPress 7.4 ([#80943](https://github.com/WordPress/gutenberg/pull/80943)).
+
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
@@ -30,12 +34,23 @@
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
+-   Further improved `WordPressComponent` typecheck performance: intrinsic `as` values use a shared attribute bag instead of remapping props per HTML tag ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ConfirmDialog`: Type the `size` prop forwarded to `Modal` ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ToggleGroupControl`: Type the `disabled` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `DropdownContentWrapper`: Type the `children` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+
+### Documentation
+
+-   `ConfirmDialog`: Opt into auto-generated README documentation from types and JSDoc ([#80866](https://github.com/WordPress/gutenberg/pull/80866)).
 
 ### Internal
 
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
+-   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+-   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
+-   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
 -   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
