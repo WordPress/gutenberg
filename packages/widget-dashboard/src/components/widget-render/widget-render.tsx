@@ -18,7 +18,7 @@ interface WidgetRenderProps {
  * @param {WidgetRenderProps} props Component props.
  */
 export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
-	const { layout, onLayoutChange, resolveWidgetModule } =
+	const { layout, onLayoutChange, resolveWidgetModule, renderBlocks } =
 		useDashboardInternalContext();
 
 	const setAttributes = useCallback(
@@ -46,6 +46,7 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 			attributes={ widget.attributes }
 			setAttributes={ setAttributes }
 			resolveWidgetModule={ resolveWidgetModule }
+			renderBlocks={ renderBlocks }
 		/>
 	);
 }

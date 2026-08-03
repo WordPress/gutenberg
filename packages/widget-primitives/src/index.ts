@@ -3,6 +3,7 @@
  */
 export { WidgetRender } from './components/widget-render';
 export { AdminBlockRenderer } from './components/admin-block-renderer';
+export type { RenderBlocks } from './components/admin-block-renderer';
 
 /**
  * Hooks
