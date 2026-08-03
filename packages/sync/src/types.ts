@@ -207,13 +207,16 @@ export interface SyncManager {
 	) => void;
 }
 
-export interface SyncUndoManager extends WPUndoManager< ObjectData > {
+export interface SyncUndoManager extends WPUndoManager {
 	addToScope: (
 		ymap: Y.Map< any >,
+		objectType: ObjectType,
+		objectId: ObjectID,
 		handlers: Pick<
 			RecordHandlers,
 			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
 		>
 	) => void;
+	setFallbackUndoManager: ( undoManager: WPUndoManager< any > ) => void;
 	stopCapturing: () => void;
 }

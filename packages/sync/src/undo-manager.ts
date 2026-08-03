@@ -6,7 +6,12 @@ import type * as Y from 'yjs';
 /**
  * WordPress dependencies
  */
-import type { HistoryRecord } from '@wordpress/undo-manager';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
+import {
+	createUndoManager as createWPUndoManager,
+	type HistoryRecord,
+	type UndoManager as WPUndoManager,
+} from '@wordpress/undo-manager';
 
 /**
  * Internal dependencies
@@ -14,7 +19,6 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
 import type {
-	ObjectData,
 	RecordHandlers,
 	SyncUndoManager,
 	SyncUndoStackState,
@@ -33,6 +37,21 @@ interface StackItemEvent {
 	ydoc: Y.Doc;
 }
 
+type UndoSource = { type: 'sync'; ydoc: Y.Doc } | { type: 'fallback' };
+
+const getEntityKey = ( objectType: string, objectId: string ): string =>
+	`${ objectType }:${ objectId }`;
+
+const isRecordEmpty = ( record?: HistoryRecord< any > ): boolean =>
+	! record?.some( ( { changes } ) =>
+		Object.values( changes ).some(
+			( { from, to } ) =>
+				typeof from !== 'function' &&
+				typeof to !== 'function' &&
+				! isShallowEqual( from, to )
+		)
+	);
+
 /**
  * Implementation of the WordPress UndoManager interface using YMultiDocUndoManager
  * internally. This allows undo/redo operations to be transacted against multiple
@@ -41,6 +60,13 @@ interface StackItemEvent {
  */
 export function createUndoManager(): SyncUndoManager {
 	const undoMetaHandlers = new Map< Y.Doc, UndoMetaHandlers >();
+	const syncedEntities = new Map< string, Y.Doc >();
+	let fallbackUndoManager: WPUndoManager< any > = createWPUndoManager();
+	let undoSources: UndoSource[] = [];
+	let redoSources: UndoSource[] = [];
+	let reservedSyncSources: Y.Doc[] = [];
+	let unclaimedSyncSources: Y.Doc[] = [];
+	let isApplyingHistory = false;
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures after 500ms of inactivity.
 		// 500 was selected from subjective local UX testing, shorter timeouts
@@ -52,9 +78,16 @@ export function createUndoManager(): SyncUndoManager {
 	} );
 
 	const getUndoStackState = (): SyncUndoStackState => ( {
-		hasRedo: yUndoManager.canRedo(),
-		hasUndo: yUndoManager.canUndo(),
+		hasRedo: redoSources.length > 0 || fallbackUndoManager.hasRedo(),
+		hasUndo: undoSources.length > 0 || fallbackUndoManager.hasUndo(),
 	} );
+
+	const notifyAllUndoStackChanges = (): void => {
+		const state = getUndoStackState();
+		undoMetaHandlers.forEach( ( handlers ) => {
+			handlers.onUndoStackChange?.( state );
+		} );
+	};
 
 	const notifyUndoStackChange = ( ydoc: Y.Doc ): void => {
 		undoMetaHandlers
@@ -69,6 +102,16 @@ export function createUndoManager(): SyncUndoManager {
 		}
 
 		handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
+		if ( event.type === 'undo' && ! isApplyingHistory ) {
+			const reservationIndex = reservedSyncSources.indexOf( event.ydoc );
+			if ( reservationIndex === -1 ) {
+				undoSources.push( { type: 'sync', ydoc: event.ydoc } );
+				redoSources = [];
+				unclaimedSyncSources.push( event.ydoc );
+			} else {
+				reservedSyncSources.splice( reservationIndex, 1 );
+			}
+		}
 		notifyUndoStackChange( event.ydoc );
 	} );
 
@@ -87,10 +130,40 @@ export function createUndoManager(): SyncUndoManager {
 	} );
 
 	yUndoManager.on( 'stack-cleared', () => {
-		undoMetaHandlers.forEach( ( handlers ) => {
-			handlers.onUndoStackChange?.( getUndoStackState() );
-		} );
+		notifyAllUndoStackChanges();
 	} );
+
+	const getRecordSource = ( record: HistoryRecord< any > ): UndoSource => {
+		let sourceDoc: Y.Doc | undefined;
+		for ( const { id } of record ) {
+			if ( typeof id === 'string' ) {
+				return { type: 'fallback' };
+			}
+			const { kind, name, recordId } = id;
+			if (
+				typeof kind !== 'string' ||
+				typeof name !== 'string' ||
+				( typeof recordId !== 'string' && typeof recordId !== 'number' )
+			) {
+				return { type: 'fallback' };
+			}
+			const ydoc = syncedEntities.get(
+				getEntityKey( `${ kind }/${ name }`, String( recordId ) )
+			);
+			if ( ! ydoc || ( sourceDoc && sourceDoc !== ydoc ) ) {
+				return { type: 'fallback' };
+			}
+			sourceDoc = ydoc;
+		}
+		return sourceDoc
+			? { type: 'sync', ydoc: sourceDoc }
+			: { type: 'fallback' };
+	};
+
+	const sourcesMatch = ( first: UndoSource, second: UndoSource ): boolean =>
+		first.type === second.type &&
+		( first.type === 'fallback' ||
+			( second.type === 'sync' && first.ydoc === second.ydoc ) );
 
 	return {
 		/**
@@ -98,27 +171,72 @@ export function createUndoManager(): SyncUndoManager {
 		 * Since Yjs automatically tracks changes, this method translates the WordPress
 		 * HistoryRecord format into Yjs operations.
 		 *
-		 * @param _record   A record of changes to record.
-		 * @param _isStaged Whether to immediately create an undo point or not.
+		 * @param record   A record of changes to record.
+		 * @param isStaged Whether to immediately create an undo point or not.
 		 */
-		addRecord(
-			_record?: HistoryRecord< ObjectData >,
-			_isStaged = false // eslint-disable-line @typescript-eslint/no-unused-vars
-		): void {
-			// This is a no-op for Yjs since it automatically tracks changes.
-			// If needed, we could implement custom logic to handle specific records.
+		addRecord( record?: HistoryRecord< any >, isStaged = false ): void {
+			if ( ! record ) {
+				fallbackUndoManager.addRecord();
+				yUndoManager.stopCapturing();
+				return;
+			}
+			if ( isRecordEmpty( record ) ) {
+				return;
+			}
+
+			const source = getRecordSource( record );
+			const previousSource = undoSources.at( -1 );
+			const continuesPreviousSource =
+				isStaged &&
+				previousSource !== undefined &&
+				sourcesMatch( previousSource, source );
+
+			// A new edit invalidates redo history regardless of which backend
+			// recorded the undone changes.
+			redoSources = [];
+			if ( source.type === 'sync' ) {
+				fallbackUndoManager.addRecord();
+				const unclaimedIndex = unclaimedSyncSources.lastIndexOf(
+					source.ydoc
+				);
+				if ( unclaimedIndex !== -1 ) {
+					unclaimedSyncSources.splice( unclaimedIndex, 1 );
+				} else if ( ! continuesPreviousSource ) {
+					yUndoManager.stopCapturing();
+					undoSources.push( source );
+					reservedSyncSources.push( source.ydoc );
+				}
+			} else {
+				yUndoManager.clear( false, true );
+				yUndoManager.stopCapturing();
+				fallbackUndoManager.addRecord(
+					record,
+					continuesPreviousSource ? isStaged : false
+				);
+				if ( ! continuesPreviousSource ) {
+					undoSources.push( source );
+				}
+			}
+			notifyAllUndoStackChanges();
 		},
 
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
 		 * @param {Y.Map< any >} ymap                       The Yjs map to add to the scope.
+		 * @param {string}       objectType                 The entity object type.
+		 * @param {string}       objectId                   The entity object ID.
 		 * @param                handlers                   Handlers for the scoped document.
 		 * @param                handlers.addUndoMeta       Handler to add metadata to undo items.
 		 * @param                handlers.onUndoStackChange Handler for undo stack changes.
 		 * @param                handlers.restoreUndoMeta   Handler to restore metadata from undo items.
 		 */
-		addToScope( ymap: Y.Map< any >, handlers: UndoMetaHandlers ): void {
+		addToScope(
+			ymap: Y.Map< any >,
+			objectType: string,
+			objectId: string,
+			handlers: UndoMetaHandlers
+		): void {
 			if ( ymap.doc === null ) {
 				// Necessary for a type check, but this shouldn't happen.
 				return;
@@ -126,9 +244,32 @@ export function createUndoManager(): SyncUndoManager {
 
 			const ydoc = ymap.doc;
 			yUndoManager.addToScope( ymap );
+			syncedEntities.set( getEntityKey( objectType, objectId ), ydoc );
 
 			if ( ! undoMetaHandlers.has( ydoc ) ) {
-				ydoc.on( 'destroy', () => undoMetaHandlers.delete( ydoc ) );
+				ydoc.on( 'destroy', () => {
+					undoMetaHandlers.delete( ydoc );
+					for ( const [ key, doc ] of syncedEntities ) {
+						if ( doc === ydoc ) {
+							syncedEntities.delete( key );
+						}
+					}
+					undoSources = undoSources.filter(
+						( source ) =>
+							source.type === 'fallback' || source.ydoc !== ydoc
+					);
+					redoSources = redoSources.filter(
+						( source ) =>
+							source.type === 'fallback' || source.ydoc !== ydoc
+					);
+					reservedSyncSources = reservedSyncSources.filter(
+						( doc ) => doc !== ydoc
+					);
+					unclaimedSyncSources = unclaimedSyncSources.filter(
+						( doc ) => doc !== ydoc
+					);
+					notifyAllUndoStackChanges();
+				} );
 			}
 			undoMetaHandlers.set( ydoc, handlers );
 		},
@@ -137,32 +278,62 @@ export function createUndoManager(): SyncUndoManager {
 		 * Undo the last recorded changes.
 		 *
 		 */
-		undo(): HistoryRecord< ObjectData > | undefined {
-			if ( ! yUndoManager.canUndo() ) {
-				return;
+		undo(): HistoryRecord< any > | undefined {
+			const source = undoSources.pop();
+			if ( ! source ) {
+				const record = fallbackUndoManager.undo();
+				if ( record ) {
+					redoSources.push( { type: 'fallback' } );
+				}
+				notifyAllUndoStackChanges();
+				return record;
 			}
-
-			// Perform the undo operation
-			yUndoManager.undo();
-
-			// Intentionally return an empty array, because the SyncProvider will update
-			// the entity record based on the Yjs document changes.
+			redoSources.push( source );
+			if ( source.type === 'fallback' ) {
+				const record = fallbackUndoManager.undo();
+				notifyAllUndoStackChanges();
+				return record;
+			}
+			const unclaimedIndex = unclaimedSyncSources.lastIndexOf(
+				source.ydoc
+			);
+			if ( unclaimedIndex !== -1 ) {
+				unclaimedSyncSources.splice( unclaimedIndex, 1 );
+			}
+			isApplyingHistory = true;
+			try {
+				yUndoManager.undo();
+			} finally {
+				isApplyingHistory = false;
+			}
 			return [];
 		},
 
 		/**
 		 * Redo the last undone changes.
 		 */
-		redo(): HistoryRecord< ObjectData > | undefined {
-			if ( ! yUndoManager.canRedo() ) {
-				return;
+		redo(): HistoryRecord< any > | undefined {
+			const source = redoSources.pop();
+			if ( ! source ) {
+				const record = fallbackUndoManager.redo();
+				if ( record ) {
+					undoSources.push( { type: 'fallback' } );
+				}
+				notifyAllUndoStackChanges();
+				return record;
 			}
-
-			// Perform the redo operation
-			yUndoManager.redo();
-
-			// Intentionally return an empty array, because the SyncProvider will update
-			// the entity record based on the Yjs document changes.
+			undoSources.push( source );
+			if ( source.type === 'fallback' ) {
+				const record = fallbackUndoManager.redo();
+				notifyAllUndoStackChanges();
+				return record;
+			}
+			isApplyingHistory = true;
+			try {
+				yUndoManager.redo();
+			} finally {
+				isApplyingHistory = false;
+			}
 			return [];
 		},
 
@@ -172,7 +343,7 @@ export function createUndoManager(): SyncUndoManager {
 		 * @return {boolean} Whether there are changes to undo.
 		 */
 		hasUndo(): boolean {
-			return yUndoManager.canUndo();
+			return getUndoStackState().hasUndo;
 		},
 
 		/**
@@ -181,7 +352,11 @@ export function createUndoManager(): SyncUndoManager {
 		 * @return {boolean} Whether there are changes to redo.
 		 */
 		hasRedo(): boolean {
-			return yUndoManager.canRedo();
+			return getUndoStackState().hasRedo;
+		},
+
+		setFallbackUndoManager( undoManager: WPUndoManager< any > ): void {
+			fallbackUndoManager = undoManager;
 		},
 
 		/**

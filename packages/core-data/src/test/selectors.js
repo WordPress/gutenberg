@@ -38,24 +38,26 @@ describe( 'hasUndo/hasRedo', () => {
 		getSyncManager.mockReset();
 	} );
 
-	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
+	it( 'reads undo availability from the sync undo manager', () => {
 		const undoManager = {
-			hasUndo: jest.fn( () => false ),
-			hasRedo: jest.fn( () => false ),
+			hasUndo: jest.fn( () => true ),
+			hasRedo: jest.fn( () => true ),
+			setFallbackUndoManager: jest.fn(),
 		};
 		getSyncManager.mockReturnValue( { undoManager } );
 
-		const state = deepFreeze( {
+		const state = {
+			undoManager: {},
 			syncUndoManagerState: {
-				hasRedo: true,
-				hasUndo: true,
+				hasRedo: false,
+				hasUndo: false,
 			},
-		} );
+		};
 
 		expect( hasUndo( state ) ).toBe( true );
 		expect( hasRedo( state ) ).toBe( true );
-		expect( undoManager.hasUndo ).not.toHaveBeenCalled();
-		expect( undoManager.hasRedo ).not.toHaveBeenCalled();
+		expect( undoManager.hasUndo ).toHaveBeenCalled();
+		expect( undoManager.hasRedo ).toHaveBeenCalled();
 	} );
 
 	it( 'falls back to the default undo manager when no sync undo manager is available', () => {

@@ -24,7 +24,6 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
-import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -1153,9 +1152,6 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasUndo;
-	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1168,9 +1164,6 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasRedo;
-	}
 	return getUndoManager( state ).hasRedo();
 }
 

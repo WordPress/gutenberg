@@ -5,6 +5,14 @@ import * as Y from 'yjs';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	createUndoManager as createWPUndoManager,
+	type HistoryRecord,
+} from '@wordpress/undo-manager';
+
+/**
  * Internal dependencies
  */
 import { LOCAL_EDITOR_ORIGIN } from '../config';
@@ -17,12 +25,13 @@ describe( 'SyncUndoManager', () => {
 		docs.splice( 0 ).forEach( ( doc ) => doc.destroy() );
 	} );
 
-	function createScopedMap() {
+	function createScopedMap( objectId = String( docs.length + 1 ) ) {
 		const doc = new Y.Doc();
 		docs.push( doc );
 		return {
 			doc,
 			map: doc.getMap( 'record' ),
+			objectId,
 			handlers: {
 				addUndoMeta: jest.fn(),
 				onUndoStackChange: jest.fn(),
@@ -31,13 +40,55 @@ describe( 'SyncUndoManager', () => {
 		};
 	}
 
+	function createRecord(
+		id: string | Record< string, unknown >,
+		from: unknown,
+		to: unknown
+	): HistoryRecord< any > {
+		return [ { id, changes: { title: { from, to } } } ];
+	}
+
+	function addScopedMap(
+		undoManager: ReturnType< typeof createUndoManager >,
+		scope: ReturnType< typeof createScopedMap >
+	) {
+		undoManager.addToScope(
+			scope.map,
+			'postType/post',
+			scope.objectId,
+			scope.handlers
+		);
+	}
+
+	function addSyncRecord(
+		undoManager: ReturnType< typeof createUndoManager >,
+		scope: ReturnType< typeof createScopedMap >,
+		value: string
+	) {
+		const previousValue = scope.map.get( 'title' );
+		scope.doc.transact( () => {
+			scope.map.set( 'title', value );
+		}, LOCAL_EDITOR_ORIGIN );
+		undoManager.addRecord(
+			createRecord(
+				{
+					kind: 'postType',
+					name: 'post',
+					recordId: scope.objectId,
+				},
+				previousValue,
+				value
+			)
+		);
+	}
+
 	it( 'notifies scoped handlers when the Yjs undo stack changes', () => {
 		const undoManager = createUndoManager();
 		const first = createScopedMap();
 		const second = createScopedMap();
 
-		undoManager.addToScope( first.map, first.handlers );
-		undoManager.addToScope( second.map, second.handlers );
+		addScopedMap( undoManager, first );
+		addScopedMap( undoManager, second );
 
 		first.doc.transact( () => {
 			first.map.set( 'title', 'First changed' );
@@ -66,8 +117,8 @@ describe( 'SyncUndoManager', () => {
 		const first = createScopedMap();
 		const second = createScopedMap();
 
-		undoManager.addToScope( first.map, first.handlers );
-		undoManager.addToScope( second.map, second.handlers );
+		addScopedMap( undoManager, first );
+		addScopedMap( undoManager, second );
 
 		first.doc.transact( () => {
 			first.map.set( 'title', 'First changed' );
@@ -124,5 +175,104 @@ describe( 'SyncUndoManager', () => {
 		expect( second.handlers.addUndoMeta ).toHaveBeenCalledTimes( 3 );
 		expect( first.handlers.restoreUndoMeta ).not.toHaveBeenCalled();
 		expect( second.handlers.restoreUndoMeta ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'uses the fallback history for non-synced entity records', () => {
+		const undoManager = createUndoManager();
+		const record = createRecord(
+			{ kind: 'root', name: 'note', recordId: '1' },
+			'Before',
+			'After'
+		);
+
+		undoManager.addRecord( record );
+
+		expect( undoManager.hasUndo() ).toBe( true );
+		expect( undoManager.undo() ).toEqual( record );
+		expect( undoManager.hasRedo() ).toBe( true );
+		expect( undoManager.redo() ).toEqual( record );
+	} );
+
+	it( 'retains fallback history created before syncing starts', () => {
+		const fallbackUndoManager = createWPUndoManager();
+		const record = createRecord(
+			{ kind: 'root', name: 'note', recordId: '1' },
+			'Before',
+			'After'
+		);
+		fallbackUndoManager.addRecord( record );
+
+		const undoManager = createUndoManager();
+		undoManager.setFallbackUndoManager( fallbackUndoManager );
+
+		expect( undoManager.hasUndo() ).toBe( true );
+		expect( undoManager.undo() ).toEqual( record );
+	} );
+
+	it( 'orders existing fallback history with new synced history', () => {
+		const fallbackUndoManager = createWPUndoManager();
+		const fallbackRecord = createRecord(
+			{ kind: 'root', name: 'note', recordId: '1' },
+			'Before',
+			'After'
+		);
+		fallbackUndoManager.addRecord( fallbackRecord );
+
+		const undoManager = createUndoManager();
+		const synced = createScopedMap();
+		undoManager.setFallbackUndoManager( fallbackUndoManager );
+		addScopedMap( undoManager, synced );
+		addSyncRecord( undoManager, synced, 'Synced' );
+
+		expect( undoManager.undo() ).toEqual( [] );
+		expect( undoManager.undo() ).toEqual( fallbackRecord );
+		expect( undoManager.redo() ).toEqual( fallbackRecord );
+		expect( synced.map.get( 'title' ) ).toBeUndefined();
+		expect( undoManager.redo() ).toEqual( [] );
+		expect( synced.map.get( 'title' ) ).toBe( 'Synced' );
+	} );
+
+	it( 'preserves chronology between synced and non-synced records', () => {
+		const undoManager = createUndoManager();
+		const synced = createScopedMap();
+		const fallbackRecord = createRecord(
+			{ kind: 'root', name: 'note', recordId: '1' },
+			'Before',
+			'After'
+		);
+		addScopedMap( undoManager, synced );
+
+		addSyncRecord( undoManager, synced, 'Synced' );
+		undoManager.addRecord( fallbackRecord );
+
+		expect( undoManager.undo() ).toEqual( fallbackRecord );
+		expect( synced.map.get( 'title' ) ).toBe( 'Synced' );
+		expect( undoManager.undo() ).toEqual( [] );
+		expect( synced.map.get( 'title' ) ).toBeUndefined();
+
+		expect( undoManager.redo() ).toEqual( [] );
+		expect( synced.map.get( 'title' ) ).toBe( 'Synced' );
+		expect( undoManager.redo() ).toEqual( fallbackRecord );
+	} );
+
+	it( 'starts a new synced undo level after a fallback record', () => {
+		const undoManager = createUndoManager();
+		const synced = createScopedMap();
+		const fallbackRecord = createRecord(
+			{ kind: 'root', name: 'note', recordId: '1' },
+			'Before',
+			'After'
+		);
+		addScopedMap( undoManager, synced );
+
+		addSyncRecord( undoManager, synced, 'First' );
+		undoManager.addRecord( fallbackRecord );
+		addSyncRecord( undoManager, synced, 'Second' );
+
+		expect( undoManager.undo() ).toEqual( [] );
+		expect( synced.map.get( 'title' ) ).toBe( 'First' );
+		expect( undoManager.undo() ).toEqual( fallbackRecord );
+		expect( undoManager.undo() ).toEqual( [] );
+		expect( synced.map.get( 'title' ) ).toBeUndefined();
 	} );
 } );
