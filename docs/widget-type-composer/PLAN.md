@@ -62,30 +62,30 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 
 ## Steps
 
-| NN  | Title                 | Phase               | Depends on | Status                              |
-| --- | --------------------- | ------------------- | ---------- | ----------------------------------- |
-| 00  | gate-scaffold         | Foundation          | none       | done                                |
-| 01  | js-contract           | Foundation          | none       | done                                |
-| 02  | widget-type-origin    | Server framework    | 00         | done                                |
-| 03  | code-registered       | Server framework    | 02         | done                                |
-| 04  | cpt-defs              | Server framework    | 02         | done                                |
-| 05  | controller-fields     | Server framework    | 02         | done                                |
-| 06  | render-endpoint       | Server framework    | 03, 04     | done                                |
-| 07  | use-widget-types      | Discovery           | 01, 05     | done                                |
-| 08  | widget-render-routing | Discovery           | 07         | done                                |
-| 09  | renderer-core         | Renderer core       | 08         | done                                |
-| 10  | ssr-fallback          | Renderer core       | 09, 06     | in-progress (`wtc/10-ssr-fallback`) |
-| 11  | block-context         | Renderer core       | 09         | todo                                |
-| 12  | ui-primitives         | Primitive blocks    | 09         | todo                                |
-| 13  | binding-sources       | Binding language    | 11         | todo                                |
-| 14  | expression            | Connection language | none       | todo                                |
-| 15  | connection-runtime    | Connection language | 09, 14     | todo                                |
-| 16  | actions               | Connection language | 15         | todo                                |
-| 17  | host-provider         | Connection language | 16         | todo                                |
-| 18  | form-block            | DataViews-as-block  | 13, 16     | todo                                |
-| 19  | collection-block      | DataViews-as-block  | 18         | todo                                |
-| 20  | style-control         | Style control       | 16         | todo                                |
-| 21  | demos-and-docs        | Demos + docs        | 19, 17     | todo                                |
+| NN  | Title                 | Phase               | Depends on | Status |
+| --- | --------------------- | ------------------- | ---------- | ------ |
+| 00  | gate-scaffold         | Foundation          | none       | done   |
+| 01  | js-contract           | Foundation          | none       | done   |
+| 02  | widget-type-origin    | Server framework    | 00         | done   |
+| 03  | code-registered       | Server framework    | 02         | done   |
+| 04  | cpt-defs              | Server framework    | 02         | done   |
+| 05  | controller-fields     | Server framework    | 02         | done   |
+| 06  | render-endpoint       | Server framework    | 03, 04     | done   |
+| 07  | use-widget-types      | Discovery           | 01, 05     | done   |
+| 08  | widget-render-routing | Discovery           | 07         | done   |
+| 09  | renderer-core         | Renderer core       | 08         | done   |
+| 10  | ssr-fallback          | Renderer core       | 09, 06     | done   |
+| 11  | block-context         | Renderer core       | 09         | todo   |
+| 12  | ui-primitives         | Primitive blocks    | 09         | todo   |
+| 13  | binding-sources       | Binding language    | 11         | todo   |
+| 14  | expression            | Connection language | none       | todo   |
+| 15  | connection-runtime    | Connection language | 09, 14     | todo   |
+| 16  | actions               | Connection language | 15         | todo   |
+| 17  | host-provider         | Connection language | 16         | todo   |
+| 18  | form-block            | DataViews-as-block  | 13, 16     | todo   |
+| 19  | collection-block      | DataViews-as-block  | 18         | todo   |
+| 20  | style-control         | Style control       | 16         | todo   |
+| 21  | demos-and-docs        | Demos + docs        | 19, 17     | todo   |
 
 ## Step details
 

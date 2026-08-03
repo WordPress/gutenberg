@@ -9,7 +9,7 @@
  */
 
 /**
- * Returns the composition for the Block Composition definition.
+ * Returns the composition for the Composition Demo definition.
  *
  * Core blocks only: none of them has an admin (React) component, so every one
  * resolves through the SSR fallback. That is the path this exercises.
@@ -22,7 +22,7 @@
  *
  * @return string Block markup.
  */
-function gutenberg_get_block_composition_widget_composition() {
+function gutenberg_get_composition_demo_content() {
 	/* Public-domain (CC0) photo from the WordPress.org photo directory. */
 	$image_url = 'https://pd.w.org/2026/08/946a703630b14924.41406734.jpg';
 	$image_alt = __( 'A grey dove drinking from a pool among mossy rocks.', 'gutenberg' );
@@ -84,13 +84,13 @@ function gutenberg_get_block_composition_widget_composition() {
  */
 function gutenberg_register_core_widget_defs() {
 	gutenberg_register_widget_def(
-		'core/nice-composition',
+		'core/composition-demo',
 		array(
-			'title'        => __( 'Nice block composition <3', 'gutenberg' ),
+			'title'        => __( 'Composition demo', 'gutenberg' ),
 			'description'  => __( 'A widget type whose body is a composition of core blocks, rendered on the server.', 'gutenberg' ),
 			'category'     => 'dashboard',
 			'presentation' => 'full-bleed',
-			'content'      => gutenberg_get_block_composition_widget_composition(),
+			'content'      => gutenberg_get_composition_demo_content(),
 		)
 	);
 }
