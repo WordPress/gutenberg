@@ -19,11 +19,7 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
-import {
-	blockContainerOf,
-	getBlocksBetween,
-	isNodeBefore,
-} from './cursor-dom-utils';
+import { getOrderedBlockRange } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -172,22 +168,16 @@ export function useBlockHighlighting(
 					return [];
 				}
 
-				// Yjs reports startEndpoint/endEndpoint in selection direction,
-				// not DOM order — a backward selection has startEndpoint below
-				// endEndpoint in the document. Normalise to DOM order so
-				// getBlocksBetween and the avatar-placement logic below always
-				// operate top-to-bottom.
-				const startEl =
-					blockEditorDocument.querySelector< HTMLElement >(
-						`[data-block="${ startId }"]`
-					);
-				const endEl = blockEditorDocument.querySelector< HTMLElement >(
-					`[data-block="${ endId }"]`
+				const range = getOrderedBlockRange(
+					startId,
+					endId,
+					blockEditorDocument
 				);
-				if ( ! startEl || ! endEl ) {
+				if ( ! range ) {
 					return [];
 				}
 
+				const { firstId, lastId, middleEls, sameContainer } = range;
 				const color = getAvatarBorderColor(
 					userState.collaboratorInfo.id
 				);
@@ -196,28 +186,11 @@ export function useBlockHighlighting(
 					userState.collaboratorInfo.avatar_urls
 				);
 
-				let firstEl: HTMLElement = startEl;
-				let lastEl: HTMLElement = endEl;
-				if ( isNodeBefore( endEl, startEl ) ) {
-					firstEl = endEl;
-					lastEl = startEl;
-				}
-
-				// Promote inner blocks (e.g. list-items) to their nearest
-				// [data-block] ancestor so the whole container is treated as one
-				// visual unit rather than highlighting each inner block separately.
-				const effectiveFirstEl = blockContainerOf( firstEl );
-				const effectiveLastEl = blockContainerOf( lastEl );
-				const effectiveFirstId =
-					effectiveFirstEl?.getAttribute( 'data-block' ) ?? startId;
-				const effectiveLastId =
-					effectiveLastEl?.getAttribute( 'data-block' ) ?? endId;
-
 				// Both endpoints in the same container (e.g. two list-items in one list).
-				if ( effectiveFirstId === effectiveLastId ) {
+				if ( sameContainer ) {
 					return [
 						{
-							blockId: effectiveFirstId,
+							blockId: firstId,
 							clientId: userState.clientId,
 							userId: userState.collaboratorInfo.id,
 							color,
@@ -228,32 +201,21 @@ export function useBlockHighlighting(
 					];
 				}
 
-				const intermediateIds = getBlocksBetween(
-					effectiveFirstId,
-					effectiveLastId,
-					blockEditorDocument
-				)
-					.filter(
-						( el ) =>
-							! effectiveFirstEl?.contains( el ) &&
-							! effectiveLastEl?.contains( el )
-					)
+				const intermediateIds = middleEls
 					.map( ( el ) => el.getAttribute( 'data-block' ) )
 					.filter( ( id ): id is string => Boolean( id ) );
 
-				return [
-					effectiveFirstId,
-					...intermediateIds,
-					effectiveLastId,
-				].map( ( blockId ) => ( {
-					blockId,
-					clientId: userState.clientId,
-					userId: userState.collaboratorInfo.id,
-					color,
-					userName,
-					avatarUrl,
-					alwaysOutline: false,
-				} ) );
+				return [ firstId, ...intermediateIds, lastId ].map(
+					( blockId ) => ( {
+						blockId,
+						clientId: userState.clientId,
+						userId: userState.collaboratorInfo.id,
+						color,
+						userName,
+						avatarUrl,
+						alwaysOutline: false,
+					} )
+				);
 			} )
 			.filter( ( block ) => {
 				if ( seen.has( block.blockId ) ) {

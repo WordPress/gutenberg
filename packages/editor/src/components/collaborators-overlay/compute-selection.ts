@@ -7,9 +7,8 @@ import type {
 import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
-	getBlocksBetween,
+	getOrderedBlockRange,
 	getSelectionRects,
-	isNodeBefore,
 } from './cursor-dom-utils';
 import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
 
@@ -259,29 +258,30 @@ function computeMultiBlockOverlayRects(
 ): SelectionVisual {
 	const { editorDocument, overlayRect } = overlayContext;
 
-	const startBlockEl = editorDocument.querySelector< HTMLElement >(
-		`[data-block="${ start.localClientId }"]`
+	const range = getOrderedBlockRange(
+		start.localClientId!,
+		end.localClientId!,
+		editorDocument
 	);
-	const endBlockEl = editorDocument.querySelector< HTMLElement >(
-		`[data-block="${ end.localClientId }"]`
-	);
-	if ( ! startBlockEl || ! endBlockEl ) {
+	if ( ! range ) {
 		return {};
 	}
 
-	// Normalise to DOM order — Yjs reports endpoints in selection direction.
-	let docFirst = start;
-	let docLast = end;
-	let docFirstEl = startBlockEl;
-	let docLastEl = endBlockEl;
-	if ( isNodeBefore( endBlockEl, startBlockEl ) ) {
-		[ docFirst, docLast ] = [ docLast, docFirst ];
-		[ docFirstEl, docLastEl ] = [ docLastEl, docFirstEl ];
-	}
+	// Align ResolvedSelection objects with the DOM-ordered elements returned by
+	// the helper. start/end are in Yjs selection direction; firstId tells us
+	// which input ended up first in the document.
+	const docFirst = range.firstId === start.localClientId ? start : end;
+	const docLast = range.firstId === start.localClientId ? end : start;
+	const {
+		firstEl: docFirstEl,
+		lastEl: docLastEl,
+		middleEls,
+		sameContainer,
+	} = range;
 
-	// After promotion in use-render-cursors, both endpoints may resolve to the
-	// same container (e.g. two list-items in the same list).
-	if ( docFirst.localClientId === docLast.localClientId ) {
+	// When both endpoints resolve to the same container after promotion
+	// (e.g. two list-items in the same list), fall back to a full bounding-box.
+	if ( sameContainer ) {
 		return docFirstEl.innerText?.trim()
 			? {
 					selectionRects: [
@@ -290,14 +290,6 @@ function computeMultiBlockOverlayRects(
 			  }
 			: {};
 	}
-
-	const middleEls = getBlocksBetween(
-		docFirst.localClientId!,
-		docLast.localClientId!,
-		editorDocument
-	).filter(
-		( el ) => ! docFirstEl.contains( el ) && ! docLastEl.contains( el )
-	);
 
 	const MAX = Number.MAX_SAFE_INTEGER;
 	const rects: SelectionRect[] = [];

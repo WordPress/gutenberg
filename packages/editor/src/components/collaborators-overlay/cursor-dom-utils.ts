@@ -216,7 +216,7 @@ export const blockContainerOf = ( el: HTMLElement ): HTMLElement => {
  * @param editorDocument - The editor document
  * @return Intermediate block HTMLElements in document order, descendants excluded
  */
-export const getBlocksBetween = (
+const getBlocksBetween = (
 	startBlockId: string,
 	endBlockId: string,
 	editorDocument: Document
@@ -256,6 +256,76 @@ export const getBlocksBetween = (
 		}
 	}
 	return result;
+};
+
+/**
+ * Result returned by getOrderedBlockRange.
+ */
+export interface BlockRangeResult {
+	/** DOM-order first element, promoted to its nearest [data-block] ancestor. */
+	firstEl: HTMLElement;
+	/** data-block value of firstEl. */
+	firstId: string;
+	/** DOM-order last element, promoted to its nearest [data-block] ancestor. */
+	lastEl: HTMLElement;
+	/** data-block value of lastEl. */
+	lastId: string;
+	/** Block elements strictly between first and last, descendants of either excluded. */
+	middleEls: HTMLElement[];
+	/** True when firstEl and lastEl resolve to the same container after promotion. */
+	sameContainer: boolean;
+}
+
+/**
+ * Resolve two block clientIds to a DOM-ordered, promotion-aware block range.
+ *
+ * Handles: querySelector for both blocks (returns null if either is missing),
+ * DOM-order normalisation, promotion via blockContainerOf, and retrieval of
+ * intermediate blocks with descendants of the endpoints excluded.
+ *
+ * When the input IDs are already at container level (e.g. already promoted by
+ * the caller), blockContainerOf is a no-op and the result is identical to a
+ * plain query + normalise.
+ *
+ * @param startId - clientId of one block endpoint (may be in either DOM order).
+ * @param endId   - clientId of the other block endpoint.
+ * @param doc     - The editor document.
+ * @return Ordered, promoted range, or null if either element is not in the DOM.
+ */
+export const getOrderedBlockRange = (
+	startId: string,
+	endId: string,
+	doc: Document
+): BlockRangeResult | null => {
+	const startEl = doc.querySelector< HTMLElement >(
+		`[data-block="${ startId }"]`
+	);
+	const endEl = doc.querySelector< HTMLElement >(
+		`[data-block="${ endId }"]`
+	);
+	if ( ! startEl || ! endEl ) {
+		return null;
+	}
+
+	// Normalise to DOM order.
+	const rawFirstEl = isNodeBefore( endEl, startEl ) ? endEl : startEl;
+	const rawLastEl = isNodeBefore( endEl, startEl ) ? startEl : endEl;
+
+	// Promote inner-block elements (e.g. list-items) to their nearest
+	// [data-block] ancestor so both callers operate on container-level blocks.
+	const firstEl = blockContainerOf( rawFirstEl );
+	const lastEl = blockContainerOf( rawLastEl );
+	const firstId = firstEl.getAttribute( 'data-block' )!;
+	const lastId = lastEl.getAttribute( 'data-block' )!;
+
+	const sameContainer = firstId === lastId;
+	const middleEls = sameContainer
+		? []
+		: getBlocksBetween( firstId, lastId, doc ).filter(
+				( el ) => ! firstEl.contains( el ) && ! lastEl.contains( el )
+		  );
+
+	return { firstEl, firstId, lastEl, lastId, middleEls, sameContainer };
 };
 
 /**
@@ -358,6 +428,6 @@ export const findInnerBlockOffset = (
  * @param b - Second node.
  * @return True if `a` comes before `b`.
  */
-export const isNodeBefore = ( a: Node, b: Node ): boolean =>
+const isNodeBefore = ( a: Node, b: Node ): boolean =>
 	// eslint-disable-next-line no-bitwise
 	!! ( a.compareDocumentPosition( b ) & Node.DOCUMENT_POSITION_FOLLOWING );
