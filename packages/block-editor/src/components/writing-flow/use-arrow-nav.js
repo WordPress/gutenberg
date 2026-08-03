@@ -102,12 +102,26 @@ export function getClosestTabbable(
 		focusableNodes.reverse();
 	}
 
-	// Consider as candidates those focusables after the current target. It's
-	// assumed this can only be reached if the target is focusable (on its
-	// keydown event), so no need to verify it exists in the set.
-	focusableNodes = focusableNodes.slice(
-		focusableNodes.indexOf( target ) + 1
-	);
+	// Consider as candidates those focusables after the current target.
+	const targetIndex = focusableNodes.indexOf( target );
+
+	if ( targetIndex !== -1 ) {
+		focusableNodes = focusableNodes.slice( targetIndex + 1 );
+	} else {
+		// The target is not focusable itself (e.g. an editable that is an
+		// inert part of the editing host): consider the focusables on the
+		// navigation side of it in document order. Without this, the slice
+		// would start from the beginning and navigation could jump to an
+		// unrelated focusable, e.g. the post title above the block.
+		focusableNodes = focusableNodes.filter( ( focusableNode ) => {
+			const position = target.compareDocumentPosition( focusableNode );
+			const mask = isReverse
+				? target.DOCUMENT_POSITION_PRECEDING
+				: target.DOCUMENT_POSITION_FOLLOWING;
+			// eslint-disable-next-line no-bitwise
+			return !! ( position & mask );
+		} );
+	}
 
 	let targetRect;
 
