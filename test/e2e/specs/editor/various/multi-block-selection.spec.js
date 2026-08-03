@@ -995,6 +995,199 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			} );
 	} );
 
+	test( 'should select a single paragraph on triple click before a non text block', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( { name: 'core/separator' } );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection to the separator instead of into it at offset 0; that
+		// overshoot must not collapse the selection or extend it into the
+		// separator.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click( { clickCount: 3 } );
+
+		// Only the paragraph is selected, not a multi-block selection reaching
+		// into the separator.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'a' } },
+				{ name: 'core/separator' },
+			] );
+	} );
+
+	test( 'should select a single paragraph on triple click before a placeholder block', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( { name: 'core/image' } );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection into an empty element of the placeholder, where the offset
+		// is both 0 and the number of child nodes; that overshoot must not
+		// collapse the selection or extend it into the image.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click( { clickCount: 3 } );
+
+		// Only the paragraph is selected, not a multi-block selection reaching
+		// into the image.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'a' } },
+				{ name: 'core/image' },
+			] );
+	} );
+
+	test( 'should select a single paragraph on triple click before a container block', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Inner' } },
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+		);
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection into the group, where the boundary has no preceding
+		// sibling; that overshoot must not collapse the selection or extend it
+		// into the group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click( { clickCount: 3 } );
+
+		// Only the first paragraph is selected, not a multi-block selection
+		// reaching into the group.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'a' } },
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inner' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select a single paragraph on triple click inside a container block', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		// The group needs two paragraphs: a container holding a single
+		// paragraph does not host an editable root.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner one' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner two' },
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/separator' } );
+
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+		);
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection past the group, to the separator after it; that overshoot
+		// must not select the group as a whole.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click( { clickCount: 3 } );
+
+		// Only the paragraph is selected, not the group containing it.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inner one' },
+					},
+					{ name: 'core/paragraph', attributes: { content: 'a' } },
+				],
+			},
+			{ name: 'core/separator' },
+		] );
+	} );
+
 	test( 'should gradually multi-select', async ( {
 		page,
 		editor,

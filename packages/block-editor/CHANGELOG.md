@@ -28,6 +28,7 @@
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
 -   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
+-   Writing flow: Move the end of a triple click selection back to the last text position before the boundary the browser overshoots to, instead of only correcting a next sibling reported at an offset of 0, so triple clicking a paragraph followed by a separator or a container block no longer starts a multi selection ([#81022](https://github.com/WordPress/gutenberg/pull/81022)).
 
 ## 16.0.0 (2026-07-14)
 
