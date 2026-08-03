@@ -1,8 +1,4 @@
 @use "@wordpress/base-styles/mixins";
-@use "../utils/theme-variables" as *;
-
-// Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
-$surface-border-color: rgba(0, 0, 0, 0.1);
 
 // Matches CONFIG.controlHeight.
 $control-height: 36px;
@@ -21,12 +17,12 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 
 .item-group {
 	&.is-bordered {
-		border: 1px solid $surface-border-color;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&.is-separated {
 		> *:not(marquee) > * {
-			border-block-end: 1px solid $surface-border-color;
+			border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 
 		> *:last-of-type > * {
