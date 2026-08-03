@@ -6,22 +6,14 @@ import type { parse } from '@wordpress/block-serialization-default-parser';
 type ParsedNode = ReturnType< typeof parse >[ number ];
 
 /*
- * Reconstructs the comment-delimited markup for a parsed block so the SSR
- * fallback can resolve it through `do_blocks()`. Walks `innerContent`,
- * splicing each inner block back in at its placeholder, so nested blocks
- * round-trip faithfully (not only leaf blocks).
+ * Reconstructs the comment-delimited markup for a parsed block. Splices inner
+ * blocks back into their `innerContent` placeholders, so nested blocks
+ * round-trip and not only leaves.
  *
- * Core owns the canonical version of this, `serializeRawBlock()` in
- * `@wordpress/blocks`, built on `getCommentDelimitedContent()`. It is not used
- * here because that package carries 26 dependencies (a data store, rich-text,
- * a markdown parser, a shortcode parser), and this one deliberately carries
- * three. The same reasoning already picked the standalone grammar parser over
- * `blocks.parse`. Core published the parser as its own package but not the
- * serializer, so there is no light path back.
- *
- * One behavioral difference: `serializeRawBlock()` joins inner content with
- * newlines and collapses runs of them, while this preserves the markup as
- * parsed, so it round-trips byte for byte.
+ * `serializeRawBlock()` in `@wordpress/blocks` is the canonical equivalent,
+ * unused here because that package pulls 26 dependencies into one that carries
+ * four. It also joins inner content with newlines and collapses them, where
+ * this preserves the markup as parsed.
  */
 export function serializeNode( node: ParsedNode ): string {
 	const name = node.blockName;
