@@ -206,17 +206,54 @@ export default function useSelectionObserver() {
 							node.focus();
 						} else if (
 							// The selected block's editable is an inert part
-							// of the host (contenteditable="inherit"): when it
-							// held focus and turned inert, the browser dropped
-							// focus, leaving the wrapper as the default
-							// activeElement without actually focusing it. The
-							// collapsed selection is in the selected block
-							// here, so reclaim focus for the host.
+							// of the host (no contenteditable attribute):
+							// when it held focus and turned inert, the
+							// browser dropped focus, leaving the wrapper as
+							// the default activeElement without actually
+							// focusing it. The collapsed selection is in the
+							// selected block here, so reclaim focus for the
+							// host.
 							activeElement === node &&
 							ownerDocument.hasFocus() &&
 							! node.matches( ':focus' )
 						) {
 							node.focus( { preventScroll: true } );
+						}
+
+						// The wrapper holds focus, so the block's rich text
+						// element receives no focus event and does not sync
+						// the caret placed by a click to the store itself.
+						// Without the synced identity the store holds only a
+						// block-level selection, and the rich text handlers,
+						// which attach to the selected instance, never
+						// attach: the next keystroke is left to the native
+						// editing behavior of the host (e.g. forward delete
+						// joins the next block's text instead of merging the
+						// blocks). Sync the selection here.
+						if ( ! getSelectionStart().attributeKey ) {
+							const richTextElement =
+								getRichTextElement( startNode );
+							const attributeKey =
+								richTextElement?.dataset.wpBlockAttributeKey;
+
+							if ( attributeKey ) {
+								const richTextData = create( {
+									element: richTextElement,
+									range: selection.getRangeAt( 0 ),
+									__unstableIsEditableTree: true,
+								} );
+								const offset =
+									richTextData.start ?? richTextData.end;
+								const position = {
+									clientId: collapsedClientId,
+									attributeKey,
+									offset,
+								};
+								selectionChange( {
+									start: position,
+									end: position,
+								} );
+							}
 						}
 						return;
 					}
