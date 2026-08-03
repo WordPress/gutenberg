@@ -742,6 +742,40 @@ describe( 'getQueryArgs', () => {
 		} );
 	} );
 
+	it( 'should only split on the first equals sign', () => {
+		const url = 'https://andalouses.example/beach?a=1&b=x=y';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			a: '1',
+			b: 'x=y',
+		} );
+	} );
+
+	it( 'should preserve base64 padding in a value', () => {
+		const url =
+			'https://andalouses.example/beach?token=eyJhbGciOiJIUzI1NiJ9==';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			token: 'eyJhbGciOiJIUzI1NiJ9==',
+		} );
+	} );
+
+	it( 'should preserve an unencoded URL in a value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			redirect: '/watch?v=abc',
+		} );
+	} );
+
+	it( 'should ignore a pair with no key', () => {
+		const url = 'https://andalouses.example/beach?=orphan&foo=bar';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: 'bar',
+		} );
+	} );
+
 	describe( 'reverses buildQueryString', () => {
 		it( 'unbuilds simple strings', () => {
 			const data = {
