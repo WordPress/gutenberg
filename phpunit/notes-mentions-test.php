@@ -126,18 +126,18 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 *
 	 * @param int    $user_id User to mention.
 	 * @param string $label   Visible mention label.
-	 * @return string Mention anchor markup.
+	 * @return string Mention chip markup.
 	 */
 	private static function mention( int $user_id, string $label = '@User' ): string {
-		return sprintf( '<a class="wp-note-mention user-%d" href="#">%s</a>', $user_id, $label );
+		return sprintf( '<span class="wp-note-mention user-%d">%s</span>', $user_id, $label );
 	}
 
 	/**
 	 * @covers ::gutenberg_get_note_mentioned_user_ids
 	 */
 	public function test_parses_mentioned_user_ids(): void {
-		$content = '<p>Hi <a class="wp-note-mention user-5" href="#">@Jane</a> and '
-			. '<a class="wp-note-mention user-9" href="#">@Bob</a>.</p>';
+		$content = '<p>Hi <span class="wp-note-mention user-5">@Jane</span> and '
+			. '<span class="wp-note-mention user-9">@Bob</span>.</p>';
 
 		$this->assertSame(
 			array( 5, 9 ),
@@ -148,32 +148,16 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_get_note_mentioned_user_ids
 	 */
-	public function test_ignores_plain_links_and_deduplicates(): void {
-		$content = '<p><a class="user-7" href="https://example.com">not a mention</a> '
-			. '<a class="wp-note-mention user-5" href="#">@Jane</a> '
-			. '<a class="wp-note-mention user-5" href="#">@Jane again</a> '
-			. '<a class="wp-note-mention" href="#">no user class</a></p>';
+	public function test_ignores_non_mentions_and_deduplicates(): void {
+		$content = '<p><span class="user-7">not a mention</span> '
+			. '<a class="wp-note-mention user-7" href="#">an anchor, not a chip</a> '
+			. '<span class="wp-note-mention user-5">@Jane</span> '
+			. '<span class="wp-note-mention user-5">@Jane again</span> '
+			. '<span class="wp-note-mention">no user class</span></p>';
 
 		$this->assertSame(
 			array( 5 ),
 			gutenberg_get_note_mentioned_user_ids( $content )
-		);
-	}
-
-	/**
-	 * @covers ::gutenberg_get_note_thread_root_id
-	 */
-	public function test_thread_root_is_parent_for_replies(): void {
-		$root  = $this->insert_note( 'Top level', self::$commenter->ID );
-		$reply = $this->insert_note( 'A reply', self::$commenter->ID, $root->comment_ID );
-
-		$this->assertSame(
-			(int) $root->comment_ID,
-			gutenberg_get_note_thread_root_id( $reply )
-		);
-		$this->assertSame(
-			(int) $root->comment_ID,
-			gutenberg_get_note_thread_root_id( $root )
 		);
 	}
 
@@ -194,9 +178,12 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_send_note_notification
-	 * @covers ::gutenberg_get_note_notification_link
 	 */
-	public function test_email_contains_context_and_deep_link(): void {
+	public function test_email_contains_context_and_editor_link(): void {
+		// The editor link comes from get_edit_post_link(), which is scoped to
+		// the current user; in the REST flow that is the note's author.
+		wp_set_current_user( self::$commenter->ID );
+
 		$note = $this->insert_note(
 			'<p>Please review ' . self::mention( self::$mentioned->ID, '@Reviewer' ) . '</p>',
 			self::$commenter->ID
@@ -210,35 +197,12 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'You were mentioned in a note', $email['subject'] );
 		// The note text is included, stripped of markup.
 		$this->assertStringContainsString( 'Please review @Reviewer', $email['message'] );
-		$this->assertStringNotContainsString( '<a', $email['message'] );
-		// The editor deep link targets the note's thread.
+		$this->assertStringNotContainsString( '<span', $email['message'] );
+		// The email links to the post editor, as core's own note email does.
 		$this->assertStringContainsString(
-			add_query_arg(
-				array(
-					'post'   => self::$post->ID,
-					'action' => 'edit',
-					'note'   => (int) $note->comment_ID,
-				),
-				admin_url( 'post.php' )
-			),
+			get_edit_post_link( self::$post->ID, 'url' ),
 			$email['message']
 		);
-	}
-
-	/**
-	 * @covers ::gutenberg_get_note_notification_link
-	 */
-	public function test_deep_link_for_a_reply_targets_the_thread_root(): void {
-		$root  = $this->insert_note( 'Top level', self::$commenter->ID );
-		$reply = $this->insert_note(
-			'Ping ' . self::mention( self::$mentioned->ID ),
-			self::$commenter->ID,
-			$root->comment_ID
-		);
-
-		$link = gutenberg_get_note_notification_link( self::$post, $reply );
-
-		$this->assertStringContainsString( 'note=' . (int) $root->comment_ID, $link );
 	}
 
 	/**
@@ -367,12 +331,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_rest_note_creation_triggers_mention_email(): void {
 		wp_set_current_user( self::$commenter->ID );
-		if ( is_multisite() ) {
-			// Mention markup needs unfiltered_html until #80221 arms the kses
-			// allowance for REST note creation; on multisite only super admins
-			// have it.
-			grant_super_admin( self::$commenter->ID );
-		}
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 		$request->set_param( 'post', self::$post->ID );
@@ -383,10 +341,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 
 		$response = rest_get_server()->dispatch( $request );
-
-		if ( is_multisite() ) {
-			revoke_super_admin( self::$commenter->ID );
-		}
 
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
@@ -404,9 +358,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 
 		wp_set_current_user( self::$commenter->ID );
-		if ( is_multisite() ) {
-			grant_super_admin( self::$commenter->ID );
-		}
 
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note->comment_ID );
 		$request->set_param(
@@ -415,10 +366,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 
 		$response = rest_get_server()->dispatch( $request );
-
-		if ( is_multisite() ) {
-			revoke_super_admin( self::$commenter->ID );
-		}
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertNotContains( self::$mentioned->user_email, $this->sent_to );

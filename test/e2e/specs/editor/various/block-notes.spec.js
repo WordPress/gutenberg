@@ -2099,50 +2099,6 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeFocused();
 		} );
 	} );
-
-	test.describe( 'Deep linking', () => {
-		test( 'opens and focuses the linked note thread on load', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Deep link target' },
-				comment: 'Deep linked note',
-			} );
-			// Persist the block's note metadata so the thread can be resolved
-			// to its block after a reload.
-			await editor.saveDraft();
-			const postId = new URL( page.url() ).searchParams.get( 'post' );
-
-			const notes = await requestUtils.rest( {
-				path: '/wp/v2/comments',
-				params: {
-					type: 'note',
-					post: postId,
-					status: 'all',
-					context: 'edit',
-				},
-			} );
-			const note = notes.find( ( { parent } ) => parent === 0 );
-
-			// Load the editor through the URL a mention notification email
-			// links to; the linked thread should open focused.
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ postId }&action=edit&note=${ note.id }`
-			);
-
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Deep linked note' } );
-			await expect( thread ).toBeVisible();
-			await expect( thread ).toBeFocused();
-		} );
-	} );
 } );
 
 class BlockNoteUtils {
