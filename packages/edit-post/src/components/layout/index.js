@@ -552,12 +552,12 @@ function Layout( {
 			<BackButton initialPost={ initialPost } />
 		) : null;
 
-	const themeColors = useMemo( getAdminThemeColors, [] );
+	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
 
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ThemeProvider color={ themeColors }>
+				<ThemeProvider color={ { primary: adminPrimary } }>
 					<ErrorBoundary canCopyContent>
 						<WelcomeGuide postType={ currentPostType } />
 						<div { ...navigateRegionsProps }>
