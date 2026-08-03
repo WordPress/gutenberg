@@ -1,19 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { debounce } from '../../utils/debounce';
+import useEvent from '../use-event';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
 interface FixedWindowList {
-	/** Items visible in the current viewport */
+	/** Items visible in the viewport, as of the last rendered window */
 	visibleItems: number;
 	/** Start index of the window */
 	start: number;
@@ -51,8 +51,12 @@ export default function useFixedWindowList(
 	FixedWindowList,
 	React.Dispatch< React.SetStateAction< FixedWindowList > >,
 ] {
-	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
-	const useWindowing = options?.useWindowing ?? true;
+	const {
+		windowOverscan,
+		useWindowing = true,
+		initWindowSize = DEFAULT_INIT_WINDOW_SIZE,
+		expandedState,
+	} = options ?? {};
 
 	const [ fixedListWindow, setFixedListWindow ] = useState< FixedWindowList >(
 		{
@@ -65,137 +69,152 @@ export default function useFixedWindowList(
 		}
 	);
 
-	useLayoutEffect( () => {
-		if ( ! useWindowing ) {
+	// Kept out of state so that measuring the list does not, on its own, force a
+	// re-render. Only the rendered window does that.
+	const visibleItemsRef = useRef( initWindowSize );
+
+	// The measuring effect re-runs whenever the list changes, so the effect
+	// running can't on its own tell the very first measurement from later ones.
+	const isFirstMeasurementRef = useRef( true );
+
+	// Stable identity, so the listeners below never have to be re-attached, and
+	// reads the latest props on every call.
+	const measureWindow = useEvent( ( initRender?: boolean ) => {
+		const scrollContainer = getScrollContainer( elementRef.current );
+		if ( ! scrollContainer ) {
 			return;
 		}
-		const scrollContainer = getScrollContainer( elementRef.current );
-		/**
-		 *  Measures and sets the window of items to render based on the scroll position
-		 *
-		 * @param {boolean} [initRender] Indicates if this is the initial render
-		 * @return {void}
-		 */
-		const measureWindow = ( initRender?: boolean ) => {
-			if ( ! scrollContainer ) {
-				return;
-			}
-			const visibleItems = Math.ceil(
-				scrollContainer.clientHeight / itemHeight
-			);
-			// Aim to keep opening list view fast, afterward we can optimize for scrolling.
-			const windowOverscan = initRender
-				? visibleItems
-				: options?.windowOverscan ?? visibleItems;
-			const firstViewableIndex = Math.floor(
-				scrollContainer.scrollTop / itemHeight
-			);
-			const start = Math.max( 0, firstViewableIndex - windowOverscan );
-			const end = Math.min(
-				totalItems - 1,
-				firstViewableIndex + visibleItems + windowOverscan
-			);
-			setFixedListWindow( ( lastWindow ) => {
-				const nextWindow = {
-					visibleItems,
-					start,
-					end,
-					itemInView: ( index: number ) => {
-						return start <= index && index <= end;
-					},
-				};
-				if (
-					lastWindow.start !== nextWindow.start ||
-					lastWindow.end !== nextWindow.end ||
-					lastWindow.visibleItems !== nextWindow.visibleItems
-				) {
-					return nextWindow;
-				}
+		const visibleItems = Math.ceil(
+			scrollContainer.clientHeight / itemHeight
+		);
+		visibleItemsRef.current = visibleItems;
+		const isFirstMeasurement = isFirstMeasurementRef.current;
+		isFirstMeasurementRef.current = false;
+		// Aim to keep opening list view fast, afterward we can optimize for scrolling.
+		const overscan = initRender
+			? visibleItems
+			: windowOverscan ?? visibleItems;
+		const firstViewableIndex = Math.floor(
+			scrollContainer.scrollTop / itemHeight
+		);
+		const start = Math.max( 0, firstViewableIndex - overscan );
+		const end = Math.min(
+			totalItems - 1,
+			firstViewableIndex + visibleItems + overscan
+		);
+		setFixedListWindow( ( lastWindow ) => {
+			// Rendering the window is the expensive part, and for the items in
+			// `lastWindow` it is already paid for. When the next window has
+			// nothing to add, keep the current one: a window that only shrinks
+			// drops nodes that are known to be needed again and forces another
+			// style recalculation, with nothing new to show for it.
+			if ( lastWindow.start <= start && lastWindow.end >= end ) {
 				return lastWindow;
-			} );
-		};
+			}
+			// The first window is rendered before the list can be measured, so
+			// it is sized by `initWindowSize` rather than by the viewport, and
+			// the measured window is normally wider than it by the overscan.
+			// Nothing has painted yet though, so there is no scrolling for the
+			// overscan to absorb: covering the visible items is enough, and
+			// keeping that window saves a render pass while the list opens.
+			if (
+				isFirstMeasurement &&
+				lastWindow.start <= firstViewableIndex &&
+				lastWindow.end >= firstViewableIndex + visibleItems
+			) {
+				return lastWindow;
+			}
+			return {
+				visibleItems,
+				start,
+				end,
+				itemInView: ( index: number ) => {
+					return start <= index && index <= end;
+				},
+			};
+		} );
+	} );
 
-		measureWindow( true );
-		const debounceMeasureList = debounce( () => {
-			measureWindow();
-		}, 16 );
-		scrollContainer?.addEventListener( 'scroll', debounceMeasureList );
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'resize',
-			debounceMeasureList
-		);
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'resize',
-			debounceMeasureList
-		);
-
-		return () => {
-			scrollContainer?.removeEventListener(
-				'scroll',
-				debounceMeasureList
-			);
-			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
-				'resize',
-				debounceMeasureList
-			);
-		};
-	}, [
-		itemHeight,
-		elementRef,
-		totalItems,
-		options?.expandedState,
-		options?.windowOverscan,
-		useWindowing,
-	] );
-
-	useLayoutEffect( () => {
-		if ( ! useWindowing ) {
-			return;
-		}
-		const scrollContainer = getScrollContainer( elementRef.current );
-		const handleKeyDown = ( event: KeyboardEvent ) => {
+	const handleKeyDown = useEvent(
+		( event: KeyboardEvent, scrollContainer: Element ) => {
 			switch ( event.keyCode ) {
 				case HOME: {
-					return scrollContainer?.scrollTo( { top: 0 } );
+					return scrollContainer.scrollTo( { top: 0 } );
 				}
 				case END: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer.scrollTo( {
 						top: totalItems * itemHeight,
 					} );
 				}
 				case PAGEUP: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer.scrollTo( {
 						top:
 							scrollContainer.scrollTop -
-							fixedListWindow.visibleItems * itemHeight,
+							visibleItemsRef.current * itemHeight,
 					} );
 				}
 				case PAGEDOWN: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer.scrollTo( {
 						top:
 							scrollContainer.scrollTop +
-							fixedListWindow.visibleItems * itemHeight,
+							visibleItemsRef.current * itemHeight,
 					} );
 				}
 			}
-		};
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'keydown',
-			handleKeyDown
-		);
+		}
+	);
+
+	// Measure whenever something that the window is derived from changes.
+	useLayoutEffect( () => {
+		if ( ! useWindowing ) {
+			return;
+		}
+		measureWindow( true );
+	}, [
+		useWindowing,
+		measureWindow,
+		itemHeight,
+		totalItems,
+		windowOverscan,
+		expandedState,
+	] );
+
+	// Only ever attaches and detaches listeners. The deps are the things that
+	// can change which element the scroll container is, or whether there is one
+	// at all: a list that is too short to overflow has no scroll container to
+	// attach to, and it grows into one by gaining items or by being expanded.
+	useLayoutEffect( () => {
+		if ( ! useWindowing ) {
+			return;
+		}
+		const scrollContainer = getScrollContainer( elementRef.current );
+		if ( ! scrollContainer ) {
+			return;
+		}
+		const { defaultView } = scrollContainer.ownerDocument;
+		// `scroll` and `resize` already fire at about the rendering rate, so
+		// there is nothing to gain from debouncing them.
+		const onMeasure = () => measureWindow();
+		const onKeyDown = ( event: KeyboardEvent ) =>
+			handleKeyDown( event, scrollContainer );
+
+		scrollContainer.addEventListener( 'scroll', onMeasure );
+		defaultView?.addEventListener( 'resize', onMeasure );
+		defaultView?.addEventListener( 'keydown', onKeyDown );
+
 		return () => {
-			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
-				'keydown',
-				handleKeyDown
-			);
+			scrollContainer.removeEventListener( 'scroll', onMeasure );
+			defaultView?.removeEventListener( 'resize', onMeasure );
+			defaultView?.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [
-		totalItems,
-		itemHeight,
-		elementRef,
-		fixedListWindow.visibleItems,
 		useWindowing,
-		options?.expandedState,
+		elementRef,
+		itemHeight,
+		totalItems,
+		expandedState,
+		measureWindow,
+		handleKeyDown,
 	] );
 
 	return [ fixedListWindow, setFixedListWindow ];

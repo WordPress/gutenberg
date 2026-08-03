@@ -55,7 +55,7 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 
 ### Contract types
 
-`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts the pass to its icon primitive as-is.
+`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
 
 ### `WidgetAttributeField< Item >`
 
@@ -75,6 +75,10 @@ The widget names the intent and how it is fulfilled; the host mounts the primiti
 `registerFieldType( definition )` names a reusable field type — `{ name: 'location', baseType: 'text', Edit, ... }`, typed by `FieldTypeDefinition`. Those attributes reference via `type`.
 
 `useWidgetTypes` resolves those references into the plain per-field `Field` props DataViews understands, inheriting the rest from `baseType`.
+
+### Icons
+
+`registerIconResolver( resolver )` registers how a registered icon name (`"icon": "core/calendar"` in `widget.json`) becomes a renderable element. The application registers it once; `useWidgetTypes` resolves references while assembling each `WidgetType`, so hosts only receive renderable icons. An unresolvable reference degrades to no icon.
 
 ## Architecture
 
