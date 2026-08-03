@@ -80,7 +80,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 13  | binding-sources       | Binding language    | 11         | todo   |
 | 14  | expression            | Connection language | none       | todo   |
 | 15  | connection-runtime    | Connection language | 09, 14     | todo   |
-| 16  | actions               | Connection language | 15         | todo   |
+| 16  | operations            | Connection language | 15         | todo   |
 | 17  | host-provider         | Connection language | 16         | todo   |
 | 18  | form-block            | DataViews-as-block  | 13, 16     | todo   |
 | 19  | collection-block      | DataViews-as-block  | 18         | todo   |
@@ -245,34 +245,58 @@ The serializable CEL-subset evaluator for `{ $expr }` args and `when` guards.
 
 ### 15 · connection-runtime
 
-Run a connection: ordered async steps, `when`, connection-level `onError`; the
-event-capable `createAdminBlock` variant; the action context and `WidgetHost`
-contract + `useWidgetHost`.
+Run a connection: ordered async steps, per-step `when`, connection-level
+`onError`; the event-capable `createAdminBlock` variant; the operation context.
 
--   Files: `ABR/connection-runtime.ts`, `ABR/action-context.tsx`,
-    `ABR/widget-host.tsx`, `ABR/types.ts` (Connection types),
-    `ABR/create-admin-block.tsx` (event variant).
+The runtime takes a step list and a scope, and knows nothing about where the
+list came from. Keep that boundary: a block event is the entry point this step
+builds, and a widget action's `steps` fulfillment is a second one that arrives
+later without touching the runtime. Do not reach for the composition from
+inside it.
+
+-   Files: `ABR/connection-runtime.ts`, `ABR/operation-context.tsx`,
+    `ABR/types.ts` (Connection types), `ABR/create-admin-block.tsx` (event
+    variant).
 -   Accept: a button with a one-step connection runs the step; `when` gates the
-    trigger; pending state flows to the component.
+    trigger; pending state flows to the component; the runtime is callable with
+    a step list alone, demonstrated by a test that invokes it without a block.
 
-### 16 · actions
+### 16 · operations
 
-The action registry and the shipped actions; the error contract.
+The operation registry and the shipped operations; the error contract.
 
--   Files: `ABR/actions.ts`, `registerAction`/`getAction`, `save-entity`
-    (`throwOnError`), `refetch`, `navigate`, `notify`.
+Named `operation`, not `action`: see _Operations, not actions_ in
+`ARCHITECTURE.md`. `action` already means a declared widget verb
+(`WidgetAction`) and dashboard chrome (`WidgetDashboard.Actions`), and this is
+neither.
+
+-   Files: `ABR/operations.ts`, `registerOperation`/`getOperation`,
+    `save-entity` (`throwOnError`), `refetch`, `navigate`, `notify`.
 -   Accept: a connection that saves then notifies works; a rejecting step runs
-    `onError`.
+    `onError`; an unregistered operation name leaves the step a no-op rather
+    than throwing.
 
 ### 17 · host-provider
 
-The dashboard's concrete host capabilities, provided through `WidgetHostProvider`
-and wired around the rendered widgets.
+The host capabilities a widget cannot confirm exist, provided through
+`WidgetHostProvider` and mounted around the rendered widgets.
 
--   Files: `WP-DASH/components/widget-host-provider/*`, plus the mount point in the
-    dashboard's widget rendering.
--   Accept: `navigate`/`notify` actions take effect on the dashboard; a widget
-    with no provider still renders (host-boundary actions no-op).
+Two consumers, not one. Operations read `host.navigate` / `host.notify`. And a
+declared action with a `link` fulfillment needs the host's link primitive, so a
+target inside the host's own routes materializes as a router link instead of a
+full page load; the widget declares where to go, the host decides how to get
+there.
+
+Sort each capability before writing it. A WordPress-generic implementation goes
+in the adapter module; a genuine host decision goes in the host. See _Who
+provides what_ in `ARCHITECTURE.md`.
+
+-   Files: `WP-PRIM/components/admin-block-renderer/widget-host.tsx`
+    (`WidgetHostProvider`, `useWidgetHost`), `WP-DASH` mount point, the route's
+    concrete capabilities.
+-   Accept: `navigate` / `notify` operations take effect on the dashboard; a
+    widget with no provider still renders and host-boundary operations no-op; a
+    link action to an in-app route does not reload the page.
 
 ### 18 · form-block
 
@@ -296,11 +320,11 @@ actions with `when` → `isEligible`.
 ### 20 · style-control
 
 Path-bound style control: `core-admin/select-control` + a global-styles provider
-block and `style-variations`, plus the `set-style-value` action and a
+block and `style-variations`, plus the `set-style-value` operation and a
 global-style binding source.
 
 -   Files: `ABR/admin-blocks/{select-control,global-styles,style-variations}.tsx`,
-    `ABR/actions.ts` (`set-style-value`), `ABR/admin-blocks/index.ts` (register).
+    `ABR/operations.ts` (`set-style-value`), `ABR/admin-blocks/index.ts` (register).
 -   Accept: oracle `core/site-styles` renders and changing a control writes a
     global style.
 

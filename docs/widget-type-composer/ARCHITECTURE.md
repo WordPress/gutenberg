@@ -6,7 +6,7 @@ A way to define a widget type as a **composition of blocks** instead of a
 hand-written render module, and to render that composition in the admin as a
 single React tree. Two declarative, serializable languages sit on top of the
 composition: **bindings** (attribute values sourced at render time) and
-**connections** (events wired to actions).
+**connections** (events wired to operations).
 
 It builds on the existing widget framework (`@wordpress/widget-primitives` +
 `WP_Widget_Type_Registry` + `/wp/v2/widget-modules`). A widget type gains an
@@ -73,13 +73,36 @@ blocks with no admin component need a per-block SSR fallback.
    (e.g. `core/instance-attribute`) against ambient block context
    (`providesContext`/`usesContext`, mirroring `block.json`).
 6. **Connections**, `metadata.connections` wires a logical event to an ordered,
-   async-aware list of action steps with `when` guards and connection-level
-   `onError`. Argument values and guards use a serializable subset of CEL
-   (`{ "$expr": "..." }`). Handlers receive an action context of two tiers:
-   intrinsic (core-data via `registry`) and host-boundary
+   async-aware list of steps with `when` guards and connection-level `onError`.
+   Argument values and guards use a serializable subset of CEL
+   (`{ "$expr": "..." }`). Each step names an **operation**; handlers receive a
+   context of two tiers: intrinsic (core-data via `registry`) and host-boundary
    (`host.navigate`/`host.notify`, silent no-ops if the host omits them), so a
-   widget stays host-agnostic. Shipped actions: `save-entity`, `refetch`,
+   widget stays host-agnostic. Shipped operations: `save-entity`, `refetch`,
    `navigate`, `notify`.
+
+## Operations, not actions
+
+A step names an **operation**, not an action. The distinction is not cosmetic:
+`action` is already taken, twice, and the two meanings sit at different levels.
+
+| Term                      | What it is                                               | Where it lives |
+| ------------------------- | -------------------------------------------------------- | -------------- |
+| `WidgetAction`            | A verb a user triggers: an envelope plus one fulfillment | `widget.json`  |
+| `WidgetDashboard.Actions` | Dashboard chrome: edit toggle, reset, add widget         | the host       |
+| operation                 | What one step of a connection invokes                    | this vertical  |
+
+An action is a **promise**; an operation is a **thing that happens**. Naming
+both "action" would put the affordance and its machinery under one word.
+
+They do meet. A widget action's fulfillment is named by the key that carries it,
+and `href` is only the first: a `steps` fulfillment is a connection's step list,
+which is why the runtime below is written to be callable from two entry points,
+an event on a block and a declared action. Wiring the second is not this
+vertical's work; being callable from it is.
+
+See the widget-primitives _Actions_ doc for the envelope, the fulfillments, and
+what the host decides.
 
 ## Who provides what
 
