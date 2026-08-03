@@ -86,7 +86,11 @@ test.describe( 'Widgets screen', () => {
 			{ name: /^Empty block/ }
 		);
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		// Click rather than focus programmatically: once the widget area has
+		// a sibling, the block's editable is an inert part of the editing
+		// host and cannot hold focus; the click places the caret through the
+		// host like a real interaction.
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'First Paragraph' );
 
 		await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );
@@ -94,7 +98,7 @@ test.describe( 'Widgets screen', () => {
 		// TODO: We can add a test for the insertion indicator here.
 		await addParagraphBlock.click();
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'Second Paragraph' );
 
 		const addShortCodeBlock =
@@ -119,7 +123,7 @@ test.describe( 'Widgets screen', () => {
 			secondWidgetArea.getByRole( 'document', {
 				name: /^Empty block/,
 			} );
-		await addedParagraphBlockInSecondWidgetArea.focus();
+		await addedParagraphBlockInSecondWidgetArea.click();
 		await page.keyboard.type( 'Third Paragraph' );
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
@@ -573,10 +577,14 @@ test.describe( 'Widgets screen', () => {
 		await widgetsScreen.saveWidgets();
 
 		// Delete the last block and save again.
+		// Click rather than focus programmatically: the block is still
+		// selected from its insertion, so its editable is an inert part of
+		// the editing host and cannot hold focus; the click places the caret
+		// through the host like a real interaction.
 		await firstWidgetArea
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Second Paragraph' } )
-			.focus();
+			.click();
 		await pageUtils.pressKeys( 'access+z' );
 		await widgetsScreen.saveWidgets();
 
