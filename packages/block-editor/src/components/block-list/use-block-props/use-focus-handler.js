@@ -85,12 +85,14 @@ export function useFocusHandler( clientId ) {
 				// an editable that is an inert part of the editing host (not
 				// focusable itself) moves focus to the nearest focusable
 				// ancestor. The caret, not the wrapper, says which block the
-				// user is in: leave the selection alone when the selection
-				// anchor sits within this block but belongs to a descendant
-				// block.
+				// user is in: leave the selection alone when, within an
+				// engaged editing host (the wrapper is editable by
+				// inheritance), the selection anchor sits within this block
+				// but belongs to a descendant block.
 				const { anchorNode } =
 					node.ownerDocument.defaultView.getSelection();
 				if (
+					node.isContentEditable &&
 					anchorNode &&
 					node.contains( anchorNode ) &&
 					getBlockClientId( anchorNode ) !== clientId
