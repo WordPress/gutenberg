@@ -38,6 +38,17 @@ export function useBlockSelectionClearer() {
 					return;
 				}
 
+				// The second and third mousedown of a double or triple click
+				// are part of a text selection gesture (e.g. a triple click
+				// on the canvas padding selects the paragraph next to it),
+				// not a click away from the blocks. Clearing the selection
+				// mid-gesture also re-renders the selected block's editable,
+				// and the mutation makes the browser abandon the native
+				// selection expansion.
+				if ( event.detail > 1 ) {
+					return;
+				}
+
 				clearSelectedBlock();
 			}
 
