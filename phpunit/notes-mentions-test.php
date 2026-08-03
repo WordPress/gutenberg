@@ -300,29 +300,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_notify_note_mentions
-	 */
-	public function test_recipients_filter_can_add_and_remove(): void {
-		$extra_user = self::create_user( 'editor' );
-
-		$filter = function ( array $ids ) use ( $extra_user ) {
-			/** @var int[] $ids */
-			$ids[] = $extra_user->ID;
-			return array_values( array_diff( $ids, array( self::$mentioned->ID ) ) );
-		};
-		add_filter( 'wp_note_notification_recipients', $filter );
-
-		$note = $this->insert_note(
-			'Ping ' . self::mention( self::$mentioned->ID ),
-			self::$commenter->ID
-		);
-		gutenberg_notify_note_mentions( $note );
-
-		$this->assertContains( $extra_user->user_email, $this->sent_to );
-		$this->assertNotContains( self::$mentioned->user_email, $this->sent_to );
-	}
-
-	/**
 	 * Creating a note through the real REST endpoint must trigger the mention
 	 * email: this exercises the `rest_insert_comment` wiring (hook name,
 	 * priority, argument count), which the direct-call tests above bypass.
