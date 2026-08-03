@@ -57,8 +57,8 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	// asynchronously reveal a caret, scrolling the viewport.
 	const isInheritedEditable =
 		container.nodeType === container.ELEMENT_NODE &&
-		container.getAttribute( 'contenteditable' ) === 'inherit' &&
-		container.isContentEditable;
+		!! container.isContentEditable &&
+		container.contentEditable !== 'true';
 
 	if ( ! isInheritedEditable ) {
 		container.focus();
@@ -125,5 +125,21 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		// body) nudges the scroll position; the placed caret, not the host,
 		// determines what should be revealed.
 		host?.focus( { preventScroll: true } );
+
+		// Gecko moves the selection when an editing host takes focus instead
+		// of adopting the existing one: re-place the range if it no longer
+		// matches.
+		const liveRange =
+			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+		if (
+			! liveRange ||
+			liveRange.startContainer !== range.startContainer ||
+			liveRange.startOffset !== range.startOffset ||
+			liveRange.endContainer !== range.endContainer ||
+			liveRange.endOffset !== range.endOffset
+		) {
+			selection.removeAllRanges();
+			selection.addRange( range );
+		}
 	}
 }

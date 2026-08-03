@@ -230,7 +230,12 @@ export default function useSelectionObserver() {
 							startNode.nodeType === startNode.ELEMENT_NODE
 								? startNode
 								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
+						// The editable may be editable by inheritance, without
+						// a contenteditable attribute of its own; rich text
+						// elements are matched by class.
+						element = element?.closest(
+							'[contenteditable], .rich-text'
+						);
 						element?.focus();
 					}
 					return;

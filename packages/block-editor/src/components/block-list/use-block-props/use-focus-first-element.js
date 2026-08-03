@@ -58,9 +58,24 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable
+		let textInputs = focus.tabbable
 			.find( ref.current )
 			.filter( ( node ) => isTextField( node ) );
+
+		// While the writing flow wrapper hosts editing, the block's editable
+		// elements are editable by inheritance (contenteditable="inherit")
+		// and not focusable areas of their own, so the tabbable search cannot
+		// find them. Find them by their editable marker instead; the caret
+		// placement below places the selection within the element and
+		// focuses the editing host.
+		if ( ! textInputs.length ) {
+			textInputs = Array.from(
+				ref.current.querySelectorAll( '.rich-text' )
+			).filter(
+				( node ) =>
+					node.isContentEditable && node.contentEditable !== 'true'
+			);
+		}
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.

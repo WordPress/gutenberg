@@ -116,7 +116,10 @@ export default function useClickSelection() {
 						getBlockClientId( editable ) === clickedClientId
 					) {
 						setContentEditableWrapper( node, true );
-						editable.setAttribute( 'contenteditable', 'inherit' );
+						// Remove the attribute rather than set "inherit":
+						// Gecko does not map the invalid value to the inherit
+						// state and treats the element as non-editable.
+						editable.removeAttribute( 'contenteditable' );
 						selectBlock( clickedClientId, null );
 					}
 				}

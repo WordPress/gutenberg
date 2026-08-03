@@ -153,11 +153,7 @@ export function getClosestTabbable(
 			// The editable element within the block may be editable by
 			// inheritance under an editing host (`contenteditable="inherit"`),
 			// so accept any explicit editable marker except an opt-out.
-			getBlockClientId(
-				node.closest(
-					'[contenteditable]:not([contenteditable="false"])'
-				)
-			)
+			getBlockClientId( node.closest( '[contenteditable], .rich-text' ) )
 		) {
 			return false;
 		}
@@ -347,7 +343,23 @@ export default function useArrowNav() {
 
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
-					if ( isClosestTabbableABlock( target, isReverse ) ) {
+					// The selected block's editable can be editable by
+					// inheritance under the editing host, and is then not
+					// itself tabbable, which the closest-tabbable lookup
+					// relies on; consult block adjacency instead.
+					const hasBlockToExtendInto =
+						target.isContentEditable &&
+						target.contentEditable !== 'true'
+							? !! ( isReverse
+									? getPreviousBlockClientId(
+											getSelectedBlockClientId()
+									  )
+									: getNextBlockClientId(
+											getSelectedBlockClientId()
+									  ) )
+							: isClosestTabbableABlock( target, isReverse );
+
+					if ( hasBlockToExtendInto ) {
 						setContentEditableWrapper( node, true );
 					} else if ( node.contentEditable === 'true' ) {
 						// There is no block to extend the selection into.

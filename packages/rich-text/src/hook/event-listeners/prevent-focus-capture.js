@@ -21,7 +21,7 @@ export function preventFocusCapture() {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 
-		let value = null;
+		let stored = null;
 
 		function onPointerDown( event ) {
 			// Abort if the event is default prevented, we will not get a pointer up event.
@@ -34,15 +34,29 @@ export function preventFocusCapture() {
 			if ( ! event.target.contains( element ) ) {
 				return;
 			}
-			value = element.getAttribute( 'contenteditable' );
+			// The attribute may be absent: the element can be editable by
+			// inheritance from the editing host, in which case it carries no
+			// contenteditable attribute of its own.
+			stored = { value: element.getAttribute( 'contenteditable' ) };
 			element.setAttribute( 'contenteditable', 'false' );
 			defaultView.getSelection().removeAllRanges();
 		}
 
 		function onPointerUp() {
-			if ( value !== null ) {
-				element.setAttribute( 'contenteditable', value );
-				value = null;
+			if ( stored ) {
+				// Only restore when the attribute is still what onPointerDown
+				// set: a render in between (e.g. the block was deselected by
+				// the click, changing the editable between an editing host
+				// and an inert part of one) owns the attribute now, and the
+				// stored value is stale.
+				if ( element.getAttribute( 'contenteditable' ) === 'false' ) {
+					if ( stored.value === null ) {
+						element.removeAttribute( 'contenteditable' );
+					} else {
+						element.setAttribute( 'contenteditable', stored.value );
+					}
+				}
+				stored = null;
 			}
 		}
 

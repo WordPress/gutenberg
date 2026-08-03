@@ -552,7 +552,10 @@ export function RichTextWrapper(
 					// Under the editing host the child is editable by
 					// inheritance, not a nested editing host of its own, so iOS
 					// keeps focus on the host and native word selection works.
-					isEditingHost ? 'inherit' : ! shouldDisableEditing
+					// The attribute must be absent, not "inherit": Gecko does
+					// not map the invalid value to the inherit state and
+					// treats the element as non-editable.
+					isEditingHost ? undefined : ! shouldDisableEditing
 				}
 				suppressContentEditableWarning
 				className={ clsx(

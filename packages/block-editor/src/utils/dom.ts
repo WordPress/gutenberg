@@ -55,15 +55,18 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	// While the wrapper is the editing host, the editable element within the
-	// selected block is editable by inheritance (`contenteditable="inherit"`),
-	// not an editing host of its own, so accept any explicit editable marker
-	// except an opt-out.
-	const editable = element?.closest(
-		'[contenteditable]:not([contenteditable="false"])'
-	);
+	// While the wrapper is the editing host, the selected block's editable
+	// is editable by inheritance without a contenteditable attribute of its
+	// own (Gecko treats any explicit value other than true/false as
+	// non-editable), so rich text elements are matched by class.
+	const editable = element?.closest( '[contenteditable], .rich-text' );
 
-	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
+	if (
+		! editable ||
+		editable === root ||
+		! ( editable as HTMLElement ).isContentEditable ||
+		! editable.contains( focusNode )
+	) {
 		return;
 	}
 
