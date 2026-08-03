@@ -121,7 +121,7 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * Exposes the container through the dynamic
 	 * `get_entity_view_config_{$kind}_{$name}` filter (with the dynamic portions
-	 * lowercased, so that core and third parties can provide the configuration for a specific entity,
+	 * lowercased), so that core and third parties can provide the configuration for a specific entity,
 	 * then reconciles the filtered container back into a plain configuration array,
 	 * limited to the documented configuration keys.
 	 *
