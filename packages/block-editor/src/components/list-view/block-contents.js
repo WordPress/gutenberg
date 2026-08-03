@@ -27,8 +27,11 @@ const ListViewBlockContents = forwardRef(
 		ref
 	) => {
 		const { clientId } = block;
-		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
-			useListViewContext();
+		const {
+			AdditionalBlockContent,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
+		} = useListViewContext();
 
 		// Only include all selected blocks if the currently clicked on block
 		// is one of the selected blocks. This ensures that if a user attempts
@@ -43,8 +46,8 @@ const ListViewBlockContents = forwardRef(
 				{ AdditionalBlockContent && (
 					<AdditionalBlockContent
 						block={ block }
-						insertedBlock={ insertedBlock }
-						setInsertedBlock={ setInsertedBlock }
+						insertedBlockClientId={ insertedBlockClientId }
+						setInsertedBlockClientId={ setInsertedBlockClientId }
 					/>
 				) }
 				<BlockDraggable

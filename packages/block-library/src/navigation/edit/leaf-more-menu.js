@@ -37,7 +37,7 @@ function AddSubmenuItem( {
 	onClose,
 	expandedState,
 	expand,
-	setInsertedBlock,
+	setInsertedBlockClientId,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -90,7 +90,7 @@ function AddSubmenuItem( {
 				// This call sets the local List View state for the "last inserted block".
 				// This is required for the Nav Block to determine whether or not to display
 				// the Link UI for this new block.
-				setInsertedBlock( newLink );
+				setInsertedBlockClientId( newLink.clientId );
 
 				if ( ! expandedState[ block.clientId ] ) {
 					expand( block.clientId );
@@ -201,7 +201,9 @@ export default function LeafMoreMenu( props ) {
 							onClose={ onClose }
 							expandedState={ props.expandedState }
 							expand={ props.expand }
-							setInsertedBlock={ props.setInsertedBlock }
+							setInsertedBlockClientId={
+								props.setInsertedBlockClientId
+							}
 						/>
 						{ canDuplicate && (
 							<MenuItem

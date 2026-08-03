@@ -175,7 +175,7 @@ function ListViewBlock( {
 		BlockSettingsMenu,
 		listViewInstanceId,
 		expandedState,
-		setInsertedBlock,
+		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
@@ -742,7 +742,9 @@ function ListViewBlock( {
 							disableOpenOnArrowDown
 							expand={ expand }
 							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
