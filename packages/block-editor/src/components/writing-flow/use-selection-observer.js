@@ -207,15 +207,19 @@ export default function useSelectionObserver() {
 						} else if (
 							// The selected block's editable is an inert part
 							// of the host (no contenteditable attribute):
-							// when it held focus and turned inert, the
-							// browser dropped focus, leaving the wrapper as
-							// the default activeElement without actually
-							// focusing it. The collapsed selection is in the
+							// clicking it, or it turning inert while it held
+							// focus, drops focus onto the document's default
+							// target without actually focusing it. That
+							// target is the wrapper itself in an iframed
+							// editor (the wrapper is the body) and the page
+							// body in an inline editor (e.g. the widgets
+							// screen). The collapsed selection is in the
 							// selected block here, so reclaim focus for the
 							// host.
-							activeElement === node &&
+							( activeElement === node ||
+								activeElement === ownerDocument.body ) &&
 							ownerDocument.hasFocus() &&
-							! node.matches( ':focus' )
+							! activeElement.matches( ':focus' )
 						) {
 							node.focus( { preventScroll: true } );
 						}
