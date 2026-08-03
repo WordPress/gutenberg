@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
 -   `cancelItem` no longer awaits the best-effort worker cancellation calls. A busy vips worker is synchronously blocked inside a wasm call and cannot answer the cancellation RPC until every operation already queued in the worker finishes, which for a large animated GIF left cancelled items stuck in the queue - and the parent attachment unfinalized - for minutes ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
 -   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 

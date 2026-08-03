@@ -129,6 +129,14 @@ if ( typeof window !== 'undefined' ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
 	}
 
+	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
+	if ( ! global.CSS ) {
+		global.CSS = {};
+	}
+	if ( ! global.CSS.supports ) {
+		global.CSS.supports = jest.fn( () => false );
+	}
+
 	/**
 	 * The following mock is for block integration tests that might render
 	 * components leveraging DOMRect. For example, the Cover block which now renders
