@@ -23,12 +23,15 @@ export interface GuidelineRow {
 }
 
 /**
- * The minimal block-type shape the Guidelines UI reads from the block registry.
+ * The minimal block-type shape the Guidelines UI reads from the
+ * `/wp/v2/block-types` REST endpoint. `icon` is the dashicon slug the server
+ * stores (often empty for Core blocks, whose SVG icons live in the editor
+ * bundle); the list falls back to a generic block icon when it is absent.
  */
 export interface ContentBlock {
 	name: string;
 	title: string;
-	icon?: { src?: unknown };
+	icon?: string;
 }
 
 /**
