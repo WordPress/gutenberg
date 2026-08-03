@@ -1,4 +1,5 @@
 import { AdminBlockRenderer } from '../admin-block-renderer';
+import type { RenderBlocks } from '../admin-block-renderer';
 import { getLazyWidgetComponent } from '../../tools/get-lazy-widget-component';
 import type { ResolveWidgetModule, WidgetType } from '../../types';
 
@@ -7,6 +8,9 @@ interface WidgetRenderProps< Item = unknown > {
 	attributes?: Item;
 	setAttributes?: ( next: Partial< Item > ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+
+	/* Forwarded to server-defined types for blocks with no admin component. */
+	renderBlocks?: RenderBlocks;
 }
 
 /*
@@ -24,12 +28,14 @@ export function WidgetRender< Item = unknown >( {
 	attributes,
 	setAttributes,
 	resolveWidgetModule,
+	renderBlocks,
 }: WidgetRenderProps< Item > ) {
 	if ( widgetType.origin && widgetType.origin !== 'built-in' ) {
 		return (
 			<AdminBlockRenderer
 				content={ widgetType.content ?? '' }
 				attributes={ ( attributes ?? {} ) as Record< string, unknown > }
+				renderBlocks={ renderBlocks }
 			/>
 		);
 	}

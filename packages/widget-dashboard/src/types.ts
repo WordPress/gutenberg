@@ -14,6 +14,7 @@ import type {
 import type {
 	WidgetName,
 	WidgetType,
+	RenderBlocks,
 	ResolveWidgetModule,
 } from '@wordpress/widget-primitives';
 
@@ -239,6 +240,12 @@ export interface WidgetDashboardProps {
 	 * remote-URL loading.
 	 */
 	resolveWidgetModule?: ResolveWidgetModule;
+
+	/**
+	 * Resolves block markup to HTML, for blocks inside a server-defined widget
+	 * type that have no admin component. Without it those blocks render nothing.
+	 */
+	renderBlocks?: RenderBlocks;
 
 	/**
 	 * Grid model configuration. See `WidgetGridSettings` for the shape.

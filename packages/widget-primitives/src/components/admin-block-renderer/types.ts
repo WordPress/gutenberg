@@ -51,6 +51,18 @@ export interface AdminBlockSpec {
 }
 
 /**
+ * Resolves block markup to rendered HTML, supplied by the caller.
+ *
+ * Blocks with no admin component render through `do_blocks()`, which is PHP,
+ * so this package declares the call and never makes it. `attributes` travels
+ * with the markup so bindings resolve against the instance.
+ */
+export type RenderBlocks = (
+	markup: string,
+	attributes: Record< string, unknown >
+) => Promise< string >;
+
+/**
  * Props the renderer passes to every admin block component produced by the
  * factory.
  */

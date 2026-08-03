@@ -8,6 +8,7 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../dataviews" },
-		{ "path": "../element/tsconfig.build.json" }
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" }
 	]
 }

@@ -10,6 +10,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import type {
+	RenderBlocks,
 	ResolveWidgetModule,
 	WidgetType,
 } from '@wordpress/widget-primitives';
@@ -113,6 +114,7 @@ interface InternalDashboardContextValue {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+	renderBlocks?: RenderBlocks;
 }
 
 interface CommitOptions {
@@ -160,6 +162,9 @@ interface ProviderProps {
 	 */
 	resolveWidgetModule?: ResolveWidgetModule;
 
+	/* Resolves block markup to HTML for server-defined widget types. */
+	renderBlocks?: RenderBlocks;
+
 	gridSettings?: WidgetGridSettings;
 
 	children: ReactNode;
@@ -186,6 +191,7 @@ export function WidgetDashboardProvider( {
 	editMode = false,
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
+	renderBlocks,
 	gridSettings: committedGridSettings = DEFAULT_GRID,
 	children,
 }: ProviderProps ): React.ReactNode {
@@ -290,6 +296,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			renderBlocks,
 		} ),
 		[
 			widgetTypes,
@@ -305,6 +312,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			renderBlocks,
 		]
 	);
 

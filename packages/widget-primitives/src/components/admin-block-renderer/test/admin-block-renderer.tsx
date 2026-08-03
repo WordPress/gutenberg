@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -57,12 +57,50 @@ describe( 'AdminBlockRenderer', () => {
 		expect( screen.getByTestId( 'box' ) ).toHaveTextContent( 'inner' );
 	} );
 
-	it( 'renders nothing for a block with no registered admin component', () => {
-		// The SSR fallback for unregistered blocks lands in step 10.
+	it( 'renders nothing for an unregistered block with no renderBlocks', () => {
 		const { container } = render(
 			<AdminBlockRenderer content="<!-- wp:core/paragraph --><p>x</p><!-- /wp:core/paragraph -->" />
 		);
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'sends an unregistered block to the server as serialized markup', async () => {
+		const renderBlocks = jest.fn().mockResolvedValue( '<p>x</p>' );
+
+		render(
+			<AdminBlockRenderer
+				content="<!-- wp:core/paragraph --><p>x</p><!-- /wp:core/paragraph -->"
+				renderBlocks={ renderBlocks }
+			/>
+		);
+
+		await waitFor( () =>
+			expect( renderBlocks ).toHaveBeenCalledWith(
+				'<!-- wp:paragraph --><p>x</p><!-- /wp:paragraph -->',
+				{}
+			)
+		);
+	} );
+
+	it( 'mixes admin blocks and server-rendered blocks, in order', async () => {
+		registerAdminBlock( {
+			name: 'test/first',
+			component: Label,
+			attributes: { label: {} },
+		} );
+
+		const { container } = render(
+			<AdminBlockRenderer
+				content={
+					'<!-- wp:test/first {"label":"admin"} /-->\n' +
+					'<!-- wp:core/paragraph --><p>server</p><!-- /wp:core/paragraph -->'
+				}
+				renderBlocks={ jest.fn().mockResolvedValue( '<p>server</p>' ) }
+			/>
+		);
+
+		expect( await screen.findByText( 'server' ) ).toBeVisible();
+		expect( container ).toHaveTextContent( /^adminserver$/ );
 	} );
 } );

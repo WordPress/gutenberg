@@ -8,20 +8,29 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { getAdminBlock } from './registry';
+import { serializeNode } from './serialize-node';
+import { SsrFallbackBlock } from './ssr-fallback-block';
+import type { RenderBlocks } from './types';
 
 type ParsedNode = ReturnType< typeof parse >[ number ];
 
 interface AdminBlockNodesProps {
 	nodes: ParsedNode[];
+	attributes: Record< string, unknown >;
+	renderBlocks?: RenderBlocks;
 }
 
 /*
  * Walks parsed blocks in order, rendering each as its registered admin (React)
  * component and recursing into container blocks so the whole composition is one
- * React tree. A block with no registered admin component renders nothing here;
- * step 10 adds the per-block SSR fallback for those.
+ * React tree. A block with no registered admin component falls back to server
+ * rendering, so a composition can mix both freely.
  */
-function AdminBlockNodes( { nodes }: AdminBlockNodesProps ) {
+function AdminBlockNodes( {
+	nodes,
+	attributes,
+	renderBlocks,
+}: AdminBlockNodesProps ) {
 	return (
 		<>
 			{ nodes.map( ( node, index ) => {
@@ -37,13 +46,25 @@ function AdminBlockNodes( { nodes }: AdminBlockNodesProps ) {
 					? getAdminBlock( node.blockName )
 					: undefined;
 
+				/* Serializing the whole node renders its subtree in one pass. */
 				if ( ! entry ) {
-					return null;
+					return (
+						<SsrFallbackBlock
+							key={ index }
+							markup={ serializeNode( node ) }
+							attributes={ attributes }
+							renderBlocks={ renderBlocks }
+						/>
+					);
 				}
 
 				const { component: AdminComponent, spec } = entry;
 				const children = spec.supportsInnerBlocks ? (
-					<AdminBlockNodes nodes={ node.innerBlocks } />
+					<AdminBlockNodes
+						nodes={ node.innerBlocks }
+						attributes={ attributes }
+						renderBlocks={ renderBlocks }
+					/>
 				) : undefined;
 
 				return (
@@ -63,22 +84,35 @@ interface AdminBlockRendererProps {
 	/* Composition (raw block markup) for the widget definition. */
 	content?: string | null;
 
-	/*
-	 * Per-instance attribute values. Consumed by later steps (seeded as block
-	 * context so read-bindings resolve per instance); accepted here so the
-	 * render contract is stable.
-	 */
+	/* Per-instance values, forwarded to server-rendered blocks. */
 	attributes?: Record< string, unknown >;
+
+	/* Resolution for blocks with no admin component; without it they render nothing. */
+	renderBlocks?: RenderBlocks;
 }
 
 /*
- * Renders a server-defined widget definition's composition as a single React
- * tree. Each block becomes its registered admin (React) component, in parsed
- * order. This is the render path for every server-defined widget type. The
- * parse is memoized by `content`.
+ * Renders a widget definition's composition as one React tree: each block in
+ * parsed order, as its registered admin component or as server-rendered HTML.
  */
-export function AdminBlockRenderer( { content }: AdminBlockRendererProps ) {
+export function AdminBlockRenderer( {
+	content,
+	attributes,
+	renderBlocks,
+}: AdminBlockRendererProps ) {
 	const nodes = useMemo( () => parse( content ?? '' ), [ content ] );
 
-	return <AdminBlockNodes nodes={ nodes } />;
+	/* Stable identity: the fallback's effect depends on this object. */
+	const instanceAttributes = useMemo(
+		() => attributes ?? {},
+		[ attributes ]
+	);
+
+	return (
+		<AdminBlockNodes
+			nodes={ nodes }
+			attributes={ instanceAttributes }
+			renderBlocks={ renderBlocks }
+		/>
+	);
 }

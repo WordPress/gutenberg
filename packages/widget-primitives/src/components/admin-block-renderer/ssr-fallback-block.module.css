@@ -1,0 +1,7 @@
+/*
+ * Generates no box, so the server-rendered markup resolves its sizing against
+ * the host's content area rather than against this wrapper.
+ */
+.root {
+	display: contents;
+}
