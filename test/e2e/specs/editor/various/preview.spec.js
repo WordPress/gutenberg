@@ -3,9 +3,20 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Internal dependencies
+ */
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
+
 test.use( {
 	previewUtils: async ( { page }, use ) => {
 		await use( new PreviewUtils( { page } ) );
+	},
+	enableCollaboration: async ( { requestUtils }, use ) => {
+		await use( () => setCollaboration( requestUtils, true ) );
+		await setCollaboration( requestUtils, false );
 	},
 } );
 
@@ -147,9 +158,19 @@ test.describe( 'Preview', () => {
 	// See: https://github.com/WordPress/gutenberg/issues/33758.
 	test( 'should not use stale autosave data after reverting title', async ( {
 		editor,
+		enableCollaboration,
 		page,
 		previewUtils,
 	} ) => {
+		await enableCollaboration();
+		await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'wp-sync' ) &&
+					response.status() === 200
+			),
+			page.reload(),
+		] );
 		const editorPage = page;
 
 		// Create and publish a post.

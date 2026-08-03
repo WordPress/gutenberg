@@ -568,6 +568,7 @@ svg {
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;
+	// One row. Spacers standing in for several rows set their height inline.
 	height: 32px;
 }
 
