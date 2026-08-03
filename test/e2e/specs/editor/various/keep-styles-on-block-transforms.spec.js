@@ -35,7 +35,7 @@ test.describe( 'Keep styles on block transforms', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Heading 2' } )
 			.click();
-		await page.click( 'role=menuitem[name="Paragraph"i]' );
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -64,9 +64,11 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.keyboard.type( 'Line 3 to be made large' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
-		await page.click( 'role=radio[name="Large"i]' );
-		await page.click( 'role=button[name="Multiple blocks selected"i]' );
-		await page.click( 'role=menuitem[name="Heading"i]' );
+		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Multiple blocks selected' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Heading' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -93,10 +95,10 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
-		await page.click( 'role=radio[name="Large"i]' );
+		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
 		await editor.showBlockToolbar();
-		await page.click( 'role=button[name="Paragraph"i]' );
-		await page.click( 'role=menuitem[name="Group"i]' );
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

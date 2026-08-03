@@ -241,6 +241,26 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 }
 
 /**
+ * Constrains a widget icon reference to a registered icon name
+ * (`collection/icon-name`). Anything else drops silently, so authoring
+ * forms not accepted yet degrade to no icon rather than warn.
+ *
+ * @param string|null $icon Icon reference from the build manifest.
+ * @return string|null The icon name, or null when the shape does not match.
+ */
+function gutenberg_sanitize_widget_icon( $icon ) {
+	if ( ! is_string( $icon ) || '' === $icon ) {
+		return null;
+	}
+
+	if ( ! preg_match( '#^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$#', $icon ) ) {
+		return null;
+	}
+
+	return $icon;
+}
+
+/**
  * Hydrates the widget type registry from the build manifest.
  *
  * Iterates the widgets discovered by the build pipeline (via
@@ -273,6 +293,7 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
+				'icon'          => gutenberg_sanitize_widget_icon( $widget['icon'] ?? null ),
 				'actions'       => gutenberg_sanitize_widget_actions(
 					$widget['actions'] ?? null,
 					$widget['dir_name'] ?? ''
