@@ -16,7 +16,9 @@ import '@wordpress/format-library';
 // Reason: Styles are injected dynamically.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import styles from './style.lazy.scss?inline';
-import { editorStyles } from '../editor-styles';
+import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
+
+const contentStyles = [ ...blockLibraryContentStyles, ...editorStyles ];
 
 export default function EditorFullPage() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -50,7 +52,7 @@ export default function EditorFullPage() {
 					<BlockInspector />
 				</div>
 				<div className="playground__content">
-					<BlockCanvas height="100%" styles={ editorStyles } />
+					<BlockCanvas height="100%" styles={ contentStyles } />
 				</div>
 			</BlockEditorProvider>
 		</div>
