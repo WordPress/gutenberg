@@ -33,7 +33,7 @@ const { Badge: WCBadge } = unlock( componentsPrivateApis );
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		clientId,
 		onClick,
 		onContextMenu,
 		onMouseDown,

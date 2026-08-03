@@ -19,7 +19,6 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 ];
 
 export function NavigationLinkUI( {
-	block,
 	insertedBlockClientId,
 	setInsertedBlockClientId,
 } ) {
@@ -41,10 +40,8 @@ export function NavigationLinkUI( {
 		[ insertedBlockClientId ]
 	);
 
-	const supportsLinkControls =
+	const showLinkControls =
 		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
-	const blockWasJustInserted = insertedBlockClientId === block.clientId;
-	const showLinkControls = supportsLinkControls && blockWasJustInserted;
 
 	// Get binding utilities for the inserted block
 	const { createBinding, clearBinding } = useEntityBinding( {

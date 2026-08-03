@@ -15,7 +15,7 @@ const ListViewBlockContents = forwardRef(
 		{
 			onClick,
 			onToggleExpanded,
-			block,
+			clientId,
 			isSelected,
 			position,
 			siblingBlockCount,
@@ -26,7 +26,6 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { clientId } = block;
 		const {
 			AdditionalBlockContent,
 			insertedBlockClientId,
@@ -41,11 +40,15 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		// The additional content is only relevant to the row of the block that
+		// was just inserted, so the other rows skip mounting it entirely.
+		const showAdditionalBlockContent =
+			!! AdditionalBlockContent && insertedBlockClientId === clientId;
+
 		return (
 			<>
-				{ AdditionalBlockContent && (
+				{ showAdditionalBlockContent && (
 					<AdditionalBlockContent
-						block={ block }
 						insertedBlockClientId={ insertedBlockClientId }
 						setInsertedBlockClientId={ setInsertedBlockClientId }
 					/>
@@ -59,7 +62,7 @@ const ListViewBlockContents = forwardRef(
 						<ListViewBlockSelectButton
 							ref={ ref }
 							className="block-editor-list-view-block-contents"
-							block={ block }
+							clientId={ clientId }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
