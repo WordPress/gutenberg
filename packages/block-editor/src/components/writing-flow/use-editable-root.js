@@ -64,10 +64,10 @@ export default function useEditableRoot() {
 				activeElement !== node &&
 				activeElement?.isContentEditable &&
 				node.contains( activeElement ) &&
-				getBlockClientId( activeElement ) ===
-					getSelectedBlockClientId() &&
 				selection.anchorNode &&
-				activeElement.contains( selection.anchorNode )
+				activeElement.contains( selection.anchorNode ) &&
+				getBlockClientId( selection.anchorNode ) ===
+					getSelectedBlockClientId()
 			) {
 				node.focus();
 			} else if (

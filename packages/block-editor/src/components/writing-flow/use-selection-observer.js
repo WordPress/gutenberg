@@ -191,17 +191,20 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons) or editables outside the block (e.g.
-						// the post title). The rich text instance owning the
-						// selection syncs it to the store itself.
+						// across browsers). The focused element may also be an
+						// ancestor block wrapper: Firefox focuses the nearest
+						// focusable ancestor when the click lands on an inert
+						// editable. The caret says where the user is, so any
+						// focused element within the wrapper that contains the
+						// caret hands focus to the host. Focus is never stolen
+						// from UI elements (they do not contain the caret) or
+						// editables outside the block (e.g. the post title).
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							getBlockClientId( activeElement ) ===
-								collapsedClientId
+							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
 						} else if (
