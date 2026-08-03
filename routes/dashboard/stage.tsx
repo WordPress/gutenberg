@@ -14,6 +14,7 @@ import {
 	type WidgetModuleRecord,
 } from '@wordpress/widget-primitives';
 import { registerDashboardFieldTypes } from './field-types';
+import { renderBlocks } from './wordpress-seams';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 
 registerDashboardFieldTypes();
@@ -67,6 +68,7 @@ function Dashboard() {
 			gridSettings={ gridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
+			renderBlocks={ renderBlocks }
 		>
 			<Page
 				breadcrumbs={
