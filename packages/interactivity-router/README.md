@@ -151,6 +151,56 @@ prefetch( url: string, options: PrefetchOptions = {} )
 
 `state.url` is a reactive property synchronized with the current URL.
 
+`state.navigation.loading` is a reactive boolean that is `true` from the moment a client-side navigation starts until its render has completed, and `false` otherwise. It's meant to be used with `watch()` or `data-wp-router-region`-adjacent directives such as `data-wp-watch` or `data-wp-class`, for instance to show a loading indicator while a Query Loop navigates between pages:
+
+```js
+store( 'my-namespace/myblock', {
+	callbacks: {
+		toggleLoadingIndicator: () => {
+			const { state } = store( 'core/router' );
+			// Show/hide a spinner, toggle a class, etc.
+			document.body.classList.toggle( 'is-navigating', state.navigation.loading );
+		},
+	},
+} );
+```
+
+<div class="callout callout-alert">
+    <code>state.navigation.hasStarted</code> and <code>state.navigation.hasFinished</code> are deprecated. They were never designed to be a public API and will stop working in WordPress 7.1. Use <code>state.navigation.loading</code> instead.
+</div>
+
+### Reacting to navigation from outside the Interactivity API
+
+Not every script on the page is built on the Interactivity API. Consent managers (e.g., OneTrust), tag managers (e.g., Google Tag Manager), analytics snippets, and chat widgets are usually plain `<script>` tags dropped in by a vendor, and they have no way to call `watch()` or import `@wordpress/interactivity`.
+
+For these scripts, the router dispatches native DOM `CustomEvent`s on `window` that can be listened to with a plain `window.addEventListener()` call, no imports required. These are dispatched at the exact same time `state.navigation.loading` flips, so the state and the events can never disagree:
+
+-   `wp-router-navigation-start`: dispatched right before a client-side navigation begins (before the page is fetched or rendered). `event.detail` contains `{ url }`.
+-   `wp-router-navigation-end`: dispatched once a client-side navigation has finished, after the DOM has been patched, `document.title` has been updated, and the browser history has been updated. `event.detail` contains `{ url, referrer, title }`, where `referrer` is the URL of the page the user navigated away from.
+
+Both events fire for regular navigations (e.g., clicking a link) as well as for navigations restored from the cache when using the browser's back/forward buttons.
+
+```js
+window.addEventListener( 'wp-router-navigation-start', ( event ) => {
+	console.log( 'Navigating to', event.detail.url );
+} );
+
+window.addEventListener( 'wp-router-navigation-end', ( event ) => {
+	const { url, referrer, title } = event.detail;
+
+	// Re-run a script that only works after the DOM has settled and the
+	// title has been updated, e.g. reload a consent banner or push a
+	// virtual pageview to a tag manager's data layer.
+	window.dataLayer = window.dataLayer || [];
+	window.dataLayer.push( {
+		event: 'virtual_pageview',
+		page_path: url,
+		page_referrer: referrer,
+		page_title: title,
+	} );
+} );
+```
+
 ## Installation
 
 Install the module:
