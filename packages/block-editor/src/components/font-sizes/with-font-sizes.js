@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -66,104 +66,14 @@ export default ( ...fontSizeNames ) => {
 				'withFontSizes'
 			),
 			( WrappedComponent ) => {
-				return class WithFontSizes extends Component {
-					constructor( props ) {
-						super( props );
+				return function WithFontSizes( props ) {
+					const { attributes, fontSizes, setAttributes } = props;
 
-						this.setters = this.createSetters();
-
-						this.state = {};
-					}
-
-					createSetters() {
-						return Object.entries( fontSizeAttributeNames ).reduce(
-							(
-								settersAccumulator,
-								[
-									fontSizeAttributeName,
-									customFontSizeAttributeName,
-								]
-							) => {
-								const upperFirstFontSizeAttributeName =
-									upperFirst( fontSizeAttributeName );
-								settersAccumulator[
-									`set${ upperFirstFontSizeAttributeName }`
-								] = this.createSetFontSize(
-									fontSizeAttributeName,
-									customFontSizeAttributeName
-								);
-								return settersAccumulator;
-							},
-							{}
-						);
-					}
-
-					createSetFontSize(
-						fontSizeAttributeName,
-						customFontSizeAttributeName
-					) {
-						return ( fontSizeValue ) => {
-							const fontSizeObject = this.props.fontSizes?.find(
-								( { size } ) => size === Number( fontSizeValue )
-							);
-							this.props.setAttributes( {
-								[ fontSizeAttributeName ]:
-									fontSizeObject && fontSizeObject.slug
-										? fontSizeObject.slug
-										: undefined,
-								[ customFontSizeAttributeName ]:
-									fontSizeObject && fontSizeObject.slug
-										? undefined
-										: fontSizeValue,
-							} );
-						};
-					}
-
-					static getDerivedStateFromProps(
-						{ attributes, fontSizes },
-						previousState
-					) {
-						const didAttributesChange = (
-							customFontSizeAttributeName,
-							fontSizeAttributeName
-						) => {
-							if ( previousState[ fontSizeAttributeName ] ) {
-								// If new font size is name compare with the previous slug.
-								if ( attributes[ fontSizeAttributeName ] ) {
-									return (
-										attributes[ fontSizeAttributeName ] !==
-										previousState[ fontSizeAttributeName ]
-											.slug
-									);
-								}
-								// If font size is not named, update when the font size value changes.
-								return (
-									previousState[ fontSizeAttributeName ]
-										.size !==
-									attributes[ customFontSizeAttributeName ]
-								);
-							}
-							// In this case we need to build the font size object.
-							return true;
-						};
-
-						if (
-							! Object.values( fontSizeAttributeNames ).some(
-								didAttributesChange
-							)
-						) {
-							return null;
-						}
-
-						const newState = Object.entries(
-							fontSizeAttributeNames
-						)
-							.filter( ( [ key, value ] ) =>
-								didAttributesChange( value, key )
-							)
-							.reduce(
+					const fontSizeValues = useMemo(
+						() =>
+							Object.entries( fontSizeAttributeNames ).reduce(
 								(
-									newStateAccumulator,
+									accumulator,
 									[
 										fontSizeAttributeName,
 										customFontSizeAttributeName,
@@ -178,37 +88,64 @@ export default ( ...fontSizeNames ) => {
 											customFontSizeAttributeName
 										]
 									);
-									newStateAccumulator[
-										fontSizeAttributeName
-									] = {
+									accumulator[ fontSizeAttributeName ] = {
 										...fontSizeObject,
 										class: getFontSizeClass(
 											fontSizeAttributeValue
 										),
 									};
-									return newStateAccumulator;
+									return accumulator;
 								},
 								{}
-							);
+							),
+						[ attributes, fontSizes ]
+					);
 
-						return {
-							...previousState,
-							...newState,
-						};
-					}
+					const setters = useMemo(
+						() =>
+							Object.entries( fontSizeAttributeNames ).reduce(
+								(
+									accumulator,
+									[
+										fontSizeAttributeName,
+										customFontSizeAttributeName,
+									]
+								) => {
+									const upperName = upperFirst(
+										fontSizeAttributeName
+									);
+									accumulator[ `set${ upperName }` ] = (
+										fontSizeValue
+									) => {
+										const fontSizeObject = fontSizes?.find(
+											( { size } ) =>
+												size === Number( fontSizeValue )
+										);
+										setAttributes( {
+											[ fontSizeAttributeName ]:
+												fontSizeObject?.slug ||
+												undefined,
+											[ customFontSizeAttributeName ]:
+												fontSizeObject?.slug
+													? undefined
+													: fontSizeValue,
+										} );
+									};
+									return accumulator;
+								},
+								{}
+							),
+						[ fontSizes, setAttributes ]
+					);
 
-					render() {
-						return (
-							<WrappedComponent
-								{ ...{
-									...this.props,
-									fontSizes: undefined,
-									...this.state,
-									...this.setters,
-								} }
-							/>
-						);
-					}
+					return (
+						<WrappedComponent
+							{ ...props }
+							fontSizes={ undefined }
+							{ ...fontSizeValues }
+							{ ...setters }
+						/>
+					);
 				};
 			},
 		] ),
