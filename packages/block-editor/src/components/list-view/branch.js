@@ -123,7 +123,9 @@ function ListViewBranch( props ) {
 	let placeholderRows = 0;
 	let placeholderKey;
 
-	const flushPlaceholders = () => {
+	// Adds the pending placeholder row, if there is one. Call before
+	// adding a real row.
+	const pushPlaceholderRow = () => {
 		if ( ! placeholderRows ) {
 			return;
 		}
@@ -201,7 +203,7 @@ function ListViewBranch( props ) {
 			}
 		}
 
-		flushPlaceholders();
+		pushPlaceholderRow();
 
 		// Determine the displacement of the block while dragging. This
 		// works out whether the current block should be displaced up or
@@ -260,7 +262,7 @@ function ListViewBranch( props ) {
 		);
 	} );
 
-	flushPlaceholders();
+	pushPlaceholderRow();
 
 	return (
 		<>
