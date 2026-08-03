@@ -73,7 +73,9 @@ export function SsrFallbackBlock( {
 		return null;
 	}
 
-	/* The class lands on RawHTML's own div: one box, not two, so a composition
-	   can size itself against the host's content area. */
+	/*
+	 * The class lands on RawHTML's own div: one box, not two, so a composition
+	 * can size itself against the host's content area.
+	 */
 	return <RawHTML className={ styles.root }>{ rendered }</RawHTML>;
 }
