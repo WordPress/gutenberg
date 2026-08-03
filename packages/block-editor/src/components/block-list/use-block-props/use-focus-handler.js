@@ -10,7 +10,7 @@ import {
 /**
  * Internal dependencies
  */
-import { isInsideRootBlock } from '../../../utils/dom';
+import { isInsideRootBlock, getBlockClientId } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -81,6 +81,23 @@ export function useFocusHandler( clientId ) {
 				// builds the multi-selection from the anchor it recorded at
 				// mousedown, so this dispatch overwriting the store anchor
 				// is harmless.
+				// A block wrapper can receive focus incidentally: a click on
+				// an editable that is an inert part of the editing host (not
+				// focusable itself) moves focus to the nearest focusable
+				// ancestor. The caret, not the wrapper, says which block the
+				// user is in: leave the selection alone when the selection
+				// anchor sits within this block but belongs to a descendant
+				// block.
+				const { anchorNode } =
+					node.ownerDocument.defaultView.getSelection();
+				if (
+					anchorNode &&
+					node.contains( anchorNode ) &&
+					getBlockClientId( anchorNode ) !== clientId
+				) {
+					return;
+				}
+
 				if ( event.target.isContentEditable ) {
 					selectBlock( clientId, null );
 					return;
