@@ -65,7 +65,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const page = Number( queryParams?.page ?? 1 );
 	const search = queryParams?.search ?? '';
 
-	const { view, baseView } = useMemo(
+	const view = useMemo(
 		() =>
 			resolveView( {
 				defaultView,
@@ -103,12 +103,12 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				onChangeQueryParams( newQueryParams );
 			}
 
-			const modifications = getUserModifications(
-				newView,
-				baseView,
+			const modifications = getUserModifications( newView, {
+				defaultView,
+				defaultLayouts,
 				activeViewOverrides,
-				persistedView
-			);
+				persistedView,
+			} );
 			if ( ! dequal( modifications, persistedView ) ) {
 				// `undefined` clears the preference: the user reverted every
 				// property they had modified.
@@ -119,7 +119,8 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			onChangeQueryParams,
 			page,
 			search,
-			baseView,
+			defaultView,
+			defaultLayouts,
 			activeViewOverrides,
 			persistedView,
 			set,

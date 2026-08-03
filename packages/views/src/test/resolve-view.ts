@@ -30,7 +30,7 @@ describe( 'locked filters', () => {
 	const activeViewOverrides = { filters: [ LOCKED ] };
 
 	it( 'should pin the locked filters an override provides', () => {
-		const { view } = resolveView( {
+		const view = resolveView( {
 			defaultView,
 			activeViewOverrides,
 		} );
@@ -38,7 +38,7 @@ describe( 'locked filters', () => {
 	} );
 
 	it( 'should keep them pinned over the persisted filters', () => {
-		const { view } = resolveView( {
+		const view = resolveView( {
 			defaultView,
 			activeViewOverrides,
 			persistedView: { filters: [ STATUS ] },
@@ -47,25 +47,24 @@ describe( 'locked filters', () => {
 	} );
 
 	it( 'should not persist them alongside the filters the user added', () => {
-		const { view, baseView } = resolveView( {
+		const view = resolveView( {
 			defaultView,
 			activeViewOverrides,
 		} );
 		const modifications = getUserModifications(
 			{ ...view, filters: [ LOCKED, STATUS ] } as View,
-			baseView,
-			activeViewOverrides
+			{ defaultView, activeViewOverrides }
 		);
 		expect( modifications ).toEqual( { filters: [ STATUS ] } );
 	} );
 
 	it( 'should not count them as a modification on their own', () => {
-		const { view, baseView } = resolveView( {
+		const view = resolveView( {
 			defaultView,
 			activeViewOverrides,
 		} );
 		expect(
-			getUserModifications( view, baseView, activeViewOverrides )
+			getUserModifications( view, { defaultView, activeViewOverrides } )
 		).toBeUndefined();
 	} );
 } );

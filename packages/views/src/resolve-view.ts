@@ -144,7 +144,7 @@ function applyLockedFilters(
 	return { ...view, filters: [ ...locked, ...rest ] };
 }
 
-interface ResolveViewArgs {
+interface ViewLayers {
 	defaultView?: View;
 	defaultLayouts?: SupportedLayouts;
 	activeViewOverrides?: ViewOverrides;
@@ -153,8 +153,37 @@ interface ResolveViewArgs {
 	 * properties they actually changed.
 	 */
 	persistedView?: ViewOverrides;
+}
+
+interface ResolveViewArgs extends ViewLayers {
 	page?: number;
 	search?: string;
+}
+
+/**
+ * Resolves the layers below the user's modifications — what a modification has
+ * to differ from to count as one. The layout type selects which entry of
+ * `defaultLayouts` applies, so the base only makes sense relative to a type.
+ *
+ * @param layers        The layers to resolve.
+ * @param effectiveType The layout type to resolve the base at.
+ * @return The resolved base view.
+ */
+function resolveBaseView(
+	layers: ViewLayers,
+	effectiveType: View[ 'type' ] | undefined
+): PlainObject {
+	const { defaultView, defaultLayouts, activeViewOverrides } = layers;
+	const layoutDefaults =
+		defaultLayouts?.[ effectiveType as keyof SupportedLayouts ];
+	return applyLockedFilters(
+		[ layoutDefaults, activeViewOverrides ].reduce< PlainObject >(
+			( lower, upper ) =>
+				mergeLayer( lower, withoutQueryParams( upper ) ),
+			withoutQueryParams( defaultView )
+		),
+		activeViewOverrides
+	);
 }
 
 /**
@@ -167,38 +196,17 @@ interface ResolveViewArgs {
  * 5. the URL query params (`page` and `search` only)
  *
  * @param args See `ResolveViewArgs`.
- * @return The resolved `view`, plus the `baseView` the layers below the user's
- *         modifications resolve to — what a modification has to differ from to
- *         count as one.
+ * @return The resolved `view`.
  */
-export function resolveView( args: ResolveViewArgs ): {
-	view: View;
-	baseView: View;
-} {
-	const {
-		defaultView,
-		defaultLayouts,
-		activeViewOverrides,
-		persistedView,
-		page,
-		search,
-	} = args;
+export function resolveView( args: ResolveViewArgs ): View {
+	const { defaultView, activeViewOverrides, persistedView, page, search } =
+		args;
 
 	// Resolve the effective layout type first: it selects which entry of
 	// `defaultLayouts` applies, and the layers above the layouts may change it.
 	const effectiveType =
 		persistedView?.type ?? activeViewOverrides?.type ?? defaultView?.type;
-	const layoutDefaults =
-		defaultLayouts?.[ effectiveType as keyof SupportedLayouts ];
-
-	const baseView = applyLockedFilters(
-		[ layoutDefaults, activeViewOverrides ].reduce< PlainObject >(
-			( lower, upper ) =>
-				mergeLayer( lower, withoutQueryParams( upper ) ),
-			withoutQueryParams( defaultView )
-		),
-		activeViewOverrides
-	);
+	const baseView = resolveBaseView( args, effectiveType );
 
 	const view = {
 		...applyLockedFilters(
@@ -211,10 +219,7 @@ export function resolveView( args: ResolveViewArgs ): {
 
 	// The layers are resolved as plain objects: `View` requires a `type`, which
 	// only the layers taken together are guaranteed to provide.
-	return {
-		view: view as unknown as View,
-		baseView: baseView as unknown as View,
-	};
+	return view as unknown as View;
 }
 
 /**
@@ -227,18 +232,25 @@ export function resolveView( args: ResolveViewArgs ): {
  * are carried over rather than dropped: they may still make a difference in
  * another view sharing the preference. See `diffLayer`.
  *
- * @param newView             The view the user produced.
- * @param baseView            The view the layers below resolve to.
- * @param activeViewOverrides The active view overrides.
- * @param persistedView       The user's previously persisted modifications.
+ * The diff basis is resolved at `newView.type`, not at the type the previous
+ * resolution used: the type selects the `defaultLayouts` entry, and a layout
+ * switch reports the new type together with that entry's values. Diffing them
+ * against the previous type's base would persist the difference between the
+ * two entries as if the user had picked those values — leaves the layouts
+ * already provide, which then linger as phantom modifications after switching
+ * back.
+ *
+ * @param newView The view the user produced.
+ * @param layers  The layers the view resolves from. See `ViewLayers`.
  * @return The modified properties, or `undefined` when the user modified none.
  */
 export function getUserModifications(
 	newView: View,
-	baseView: View,
-	activeViewOverrides?: ViewOverrides,
-	persistedView?: ViewOverrides
+	layers: ViewLayers
 ): ViewOverrides | undefined {
+	const { activeViewOverrides, persistedView } = layers;
+	const baseView = resolveBaseView( layers, newView.type );
+
 	const modifications = diffLayer(
 		withoutQueryParams( newView ),
 		withoutQueryParams( baseView ),

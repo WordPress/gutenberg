@@ -43,7 +43,7 @@ export async function loadView( config: ViewConfig ) {
 		preferencesStore
 	).get( 'core/views', preferenceKey ) as ViewOverrides | undefined;
 
-	const { view } = resolveView( {
+	return resolveView( {
 		defaultView,
 		defaultLayouts,
 		activeViewOverrides,
@@ -51,6 +51,4 @@ export async function loadView( config: ViewConfig ) {
 		page: queryParams?.page,
 		search: queryParams?.search,
 	} );
-
-	return view;
 }

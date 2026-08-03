@@ -601,6 +601,77 @@ describe( 'useView', () => {
 			expect( result.current.isModified ).toBe( false );
 		} );
 
+		describe( 'switching layout types', () => {
+			const defaultLayouts = {
+				grid: {
+					showMedia: true,
+					layout: { badgeFields: [ 'status' ] },
+				},
+				table: {
+					showMedia: false,
+					layout: { styles: { title: { minWidth: 320 } } },
+				},
+			};
+			const props = {
+				...BASE_PROPS,
+				defaultView: { type: 'grid' },
+				defaultLayouts,
+			} as Parameters< typeof useView >[ 0 ];
+
+			function switchLayout(
+				view: View,
+				type: keyof typeof defaultLayouts
+			) {
+				const { layout, ...rest } = view as View & {
+					layout?: unknown;
+				};
+				return { ...rest, type, ...defaultLayouts[ type ] } as View;
+			}
+
+			it( 'should persist only the type, not the layout defaults it selects', () => {
+				const registry = createTestRegistry();
+				const { result, rerender } = renderUseView( registry, props );
+				act( () => {
+					result.current.updateView(
+						switchLayout( result.current.view, 'table' )
+					);
+				} );
+				rerender( props );
+
+				expect( getPreference( registry ) ).toEqual( {
+					type: 'table',
+				} );
+				expect( result.current.view ).toMatchObject( {
+					type: 'table',
+					showMedia: false,
+				} );
+			} );
+
+			it( 'should clear the preference on a round trip back to the default type', () => {
+				const registry = createTestRegistry();
+				const { result, rerender } = renderUseView( registry, props );
+				act( () => {
+					result.current.updateView(
+						switchLayout( result.current.view, 'table' )
+					);
+				} );
+				rerender( props );
+				act( () => {
+					result.current.updateView(
+						switchLayout( result.current.view, 'grid' )
+					);
+				} );
+				rerender( props );
+
+				expect( getPreference( registry ) ).toBeUndefined();
+				expect( result.current.isModified ).toBe( false );
+				expect( result.current.view ).toMatchObject( {
+					type: 'grid',
+					showMedia: true,
+				} );
+			} );
+		} );
+
 		// A value the user picks that happens to be the one a lower layer
 		// carries is still their pick: it has to be persisted, otherwise the
 		// override would bounce it back on the next read.
