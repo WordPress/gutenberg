@@ -7,6 +7,7 @@ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
+import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs';
 
 const config: Config = {
 	tokens: [
@@ -268,6 +269,18 @@ const config: Config = {
 	],
 	lint: {
 		rules: {
+			'a11y/min-contrast': [
+				'error',
+				{
+					level: 'AA',
+					pairs: SEMANTIC_COLOR_CONTRAST_PAIRS.map(
+						( { foreground, background } ) => ( {
+							foreground: `wpds-color.${ foreground }`,
+							background: `wpds-color.${ background }`,
+						} )
+					),
+				},
+			],
 			// Primitive color names are generated outside this package and use
 			// camelCase names that do not match Terrazzo's kebab-case default.
 			'core/consistent-naming': [ 'off', {} ],
