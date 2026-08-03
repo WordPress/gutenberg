@@ -277,7 +277,20 @@ export default function useSelectionObserver() {
 						element = element?.closest(
 							'[contenteditable], .rich-text'
 						);
-						element?.focus();
+						// Only move focus into the editable when it belongs to
+						// the selected block. The collapsed selection can be a
+						// stale caret from before the block selection moved
+						// through the store (e.g. select all promoting the
+						// selection to the parent block): focusing an editable
+						// of a deselected block would make its focus handler
+						// hijack the block selection back.
+						if (
+							element &&
+							getBlockClientId( element ) ===
+								getSelectedBlockClientId()
+						) {
+							element.focus();
+						}
 					}
 					return;
 				}
