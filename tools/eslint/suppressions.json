@@ -1154,11 +1154,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-site/src/components/layout/index.js": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/edit-site/src/components/page-templates/fields.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1212,11 +1207,6 @@
 	"packages/edit-site/src/components/site-editor-routes/notfound.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		}
-	},
-	"packages/edit-widgets/src/components/layout/index.js": {
-		"react-hooks/refs": {
-			"count": 3
 		}
 	},
 	"packages/edit-widgets/src/components/sidebar/index.js": {

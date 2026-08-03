@@ -44,19 +44,31 @@ jobs:
             - name: Validate manifest matches design-system-mcp contract
               run: node packages/design-system-mcp/scripts/validate-manifest.mjs
 
+            # Regenerates the committed snapshot of components/props/descriptions
+            # from the freshly built manifest. Fails if a component or prop is
+            # newly missing a description (see the allowlist for known gaps).
+            - name: Generate manifest snapshot
+              run: npm run storybook:manifest-snapshot
+
+            # Fails when the generated snapshot or pruned allowlist differs from
+            # what's committed, surfacing documentation changes for sign-off.
+            # This is similar to the "Check local changes" step of the static
+            # checks workflow, but the other workflow does not build Storybook,
+            # which is an expensive operation and only happens here.
+            - name: Check manifest snapshot is up to date
+              run: |
+                  if ! git diff --exit-code -- storybook/components-manifest.yml storybook/prop-description-allowlist.json; then
+                      echo "::error::The Storybook manifest snapshot is out of date. Review the diff above to confirm the change is expected, then run 'npm run storybook:build && npm run storybook:manifest-snapshot' locally and commit the updated storybook/components-manifest.yml and storybook/prop-description-allowlist.json."
+                      exit 1
+                  fi
+
             - name: Build E2E Storybook
               env:
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 
-            - name: Install test-runner and Playwright dependencies
-              run: |
-                  npm install --no-save @storybook/test-runner@0.24.2
-                  npx playwright install --with-deps
+            - name: Install Playwright browsers
+              run: npm run --workspace @wordpress/storybook test:smoke:setup
 
             - name: Serve Storybook and run tests
-              run: |
-                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-                  "npx http-server ./storybook/build --port 50240 --silent" \
-                  "npx wait-on tcp:127.0.0.1:50240 && \
-                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
+              run: npm run --workspace @wordpress/storybook test:smoke

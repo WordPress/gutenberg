@@ -11,7 +11,8 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Surface > = {
 	component: Surface,
-	title: 'Components/Surface',
+	title: 'Components/Deprecated/Surface',
+	id: 'components-surface',
 	argTypes: {
 		children: { control: false },
 		as: { control: { type: 'text' } },
@@ -25,7 +26,7 @@ const meta: Meta< typeof Surface > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Write your own CSS instead, preferably using the [`design tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
 	},
 };

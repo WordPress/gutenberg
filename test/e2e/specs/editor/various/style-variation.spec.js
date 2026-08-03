@@ -19,7 +19,7 @@ test.describe( 'adding blocks', () => {
 
 		await editor.clickBlockToolbarButton( 'Quote' );
 
-		await page.click( 'role=menuitem[name="Plain"i]' );
+		await page.getByRole( 'menuitem', { name: 'Plain' } ).click();
 
 		// Check the content
 		const content = await editor.getEditedPostContent();
