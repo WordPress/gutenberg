@@ -6,13 +6,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Warning,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -59,7 +58,7 @@ const CommentsFormPlaceholder = () => {
 };
 
 const CommentsForm = ( { postId, postType } ) => {
-	const [ commentStatus, setCommentStatus ] = useEntityProp(
+	const [ commentStatus ] = useEntityProp(
 		'postType',
 		postType,
 		'comment_status',
@@ -83,21 +82,8 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
-			const actions = [
-				<Button
-					__next40pxDefaultSize
-					key="enableComments"
-					onClick={ () => setCommentStatus( 'open' ) }
-					variant="primary"
-				>
-					{ _x(
-						'Enable comments',
-						'action that affects the current post'
-					) }
-				</Button>,
-			];
 			return (
-				<Warning actions={ actions }>
+				<Warning>
 					{ __(
 						'Post Comments Form block: Comments are not enabled for this item.'
 					) }
