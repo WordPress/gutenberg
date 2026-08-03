@@ -515,6 +515,35 @@ export default function useSelectionObserver() {
 				onSelectionChange
 			);
 			function onMouseUp( event ) {
+				// WebKit does not expand a triple click on the editing host's
+				// padding into a selection of the adjacent paragraph, leaving
+				// no selection at all. Build the selection of the rich text
+				// element at the click point instead; the selection observer
+				// then maps it to the block exactly as for a native
+				// expansion. Only WebKit implements caretRangeFromPoint, and
+				// only WebKit drops the expansion.
+				if ( isTripleClick ) {
+					const selection = defaultView.getSelection();
+					if ( ! selection.rangeCount || selection.isCollapsed ) {
+						const range = ownerDocument.caretRangeFromPoint?.(
+							event.clientX,
+							event.clientY
+						);
+						const element =
+							range &&
+							( range.startContainer.nodeType ===
+							range.startContainer.ELEMENT_NODE
+								? range.startContainer
+								: range.startContainer.parentElement );
+						const richText = element?.closest(
+							'[data-wp-block-attribute-key]'
+						);
+						if ( richText ) {
+							selection.selectAllChildren( richText );
+						}
+					}
+				}
+
 				onSelectionChange( event );
 				stopMultiSelect();
 			}
