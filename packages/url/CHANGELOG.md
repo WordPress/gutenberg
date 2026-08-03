@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `getQueryArgs`: Split each query argument on its first `=` only, so values containing `=` — base64 padding, JWTs, nested URLs — are no longer truncated, and ignore malformed pairs with no key instead of promoting the value to one ([#81066](https://github.com/WordPress/gutenberg/issues/81066)).
+-   `getQueryArgs`: Split each query argument on its first `=` only, so values containing `=` — base64 padding, JWTs, nested URLs — are no longer truncated, and ignore malformed pairs with no key instead of promoting the value to one ([#81066](https://github.com/WordPress/gutenberg/pull/81066)).
 
 ## 4.51.0 (2026-07-14)
 
