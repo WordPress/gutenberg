@@ -243,20 +243,13 @@ function GoalProgressWidget( {
 	);
 }
 
-// Two attributes, both promoted: nothing is left for the settings surface.
+// A single promoted attribute: nothing is left for the settings surface.
 const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 	{
 		id: 'metric',
 		label: 'Goal metric',
 		type: 'text',
 		elements: GOAL_METRICS,
-		relevance: 'high',
-	},
-	{
-		id: 'target',
-		label: 'Target',
-		type: 'text',
-		elements: GOAL_TARGETS,
 		relevance: 'high',
 	},
 ];
@@ -272,7 +265,7 @@ const GOAL_ACTIONS: WidgetAction[] = [
 	{
 		id: 'export-progress',
 		label: 'Export progress',
-		href: 'data:text/csv;charset=utf-8,metric,target,current,percent%0Arevenue,5000,3600,72',
+		href: new URL( './goal-progress.csv', import.meta.url ).href,
 		download: 'goal-progress.csv',
 	},
 ];
@@ -284,7 +277,7 @@ const goalProgressWidgetType: WidgetType = {
 	description: 'Sample goal widget whose attributes are all promoted.',
 	help: {
 		content:
-			'Two attributes, <strong>Goal metric</strong> and <strong>Target</strong>, both <strong>high</strong> relevance — two fields in the header, no settings button. Two actions in the <strong>More</strong> menu: a link and a download.',
+			'One attribute, <strong>Goal metric</strong>, at <strong>high</strong> relevance: a single field in the header and no settings button. Two actions in the <strong>More</strong> menu: a link and a download.',
 	},
 	icon: trendingUp,
 	renderModule: 'demo/widgets/goal-progress/render',
@@ -329,7 +322,7 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard',
+	title: 'Widget Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -370,6 +363,61 @@ function DefaultStory() {
 	);
 }
 
+// The snapshot type under a title no tile fits comfortably, so the identity's
+// truncation shows at the widths the grid offers.
+const longTitleWidgetType: WidgetType = {
+	...trafficSnapshotWidgetType,
+	name: 'demo/long-title',
+	title: 'Traffic Snapshot Against the Quarterly Revenue Target',
+};
+
+const LONG_TITLE_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'long-title-wide',
+		type: 'demo/long-title',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'long-title-narrow',
+		type: 'demo/long-title',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+];
+
+function LongTitleStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( LONG_TITLE_LAYOUT );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [ longTitleWidgetType ] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ { model: 'grid', rowHeight: 200 } }
+		>
+			<WidgetDashboard.Widgets />
+		</WidgetDashboard>
+	);
+}
+
+export const LongTitle: StoryObj = {
+	render: () => <LongTitleStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The identity holds the widget type's title. When the row cannot fit it, the title truncates with an ellipsis rather than wrapping: the header is one line tall.
+
+The same type appears at two widths. Resize the canvas to watch where the cut lands.
+`,
+			},
+		},
+	},
+};
+
 export const Default: StoryObj = {
 	render: () => <DefaultStory />,
 	parameters: {
@@ -381,12 +429,13 @@ In normal mode the dashboard promotes every \`relevance: 'high'\` attribute into
 Two demo types exercise that policy:
 
 - \`demo/traffic-snapshot\` declares three attributes: \`metric\` and \`period\` are \`relevance: 'high'\`, and \`label\` stays on the settings surface.
-- \`demo/goal-progress\` declares two attributes, both \`relevance: 'high'\`: with nothing left for the settings surface, the inline presentation shows no settings entry point.
+- \`demo/goal-progress\` declares a single attribute at \`relevance: 'high'\`: with nothing left for the settings surface, the inline presentation shows no settings entry point.
 
 Their tiles compare the header presentations:
 
 - The two-column tile fits the identity and both inline controls, so they stay in the header.
-- The one-column tiles do not: the promoted fields collapse into a dropdown holding them as a form, while the settings trigger stays in the toolbar beside it. The goal tile, with every attribute promoted, shows the dropdown next to its actions menu.
+- The one-column traffic tile does not: the promoted fields collapse into a dropdown holding them as a form, while the settings trigger stays in the toolbar beside it.
+- The one-column goal tile carries a single promoted field and no settings surface, so its toolbar holds that field and the actions menu.
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 

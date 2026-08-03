@@ -4,13 +4,12 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	useEntitiesSavedStatesIsDirty,
-	store as editorStore,
-} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,6 +22,7 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
+const { useEntitiesSavedStatesIsDirty } = unlock( coreDataPrivateApis );
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -35,7 +35,7 @@ export default function SaveButton( {
 } ) {
 	const { params } = useLocation();
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
+	const { saveDirtyEntities } = unlock( useDispatch( coreStore ) );
 	const { dirtyEntityRecords } = useEntitiesSavedStatesIsDirty();
 	const { isSaving, isSaveViewOpen, previewingThemeName } = useSelect(
 		( select ) => {

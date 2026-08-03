@@ -33,7 +33,11 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	isGlobalStylesInheritanceEnabled,
+} from './inheritance';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -355,7 +359,7 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const { dimensions, spacing } = settings;
 

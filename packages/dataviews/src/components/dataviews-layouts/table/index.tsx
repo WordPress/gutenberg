@@ -28,6 +28,7 @@ import { sortValues } from '../../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
+	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
 } from '../../dataviews-bulk-actions';
 import type {
@@ -290,10 +291,12 @@ function ViewTable< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
+		selectionMode: 'multi',
+		shouldSelectOnClick: false,
 	} );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >

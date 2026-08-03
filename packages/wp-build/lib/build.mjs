@@ -1671,6 +1671,11 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
+	// Skip build-generated worker bundles written back into src/.
+	if ( relativePath.endsWith( '/src/worker-code.ts' ) ) {
+		return false;
+	}
+
 	return PACKAGES.some( ( packageName ) => {
 		const packagePath = normalizePath(
 			path.join( 'packages', packageName )
@@ -2016,7 +2021,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2038,6 +2043,7 @@ function collectWidgets() {
 				title: metadata.title ?? null,
 				description: metadata.description ?? null,
 				help: metadata.help ?? null,
+				icon: metadata.icon ?? null,
 				actions: metadata.actions ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
@@ -2194,6 +2200,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const titleStr = toPhpStringLiteral( widget.title );
 			const descriptionStr = toPhpStringLiteral( widget.description );
 			const helpStr = toPhpHelpLiteral( widget.help );
+			const iconStr = toPhpStringLiteral( widget.icon );
 			const actionsStr = toPhpActionsLiteral( widget.actions );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
@@ -2203,6 +2210,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'title'        => ${ titleStr },
 		'description'  => ${ descriptionStr },
 		'help'         => ${ helpStr },
+		'icon'         => ${ iconStr },
 		'actions'      => ${ actionsStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
@@ -2592,6 +2600,9 @@ async function watchMode() {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
 			'**/*.{spec,test}.{js,ts,tsx}',
+			// Avoid rebuild loops: worker packages write bundled WASM/JS back
+			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
+			'**/worker-code.ts',
 		],
 		persistent: true,
 		ignoreInitial: true,

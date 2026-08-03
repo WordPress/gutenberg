@@ -35,6 +35,16 @@
 			&[type="url"] {
 				direction: ltr; /* maintain LTR in RTL languages */
 			}
+
+			&[type="number"] {
+				appearance: textfield;
+
+				&::-webkit-outer-spin-button,
+				&::-webkit-inner-spin-button {
+					appearance: none;
+					margin: 0;
+				}
+			}
 		}
 	}
 }

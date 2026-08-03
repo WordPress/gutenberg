@@ -9,7 +9,6 @@ import { useDrag } from '@use-gesture/react';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
-import Theme from './theme';
 import { Tabs } from './tabs';
 import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
@@ -39,7 +38,6 @@ lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
-	Theme,
 	Menu,
 	kebabCase,
 	withIgnoreIMEEvents,

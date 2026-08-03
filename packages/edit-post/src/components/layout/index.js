@@ -157,9 +157,7 @@ function MetaBoxesMain() {
 		if ( ! container ) {
 			return;
 		}
-		const noticeContainer = container.querySelector(
-			':scope > .notices-inline-notices-wrapper'
-		);
+		const noticeContainer = container.querySelector( '.editor-notices' );
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
 		);

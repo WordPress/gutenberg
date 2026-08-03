@@ -25,8 +25,11 @@ $z-layers: (
 	".components-drop-zone": 40,
 	".components-drop-zone__content": 50,
 
-	// The floated blocks should be above the other blocks to allow selection.
-	"{core/image aligned left or right} .wp-block": 21,
+	// The floated blocks should be above adjacent blocks (`z-index: auto`) to
+	// allow selection, and above in-block UI like resize handles (2), but below
+	// sticky/fixed blocks (10) so they don't cover them when scrolling, as
+	// happens on the front end where floated blocks have no z-index.
+	"{core/image aligned left or right} .wp-block": 9,
 
 	// Needs to be below media library that has a z-index of 160000.
 	"{core/video track editor popover}": 160000 - 10,

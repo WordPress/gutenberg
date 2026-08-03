@@ -9,8 +9,11 @@ import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useContext, useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { store as blocksStore } from '@wordpress/blocks';
+import { sprintf, __ } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -21,12 +24,15 @@ import VisualEditor from '../visual-editor';
 import {
 	registerDiffFormatTypes,
 	unregisterDiffFormatTypes,
+	DIFF_DESCRIPTION_IDS,
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
-const { usePrivateStyleOverride } = unlock( blockEditorPrivateApis );
+const { usePrivateStyleOverride, PrivateBlockContext } = unlock(
+	blockEditorPrivateApis
+);
 
-// SVG filter for removed blocks: grayscale + red tint
+// SVG filter for Removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
 <svg
 	xmlns="http://www.w3.org/2000/svg"
@@ -78,6 +84,14 @@ const REVISION_DIFF_STYLES = `
 		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
 		text-decoration: none;
 	}
+	/* Reset UA <mark> styles so format markers keep the same look as before. */
+	mark.revision-diff-format-added,
+	mark.revision-diff-format-removed,
+	mark.revision-diff-format-changed {
+		background: transparent;
+		color: inherit;
+		padding: 0;
+	}
 	.revision-diff-format-added {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #00a32a 70%);
 		text-decoration-thickness: 2px;
@@ -93,14 +107,79 @@ const REVISION_DIFF_STYLES = `
 `;
 
 /**
+ * Returns an accessible label for a block based on its revision diff status.
+ *
+ * @param {string} status     The diff status: 'added', 'removed', or 'modified'.
+ * @param {string} blockTitle The human-readable block type name.
+ * @return {string|undefined} The aria-label string, or undefined if not applicable.
+ */
+function getDiffStatusLabel( status, blockTitle ) {
+	switch ( status ) {
+		case 'added':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Added block: %s' ), blockTitle );
+		case 'removed':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Removed block: %s' ), blockTitle );
+		case 'modified':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Modified block: %s' ), blockTitle );
+	}
+}
+
+/**
+ * Overrides the wrapped block's aria-label with its diff status label.
+ *
+ * Only the block itself is affected: nested blocks set up their own private
+ * context, so they don't inherit an ancestor's diff label.
+ *
+ * @param {Object}      props            Component props.
+ * @param {string}      props.status     The diff status.
+ * @param {string}      props.name       The block name.
+ * @param {Object}      props.attributes The block attributes.
+ * @param {JSX.Element} props.children   The block to label.
+ * @return {JSX.Element} The labelled block.
+ */
+function BlockDiffLabelProvider( { status, name, attributes, children } ) {
+	const context = useContext( PrivateBlockContext );
+	// Resolve the variation-aware title (e.g. "Row" instead of "Group") so
+	// blocks are announced by the name users know them as. The canvas's
+	// default wrapper labels can't be reused here: in preview mode they
+	// intentionally skip variation matching.
+	const blockTitle = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
+			return (
+				getActiveBlockVariation( name, attributes )?.title ??
+				getBlockType( name )?.title
+			);
+		},
+		[ name, attributes ]
+	);
+	return (
+		<PrivateBlockContext.Provider
+			value={ {
+				...context,
+				ariaLabel: blockTitle
+					? getDiffStatusLabel( status, blockTitle )
+					: undefined,
+			} }
+		>
+			{ children }
+		</PrivateBlockContext.Provider>
+	);
+}
+
+/**
  * Filter to add diff status CSS classes to blocks.
  *
  * @param {Object} BlockListBlock The original block list block component.
  * @return {Function} Enhanced component with diff status classes.
  */
 function withRevisionDiffClasses( BlockListBlock ) {
-	return ( props ) => {
-		const { block, className } = props;
+	return function WithRevisionDiffClasses( props ) {
+		const { block, className, name, attributes } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
 		const enhancedClassName = clsx( className, {
@@ -109,7 +188,23 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
-		return <BlockListBlock { ...props } className={ enhancedClassName } />;
+		// This filter runs for every block in every editor, so the private
+		// context is only overridden where a diff status actually applies.
+		if ( ! diffStatus ) {
+			return (
+				<BlockListBlock { ...props } className={ enhancedClassName } />
+			);
+		}
+
+		return (
+			<BlockDiffLabelProvider
+				status={ diffStatus }
+				name={ name }
+				attributes={ attributes }
+			>
+				<BlockListBlock { ...props } className={ enhancedClassName } />
+			</BlockDiffLabelProvider>
+		);
 	};
 }
 
@@ -136,10 +231,36 @@ function DiffStyleOverrides( { showDiff } ) {
 	return null;
 }
 
+/**
+ * Visually hidden descriptions that diff marks (<del>, <ins>, <mark>)
+ * reference via `aria-describedby`. They must be rendered inside the
+ * canvas iframe because `aria-describedby` cannot reference an element
+ * across a document/iframe boundary. This is more reliable than `title`,
+ * which some screen readers ignore in low-verbosity modes.
+ */
+function DiffDescriptions() {
+	return (
+		<VisuallyHidden>
+			<span id={ DIFF_DESCRIPTION_IDS.removed }>{ __( 'Removed' ) }</span>
+			<span id={ DIFF_DESCRIPTION_IDS.added }>{ __( 'Added' ) }</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatAdded }>
+				{ __( 'Format added' ) }
+			</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatRemoved }>
+				{ __( 'Format removed' ) }
+			</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatChanged }>
+				{ __( 'Format changed' ) }
+			</span>
+		</VisuallyHidden>
+	);
+}
+
 function CanvasContent( { showDiff } ) {
 	const [ contentRef, diffMarkers ] = useDiffMarkers();
 	return (
 		<>
+			{ showDiff && <DiffDescriptions /> }
 			<VisualEditor contentRef={ contentRef } />
 			{ showDiff && diffMarkers }
 		</>
