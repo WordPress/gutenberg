@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useView`, `loadView`. Resolve the view as a stack of layers — `defaultView`, `defaultLayouts` (for the effective type), `activeViewOverrides`, the user's preference, and the URL query params — and persist only the properties the user actually modified. Previously the whole view was persisted, so a later change to any of the lower layers stopped showing through, an override could bounce back a value the user had picked, and a partial `sort` or `layout` override marked the view as modified forever. `page` and `search` are now sourced from the URL alone, and `layout`, `groupBy` and `sort` merge leaf by leaf, so an override for one field's styles no longer wipes the other fields'. Persisted modifications that happen to coincide with the current view's base are retained on update, so a change made in one view no longer drops a pick made in another view sharing the preference. [#80832](https://github.com/WordPress/gutenberg/pull/80832)
+
 ## 1.18.0 (2026-07-14)
 
 ## 1.17.0 (2026-07-01)

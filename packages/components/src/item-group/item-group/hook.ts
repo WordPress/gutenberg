@@ -1,15 +1,9 @@
-/**
- * Internal dependencies
- */
+import clsx from 'clsx';
+
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemGroupProps } from '../types';
+import styles from '../style.module.scss';
 
 export function useItemGroup(
 	props: WordPressComponentProps< ItemGroupProps, 'div' >
@@ -23,12 +17,13 @@ export function useItemGroup(
 		...otherProps
 	} = useContextSystem( props, 'ItemGroup' );
 
-	const cx = useCx();
-
-	const classes = cx(
-		isBordered && styles.bordered,
-		isSeparated && styles.separated,
-		isRounded && styles.rounded,
+	const classes = clsx(
+		styles[ 'item-group' ],
+		{
+			[ styles[ 'is-bordered' ] ]: isBordered,
+			[ styles[ 'is-separated' ] ]: isSeparated,
+			[ styles[ 'is-rounded' ] ]: isRounded,
+		},
 		className
 	);
 
