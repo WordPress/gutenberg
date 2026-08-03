@@ -757,6 +757,7 @@
 
 ### Bug Fixes
 
+-   `ItemGroup`: Fix focus style to make it consistent with the `Button` component([#69289](https://github.com/WordPress/gutenberg/pull/69289)).
 -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
 
 ## 29.5.0 (2025-02-28)

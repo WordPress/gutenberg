@@ -28,18 +28,29 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 			color: ${ COLORS.theme.accent };
 		}
 
-		&:focus {
+		${ as === 'button'
+			? `
+			&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus)
+				${ COLORS.theme.accent };
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 3px solid transparent;
+			}
+			`
+			: `
+			&:focus {
 			box-shadow: none;
 			outline: none;
-		}
-
-		&:focus-visible {
-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			}
+			
+			&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus)
 				${ COLORS.theme.accent };
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
 			outline-offset: 0;
-		}
+			}
+		` }
 	`;
 };
 
