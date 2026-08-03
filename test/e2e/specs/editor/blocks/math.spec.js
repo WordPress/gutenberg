@@ -124,4 +124,30 @@ test.describe( 'Math Block', () => {
 		);
 		expect( paddingTop ).not.toBe( '0px' );
 	} );
+
+	test( 'should render a pmatrix/vmatrix as a full-width block, not inline', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/math' } );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type(
+			'\\begin{pmatrix}\n1 & 2 \\\\\n3 & 4\n\\end{pmatrix}'
+		);
+		await page.keyboard.press( 'Escape' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const mathElement = page.locator( '.wp-block-math math' ).first();
+		await expect( mathElement ).toBeVisible();
+
+		const display = await mathElement.evaluate(
+			( element ) => window.getComputedStyle( element ).display
+		);
+		expect( display ).toBe( 'block' );
+
+		const mtable = page.locator( '.wp-block-math mtable' ).first();
+		await expect( mtable ).toBeVisible();
+	} );
 } );

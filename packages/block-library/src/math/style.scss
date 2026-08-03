@@ -16,6 +16,14 @@
 		> mrow {
 			padding: 0.5ex 0;
 		}
+
+		// This block always renders `<math display="block">`. Keep that
+		// block-level layout instead of letting the inline-flex rule above
+		// override it.
+		&[display="block"] {
+			display: block;
+			width: 100%;
+		}
 	}
 
 	// Array/matrix cell justification.
