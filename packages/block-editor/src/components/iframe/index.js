@@ -7,7 +7,12 @@ import { version as reactVersion } from 'react';
 /**
  * WordPress dependencies
  */
-import { useState, createPortal, forwardRef } from '@wordpress/element';
+import {
+	useState,
+	createPortal,
+	forwardRef,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
@@ -139,6 +144,30 @@ function getIframeSrc( resolvedAssets ) {
 	iframeSrcCache.set( resolvedAssets, src );
 	iframeSrcCleanup?.register( resolvedAssets, src );
 	return src;
+}
+
+/**
+ * Dispatches a `wp-block-editor:content-ready` event into the iframe document
+ * once after React first renders block content into it. View script modules
+ * execute when the iframe blob URL loads (before React injects blocks via
+ * createPortal), so they should listen for this event rather than scanning
+ * the DOM on load.
+ *
+ * @param {Object}        root0
+ * @param {Document|null} root0.iframeDocument The iframe's document object.
+ */
+function ContentEventDispatcher( { iframeDocument } ) {
+	useLayoutEffect( () => {
+		if ( ! iframeDocument ) {
+			return;
+		}
+		iframeDocument.dispatchEvent(
+			new CustomEvent( 'wp-block-editor:content-ready', {
+				bubbles: false,
+			} )
+		);
+	}, [ iframeDocument ] );
+	return null;
 }
 
 function Iframe( {
@@ -366,6 +395,9 @@ function Iframe( {
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
+								<ContentEventDispatcher
+									iframeDocument={ iframeDocument }
+								/>
 							</StyleProvider>
 						</body>,
 						iframeDocument.documentElement

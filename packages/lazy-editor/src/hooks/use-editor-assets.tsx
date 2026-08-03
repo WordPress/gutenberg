@@ -24,7 +24,8 @@ export async function loadEditorAssets() {
 			editorAssets.styles || {},
 			editorAssets.inline_styles || { before: {}, after: {} },
 			editorAssets.html_templates || [],
-			editorAssets.script_modules || {}
+			editorAssets.script_modules || {},
+			editorAssets.enqueued_script_modules || []
 		);
 	};
 

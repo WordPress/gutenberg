@@ -249,7 +249,8 @@ async function loadAssets(
 	stylesData: Record< string, Style >,
 	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >,
 	htmlTemplates?: string[],
-	scriptModules?: ScriptModules
+	scriptModules?: ScriptModules,
+	enqueuedScriptModules?: string[]
 ): Promise< void > {
 	// Inject import map first so script modules can be resolved
 	if ( scriptModules ) {
@@ -299,6 +300,39 @@ async function loadAssets(
 	const scriptsPromise = performScriptLoad( scriptElements, document.body );
 
 	await Promise.all( [ Promise.all( stylePromises ), scriptsPromise ] );
+
+	// Execute enqueued script modules by injecting <script type="module"> tags.
+	// The import map was already injected above, so each module ID can be resolved.
+	// We must wait for scripts to finish loading first because some modules may
+	// depend on globals exposed by those scripts (e.g. wp.* namespace objects).
+	if ( enqueuedScriptModules && enqueuedScriptModules.length > 0 ) {
+		const modulePromises = enqueuedScriptModules.map( ( moduleId ) => {
+			return new Promise< void >( ( resolve ) => {
+				// Skip if already injected.
+				const safeId = moduleId.replace( /[^a-zA-Z0-9-_]/g, '-' );
+				const existingScript = document.getElementById(
+					safeId + '-js-module'
+				);
+				if ( existingScript ) {
+					resolve();
+					return;
+				}
+
+				const script = document.createElement( 'script' );
+				script.type = 'module';
+				script.id = safeId + '-js-module';
+				// Use a dynamic import so that the import map is honoured.
+				script.textContent = `import '${ moduleId }';`;
+				script.onload = () => resolve();
+				// Inline module scripts fire load synchronously in some browsers;
+				// fall back to resolving immediately after append.
+				document.body.appendChild( script );
+				// Inline scripts execute synchronously, so resolve after append.
+				resolve();
+			} );
+		} );
+		await Promise.all( modulePromises );
+	}
 
 	// Inject HTML templates (e.g., wp.media templates) into the DOM
 	// Note: We can't use innerHTML for script tags, so we need to parse and create elements properly
