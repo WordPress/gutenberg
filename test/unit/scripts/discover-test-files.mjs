@@ -39,6 +39,7 @@ export function discoverTestFiles( rootDir ) {
 				glob( pattern, {
 					absolute: false,
 					cwd: rootDir,
+					dot: true,
 					ignore: TEST_IGNORES,
 					nodir: true,
 				} )
@@ -47,8 +48,7 @@ export function discoverTestFiles( rootDir ) {
 	].sort();
 }
 
-export function getVitestTests( rootDir, manifest ) {
-	const discoveredTests = discoverTestFiles( rootDir );
+export function getVitestTests( discoveredTests, manifest ) {
 	const directoryTests = discoveredTests.filter( ( testPath ) =>
 		manifest.vitest.directories.some(
 			( directoryPath ) =>

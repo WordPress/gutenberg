@@ -57,9 +57,13 @@ function listTests( packageName, args ) {
 		}
 	);
 
+	if ( result.error ) {
+		throw result.error;
+	}
+
 	if ( result.status !== 0 ) {
-		process.stderr.write( result.stdout );
-		process.stderr.write( result.stderr );
+		process.stderr.write( result.stdout ?? '' );
+		process.stderr.write( result.stderr ?? '' );
 		process.exit( result.status ?? 1 );
 	}
 
@@ -123,6 +127,7 @@ const vitestTests = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
 			'--filesOnly',
 	  ] )
 	: new Set();
+const staticInventory = discoverTestFiles( ROOT_DIR );
 
 const migratedTestFiles = manifest.vitest.files;
 const migratedDirectories = manifest.vitest.directories;
@@ -169,6 +174,20 @@ assert.deepEqual(
 	) }`
 );
 
+const emptyMigratedDirectories = migratedDirectories.filter(
+	( directoryPath ) =>
+		! staticInventory.some( ( testPath ) =>
+			isWithinDirectory( testPath, directoryPath )
+		)
+);
+assert.deepEqual(
+	emptyMigratedDirectories,
+	[],
+	`Migrated directories must contain at least one test:\n${ emptyMigratedDirectories.join(
+		'\n'
+	) }`
+);
+
 const overlappingTests = [ ...jestTests ].filter( ( testPath ) =>
 	vitestTests.has( testPath )
 );
@@ -180,14 +199,13 @@ assert.deepEqual(
 	) }`
 );
 
-const expectedVitestTests = getVitestTests( ROOT_DIR, manifest );
+const expectedVitestTests = getVitestTests( staticInventory, manifest );
 assert.deepEqual(
 	[ ...vitestTests ].sort(),
 	expectedVitestTests,
 	`Vitest discovery does not match the migration manifest.`
 );
 
-const staticInventory = discoverTestFiles( ROOT_DIR );
 const runnerInventory = [
 	...new Set( [ ...jestTests, ...vitestTests ] ),
 ].sort();
