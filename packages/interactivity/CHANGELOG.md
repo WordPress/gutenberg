@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `renderElement()` to render server-rendered HTML inserted into the live DOM as fully interactive content. ([#…](…))
+
 ## 6.51.0 (2026-07-14)
 
 ## 6.50.0 (2026-07-01)

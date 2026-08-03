@@ -1362,6 +1362,28 @@ const unwatch = watch( () => {
 } );
 ```
 
+### renderElement()
+
+Renders server-rendered HTML that has been inserted into the live DOM after the initial page load, processing all Interactivity API directives on it. This makes the inserted markup fully interactive.
+
+```js
+import { renderElement } from '@wordpress/interactivity';
+
+const res = await fetch( '/my-plugin/card' );
+const doc = new DOMParser().parseFromString( await res.text(), 'text/html' );
+const card = doc.body.firstElementChild;
+feedList.insertBefore( card, feedList.firstChild );
+renderElement( card );
+```
+
+-   `element` (`Element | Element[]`): The element, or an array of contiguous sibling elements, to render.
+
+The element(s) MUST already be attached to the DOM — the root-fragment mechanism requires a parent element. Multiple elements must be contiguous siblings under the same parent (the fragment's insertion anchor is the last element's next sibling); otherwise call once per element.
+
+Calling `renderElement()` again with the same element updates it in place (preact diffs against the previous render): no duplicate listeners, no remount. Only the passed element(s) are processed — siblings and any enclosing router region are untouched.
+
+`renderElement()` is not supported during initial hydration or during an in-flight navigation.
+
 ## Server functions
 
 The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's sent to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.

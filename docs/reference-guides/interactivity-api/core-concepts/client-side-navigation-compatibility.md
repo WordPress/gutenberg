@@ -290,6 +290,8 @@ store( 'myPlugin', {
 } );
 ```
 
+If you need to insert **server-rendered HTML** into the live DOM — for example, a fragment fetched from a REST endpoint — use the [`renderElement()`](/docs/reference-guides/interactivity-api/directives-and-store.md#renderelement) function instead. It processes all Interactivity API directives on the inserted markup, making it fully interactive, and it is virtual-DOM aware: calling it again with the same element updates it in place. Note that a fragment inserted with `data-wp-watch` + `innerHTML` remains dead markup — it is not processed by the Interactivity API.
+
 #### Do not create HTML dynamically outside router regions
 
 Interactive blocks should avoid injecting new HTML elements into the DOM outside of router regions — for example, creating overlays, modals, or tooltips that are appended to the `<body>`.

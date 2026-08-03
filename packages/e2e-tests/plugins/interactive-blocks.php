@@ -36,3 +36,27 @@ add_action(
 		}
 	}
 );
+
+add_action(
+	'rest_api_init',
+	function () {
+		// REST route that returns a server-rendered fragment for the
+		// `test/render-element` block to fetch and hydrate with
+		// `renderElement()`.
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<div data-wp-interactive="test/render-element" data-wp-context=\'{ "count": 0 }\'>' .
+						'<button data-testid="counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>' .
+						'</div>'
+					);
+				},
+			)
+		);
+	}
+);
