@@ -14,10 +14,19 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 
+// The Term Template's layout attribute arranges the term items, not the
+// blocks of the template, which always stack vertically inside each term
+// item. Override the inherited layout so inner block UI (movers, inserters,
+// grid controls) doesn't follow the term items' grid.
+const INNER_BLOCKS_LAYOUT = { type: 'default' };
+
 function TermTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: clsx( 'wp-block-term', classList ) },
-		{ __unstableDisableLayoutClassNames: true }
+		{
+			__unstableDisableLayoutClassNames: true,
+			layout: INNER_BLOCKS_LAYOUT,
+		}
 	);
 	return <li { ...innerBlocksProps } />;
 }
