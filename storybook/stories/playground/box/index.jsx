@@ -5,10 +5,6 @@ import {
 	BlockCanvas,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
 import styles from './style.module.css';
 
