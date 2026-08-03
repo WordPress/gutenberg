@@ -199,10 +199,9 @@ export function BackgroundImagePanel( {
 		selectedState
 	);
 
-	const backgroundGradientSupported = hasBackgroundSupport(
-		name,
-		'gradient'
-	);
+	const backgroundGradientSupported =
+		hasBackgroundSupport( name, 'gradient' ) &&
+		!! settings?.background?.gradient;
 
 	const colorSupport = getBlockSupport( name, 'color' );
 	const hasColorBackgroundSupport =

@@ -53,7 +53,7 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
+	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -163,20 +163,6 @@ const PlaylistTrackEdit = ( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-			{ !! addTracks && (
-				<BlockControls group="block">
-					<MediaReplaceFlow
-						name={ __( 'Add' ) }
-						onSelect={ addTracks }
-						accept="audio/*"
-						multiple
-						handleUpload={ false }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onError={ onUploadError }
-						variant="toolbar"
-					/>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl

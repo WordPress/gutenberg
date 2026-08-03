@@ -24,7 +24,7 @@ class LifecycleScriptError extends Error {
  *
  * @param {string}   event   The lifecycle event to run the script for.
  * @param {WPConfig} config  The config object to use.
- * @param {Object}   spinner A CLI spinner which indciates progress.
+ * @param {Object}   spinner A CLI spinner which indicates progress.
  *
  * @return {Promise} Resolves when the script has completed and rejects when there is an error.
  */
