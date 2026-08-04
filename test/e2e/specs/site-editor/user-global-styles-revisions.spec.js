@@ -124,11 +124,10 @@ test.describe( 'Style Revisions', () => {
 			.last();
 		await expect( lastRevisionItem ).toContainText( 'Default styles' );
 		await lastRevisionItem.click();
+		// The footer action relabels for the reset entry.
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-		).toBeVisible();
+			page.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeEnabled();
 	} );
 
 	test( 'should access from the site editor sidebar', async ( {

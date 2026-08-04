@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { Field, SupportedLayouts, View } from '@wordpress/dataviews';
+import type {
+	ActionButton,
+	Field,
+	SupportedLayouts,
+	View,
+} from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -125,7 +127,7 @@ interface RevisionsListProps {
 	isLoading?: boolean;
 	paginationInfo: { totalItems: number; totalPages: number };
 	canApplyRevision?: boolean;
-	onApplyRevision?: () => void;
+	actions?: ActionButton< Revision >[];
 }
 
 /**
@@ -139,7 +141,7 @@ interface RevisionsListProps {
  * @param root0.isLoading
  * @param root0.paginationInfo
  * @param root0.canApplyRevision
- * @param root0.onApplyRevision
+ * @param root0.actions
  */
 function RevisionsList( {
 	revisions,
@@ -150,7 +152,7 @@ function RevisionsList( {
 	isLoading,
 	paginationInfo,
 	canApplyRevision,
-	onApplyRevision,
+	actions,
 }: RevisionsListProps ) {
 	const { currentThemeName, currentUser } = useSelect( ( select ) => {
 		const { getCurrentTheme, getCurrentUser } = select( coreStore );
@@ -275,27 +277,13 @@ function RevisionsList( {
 									}
 								/>
 							) }
-							{ ! canApplyRevision ? (
+							{ ! canApplyRevision && (
 								<WCBadge
 									className="global-styles-ui-screen-revisions__active-badge"
 									intent="info"
 								>
 									{ __( 'Active' ) }
 								</WCBadge>
-							) : (
-								<Button
-									size="compact"
-									variant="primary"
-									className="global-styles-ui-screen-revisions__apply-button"
-									onClick={ onApplyRevision }
-									aria-label={ __(
-										'Apply the selected revision to your site.'
-									) }
-								>
-									{ isReset
-										? __( 'Reset to defaults' )
-										: __( 'Apply' ) }
-								</Button>
 							) }
 						</span>
 					);
@@ -307,7 +295,6 @@ function RevisionsList( {
 	}, [
 		selection,
 		canApplyRevision,
-		onApplyRevision,
 		currentUser,
 		currentThemeName,
 		revisions,
@@ -327,6 +314,7 @@ function RevisionsList( {
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				itemListLabel={ __( 'Global styles revisions list' ) }
+				actions={ actions }
 			>
 				<DataViewsPicker.Layout />
 				<DataViewsPicker.Footer />

@@ -5,11 +5,12 @@ import {
 } from '@wordpress/components';
 import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
-import type { View } from '@wordpress/dataviews';
+import type { ActionButton, View } from '@wordpress/dataviews';
 import { ScreenHeader } from '../screen-header';
 import { GlobalStylesContext } from '../context';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsList from './revisions-list';
+import type { Revision } from './types';
 
 const PAGE_SIZE = 10;
 const EMPTY_ARRAY: string[] = [];
@@ -75,17 +76,20 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 		currentEditorGlobalStyles
 	);
 
-	const onCloseRevisions = () => {
+	const onCloseRevisions = useCallback( () => {
 		if ( onClose ) {
 			onClose();
 		}
-	};
+	}, [ onClose ] );
 
-	const restoreRevision = ( revision: any ) => {
-		setUserConfig( revision );
-		setIsLoadingRevisionWithUnsavedChanges( false );
-		onCloseRevisions();
-	};
+	const restoreRevision = useCallback(
+		( revision: any ) => {
+			setUserConfig( revision );
+			setIsLoadingRevisionWithUnsavedChanges( false );
+			onCloseRevisions();
+		},
+		[ setUserConfig, onCloseRevisions ]
+	);
 
 	const currentlySelectedRevisionId =
 		// @ts-expect-error: revision id is not present in the fallback (default object).
@@ -102,9 +106,9 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 	const onChangeSelection = useCallback(
 		( newSelection: string[] ) => {
 			// The picker's single selection is clearable: clicking the selected
-			// item again emits an empty selection (clicks bubbling up from the
-			// Apply button included). Keep the current revision selected in
-			// that case so the timeline never ends up with nothing selected.
+			// item again emits an empty selection. Keep the current revision
+			// selected in that case so the timeline never ends up with nothing
+			// selected.
 			if ( ! newSelection.length ) {
 				return;
 			}
@@ -113,12 +117,41 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 		[ goTo ]
 	);
 
-	// Only display load button if there is a revision to load,
-	// and it is different from the current editor styles.
+	// The selected revision is applicable when it exists and differs from
+	// the current editor styles. Drives both the Active badge in the list
+	// and the footer action's eligibility.
 	const isLoadButtonEnabled =
 		!! currentlySelectedRevisionId &&
 		currentlySelectedRevisionId !== 'unsaved' &&
 		! selectedRevisionMatchesEditorStyles;
+
+	const onApplyRevision = useCallback( () => {
+		if ( hasUnsavedChanges ) {
+			setIsLoadingRevisionWithUnsavedChanges( true );
+			return;
+		}
+		restoreRevision( currentlySelectedRevision );
+	}, [ hasUnsavedChanges, restoreRevision, currentlySelectedRevision ] );
+
+	// Apply / Reset to defaults render in the picker footer, outside the
+	// timeline listbox, so the options hold no interactive content.
+	const actions: ActionButton< Revision >[] = useMemo(
+		() => [
+			{
+				id: 'apply-revision',
+				label: ( items: Revision[] ) =>
+					items[ 0 ]?.id === 'parent'
+						? __( 'Reset to defaults' )
+						: __( 'Apply' ),
+				isPrimary: true,
+				isEligible: ( item: Revision ) =>
+					'unsaved' !== item.id &&
+					! areGlobalStylesEqual( item, currentEditorGlobalStyles ),
+				callback: onApplyRevision,
+			},
+		],
+		[ currentEditorGlobalStyles, onApplyRevision ]
+	);
 
 	return (
 		<>
@@ -146,11 +179,7 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				canApplyRevision={ isLoadButtonEnabled }
-				onApplyRevision={ () =>
-					hasUnsavedChanges
-						? setIsLoadingRevisionWithUnsavedChanges( true )
-						: restoreRevision( currentlySelectedRevision )
-				}
+				actions={ actions }
 			/>
 			{ isLoadingRevisionWithUnsavedChanges && (
 				<ConfirmDialog
