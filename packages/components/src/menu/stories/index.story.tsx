@@ -415,10 +415,7 @@ export const WithModals: StoryObj< typeof Menu > = {
 						Open menu
 					</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item
-							onClick={ () => setOuterModalOpen( true ) }
-							hideOnClick={ false }
-						>
+						<Menu.Item onClick={ () => setOuterModalOpen( true ) }>
 							<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
 						</Menu.Item>
 						<Menu.Item
