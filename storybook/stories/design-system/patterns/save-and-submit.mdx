@@ -49,14 +49,21 @@ When all changes are saved, the Save button is disabled and can reveal a “No u
 
 If the user navigates away with unsaved edits, prompt them to confirm before leaving so their changes aren’t lost. This guard exists **only** in the manual save model; an autosave surface never needs it.
 
-### Invalid fields
+### Invalid fields, partial saves, and failed saves
 
-If the save or submit fails due to user error (an invalid field, or a required field is omitted), the page scrolls with animation to the first invalid field, which shows a validation error message.
+For automatic saving methods, an invalid field can require being addressed before saving, e.g. by outputting an error message right below the relevant input control. 
 
-### Failed save
+In some situations, however, some options might save successfully save while others still need attention. In this case, through a `Notice`, tell people what saved and what still needs attention. And never stack a success and an error on top of each other. You can list multiple areas that need attention in the `Notice` component, so you don't have to stack multiple.
 
-If the save process fails for any other reason, notify the user via `ConfirmDialog`.
+For fully failed saves, show the reason in the `Notice`.
 
 ## Toggles
 
 A toggle implies immediate effect, like a light switch, which makes it a natural fit for autosave surfaces where a change takes effect as soon as it is flipped. On a manual-save surface, nothing applies until the Save button is clicked, so weigh whether that immediacy still reads true.
+
+- Auto-saving is restricted to `ToggleControl` fields.
+- Follows the same feedback conventions as other save methods.
+- It is preferable to use a toggle instead of a checkbox for turning features on and off. The exception would be if the checkbox is part of a form with other fields that also need to be updated at the same time.
+- Keep labels short. Use the description under the toggle or in the card title to provide more context.
+- Lead labels with a verb like “Use, Allow, Show,” or “Enable”.
+
