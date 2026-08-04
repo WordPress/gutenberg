@@ -15,6 +15,7 @@
 
 ### Bug Fixes
 
+-   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ### Internal

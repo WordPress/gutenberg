@@ -15,7 +15,7 @@ const ListViewBlockContents = forwardRef(
 		{
 			onClick,
 			onToggleExpanded,
-			block,
+			clientId,
 			isSelected,
 			position,
 			siblingBlockCount,
@@ -26,9 +26,11 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { clientId } = block;
-		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
-			useListViewContext();
+		const {
+			AdditionalBlockContent,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
+		} = useListViewContext();
 
 		// Only include all selected blocks if the currently clicked on block
 		// is one of the selected blocks. This ensures that if a user attempts
@@ -38,13 +40,17 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		// The additional content is only relevant to the row of the block that
+		// was just inserted, so the other rows skip mounting it entirely.
+		const showAdditionalBlockContent =
+			!! AdditionalBlockContent && insertedBlockClientId === clientId;
+
 		return (
 			<>
-				{ AdditionalBlockContent && (
+				{ showAdditionalBlockContent && (
 					<AdditionalBlockContent
-						block={ block }
-						insertedBlock={ insertedBlock }
-						setInsertedBlock={ setInsertedBlock }
+						insertedBlockClientId={ insertedBlockClientId }
+						setInsertedBlockClientId={ setInsertedBlockClientId }
 					/>
 				) }
 				<BlockDraggable
@@ -56,7 +62,7 @@ const ListViewBlockContents = forwardRef(
 						<ListViewBlockSelectButton
 							ref={ ref }
 							className="block-editor-list-view-block-contents"
-							block={ block }
+							clientId={ clientId }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
