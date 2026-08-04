@@ -54,7 +54,7 @@ import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
-	block: { clientId },
+	clientId,
 	displacement,
 	isAfterDraggedBlocks,
 	isDragged,
@@ -120,12 +120,11 @@ function ListViewBlock( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-
 	const pasteStyles = usePasteStyles();
 
 	const {
-		block,
 		blockName,
+		blockVisibility,
 		blockEditingMode,
 		allowRightClickOverrides,
 		editedSection,
@@ -134,8 +133,8 @@ function ListViewBlock( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock,
 				getBlockName,
+				getBlockAttributes,
 				getBlockEditingMode: getBlockEditingModeForClientId,
 				getSettings,
 				getEditedContentOnlySection,
@@ -143,8 +142,9 @@ function ListViewBlock( {
 			const settings = getSettings();
 
 			return {
-				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
+				blockVisibility:
+					getBlockAttributes( clientId )?.metadata?.blockVisibility,
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
@@ -175,7 +175,7 @@ function ListViewBlock( {
 		BlockSettingsMenu,
 		listViewInstanceId,
 		expandedState,
-		setInsertedBlock,
+		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
@@ -543,7 +543,7 @@ function ListViewBlock( {
 	// When switching between rendering modes (such as template preview and content only),
 	// it is possible for a block to temporarily be unavailable. In this case, we should not
 	// render the leaf, to avoid errors further down the tree.
-	if ( ! block ) {
+	if ( ! blockName ) {
 		return null;
 	}
 
@@ -560,7 +560,7 @@ function ListViewBlock( {
 
 	// Determine label based on where block is hidden (not when/current viewport)
 	const blockVisibilityDescription = getBlockVisibilityLabel(
-		block?.attributes?.metadata?.blockVisibility,
+		blockVisibility,
 		viewportSettings
 	);
 
@@ -650,7 +650,7 @@ function ListViewBlock( {
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
-							block={ block }
+							clientId={ clientId }
 							onClick={ selectEditorBlock }
 							onContextMenu={
 								isDisabled ? undefined : onContextMenu
@@ -724,8 +724,8 @@ function ListViewBlock( {
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
+							clientId={ clientId }
 							clientIds={ dropdownClientIds }
-							block={ block }
 							icon={ moreVertical }
 							label={ __( 'Options' ) }
 							popoverProps={ {
@@ -742,7 +742,9 @@ function ListViewBlock( {
 							disableOpenOnArrowDown
 							expand={ expand }
 							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}

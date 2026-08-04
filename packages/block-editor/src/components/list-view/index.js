@@ -134,7 +134,8 @@ function ListViewComponent(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
@@ -296,8 +297,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			treeGridElementRef: elementRef,
 			rootClientId,
 		} ),
@@ -314,8 +315,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			rootClientId,
 		]
 	);

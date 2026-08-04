@@ -222,7 +222,7 @@ function ListViewBranch( props ) {
 			<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 				{ showBlock && (
 					<ListViewBlock
-						block={ block }
+						clientId={ clientId }
 						selectBlock={ selectBlock }
 						isSelected={ isSelected }
 						isBranchSelected={ isSelectedBranch }

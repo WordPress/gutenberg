@@ -366,12 +366,13 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( () =>
-	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
+export const getEnabledClientIdsTree = createSelector(
+	getEnabledClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
-	] )
+	]
 );
 
 /**
@@ -388,18 +389,27 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getListViewClientIdsTree = createRegistrySelector( () =>
-	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
+export const getListViewClientIdsTree = createSelector(
+	getListViewClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
-		state.blocks.byClientId,
-		state.blocks.attributes,
-		state.blockListSettings,
 		state.editedContentOnlySection,
-		state.settings,
-	] )
+		// The state below is only read to resolve a block's parent section,
+		// which the tree does only while a content-only section is being
+		// edited. Depending on it otherwise rebuilds the tree on every
+		// attribute change, i.e. on every keystroke.
+		...( state.editedContentOnlySection
+			? [
+					state.blocks.byClientId,
+					state.blocks.attributes,
+					state.blockListSettings,
+					state.settings,
+			  ]
+			: [] ),
+	]
 );
 
 /**

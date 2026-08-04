@@ -267,8 +267,8 @@ function Iframe( {
 	}, [] );
 
 	const {
-		contentResizeListener,
-		containerResizeListener,
+		contentRef: scaleContentRef,
+		containerRef,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -284,6 +284,7 @@ function Iframe( {
 		contentRef,
 		writingFlowRef,
 		disabledRef,
+		scaleContentRef,
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.
@@ -363,7 +364,6 @@ function Iframe( {
 								...bodyClasses
 							) }
 						>
-							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
@@ -376,8 +376,7 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container">
-			{ containerResizeListener }
+		<div className="block-editor-iframe__container" ref={ containerRef }>
 			<div
 				className={ clsx(
 					'block-editor-iframe__scale-container',

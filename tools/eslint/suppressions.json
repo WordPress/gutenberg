@@ -776,11 +776,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/item-group/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/menu/stories/index.story.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -1368,16 +1363,6 @@
 		}
 	},
 	"packages/editor/src/components/post-visibility/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/sidebar/header.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/sidebar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

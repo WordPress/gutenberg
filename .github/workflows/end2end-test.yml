@@ -22,10 +22,11 @@ permissions: {}
 jobs:
     build:
         name: Build
-        runs-on: 'ubuntu-24.04'
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -66,8 +67,9 @@ jobs:
 
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: build
+        timeout-minutes: 45
         # A skipped check counts as passing for required status checks, so a
         # broken build must not skip these jobs — they have to start and go red
         # (see the guard step below). `!cancelled()` is what drops the implicit
@@ -135,8 +137,9 @@ jobs:
 
     e2e-playwright-rtc-websocket:
         name: Playwright - RTC WebSocket
-        runs-on: 'ubuntu-24.04'
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: build
+        timeout-minutes: 20
         # A skipped check counts as passing for required status checks, so a
         # broken build must not skip these jobs — they have to start and go red
         # (see the guard step below). `!cancelled()` is what drops the implicit
@@ -212,6 +215,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+        timeout-minutes: 5
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
@@ -268,6 +272,7 @@ jobs:
             contents: read
             issues: write
             pull-requests: write
+        timeout-minutes: 10
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
