@@ -49,9 +49,8 @@ jobs:
                       relevant:
                           - '**'
                           - '!**/*.md'
-                          - '!**/*.native.*'
-                          - '!{backport-changelog,bin,docs,phpunit,schemas,skills,storybook,typings}/**'
-                          - '!test/{integration,native,php,storybook-playwright,unit}/**'
+                          - '!{backport-changelog,bin,docs,phpunit,schemas,storybook,typings}/**'
+                          - '!test/{integration,php,storybook-playwright,unit}/**'
                           - '!test/e2e/{*,!(assets)/**}'
                           - '!{packages,tools}/**/{test,tests}/**'
                           - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
