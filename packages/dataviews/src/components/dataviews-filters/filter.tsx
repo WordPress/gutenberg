@@ -212,22 +212,28 @@ export default function Filter( {
 		} );
 	} else if ( Array.isArray( filterInView?.value ) ) {
 		// or, filterInView.value can also be array
-		// for the between operator, as in [ 1, 2 ]
-		const label = filterInView.value.map( ( v ) => {
-			const formattedValue = field?.getValueFormatted( {
-				item: { [ field.id ]: v },
-				field,
+		// for the between operator, as in [ 1, 2 ]. A range with an unfilled
+		// bound does not filter, so the chip renders as if no value were set.
+		const isComplete = ! filterInView.value.some(
+			( v ) => v === undefined || v === null || v === ''
+		);
+		if ( isComplete ) {
+			const label = filterInView.value.map( ( v ) => {
+				const formattedValue = field?.getValueFormatted( {
+					item: { [ field.id ]: v },
+					field,
+				} );
+				return formattedValue || String( v );
 			} );
-			return formattedValue || String( v );
-		} );
 
-		activeElements = [
-			{
-				value: filterInView.value,
-				// @ts-ignore
-				label,
-			},
-		];
+			activeElements = [
+				{
+					value: filterInView.value,
+					// @ts-ignore
+					label,
+				},
+			];
+		}
 	} else if ( typeof filterInView?.value === 'object' ) {
 		// or, it can also be object for the inThePast/over operators,
 		// as in { value: '1', units: 'days' }
