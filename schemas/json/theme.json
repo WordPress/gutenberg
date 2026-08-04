@@ -2820,22 +2820,12 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesBlockPropertiesFallback"
+				"^(?!core/(button|navigation-link)$)[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"description": "Style schema for blocks without explicit support for pseudo-classes. Excludes core/button and core/navigation-link, whose explicit definitions in properties allow pseudo-classes from the strict general validation below. Extend the lookahead whenever a block gains pseudo-class support.",
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},
 			"additionalProperties": false
-		},
-		"stylesBlockPropertiesFallback": {
-			"description": "Permissive style schema for blocks not explicitly listed, so the stricter per-block definitions in properties are the authority. In particular this avoids treating arbitrary colon-prefixed keys as valid for blocks that do not support pseudo-classes.",
-			"allOf": [
-				{
-					"$ref": "#/definitions/stylesProperties"
-				},
-				{
-					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
-				}
-			]
 		},
 		"stylesPropertiesAndElementsComplete": {
 			"allOf": [
@@ -3373,22 +3363,12 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesFallback"
+				"^(?!core/(button|navigation-link)$)[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"description": "Style schema for variation blocks without explicit support for pseudo-classes. Excludes core/button and core/navigation-link, whose explicit definitions in properties allow pseudo-classes from the strict general validation below. Extend the lookahead whenever a block gains pseudo-class support.",
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				}
 			},
 			"additionalProperties": false
-		},
-		"stylesVariationBlockPropertiesFallback": {
-			"description": "Permissive style schema for variation blocks not explicitly listed, so the stricter per-block definitions in properties are the authority. In particular this avoids treating arbitrary colon-prefixed keys as valid for blocks that do not support pseudo-classes.",
-			"allOf": [
-				{
-					"$ref": "#/definitions/stylesProperties"
-				},
-				{
-					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
-				}
-			]
 		},
 		"stylesVariationBlockPropertiesComplete": {
 			"allOf": [
