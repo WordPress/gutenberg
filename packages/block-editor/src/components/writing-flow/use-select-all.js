@@ -71,9 +71,14 @@ export default function useSelectAll() {
 			event.preventDefault();
 
 			const [ firstSelectedClientId ] = selectedClientIds;
-			const activeClientId = getBlockClientId(
-				ownerDocument.activeElement
-			);
+			// The engaged editing host holds focus on behalf of the selection
+			// inside it. It can be a block's own element (a block list that
+			// is also a block, e.g. a column), which must not count as the
+			// user focusing that block.
+			const activeClientId =
+				ownerDocument.activeElement === getEditableRootElement( node )
+					? undefined
+					: getBlockClientId( ownerDocument.activeElement );
 
 			// Handle the case when an appender is selected.
 			if (

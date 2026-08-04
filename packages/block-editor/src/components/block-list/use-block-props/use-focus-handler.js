@@ -10,7 +10,7 @@ import {
 /**
  * Internal dependencies
  */
-import { isInsideRootBlock } from '../../../utils/dom';
+import { getBlockClientId, isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -71,6 +71,26 @@ export function useFocusHandler( clientId ) {
 				// setting the selected block.
 				if ( ! isInsideRootBlock( node, event.target ) ) {
 					return;
+				}
+
+				// While the wrapper is an editing host, it holds focus on
+				// behalf of the caret inside it. When the caret lives in a
+				// descendant block, focus arriving on the wrapper is host
+				// engagement, not the user targeting this block: the caret
+				// decides the selection.
+				if (
+					event.target === node &&
+					node.contentEditable === 'true'
+				) {
+					const { anchorNode } =
+						node.ownerDocument.defaultView.getSelection();
+					if (
+						anchorNode &&
+						node.contains( anchorNode ) &&
+						getBlockClientId( anchorNode ) !== clientId
+					) {
+						return;
+					}
 				}
 
 				// For editable targets, select without initial caret
