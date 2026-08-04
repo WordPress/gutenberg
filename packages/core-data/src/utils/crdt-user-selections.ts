@@ -3,7 +3,7 @@
  */
 import { select } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
+// @ts-expect-error `@wordpress/block-editor` is not typed yet.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**

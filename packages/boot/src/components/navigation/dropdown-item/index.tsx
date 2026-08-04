@@ -71,7 +71,7 @@ export default function DropdownItem( {
 }: DropdownItemProps ) {
 	const menuItems: MenuItem[] = useSelect(
 		( select ) =>
-			// @ts-expect-error The boot store is untyped, so `select()` resolves to `never`.
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems(),
 		[]
 	);
