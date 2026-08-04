@@ -62,10 +62,14 @@ jest.mock( '@wordpress/dataviews', () => {
 		view,
 		onChangeView,
 		itemListLabel,
+		actions = [],
 	} ) => {
 		const titleField = fields.find( ( f ) => f.id === view.titleField );
 		const descriptionField = fields.find(
 			( f ) => f.id === view.descriptionField
+		);
+		const selectedItems = data.filter( ( item ) =>
+			selection.includes( getItemId( item ) )
 		);
 
 		return (
@@ -104,6 +108,27 @@ jest.mock( '@wordpress/dataviews', () => {
 				>
 					Next page
 				</button>
+				{ /* Mirrors the picker footer's action buttons: eligibility
+				     disables the button, the label sees the selection, the
+				     callback only receives eligible items. */ }
+				{ actions.map( ( action ) => {
+					const eligibleItems = action.isEligible
+						? selectedItems.filter( action.isEligible )
+						: selectedItems;
+					return (
+						<button
+							key={ action.id }
+							disabled={
+								! selection.length || ! eligibleItems.length
+							}
+							onClick={ () => action.callback( eligibleItems ) }
+						>
+							{ typeof action.label === 'string'
+								? action.label
+								: action.label( selectedItems ) }
+						</button>
+					);
+				} ) }
 			</div>
 		);
 	};
@@ -217,11 +242,10 @@ describe( 'ScreenRevisions', () => {
 		const selected = screen.getAllByRole( 'option' )[ 0 ];
 		expect( selected ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( within( selected ).getByText( 'Active' ) ).toBeVisible();
+		// The footer action is not applicable to the active revision.
 		expect(
-			screen.queryByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-		).not.toBeInTheDocument();
+			screen.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
 	} );
 
 	it( 'appends the matching-styles hint to the selected revision label', () => {
@@ -234,7 +258,7 @@ describe( 'ScreenRevisions', () => {
 		);
 	} );
 
-	it( 'shows the changes summary and Apply button only for the selected revision', async () => {
+	it( 'shows the changes summary for the selected revision and applies it from the footer', async () => {
 		useNavigator.mockReturnValue( { params: { revisionId: '9' }, goTo } );
 
 		const { onChange } = renderScreen( {
@@ -257,13 +281,31 @@ describe( 'ScreenRevisions', () => {
 			{ maxResults: 7 }
 		);
 
-		const applyButton = within( selected ).getByRole( 'button', {
-			name: 'Apply the selected revision to your site.',
-		} );
+		// Options hold no interactive content; the action lives in the
+		// footer, outside the listbox options.
+		expect(
+			within( selected ).queryByRole( 'button' )
+		).not.toBeInTheDocument();
+
+		const applyButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( applyButton ).toBeEnabled();
 		await userEvent.click( applyButton );
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( { id: 9 } )
 		);
+	} );
+
+	it( 'labels the footer action for the reset entry', () => {
+		useNavigator.mockReturnValue( {
+			params: { revisionId: 'parent' },
+			goTo,
+		} );
+
+		renderScreen( { userConfig: { styles: STYLES_B, settings: {} } } );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeEnabled();
 	} );
 
 	it( 'asks for confirmation before applying over unsaved changes', async () => {
@@ -280,9 +322,7 @@ describe( 'ScreenRevisions', () => {
 		} );
 
 		await userEvent.click(
-			screen.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
+			screen.getByRole( 'button', { name: 'Apply' } )
 		);
 		const dialog = screen.getByRole( 'dialog' );
 		expect( dialog ).toHaveTextContent(
