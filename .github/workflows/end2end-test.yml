@@ -59,8 +59,7 @@ jobs:
                       packages/*/src/worker-code.ts
                       packages/block-serialization-spec-parser/parser.js
                       packages/block-serialization-spec-parser/parser.php
-                  # Stay available for GitHub's whole 30-day re-run window.
-                  retention-days: 30
+                  retention-days: 3
                   if-no-files-found: error
                   # Allow re-running the workflow over a previous attempt.
                   overwrite: true
