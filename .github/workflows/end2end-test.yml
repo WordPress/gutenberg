@@ -49,6 +49,7 @@ jobs:
             - name: Install Playwright dependencies
               uses: ./.github/setup-playwright
               with:
+                  workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium firefox webkit
 
             - name: Install WordPress and start the server
@@ -102,6 +103,7 @@ jobs:
             - name: Install Playwright dependencies
               uses: ./.github/setup-playwright
               with:
+                  workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium
 
             - name: Install WordPress and start the server
