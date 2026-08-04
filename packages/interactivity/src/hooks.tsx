@@ -13,7 +13,7 @@ import {
 	type VNode,
 	type Context,
 } from 'preact';
-import { useRef, useCallback, useContext, useLayoutEffect } from 'preact/hooks';
+import { useRef, useCallback, useContext } from 'preact/hooks';
 
 /**
  * Internal dependencies
@@ -316,9 +316,20 @@ const Directives = ( {
 	originalProps,
 	previousScope,
 }: DirectivesProps ) => {
-	// Initialize the scope of this element. These scopes are different per each
-	// level because each level has a different context, but they share the same
-	// element ref, state and props.
+	/*
+	 * Initialize the scope of this element. These scopes are different per each
+	 * level because each level has a different context, but they share the same
+	 * element ref, state and props.
+	 *
+	 * The `scope` object is a mutable container written during render on
+	 * purpose: it records what this render computed (the evaluate function,
+	 * the resolved context, the ref) so directive callbacks can read it back.
+	 * It is render-OUTPUT, not render-input state, so mutating it here is
+	 * intentional — which is why `react-hooks/rules-of-hooks` is disabled for
+	 * the `useRef` below. Do NOT add other hooks to this component: the React
+	 * Compiler would then analyze the whole block and flag every mutation
+	 * (react-hooks/immutability).
+	 */
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	const { client, server } = useContext( context );
@@ -354,28 +365,6 @@ const Directives = ( {
 		evaluate: scope.evaluate,
 	};
 
-	/*
-	 * Register this element's rendered context in the context registry, so
-	 * `renderElement()` can find the live context at this position in the
-	 * DOM. Runs in a layout effect, which fires synchronously after the DOM
-	 * mutation (before paint), so the registry is populated by the time
-	 * `renderElement()` returns.
-	 *
-	 * Elements with a `context` directive render a Provider as their child
-	 * whose value holds the post-merge context (own value merged with the
-	 * inherited one) — that is what should be registered, since it is the
-	 * effective context at this element.
-	 */
-	useLayoutEffect( () => {
-		if ( scope.ref.current ) {
-			const providerValue = props.children?.props?.value;
-			registerElementContext( scope.ref.current, {
-				client: providerValue?.client ?? scope.context,
-				server: providerValue?.server ?? scope.serverContext,
-			} );
-		}
-	} );
-
 	setScope( scope );
 
 	for ( const directiveName of currentPriorityLevel ) {
@@ -387,7 +376,63 @@ const Directives = ( {
 
 	resetScope();
 
+	/*
+	 * Queue this element's rendered context for registration in the context
+	 * registry. The DOM element only exists after preact has committed this
+	 * vnode, so the actual registration happens in the `options.diffed` hook
+	 * below, which fires after this vnode has been diffed into the DOM.
+	 *
+	 * Elements with a `context` directive render a Provider as their child
+	 * whose value holds the post-merge context (own value merged with the
+	 * inherited one) — that is what should be registered, since it is the
+	 * effective context at this element.
+	 */
+	const providerValue = props.children?.props?.value;
+	pendingContextRegistrations.set( element, {
+		client: providerValue?.client ?? scope.context,
+		server: providerValue?.server ?? scope.serverContext,
+	} );
+
 	return props.children;
+};
+
+// VNodes whose rendered context should be registered in the context registry
+// once they have been diffed into the DOM. Keyed by the element vnode; entries
+// are deleted on registration, so they are garbage-collected with the vnode.
+const pendingContextRegistrations = new WeakMap<
+	VNode,
+	{ client: object; server: object }
+>();
+
+/*
+ * Preact Options Hook called after a vnode has been diffed into the DOM.
+ * Registers the element's context in the context registry so
+ * `renderElement()` can find the live context at any DOM position.
+ *
+ * This uses preact's `options.diffed` hook rather than a `useLayoutEffect`
+ * inside the `Directives` component on purpose:
+ * - Adding a hook to `Directives` would make the React Compiler analyze the
+ *   component, flagging every intentional `scope.*` mutation above
+ *   (react-hooks/immutability).
+ * - `options.diffed` fires synchronously during the render/commit cycle,
+ *   before the render call returns — so the registry is populated by the time
+ *   `renderElement()` reads it, with no effect-timing race.
+ * - It reads the DOM node directly off the vnode, with no dependency on ref
+ *   attachment order.
+ */
+const oldDiffed = options.diffed;
+options.diffed = ( vnode: VNode< any > ) => {
+	const value = pendingContextRegistrations.get( vnode );
+	// `_dom` (or `__e` in preact's minified builds) is a preact internal: the
+	// DOM node this vnode was diffed into.
+	const dom = ( vnode as any )._dom ?? ( vnode as any ).__e;
+	if ( value && dom instanceof Element ) {
+		registerElementContext( dom, value );
+		pendingContextRegistrations.delete( vnode );
+	}
+	if ( oldDiffed ) {
+		oldDiffed( vnode );
+	}
 };
 
 // Preact Options Hook called each time a vnode is created.
