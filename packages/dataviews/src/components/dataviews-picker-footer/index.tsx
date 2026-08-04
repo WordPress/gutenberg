@@ -170,8 +170,11 @@ function PickerBulkSelectionInfo() {
 		[ selection, getItemId, data ]
 	);
 
-	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
-	if ( ! actions.length ) {
+	// The count and the selection checkbox belong with the actions, mirroring
+	// `DataViews`. Single-select pickers always hold exactly one selection, so
+	// the count carries no information and only the multiselect variant
+	// renders it.
+	if ( ! actions.length || ! isMultiselect ) {
 		return null;
 	}
 
