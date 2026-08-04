@@ -49,10 +49,23 @@ _Parameters_
 -   _gifSource_ `ArrayBuffer | Blob`: GIF file as a Blob/File or ArrayBuffer.
 -   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
 -   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+-   _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
 
 _Returns_
 
 -   `Promise< ArrayBuffer >`: Encoded video buffer.
+
+### DEFAULT_MAX_TOTAL_PIXELS
+
+Default budget for total decoded pixels (width × height × frame count) beyond which conversion is not attempted.
+
+Conversion cost is roughly proportional to the total number of decoded pixels. 300 megapixels approximates what a mid-range machine converts within the ~30s the caller is willing to wait (e.g. a 1920x1080 GIF at ~145 frames); anything larger would likely be abandoned anyway, so it is cheaper to not start. Pass `0` to disable the check.
+
+### SIZE_LIMIT_ERROR_PREFIX
+
+Message prefix for GIFs skipped because they exceed the total-pixel budget.
+
+Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip as a graceful fallback (keep the uploaded GIF, no companion video); the longer prefix lets consumers distinguish it, e.g. to log a warning. Like UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only the message string survives the worker boundary.
 
 ### UNSUPPORTED_ERROR_PREFIX
 

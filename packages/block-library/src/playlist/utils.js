@@ -2,15 +2,34 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
+
+function getMediaUrl( media ) {
+	return media?.url ?? media?.source_url;
+}
+
+function getMediaTitle( media ) {
+	const title = media?.title;
+
+	if ( title === undefined ) {
+		return undefined;
+	}
+
+	if ( typeof title === 'string' ) {
+		return title;
+	}
+
+	return decodeEntities( title?.raw || title?.rendered || '' );
+}
 
 /**
- * Transform media library image data into album cover attributes.
+ * Transform media library image data into track image attributes.
  *
  * @param {Object} image - Image object from the media library.
- * @return {Object} Album cover attributes for the playlist-track block.
+ * @return {Object} Track image attributes for the playlist-track block.
  */
-export function getAlbumCoverAttributes( image ) {
-	const imageSrc = image?.src ?? image?.url;
+export function getTrackImageAttributes( image ) {
+	const imageSrc = image?.src ?? getMediaUrl( image );
 
 	// Prevent using the default media attachment icon as the track image.
 	if ( imageSrc?.endsWith( '/images/media/audio.svg' ) ) {
@@ -34,10 +53,12 @@ export function getAlbumCoverAttributes( image ) {
  * @return {Object} Track attributes for the playlist-track block.
  */
 export function getTrackAttributes( media ) {
+	const mediaUrl = getMediaUrl( media );
+
 	return {
-		id: media.id || media.url, // Attachment ID or URL.
-		src: media.url,
-		title: media.title,
+		id: media.id || mediaUrl, // Attachment ID or URL.
+		src: mediaUrl,
+		title: getMediaTitle( media ),
 		artist:
 			media.artist ||
 			media?.meta?.artist ||
@@ -49,6 +70,6 @@ export function getTrackAttributes( media ) {
 			media?.media_details?.album ||
 			__( 'Unknown album' ),
 		length: media?.fileLength || media?.media_details?.length_formatted,
-		...getAlbumCoverAttributes( media?.image ),
+		...getTrackImageAttributes( media?.image ),
 	};
 }

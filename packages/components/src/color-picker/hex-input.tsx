@@ -58,7 +58,6 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
-			size="__unstable-large"
 			__unstableStateReducer={ stateReducer }
 			__unstableInputWidth="9em"
 		/>

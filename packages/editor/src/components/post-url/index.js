@@ -109,7 +109,6 @@ export default function PostURL( { onClose } ) {
 					{ isEditable && (
 						<>
 							<InputControl
-								__next40pxDefaultSize
 								prefix={
 									<InputControlPrefixWrapper>
 										/

@@ -94,21 +94,23 @@ describe( 'RectangleStencil', () => {
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
 
 			expect( labels ).toEqual( [
-				'Resize top-left corner',
-				'Resize top edge',
-				'Resize top-right corner',
-				'Resize right edge',
-				'Resize bottom-right corner',
-				'Resize bottom edge',
-				'Resize bottom-left corner',
-				'Resize left edge',
+				'Resize from top-left corner',
+				'Resize from top edge',
+				'Resize from top-right corner',
+				'Resize from right edge',
+				'Resize from bottom-right corner',
+				'Resize from bottom edge',
+				'Resize from bottom-left corner',
+				'Resize from left edge',
 			] );
 		} );
 
 		it( 'describes keyboard resizing on resize handles', () => {
 			renderStencil();
 			expect(
-				screen.getByRole( 'button', { name: 'Resize top-left corner' } )
+				screen.getByRole( 'button', {
+					name: 'Resize from top-left corner',
+				} )
 			).toHaveAccessibleDescription(
 				'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
 			);
@@ -121,10 +123,10 @@ describe( 'RectangleStencil', () => {
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
 
 			expect( labels ).toEqual( [
-				'Resize top-left corner',
-				'Resize top-right corner',
-				'Resize bottom-right corner',
-				'Resize bottom-left corner',
+				'Resize from top-left corner',
+				'Resize from top-right corner',
+				'Resize from bottom-right corner',
+				'Resize from bottom-left corner',
 			] );
 		} );
 	} );
@@ -252,7 +254,7 @@ describe( 'RectangleStencil', () => {
 				imageSize: { width: 500, height: 500 },
 			} );
 			const nwHandle = screen.getByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} );
 
 			fireEvent.keyDown( nwHandle, {
@@ -319,7 +321,7 @@ describe( 'RectangleStencil', () => {
 			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => rect );
 			renderStencil( { aspectRatio: 1, snapCropRect } );
 			const nwHandle = screen.getByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} );
 
 			fireEvent.keyDown( nwHandle, {

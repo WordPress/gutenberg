@@ -19,11 +19,12 @@ test.describe( 'Group', () => {
 
 		await inserterButton.click();
 
-		await page.type( 'role=searchbox[name="Search"i]', 'Group' );
+		await page.getByRole( 'searchbox', { name: 'Search' } ).type( 'Group' );
 
-		await page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Group' } )
+			.click();
 
 		// Select the default, selected Group layout from the variation picker.
 		await editor.canvas
@@ -69,9 +70,10 @@ test.describe( 'Group', () => {
 			)
 			.click();
 		await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-		await page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();

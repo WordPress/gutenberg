@@ -6,6 +6,7 @@ export * from './input-control';
 export * from './number-control';
 export * from './radio-control';
 export * from './range-control';
+export * from './content-editable-control';
 export * from './select-control';
 export * from './text-control';
 export * from './textarea-control';

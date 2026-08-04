@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
 		{ "path": "../components" },
 		{ "path": "../compose" },

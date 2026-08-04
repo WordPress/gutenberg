@@ -444,62 +444,6 @@ Learn more about [using build scripts](#using-build-scripts) to optimize the dev
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
-### `test-e2e`
-
-Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/HEAD/docs/api.md):
-
-> [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
-
-> [Puppeteer](https://pptr.dev/) is a Node library which provides a high-level API to control Chrome or Chromium over the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Puppeteer runs [headless](https://developers.google.com/web/updates/2017/04/headless-chrome) by default, but can be configured to run full (non-headless) Chrome or Chromium.
-
-_Example:_
-
-```json
-{
-	"scripts": {
-		"test:e2e": "wp-scripts test-e2e",
-		"test:e2e:help": "wp-scripts test-e2e --help",
-		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e --puppeteer-devtools"
-	}
-}
-```
-
-This is how you execute those scripts using the presented setup:
-
--   `npm run test:e2e` - runs all e2e tests.
--   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
--   `npm run test:e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
--   `npm run test:e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
--   `npm run test:e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
--   `npm run test:e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
-
-Jest will look for test files with any of the following popular naming conventions:
-
--   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix at any level of depth in `spec` folders.
--   Files with `.spec.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
-
-This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
-
--   You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
-
-We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
-
-#### Failed Test Artifacts
-
-When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
-
-The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
-
-#### Advanced information
-
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
-
-Should there be any situation where you want to provide your own Jest config, you can do so.
-
--   the command receives a `--config` argument. Example: `wp-scripts test-e2e --config my-jest-config.js`.
--   there is a file called `jest-e2e.config.js`, `jest-e2e.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
--   a `jest` object can be provided in the `package.json` file with the test configuration.
-
 ### `test-unit-js`
 
 _Alias_: `test-unit-jest`
@@ -542,9 +486,11 @@ Should there be any situation where you want to provide your own Jest config, yo
 -   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
 -   a `jest` object can be provided in the `package.json` file with the test configuration.
 
-### `test-playwright`
+### `test-e2e`
 
-Launches the Playwright End-To-End (E2E) test runner. Similar to Puppeteer, it provides a high-level API to control a headless browser.
+_Alias_: `test-playwright`
+
+Launches the End-To-End (E2E) test runner, powered by [Playwright](https://playwright.dev/). It provides a high-level API to control a headless browser. `test-playwright` remains available as an alias that runs the same command.
 
 Refer to the [Getting Started guide](https://playwright.dev/docs/writing-tests) to learn how to write tests.
 
@@ -553,20 +499,20 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"test:playwright": "wp-scripts test-playwright",
-		"test:playwright:help": "wp-scripts test-playwright --help",
-		"test:playwright:debug": "wp-scripts test-playwright --debug"
+		"test:e2e": "wp-scripts test-e2e",
+		"test:e2e:help": "wp-scripts test-e2e --help",
+		"test:e2e:debug": "wp-scripts test-e2e --debug"
 	}
 }
 ```
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run test:playwright` - runs all tests.
--   `npm run test:playwright:help` - prints all available options to configure the test runner.
--   `npm run test:playwright:debug` - runs all tests interactively with the Playwright inspector.
--   `npm run test:playwright FILE_NAME` - runs a specific test file.
--   `npm run test:playwright -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
+-   `npm run test:e2e` - runs all tests.
+-   `npm run test:e2e:help` - prints all available options to configure the test runner.
+-   `npm run test:e2e:debug` - runs all tests interactively with the Playwright inspector.
+-   `npm run test:e2e FILE_NAME` - runs a specific test file.
+-   `npm run test:e2e -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
 
 By default, Playwright looks for JavaScript or TypeScript files with `.test` or `.spec` suffix in the project root-level `/specs` folder, for example `/specs/login-screen.wrong-credentials.spec.ts`.
 
@@ -577,11 +523,11 @@ To do so, you can add a file called `playwright.config.ts` or `playwright.config
 
 When tests fail, snapshots will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
 
-The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:playwright`.
+The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
 
 #### Advanced information
 
-You are able to use all of Playwright’s [CLI options](https://playwright.dev/docs/test-cli#reference). You can also run `./node_modules/.bin/wp-scripts test-playwright --help` or `npm run test:playwright:help` (as mentioned above) to view all the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+You are able to use all of Playwright’s [CLI options](https://playwright.dev/docs/test-cli#reference). You can also run `./node_modules/.bin/wp-scripts test-e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ## Passing Node.js options
 
@@ -622,18 +568,6 @@ Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts Vie
 The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
 
 See [Debugging in Visual Studio Code](https://code.visualstudio.com/Docs/editor/debugging) for more details on using the Visual Studio Code debugger.
-
-#### Debugging e2e tests
-
-Since e2e tests run both in the node context _and_ the (usually headless) browser context, not all lines of code can have breakpoints set within the inspector client—only the node context is debugged in the inspector client.
-
-The code executed in the node context includes all of the test files _excluding_ code within `page.evaluate` functions. The `page.evaluate` functions and the rest of your app code is executed within the browser context.
-
-Test code (node context) can be debugged normally using the instructions above.
-
-To also debug the browser context, run `wp-scripts --inspect-brk test-e2e --puppeteer-devtools`. The `--puppeteer-devtools` option (or the `PUPPETEER_DEVTOOLS="true"` environment variable when used with `PUPPETEER_HEADLESS="false"`) will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
-
-For more e2e debugging tips check out the [Puppeteer debugging docs](https://developers.google.com/web/tools/puppeteer/debugging).
 
 ## Using build scripts
 

@@ -4,6 +4,23 @@
 
 ### Enhancements
 
+-   Widgets: carry a widget's declarative `actions` from `widget.json` into
+    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Widgets: carry a widget's declarative `icon` reference from `widget.json`
+    into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+
+### Bug Fixes
+
+-   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
+-   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
+-   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
+-   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+
+## 0.19.0 (2026-07-14)
+
+### Enhancements
+
+-   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widgets: carry the optional metadata fields from `widget.json` into
     the generated PHP registry: `title`, `description`, `category`,
     `keywords`, `textdomain`, and the `help` note, so hosts can translate
@@ -11,6 +28,10 @@
     ([#79638](https://github.com/WordPress/gutenberg/pull/79638),
     [#79701](https://github.com/WordPress/gutenberg/pull/79701),
     [#79830](https://github.com/WordPress/gutenberg/pull/79830)).
+
+### Bug Fixes
+
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 1.x releases and preserve automatic design token fallback plugin loading ([#80089](https://github.com/WordPress/gutenberg/pull/80089)).
 
 ## 0.18.0 (2026-07-01)
 

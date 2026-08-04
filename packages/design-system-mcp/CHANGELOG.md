@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-07-14)
+
+### Bug Fixes
+
+-   Fix error caused by changes in upstream package APIs prerelease version ([#80061](https://github.com/WordPress/gutenberg/pull/80061)).
+
 ## 0.7.0 (2026-07-01)
 
 ## 0.6.0 (2026-06-24)

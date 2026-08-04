@@ -32,7 +32,7 @@ const meta: Meta< typeof Card > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
+			notes: 'Use [`Card`](?path=/docs/design-system-components-card--docs) or [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

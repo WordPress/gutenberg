@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	BlockControls,
-	AlignmentControl,
 	InspectorControls,
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
@@ -32,18 +26,14 @@ export default function TermNameEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, level = 0, isLink, levelOptions } = attributes;
+	const { level = 0, isLink, levelOptions } = attributes;
 	const { term } = useTermName( termId, taxonomy );
 
 	const termName = term?.name
 		? decodeEntities( term.name )
 		: __( 'Term Name' );
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -69,12 +59,6 @@ export default function TermNameEdit( {
 					options={ levelOptions }
 					onChange={ ( newLevel ) => {
 						setAttributes( { level: newLevel } );
-					} }
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>

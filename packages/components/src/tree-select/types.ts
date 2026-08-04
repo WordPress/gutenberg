@@ -18,15 +18,8 @@ export interface Tree {
 export interface TreeSelectProps
 	extends Omit<
 		SelectControlSingleSelectionProps,
-		'value' | 'multiple' | 'onChange' | '__next40pxDefaultSize'
+		'value' | 'multiple' | 'onChange'
 	> {
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */

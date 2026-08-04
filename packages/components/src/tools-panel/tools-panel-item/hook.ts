@@ -1,22 +1,21 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import * as styles from '../styles';
+import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
 const noop = () => {};
@@ -174,32 +173,15 @@ export function useToolsPanelItem(
 		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		const shouldApplyPlaceholderStyles =
-			shouldRenderPlaceholder && ! isShown;
-		const firstItemStyle =
-			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
-		const lastItemStyle =
-			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
-		return cx(
-			styles.ToolsPanelItem,
-			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
-			! shouldApplyPlaceholderStyles && className,
-			firstItemStyle,
-			lastItemStyle
-		);
-	}, [
-		isShown,
-		shouldRenderPlaceholder,
-		className,
-		cx,
-		firstDisplayedItem,
-		lastDisplayedItem,
-		__experimentalFirstVisibleItemClass,
-		__experimentalLastVisibleItemClass,
-		label,
-	] );
+	const shouldApplyPlaceholderStyles = shouldRenderPlaceholder && ! isShown;
+	const classes = clsx(
+		styles[ 'tools-panel-item' ],
+		shouldApplyPlaceholderStyles &&
+			styles[ 'tools-panel-item-placeholder' ],
+		! shouldApplyPlaceholderStyles && className,
+		firstDisplayedItem === label && __experimentalFirstVisibleItemClass,
+		lastDisplayedItem === label && __experimentalLastVisibleItemClass
+	);
 
 	return {
 		...otherProps,

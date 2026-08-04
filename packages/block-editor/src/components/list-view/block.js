@@ -6,11 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	hasBlockSupport,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -48,6 +44,7 @@ import {
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import { useBlockRename, BlockRenameModal } from '../block-rename';
@@ -133,6 +130,7 @@ function ListViewBlock( {
 		allowRightClickOverrides,
 		editedSection,
 		viewportSettings,
+		blockVisibilitySetting,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -151,6 +149,9 @@ function ListViewBlock( {
 				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
 				viewportSettings: settings.__experimentalFeatures?.viewport,
+				blockVisibilitySetting:
+					settings.__experimentalFeatures?.blockVisibility
+						?.allowEditing,
 			};
 		},
 		[ clientId ]
@@ -381,10 +382,7 @@ function ListViewBlock( {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( blocksToUpdate );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = switchToBlockType(
-					blocks,
-					groupingBlockName
-				);
+				const newBlocks = groupBlocks( blocks, groupingBlockName );
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
@@ -394,6 +392,9 @@ function ListViewBlock( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );

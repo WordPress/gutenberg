@@ -11,6 +11,7 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	forwardRef,
 	useContext,
@@ -28,7 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -99,6 +104,7 @@ export function RichTextWrapper(
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -241,6 +247,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
+		( select ) => {
+			if (
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
+			) {
+				return false;
+			}
+
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
+		},
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+	);
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -344,6 +371,60 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		isSelected,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -351,6 +432,22 @@ export function RichTextWrapper(
 
 	function onFocus() {
 		anchorRef.current?.focus();
+	}
+
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
 	}
 
 	const TagName = tagName;
@@ -436,17 +533,7 @@ export function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				// Setting tabIndex to 0 is unnecessary, the element is already
-				// focusable because it's contentEditable. This also fixes a
-				// Safari bug where it's not possible to Shift+Click multi
-				// select blocks when Shift Clicking into an element with
-				// tabIndex because Safari will focus the element. However,
-				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={
-					props.tabIndex === 0 && ! shouldDisableEditing
-						? null
-						: props.tabIndex
-				}
+				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>

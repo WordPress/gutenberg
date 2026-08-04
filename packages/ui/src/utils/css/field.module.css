@@ -8,7 +8,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			line-height: var(--wp-ui-field-label-line-height);
-			font-weight: var(--wpds-typography-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			text-transform: uppercase;
 			color: var(--wpds-color-foreground-content-neutral);
 

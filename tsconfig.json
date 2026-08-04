@@ -78,6 +78,7 @@
 		{ "path": "packages/style-runtime" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
+		{ "path": "packages/theme/tsconfig.test.json" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/ui" },
 		{ "path": "packages/undo-manager" },

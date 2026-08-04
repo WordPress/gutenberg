@@ -219,6 +219,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowJustification = true } = layoutBlockSupport;
 
@@ -226,7 +227,10 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }

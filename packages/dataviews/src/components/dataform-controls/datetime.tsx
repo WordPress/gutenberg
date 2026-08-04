@@ -176,7 +176,6 @@ function CalendarDateTimeControl< Item >( {
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
 					ref={ inputControlRef }
-					__next40pxDefaultSize
 					required={ !! isValid?.required }
 					customValidity={ getCustomValidity( isValid, validity ) }
 					type="datetime-local"

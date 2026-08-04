@@ -168,11 +168,20 @@ export interface SyncManager {
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => string | null;
+	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

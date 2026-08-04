@@ -12,14 +12,22 @@ const audioPath = path.join(
 	__dirname,
 	'../../../assets/playlist-e2e-test.wav'
 );
+const imagePath = path.join(
+	__dirname,
+	'../../../assets/10x10_e2e_test_image_green.png'
+);
 
 test.describe( 'Playlist block', () => {
-	let uploadedMedia;
+	let uploadedAudio;
+	let uploadedSecondAudio;
+	let uploadedImage;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 
-		uploadedMedia = await requestUtils.uploadMedia( audioPath );
+		uploadedAudio = await requestUtils.uploadMedia( audioPath );
+		uploadedSecondAudio = await requestUtils.uploadMedia( audioPath );
+		uploadedImage = await requestUtils.uploadMedia( imagePath );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -28,6 +36,53 @@ test.describe( 'Playlist block', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'shows the add track control when a playlist track is selected', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+		await page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
+
+		await page.evaluate( ( audio ) => {
+			const track = window.wp.blocks.createBlock( 'core/playlist-track', {
+				id: audio.id,
+				src: audio.source_url,
+				title: 'Selected Track',
+				artist: 'Test Artist',
+				length: '0:12',
+			} );
+			const playlist = window.wp.blocks.createBlock(
+				'core/playlist',
+				{},
+				[ track ]
+			);
+
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.insertBlock( playlist );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.selectBlock( track.clientId );
+		}, uploadedAudio );
+
+		await expect(
+			editor.canvas
+				.locator( '[data-type="core/playlist-track"].is-selected' )
+				.first()
+		).toBeVisible();
+		await editor.showBlockToolbar();
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add track' } )
+		).toBeVisible();
 	} );
 
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
@@ -57,9 +112,9 @@ test.describe( 'Playlist block', () => {
 		const trackTitle = 'Keyboard Test Track';
 		const playlistAttributes = { currentTrack: uniqueId };
 		const trackAttributes = {
-			id: uploadedMedia.id,
+			id: uploadedAudio.id,
 			uniqueId,
-			src: uploadedMedia.source_url,
+			src: uploadedAudio.source_url,
 			title: trackTitle,
 			artist: 'Test Artist',
 			length: '0:12',
@@ -86,7 +141,7 @@ test.describe( 'Playlist block', () => {
 		await page.goto( post.link );
 
 		// `exact` avoids matching the track button, whose accessible name
-		// includes the "Select to play this track" screen-reader text.
+		// includes the "Play" or "Pause" screen-reader text.
 		const playButton = page.getByRole( 'button', {
 			name: 'Play',
 			exact: true,
@@ -169,5 +224,78 @@ test.describe( 'Playlist block', () => {
 
 		// Focus should still be on the slider after seeking.
 		await expect( seekControl ).toBeFocused();
+	} );
+
+	test( 'removes player artwork when switching to a track without an image on the frontend', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const trackWithImageId = 'playlist-track-with-image';
+		const trackWithoutImageId = 'playlist-track-without-image';
+		const trackWithoutImageTitle = 'Track without artwork';
+		const playlistAttributes = { currentTrack: trackWithImageId };
+		const trackWithImageAttributes = {
+			id: uploadedAudio.id,
+			uniqueId: trackWithImageId,
+			src: uploadedAudio.source_url,
+			title: 'Track with artwork',
+			artist: 'Test Artist',
+			image: uploadedImage.source_url,
+			imageAlt: 'Green album cover',
+			length: '0:12',
+		};
+		const trackWithoutImageAttributes = {
+			id: uploadedSecondAudio.id,
+			uniqueId: trackWithoutImageId,
+			src: uploadedSecondAudio.source_url,
+			title: trackWithoutImageTitle,
+			artist: 'Test Artist',
+			length: '0:12',
+		};
+		const playlistComment = `<!-- wp:playlist ${ JSON.stringify(
+			playlistAttributes
+		) } -->`;
+		const firstTrackComment = `<!-- wp:playlist-track ${ JSON.stringify(
+			trackWithImageAttributes
+		) } /-->`;
+		const secondTrackComment = `<!-- wp:playlist-track ${ JSON.stringify(
+			trackWithoutImageAttributes
+		) } /-->`;
+		const post = await requestUtils.createPost( {
+			title: 'Playlist artwork removal',
+			status: 'publish',
+			content: [
+				playlistComment,
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">',
+				firstTrackComment,
+				secondTrackComment,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+			].join( '' ),
+		} );
+
+		await page.goto( post.link );
+
+		const player = page.locator( '.wp-block-playlist__waveform-player' );
+		const playerArtwork = player.locator( '.waveform-artwork' );
+
+		await expect( playerArtwork ).toHaveAttribute(
+			'src',
+			uploadedImage.source_url
+		);
+		await expect( playerArtwork ).toHaveAttribute(
+			'alt',
+			'Green album cover'
+		);
+
+		await page
+			.getByRole( 'button', { name: /Track without artwork/ } )
+			.click();
+
+		await expect(
+			player.getByRole( 'slider', { name: trackWithoutImageTitle } )
+		).toBeVisible();
+		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 } );

@@ -60,6 +60,7 @@ function ScreenColors() {
 				value={ style }
 				onChange={ setStyle }
 				settings={ settings }
+				showInheritanceLabelIndicators={ false }
 			/>
 		</>
 	);

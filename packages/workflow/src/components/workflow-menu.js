@@ -21,7 +21,6 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
-import { initialize as initializeCoreAbilities } from '@wordpress/core-abilities';
 
 /**
  * Internal dependencies
@@ -128,7 +127,9 @@ export function WorkflowMenu() {
 
 	useEffect( () => {
 		if ( isOpen ) {
-			initializeCoreAbilities();
+			// Load @wordpress/core-abilities on demand. Importing it fetches
+			// and registers all server abilities and categories.
+			import( '@wordpress/core-abilities' );
 		}
 	}, [ isOpen ] );
 

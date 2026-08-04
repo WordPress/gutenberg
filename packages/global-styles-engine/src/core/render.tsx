@@ -266,13 +266,15 @@ function getPresetsClasses(
 									const classSelectorToUse = `.has-${ kebabCase(
 										slug
 									) }-${ classSuffix }`;
+									// Wrap the block selector in `:where()` so a block-level
+									// preset keeps the same 0-1-0 specificity as a root-level
+									// one. Without it, rules like `p.has-x-color` out-rank
+									// equally-important 0-1-0 rules targeting the same
+									// property, such as per-instance responsive state styles.
+									// `blockSelector` can be a list, e.g. "h1, h2, h3".
 									const selectorToUse = blockSelector
-										.split( ',' ) // Selector can be "h1, h2, h3"
-										.map(
-											( selector ) =>
-												`${ selector }${ classSelectorToUse }`
-										)
-										.join( ',' );
+										? `:where(${ blockSelector })${ classSelectorToUse }`
+										: classSelectorToUse;
 									const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
 										slug
 									) })`;
@@ -1012,7 +1014,11 @@ function getResponsiveStyleNodes(
 	const {
 		styles,
 		selector,
+		fallbackGapValue,
 		featureSelectors,
+		hasLayoutSupport,
+		layoutHasBlockGapSupport,
+		layoutSelector,
 		name,
 		elementName,
 		isStyleVariation,
@@ -1039,10 +1045,14 @@ function getResponsiveStyleNodes(
 						featureSelectors && typeof featureSelectors !== 'string'
 							? featureSelectors
 							: undefined,
+					fallbackGapValue,
+					hasLayoutSupport,
 					name,
 					elementName,
 					isStyleVariation,
 					variationName,
+					layoutSelector,
+					layoutHasBlockGapSupport,
 				},
 			];
 		}
