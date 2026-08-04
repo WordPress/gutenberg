@@ -31,6 +31,11 @@ export interface SyncEnvelopeFromClient {
 
 export interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
+	// Persisted base-version token for post-entity rooms. Broadcast with
+	// every response so caught-up session participants always hold the
+	// current token for save guards; a client missing the latest token is
+	// exactly the drifted client a base-version check should fence.
+	base_version?: string;
 	compaction_request?: SyncUpdate[]; // deprecated
 	end_cursor: number; // use as `after` in next request
 	should_compact?: boolean;

@@ -500,6 +500,21 @@ function poll(): void {
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
 
+				// Relay the persisted base-version token to save-guard
+				// listeners (e.g. the distributed-editing prototype's apiFetch
+				// middleware). A window event keeps the coupling loose: the
+				// sync layer knows nothing about who consumes the token.
+				if ( room.base_version && typeof window !== 'undefined' ) {
+					window.dispatchEvent(
+						new CustomEvent( 'wp-sync-base-version', {
+							detail: {
+								baseVersion: room.base_version,
+								room: room.room,
+							},
+						} )
+					);
+				}
+
 				// If a limit is exceeded, disconnect immediately without processing updates.
 				if ( checkConnectionLimit( room.awareness, roomState ) ) {
 					roomState.onStatusChange( {

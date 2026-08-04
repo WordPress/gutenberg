@@ -199,7 +199,37 @@ if ( ! class_exists( 'WP_Sync_Server_Core' ) ) {
 			$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
 			$room_response['awareness'] = $merged_awareness;
 
+			$base_version = $this->get_room_base_version( $room );
+			if ( null !== $base_version ) {
+				$room_response['base_version'] = $base_version;
+			}
+
 			return $room_response;
+		}
+
+		/**
+		 * Returns the persisted base-version token for a post-entity room.
+		 *
+		 * Broadcasting the persisted version through the sync channel is what
+		 * makes a base-version save guard correct for session participants: a
+		 * caught-up client always holds the current token, and a drifted
+		 * client (offline through a save, or saving before catch-up) is the
+		 * one that gets fenced.
+		 *
+		 * @param string $room Room identifier (e.g. `postType/post:123`).
+		 * @return string|null Version token, or null for non-post rooms.
+		 */
+		public function get_room_base_version( string $room ) {
+			if ( ! preg_match( '/^postType\/[\w-]+:(\d+)$/', $room, $matches ) ) {
+				return null;
+			}
+			$post = get_post( (int) $matches[1] );
+			if ( ! $post ) {
+				return null;
+			}
+			// Token format matches Gutenberg_Distributed_Editing_Engine::get_version(),
+			// so the save-guard middleware can consume either source.
+			return 'v1:' . hash( 'sha256', $post->post_content );
 		}
 
 		/**
@@ -344,6 +374,18 @@ if ( ! class_exists( 'WP_Sync_Server_Core' ) ) {
 				'client_id' => $client_id,
 				'data'      => $data,
 				'type'      => $type,
+				/*
+				 * Actor stamp: the authenticated user behind this ingest,
+				 * recorded server-side at the moment of storage. The payload
+				 * stays opaque, so this is update-level attribution, not
+				 * content-level — but it is a fact the server established, not
+				 * a claim the client made, and it is the substrate any future
+				 * engine needs to attribute content. Every transport
+				 * authenticates before reaching this point (REST cookie/nonce
+				 * for polling and long-poll; per-message wp_set_current_user
+				 * in the WebSocket daemon).
+				 */
+				'actor'     => get_current_user_id(),
 			);
 
 			if ( ! $this->storage->add_update( $room, $update ) ) {
