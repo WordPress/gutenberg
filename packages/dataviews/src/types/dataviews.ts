@@ -18,6 +18,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
+import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -238,16 +239,11 @@ export type Density = 'compact' | 'balanced' | 'comfortable';
 
 /**
  * The preset aspect ratios available for item media previews, mirroring
- * Core's default `aspect-ratio` presets.
+ * Core's default `aspect-ratio` presets. Derived from the
+ * `MEDIA_ASPECT_RATIOS` constant, which layouts also use to validate the
+ * configured value at runtime, so the two can't drift apart.
  */
-export type MediaAspectRatio =
-	| '1/1'
-	| '4/3'
-	| '3/4'
-	| '3/2'
-	| '2/3'
-	| '16/9'
-	| '9/16';
+export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
 
 export interface ViewTable extends ViewBase {
 	type: 'table';

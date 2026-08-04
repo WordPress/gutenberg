@@ -312,6 +312,10 @@
 .dataviews-view-table.has-media-aspect-ratio .dataviews-column-primary__media {
 	height: var(--wpds-dimension-size-md);
 	aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
+	// Release the base rule's `min-width`: it equals the fixed height, so for
+	// ratios narrower than 1/1 the ratio-derived width would fall below it
+	// and the minimum would win, forcing the box back to a square.
+	min-width: 0;
 
 	img {
 		width: 100%;
