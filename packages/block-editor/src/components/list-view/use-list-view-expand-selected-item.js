@@ -11,7 +11,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function useListViewExpandSelectedItem( {
 	firstSelectedBlockClientId,
-	setExpandedState,
+	updateExpansion,
 } ) {
 	const [ selectedTreeId, setSelectedTreeId ] = useState( null );
 	const { selectedBlockParentClientIds } = useSelect(
@@ -39,7 +39,7 @@ export default function useListViewExpandSelectedItem( {
 		if ( selectedBlockParentClientIds?.length ) {
 			// If the selected block has parents,
 			// expand the tree branch.
-			setExpandedState( {
+			updateExpansion( {
 				type: 'expand',
 				clientIds: selectedBlockParentClientIds,
 			} );
@@ -48,7 +48,7 @@ export default function useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId,
 		selectedBlockParentClientIds,
 		selectedTreeId,
-		setExpandedState,
+		updateExpansion,
 	] );
 
 	return {
