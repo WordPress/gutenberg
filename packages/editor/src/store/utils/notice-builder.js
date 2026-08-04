@@ -9,11 +9,11 @@ import { __ } from '@wordpress/i18n';
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
 const AUTO_SAVE_FAILURE_NOTICE = __(
-	'Auto-save failed. Your changes will be persisted locally to avoid content loss. You can save manually.'
+	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.'
 );
 
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
-	'Auto-save failed because you were offline. Your changes will be persisted locally to avoid content loss. Please verify your connection and save manually.'
+	'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.'
 );
 
 /**
@@ -137,16 +137,16 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const messages = {
 		publish: __(
-			'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.'
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
 		),
 		private: __(
-			'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.'
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
 		),
 		future: __(
-			'Scheduling failed. Your content will be persisted locally to avoid content loss. Please try scheduling again.'
+			'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.'
 		),
 		default: __(
-			'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.'
+			'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
 		),
 	};
 

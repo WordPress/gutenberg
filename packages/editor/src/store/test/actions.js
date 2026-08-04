@@ -322,7 +322,7 @@ describe( 'Post actions', () => {
 				__unstableHTML: true,
 			} );
 			expect( notice.content ).toContain(
-				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.'
+				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
 			);
 			expect( notice.content ).toContain(
 				'<details class="editor-save-error-details">'
@@ -337,7 +337,7 @@ describe( 'Post actions', () => {
 				'<span class="editor-save-error-details__message">Details from server.</span>'
 			);
 			expect( speak ).toHaveBeenCalledWith(
-				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.',
+				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
 				'assertive'
 			);
 		} );

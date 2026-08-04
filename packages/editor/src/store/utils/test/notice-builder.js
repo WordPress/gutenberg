@@ -120,7 +120,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'publish' ],
 			[
-				'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -129,7 +129,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'private' ],
 			[
-				'Publishing failed. Your content will be persisted locally to avoid content loss. Please try publishing again.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -138,7 +138,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'future' ],
 			[
-				'Scheduling failed. Your content will be persisted locally to avoid content loss. Please try scheduling again.',
+				'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.',
 				defaultExpectedAction,
 			],
 		],
@@ -147,7 +147,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Updating failed. Your content will be persisted locally to avoid content loss. Please try updating again.',
+				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
 				defaultExpectedAction,
 			],
 		],
@@ -156,7 +156,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Auto-save failed. Your changes will be persisted locally to avoid content loss. You can save manually.',
+				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
 				defaultExpectedAction,
 			],
 			{ isAutosave: true },
