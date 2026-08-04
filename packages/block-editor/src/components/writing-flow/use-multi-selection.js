@@ -95,8 +95,12 @@ export default function useMultiSelection() {
 			if ( firstElement && lastElement ) {
 				const selection = defaultView.getSelection();
 				const range = ownerDocument.createRange();
-				range.setStartBefore( firstElement );
-				range.setEndAfter( lastElement );
+				// Anchor the boundaries within the block elements, not
+				// around them: a boundary in the parent layout resolves to
+				// the layout's own block (e.g. the column) in the selection
+				// observer, which would rewrite the store selection to it.
+				range.setStart( firstElement, 0 );
+				range.setEnd( lastElement, lastElement.childNodes.length );
 				selection.removeAllRanges();
 				selection.addRange( range );
 			}

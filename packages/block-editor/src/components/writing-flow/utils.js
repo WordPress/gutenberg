@@ -146,7 +146,17 @@ const editableRootElements = new WeakMap();
  * @return {?HTMLElement} The engaged editing host.
  */
 export function getEditableRootElement( node ) {
-	return editableRootElements.get( node ) ?? null;
+	const engaged = editableRootElements.get( node );
+
+	if ( engaged?.contentEditable === 'true' ) {
+		return engaged;
+	}
+
+	// The layout host hook engages declaratively, without going through
+	// setContentEditableWrapper: derive the engaged element instead of
+	// trusting the bookkeeping.
+	const resolved = resolveEditableRootElement( node );
+	return resolved?.contentEditable === 'true' ? resolved : null;
 }
 
 /**
