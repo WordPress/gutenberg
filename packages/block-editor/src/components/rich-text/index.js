@@ -263,7 +263,6 @@ export function RichTextWrapper(
 				getSelectedBlockClientId,
 				canHostEditableRoot,
 				isBlockMultiSelected,
-				isAncestorMultiSelected,
 			} = unlock( select( blockEditorStore ) );
 
 			if ( isBlockSelected ) {
@@ -272,15 +271,6 @@ export function RichTextWrapper(
 
 			if ( isBlockMultiSelected( clientId ) ) {
 				return canHostEditableRoot( clientId );
-			}
-
-			// A block within a multi-selected ancestor sits inside the live
-			// selection range of the engaged editing host: it must not be a
-			// nested editing host of its own there. WebKit rewrites the
-			// content around a selection that reaches into a nested editing
-			// host when it normalizes the range.
-			if ( isAncestorMultiSelected( clientId ) ) {
-				return true;
 			}
 
 			return false;
