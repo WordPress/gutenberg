@@ -63,6 +63,7 @@
 -   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
 -   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+-   `Button`: Migrate hardcoded Sass spacing, and typography values to WPDS design tokens ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
 
 ## 37.0.0 (2026-07-14)
 

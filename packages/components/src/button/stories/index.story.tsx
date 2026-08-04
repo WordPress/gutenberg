@@ -118,6 +118,13 @@ IsDestructive.args = {
 	isDestructive: true,
 };
 
+export const WithIcon = Template.bind( {} );
+WithIcon.args = {
+	children: 'Code is poetry',
+	icon: 'wordpress',
+	variant: 'primary',
+};
+
 export const Icon = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',
