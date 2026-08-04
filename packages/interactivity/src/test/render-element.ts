@@ -8,7 +8,7 @@ import { getContext } from '../scopes';
  * Internal dependencies
  */
 import '../directives'; // Registers all the core directives.
-import { renderElement } from '../render';
+import { renderElement, renderHTML } from '../render';
 
 function el( html: string ): HTMLElement {
 	const host = document.createElement( 'div' );
@@ -309,5 +309,149 @@ describe( 'renderElement', () => {
 		expect(
 			node.querySelector( '[data-testid="out"]' )?.textContent
 		).toBe( 'updated' );
+	} );
+} );
+
+describe( 'renderHTML', () => {
+	/* eslint-disable @wordpress/wp-global-usage */
+	const testGlobalThis = globalThis as typeof globalThis & {
+		IS_GUTENBERG_PLUGIN?: boolean;
+	};
+	let originalIsGutenbergPlugin: boolean | undefined;
+
+	beforeEach( () => {
+		document.body.innerHTML = '';
+		originalIsGutenbergPlugin = testGlobalThis.IS_GUTENBERG_PLUGIN;
+		testGlobalThis.IS_GUTENBERG_PLUGIN = false;
+	} );
+
+	afterEach( () => {
+		testGlobalThis.IS_GUTENBERG_PLUGIN = originalIsGutenbergPlugin;
+	} );
+	/* eslint-enable @wordpress/wp-global-usage */
+
+	it( 'parses HTML, inserts it into the container, and hydrates directives', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		// Hydrate the island so the registry has an entry at the target.
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="out" data-wp-text="state.message"></span>'
+		);
+
+		expect(
+			target.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'hello' );
+	} );
+
+	it( 'appends by default', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"><span data-testid="existing">keep</span></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="added">new</span>'
+		);
+
+		expect(
+			target.querySelector( '[data-testid="existing"]' )
+		).not.toBeNull();
+		expect(
+			target.querySelector( '[data-testid="added"]' )
+		).not.toBeNull();
+	} );
+
+	it( 'prepends when position is "prepend"', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"><span data-testid="existing">keep</span></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="added">new</span>',
+			{ position: 'prepend' }
+		);
+
+		expect( target.firstElementChild?.getAttribute( 'data-testid' ) ).toBe(
+			'added'
+		);
+	} );
+
+	it( 'replaces children when position is "replace"', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"><span data-testid="existing">old</span></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="added">new</span>',
+			{ position: 'replace' }
+		);
+
+		expect(
+			target.querySelector( '[data-testid="existing"]' )
+		).toBeNull();
+		expect(
+			target.querySelector( '[data-testid="added"]' )
+		).not.toBeNull();
+	} );
+
+	it( 'hydrates a plain fragment inside an existing island via the container', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element" ' +
+				"data-wp-context='{ \"label\": \"ctx\" }'>" +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="out" data-wp-text="context.label"></span>'
+		);
+
+		expect(
+			target.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'ctx' );
 	} );
 } );

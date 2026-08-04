@@ -134,3 +134,64 @@ export function renderElement( element: Element | Element[] ): void {
 		);
 	} );
 }
+
+/**
+ * Parses a server-rendered HTML string, inserts the resulting element(s) into
+ * the live DOM at the given position in `container`, and renders them with
+ * `renderElement()` so all Interactivity API directives on them are processed.
+ *
+ * This is a convenience wrapper over the parse → insert → `renderElement()`
+ * sequence, so callers don't need to write their own `DOMParser`/insertion
+ * code:
+ *
+ * ```js
+ * import { renderHTML } from '@wordpress/interactivity';
+ *
+ * const res = await fetch( '/wp-json/my-plugin/v1/cards' );
+ * renderHTML( document.querySelector( '#feed' ), await res.text() );
+ * ```
+ *
+ * Unlike `renderElement()`, each call creates fresh nodes — there is no
+ * cross-call in-place diffing. With `position: 'replace'` the container's
+ * previous children are removed first, making `renderHTML( ref, html, {
+ * position: 'replace' } )` a drop-in replacement for `ref.innerHTML = html`
+ * that actually hydrates the markup.
+ *
+ * The inserted element(s) must have an enclosing island or their own
+ * `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
+ *
+ * @param container The element the parsed HTML is inserted into.
+ * @param html      The server-rendered HTML string.
+ * @param options   Options.
+ * @param options.position Where to insert the parsed elements. `append` puts
+ *                         them at the end (default), `prepend` at the start,
+ *                         and `replace` clears the container first.
+ */
+export function renderHTML(
+	container: Element,
+	html: string,
+	{ position = 'append' }: { position?: 'append' | 'prepend' | 'replace' } = {}
+): void {
+	// Use a `<template>` to parse the HTML into nodes (same as the browser
+	// would) without triggering side effects like image loading.
+	const template = document.createElement( 'template' );
+	template.innerHTML = html;
+	const nodes = Array.from( template.content.children );
+	if ( ! nodes.length ) {
+		return;
+	}
+
+	switch ( position ) {
+		case 'prepend':
+			container.prepend( ...nodes );
+			break;
+		case 'replace':
+			container.replaceChildren( ...nodes );
+			break;
+		case 'append':
+		default:
+			container.append( ...nodes );
+	}
+
+	renderElement( nodes.length === 1 ? nodes[ 0 ] : nodes );
+}

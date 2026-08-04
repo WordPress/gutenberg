@@ -70,7 +70,7 @@ export { useState, useRef } from 'preact/hooks';
  * ```
  */
 export const watch = effect;
-export { renderElement } from './render';
+export { renderElement, renderHTML } from './render';
 
 // Internal exports for tests and the `renderElement()` implementation.
 export { registerElementContext, getContextAt } from './context-registry';
