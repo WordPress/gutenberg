@@ -64,24 +64,10 @@ export function useWritingFlow() {
 						};
 					}
 
-					node.setAttribute(
-						'aria-label',
-						__( 'Multiple selected blocks' )
-					);
-
+					// The editing host names itself (see
+					// useEditableRootHost).
 					return () => {
 						delete node.dataset.hasMultiSelection;
-						// The wrapper may remain the editing host (the
-						// collapsed block supports `editableRoot`): keep it
-						// named, as the textbox role requires.
-						if ( getEditableRootElement( node ) ) {
-							node.setAttribute(
-								'aria-label',
-								__( 'Editor canvas' )
-							);
-						} else {
-							node.removeAttribute( 'aria-label' );
-						}
 					};
 				},
 				[ hasMultiSelection ]

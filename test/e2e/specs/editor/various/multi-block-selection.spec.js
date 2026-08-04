@@ -256,7 +256,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		// The wrapper hosts editing for the selected block: it must present
 		// as a named multiline textbox for as long as it is the editing
 		// host, including while a selection crosses blocks.
-		const host = editor.canvas.locator( 'body' );
+		// The editing host is the block list containing the selection.
+		const host = editor.canvas.locator( '.is-root-container' );
 		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
 		await expect( host ).toHaveAttribute( 'role', 'textbox' );
 		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
@@ -293,7 +294,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.click();
-		await expect( host ).toHaveAttribute( 'contenteditable', 'false' );
+		await expect( host ).not.toHaveAttribute( 'contenteditable', 'true' );
 		await expect( host ).not.toHaveAttribute( 'role' );
 		await expect( host ).not.toHaveAttribute( 'aria-multiline' );
 		await expect( host ).not.toHaveAttribute( 'aria-label' );

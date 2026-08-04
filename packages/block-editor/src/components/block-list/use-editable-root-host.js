@@ -22,7 +22,7 @@ import { unlock } from '../../lock-unlock';
  * @return {Object} Props to apply to the layout element.
  */
 export default function useEditableRootHost( rootClientId = '' ) {
-	const isHost = useSelect(
+	const hostState = useSelect(
 		( select ) => {
 			const {
 				getSelectionStart,
@@ -42,7 +42,8 @@ export default function useEditableRootHost( rootClientId = '' ) {
 						// A selection gesture in progress (e.g. a drag
 						// leaving the block) needs the list editable so the
 						// native selection can extend across its blocks.
-						isMultiSelecting() )
+						isMultiSelecting() ) &&
+					'single'
 				);
 			}
 
@@ -53,7 +54,7 @@ export default function useEditableRootHost( rootClientId = '' ) {
 			if ( hasMultiSelection() ) {
 				return (
 					getBlockRootClientId( getSelectionStart().clientId ) ===
-					rootClientId
+						rootClientId && 'multi'
 				);
 			}
 
@@ -62,7 +63,7 @@ export default function useEditableRootHost( rootClientId = '' ) {
 		[ rootClientId ]
 	);
 
-	if ( ! isHost ) {
+	if ( ! hostState ) {
 		return {};
 	}
 
@@ -71,6 +72,9 @@ export default function useEditableRootHost( rootClientId = '' ) {
 		suppressContentEditableWarning: true,
 		role: 'textbox',
 		'aria-multiline': 'true',
-		'aria-label': __( 'Editor canvas' ),
+		'aria-label':
+			hostState === 'multi'
+				? __( 'Multiple selected blocks' )
+				: __( 'Editor canvas' ),
 	};
 }
