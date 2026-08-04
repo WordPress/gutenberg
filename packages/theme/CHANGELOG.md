@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add structured color ramp and semantic contrast warnings for `ThemeProvider` consumers ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+
 ### Bug Fixes
 
+-   Return contrast warnings for the final generated ramp and include active fill pairs in accessibility checks ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
 -   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
 
 ### Internal
@@ -11,7 +16,6 @@
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 -   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
-
 ## 1.2.0 (2026-08-12)
 
 ### Bug Fixes
