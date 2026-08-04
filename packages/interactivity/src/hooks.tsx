@@ -333,6 +333,27 @@ const Directives = ( {
 	element = cloneElement( element, { ref: scope.ref } );
 	scope.attributes = element.props;
 
+	// Recursively render the wrapper for the next priority level.
+	const children =
+		nextPriorityLevels.length > 0
+			? createElement( Directives, {
+					directives,
+					priorityLevels: nextPriorityLevels,
+					element,
+					originalProps,
+					previousScope: scope,
+			  } )
+			: element;
+
+	const props = { ...originalProps, children };
+	const directiveArgs = {
+		directives,
+		props,
+		element,
+		context,
+		evaluate: scope.evaluate,
+	};
+
 	/*
 	 * Register this element's rendered context in the context registry, so
 	 * `renderElement()` can find the live context at this position in the
@@ -354,27 +375,6 @@ const Directives = ( {
 			} );
 		}
 	} );
-
-	// Recursively render the wrapper for the next priority level.
-	const children =
-		nextPriorityLevels.length > 0
-			? createElement( Directives, {
-					directives,
-					priorityLevels: nextPriorityLevels,
-					element,
-					originalProps,
-					previousScope: scope,
-			  } )
-			: element;
-
-	const props = { ...originalProps, children };
-	const directiveArgs = {
-		directives,
-		props,
-		element,
-		context,
-		evaluate: scope.evaluate,
-	};
 
 	setScope( scope );
 

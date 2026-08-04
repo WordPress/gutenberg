@@ -27,6 +27,7 @@ const getAncestorNamespace = ( element: Element ): string | null => {
 		if ( value !== null ) {
 			try {
 				const parsed = JSON.parse( value );
+				// eslint-disable-next-line no-nested-ternary
 				return typeof parsed === 'string'
 					? parsed
 					: typeof parsed?.namespace === 'string'
@@ -174,10 +175,10 @@ export function renderElement( element: Element | Element[] ): void {
  * The inserted element(s) must have an enclosing island or their own
  * `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
  *
- * @param container The element the parsed HTML is inserted into, or a CSS
- *                  selector for it (resolved via `document.querySelector`).
- * @param html      The HTML string.
- * @param options   Options.
+ * @param container        The element the parsed HTML is inserted into, or a CSS
+ *                         selector for it (resolved via `document.querySelector`).
+ * @param html             The HTML string.
+ * @param options          Options.
  * @param options.position Where to insert the parsed elements:
  *                         - `append`: as the container's last children (default)
  *                         - `prepend`: as the container's first children

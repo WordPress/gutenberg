@@ -27,8 +27,10 @@ const contextRegistry = new WeakMap<
  * Idempotent and cheap: setting the same object twice is a no-op beyond the
  * map write.
  *
- * @param element The DOM element whose position in the tree gets this context.
- * @param value   The context (`client`/`server`) rendered at that position.
+ * @param element      The DOM element whose position in the tree gets this context.
+ * @param value        The context rendered at that position.
+ * @param value.client The client context object.
+ * @param value.server The server context object.
  */
 export const registerElementContext = (
 	element: Element,

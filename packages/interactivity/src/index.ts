@@ -21,7 +21,6 @@ import {
 import { toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
-import { registerElementContext, getContextAt } from './context-registry';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 import {

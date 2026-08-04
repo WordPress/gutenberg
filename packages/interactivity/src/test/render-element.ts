@@ -200,7 +200,8 @@ describe( 'renderElement', () => {
 
 		renderElement( node );
 
-		expect( node.textContent ).toBe( 'hello' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( node ).toHaveTextContent( 'hello' );
 
 		// A second fragment reading context.
 		const ctxNode = el(
@@ -211,7 +212,8 @@ describe( 'renderElement', () => {
 			.appendChild( ctxNode );
 		renderElement( ctxNode );
 
-		expect( ctxNode.textContent ).toBe( 'ctx' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( ctxNode ).toHaveTextContent( 'ctx' );
 	} );
 
 	it( 'warns and skips when the element has no enclosing island', () => {
@@ -323,13 +325,15 @@ describe( 'renderElement', () => {
 		const btn = node.querySelector(
 			'[data-testid="btn"]'
 		) as HTMLButtonElement;
-		expect( btn.textContent ).toBe( '10' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( btn ).toHaveTextContent( '10' );
 
 		// Writing to the fragment's context must NOT affect the island's.
 		btn.click();
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
-		expect( btn.textContent ).toBe( '11' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( btn ).toHaveTextContent( '11' );
 		expect(
 			island.querySelector( '[data-testid="island-count"]' )?.textContent
 		).toBe( '0' );
@@ -384,8 +388,10 @@ describe( 'renderElement', () => {
 
 		const items = node.querySelectorAll( '[data-testid="item"]' );
 		expect( items.length ).toBe( 3 );
-		expect( items[ 0 ].textContent ).toBe( 'one' );
-		expect( items[ 2 ].textContent ).toBe( 'three' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( items[ 0 ] ).toHaveTextContent( 'one' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( items[ 2 ] ).toHaveTextContent( 'three' );
 
 		// The list is reactive: adding an item re-renders it. Wait for the
 		// reactive flush (after the next animation frame).
@@ -396,7 +402,8 @@ describe( 'renderElement', () => {
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		const updated = node.querySelectorAll( '[data-testid="item"]' );
 		expect( updated.length ).toBe( 4 );
-		expect( updated[ 3 ].textContent ).toBe( 'item-4' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( updated[ 3 ] ).toHaveTextContent( 'item-4' );
 	} );
 
 	it( 'runs data-wp-init on an inserted fragment', async () => {
@@ -458,7 +465,8 @@ describe( 'renderElement', () => {
 		// Runs on insertion.
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
-		expect( watch.textContent ).toBe( 'watched 3' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( watch ).toHaveTextContent( 'watched 3' );
 
 		// Re-runs when state changes.
 		(
@@ -466,7 +474,8 @@ describe( 'renderElement', () => {
 		 ).click();
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
-		expect( watch.textContent ).toBe( 'watched 4' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( watch ).toHaveTextContent( 'watched 4' );
 	} );
 } );
 
