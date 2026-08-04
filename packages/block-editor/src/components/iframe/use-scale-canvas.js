@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useCallback } from '@wordpress/element';
+import { useEffect, useRef, useCallback, useState } from '@wordpress/element';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 
 /**
@@ -133,11 +133,33 @@ function getAnimationKeyframes( transitionFrom, transitionTo ) {
 }
 
 /**
+ * @typedef {Object} ObservedSize
+ * @property {number|null} width  The width of the observed element.
+ * @property {number|null} height The height of the observed element.
+ */
+/** @type {ObservedSize} */
+const NULL_SIZE = { width: null, height: null };
+
+/**
+ * Get the size of the observed element.
+ *
+ * @param {ResizeObserverEntry[]} entries Array of the new dimensions of the element after each change.
+ * @return {ObservedSize} Latest width and height of the observed element.
+ */
+function extractSize( entries ) {
+	const contentBoxSize = entries.at( -1 ).contentBoxSize[ 0 ];
+	return {
+		width: contentBoxSize.inlineSize,
+		height: contentBoxSize.blockSize,
+	};
+}
+
+/**
  * @typedef {Object} ScaleCanvasResult
- * @property {boolean} isZoomedOut             A boolean indicating if the canvas is zoomed out.
- * @property {number}  scaleContainerWidth     The width of the container used to calculate the scale.
- * @property {Object}  contentResizeListener   A resize observer for the content.
- * @property {Object}  containerResizeListener A resize observer for the container.
+ * @property {boolean}                      isZoomedOut         A boolean indicating if the canvas is zoomed out.
+ * @property {number}                       scaleContainerWidth The width of the container used to calculate the scale.
+ * @property {import('react').Ref<Element>} contentRef          A callback ref to the content element.
+ * @property {import('react').Ref<Element>} containerRef        A callback ref to the container element.
  */
 
 /**
@@ -157,12 +179,17 @@ export function useScaleCanvas( {
 	maxContainerWidth = 750,
 	scale,
 } ) {
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
+	const [ { height: contentHeight }, setContentRect ] = useState( NULL_SIZE );
+	const contentRef = useResizeObserver( ( entries ) => {
+		setContentRect( extractSize( entries ) );
+	} );
 	const [
-		containerResizeListener,
 		{ width: containerWidth, height: containerHeight },
-	] = useResizeObserver();
+		setContainerRect,
+	] = useState( NULL_SIZE );
+	const containerRef = useResizeObserver( ( entries ) => {
+		setContainerRect( extractSize( entries ) );
+	} );
 
 	const initialContainerWidthRef = useRef( 0 );
 	const isZoomedOut = scale !== 1;
@@ -486,7 +513,7 @@ export function useScaleCanvas( {
 	return {
 		isZoomedOut,
 		scaleContainerWidth,
-		contentResizeListener,
-		containerResizeListener,
+		contentRef,
+		containerRef,
 	};
 }
