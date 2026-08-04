@@ -1922,7 +1922,7 @@ export const getBlockSelectors = (
 			!! blockType?.supports?.layout ||
 			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
-			// @ts-expect-error
+			// @ts-expect-error `blockGap` support is typed as `boolean | AxialDirection[]`.
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
 		const blockStyleVariations = getBlockStyles( name );

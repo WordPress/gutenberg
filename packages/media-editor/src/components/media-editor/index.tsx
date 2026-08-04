@@ -32,8 +32,7 @@ import {
 	ComplementaryArea,
 	InterfaceSkeleton,
 	PinnedItems,
-	// No type declarations available for @wordpress/interface.
-	// @ts-expect-error
+	// @ts-expect-error `@wordpress/interface` is not typed yet.
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 

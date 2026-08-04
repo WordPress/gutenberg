@@ -600,14 +600,14 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 			// Fallback to localized strings from Interactivity API state.
 			// @todo This block is for Core < 6.7.0. Remove when support is dropped.
 
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loading ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loading = state.navigation.texts.loading;
 			}
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loaded ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loaded = state.navigation.texts.loaded;
 			}
 		}
