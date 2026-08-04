@@ -57,7 +57,6 @@ export default function useTabActions( tabsClientId ) {
 		}
 
 		const newIndex = atIndex ?? tabPanelBlocks.length;
-
 		insertBlock(
 			createBlock( 'core/tab-panel' ),
 			newIndex,
