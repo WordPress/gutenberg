@@ -4,8 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Font Appearance Control dropdown menu', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		// The tests read the block inspector, and the sidebar's visibility is
+		// a persisted user preference, so a preceding test that closed it
+		// would otherwise leave these tests without an inspector.
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test( 'should apply available font weight and styles from active font family', async ( {

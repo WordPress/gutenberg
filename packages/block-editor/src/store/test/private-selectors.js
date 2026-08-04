@@ -650,10 +650,6 @@ describe( 'private selectors', () => {
 				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
 			] ),
 		};
-		getEnabledClientIdsTree.registry = {
-			select: jest.fn( () => ( {} ) ),
-		};
-
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
@@ -944,12 +940,6 @@ describe( 'private selectors', () => {
 			unregisterBlockType( TEST_STRUCTURE_BLOCK );
 		} );
 
-		beforeEach( () => {
-			getListViewClientIdsTree.registry = {
-				select: jest.fn( () => ( {} ) ),
-			};
-		} );
-
 		it( 'includes disabled outside-section context while preserving the edited section', () => {
 			const state = createBaseState();
 
@@ -1192,6 +1182,111 @@ describe( 'private selectors', () => {
 					],
 				},
 			] );
+		} );
+
+		it( 'returns the same tree when section-only state changes outside of a content-only section edit', () => {
+			const state = {
+				...createBaseState(),
+				editedContentOnlySection: undefined,
+				derivedBlockEditingModes: new Map(),
+			};
+			const tree = getListViewClientIdsTree( state );
+
+			// None of this is read unless a content-only section is edited.
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					byClientId: new Map( state.blocks.byClientId ),
+					attributes: new Map( state.blocks.attributes ),
+				},
+				blockListSettings: new Map( [
+					[ 'header', { templateLock: 'contentOnly' } ],
+				] ),
+				settings: { ...state.settings },
+			};
+
+			expect( getListViewClientIdsTree( nextState ) ).toBe( tree );
+		} );
+
+		it( 'rebuilds the tree when a pattern name changes while a content-only section is edited', () => {
+			const state = createBaseState();
+
+			// `other-structure` is hidden while `other-pattern` is a section.
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{ clientId: 'header', innerBlocks: [] },
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{ clientId: 'edited-content', innerBlocks: [] },
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{ clientId: 'other-content', innerBlocks: [] },
+					],
+				},
+			] );
+
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( state.blocks.attributes ).set(
+						'other-pattern',
+						{ metadata: {} }
+					),
+				},
+			};
+
+			// It is no longer a section, so its structural child is shown.
+			expect( getListViewClientIdsTree( nextState ) ).toEqual( [
+				{ clientId: 'header', innerBlocks: [] },
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{ clientId: 'edited-content', innerBlocks: [] },
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{ clientId: 'other-content', innerBlocks: [] },
+						{ clientId: 'other-structure', innerBlocks: [] },
+					],
+				},
+			] );
+		} );
+
+		// The memoization above is only reachable if the reducer preserves
+		// these references through a keystroke.
+		it( 'should keep its dependants referentially stable while typing', () => {
+			const block = ( clientId ) => ( {
+				clientId,
+				name: TEST_CONTENT_BLOCK,
+				attributes: { content: clientId },
+				innerBlocks: [],
+			} );
+			const state = reducer( reducer( undefined, { type: '@@init' } ), {
+				type: 'RESET_BLOCKS',
+				blocks: [ block( 'a' ), block( 'b' ) ],
+			} );
+
+			const next = reducer( state, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'a' ],
+				attributes: { content: 'typed' },
+			} );
+
+			// Guards against the assertion below passing vacuously.
+			expect( next.blocks.attributes ).not.toBe(
+				state.blocks.attributes
+			);
+
+			expect( getListViewClientIdsTree( next ) ).toBe(
+				getListViewClientIdsTree( state )
+			);
 		} );
 	} );
 

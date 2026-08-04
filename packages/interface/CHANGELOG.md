@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComplementaryArea`: Add a `render` prop to replace the default container element with a given React element ([#81054](https://github.com/WordPress/gutenberg/pull/81054)).
+
 ### Bug Fixes
 
 -   `ComplementaryArea`: Remove incorrect `aria-expanded` attribute from the "Pin to toolbar" toggle button, which already exposes its state via `aria-pressed` ([#79874](https://github.com/WordPress/gutenberg/pull/79874)).

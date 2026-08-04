@@ -3,6 +3,15 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function defer() {
+	let resolve;
+	const deferred = new Promise( ( res ) => {
+		resolve = res;
+	} );
+	deferred.resolve = resolve;
+	return deferred;
+}
+
 test.describe( 'Post revisions', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -84,6 +93,111 @@ test.describe( 'Post revisions', () => {
 				attributes: { content: 'Original content' },
 			},
 		] );
+	} );
+
+	test( 'should show revision changes in the code editor (@webkit)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Original content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Updated content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		const revisionsRequestStarted = defer();
+		const releaseRevisionsRequest = defer();
+		let shouldDelayRevisionsRequest = true;
+		await page.route(
+			( url ) => {
+				const restRoute = url.searchParams.get( 'rest_route' );
+				return ( restRoute ?? url.pathname ).includes( '/revisions' );
+			},
+			async ( route, request ) => {
+				if (
+					shouldDelayRevisionsRequest &&
+					request.method() === 'GET'
+				) {
+					shouldDelayRevisionsRequest = false;
+					revisionsRequestStarted.resolve();
+					await releaseRevisionsRequest;
+				}
+				await route.continue();
+			}
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
+
+		await revisionsRequestStarted;
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const optionsButton = page.getByRole( 'button', { name: 'Options' } );
+		const codeEditorMenuItem = page.getByRole( 'menuitemradio', {
+			name: 'Code editor',
+		} );
+		try {
+			await optionsButton.click();
+			await expect( codeEditorMenuItem ).toBeVisible();
+		} finally {
+			releaseRevisionsRequest.resolve();
+		}
+
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toBeVisible();
+		await expect( codeEditorMenuItem ).toBeVisible();
+		await codeEditorMenuItem.click();
+
+		const codeDiff = page.getByRole( 'region', { name: 'Code changes' } );
+		await expect(
+			codeDiff.locator( 'tr.is-removed' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Updated content</p>',
+			} )
+		).toBeVisible();
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect( codeDiff ).not.toContainText( '<p>Updated content</p>' );
+
+		await page.getByRole( 'button', { name: 'Show changes' } ).click();
+		const revisionCode = page.getByRole( 'region', {
+			name: 'Revision code',
+		} );
+		await expect( revisionCode ).toContainText( '<p>Original content</p>' );
+		await expect( revisionCode.locator( 'tr.is-removed' ) ).toHaveCount(
+			0
+		);
+
+		await optionsButton.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Visual editor' } )
+			.click();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'Original content' );
 	} );
 
 	test( 'should preserve block clientId when sliding between revisions', async ( {
@@ -337,6 +451,73 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			} )
 		).toHaveCount( 0 );
 	} );
+
+	test( 'redirects revision deep links to the classic screen', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Meta box deep link',
+				content:
+					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Updated content</p><!-- /wp:paragraph -->',
+			},
+		} );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }/revisions`,
+		} );
+		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
+
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
+		);
+
+		await expect( page ).toHaveURL(
+			new RegExp( `revision\\.php\\?revision=${ oldestRevisionId }` )
+		);
+	} );
+
+	test( 'keeps invalid revision deep links in the editor', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Meta box invalid deep link',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=99999999`
+		);
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Invalid revision ID.' } )
+		).toBeVisible();
+		expect( new URL( page.url() ).pathname ).toContain( '/post.php' );
+	} );
 } );
 
 test.describe( 'Post revisions slider pagination', () => {
@@ -585,5 +766,237 @@ test.describe( 'Template and template part revisions', () => {
 				},
 			] );
 		} );
+	} );
+} );
+
+test.describe( 'Post revisions shareable URLs', () => {
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should open the revision from the URL and keep it in sync', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Creating a post does not create a revision, so update it twice.
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Shareable URL Test',
+				content:
+					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>First revision</p><!-- /wp:paragraph -->',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Second revision</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		// The REST API returns revisions newest first, so the oldest is last.
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }/revisions`,
+		} );
+		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
+		const newestRevisionId = revisions[ 0 ].id;
+
+		// `editPost()` dismisses the welcome guide and turns off fullscreen
+		// mode before opening the revision URL directly.
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
+		);
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'First revision' );
+
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await slider.focus();
+		await page.keyboard.press( 'End' );
+		// Poll because URL writes are debounced.
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( String( newestRevisionId ) );
+
+		await page.getByRole( 'button', { name: 'Exit' } ).click();
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( null );
+	} );
+
+	test( 'should show a notice when the URL revision is invalid', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Invalid revision test',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=99999999`
+		);
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Invalid revision ID.' } )
+		).toBeVisible();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeHidden();
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( null );
+	} );
+
+	test( 'should keep the URL revision when the request fails', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Failing revision test',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		const revisionId = 99999999;
+
+		// Do not treat a server error as a missing revision.
+		await page.route(
+			( url ) =>
+				url.href.includes( `revisions/${ revisionId }` ) ||
+				url.href.includes( `revisions%2F${ revisionId }` ),
+			async ( route ) => {
+				await route.fulfill( {
+					status: 500,
+					json: {
+						code: 'internal_server_error',
+						message: 'Server error.',
+						data: { status: 500 },
+					},
+				} );
+			}
+		);
+
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ revisionId }`
+		);
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Revisions could not be loaded.' } )
+		).toBeVisible();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Invalid revision ID.' } )
+		).toBeHidden();
+
+		// The selection survives so a reload can try again.
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( String( revisionId ) );
+	} );
+} );
+
+test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
+	test.beforeEach( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-post-revisions'
+		);
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-post-revisions'
+		);
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should render an autosave that is absent from the revisions collection', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Autosave URL Test',
+				content:
+					'<!-- wp:paragraph --><p>Saved content</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+		const autosave = await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }/autosaves`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Autosaved content</p><!-- /wp:paragraph -->',
+			},
+		} );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }/revisions`,
+		} );
+		expect( revisions ).toHaveLength( 0 );
+
+		await admin.editPost( post.id );
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=${ autosave.id }`
+		);
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toHaveText( 'Autosaved content' );
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
+			.toBe( String( autosave.id ) );
 	} );
 } );

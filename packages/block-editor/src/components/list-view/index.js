@@ -39,7 +39,7 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
-import { focusListItem } from './utils';
+import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
@@ -60,8 +60,6 @@ const expanded = ( state, action ) => {
 	}
 	return state;
 };
-
-export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
 /** @typedef {React.ComponentType} ComponentType */
 /** @typedef {React.Ref<HTMLElement>} Ref */
@@ -136,7 +134,8 @@ function ListViewComponent(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
@@ -298,8 +297,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			treeGridElementRef: elementRef,
 			rootClientId,
 		} ),
@@ -316,15 +315,12 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			rootClientId,
 		]
 	);
 
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
 		BLOCK_LIST_ITEM_HEIGHT,
