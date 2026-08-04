@@ -6,6 +6,7 @@ import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';
 import * as Styled from './styles';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -16,29 +17,27 @@ const radioCheck = (
 export const RadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< RadioItemProps, 'div', false >
->( function RadioItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
-	ref
-) {
+>( function RadioItem( { suffix, children, disabled = false, ...props }, ref ) {
 	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const hideOnClick = useMenuItemHideOnClick( store );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.RadioItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
 		<Styled.RadioItem
 			ref={ ref }
 			{ ...props }
 			accessibleWhenDisabled
 			disabled={ disabled }
+			store={ store }
 			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
+				store={ store }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
