@@ -9,6 +9,10 @@
 -   Inherited Global Styles now resolve the `link` element (`styles.elements.link`) for whole-block link blocks — those that render as a link — so their inspector controls reflect inherited link styles, mirroring the `button` element treatment for `core/button`. Covers `core/read-more`, `core/loginout`, `core/post-navigation-link`, `core/query-pagination-next`, `core/query-pagination-previous`, `core/query-pagination-numbers`, `core/comments-pagination-next`, `core/comments-pagination-previous`, `core/comments-pagination-numbers`, `core/comment-edit-link`, `core/comment-reply-link`, and `core/post-comments-link` [#80607](https://github.com/WordPress/gutenberg/pull/80607)).
 -   Add support for the `blockStatesEditingEnabled` editor setting, which hides state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
 
+### Performance
+
+-   `ListView`: Collapse the placeholder rows that stand in for blocks outside of the render window into a single spacer row per run, instead of rendering a `<tr>`/`<td>` pair for every block. On a post with 1000 top-level blocks this removes ~1900 elements (about 60% of the List View's DOM and nearly half of the document's elements), which cuts the style recalculation and layout work done when the List View opens ([#80953](https://github.com/WordPress/gutenberg/pull/80953)).
+
 ### Internal
 
 -   `ListView`: Reimplement the Firefox description-recomputation workaround in `AriaReferencedText` by keying the element on its text, so React replaces it instead of updating the existing text node in place ([#80929](https://github.com/WordPress/gutenberg/pull/80929).
