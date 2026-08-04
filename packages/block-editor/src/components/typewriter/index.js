@@ -177,57 +177,22 @@ export function useTypewriter() {
 		}
 
 		/**
-		 * Returns the editable element owning the selection: the active
-		 * element, or, when a focused editing host contains the node
-		 * (a selected block supports `editableRoot`), the editable
-		 * element containing the selection.
+		 * Checks if the current situation is eligible for scroll:
+		 * - The component must contain the selection.
+		 * - The selection must be within editable content.
 		 */
-		function getActiveEditableElement() {
-			const { activeElement } = ownerDocument;
-
-			if ( ! activeElement ) {
-				return null;
-			}
-
-			if (
-				! activeElement.isContentEditable ||
-				! activeElement.contains( node )
-			) {
-				return activeElement;
-			}
-
+		function isSelectionEligibleForScroll() {
 			const { anchorNode } = defaultView.getSelection();
 
-			if ( ! anchorNode ) {
-				return null;
+			if ( ! anchorNode || ! node.contains( anchorNode ) ) {
+				return false;
 			}
 
 			const element =
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			// The editable element within the block may be editable by
-			// inheritance from the editing host (contenteditable="inherit"),
-			// so accept any explicit editable marker except an opt-out. The
-			// host itself (outside `node`) must not be the result.
-			const editable = element?.closest(
-				'[contenteditable], .rich-text'
-			);
-			return editable?.isContentEditable ? editable : null;
-		}
-
-		/**
-		 * Checks if the current situation is eligible for scroll:
-		 * - The component must contain the selection.
-		 * - The active element must be contenteditable.
-		 */
-		function isSelectionEligibleForScroll() {
-			const activeEditableElement = getActiveEditableElement();
-			return (
-				!! activeEditableElement &&
-				node.contains( activeEditableElement ) &&
-				activeEditableElement.isContentEditable
-			);
+			return !! element?.isContentEditable;
 		}
 
 		function isLastEditableNode() {
@@ -235,7 +200,8 @@ export function useTypewriter() {
 				node.querySelectorAll( '[contenteditable], .rich-text' )
 			).filter( ( editable ) => editable.isContentEditable );
 			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			return lastEditableNode === getActiveEditableElement();
+			const { anchorNode } = defaultView.getSelection();
+			return !! lastEditableNode?.contains( anchorNode );
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
