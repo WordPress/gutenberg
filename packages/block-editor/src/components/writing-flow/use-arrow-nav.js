@@ -190,6 +190,7 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getBlockRootClientId,
 		getNextBlockClientId,
 		getPreviousBlockClientId,
 		getSelectedBlockClientId,
@@ -209,13 +210,22 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		function isClosestTabbableABlock( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return closestTabbable && getBlockClientId( closestTabbable );
+		function getAdjacentBlockInAnyLevel( clientId, isReverse ) {
+			let current = clientId;
+
+			while ( current ) {
+				const adjacent = isReverse
+					? getPreviousBlockClientId( current )
+					: getNextBlockClientId( current );
+
+				if ( adjacent ) {
+					return adjacent;
+				}
+
+				current = getBlockRootClientId( current );
+			}
+
+			return null;
 		}
 
 		function onKeyDown( event ) {
@@ -354,21 +364,14 @@ export default function useArrowNav() {
 
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
-					// The selected block's editable can be editable by
-					// inheritance under the editing host, and is then not
-					// itself tabbable, which the closest-tabbable lookup
-					// relies on; consult block adjacency instead.
-					const hasBlockToExtendInto =
-						target.isContentEditable &&
-						target.contentEditable !== 'true'
-							? !! ( isReverse
-									? getPreviousBlockClientId(
-											getSelectedBlockClientId()
-									  )
-									: getNextBlockClientId(
-											getSelectedBlockClientId()
-									  ) )
-							: isClosestTabbableABlock( target, isReverse );
+					// Whether there is a block to extend the selection
+					// into is a question of document order: the adjacent
+					// block at this level, or, at the edge of a container,
+					// the block adjacent to an ancestor.
+					const hasBlockToExtendInto = !! getAdjacentBlockInAnyLevel(
+						getSelectedBlockClientId(),
+						isReverse
+					);
 
 					if ( hasBlockToExtendInto ) {
 						setContentEditableWrapper( node, true );
