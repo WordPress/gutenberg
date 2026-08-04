@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Mark the Site Editor root `ThemeProvider` as `isRoot` so design tokens are forwarded to the document root for portals and other UI rendered outside the React subtree.
+
 ## 7.0.0 (2026-07-14)
 
 ### Breaking Changes

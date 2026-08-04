@@ -324,7 +324,7 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 			<Tooltip.Provider>
 				{ /** This needs to be within the SlotFillProvider */ }
 				<PluginArea onError={ onPluginAreaError } />
-				<ThemeProvider color={ themeColors }>
+				<ThemeProvider isRoot color={ themeColors }>
 					<Layout { ...props } />
 				</ThemeProvider>
 			</Tooltip.Provider>
