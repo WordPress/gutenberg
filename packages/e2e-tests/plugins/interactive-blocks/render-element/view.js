@@ -36,6 +36,10 @@ const { state } = store( 'test/render-element', {
 			state.lifecycle = 'initialized';
 			state.isHydrated = 'yes';
 		},
+		/*
+		 * Generic fragment loader. The button's `data-position` attribute
+		 * selects the `renderHTML` position; `data-fragment-url` the endpoint.
+		 */
 		*loadFragment() {
 			const { ref } = getElement();
 			const res = yield fetch( ref.dataset.fragmentUrl );
@@ -43,67 +47,9 @@ const { state } = store( 'test/render-element', {
 			const target = document.querySelector(
 				'[data-testid="target"]'
 			);
-			renderHTML( target, html );
-			state.isHydrated = 'yes';
-		},
-		*reloadFragment() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html, { position: 'inner' } );
-			state.isHydrated = 'yes';
-		},
-		*loadIslandFragment() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html );
-			state.isHydrated = 'yes';
-		},
-		*loadBefore() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html, { position: 'before' } );
-			state.isHydrated = 'yes';
-		},
-		*loadAfter() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html, { position: 'after' } );
-			state.isHydrated = 'yes';
-		},
-		*loadOuter() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html, { position: 'outer' } );
-			state.isHydrated = 'yes';
-		},
-		*loadWatch() {
-			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
-			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
-			renderHTML( target, html );
+			renderHTML( target, html, {
+				position: ref.dataset.position ?? 'append',
+			} );
 			state.isHydrated = 'yes';
 		},
 		navigate: withSyncEvent( function* ( event ) {

@@ -310,6 +310,114 @@ describe( 'renderElement', () => {
 			node.querySelector( '[data-testid="out"]' )?.textContent
 		).toBe( 'updated' );
 	} );
+
+	it( 'renders a data-wp-each list inside an inserted fragment', async () => {
+		const { state } = store( 'test/render-element', {
+			state: { items: [ 'one', 'two', 'three' ] },
+			actions: {
+				addItem() {
+					state.items = [
+						...state.items,
+						`item-${ state.items.length + 1 }`,
+					];
+				},
+			},
+		} );
+		const node = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<button data-testid="add" data-wp-on--click="actions.addItem"></button>' +
+				'<ul>' +
+				'<template data-wp-each="state.items">' +
+				'<li data-testid="item" data-wp-text="context.item"></li>' +
+				'</template>' +
+				'</ul>' +
+				'</div>'
+		);
+		document.body.appendChild( node );
+		renderElement( node );
+
+		const items = node.querySelectorAll( '[data-testid="item"]' );
+		expect( items.length ).toBe( 3 );
+		expect( items[ 0 ].textContent ).toBe( 'one' );
+		expect( items[ 2 ].textContent ).toBe( 'three' );
+
+		// The list is reactive: adding an item re-renders it. Wait for the
+		// reactive flush (after the next animation frame).
+		( node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement ).click();
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		const updated = node.querySelectorAll( '[data-testid="item"]' );
+		expect( updated.length ).toBe( 4 );
+		expect( updated[ 3 ].textContent ).toBe( 'item-4' );
+	} );
+
+	it( 'runs data-wp-init on an inserted fragment', async () => {
+		const { state } = store( 'test/render-element', {
+			state: { lifecycle: null },
+			actions: {
+				initFragment() {
+					state.lifecycle = 'initialized';
+				},
+			},
+		} );
+		const node = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<p data-testid="lifecycle" data-wp-init="actions.initFragment" data-wp-text="state.lifecycle">not initialized</p>' +
+				'</div>'
+		);
+		document.body.appendChild( node );
+		renderElement( node );
+
+		// `data-wp-init` uses `useEffect` (async): wait for it to fire and
+		// the reactive text update to flush.
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		expect(
+			node.querySelector( '[data-testid="lifecycle"]' )?.textContent
+		).toBe( 'initialized' );
+	} );
+
+	it( 'runs data-wp-watch on insertion and re-runs on state change', async () => {
+		const { state } = store( 'test/render-element', {
+			state: {
+				watchText: 'not watched',
+				items: [ 'one', 'two', 'three' ],
+			},
+			callbacks: {
+				updateWatch() {
+					state.watchText = `watched ${ state.items.length }`;
+				},
+			},
+			actions: {
+				addItem() {
+					state.items = [
+						...state.items,
+						`item-${ state.items.length + 1 }`,
+					];
+				},
+			},
+		} );
+		const node = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<button data-testid="add" data-wp-on--click="actions.addItem"></button>' +
+				'<p data-testid="watch" data-wp-watch="callbacks.updateWatch" data-wp-text="state.watchText">not watched</p>' +
+				'</div>'
+		);
+		document.body.appendChild( node );
+		renderElement( node );
+
+		const watch = node.querySelector( '[data-testid="watch"]' )!;
+		// Runs on insertion.
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		expect( watch.textContent ).toBe( 'watched 3' );
+
+		// Re-runs when state changes.
+		( node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement ).click();
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		expect( watch.textContent ).toBe( 'watched 4' );
+	} );
 } );
 
 describe( 'renderHTML', () => {

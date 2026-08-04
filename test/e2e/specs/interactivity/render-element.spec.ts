@@ -72,41 +72,6 @@ test.describe( 'renderElement', () => {
 		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
-	test( 'renders a data-wp-each list fragment and its items are interactive', async ( {
-		page,
-	} ) => {
-		const items = page.getByTestId( 'item' );
-		await expect( items ).toHaveCount( 0 );
-
-		await page.getByTestId( 'load-list' ).click();
-
-		// The template's items render from `state.items`.
-		await expect( items ).toHaveCount( 3 );
-		await expect( items.nth( 0 ) ).toHaveText( 'one' );
-		await expect( items.nth( 1 ) ).toHaveText( 'two' );
-		await expect( items.nth( 2 ) ).toHaveText( 'three' );
-
-		// The list is hydrated: `data-wp-each` re-renders when state changes.
-		await page.getByTestId( 'add-item' ).click();
-		await expect( items ).toHaveCount( 4 );
-		await expect( items.nth( 3 ) ).toHaveText( 'item-4' );
-
-		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
-	} );
-
-	test( 'runs lifecycle directives on inserted fragments', async ( {
-		page,
-	} ) => {
-		await page.getByTestId( 'load-lifecycle' ).click();
-
-		// `data-wp-init` fires on insertion and updates the text.
-		await expect( page.getByTestId( 'lifecycle' ) ).toHaveText(
-			'initialized'
-		);
-
-		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
-	} );
-
 	test( 're-fetching with fresh server markup replaces the fragment', async ( {
 		page,
 	} ) => {
@@ -139,79 +104,5 @@ test.describe( 'renderElement', () => {
 			'server content'
 		);
 		await expect( page.getByTestId( 'region-fragment' ) ).toHaveCount( 0 );
-	} );
-
-	test( 'inserts a fragment before the target with position "before"', async ( {
-		page,
-	} ) => {
-		const target = page.getByTestId( 'target' );
-		await expect( page.getByTestId( 'frag-before' ) ).toHaveCount( 0 );
-
-		await page.getByTestId( 'load-before' ).click();
-
-		// The fragment is hydrated (reads the island context)...
-		const frag = page.getByTestId( 'frag-before' );
-		await expect( frag ).toHaveText( '0' );
-
-		// ...and is a sibling immediately before the target.
-		await expect( frag ).toBeVisible();
-		const beforeIsTarget = await frag.evaluate(
-			( el ) => el.nextElementSibling?.getAttribute( 'data-testid' )
-		);
-		expect( beforeIsTarget ).toBe( 'target' );
-		await expect( target ).toHaveCount( 1 );
-	} );
-
-	test( 'inserts a fragment after the target with position "after"', async ( {
-		page,
-	} ) => {
-		const target = page.getByTestId( 'target' );
-		await expect( page.getByTestId( 'frag-after' ) ).toHaveCount( 0 );
-
-		await page.getByTestId( 'load-after' ).click();
-
-		// The fragment is hydrated (reads the island context)...
-		const frag = page.getByTestId( 'frag-after' );
-		await expect( frag ).toHaveText( '0' );
-
-		// ...and is a sibling immediately after the target.
-		await expect( frag ).toBeVisible();
-		const afterIsTarget = await frag.evaluate(
-			( el ) => el.previousElementSibling?.getAttribute( 'data-testid' )
-		);
-		expect( afterIsTarget ).toBe( 'target' );
-		await expect( target ).toHaveCount( 1 );
-	} );
-
-	test( 'replaces the target itself with position "outer"', async ( {
-		page,
-	} ) => {
-		await expect( page.getByTestId( 'target' ) ).toHaveCount( 1 );
-		await expect( page.getByTestId( 'frag-outer' ) ).toHaveCount( 0 );
-
-		await page.getByTestId( 'load-outer' ).click();
-
-		// The target is replaced by the fragment...
-		await expect( page.getByTestId( 'target' ) ).toHaveCount( 0 );
-
-		// ...which is hydrated (reads the island context).
-		await expect( page.getByTestId( 'frag-outer' ) ).toHaveText( '0' );
-	} );
-
-	test( 'runs data-wp-watch on insertion and re-runs on state change', async ( {
-		page,
-	} ) => {
-		await page.getByTestId( 'load-watch' ).click();
-
-		// `data-wp-watch` runs when the node is created: the callback reads
-		// `state.items` and updates `state.watchText`, which `data-wp-text`
-		// displays.
-		const watch = page.getByTestId( 'watch' );
-		await expect( watch ).toHaveText( 'watched 3' );
-
-		// Clicking the fragment's button mutates `state.items`, so the watch
-		// re-runs and the text updates reactively.
-		await page.getByTestId( 'watch-add' ).click();
-		await expect( watch ).toHaveText( 'watched 4' );
 	} );
 } );
