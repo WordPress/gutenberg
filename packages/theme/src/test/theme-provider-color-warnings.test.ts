@@ -1,44 +1,38 @@
-import { renderHook } from '@testing-library/react';
 import { buildBgRamp, type RampResult } from '../color-ramps';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
 } from '../theme-provider-color-warnings';
-import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
-describe( 'ThemeProvider color warnings', () => {
-	it( 'reports structured semantic contrast warnings', () => {
-		const { result } = renderHook( () =>
-			useThemeProviderStyles( {
-				color: {
-					primary: '#608010',
-					background: '#4f386e',
-				},
-			} )
-		);
-		const warning = result.current.colorWarnings.find(
-			( item ) =>
-				item.type === 'contrast' &&
-				item.backgroundToken ===
-					'background.interactive.brand-strong-active'
-		);
+describe( 'collectThemeProviderColorWarnings', () => {
+	it( 'reports semantic contrast warnings', () => {
+		const colorValues = new Map( [
+			[
+				'--wpds-color-background-interactive-brand-strong-active',
+				'#608010',
+			],
+			[
+				'--wpds-color-foreground-interactive-brand-strong-active',
+				'#608010',
+			],
+		] );
 
-		expect( warning ).toEqual(
-			expect.objectContaining( {
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
 				type: 'contrast',
 				backgroundToken: 'background.interactive.brand-strong-active',
+				backgroundColor: '#608010',
 				foregroundToken: 'foreground.interactive.brand-strong-active',
+				foregroundColor: '#608010',
 				requiredContrast: 4.5,
-			} )
-		);
-		expect(
-			warning?.type === 'contrast'
-				? warning.achievedContrast
-				: Number.POSITIVE_INFINITY
-		).toBeLessThan( 4.5 );
+				achievedContrast: 1,
+			},
+		] );
 	} );
 
-	it( 'reports structured ramp-generation warnings', () => {
+	it( 'reports ramp-generation warnings', () => {
 		const backgroundRamp: RampResult = {
 			...buildBgRamp( '#fcfcfc' ),
 			warnings: [ 'stroke4' ],

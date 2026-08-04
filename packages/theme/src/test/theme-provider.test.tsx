@@ -169,11 +169,26 @@ describe( 'ThemeProvider', () => {
 			/>
 		);
 
-		expect( onColorWarningsChange ).toHaveBeenCalledWith(
-			expect.arrayContaining( [
-				expect.objectContaining( { type: 'contrast' } ),
-			] )
+		const warning = onColorWarningsChange.mock.calls[ 0 ][ 0 ].find(
+			( item ) =>
+				item.type === 'contrast' &&
+				item.backgroundToken ===
+					'background.interactive.brand-strong-active'
 		);
+
+		expect( warning ).toEqual(
+			expect.objectContaining( {
+				type: 'contrast',
+				backgroundToken: 'background.interactive.brand-strong-active',
+				foregroundToken: 'foreground.interactive.brand-strong-active',
+				requiredContrast: 4.5,
+			} )
+		);
+		expect(
+			warning?.type === 'contrast'
+				? warning.achievedContrast
+				: Number.POSITIVE_INFINITY
+		).toBeLessThan( 4.5 );
 
 		onColorWarningsChange.mockClear();
 		rerender(
