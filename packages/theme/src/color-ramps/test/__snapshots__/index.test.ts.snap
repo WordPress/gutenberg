@@ -400,7 +400,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#3858e9",
-          "bgFill2": "#2e49d9",
+          "bgFill2": "#4367f9",
           "bgFillDark": "#000",
           "bgFillInverted1": "#c8dcff",
           "bgFillInverted2": "#eff0f2",
@@ -442,7 +442,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#3858e9",
-          "bgFill2": "#2e49d9",
+          "bgFill2": "#4367f9",
           "bgFillDark": "#000",
           "bgFillInverted1": "#c8dcff",
           "bgFillInverted2": "#eff0f2",
@@ -484,7 +484,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#3858e9",
-          "bgFill2": "#2e49d9",
+          "bgFill2": "#4367f9",
           "bgFillDark": "#000",
           "bgFillInverted1": "#c8dcff",
           "bgFillInverted2": "#eff0f2",
@@ -526,7 +526,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#3858e9",
-          "bgFill2": "#2e49d9",
+          "bgFill2": "#4367f9",
           "bgFillDark": "#000",
           "bgFillInverted1": "#c8dcff",
           "bgFillInverted2": "#eff0f2",
@@ -568,7 +568,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#3858e9",
-          "bgFill2": "#2e49d9",
+          "bgFill2": "#4367f9",
           "bgFillDark": "#000",
           "bgFillInverted1": "#c8dcff",
           "bgFillInverted2": "#eff0f2",
@@ -990,7 +990,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "darker",
         "ramp": {
           "bgFill1": "#0090ff",
-          "bgFill2": "#37a3ff",
+          "bgFill2": "#007fed",
           "bgFillDark": "#040609",
           "bgFillInverted1": "#001a4f",
           "bgFillInverted2": "#040609",
@@ -1032,7 +1032,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "darker",
         "ramp": {
           "bgFill1": "#0090ff",
-          "bgFill2": "#37a3ff",
+          "bgFill2": "#007fed",
           "bgFillDark": "#1a1f24",
           "bgFillInverted1": "#002a69",
           "bgFillInverted2": "#1a1f24",
@@ -1074,7 +1074,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "darker",
         "ramp": {
           "bgFill1": "#0090ff",
-          "bgFill2": "#37a3ff",
+          "bgFill2": "#007fed",
           "bgFillDark": "#1a1f24",
           "bgFillInverted1": "#002a69",
           "bgFillInverted2": "#1a1f24",
@@ -1116,7 +1116,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "darker",
         "ramp": {
           "bgFill1": "#0090ff",
-          "bgFill2": "#37a3ff",
+          "bgFill2": "#007fed",
           "bgFillDark": "#1a1f24",
           "bgFillInverted1": "#002a69",
           "bgFillInverted2": "#1a1f24",
@@ -2300,7 +2300,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#cc1818",
-          "bgFill2": "#b90000",
+          "bgFill2": "#dd3029",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd0c7",
           "bgFillInverted2": "#f2efef",
@@ -2342,7 +2342,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#cc1818",
-          "bgFill2": "#b90000",
+          "bgFill2": "#dd3029",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd0c7",
           "bgFillInverted2": "#f2efef",
@@ -2384,7 +2384,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#cc1818",
-          "bgFill2": "#b90000",
+          "bgFill2": "#dd3029",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd0c7",
           "bgFillInverted2": "#f2efef",
@@ -2426,7 +2426,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#cc1818",
-          "bgFill2": "#b90000",
+          "bgFill2": "#dd3029",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd0c7",
           "bgFillInverted2": "#f2efef",
@@ -2468,7 +2468,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#cc1818",
-          "bgFill2": "#b90000",
+          "bgFill2": "#dd3029",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd0c7",
           "bgFillInverted2": "#f2efef",
@@ -2680,7 +2680,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#437aa8",
-          "bgFill2": "#356c99",
+          "bgFill2": "#5189b8",
           "bgFillDark": "#000",
           "bgFillInverted1": "#b0e1ff",
           "bgFillInverted2": "#eff0f2",
@@ -2722,7 +2722,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#437aa8",
-          "bgFill2": "#356c99",
+          "bgFill2": "#5189b8",
           "bgFillDark": "#000",
           "bgFillInverted1": "#b0e1ff",
           "bgFillInverted2": "#eff0f2",
@@ -2764,7 +2764,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#437aa8",
-          "bgFill2": "#356c99",
+          "bgFill2": "#5189b8",
           "bgFillDark": "#000",
           "bgFillInverted1": "#b0e1ff",
           "bgFillInverted2": "#eff0f2",
@@ -2806,7 +2806,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#437aa8",
-          "bgFill2": "#356c99",
+          "bgFill2": "#5189b8",
           "bgFillDark": "#000",
           "bgFillInverted1": "#b0e1ff",
           "bgFillInverted2": "#eff0f2",
@@ -2848,7 +2848,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#437aa8",
-          "bgFill2": "#356c99",
+          "bgFill2": "#5189b8",
           "bgFillDark": "#000",
           "bgFillInverted1": "#b0e1ff",
           "bgFillInverted2": "#eff0f2",
@@ -3060,7 +3060,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#916745",
-          "bgFill2": "#835a38",
+          "bgFill2": "#a07553",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd2ad",
           "bgFillInverted2": "#f2efee",
@@ -3102,7 +3102,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#916745",
-          "bgFill2": "#835a38",
+          "bgFill2": "#a07553",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd2ad",
           "bgFillInverted2": "#f2efee",
@@ -3144,7 +3144,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#916745",
-          "bgFill2": "#835a38",
+          "bgFill2": "#a07553",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd2ad",
           "bgFillInverted2": "#f2efee",
@@ -3186,7 +3186,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#916745",
-          "bgFill2": "#835a38",
+          "bgFill2": "#a07553",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd2ad",
           "bgFillInverted2": "#f2efee",
@@ -3228,7 +3228,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#916745",
-          "bgFill2": "#835a38",
+          "bgFill2": "#a07553",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd2ad",
           "bgFillInverted2": "#f2efee",
@@ -3440,7 +3440,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#646c3e",
-          "bgFill2": "#575f31",
+          "bgFill2": "#717a4b",
           "bgFillDark": "#000",
           "bgFillInverted1": "#d6e0ae",
           "bgFillInverted2": "#eff2e3",
@@ -3482,7 +3482,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#646c3e",
-          "bgFill2": "#575f31",
+          "bgFill2": "#717a4b",
           "bgFillDark": "#000",
           "bgFillInverted1": "#d6e0ae",
           "bgFillInverted2": "#eff2e3",
@@ -3524,7 +3524,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#646c3e",
-          "bgFill2": "#575f31",
+          "bgFill2": "#717a4b",
           "bgFillDark": "#000",
           "bgFillInverted1": "#d6e0ae",
           "bgFillInverted2": "#eff2e3",
@@ -3566,7 +3566,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#646c3e",
-          "bgFill2": "#575f31",
+          "bgFill2": "#717a4b",
           "bgFillDark": "#000",
           "bgFillInverted1": "#d6e0ae",
           "bgFillInverted2": "#eff2e3",
@@ -3608,7 +3608,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#646c3e",
-          "bgFill2": "#575f31",
+          "bgFill2": "#717a4b",
           "bgFillDark": "#000",
           "bgFillInverted1": "#d6e0ae",
           "bgFillInverted2": "#eff2e3",
@@ -3820,7 +3820,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#ad631e",
-          "bgFill2": "#9e5505",
+          "bgFill2": "#bd7230",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd3a7",
           "bgFillInverted2": "#f3efed",
@@ -3862,7 +3862,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#ad631e",
-          "bgFill2": "#9e5505",
+          "bgFill2": "#bd7230",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd3a7",
           "bgFillInverted2": "#f3efed",
@@ -3904,7 +3904,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#ad631e",
-          "bgFill2": "#9e5505",
+          "bgFill2": "#bd7230",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd3a7",
           "bgFillInverted2": "#f3efed",
@@ -3946,7 +3946,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#ad631e",
-          "bgFill2": "#9e5505",
+          "bgFill2": "#bd7230",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd3a7",
           "bgFillInverted2": "#f3efed",
@@ -3988,7 +3988,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
         "direction": "lighter",
         "ramp": {
           "bgFill1": "#ad631e",
-          "bgFill2": "#9e5505",
+          "bgFill2": "#bd7230",
           "bgFillDark": "#000",
           "bgFillInverted1": "#ffd3a7",
           "bgFillInverted2": "#f3efed",

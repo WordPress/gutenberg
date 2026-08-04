@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { DEFAULT_SEED_COLORS } from '../color-ramps';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
-const ADMIN_COLOR_SCHEME_CASES = [
+const COLOR_WARNING_CASES = [
 	{
 		name: 'modern',
 		color: { primary: '#3858e9', background: '#222524' },
@@ -28,7 +28,7 @@ const ADMIN_COLOR_SCHEME_CASES = [
 		color: { primary: '#437aa8', background: '#3876a8' },
 	},
 	{
-		name: 'ectoplasm',
+		name: 'current Ectoplasm',
 		color: { primary: '#646c3e', background: '#4f386e' },
 	},
 	{
@@ -36,8 +36,8 @@ const ADMIN_COLOR_SCHEME_CASES = [
 		color: { primary: '#ad631e', background: '#cc4541' },
 	},
 	{
-		name: 'light',
-		color: { primary: '#007cba', background: '#eaeeed' },
+		name: 'proposed Ectoplasm',
+		color: { primary: '#608010', background: '#4f386e' },
 	},
 ] as const;
 
@@ -57,20 +57,29 @@ describe( 'ThemeProvider color warnings', () => {
 			},
 		},
 		{
-			name: 'Ectoplasm colors',
-			color: {
-				primary: '#608010',
-				background: '#4f386e',
-			},
+			name: 'Light admin colors',
+			color: { primary: '#007cba', background: '#eaeeed' },
 		},
 	] )( 'returns no warnings for $name', ( { color } ) => {
 		expect( getColorWarnings( color ) ).toEqual( [] );
 	} );
 
-	it.each( ADMIN_COLOR_SCHEME_CASES )(
-		'returns no warnings for the $name admin color scheme',
+	it.each( COLOR_WARNING_CASES )(
+		'reports the active fill contrast failure for $name colors',
 		( { color } ) => {
-			expect( getColorWarnings( color ) ).toEqual( [] );
+			const warnings = getColorWarnings( color );
+
+			expect( warnings ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						type: 'contrast',
+						ramp: 'primary',
+						backgroundStep: 'bgFill2',
+						foregroundStep: 'fgFill',
+						requiredContrast: 4.5,
+					} ),
+				] )
+			);
 		}
 	);
 

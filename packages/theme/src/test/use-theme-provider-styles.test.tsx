@@ -56,7 +56,7 @@ describe( 'useThemeProviderStyles', () => {
 		describe( 'within a parent provider', () => {
 			const wrapper = ( { children }: { children: ReactNode } ) => (
 				<ThemeProvider
-					color={ { primary: '#abcdef', background: '#222222' } }
+					color={ { primary: '#abcdef', background: '#f8f8f8' } }
 					cursor={ { control: 'pointer' } }
 					cornerRadius="pronounced"
 				>
@@ -71,7 +71,7 @@ describe( 'useThemeProviderStyles', () => {
 
 				expect( result.current.resolvedSettings.color ).toEqual( {
 					primary: '#abcdef',
-					background: '#222222',
+					background: '#f8f8f8',
 				} );
 				expect( result.current.resolvedSettings.cursor ).toEqual( {
 					control: 'pointer',
@@ -94,7 +94,7 @@ describe( 'useThemeProviderStyles', () => {
 					// Provided locally.
 					primary: '#00ff00',
 					// `background` keeps inheriting from the parent.
-					background: '#222222',
+					background: '#f8f8f8',
 				} );
 				// `cursor` and `cornerRadius` keep inheriting from the parent.
 				expect( result.current.resolvedSettings.cursor ).toEqual( {
@@ -138,7 +138,7 @@ describe( 'useThemeProviderStyles', () => {
 		it( 're-emits inherited color tokens so portaled subtrees can re-apply them', () => {
 			const wrapper = ( { children }: { children: ReactNode } ) => (
 				<ThemeProvider
-					color={ { primary: '#abcdef', background: '#222222' } }
+					color={ { primary: '#abcdef', background: '#f8f8f8' } }
 				>
 					{ children }
 				</ThemeProvider>
@@ -150,7 +150,7 @@ describe( 'useThemeProviderStyles', () => {
 
 			expect( result.current.resolvedSettings.color ).toEqual( {
 				primary: '#abcdef',
-				background: '#222222',
+				background: '#f8f8f8',
 			} );
 			expect( result.current.themeProviderStyles ).toHaveProperty(
 				'--wp-admin-theme-color',

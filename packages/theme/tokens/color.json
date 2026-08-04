@@ -183,8 +183,8 @@
 				"bgFill2": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.216, 0.639, 1 ],
-						"hex": "#37a3ff"
+						"components": [ 0, 0.498, 0.929 ],
+						"hex": "#007fed"
 					}
 				},
 				"surface2": {

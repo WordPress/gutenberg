@@ -131,7 +131,7 @@ describe( 'buildRamps', () => {
 		);
 	} );
 
-	it( 'keeps normal and active fill text accessible without changing the seed', () => {
+	it( 'reports the Ectoplasm active fill contrast failure', () => {
 		const bgRamp = buildBgRamp( '#4f386e' );
 		const accentRamp = buildAccentRamp( '#608010', bgRamp );
 
@@ -141,23 +141,9 @@ describe( 'buildRamps', () => {
 		).toBeGreaterThanOrEqual( 4.5 );
 		expect(
 			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
-		).toBeGreaterThanOrEqual( 4.5 );
-	} );
+		).toBeLessThan( 4.5 );
 
-	it( 'reports an inaccessible active fill and foreground pair', () => {
-		const bgRamp = buildBgRamp( '#4f386e' );
-		const accentRamp = buildAccentRamp( '#608010', bgRamp );
-		const inaccessibleRamp = {
-			...accentRamp,
-			ramp: {
-				...accentRamp.ramp,
-				bgFill2: '#ffffff',
-			},
-		};
-
-		expect(
-			checkAccessibleCombinations( { bgRamp: inaccessibleRamp } )
-		).toEqual(
+		expect( checkAccessibleCombinations( { bgRamp: accentRamp } ) ).toEqual(
 			expect.arrayContaining( [
 				expect.objectContaining( {
 					bgName: 'bgFill2',

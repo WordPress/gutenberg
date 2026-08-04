@@ -24,10 +24,13 @@ const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
-const PRIMARY = '#1e90ff';
+const PRIMARY = '#1e3a5f';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
-const INACCESSIBLE_COLOR = 'rgb(40% 56% 24%)';
+const INACCESSIBLE_PRIMARY = '#608010';
+const INACCESSIBLE_BACKGROUND = '#4f386e';
+const ACCESSIBLE_PRIMARY = '#3858e9';
+const ACCESSIBLE_BACKGROUND = '#fcfcfc';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -135,8 +138,8 @@ describe( 'ThemeProvider', () => {
 		render(
 			<ThemeProvider
 				color={ {
-					primary: INACCESSIBLE_COLOR,
-					background: INACCESSIBLE_COLOR,
+					primary: INACCESSIBLE_PRIMARY,
+					background: INACCESSIBLE_BACKGROUND,
 				} }
 			>
 				<div>x</div>
@@ -149,7 +152,7 @@ describe( 'ThemeProvider', () => {
 				expect.objectContaining( {
 					type: 'contrast',
 					ramp: 'primary',
-					backgroundStep: 'bgFill1',
+					backgroundStep: 'bgFill2',
 					foregroundStep: 'fgFill',
 				} ),
 			] )
@@ -167,8 +170,8 @@ describe( 'ThemeProvider', () => {
 		render(
 			<ThemeProvider
 				color={ {
-					primary: INACCESSIBLE_COLOR,
-					background: INACCESSIBLE_COLOR,
+					primary: INACCESSIBLE_PRIMARY,
+					background: INACCESSIBLE_BACKGROUND,
 				} }
 				onColorWarningsChange={ onColorWarningsChange }
 			>
@@ -181,7 +184,7 @@ describe( 'ThemeProvider', () => {
 				expect.objectContaining( {
 					type: 'contrast',
 					ramp: 'primary',
-					backgroundStep: 'bgFill1',
+					backgroundStep: 'bgFill2',
 					foregroundStep: 'fgFill',
 				} ),
 			] )
@@ -198,8 +201,8 @@ describe( 'ThemeProvider', () => {
 		const { rerender } = render(
 			<ThemeProvider
 				color={ {
-					primary: INACCESSIBLE_COLOR,
-					background: INACCESSIBLE_COLOR,
+					primary: INACCESSIBLE_PRIMARY,
+					background: INACCESSIBLE_BACKGROUND,
 				} }
 				onColorWarningsChange={ onColorWarningsChange }
 			/>
@@ -208,7 +211,10 @@ describe( 'ThemeProvider', () => {
 		onColorWarningsChange.mockClear();
 		rerender(
 			<ThemeProvider
-				color={ { primary: PRIMARY, background: BACKGROUND } }
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
 				onColorWarningsChange={ onColorWarningsChange }
 			/>
 		);

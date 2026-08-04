@@ -39,13 +39,6 @@ function buildDependencyGraph( config: RampConfig ): {
 		dependencies.get( step )!.push( reference );
 		dependents.get( reference )!.push( step );
 
-		if ( stepConfig.oppositeDirectionFallback ) {
-			const fallbackReference =
-				stepConfig.oppositeDirectionFallback.reference;
-			dependencies.get( step )!.push( fallbackReference );
-			dependents.get( fallbackReference )!.push( step );
-		}
-
 		// Add dependency for sameAsIfPossible
 		if ( stepConfig.sameAsIfPossible ) {
 			dependencies.get( step )!.push( stepConfig.sameAsIfPossible );
@@ -122,9 +115,6 @@ export function stepsForStep(
 		}
 
 		visit( stepConfig.contrast.reference );
-		if ( stepConfig.oppositeDirectionFallback ) {
-			visit( stepConfig.oppositeDirectionFallback.reference );
-		}
 		if ( stepConfig.sameAsIfPossible ) {
 			visit( stepConfig.sameAsIfPossible );
 		}
