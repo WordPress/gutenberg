@@ -2,8 +2,6 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	Flex,
-	FlexItem,
 	SearchControl,
 	TextHighlight,
 	Composite,
@@ -167,7 +165,7 @@ function AddCustomTemplateModalContent( {
 			);
 			firstFocusable?.focus();
 		}
-	}, [ showSearchEntities ] );
+	}, [ containerRef, showSearchEntities ] );
 
 	return (
 		<Stack
@@ -183,14 +181,15 @@ function AddCustomTemplateModalContent( {
 							'Select whether to create a single template for all items or a specific one.'
 						) }
 					</Text>
-					<Flex
-						className="edit-site-custom-template-modal__contents"
+					<Stack
+						direction="row"
 						gap="4"
 						align="initial"
+						className="edit-site-custom-template-modal__contents"
 					>
-						<FlexItem
+						<Button
+							__next40pxDefaultSize
 							isBlock
-							as={ Button }
 							onClick={ () => {
 								const {
 									slug,
@@ -215,10 +214,10 @@ function AddCustomTemplateModalContent( {
 									__( 'For all items' )
 								}
 							</Text>
-						</FlexItem>
-						<FlexItem
+						</Button>
+						<Button
+							__next40pxDefaultSize
 							isBlock
-							as={ Button }
 							onClick={ () => {
 								setShowSearchEntities( true );
 							} }
@@ -232,9 +231,9 @@ function AddCustomTemplateModalContent( {
 									__( 'For a specific item' )
 								}
 							</Text>
-						</FlexItem>
-					</Flex>
-					<Flex justify="right">
+						</Button>
+					</Stack>
+					<Stack direction="row" justify="flex-end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -242,7 +241,7 @@ function AddCustomTemplateModalContent( {
 						>
 							{ __( 'Back' ) }
 						</Button>
-					</Flex>
+					</Stack>
 				</>
 			) }
 			{ showSearchEntities && (
@@ -256,7 +255,7 @@ function AddCustomTemplateModalContent( {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-					<Flex justify="right">
+					<Stack direction="row" justify="flex-end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -272,7 +271,7 @@ function AddCustomTemplateModalContent( {
 						>
 							{ __( 'Back' ) }
 						</Button>
-					</Flex>
+					</Stack>
 				</>
 			) }
 		</Stack>
