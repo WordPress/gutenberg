@@ -74,21 +74,48 @@ protocol helper.
 
 ## Verification status (honest ledger)
 
-- `packages/sync` jest: **256/256 pass** (includes both new transport suites
+All executed against wp-env (OrbStack) after `npm run build`:
+
+- **Build**: green (types built in dependency order:
+  `tsc -b packages/undo-manager packages/sync` first if a fresh worktree
+  trips the sync-package type resolution).
+- `packages/sync` **jest: 256/256 pass** (includes both new transport suites
   and the reconciled polling manager).
-- `php -l` on every touched PHP file: clean. `node --check` on both
-  build-free scripts: clean.
-- PHPUnit (including the two new engine tests): **written but not executed
-  here** — wp-env was not started in this worktree. Run
-  `npm run wp-env start -- --auto-port` and the phpunit suite before
-  trusting the engine changes.
-- e2e (DE spec, transport specs): **not executed here**; both suites passed
-  in their donor worktrees before the stitch.
-- `tsc -p packages/sync` standalone: fails on cross-package type resolution
-  in this fresh worktree (dependency `.d.ts` not built) — pre-existing
-  environment condition, not introduced by these changes.
+- **PHPUnit — DE engine: 27/27** (`--filter Gutenberg_Distributed_Editing`),
+  the original 25 plus the two new syncId-matching tests (moved-block
+  pass-through, edited-pair not-a-deletion).
+- **PHPUnit — collaboration/sync: 185/185** (`--filter 'Collaboration|Sync'`),
+  covering the actor-stamp and base-version-broadcast changes to
+  `WP_Sync_Server_Core`.
+- **e2e — distributed-editing: 5/5** (see the note below; requires
+  `wp option update wp_collaboration_enabled 0` in the e2e env — the suite
+  exercises the non-live save path).
+- **e2e — collaboration-sync: 4/4**, confirming live RTC (two-browser sync)
+  still works with the base-version broadcast added to the polling manager.
+- `php -l` / `node --check` on every touched file: clean.
 - Package CHANGELOGs deliberately not updated: nothing here targets trunk
   yet; changelog entries come when something graduates.
+
+### Bug found and fixed during e2e (worth recording)
+
+The first `sync-id.js` assigned syncIds from inside a `core/block-editor`
+`subscribe` callback, dispatching `updateBlockAttributes` synchronously on
+every store tick. That raced with a new post's create-save and silently
+dropped the content being saved (unit tests don't load the editor, so only
+e2e caught it). Fixed by deferring the mutation to a microtask and skipping
+it entirely while a save/autosave is in flight. If you extend the minter,
+keep both properties.
+
+### e2e environment note
+
+The DE specs exercise the NON-LIVE save path, so they require collaboration
+disabled: `wp option update wp_collaboration_enabled 0` on the e2e env. This
+is because (a) with a live channel, auto-approval is deliberately off (the
+laundering guard) so "auto-approve own content" wouldn't hold, and (b) trunk
+now defers the save notice during collaboration. The setting is not exposed
+over the REST settings endpoint, so the suite can't currently toggle it
+itself — a small follow-up (expose it, or add a test-only mu-plugin) would
+make the suite self-contained.
 
 ## Demo script
 

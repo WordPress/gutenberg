@@ -11,6 +11,38 @@ async function waitForDistributedEditingReady( page ) {
 	);
 }
 
+/**
+ * Saves the post and waits for the save to actually complete.
+ *
+ * The prior "Draft saved" snackbar is transient (it auto-dismisses) and, on
+ * current trunk, deferred during collaboration — waiting on it is racy.
+ * Instead, drive the save and settle on the editor store: saving finished and
+ * no unsaved edits remain.
+ *
+ * @param {Object} page      Playwright page.
+ * @param {Object} pageUtils Page utils fixture.
+ */
+async function saveAndSettle( page, pageUtils ) {
+	await pageUtils.pressKeys( 'primary+s' );
+	// Wait for the editor store to settle: not mid-save, no unsaved edits, and
+	// a real persisted post ID (the first save of a new post is a create
+	// round-trip).
+	await page.waitForFunction( () => {
+		const editor = window.wp.data.select( 'core/editor' );
+		return (
+			! editor.isSavingPost() &&
+			! editor.isEditedPostDirty() &&
+			editor.getCurrentPostId() > 0
+		);
+	} );
+	// The store can settle a hair before the persisted content is readable
+	// through the DE state endpoint; poll it so callers never read ahead of
+	// the save round-trip. expect.poll retries the async fetch properly
+	// (an async waitForFunction resolves on the returned promise, not its
+	// value).
+	await expect.poll( () => getServerContent( page ) ).not.toBe( '' );
+}
+
 async function getServerContent( page ) {
 	return page.evaluate( async () => {
 		const postId = window.wp.data
@@ -38,11 +70,7 @@ async function sequesterScriptProposal( page, pageUtils, editor ) {
 		name: 'core/paragraph',
 	} );
 	await waitForDistributedEditingReady( page );
-	await pageUtils.pressKeys( 'primary+s' );
-	await page
-		.getByRole( 'button', { name: 'Dismiss this notice' } )
-		.filter( { hasText: 'Draft saved' } )
-		.waitFor();
+	await saveAndSettle( page, pageUtils );
 
 	await page.evaluate( async () => {
 		const postId = window.wp.data
@@ -69,6 +97,14 @@ async function sequesterScriptProposal( page, pageUtils, editor ) {
 	).toBeVisible();
 }
 
+// These scenarios exercise the NON-LIVE save path. With a live collaboration
+// channel active, auto-approval is deliberately disabled (peer content is
+// indistinguishable from the user's own — the content-laundering guard) and
+// RTC also defers the "Draft saved" notice these tests wait on. The suite
+// therefore requires collaboration disabled in the environment:
+//   wp option update wp_collaboration_enabled 0
+// See PROTOTYPE.md. A follow-up should make this self-contained (the setting
+// is not currently exposed over the REST settings endpoint).
 test.describe( 'Distributed editing prototype', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -85,12 +121,7 @@ test.describe( 'Distributed editing prototype', () => {
 		} );
 
 		await waitForDistributedEditingReady( page );
-		await pageUtils.pressKeys( 'primary+s' );
-
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Draft saved' } )
-			.waitFor();
+		await saveAndSettle( page, pageUtils );
 
 		expect( await getServerContent( page ) ).toContain(
 			'Plain collaborative paragraph.'
@@ -110,13 +141,8 @@ test.describe( 'Distributed editing prototype', () => {
 		} );
 
 		await waitForDistributedEditingReady( page );
-		await pageUtils.pressKeys( 'primary+s' );
-
 		// No modal, no bounce: the save completes as a normal editor save.
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Draft saved' } )
-			.waitFor();
+		await saveAndSettle( page, pageUtils );
 
 		expect( await getServerContent( page ) ).toContain(
 			'<script>document.title = "own-edit";</script>'
@@ -154,11 +180,7 @@ test.describe( 'Distributed editing prototype', () => {
 			.click();
 
 		await waitForDistributedEditingReady( page );
-		await pageUtils.pressKeys( 'primary+s' );
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Draft saved' } )
-			.waitFor();
+		await saveAndSettle( page, pageUtils );
 
 		const serverContent = await getServerContent( page );
 		expect( serverContent ).toContain(
@@ -231,11 +253,7 @@ test.describe( 'Distributed editing prototype', () => {
 			.click();
 
 		await waitForDistributedEditingReady( page );
-		await pageUtils.pressKeys( 'primary+s' );
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Draft saved' } )
-			.waitFor();
+		await saveAndSettle( page, pageUtils );
 
 		const serverContent = await getServerContent( page );
 		expect( serverContent ).not.toContain( '<script' );
