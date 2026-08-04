@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Increase the footer height from 24px to 32px to prevent the focus ring from being clipped ([#81145](https://github.com/WordPress/gutenberg/pull/81145)).
+
 ## 9.36.0 (2026-07-14)
 
 ### Enhancements
