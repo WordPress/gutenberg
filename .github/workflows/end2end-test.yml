@@ -20,19 +20,13 @@ concurrency:
 permissions: {}
 
 jobs:
-    e2e-playwright:
-        name: Playwright - ${{ matrix.part }}
+    build:
+        name: Build
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         permissions:
             contents: read
-            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        timeout-minutes: 45
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3, 4, 5, 6, 7, 8]
-                totalParts: [8]
+        timeout-minutes: 30
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -46,9 +40,73 @@ jobs:
             - name: Npm build
               run: npm run build -- --skip-types
 
+            # Wider than the `build*` directories, because the build also emits
+            # generated files next to sources: the block parsers, the icon
+            # library, and the worker entry points.
+            - name: Upload build output
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: build-output
+                  path: |
+                      build
+                      packages/*/build
+                      packages/*/build-module
+                      packages/*/build-style
+                      packages/*/build-types
+                      packages/*/build-wp
+                      packages/*/src/library/*.tsx
+                      packages/*/src/library/index.ts
+                      packages/*/src/worker-code.ts
+                      packages/block-serialization-spec-parser/parser.js
+                      packages/block-serialization-spec-parser/parser.php
+                  retention-days: 3
+                  if-no-files-found: error
+                  # Allow re-running the workflow over a previous attempt.
+                  overwrite: true
+
+    e2e-playwright:
+        name: Playwright - ${{ matrix.part }}
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 45
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        permissions:
+            contents: read
+            id-token: write
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4, 5, 6, 7, 8]
+                totalParts: [8]
+
+        steps:
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
+
             - name: Install Playwright dependencies
               uses: ./.github/setup-playwright
               with:
+                  workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium firefox webkit
 
             - name: Install WordPress and start the server
@@ -80,13 +138,24 @@ jobs:
     e2e-playwright-rtc-websocket:
         name: Playwright - RTC WebSocket
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 20
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
             id-token: write
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        timeout-minutes: 20
 
         steps:
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -95,13 +164,16 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Npm build
-              run: npm run build -- --skip-types
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
 
             # No collaboration spec is tagged `@webkit` or `@firefox`.
             - name: Install Playwright dependencies
               uses: ./.github/setup-playwright
               with:
+                  workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium
 
             - name: Install WordPress and start the server
