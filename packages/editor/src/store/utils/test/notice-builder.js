@@ -156,7 +156,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Auto-save failed. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually.',
+				'Auto-save failed. Your changes will be persisted locally to avoid content loss. You can save manually.',
 				defaultExpectedAction,
 			],
 			{ isAutosave: true },

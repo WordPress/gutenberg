@@ -9,11 +9,11 @@ import { __ } from '@wordpress/i18n';
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
 const AUTO_SAVE_FAILURE_NOTICE = __(
-	'Auto-save failed. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually.'
+	'Auto-save failed. Your changes will be persisted locally to avoid content loss. You can save manually.'
 );
 
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
-	'Auto-save failed because you were offline. Your changes will be persisted locally to avoid content loss. We’ll retry automatically, or you can save manually. Please verify your connection and try again.'
+	'Auto-save failed because you were offline. Your changes will be persisted locally to avoid content loss. Please verify your connection and save manually.'
 );
 
 /**
