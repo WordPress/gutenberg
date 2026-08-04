@@ -190,7 +190,10 @@ export const saveDirtyEntities =
 				pendingSavedRecords.push(
 					registry
 						.dispatch( coreStore )
-						.saveEditedEntityRecord( kind, name, key )
+						.saveEditedEntityRecord( kind, name, key, {
+							throwOnError: true,
+						} )
+						.catch( ensureError )
 				);
 			}
 		} );
@@ -202,15 +205,19 @@ export const saveDirtyEntities =
 						'root',
 						'site',
 						undefined,
-						siteItemsToSave
+						siteItemsToSave,
+						{
+							throwOnError: true,
+						}
 					)
+					.catch( ensureError )
 			);
 		}
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
 
-		Promise.all( pendingSavedRecords )
+		return Promise.all( pendingSavedRecords )
 			.then( async ( values ) => {
 				if ( onSave ) {
 					await onSave();
@@ -218,12 +225,23 @@ export const saveDirtyEntities =
 				return values;
 			} )
 			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
+				const errors = values.filter( ( v ) => v instanceof Error );
+				if ( errors.length ) {
+					const firstMessage = errors.find(
+						( e ) => e.message
+					)?.message;
+
 					registry
 						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
+						.createErrorNotice(
+							decodeEntities(
+								firstMessage || __( 'Saving failed.' )
+							),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+							}
+						);
 				} else {
 					registry
 						.dispatch( noticesStore )
@@ -247,9 +265,42 @@ export const saveDirtyEntities =
 				registry
 					.dispatch( noticesStore )
 					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
+						decodeEntities(
+							error?.message || __( 'Saving failed.' )
+						),
+						{
+							type: 'snackbar',
+							id: saveNoticeId,
+						}
 					)
 			);
+
+		function ensureError( error ) {
+			if ( error instanceof Error ) {
+				return error;
+			}
+
+			// Expect certain errors to be plain objects with a `message`
+			// property, such as those thrown by `apiFetch`. Otherwise, do our
+			// best to infer a message via duck typing.
+			let message;
+			if ( ! error ) {
+			} else if ( typeof error.message === 'string' ) {
+				message = error.message;
+			} else if ( typeof error === 'string' ) {
+				message = error;
+			} else if (
+				Object.hasOwn( error, 'toString' ) &&
+				typeof error.toString === 'function'
+			) {
+				const result = error.toString();
+				if ( typeof result === 'string' ) {
+					message = result;
+				}
+			}
+
+			return new Error( message, { cause: error } );
+		}
 	};
 
 /**
