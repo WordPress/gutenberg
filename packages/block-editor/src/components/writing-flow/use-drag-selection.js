@@ -136,10 +136,10 @@ export default function useDragSelection() {
 				// `mouseup` happens anywhere in the window.
 				defaultView.addEventListener( 'mouseup', onMouseUp );
 
-				// Allow cross contentEditable selection by temporarily making
-				// all content editable. We can't rely on using the store and
-				// React because re-rending happens too slowly. We need to be
-				// able to select across instances immediately.
+				// The layout host hook also makes the list editable in
+				// response to `startMultiSelect`, but a React commit does not
+				// reliably land before the drag crosses the block boundary;
+				// engage synchronously and let the render agree.
 				setContentEditableWrapper( node, true );
 			}
 

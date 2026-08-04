@@ -53,6 +53,7 @@ export default function useEditableRootHost( rootClientId = '' ) {
 				getSelectionStart,
 				getBlockRootClientId,
 				hasMultiSelection,
+				isMultiSelecting,
 				getSelectedBlockClientId,
 				canHostEditableRoot,
 			} = unlock( select( blockEditorStore ) );
@@ -62,7 +63,11 @@ export default function useEditableRootHost( rootClientId = '' ) {
 				return (
 					getBlockRootClientId( selectedClientId ) ===
 						rootClientId &&
-					canHostEditableRoot( selectedClientId )
+					( canHostEditableRoot( selectedClientId ) ||
+						// A selection gesture in progress (e.g. a drag
+						// leaving the block) needs the list editable so the
+						// native selection can extend across its blocks.
+						isMultiSelecting() )
 				);
 			}
 
