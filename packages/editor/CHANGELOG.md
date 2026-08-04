@@ -15,6 +15,7 @@
 ### Bug Fixes
 
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+-   Collaboration: Suppress the remote awareness cursor, selection highlight, and whole-block outline/avatar when they point inside content hidden by a collapsed container (e.g. a closed `core/details` panel or an inactive `core/accordion` panel), instead of drawing them at a misleading fallback position ([#79641](https://github.com/WordPress/gutenberg/issues/79641)).
 
 ### Internal
 

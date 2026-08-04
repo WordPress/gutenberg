@@ -1,3 +1,15 @@
+/**
+ * WordPress dependencies
+ */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { isElementVisible } = unlock( blockEditorPrivateApis );
+
 export interface SelectionRect {
 	x: number;
 	y: number;
@@ -57,6 +69,14 @@ const getOffsetPositionInBlock = (
 	editorDocument: Document,
 	overlayRect: DOMRect
 ) => {
+	// The target may be hidden inside collapsed content (e.g. a closed
+	// core/details or an inactive core/accordion panel). Its range then has
+	// no layout box, so don't draw a cursor at a fallback position — suppress
+	// it entirely rather than misplacing it at the collapsed wrapper.
+	if ( ! isElementVisible( blockElement ) ) {
+		return null;
+	}
+
 	const { node, offset } = findInnerBlockOffset(
 		blockElement,
 		charOffset,
@@ -126,6 +146,13 @@ export const getSelectionRects = (
 	editorDocument: Document,
 	overlayRect: DOMRect
 ): SelectionRect[] | null => {
+	// Same rationale as getOffsetPositionInBlock: a hidden target has no
+	// layout box to derive rects from, so skip it rather than draw a
+	// misplaced or empty selection.
+	if ( ! isElementVisible( blockElement ) ) {
+		return null;
+	}
+
 	// Normalize direction.
 	let normalizedStart = startOffset;
 	let normalizedEnd = endOffset;
