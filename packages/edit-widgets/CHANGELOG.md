@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Wrap the widgets editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color.
+-   Wrap the widgets editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81173](https://github.com/WordPress/gutenberg/pull/81173)).
 
 ## 6.51.0 (2026-07-14)
 
