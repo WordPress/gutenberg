@@ -26,10 +26,10 @@
 	stroke: currentColor;
 	stroke-linecap: round;
 	transform-origin: 50% 50%;
-	animation: components-spinner-animation 1.4s linear infinite both;
+	animation: spin 1.4s linear infinite both;
 }
 
-@keyframes components-spinner-animation {
+@keyframes spin {
 	from {
 		transform: rotate(0deg);
 	}
