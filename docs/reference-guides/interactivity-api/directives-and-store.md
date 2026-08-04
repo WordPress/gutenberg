@@ -1364,7 +1364,7 @@ const unwatch = watch( () => {
 
 ### renderElement()
 
-Renders server-rendered HTML that has been inserted into the live DOM after the initial page load, processing all Interactivity API directives on it. This makes the inserted markup fully interactive.
+Renders HTML elements that have been inserted into the live DOM after the initial page load, processing all Interactivity API directives on them. This makes the inserted markup fully interactive. The markup is commonly server-rendered — e.g. a fragment fetched from a REST endpoint — but the elements can come from anywhere.
 
 ```js
 import { renderElement } from '@wordpress/interactivity';
@@ -1390,7 +1390,7 @@ Calling `renderElement()` again with the same element updates it in place (preac
 
 ### renderHTML()
 
-Parses a server-rendered HTML string, inserts the resulting element(s) into the live DOM, and renders them with `renderElement()` so all Interactivity API directives on them are processed. It is a convenience wrapper over the parse → insert → `renderElement()` sequence — callers don't need to write their own `DOMParser` or insertion code.
+Parses an HTML string, inserts the resulting element(s) into the live DOM, and renders them with `renderElement()` so all Interactivity API directives on them are processed. It is a convenience wrapper over the parse → insert → `renderElement()` sequence — callers don't need to write their own `DOMParser` or insertion code. The HTML commonly comes from a server — e.g. a fragment fetched from a REST endpoint — but can come from anywhere.
 
 ```js
 import { renderHTML } from '@wordpress/interactivity';
@@ -1400,7 +1400,7 @@ renderHTML( document.querySelector( '#feed' ), await res.text() );
 ```
 
 -   `container` (`Element`): The element the parsed HTML is inserted into.
--   `html` (`string`): The server-rendered HTML string.
+-   `html` (`string`): The HTML string.
 -   `options` (`Object`): Options.
     -   `options.position` (`string`): Where to insert the parsed elements. One of:
         -   `append` (default): as the container's last children.
@@ -1410,7 +1410,7 @@ renderHTML( document.querySelector( '#feed' ), await res.text() );
         -   `inner`: replace the container's children.
         -   `outer`: replace the container itself.
 
-Unlike `renderElement()`, each call creates fresh nodes — there is no cross-call in-place diffing. With `position: 'inner'`, `renderHTML( ref, html, { position: 'inner' } )` is a drop-in replacement for `ref.innerHTML = html` that actually hydrates the markup (plain `innerHTML` assignment leaves the inserted directives unprocessed — dead markup).
+Because `renderHTML()` parses fresh nodes on every call, repeated calls mount fresh content rather than diffing against the previous call's nodes — unlike `renderElement()` re-called with the same element, which diffs in place. With `position: 'inner'`, `renderHTML( ref, html, { position: 'inner' } )` is a drop-in replacement for `ref.innerHTML = html` that actually hydrates the markup (plain `innerHTML` assignment leaves the inserted directives unprocessed — dead markup).
 
 The inserted element(s) must have an enclosing island or their own `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
 

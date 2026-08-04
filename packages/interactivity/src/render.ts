@@ -43,8 +43,10 @@ const getAncestorNamespace = ( element: Element ): string | null => {
 };
 
 /**
- * Renders server-rendered HTML that has been inserted into the live DOM after
- * the initial page load, processing all Interactivity API directives on it.
+ * Renders HTML elements that have been inserted into the live DOM after the
+ * initial page load, processing all Interactivity API directives on them.
+ * The markup is commonly server-rendered — e.g. a fragment fetched from a
+ * REST endpoint — but the elements can come from anywhere.
  *
  * The element(s) MUST already be attached to the DOM — the root-fragment
  * mechanism requires a parent element. Multiple elements must be contiguous
@@ -136,9 +138,10 @@ export function renderElement( element: Element | Element[] ): void {
 }
 
 /**
- * Parses a server-rendered HTML string and inserts the resulting element(s)
- * into the live DOM, then renders them with `renderElement()` so all
- * Interactivity API directives on them are processed.
+ * Parses an HTML string and inserts the resulting element(s) into the live
+ * DOM, then renders them with `renderElement()` so all Interactivity API
+ * directives on them are processed. The HTML commonly comes from a server —
+ * e.g. a fragment fetched from a REST endpoint — but can come from anywhere.
  *
  * This is a convenience wrapper over the parse → insert → `renderElement()`
  * sequence, so callers don't need to write their own `DOMParser`/insertion
@@ -151,17 +154,20 @@ export function renderElement( element: Element | Element[] ): void {
  * renderHTML( document.querySelector( '#feed' ), await res.text() );
  * ```
  *
- * Unlike `renderElement()`, each call creates fresh nodes — there is no
- * cross-call in-place diffing. With `position: 'inner'` the container's
- * previous children are removed first, making `renderHTML( ref, html, {
- * position: 'inner' } )` a drop-in replacement for `ref.innerHTML = html`
- * that actually hydrates the markup.
+ * Because `renderHTML()` parses fresh nodes on every call, repeated calls
+ * mount fresh content rather than diffing against the previous call's nodes —
+ * unlike `renderElement()` re-called with the same element, which diffs in
+ * place. With `position: 'inner'` the container's previous children are
+ * removed first, making `renderHTML( ref, html, { position: 'inner' } )` a
+ * drop-in replacement for `ref.innerHTML = html` that actually hydrates the
+ * markup (plain `innerHTML` assignment leaves the inserted directives
+ * unprocessed — dead markup).
  *
  * The inserted element(s) must have an enclosing island or their own
  * `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
  *
  * @param container The element the parsed HTML is inserted into.
- * @param html      The server-rendered HTML string.
+ * @param html      The HTML string.
  * @param options   Options.
  * @param options.position Where to insert the parsed elements:
  *                         - `append`: as the container's last children (default)
