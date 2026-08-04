@@ -312,7 +312,7 @@ describe( 'normalizeFormFields', () => {
 				layout: {
 					type: 'card',
 					withHeader: false,
-					// @ts-expect-error Deliberately invalid type, to verify runtime behavior.
+					// @ts-expect-error With `withHeader: false`, `isOpened` must be `true`; normalization of `false` is tested.
 					isOpened: false,
 					summary: [ { id: 'field1', visibility: 'always' } ],
 				},

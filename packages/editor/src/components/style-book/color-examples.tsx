@@ -10,7 +10,7 @@ import { __experimentalGrid as Grid } from '@wordpress/components';
 import {
 	getColorClassName,
 	__experimentalGetGradientClass,
-	// @ts-expect-error `@wordpress/block-editor` is not typed yet.
+	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
 
 /**

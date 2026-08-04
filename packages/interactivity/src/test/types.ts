@@ -234,7 +234,7 @@ describe( 'Interactivity API types', () => {
 					},
 				} );
 
-				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
+				// @ts-expect-error This store part declares no `state` property.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;

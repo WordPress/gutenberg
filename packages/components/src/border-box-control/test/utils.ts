@@ -47,13 +47,13 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'isEmptyBorder', () => {
 		it( 'should determine a undefined, null, and {} to be empty', () => {
 			expect( isEmptyBorder( undefined ) ).toBe( true );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( isEmptyBorder( null ) ).toBe( true );
 			expect( isEmptyBorder( {} ) ).toBe( true );
 		} );
 
 		it( 'should determine object missing all border props to be empty', () => {
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( isEmptyBorder( nonBorder ) ).toBe( true );
 		} );
 
@@ -112,13 +112,13 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'isCompleteBorder', () => {
 		it( 'should determine a undefined, null, and {} to be incomplete', () => {
 			expect( isCompleteBorder( undefined ) ).toBe( false );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( isCompleteBorder( null ) ).toBe( false );
 			expect( isCompleteBorder( {} ) ).toBe( false );
 		} );
 
 		it( 'should determine objects missing border props to be incomplete', () => {
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( isCompleteBorder( nonBorder ) ).toBe( false );
 			expect( isCompleteBorder( partialBorder ) ).toBe( false );
 			expect( isCompleteBorder( partialWithExtraProp ) ).toBe( false );
@@ -153,7 +153,7 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should determine undefined, non-border or empty object as not being mixed', () => {
 			expect( hasMixedBorders( undefined ) ).toBe( false );
 			expect( hasMixedBorders( {} ) ).toBe( false );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` is not assignable to `AnyBorder`; resilience is tested.
 			expect( hasMixedBorders( nonBorder ) ).toBe( false );
 		} );
 
@@ -173,13 +173,13 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'getSplitBorders', () => {
 		it( 'should return undefined when no border provided', () => {
 			expect( getSplitBorders( undefined ) ).toEqual( undefined );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( getSplitBorders( null ) ).toEqual( undefined );
 		} );
 
 		it( 'should return undefined when supplied border is empty', () => {
 			expect( getSplitBorders( {} ) ).toEqual( undefined );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( getSplitBorders( nonBorder ) ).toEqual( undefined );
 		} );
 
@@ -200,7 +200,7 @@ describe( 'BorderBoxControl Utils', () => {
 		} );
 
 		it( 'should only return differences for border related properties', () => {
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			const diff = getBorderDiff( nonBorder, { caffeine: 'coffee' } );
 			expect( diff ).toEqual( {} );
 		} );
@@ -209,7 +209,7 @@ describe( 'BorderBoxControl Utils', () => {
 			const diff = getBorderDiff( completeBorder, {
 				...completeBorder,
 				color: '#21759b',
-				// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+				// @ts-expect-error `caffeine` is not a declared `Border` property; the test checks it is ignored.
 				caffeine: 'cola',
 			} );
 			expect( diff ).toEqual( { color: '#21759b' } );
@@ -307,7 +307,7 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should return undefined when no border provided', () => {
 			expect( getShorthandBorderStyle( undefined ) ).toEqual( undefined );
 			expect( getShorthandBorderStyle( {} ) ).toEqual( undefined );
-			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( getShorthandBorderStyle( nonBorder ) ).toEqual( undefined );
 		} );
 

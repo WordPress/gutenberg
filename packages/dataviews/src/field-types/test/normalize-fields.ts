@@ -294,7 +294,7 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'user',
 					filterBy: {
-						// @ts-expect-error Deliberately invalid operators, to verify runtime behavior.
+						// @ts-expect-error `invalid` and `operator` are not members of the `Operator` union.
 						operators: [ 'invalid', 'operator' ],
 					},
 				},
@@ -325,7 +325,7 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'integer',
 					filterBy: {
 						isPrimary: true,
-						// @ts-expect-error Deliberately invalid operators, to verify runtime behavior.
+						// @ts-expect-error `invalid` is not a member of the `Operator` union.
 						operators: [ 'invalid', 'lessThan' ],
 					},
 				},

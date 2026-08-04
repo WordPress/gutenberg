@@ -326,7 +326,7 @@ const getLayoutFromStoryArgs = ( {
 			type: 'card',
 		};
 		if ( withHeader !== undefined ) {
-			// @ts-expect-error `withHeader` is not part of the `CardLayout` type.
+			// @ts-expect-error `cardLayout` is narrowed to the member whose `withHeader` can only be `true`.
 			cardLayout.withHeader = withHeader;
 		}
 		layout = cardLayout;

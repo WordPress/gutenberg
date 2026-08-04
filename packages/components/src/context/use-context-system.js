@@ -34,7 +34,7 @@ export function useContextSystem( props, namespace ) {
 	const contextProps = contextSystemProps?.[ namespace ] || {};
 
 	/** @type {ConnectedProps<P>} */
-	// @ts-expect-error The remaining properties are filled in below.
+	// @ts-expect-error The initial object cannot satisfy the generic `P`, whose props are copied in below.
 	const finalComponentProps = {
 		...getConnectedNamespace(),
 		...getNamespace( namespace ),

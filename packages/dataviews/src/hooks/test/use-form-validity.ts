@@ -2439,7 +2439,7 @@ describe( 'useFormValidity', () => {
 					id: 'title',
 					type: 'text',
 					isValid: {
-						// @ts-expect-error Deliberately returns the wrong type, for testing purposes.
+						// @ts-expect-error Resolves to `number`, but custom validators may resolve only to `string | null`.
 						custom: async () =>
 							await new Promise( ( resolve ) =>
 								setTimeout( resolve, 5 )

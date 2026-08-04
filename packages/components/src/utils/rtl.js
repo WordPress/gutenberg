@@ -75,11 +75,11 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
 		if ( rtlStyles ) {
-			// @ts-expect-error `css` accepts an object, but its types omit that overload: https://emotion.sh/docs/object-styles#with-css
+			// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		// @ts-expect-error `css` accepts an object, but its types omit that overload: https://emotion.sh/docs/object-styles#with-css
+		// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

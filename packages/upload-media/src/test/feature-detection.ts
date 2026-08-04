@@ -50,11 +50,9 @@ describe( 'feature-detection', () => {
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
 		if ( 'deviceMemory' in navigator ) {
-			// @ts-expect-error `deviceMemory` is not part of the standard `Navigator` type.
 			delete navigator.deviceMemory;
 		}
 		if ( 'connection' in navigator ) {
-			// @ts-expect-error `connection` is not part of the standard `Navigator` type.
 			delete navigator.connection;
 		}
 		if ( 'hardwareConcurrency' in navigator ) {
@@ -79,7 +77,6 @@ describe( 'feature-detection', () => {
 				originalDeviceMemoryDescriptor
 			);
 		} else if ( 'deviceMemory' in navigator ) {
-			// @ts-expect-error `deviceMemory` is not part of the standard `Navigator` type.
 			delete navigator.deviceMemory;
 		}
 
@@ -91,7 +88,6 @@ describe( 'feature-detection', () => {
 				originalConnectionDescriptor
 			);
 		} else if ( 'connection' in navigator ) {
-			// @ts-expect-error `connection` is not part of the standard `Navigator` type.
 			delete navigator.connection;
 		}
 
@@ -117,7 +113,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-expect-error Deliberately unsets `WebAssembly` to test the fallback.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -129,7 +125,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
-			// @ts-expect-error Deliberately unsets `SharedArrayBuffer` to test the fallback.
+			// @ts-expect-error `SharedArrayBuffer` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.SharedArrayBuffer = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -139,7 +135,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when Worker is unavailable', () => {
-			// @ts-expect-error Deliberately unsets `Worker` to test the fallback.
+			// @ts-expect-error `Worker` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.Worker = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -269,7 +265,7 @@ describe( 'feature-detection', () => {
 			expect( result1.supported ).toBe( true );
 
 			// Now set WebAssembly to undefined - cached result should still be returned.
-			// @ts-expect-error Deliberately unsets `WebAssembly` to test the fallback.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
@@ -284,7 +280,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-expect-error Deliberately unsets `WebAssembly` to test the fallback.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
@@ -359,7 +355,7 @@ describe( 'feature-detection', () => {
 
 			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
-			// @ts-expect-error Deliberately unsets `WebAssembly` to test the fallback.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
