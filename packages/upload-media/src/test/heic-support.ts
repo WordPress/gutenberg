@@ -20,6 +20,8 @@ const CHROME_WINDOWS =
 	'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 const EDGE_WINDOWS =
 	'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0';
+const CHROME_ANDROID =
+	'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36';
 
 /**
  * Replaces the navigator signals the detection reads from.
@@ -47,81 +49,72 @@ describe( 'getHeicUnsupportedMessage', () => {
 		mockNavigator( '', undefined );
 	} );
 
-	it( 'names Firefox and lists the browsers that work on macOS', () => {
+	it( 'names Firefox and suggests the browsers that work on macOS', () => {
 		mockNavigator( FIREFOX_MAC );
 
-		const message = getHeicUnsupportedMessage();
-
-		expect( message ).toContain( 'Firefox cannot convert HEIC images' );
-		expect( message ).toContain(
-			'Safari, Chrome, Edge, and other Chromium-based browsers'
+		expect( getHeicUnsupportedMessage() ).toBe(
+			"Firefox can't read HEIC photos, so we couldn't convert this one. Safari or Chrome usually can, or you can upload a JPEG instead."
 		);
-		expect( message ).toContain( 'JPEG' );
 	} );
 
-	it( 'names Firefox and mentions HEVC support on Windows', () => {
+	it( 'names Firefox and suggests the browsers that work on Windows', () => {
 		mockNavigator( FIREFOX_WINDOWS );
 
 		const message = getHeicUnsupportedMessage();
 
-		expect( message ).toContain( 'Firefox cannot convert HEIC images' );
-		expect( message ).toContain( 'HEVC video support' );
+		expect( message ).toBe(
+			"Firefox can't read HEIC photos, so we couldn't convert this one. Chrome or Edge might, or you can upload a JPEG instead."
+		);
+		// Safari has not shipped on Windows in over a decade.
 		expect( message ).not.toContain( 'Safari' );
 	} );
 
-	it( 'falls back to the JPEG suggestion on platforms without a working browser', () => {
+	it( 'blames the platform rather than the browser on Linux', () => {
 		mockNavigator( FIREFOX_LINUX );
 
 		const message = getHeicUnsupportedMessage();
 
-		expect( message ).toContain( 'Firefox cannot convert HEIC images' );
-		expect( message ).toContain( 'Converting the image to JPEG' );
-		expect( message ).not.toContain( 'Safari' );
+		expect( message ).toBe(
+			"HEIC photos can't be decoded on Linux, so unfortunately we couldn't convert this one. You can upload a JPEG instead."
+		);
+		// No Linux browser decodes HEIC, so none should be suggested.
+		expect( message ).not.toContain( 'Firefox' );
+		expect( message ).not.toContain( 'Chrome' );
 	} );
 
 	it( 'identifies Safari, which reports itself without a Chrome token', () => {
 		mockNavigator( SAFARI_MAC );
 
-		expect( getHeicUnsupportedMessage() ).toContain(
-			'Safari cannot convert HEIC images'
+		expect( getHeicUnsupportedMessage() ).toBe(
+			"Safari couldn't decode HEIC on this Mac, so we couldn't convert this one. You can upload a JPEG instead."
 		);
-	} );
-
-	it( 'identifies Chromium browsers from the user agent string', () => {
-		mockNavigator( CHROME_WINDOWS );
-
-		expect( getHeicUnsupportedMessage() ).toContain(
-			'Chrome cannot convert HEIC images'
-		);
-	} );
-
-	it( 'points a failing Chromium browser on Windows at the HEVC codec', () => {
-		mockNavigator( CHROME_WINDOWS );
-
-		const message = getHeicUnsupportedMessage();
-
-		expect( message ).toContain( 'requires HEVC video support' );
-		// Suggesting the browser that just failed would be nonsense.
-		expect( message ).not.toContain( 'Chrome, Edge, and other browsers' );
 	} );
 
 	it( 'suggests only Safari to a failing Chromium browser on macOS', () => {
 		mockNavigator( CHROME_MAC );
 
-		const message = getHeicUnsupportedMessage();
-
-		expect( message ).toContain( 'Chrome cannot convert HEIC images' );
-		expect( message ).toContain( 'Safari can convert them on macOS' );
-		expect( message ).not.toContain(
-			'Safari, Chrome, Edge, and other Chromium-based browsers'
+		expect( getHeicUnsupportedMessage() ).toBe(
+			"Chrome couldn't decode HEIC on this Mac, so we couldn't convert this one. Safari usually can, or you can upload a JPEG instead."
 		);
 	} );
 
-	it( 'identifies Edge as a Chromium browser rather than as Safari', () => {
+	it( 'sends a failing Chromium browser on Windows straight to JPEG', () => {
+		mockNavigator( CHROME_WINDOWS );
+
+		const message = getHeicUnsupportedMessage();
+
+		expect( message ).toBe(
+			"Chrome couldn't decode HEIC on this PC, so we couldn't convert this one. You can upload a JPEG instead."
+		);
+		// Suggesting the browser that just failed would be nonsense.
+		expect( message ).not.toContain( 'Chrome or Edge might' );
+	} );
+
+	it( 'names Edge rather than treating it as Chrome or Safari', () => {
 		mockNavigator( EDGE_WINDOWS );
 
-		expect( getHeicUnsupportedMessage() ).toContain(
-			'Chrome cannot convert HEIC images'
+		expect( getHeicUnsupportedMessage() ).toBe(
+			"Edge couldn't decode HEIC on this PC, so we couldn't convert this one. You can upload a JPEG instead."
 		);
 	} );
 
@@ -136,7 +129,7 @@ describe( 'getHeicUnsupportedMessage', () => {
 		} );
 
 		expect( getHeicUnsupportedMessage() ).toContain(
-			'Chrome cannot convert HEIC images'
+			"Chrome couldn't decode HEIC on this Mac"
 		);
 	} );
 
@@ -147,15 +140,27 @@ describe( 'getHeicUnsupportedMessage', () => {
 
 		const message = getHeicUnsupportedMessage();
 
-		expect( message ).not.toContain( 'macOS' );
-		expect( message ).toContain( 'Converting the image to JPEG' );
+		expect( message ).toBe(
+			"Safari couldn't decode HEIC on this device, so we couldn't convert this one. You can upload a JPEG instead."
+		);
+	} );
+
+	it( 'does not blame Linux on Android, which reports itself as Linux', () => {
+		mockNavigator( CHROME_ANDROID );
+
+		const message = getHeicUnsupportedMessage();
+
+		expect( message ).toBe(
+			"Chrome couldn't decode HEIC on this device, so we couldn't convert this one. You can upload a JPEG instead."
+		);
+		expect( message ).not.toContain( 'Linux' );
 	} );
 
 	it( 'uses a generic phrase when the browser cannot be identified', () => {
 		mockNavigator( 'Some unknown agent' );
 
-		expect( getHeicUnsupportedMessage() ).toContain(
-			'This browser cannot convert HEIC images'
+		expect( getHeicUnsupportedMessage() ).toBe(
+			"This browser can't read HEIC photos, so we couldn't convert this one. You can upload a JPEG instead."
 		);
 	} );
 } );
@@ -171,17 +176,24 @@ describe( 'getHeicConversionAdvice', () => {
 			configurable: true,
 		} );
 
-		expect( getHeicConversionAdvice() ).toContain( 'macOS' );
+		expect( getHeicConversionAdvice() ).toBe(
+			'Safari or Chrome usually can, or you can upload a JPEG instead.'
+		);
 	} );
 
-	it( 'always ends with the JPEG conversion fallback', () => {
+	it( 'always ends with the JPEG fallback', () => {
 		for ( const userAgent of [
 			FIREFOX_MAC,
 			FIREFOX_WINDOWS,
 			FIREFOX_LINUX,
+			CHROME_MAC,
+			CHROME_WINDOWS,
+			SAFARI_MAC,
 		] ) {
 			mockNavigator( userAgent );
-			expect( getHeicConversionAdvice() ).toContain( 'JPEG' );
+			expect( getHeicConversionAdvice() ).toContain(
+				'upload a JPEG instead'
+			);
 		}
 	} );
 } );

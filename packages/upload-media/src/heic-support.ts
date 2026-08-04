@@ -14,7 +14,7 @@ type BrowserFamily = 'firefox' | 'safari' | 'chromium' | null;
 /**
  * Operating systems that matter for HEIC decoding.
  */
-type Platform = 'macos' | 'windows' | 'other';
+type Platform = 'macos' | 'windows' | 'linux' | 'other';
 
 interface UserAgentBrand {
 	brand: string;
@@ -103,22 +103,55 @@ function detectPlatform(): Platform {
 		return 'windows';
 	}
 
+	// Android and ChromeOS both report as Linux, and both decode HEIC through
+	// their own platform codecs, so they have to be ruled out before the Linux
+	// check.
+	if ( /Android|CrOS|Chrome OS/i.test( platform ) ) {
+		return 'other';
+	}
+
+	if ( /Linux|X11/i.test( platform ) ) {
+		return 'linux';
+	}
+
 	return 'other';
 }
 
 /**
- * Returns the display name of the current browser family.
+ * Returns the display name of the current browser.
  *
  * @return The browser name, or `null` when it cannot be determined.
  */
 function getBrowserName(): string | null {
+	if ( detectBrowserFamily() === 'chromium' ) {
+		// Edge and Opera are worth naming individually: they are common enough
+		// that being told "Chrome" failed would just be confusing.
+		const brands =
+			( navigator as NavigatorExtended ).userAgentData?.brands ?? [];
+		const userAgent = navigator.userAgent || '';
+
+		if (
+			brands.some( ( { brand } ) => /Edge/i.test( brand ) ) ||
+			/Edg\//i.test( userAgent )
+		) {
+			return 'Edge';
+		}
+
+		if (
+			brands.some( ( { brand } ) => /Opera/i.test( brand ) ) ||
+			/OPR\//i.test( userAgent )
+		) {
+			return 'Opera';
+		}
+
+		return 'Chrome';
+	}
+
 	switch ( detectBrowserFamily() ) {
 		case 'firefox':
 			return 'Firefox';
 		case 'safari':
 			return 'Safari';
-		case 'chromium':
-			return 'Chrome';
 		default:
 			return null;
 	}
@@ -129,8 +162,8 @@ function getBrowserName(): string | null {
  *
  * HEIC decoding depends on codecs provided by the operating system, so which
  * browsers work varies by platform. The browser that just failed is left out of
- * the suggestions, and every variant ends with the JPEG conversion fallback,
- * which works everywhere.
+ * the suggestions, and every variant ends with the JPEG fallback, which works
+ * everywhere.
  *
  * @return A localized, browser- and platform-specific sentence.
  */
@@ -144,55 +177,86 @@ export function getHeicConversionAdvice(): string {
 		// and only Safari is worth suggesting.
 		if ( family === 'chromium' ) {
 			return __(
-				'Safari can convert them on macOS. You can also convert the image to JPEG before uploading.'
+				'Safari usually can, or you can upload a JPEG instead.'
 			);
 		}
 
 		if ( family !== 'safari' ) {
 			return __(
-				'Safari, Chrome, Edge, and other Chromium-based browsers can convert them on macOS. You can also convert the image to JPEG before uploading.'
+				'Safari or Chrome usually can, or you can upload a JPEG instead.'
 			);
 		}
 	}
 
-	if ( platform === 'windows' ) {
-		// On Windows the HEVC codec is a separate install, so a Chromium
-		// browser failing here means the codec is missing rather than that the
-		// browser is the wrong one.
-		if ( family === 'chromium' ) {
-			return __(
-				'This browser requires HEVC video support to handle HEIC uploads. You can also convert the image to JPEG before uploading.'
-			);
-		}
-
-		return __(
-			'Chrome, Edge, and other browsers built on Chromium can convert them on Windows when HEVC video support is installed. You can also convert the image to JPEG before uploading.'
-		);
+	// On Windows the HEVC codec is a separate install, so a Chromium browser
+	// failing here means the codec is missing rather than that the browser is
+	// the wrong one. Only Firefox gets pointed at another browser.
+	if ( platform === 'windows' && family === 'firefox' ) {
+		return __( 'Chrome or Edge might, or you can upload a JPEG instead.' );
 	}
 
-	return __(
-		'Converting the image to JPEG before uploading it will work on any browser.'
-	);
+	return __( 'You can upload a JPEG instead.' );
 }
 
 /**
  * Builds the message shown when a HEIC image cannot be converted.
  *
- * Names the browser that failed, then lists the browsers that do work on the
- * current operating system.
+ * Explains why the conversion failed in terms of the current browser and
+ * operating system, then hands off to the advice for that combination.
  *
  * @return A localized, browser- and platform-specific error message.
  */
 export function getHeicUnsupportedMessage(): string {
+	const platform = detectPlatform();
+	const family = detectBrowserFamily();
 	const browserName = getBrowserName();
 
-	const cause = browserName
-		? sprintf(
-				/* translators: %s: browser name, e.g. "Firefox". */
-				__( '%s cannot convert HEIC images on this device.' ),
-				browserName
-		  )
-		: __( 'This browser cannot convert HEIC images on this device.' );
+	/*
+	 * Each platform gets its own complete sentence rather than a shared one with
+	 * the device name interpolated in, so that translators always see the whole
+	 * thing.
+	 */
+	let cause;
+
+	if ( platform === 'linux' ) {
+		// No Linux browser ships an HEVC decoder, so naming one would only
+		// send people on a fruitless hunt for a different browser.
+		cause = __(
+			"HEIC photos can't be decoded on Linux, so unfortunately we couldn't convert this one."
+		);
+	} else if ( family === 'firefox' ) {
+		cause = __(
+			"Firefox can't read HEIC photos, so we couldn't convert this one."
+		);
+	} else if ( browserName && platform === 'windows' ) {
+		cause = sprintf(
+			/* translators: %s: browser name, e.g. "Chrome". */
+			__(
+				"%s couldn't decode HEIC on this PC, so we couldn't convert this one."
+			),
+			browserName
+		);
+	} else if ( browserName && platform === 'macos' ) {
+		cause = sprintf(
+			/* translators: %s: browser name, e.g. "Safari". */
+			__(
+				"%s couldn't decode HEIC on this Mac, so we couldn't convert this one."
+			),
+			browserName
+		);
+	} else if ( browserName ) {
+		cause = sprintf(
+			/* translators: %s: browser name, e.g. "Chrome". */
+			__(
+				"%s couldn't decode HEIC on this device, so we couldn't convert this one."
+			),
+			browserName
+		);
+	} else {
+		cause = __(
+			"This browser can't read HEIC photos, so we couldn't convert this one."
+		);
+	}
 
 	return `${ cause } ${ getHeicConversionAdvice() }`;
 }

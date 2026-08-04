@@ -12,7 +12,7 @@ test.describe( 'HEIC upload error message', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'names the browser when a HEIC file cannot be decoded', async ( {
+	test( 'explains why the file failed and waits to be dismissed', async ( {
 		editor,
 		page,
 	} ) => {
@@ -37,18 +37,33 @@ test.describe( 'HEIC upload error message', () => {
 				buffer: Buffer.from( 'not a heic file' ),
 			} );
 
-		// Playwright drives Chromium here, so the message names Chrome. Every
-		// browser gets its own name from the same detection.
+		/*
+		 * The first sentence names the browser and operating system that failed,
+		 * so it varies with the machine running the test. The rest of the
+		 * message is the same everywhere.
+		 */
 		const notice = page.locator( '.components-snackbar' ).filter( {
-			hasText: 'cannot convert HEIC images',
+			hasText: "we couldn't convert this one",
 		} );
 		await expect( notice ).toBeVisible( { timeout: 30_000 } );
-		await expect( notice ).toContainText( 'Chrome' );
 		await expect( notice ).toContainText( 'JPEG' );
 
 		// The block falls back to the placeholder so another image can be chosen.
 		await expect(
 			imageBlock.getByRole( 'button', { name: 'Media Library' } )
 		).toBeVisible();
+
+		/*
+		 * Snackbars usually disappear on their own after a few seconds. This one
+		 * has too much to read for that, so it stays until dismissed, which the
+		 * dismiss button is the visible sign of.
+		 */
+		const dismissButton = notice.getByRole( 'button', {
+			name: 'Dismiss this notice',
+		} );
+		await expect( dismissButton ).toBeVisible();
+
+		await dismissButton.click();
+		await expect( notice ).toBeHidden();
 	} );
 } );
