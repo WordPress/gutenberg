@@ -248,18 +248,24 @@ export default function useArrowNav() {
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
 				if ( shiftKey ) {
-					// A fully selected multi-selection has no native
-					// selection to extend (use-multi-selection cleared it),
-					// so grow or shrink it by one block at the focus end.
-					// Only without a usable native selection: a selection
-					// that is fully selected because it resolves to a
-					// nesting ancestor keeps its native selection, which
-					// the browser extends natively (and the observer
-					// promotes to the common level).
+					// A fully selected multi-selection is represented
+					// natively by a range with block-element boundaries
+					// (see use-multi-selection), which cannot extend
+					// natively: the browser drops the element-level anchor
+					// and re-anchors at the focus. Grow or shrink it by one
+					// block at the focus end instead. A selection anchored
+					// in text (e.g. fully selected because it resolves to a
+					// nesting ancestor) extends natively, keeping character
+					// granularity, and the observer promotes to the common
+					// level.
 					const selection = defaultView.getSelection();
+					const { anchorNode } = selection;
+					const hasTextAnchor =
+						anchorNode &&
+						anchorNode.nodeType === anchorNode.TEXT_NODE;
 					if (
 						__unstableIsFullySelected() &&
-						( ! selection.rangeCount || selection.isCollapsed )
+						( ! hasTextAnchor || selection.isCollapsed )
 					) {
 						const anchorClientId =
 							getMultiSelectedBlocksStartClientId();
