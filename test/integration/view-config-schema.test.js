@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
 import Ajv from 'ajv-draft-04';
 
 /**
@@ -29,5 +31,29 @@ describe( 'view-config schema', () => {
 		const result = ajv.compile( viewConfigSchema );
 
 		expect( result.errors ).toBe( null );
+	} );
+
+	test( 'the generated PHP schema file is up to date', () => {
+		// The REST endpoint consumes the schema through the generated
+		// lib/compat/wordpress-7.1/view-config-schema.php file. Regenerating
+		// it must be a no-op, otherwise the two artifacts have drifted.
+		const { status, stderr } = spawnSync(
+			process.execPath,
+			[
+				path.join(
+					__dirname,
+					'..',
+					'..',
+					'tools',
+					'docs',
+					'gen-view-config-schema-php.mjs'
+				),
+				'--check',
+			],
+			{ encoding: 'utf8' }
+		);
+
+		expect( stderr ).toBe( '' );
+		expect( status ).toBe( 0 );
 	} );
 } );

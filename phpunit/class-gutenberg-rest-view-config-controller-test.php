@@ -408,94 +408,25 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The endpoint schema must stay in sync with the canonical JSON Schema at
-	 * `schemas/json/view-config.json`, which is the source for the view
-	 * configuration reference docs.
-	 *
-	 * Both schemas are compared structurally: internal `$ref` pointers of the
-	 * JSON file are dereferenced and `description` annotations (which only the
-	 * JSON file carries) are stripped on both sides.
+	 * The endpoint schema is derived from the canonical JSON Schema at
+	 * `schemas/json/view-config.json` through the generated
+	 * `lib/compat/wordpress-7.1/view-config-schema.php` file, so the two can
+	 * no longer drift structurally. The freshness of the generated file is
+	 * enforced by `test/integration/view-config-schema.test.js`; here we only
+	 * assert that the descriptions attached in PHP land on the schema.
 	 *
 	 * @covers ::get_item_schema
 	 */
-	public function test_get_item_schema_matches_canonical_json_schema() {
-		$schema_file = dirname( __DIR__ ) . '/schemas/json/view-config.json';
-		$this->assertFileExists( $schema_file, 'The canonical JSON Schema schemas/json/view-config.json is missing.' );
-
-		$json_schema = json_decode( file_get_contents( $schema_file ), true );
-		$this->assertIsArray( $json_schema, 'schemas/json/view-config.json must contain valid JSON.' );
-
-		$json_schema = $this->resolve_schema_refs( $json_schema, $json_schema );
-		unset( $json_schema['definitions'] );
-		$json_schema = $this->strip_schema_descriptions( $json_schema );
-
+	public function test_get_item_schema_attaches_translated_descriptions() {
 		$controller = new Gutenberg_REST_View_Config_Controller_7_1();
-		$php_schema = json_decode( wp_json_encode( $controller->get_item_schema() ), true );
-		$php_schema = $this->strip_schema_descriptions( $php_schema );
+		$schema     = $controller->get_item_schema();
 
-		$this->assertEquals(
-			$json_schema,
-			$php_schema,
-			'The REST endpoint schema and schemas/json/view-config.json have drifted apart. ' .
-			'When changing Gutenberg_REST_View_Config_Controller_7_1::get_item_schema(), mirror the change ' .
-			'in schemas/json/view-config.json (and vice versa), then regenerate the reference docs ' .
-			'with `npm run docs:view-config-ref`.'
-		);
-	}
-
-	/**
-	 * Recursively resolves local `$ref` pointers (e.g. `#/definitions/foo`)
-	 * against the schema root.
-	 *
-	 * @param mixed $node The schema node to resolve.
-	 * @param array $root The schema root the pointers are resolved against.
-	 * @return mixed The resolved node.
-	 */
-	private function resolve_schema_refs( $node, $root ) {
-		if ( ! is_array( $node ) ) {
-			return $node;
+		foreach ( $schema['properties'] as $property => $property_schema ) {
+			$this->assertArrayHasKey(
+				'description',
+				$property_schema,
+				"Top-level property `$property` should carry a translatable description."
+			);
 		}
-
-		if ( isset( $node['$ref'] ) && is_string( $node['$ref'] ) && 0 === strpos( $node['$ref'], '#/' ) ) {
-			$target = $root;
-			foreach ( explode( '/', substr( $node['$ref'], 2 ) ) as $segment ) {
-				$segment = str_replace( array( '~1', '~0' ), array( '/', '~' ), $segment );
-				$this->assertIsArray( $target, "Unresolvable \$ref `{$node['$ref']}` in schemas/json/view-config.json." );
-				$this->assertArrayHasKey( $segment, $target, "Unresolvable \$ref `{$node['$ref']}` in schemas/json/view-config.json." );
-				$target = $target[ $segment ];
-			}
-			return $this->resolve_schema_refs( $target, $root );
-		}
-
-		foreach ( $node as $key => $value ) {
-			$node[ $key ] = $this->resolve_schema_refs( $value, $root );
-		}
-
-		return $node;
-	}
-
-	/**
-	 * Recursively removes `description` annotations from a schema.
-	 *
-	 * Only string values are removed: a schema *property* named `description`
-	 * (e.g. a form field description) maps to an array, so it is preserved.
-	 *
-	 * @param mixed $node The schema node to strip.
-	 * @return mixed The stripped node.
-	 */
-	private function strip_schema_descriptions( $node ) {
-		if ( ! is_array( $node ) ) {
-			return $node;
-		}
-
-		if ( isset( $node['description'] ) && is_string( $node['description'] ) ) {
-			unset( $node['description'] );
-		}
-
-		foreach ( $node as $key => $value ) {
-			$node[ $key ] = $this->strip_schema_descriptions( $value );
-		}
-
-		return $node;
 	}
 }
