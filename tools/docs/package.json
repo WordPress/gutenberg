@@ -43,6 +43,7 @@
 		"docs:blocks-detail": "node ./generate-block-docs.mjs",
 		"docs:check-api-docs-unstaged": "node ./are-api-docs-unstaged.js",
 		"docs:components": "node ./gen-components-docs/index.mjs",
-		"docs:theme-ref": "node ./gen-theme-reference.mjs"
+		"docs:theme-ref": "node ./gen-theme-reference.mjs",
+		"docs:view-config-ref": "node ./gen-view-config-reference.mjs"
 	}
 }
