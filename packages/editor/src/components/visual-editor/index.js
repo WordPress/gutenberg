@@ -348,12 +348,9 @@ function VisualEditor( {
 	);
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
-	// A dragged width drops the device height, so hold the starting height
-	// until the drag ends.
 	const effectiveCanvasHeight = isResizingCanvas
 		? resizingCanvasHeight
 		: canvasHeight;
-	// Fill the frame at any constrained width, not just device presets.
 	const iframeBodyMinHeightCSS =
 		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
 
