@@ -9,9 +9,18 @@ require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
+	require_once __DIR__ . '/class-wp-sync-server-core.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+	require_once __DIR__ . '/class-wp-http-long-polling-sync-server.php';
+	require_once __DIR__ . '/class-wp-websocket-connection.php';
+	require_once __DIR__ . '/class-wp-websocket-sync-server.php';
+	require_once __DIR__ . '/class-wp-websocket-token-controller.php';
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once __DIR__ . '/class-wp-sync-server-cli-command.php';
+}
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	/**
@@ -62,10 +71,89 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 
+		// Both HTTP routes are always registered; the client chooses the
+		// transport based on wp_get_collaboration_transport().
+		$long_polling_server = new WP_HTTP_Long_Polling_Sync_Server( $sync_storage );
+		$long_polling_server->register_routes();
+
+		// The WebSocket token endpoint is only needed by the WebSocket transport.
+		if ( 'php-websocket' === wp_get_collaboration_transport() ) {
+			$token_controller = new WP_WebSocket_Token_Controller();
+			$token_controller->register_routes();
+		}
+
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
+}
+
+if ( ! function_exists( 'wp_get_collaboration_transport' ) ) {
+	/**
+	 * Determines which real-time collaboration transport is active.
+	 *
+	 * The transport can be set via the WP_COLLABORATION_TRANSPORT constant or
+	 * environment variable, and is filterable via 'wp_collaboration_transport'.
+	 * Invalid values fall back to 'http-polling'.
+	 *
+	 * @since 7.4.0
+	 *
+	 * @return string One of 'http-polling', 'http-long-polling', 'php-websocket'.
+	 */
+	function wp_get_collaboration_transport() {
+		$default_transport = 'http-polling';
+
+		if ( defined( 'WP_COLLABORATION_TRANSPORT' ) ) {
+			$transport = WP_COLLABORATION_TRANSPORT;
+		} else {
+			$env_value = getenv( 'WP_COLLABORATION_TRANSPORT' );
+			$transport = false === $env_value ? $default_transport : $env_value;
+		}
+
+		/**
+		 * Filters the real-time collaboration transport.
+		 *
+		 * @since 7.4.0
+		 *
+		 * @param string $transport The transport identifier.
+		 */
+		$transport = apply_filters( 'wp_collaboration_transport', $transport );
+
+		$allowed_transports = array( 'http-polling', 'http-long-polling', 'php-websocket' );
+		if ( ! in_array( $transport, $allowed_transports, true ) ) {
+			return $default_transport;
+		}
+
+		return $transport;
+	}
+}
+
+if ( ! function_exists( 'wp_get_collaboration_websocket_url' ) ) {
+	/**
+	 * Gets the WebSocket URL used by the 'php-websocket' collaboration transport.
+	 *
+	 * Defaults to ws://<host>:8787 derived from home_url() and is filterable
+	 * via 'wp_sync_websocket_url'. Production deployments must run the
+	 * WebSocket server behind TLS termination and filter this to a wss:// URL.
+	 *
+	 * @since 7.4.0
+	 *
+	 * @return string WebSocket URL.
+	 */
+	function wp_get_collaboration_websocket_url() {
+		$host        = wp_parse_url( home_url(), PHP_URL_HOST );
+		$default_url = 'ws://' . $host . ':8787';
+
+		/**
+		 * Filters the WebSocket URL used by the 'php-websocket' collaboration
+		 * transport.
+		 *
+		 * @since 7.4.0
+		 *
+		 * @param string $url WebSocket URL.
+		 */
+		return (string) apply_filters( 'wp_sync_websocket_url', $default_url );
+	}
 }
 
 if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
@@ -298,12 +386,16 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		)
 	);
 
-	wp_add_inline_script(
-		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
-		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';',
-		'after'
-	);
+	$transport     = wp_get_collaboration_transport();
+	$inline_script = 'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
+		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';' .
+		'window._wpCollaborationTransport = ' . wp_json_encode( $transport ) . ';';
+
+	if ( 'php-websocket' === $transport ) {
+		$inline_script .= 'window._wpCollaborationWebSocketUrl = ' . wp_json_encode( wp_get_collaboration_websocket_url() ) . ';';
+	}
+
+	wp_add_inline_script( 'wp-core-data', $inline_script, 'after' );
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 

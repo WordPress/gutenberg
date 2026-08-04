@@ -18,6 +18,8 @@ import type { ConnectionError } from './errors';
 declare global {
 	interface Window {
 		_wpCollaborationEnabled?: string;
+		_wpCollaborationTransport?: string;
+		_wpCollaborationWebSocketUrl?: string;
 	}
 }
 

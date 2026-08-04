@@ -14,17 +14,17 @@ import type { Awareness } from 'y-protocols/awareness';
  */
 import {
 	DEFAULT_CLIENT_LIMIT_PER_ROOM,
+	DISCONNECT_DIALOG_RETRY_MS,
 	ERROR_RETRY_DELAYS_SOLO_MS,
 	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
-	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES,
-	MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES,
-	MAX_ROOMS_PER_REQUEST,
-	MAX_UPDATE_SIZE_IN_BYTES,
-	POLLING_INTERVAL_IN_MS,
-	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
-	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
-	DISCONNECT_DIALOG_RETRY_MS,
 	MANUAL_RETRY_INTERVAL_MS,
+	MAX_ROOMS_PER_REQUEST,
+	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES,
+	MAX_UPDATE_SIZE_IN_BYTES,
+	MIN_REQUEST_INTERVAL_MS,
+	MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES,
+	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
+	SEND_DEBOUNCE_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
@@ -35,15 +35,13 @@ import {
 	type SyncUpdate,
 	SyncUpdateType,
 	type UpdateQueue,
-} from './types';
+} from '../common/types';
 import {
 	createSyncUpdate,
 	createUpdateQueue,
 	intValueOrDefault,
-	postSyncUpdate,
-	postSyncUpdateNonBlocking,
 	rotateWindow,
-} from './utils';
+} from '../common/utils';
 import {
 	createCompactionUpdate,
 	createDeprecatedCompactionUpdate,
@@ -57,8 +55,13 @@ import {
 	isRequestBodyTooLargeError,
 	type WPRestError,
 } from '../common/rest-errors';
+import {
+	postSyncUpdate,
+	postSyncUpdateNonBlocking,
+} from '../http-polling/utils';
+import { isAbortError, postLongPollSyncUpdate } from './utils';
 
-const POLLING_MANAGER_ORIGIN = 'polling-manager';
+const LONG_POLLING_MANAGER_ORIGIN = 'long-polling-manager';
 
 type LogFunction = (
 	message: string,
@@ -67,7 +70,7 @@ type LogFunction = (
 	force?: boolean
 ) => void;
 
-interface PollingManager {
+interface LongPollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
 	retryNow: () => void;
 	unregisterRoom: (
@@ -82,6 +85,7 @@ interface RegisterRoomOptions {
 	awareness: Awareness;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
+	onSync: () => void;
 }
 
 interface RoomState {
@@ -102,7 +106,7 @@ interface RoomState {
 /**
  * Handle a 403 from the sync endpoint. Silently unregisters the affected
  * rooms listed in the error data, and restores pending updates for the
- * remaining rooms so they retry on the next poll cycle.
+ * remaining rooms so they retry on the next request cycle.
  *
  * If the error does not include room details, it is treated as a generic auth
  * failure and all rooms are unregistered.
@@ -136,7 +140,7 @@ function handleForbiddenError(
 		}
 
 		// Restore updates for remaining rooms so they can be retried on
-		// the next poll cycle.
+		// the next request cycle.
 		for ( const room of requestedRooms ) {
 			if ( forbiddenRooms.includes( room.room ) ) {
 				continue;
@@ -214,31 +218,30 @@ function checkConnectionLimit(
 
 let areListenersRegistered = false;
 let consecutiveFailures = 0;
+let currentAbortController: AbortController | null = null;
+let currentRequestHasUpdates = false;
+let flushTimeoutId: ReturnType< typeof setTimeout > | null = null;
 let hasCheckedConnectionLimit = false;
-let isManualRetry = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
-let isPolling = false;
+let isManualRetry = false;
+let isRequestLoopActive = false;
+let isSelfAbort = false;
 let isUnloadPending = false;
-let pollInterval = POLLING_INTERVAL_IN_MS;
-let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+let requestTimeoutId: ReturnType< typeof setTimeout > | null = null;
 let syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
 
 // When more rooms are registered than the server allows per request
-// (MAX_ROOMS_PER_REQUEST), the primary room is sent every poll and the
-// remaining "overflow" rooms are rotated across polls. This offset
+// (MAX_ROOMS_PER_REQUEST), the primary room is sent every request and the
+// remaining "overflow" rooms are rotated across requests. This offset
 // points into the overflow list at the next room to include.
 let roomOverflowOffset = 0;
 
 /**
  * Mark that a page unload has been requested. This fires on
  * `beforeunload` which happens before the browser aborts in-flight
- * fetches, allowing us to distinguish poll failures caused by
+ * fetches, allowing us to distinguish request failures caused by
  * navigation from genuine server errors in the catch block.
- *
- * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
- * the flag is reset at the start of the next poll cycle so that polling can
- * resume.
  */
 function handleBeforeUnload(): void {
 	isUnloadPending = true;
@@ -246,7 +249,7 @@ function handleBeforeUnload(): void {
 
 /**
  * Send a disconnect signal for all registered rooms when the page is
- * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ * being unloaded. Uses keepalive so the request survives navigation.
  */
 function handlePageHide(): void {
 	const rooms = Array.from( roomStates.entries() ).map(
@@ -267,51 +270,38 @@ function handlePageHide(): void {
 }
 
 /**
- * Hangle change in visibility state of browser tab.
+ * Handle a change in the visibility state of the browser tab.
  *
- * Used to trigger a slow down of the collaboration syncs when the
- * browser tab becomes inactive (either the user switches tabs or the
- * screen saver comes on).
- *
- * Fires on the document's visibilitychange event.
+ * Background tabs must not hold long-poll connections open, so on hide the
+ * held request is aborted (a deliberate abort, not an error) and the loop
+ * falls back to plain interval polling at the background cadence. On show,
+ * the loop resumes long polling immediately.
  */
 function handleVisibilityChange() {
 	const wasActive = isActiveBrowser;
 	isActiveBrowser = document.visibilityState === 'visible';
 
+	if ( ! isActiveBrowser && wasActive ) {
+		// Release a held long-poll; the next cycle uses interval polling.
+		if ( currentAbortController && ! currentRequestHasUpdates ) {
+			isSelfAbort = true;
+			currentAbortController.abort();
+		}
+		return;
+	}
+
 	if ( isActiveBrowser && ! wasActive ) {
-		/*
-		 * Remove scheduled polling and repoll immediately when reactivated.
-		 *
-		 * This ensures that any updates by collaborators are immediately
-		 * reflected in the document once the browser tab becomes active.
-		 * Otherwise there would be a delay of up to 30 seconds before the
-		 * updates came through.
-		 *
-		 * Only repoll if we cleared a pending timeout, meaning the poll loop
-		 * was idle between cycles. If no timeout is pending, a poll request
-		 * is already in-flight and will pick up the updated isActiveBrowser
-		 * value when it schedules the next cycle.
-		 */
-		if ( pollingTimeoutId ) {
-			clearTimeout( pollingTimeoutId );
-			pollingTimeoutId = null;
-			poll();
+		// Resume long polling immediately when reactivated.
+		if ( requestTimeoutId ) {
+			clearTimeout( requestTimeoutId );
+			requestTimeoutId = null;
+			runRequest();
 		}
 	}
 }
 
 /**
  * Select which rooms to include in the next sync request.
- *
- * The server caps requests at MAX_ROOMS_PER_REQUEST rooms. When fewer rooms are
- * registered than the cap, every room is included on every poll. When the cap
- * is exceeded, the primary room is sent on every poll (so the main document
- * stays fully synced) and the remaining overflow rooms are rotated across
- * successive polls so each one is included (at a reduced frequency).
- *
- * Rooms that are skipped on a given poll keep their queued updates; the updates
- * are drained on the next poll that includes them.
  *
  * @return The RoomStates to include in this request, in send order.
  */
@@ -324,7 +314,7 @@ function selectRoomsForRequest(): RoomState[] {
 	}
 
 	// Rotation path: pin the primary room to every request (if one exists)
-	// and rotate the remaining overflow rooms across successive polls.
+	// and rotate the remaining overflow rooms across successive requests.
 	const primaryRoom = allRooms.find( ( state ) => state.isPrimaryRoom );
 	const overflowRooms = allRooms.filter( ( state ) => state !== primaryRoom );
 	const overflowSlotsPerRequest =
@@ -443,44 +433,109 @@ function restoreExactUpdates( payload: SyncPayload ): void {
 	}
 }
 
-function poll(): void {
-	isPolling = true;
-	pollingTimeoutId = null;
+/**
+ * Schedule the next request after `delayMs` milliseconds.
+ *
+ * @param delayMs Delay before the next request is issued.
+ */
+function scheduleNextRequest( delayMs: number ): void {
+	if ( requestTimeoutId ) {
+		clearTimeout( requestTimeoutId );
+	}
 
-	async function start(): Promise< void > {
-		if ( 0 === roomStates.size ) {
-			isPolling = false;
+	requestTimeoutId = setTimeout( runRequest, delayMs );
+}
+
+/**
+ * Request that queued local updates are sent as soon as possible.
+ *
+ * If a long-poll request is being held open without outgoing updates, it is
+ * deliberately aborted (after a short coalescing window) and immediately
+ * re-issued carrying the queued updates. Requests that are already carrying
+ * updates are never aborted.
+ */
+function requestImmediateSend(): void {
+	if ( flushTimeoutId ) {
+		return;
+	}
+
+	flushTimeoutId = setTimeout( () => {
+		flushTimeoutId = null;
+
+		if ( currentAbortController && ! currentRequestHasUpdates ) {
+			// Abort the held request; the catch handler re-issues immediately.
+			isSelfAbort = true;
+			currentAbortController.abort();
 			return;
 		}
 
-		// Reset the unloading flag at the start of each poll cycle so
-		// it doesn't permanently suppress disconnect after the user
-		// cancels a beforeunload dialog.
+		// If the loop is idle between requests (and not backing off after a
+		// failure), shortcut the delay and send now.
+		if ( requestTimeoutId && 0 === consecutiveFailures ) {
+			clearTimeout( requestTimeoutId );
+			requestTimeoutId = null;
+			runRequest();
+		}
+	}, SEND_DEBOUNCE_MS );
+}
+
+function runRequest(): void {
+	isRequestLoopActive = true;
+	requestTimeoutId = null;
+
+	async function start(): Promise< void > {
+		if ( 0 === roomStates.size ) {
+			isRequestLoopActive = false;
+			return;
+		}
+
+		// Reset the unloading flag at the start of each cycle so it doesn't
+		// permanently suppress disconnect after the user cancels a
+		// beforeunload dialog.
 		isUnloadPending = false;
 
-		// Create a payload with queued updates. We include rooms even if they
-		// have no updates to ensure we receive any incoming updates, while keeping
-		// the serialized body below the server's aggregate request-size limit.
 		const { payload, roomsInRequest } = buildPayloadForRequest(
 			selectRoomsForRequest()
 		);
 
 		// Emit 'connecting' status only for rooms in this request. Rooms
-		// rotated out of this poll keep their prior status.
+		// rotated out of this request keep their prior status.
 		roomsInRequest.forEach( ( state ) => {
 			state.onStatusChange( { status: 'connecting' } );
 		} );
 
+		const useLongPoll = isActiveBrowser;
+		// Ignore reason: measured in the success path only; error paths return early.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const requestStartedAt = Date.now();
+
+		currentRequestHasUpdates = payload.rooms.some(
+			( room ) => room.updates.length > 0
+		);
+
 		try {
-			const { rooms } = await postSyncUpdate( payload );
+			let rooms;
+
+			if ( useLongPoll ) {
+				currentAbortController = new AbortController();
+				( { rooms } = await postLongPollSyncUpdate(
+					payload,
+					currentAbortController.signal
+				) );
+			} else {
+				// Background tabs must not hold connections open; use the
+				// plain polling endpoint at the background cadence instead.
+				( { rooms } = await postSyncUpdate( payload ) );
+			}
+
+			currentAbortController = null;
 
 			// Emit 'connected' status.
 			consecutiveFailures = 0;
 			isManualRetry = false;
 			syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
 			roomsInRequest.forEach( ( state ) => {
-				// Skip rooms unregistered during the await (e.g. the
-				// size-limit handler in onDocUpdate). Their terminal
+				// Skip rooms unregistered during the await. Their terminal
 				// status was already set by whatever unregistered them.
 				if ( roomStates.get( state.room ) !== state ) {
 					return;
@@ -492,6 +547,8 @@ function poll(): void {
 			// Reset before checking each room
 			hasCollaborators = false;
 
+			let receivedUpdates = false;
+
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
 					return;
@@ -499,6 +556,10 @@ function poll(): void {
 
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
+
+				if ( room.updates.length > 0 ) {
+					receivedUpdates = true;
+				}
 
 				// If a limit is exceeded, disconnect immediately without processing updates.
 				if ( checkConnectionLimit( room.awareness, roomState ) ) {
@@ -517,11 +578,7 @@ function poll(): void {
 				roomState.processAwarenessUpdate( room.awareness );
 
 				// If there is another collaborator on the primary entity,
-				// resume all room queues for the next poll and increase
-				// polling frequency. We only check the primary room to
-				// avoid false positives from shared collection rooms
-				// (e.g. taxonomy/category), but resume all queues so
-				// collection rooms (e.g. root/comment) can also sync.
+				// resume all room queues for the next request.
 				if (
 					roomState.isPrimaryRoom &&
 					Object.keys( room.awareness ).length > 1
@@ -552,9 +609,7 @@ function poll(): void {
 
 				roomState.updateQueue.addBulk( responseUpdates );
 
-				// Respond to compaction requests from server. The server asks only one
-				// client at a time to compact (lowest active client ID). We encode our
-				// full document state to replace all prior updates on the server.
+				// Respond to compaction requests from server.
 				if ( room.should_compact ) {
 					roomState.log( 'Server requested compaction update' );
 					roomState.updateQueue.clear();
@@ -572,34 +627,77 @@ function poll(): void {
 				}
 			} );
 
-			// Recalculate polling interval.
-			if ( isActiveBrowser && hasCollaborators ) {
-				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
-			} else if ( isActiveBrowser ) {
-				pollInterval = POLLING_INTERVAL_IN_MS;
-			} else {
-				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			if ( 0 === roomStates.size ) {
+				isRequestLoopActive = false;
+				return;
 			}
+
+			// Re-issue immediately. If the request returned very quickly with
+			// nothing to deliver and nothing to send, apply a small minimum
+			// interval so a misbehaving server can't cause a hot loop. In the
+			// background, fall back to the plain polling cadence.
+			let delay = 0;
+			if ( ! isActiveBrowser ) {
+				delay = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
+			} else {
+				const elapsed = Date.now() - requestStartedAt;
+				// peek() respects the paused state, so paused queues (e.g.
+				// the seeded sync_step1 before a collaborator appears) do
+				// not force an immediate re-issue.
+				const hasQueuedUpdates = Array.from( roomStates.values() ).some(
+					( state ) => state.updateQueue.peek().length > 0
+				);
+				if (
+					! receivedUpdates &&
+					! hasQueuedUpdates &&
+					elapsed < MIN_REQUEST_INTERVAL_MS
+				) {
+					delay = MIN_REQUEST_INTERVAL_MS - elapsed;
+				}
+			}
+
+			scheduleNextRequest( delay );
 		} catch ( error ) {
+			currentAbortController = null;
+
+			// A deliberate abort (local updates queued while the request was
+			// held, or the tab moving to the background) is not a failure:
+			// nothing was sent, so there is nothing to restore or recover.
+			// Re-issue immediately (the next cycle picks the right transport
+			// for the current visibility state).
+			if ( isSelfAbort && isAbortError( error ) ) {
+				isSelfAbort = false;
+				scheduleNextRequest(
+					isActiveBrowser ? 0 : POLLING_INTERVAL_BACKGROUND_TAB_IN_MS
+				);
+				return;
+			}
+
+			isSelfAbort = false;
+
 			// A 403 response means the user does not have permission to
 			// sync a specific entity. Silently unregister the affected
-			// room(s) and let polling continue for the rest.
+			// room(s) and let the loop continue for the rest.
 			if ( isForbiddenError( error ) ) {
 				handleForbiddenError( error, payload.rooms );
 
-				// If every room was unregistered, stop the poll loop
-				// instead of scheduling another tick. Reset isPolling
-				// so a future registerRoom() call can restart it.
 				if ( roomStates.size === 0 ) {
-					isPolling = false;
+					isRequestLoopActive = false;
 					return;
 				}
-			} else if ( isRequestBodyTooLargeError( error ) ) {
+
+				scheduleNextRequest( 0 );
+				return;
+			}
+
+			let retryDelay: number;
+
+			if ( isRequestBodyTooLargeError( error ) ) {
 				syncRequestBodySizeLimit = Math.max(
 					MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES,
 					Math.floor( syncRequestBodySizeLimit / 2 )
 				);
-				pollInterval = hasCollaborators
+				retryDelay = hasCollaborators
 					? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS[ 0 ]
 					: ERROR_RETRY_DELAYS_SOLO_MS[ 0 ];
 				restoreExactUpdates( payload );
@@ -613,18 +711,21 @@ function poll(): void {
 						'Sync request body too large, retrying with smaller batches',
 						{
 							error,
-							nextPoll: pollInterval,
+							nextRequest: retryDelay,
 							syncRequestBodySizeLimit,
 						},
 						'error',
 						true // force
 					);
 				}
-			} else if ( isProtocolMismatchError( error ) ) {
-				// The server explicitly signaled a protocol mismatch, so we fail
-				// gracefully instead of retrying indefinitely. This can happen if
-				// the client is running an outdated version of the code that is
-				// incompatible with the server.
+
+				scheduleNextRequest( retryDelay );
+				return;
+			}
+
+			if ( isProtocolMismatchError( error ) ) {
+				// The server explicitly signaled a protocol mismatch, so we
+				// fail gracefully instead of retrying indefinitely.
 				const affectedRooms = [ ...roomStates.entries() ];
 
 				for ( const [ , state ] of affectedRooms ) {
@@ -637,94 +738,86 @@ function poll(): void {
 					} );
 				}
 
-				// Skip the server-side disconnect signal: by definition the
-				// server can't speak our protocol, so sending one is pointless.
 				for ( const [ room ] of affectedRooms ) {
 					unregisterRoom( room, { sendDisconnectSignal: false } );
 				}
 
-				isPolling = false;
+				isRequestLoopActive = false;
 				return;
-			} else {
-				// Use the explicit retry delay schedule for backoff.
-				consecutiveFailures++;
-				const retrySchedule = hasCollaborators
-					? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
-					: ERROR_RETRY_DELAYS_SOLO_MS;
-				if ( consecutiveFailures <= retrySchedule.length ) {
-					pollInterval = retrySchedule[ consecutiveFailures - 1 ];
-				} else {
-					pollInterval = DISCONNECT_DIALOG_RETRY_MS;
-				}
-
-				// After a manual retry, use a shorter interval for one cycle.
-				if ( isManualRetry ) {
-					pollInterval = MANUAL_RETRY_INTERVAL_MS;
-					isManualRetry = false;
-				}
-
-				// Recover from the failed request. We don't know whether the server stored
-				// our updates before the error occurred (e.g. a network timeout after a
-				// successful write). Re-sending the same updates via restore() would
-				// duplicate them on the server and cause unbounded storage growth.
-				//
-				// Instead, for rooms that had outgoing updates, replace the queue with a
-				// single compaction (full document state). This is idempotent: if the
-				// server already stored the updates, the compaction safely supersedes
-				// them; if it didn't, the compaction includes them. Updates not seen by
-				// this client are preserved in both cases.
-				for ( const room of payload.rooms ) {
-					if ( ! roomStates.has( room.room ) ) {
-						continue;
-					}
-
-					const state = roomStates.get( room.room )!;
-
-					if ( room.updates.length > 0 && state.endCursor > 0 ) {
-						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
-					} else if ( room.updates.length > 0 ) {
-						state.updateQueue.restore( room.updates );
-					}
-
-					state.log(
-						'Error posting sync update, will retry with backoff',
-						{ error, nextPoll: pollInterval },
-						'error',
-						true // force
-					);
-				}
-
-				// Don't report disconnected status when the request was aborted
-				// due to page unload (e.g. during a refresh) to avoid briefly
-				// flashing the disconnect dialog before the new page loads.
-				if ( ! isUnloadPending ) {
-					const backgroundRetriesFailed =
-						consecutiveFailures > retrySchedule.length;
-
-					roomsInRequest.forEach( ( state ) => {
-						// Skip rooms unregistered during the await so
-						// their terminal status isn't overwritten.
-						if ( roomStates.get( state.room ) !== state ) {
-							return;
-						}
-
-						state.onStatusChange( {
-							status: 'disconnected',
-							canManuallyRetry: true,
-							consecutiveFailures,
-							backgroundRetriesFailed,
-							willAutoRetryInMs: pollInterval,
-						} );
-					} );
-				}
 			}
-		}
 
-		pollingTimeoutId = setTimeout( poll, pollInterval );
+			// Use the explicit retry delay schedule for backoff.
+			consecutiveFailures++;
+			const retrySchedule = hasCollaborators
+				? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
+				: ERROR_RETRY_DELAYS_SOLO_MS;
+			if ( consecutiveFailures <= retrySchedule.length ) {
+				retryDelay = retrySchedule[ consecutiveFailures - 1 ];
+			} else {
+				retryDelay = DISCONNECT_DIALOG_RETRY_MS;
+			}
+
+			// After a manual retry, use a shorter interval for one cycle.
+			if ( isManualRetry ) {
+				retryDelay = MANUAL_RETRY_INTERVAL_MS;
+				isManualRetry = false;
+			}
+
+			// Recover from the failed request. We don't know whether the
+			// server stored our updates before the error occurred. For rooms
+			// that had outgoing updates, replace the queue with a single
+			// compaction (full document state), which is idempotent. Aborted
+			// requests that carried no updates take the `updates.length > 0`
+			// guard below and skip the compaction-recovery path entirely.
+			for ( const room of payload.rooms ) {
+				if ( ! roomStates.has( room.room ) ) {
+					continue;
+				}
+
+				const state = roomStates.get( room.room )!;
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
+					state.updateQueue.add( state.createCompactionUpdate() );
+				} else if ( room.updates.length > 0 ) {
+					state.updateQueue.restore( room.updates );
+				}
+
+				state.log(
+					'Error posting sync update, will retry with backoff',
+					{ error, nextRequest: retryDelay },
+					'error',
+					true // force
+				);
+			}
+
+			// Don't report disconnected status when the request was aborted
+			// due to page unload (e.g. during a refresh).
+			if ( ! isUnloadPending ) {
+				const backgroundRetriesFailed =
+					consecutiveFailures > retrySchedule.length;
+
+				roomsInRequest.forEach( ( state ) => {
+					// Skip rooms unregistered during the await so their
+					// terminal status isn't overwritten.
+					if ( roomStates.get( state.room ) !== state ) {
+						return;
+					}
+
+					state.onStatusChange( {
+						status: 'disconnected',
+						canManuallyRetry: true,
+						consecutiveFailures,
+						backgroundRetriesFailed,
+						willAutoRetryInMs: retryDelay,
+					} );
+				} );
+			}
+
+			scheduleNextRequest( retryDelay );
+		}
 	}
 
-	// Start polling.
 	void start();
 }
 
@@ -733,6 +826,7 @@ function registerRoom( {
 	doc,
 	awareness,
 	log,
+	onSync,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
@@ -742,45 +836,19 @@ function registerRoom( {
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
-	/**
-	 * Connection limits are enforced on the first entity to be loaded for sync.
-	 * This is an inelegant solution to a hard problem: This sync provider and the
-	 * sync package in general intentionally have no knowledge of the individual
-	 * entities being synced.
-	 *
-	 * Let's say a user opens a document (Entity A) for editing. If you asked the
-	 * user what they are doing, they would reply "I'm editing Entity A." You might
-	 * say that Entity A is "primary."
-	 *
-	 * However, the action of editing Entity A also triggers the loading of a
-	 * collection of document categories (Entity B) and another document (Entity C)
-	 * that is embedded in Entity A. You might therefore say that Entity B and
-	 * Entity C are "secondary" in this session.
-	 *
-	 * Meanwhile, a different user opens Entity C for editing, which also triggers
-	 * the loading of Entity B. In this session, Entity C is "primary" and Entity B
-	 * is "secondary."
-	 *
-	 * How do we enforce limits? The intuitive answer is that we only want to count
-	 * connections when the entity is "primary." However, we have no ability to
-	 * detect this. A document might be loaded as a primary entity in one session
-	 * and a secondary entity in another.
-	 *
-	 * In practice, we can consider the first-loaded entity as "primary" and use it
-	 * to enforce our connection limit. This is an imperfect assumption of consumer
-	 * behavior.
-	 *
-	 * How might this approach be improved? We could develop some way to annotate
-	 * entity loading so that the consumer can indicate which entity is primary.
-	 */
+	// The first-loaded entity is treated as "primary". See the polling
+	// manager for a discussion of this heuristic.
 	const isPrimaryRoom = 0 === roomStates.size;
 
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
+		// Push awareness changes promptly so peers see cursors move without
+		// waiting out the held request.
+		requestImmediateSend();
 	}
 
 	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
-		if ( POLLING_MANAGER_ORIGIN === origin ) {
+		if ( LONG_POLLING_MANAGER_ORIGIN === origin ) {
 			return;
 		}
 
@@ -810,6 +878,9 @@ function registerRoom( {
 
 		// Tag local document changes as 'update' type.
 		updateQueue.add( createSyncUpdate( update, SyncUpdateType.UPDATE ) );
+
+		// Abort a held long-poll (if any) and send the update promptly.
+		requestImmediateSend();
 	}
 
 	function unregister(): void {
@@ -827,12 +898,18 @@ function registerRoom( {
 		log,
 		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
-			processAwarenessUpdate( state, awareness, POLLING_MANAGER_ORIGIN ),
+			processAwarenessUpdate(
+				state,
+				awareness,
+				LONG_POLLING_MANAGER_ORIGIN
+			),
 		processDocUpdate: ( update: SyncUpdate ) =>
-			// Trunk removed the onSync callback from this chain (autosave
-			// notices now rely on a timeout); pass a no-op to the shared
-			// protocol helper, which the other transports still use.
-			processDocUpdate( update, doc, () => {}, POLLING_MANAGER_ORIGIN ),
+			processDocUpdate(
+				update,
+				doc,
+				onSync,
+				LONG_POLLING_MANAGER_ORIGIN
+			),
 		room,
 		unregister,
 		updateQueue,
@@ -849,8 +926,12 @@ function registerRoom( {
 		areListenersRegistered = true;
 	}
 
-	if ( ! isPolling ) {
-		poll();
+	if ( ! isRequestLoopActive ) {
+		runRequest();
+	} else if ( currentAbortController && ! currentRequestHasUpdates ) {
+		// A held request doesn't include the new room; release it so the
+		// next request registers the room with the server promptly.
+		requestImmediateSend();
 	}
 }
 
@@ -880,38 +961,55 @@ function unregisterRoom(
 		roomStates.delete( room );
 	}
 
-	if ( 0 === roomStates.size && areListenersRegistered ) {
-		window.removeEventListener( 'beforeunload', handleBeforeUnload );
-		window.removeEventListener( 'pagehide', handlePageHide );
-		document.removeEventListener(
-			'visibilitychange',
-			handleVisibilityChange
-		);
-		areListenersRegistered = false;
-		hasCheckedConnectionLimit = false;
-		consecutiveFailures = 0;
-		roomOverflowOffset = 0;
-		syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
+	if ( 0 === roomStates.size ) {
+		// Release any held request; the loop exits on the next cycle.
+		if ( currentAbortController ) {
+			isSelfAbort = true;
+			currentAbortController.abort();
+		}
+
+		if ( requestTimeoutId ) {
+			clearTimeout( requestTimeoutId );
+			requestTimeoutId = null;
+			isRequestLoopActive = false;
+		}
+
+		if ( flushTimeoutId ) {
+			clearTimeout( flushTimeoutId );
+			flushTimeoutId = null;
+		}
+
+		if ( areListenersRegistered ) {
+			window.removeEventListener( 'beforeunload', handleBeforeUnload );
+			window.removeEventListener( 'pagehide', handlePageHide );
+			document.removeEventListener(
+				'visibilitychange',
+				handleVisibilityChange
+			);
+			areListenersRegistered = false;
+			hasCheckedConnectionLimit = false;
+			consecutiveFailures = 0;
+			roomOverflowOffset = 0;
+			syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
+		}
 	}
 }
 
 /**
  * Immediately retry the sync connection by cancelling any pending
- * timeout and triggering a new poll. If the retry fails, the next
- * auto-retry waits 15s (MANUAL_RETRY_INTERVAL_MS) instead of the
- * usual 30s, then falls back to 30s for subsequent auto-retries.
+ * timeout and triggering a new request.
  */
 function retryNow(): void {
 	isManualRetry = true;
 
-	if ( pollingTimeoutId ) {
-		clearTimeout( pollingTimeoutId );
-		pollingTimeoutId = null;
-		poll();
+	if ( requestTimeoutId ) {
+		clearTimeout( requestTimeoutId );
+		requestTimeoutId = null;
+		runRequest();
 	}
 }
 
-export const pollingManager: PollingManager = {
+export const longPollingManager: LongPollingManager = {
 	registerRoom,
 	retryNow,
 	unregisterRoom,

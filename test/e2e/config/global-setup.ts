@@ -13,6 +13,10 @@ import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
+import {
+	setupRtcLongPollingTransport,
+	setupRtcPhpWebSocketTransport,
+} from './rtc-transport-setup';
 
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
@@ -43,6 +47,8 @@ async function globalSetup( config: FullConfig ) {
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
 		setupRtcWebSocketProvider( requestUtils ),
+		setupRtcLongPollingTransport( requestUtils ),
+		setupRtcPhpWebSocketTransport( requestUtils ),
 	] );
 
 	await requestContext.dispose();

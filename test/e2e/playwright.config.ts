@@ -47,11 +47,15 @@ const config = defineConfig( {
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
 	// The default suite runs RTC tests on the HTTP polling provider. Specs
-	// that rely on WebSocket-only semantics live under `websocket-only/` and
-	// are picked up by playwright.rtc-websocket.config.ts instead.
+	// that rely on transport-specific semantics live under `websocket-only/`,
+	// `long-polling-only/`, and `php-websocket-only/` and are picked up by
+	// playwright.rtc-websocket.config.ts, playwright.rtc-long-polling.config.ts,
+	// and playwright.rtc-php-websocket.config.ts instead.
 	testIgnore: [
 		...baseTestIgnore,
 		'**/specs/editor/collaboration/websocket-only/**',
+		'**/specs/editor/collaboration/long-polling-only/**',
+		'**/specs/editor/collaboration/php-websocket-only/**',
 	],
 	projects: [
 		{

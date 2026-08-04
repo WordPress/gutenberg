@@ -52,6 +52,7 @@ export const SECOND_USER: UserCredentials = {
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 const USE_TEST_WS_PROVIDER = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
+const USE_PHP_WS_TRANSPORT = process.env.GUTENBERG_RTC_TEST_PHP_WS === '1';
 
 export default class CollaborationUtils {
 	private admin: Admin;
@@ -199,6 +200,24 @@ export default class CollaborationUtils {
 					.waitFor( { timeout: resolvedTimeout } )
 			)
 		);
+
+		if ( USE_PHP_WS_TRANSPORT ) {
+			// The PHP WebSocket transport does not produce recurring
+			// wp-sync HTTP responses; wait on the provider's debug state.
+			const roomName = await this.getCurrentPostRoomName(
+				this.primaryPage
+			);
+			await Promise.all(
+				pages.map( ( pg ) =>
+					this.waitForSyncCycle( pg, 3, {
+						timeout: resolvedTimeout,
+						room: roomName,
+					} )
+				)
+			);
+			return;
+		}
+
 		await Promise.all(
 			pages.map( ( pg ) =>
 				this.waitForSyncCycle( pg, 3, { timeout: resolvedTimeout } )
@@ -414,6 +433,28 @@ export default class CollaborationUtils {
 				( roomName: string ) => {
 					const state = ( window as any )
 						.__gutenbergTestWebSocketSync;
+					const matchingRoom = state?.rooms?.[ roomName ];
+					return (
+						matchingRoom?.status === 'connected' &&
+						matchingRoom?.synced === true
+					);
+				},
+				targetRoom,
+				{ timeout }
+			);
+			return;
+		}
+
+		if ( USE_PHP_WS_TRANSPORT ) {
+			// The PHP WebSocket transport pushes updates over a socket
+			// instead of recurring wp-sync HTTP requests. Mirror the
+			// y-websocket branch: require the provider's debug state to
+			// report a connected and synced room.
+			const targetRoom =
+				room ?? ( await this.getCurrentPostRoomName( page ) );
+			await page.waitForFunction(
+				( roomName: string ) => {
+					const state = ( window as any ).__gutenbergPhpWebSocketSync;
 					const matchingRoom = state?.rooms?.[ roomName ];
 					return (
 						matchingRoom?.status === 'connected' &&

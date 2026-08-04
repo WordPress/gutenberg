@@ -7,18 +7,28 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { createHttpPollingProvider } from './http-polling/http-polling-provider';
+import { createHttpLongPollingProvider } from './http-long-polling/http-long-polling-provider';
+import { createPhpWebSocketProvider } from './php-websocket/php-websocket-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns the defeault provider creators. HTTP polling is the current default
- * provider.
+ * Returns the default provider creators, selecting the provider that matches
+ * the transport configured on the server (window._wpCollaborationTransport).
+ * HTTP polling is the default provider.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	return [ createHttpPollingProvider() ];
+	switch ( window._wpCollaborationTransport ) {
+		case 'http-long-polling':
+			return [ createHttpLongPollingProvider() ];
+		case 'php-websocket':
+			return [ createPhpWebSocketProvider() ];
+		default:
+			return [ createHttpPollingProvider() ];
+	}
 }
 
 /**
