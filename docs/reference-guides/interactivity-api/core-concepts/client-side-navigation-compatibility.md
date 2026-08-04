@@ -95,7 +95,7 @@ The table below summarizes the compatibility status and required action for each
 | Block using regular scripts (not script modules)     | No                               | Migrate to script modules                       |
 | Block importing from `window.wp.*` globals           | No                               | Use ES module imports                           |
 | Block relying on DOM ready events for initialization | No                               | Use `data-wp-init`                              |
-| Block mutating the DOM outside the Interactivity API | No                               | Use directives or `data-wp-watch`               |
+| Block mutating the DOM outside the Interactivity API | No                               | Use directives, `data-wp-watch`, or `renderElement()` for server-rendered fragments |
 
 The same applies for interactive regions included in classic PHP themes or plugins.
 
@@ -290,7 +290,7 @@ store( 'myPlugin', {
 } );
 ```
 
-If you need to insert **server-rendered HTML** into the live DOM — for example, a fragment fetched from a REST endpoint — use the [`renderElement()`](/docs/reference-guides/interactivity-api/directives-and-store.md#renderelement) function instead. It processes all Interactivity API directives on the inserted markup, making it fully interactive, and it is virtual-DOM aware: calling it again with the same element updates it in place. Note that a fragment inserted with `data-wp-watch` + `innerHTML` remains dead markup — it is not processed by the Interactivity API.
+If you need to insert **server-rendered HTML** into the live DOM — for example, a fragment fetched from a REST endpoint — use the [`renderElement()`](/docs/reference-guides/interactivity-api/directives-and-store.md#renderelement) function instead. It processes all Interactivity API directives on the inserted markup, making it fully interactive, and it is virtual-DOM aware: calling it again with the same element updates it in place. A fragment inserted inside an existing interactive island inherits the island's namespace and live context, so it does not need its own `data-wp-interactive` attribute. Note that a fragment inserted with `data-wp-watch` + `innerHTML` remains dead markup — it is not processed by the Interactivity API.
 
 #### Do not create HTML dynamically outside router regions
 

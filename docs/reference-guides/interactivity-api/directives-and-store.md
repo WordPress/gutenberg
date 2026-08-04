@@ -1380,6 +1380,10 @@ renderElement( card );
 
 The element(s) MUST already be attached to the DOM — the root-fragment mechanism requires a parent element. Multiple elements must be contiguous siblings under the same parent (the fragment's insertion anchor is the last element's next sibling); otherwise call once per element.
 
+A fragment without its own `data-wp-interactive` attribute is treated as part of the enclosing island: its directives resolve against the nearest ancestor island's namespace, and it inherits the live context at its insertion point. This makes the fragment behave as if it had been part of the original HTML at that position — including reacting to context changes made by the fragment. A fragment that carries its own `data-wp-interactive` (and, if needed, `data-wp-context`) is also supported and behaves as a self-contained island.
+
+If the fragment has no enclosing island and no own `data-wp-interactive`, nothing is hydrated: a warning is logged and the DOM is left untouched.
+
 Calling `renderElement()` again with the same element updates it in place (preact diffs against the previous render): no duplicate listeners, no remount. Only the passed element(s) are processed — siblings and any enclosing router region are untouched.
 
 `renderElement()` is not supported during initial hydration or during an in-flight navigation.

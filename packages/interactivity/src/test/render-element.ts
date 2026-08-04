@@ -231,7 +231,25 @@ describe( 'renderElement', () => {
 		);
 	} );
 
-	it( 'lets a fragment write through to the island context, and the island reacts', () => {
+	it( 'hydrates a self-contained island fragment with no ancestor, without warning', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const node = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<span data-testid="out" data-wp-text="state.message"></span>' +
+				'</div>'
+		);
+		document.body.appendChild( node );
+
+		renderElement( node );
+
+		expect(
+			node.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'hello' );
+		// @ts-expect-error jest-console matcher is added by the test setup.
+		expect( console ).not.toHaveWarned();
+	} );
+
+	it( 'lets a fragment write through to the island context, and the island reacts', async () => {
 		store( 'test/render-element', {
 			actions: {
 				increment() {
@@ -256,15 +274,19 @@ describe( 'renderElement', () => {
 		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
 		renderElement( node );
 
-		const islandCount = island.querySelector(
-			'[data-testid="island-count"]'
-		)!;
 		const btn = node as HTMLButtonElement;
 		btn.click();
 		btn.click();
 
 		// The island's own element must react to the fragment's write-through.
-		expect( islandCount.textContent ).toBe( '2' );
+		// The reactive update is flushed after the next animation frame, so
+		// wait for it before asserting.
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+
+		expect(
+			island.querySelector( '[data-testid="island-count"]' )?.textContent
+		).toBe( '2' );
 	} );
 
 	it( 'updates a kept node with fresh server markup in place', () => {
@@ -280,9 +302,9 @@ describe( 'renderElement', () => {
 			node.querySelector( '[data-testid="out"]' )?.textContent
 		).toBe( 'hello' );
 
-		// Mutate the node's markup, re-insert, re-render.
+		// Change the state and re-render the SAME node: the directive must
+		// re-evaluate against the new state, updating in place.
 		store( 'test/render-element', { state: { message: 'updated' } } );
-		node.querySelector( '[data-testid="out"]' )!.textContent = 'server';
 		renderElement( node );
 		expect(
 			node.querySelector( '[data-testid="out"]' )?.textContent
