@@ -2,6 +2,9 @@ name: 'Install Playwright browsers'
 description: 'Install Playwright browsers and their system dependencies, caching the Debian packages that WebKit needs.'
 
 inputs:
+    workspace:
+        description: 'The npm workspace that declares playwright. Its copy installs the browsers, so the version installed is the one that workspace tests with.'
+        required: true
     browsers:
         description: 'Optional. Space separated list of browsers to install. When not specified, all browsers are installed.'
         required: false
@@ -16,12 +19,13 @@ runs:
           id: prepare
           env:
               BROWSERS: ${{ inputs.browsers }}
+              WORKSPACE: ${{ inputs.workspace }}
           run: |
-              VERSION="$(node -p "require('playwright-core/package.json').version")"
+              VERSION="$(npm exec --no --workspace "$WORKSPACE" -- node -p "require('playwright/package.json').version")"
               BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
               # Packages cached under another runner image mostly miss.
               IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
-              echo "PREFIX=playwright-apt-${RUNNER_OS}-${RUNNER_ARCH}-${IMAGE}-${VERSION}-${BROWSERS_KEY}-" >> "$GITHUB_OUTPUT"
+              echo "PREFIX=playwright-apt--os-${RUNNER_OS}--arch-${RUNNER_ARCH}--img-${IMAGE}--pw-${VERSION}--browsers-${BROWSERS_KEY}--fingerprint-" >> "$GITHUB_OUTPUT"
 
               if [ -z "$BROWSERS" ] || [ "${BROWSERS#*webkit}" != "$BROWSERS" ]; then
                   echo "CACHE_DEPS=true" >> "$GITHUB_OUTPUT"
@@ -50,6 +54,7 @@ runs:
           id: install
           env:
               BROWSERS: ${{ inputs.browsers }}
+              WORKSPACE: ${{ inputs.workspace }}
           run: |
               fingerprint() {
                   find "$HOME/apt-cache" -maxdepth 1 -name '*.deb' -printf '%f\n' | LC_ALL=C sort | sha256sum | cut -c1-16
@@ -63,7 +68,7 @@ runs:
               sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
 
               # shellcheck disable=SC2086 # The browser list is intentionally split into separate arguments.
-              npx playwright install $BROWSERS --with-deps
+              npm exec --no --workspace "$WORKSPACE" -- playwright install $BROWSERS --with-deps
 
               sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
               sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
