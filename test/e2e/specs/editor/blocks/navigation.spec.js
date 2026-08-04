@@ -219,6 +219,129 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 		} );
 
+		test.describe( 'adding a submenu to a page link', () => {
+			test.afterEach( async ( { requestUtils } ) => {
+				await Promise.all( [
+					requestUtils.deleteAllPages(),
+					requestUtils.deleteAllMenus(),
+				] );
+			} );
+
+			async function addSubmenuToPageLink( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				parentPage,
+			} ) {
+				await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: `<!-- wp:navigation-link {"label":"${ parentPage.title.raw }","type":"page","id":${ parentPage.id },"kind":"post-type","url":"${ parentPage.link }"} /-->`,
+				} );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/navigation' } );
+
+				await editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.click();
+
+				await page
+					.getByRole( 'button', { name: 'Add submenu' } )
+					.click();
+			}
+
+			test( 'inserts a Page List of the page’s children', async ( {
+				admin,
+				page,
+				editor,
+				requestUtils,
+			} ) => {
+				const parentPage = await requestUtils.createPage( {
+					title: 'Projects',
+					status: 'publish',
+				} );
+				await requestUtils.createPage( {
+					title: 'Project One',
+					status: 'publish',
+					parent: parentPage.id,
+				} );
+				await requestUtils.createPage( {
+					title: 'Unrelated Page',
+					status: 'publish',
+				} );
+
+				await addSubmenuToPageLink( {
+					admin,
+					editor,
+					page,
+					requestUtils,
+					parentPage,
+				} );
+
+				const submenuBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Submenu',
+				} );
+				await expect( submenuBlock ).toBeVisible();
+
+				// The Page List is the submenu's only child and lists the
+				// parent page's children.
+				await expect(
+					submenuBlock.getByRole( 'document', {
+						name: 'Block: Page List',
+					} )
+				).toBeVisible();
+				const pageListBlock = submenuBlock.getByRole( 'document', {
+					name: 'Block: Page List',
+				} );
+				await expect(
+					pageListBlock.getByText( 'Project One' )
+				).toBeVisible();
+				// The list is scoped to the parent page, so unrelated top level
+				// pages are not included.
+				await expect(
+					pageListBlock.getByText( 'Unrelated Page' )
+				).toBeHidden();
+			} );
+
+			test( 'inserts an empty link when the page has no children', async ( {
+				admin,
+				page,
+				editor,
+				requestUtils,
+			} ) => {
+				const parentPage = await requestUtils.createPage( {
+					title: 'Contact',
+					status: 'publish',
+				} );
+
+				await addSubmenuToPageLink( {
+					admin,
+					editor,
+					page,
+					requestUtils,
+					parentPage,
+				} );
+
+				const submenuBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Submenu',
+				} );
+				await expect( submenuBlock ).toBeVisible();
+
+				// Falls back to the empty link, which opens the link UI.
+				await expect(
+					page.getByRole( 'combobox', { name: 'Search or type URL' } )
+				).toBeVisible();
+				await expect(
+					submenuBlock.getByRole( 'document', {
+						name: 'Block: Page List',
+					} )
+				).toBeHidden();
+			} );
+		} );
+
 		test( 'submenu converts to link automatically', async ( {
 			admin,
 			pageUtils,

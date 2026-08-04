@@ -7,7 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -162,6 +163,7 @@ export default function NavigationLinkEdit( {
 
 	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
 	const { getBlocks } = useSelect( blockEditorStore );
+	const registry = useRegistry();
 
 	// URL binding logic
 	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
@@ -185,13 +187,51 @@ export default function NavigationLinkEdit( {
 	);
 
 	/**
+	 * Builds a Page List block listing this link's child pages, or `null` when
+	 * the link doesn't point at a Page that has children.
+	 *
+	 * Submenus under a Page are commonly a manual copy of that page's
+	 * children, so a Page List is a better starting point than an empty link:
+	 * it keeps the submenu up to date as child pages are added.
+	 */
+	const getChildPageListBlock = useCallback( async () => {
+		const isPageLink =
+			type === 'page' && ( ! kind || kind === 'post-type' ) && !! id;
+
+		if ( ! isPageLink ) {
+			return null;
+		}
+
+		const childPages = await registry
+			.resolveSelect( coreStore )
+			.getEntityRecords( 'postType', 'page', {
+				parent: id,
+				per_page: 1,
+				_fields: [ 'id' ],
+			} )
+			.catch( () => null );
+
+		if ( ! childPages?.length ) {
+			return null;
+		}
+
+		return createBlock( 'core/page-list', { parentPageID: id } );
+	}, [ type, kind, id, registry ] );
+
+	/**
 	 * Transform to submenu block.
 	 */
-	const transformToSubmenu = useCallback( () => {
+	const transformToSubmenu = useCallback( async () => {
 		let innerBlocks = getBlocks( clientId );
 		if ( innerBlocks.length === 0 ) {
-			innerBlocks = [ createBlock( 'core/navigation-link' ) ];
-			selectBlock( innerBlocks[ 0 ].clientId );
+			const childPageList = await getChildPageListBlock();
+
+			if ( childPageList ) {
+				innerBlocks = [ childPageList ];
+			} else {
+				innerBlocks = [ createBlock( 'core/navigation-link' ) ];
+				selectBlock( innerBlocks[ 0 ].clientId );
+			}
 		}
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
@@ -199,7 +239,14 @@ export default function NavigationLinkEdit( {
 			innerBlocks
 		);
 		replaceBlock( clientId, newSubmenu );
-	}, [ getBlocks, clientId, selectBlock, replaceBlock, attributes ] );
+	}, [
+		getBlocks,
+		clientId,
+		getChildPageListBlock,
+		selectBlock,
+		replaceBlock,
+		attributes,
+	] );
 
 	// On mount, if this is a new link without a URL and it's selected,
 	// select the parent block (submenu or navigation) instead to keep the appender visible.
