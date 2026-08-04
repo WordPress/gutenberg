@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-// @ts-ignore -- No declaration file available.
+// @ts-expect-error -- No usable declaration file available.
 import { isPlainObject } from 'is-plain-object';
-// @ts-ignore -- No declaration file available.
 import { isValidElementType } from 'react-is';
 
 /**

@@ -24,7 +24,7 @@ function Navigation() {
 		useSidebarParent();
 	const menuItems = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error The boot store is untyped, so `select()` resolves to `never`.
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);
