@@ -1778,6 +1778,11 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
 	"packages/global-styles-ui/src/size-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
