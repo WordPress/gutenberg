@@ -25,8 +25,32 @@
 
 .global-styles-ui-screen-revisions__changes,
 .global-styles-ui-screen-revisions__meta {
-	color: $gray-700;
+	// Dark enough to keep AA contrast over the selected row's tint.
+	color: $gray-800;
 	font-size: 12px;
+}
+
+.global-styles-ui-screen-revisions .dataviews-footer {
+	// Keep the pagination text on one line, and let the footer wrap
+	// instead of clipping the action button in the sidebar's width.
+	flex-wrap: wrap;
+	row-gap: $grid-unit-10;
+
+	.dataviews-pagination,
+	.dataviews-pagination__page-select {
+		flex-wrap: nowrap;
+		white-space: nowrap;
+	}
+
+	// The page select is complete pagination by itself; the prev/next
+	// arrows don't fit next to the footer action at this width.
+	.dataviews-pagination > *:not(.dataviews-pagination__page-select) {
+		display: none;
+	}
+
+	.dataviews-picker-footer__actions {
+		margin-left: auto;
+	}
 }
 
 .global-styles-ui-screen-revisions__meta {

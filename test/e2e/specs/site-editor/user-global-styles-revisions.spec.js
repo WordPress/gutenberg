@@ -275,13 +275,17 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		// The page select is the screen's single pagination control; the
+		// prev/next buttons are hidden at the sidebar's width.
 		const currentPage = page.getByLabel( 'Current page' );
 		await expect( currentPage ).toHaveValue( '1' );
-		await page.getByRole( 'button', { name: 'Next page' } ).click();
+		await currentPage.selectOption( '2' );
 		await expect( currentPage ).toHaveValue( '2' );
 		await expect(
-			page.getByRole( 'button', { name: 'Next page' } )
-		).toBeDisabled();
+			page.getByRole( 'option', {
+				name: 'Reset the styles to the theme defaults',
+			} )
+		).toBeVisible();
 	} );
 } );
 
