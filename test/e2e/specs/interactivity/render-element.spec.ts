@@ -197,4 +197,21 @@ test.describe( 'renderElement', () => {
 		// ...which is hydrated (reads the island context).
 		await expect( page.getByTestId( 'frag-outer' ) ).toHaveText( '0' );
 	} );
+
+	test( 'runs data-wp-watch on insertion and re-runs on state change', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'load-watch' ).click();
+
+		// `data-wp-watch` runs when the node is created: the callback reads
+		// `state.items` and updates `state.watchText`, which `data-wp-text`
+		// displays.
+		const watch = page.getByTestId( 'watch' );
+		await expect( watch ).toHaveText( 'watched 3' );
+
+		// Clicking the fragment's button mutates `state.items`, so the watch
+		// re-runs and the text updates reactively.
+		await page.getByTestId( 'watch-add' ).click();
+		await expect( watch ).toHaveText( 'watched 4' );
+	} );
 } );

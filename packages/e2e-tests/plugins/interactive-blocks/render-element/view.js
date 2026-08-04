@@ -13,7 +13,13 @@ const { state } = store( 'test/render-element', {
 	state: {
 		isHydrated: 'no',
 		lifecycle: null,
+		watchText: 'not watched',
 		items: [ 'one', 'two', 'three' ],
+	},
+	callbacks: {
+		updateWatch() {
+			state.watchText = `watched ${ state.items.length }`;
+		},
 	},
 	actions: {
 		increment() {
@@ -88,6 +94,16 @@ const { state } = store( 'test/render-element', {
 				'[data-testid="target"]'
 			);
 			renderHTML( target, html, { position: 'outer' } );
+			state.isHydrated = 'yes';
+		},
+		*loadWatch() {
+			const { ref } = getElement();
+			const res = yield fetch( ref.dataset.fragmentUrl );
+			const html = yield res.json();
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html );
 			state.isHydrated = 'yes';
 		},
 		navigate: withSyncEvent( function* ( event ) {

@@ -140,6 +140,26 @@ add_action(
 			)
 		);
 
+		/*
+		 * A fragment that runs a `data-wp-watch` callback: it runs on
+		 * insertion and re-runs whenever `state.items` changes, updating
+		 * `state.watchText` which the fragment's `data-wp-text` displays.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/watch',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<button data-testid="watch-add" data-wp-on--click="actions.addItem">Add</button>' .
+						'<p data-testid="watch" data-wp-watch="callbacks.updateWatch" data-wp-text="state.watchText">not watched</p>'
+					);
+				},
+			)
+		);
+
 		// A fragment that runs lifecycle directives (`data-wp-init`).
 		register_rest_route(
 			'test/render-element/v1',

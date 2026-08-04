@@ -72,6 +72,13 @@
 	>
 		Load outer fragment
 	</button>
+	<button
+		data-wp-on--click="actions.loadWatch"
+		data-testid="load-watch"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/watch' ) ); ?>"
+	>
+		Load watch fragment
+	</button>
 	<?php if ( ! empty( $attributes['next'] ) ) : ?>
 		<a
 			data-wp-on--click="actions.navigate"
