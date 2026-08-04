@@ -2,13 +2,19 @@
 
 ## Unreleased
 
+### New Features
+
+-   DataViews: Add a `time` field type and matching `time` control for times of day with no date attached. Values are wall-clock `HH:mm`/`HH:mm:ss` strings that render identically regardless of the visitor's timezone, and `format.time` controls both the rendered format and whether the control offers a seconds field. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
+
 ### Enhancements
 
+-   DataViews: Generalize the ordering filter operators (`on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `between`) from dates to temporal values, so they also compare times of day. Comparisons for `date` and `datetime` are unchanged. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
 
 ### Bug Fix
 
+-   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataForms: Stop the `card` and `details` layouts from hijacking focus when they reveal validation errors. Errors for every field in the container are now shown once focus leaves it, instead of on each internal blur, and revealing them no longer moves focus, so the natural tab sequence is preserved. [#80685](https://github.com/WordPress/gutenberg/pull/80685)
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
