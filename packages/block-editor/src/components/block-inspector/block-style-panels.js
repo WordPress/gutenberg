@@ -12,7 +12,74 @@ const DEFAULT_PANELS = [
 	'dimensions',
 ];
 
+const PANEL_COMPONENTS = {
+	elements: ElementsEdit,
+	background: BackgroundImagePanel,
+	typography: TypographyPanel,
+	border: BorderPanel,
+	dimensions: DimensionsPanel,
+};
+
+function getPanelProps( { clientId, name, setAttributes, settings } ) {
+	return {
+		clientId,
+		name,
+		setAttributes,
+		settings: {
+			...settings,
+			typography: {
+				...settings.typography,
+				// The text alignment UI for individual blocks is rendered in
+				// the block toolbar, so disable it here.
+				textAlign: false,
+			},
+		},
+	};
+}
+
 export default function BlockStylePanels( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	panelWrappers = {},
+} ) {
+	const passedProps = getPanelProps( {
+		clientId,
+		name,
+		setAttributes,
+		settings,
+	} );
+
+	return (
+		<>
+			<ElementsEdit
+				{ ...passedProps }
+				asWrapper={ panelWrappers.elements }
+			/>
+			<BackgroundImagePanel
+				{ ...passedProps }
+				asWrapper={ panelWrappers.background }
+			/>
+			<TypographyPanel
+				{ ...passedProps }
+				asWrapper={ panelWrappers.typography }
+			/>
+			<BorderPanel
+				{ ...passedProps }
+				asWrapper={ panelWrappers.border }
+			/>
+			<DimensionsPanel
+				{ ...passedProps }
+				asWrapper={ panelWrappers.dimensions }
+			/>
+		</>
+	);
+}
+
+// Keep the normal block-support panels unconditional so their inspector fills
+// always register. Only mixed text selections use this filtered renderer.
+export function BlockStylePanelsSubset( {
 	clientId,
 	name,
 	setAttributes,
@@ -20,55 +87,26 @@ export default function BlockStylePanels( {
 	panelWrappers = {},
 	panels = DEFAULT_PANELS,
 } ) {
-	const panelSettings = {
-		...settings,
-		typography: {
-			...settings.typography,
-			// The text alignment UI for individual blocks is rendered in
-			// the block toolbar, so disable it here.
-			textAlign: false,
-		},
-	};
-
-	const passedProps = {
+	const passedProps = getPanelProps( {
 		clientId,
 		name,
 		setAttributes,
-		settings: panelSettings,
-	};
+		settings,
+	} );
 
 	return (
 		<>
-			{ panels.includes( 'elements' ) && (
-				<ElementsEdit
-					{ ...passedProps }
-					asWrapper={ panelWrappers.elements }
-				/>
-			) }
-			{ panels.includes( 'background' ) && (
-				<BackgroundImagePanel
-					{ ...passedProps }
-					asWrapper={ panelWrappers.background }
-				/>
-			) }
-			{ panels.includes( 'typography' ) && (
-				<TypographyPanel
-					{ ...passedProps }
-					asWrapper={ panelWrappers.typography }
-				/>
-			) }
-			{ panels.includes( 'border' ) && (
-				<BorderPanel
-					{ ...passedProps }
-					asWrapper={ panelWrappers.border }
-				/>
-			) }
-			{ panels.includes( 'dimensions' ) && (
-				<DimensionsPanel
-					{ ...passedProps }
-					asWrapper={ panelWrappers.dimensions }
-				/>
-			) }
+			{ panels.map( ( panel ) => {
+				const Panel = PANEL_COMPONENTS[ panel ];
+
+				return (
+					<Panel
+						key={ panel }
+						{ ...passedProps }
+						asWrapper={ panelWrappers[ panel ] }
+					/>
+				);
+			} ) }
 		</>
 	);
 }
