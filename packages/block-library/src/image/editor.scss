@@ -70,9 +70,7 @@ figure.wp-block-image:not(.wp-block) {
 	filter: none !important;
 }
 
-.block-editor-block-list__block[data-type="core/image"]
-.block-editor-block-toolbar
-.block-editor-url-input__button-modal {
+.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -136,21 +134,4 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image__toolbar_content_textarea {
 	// Corresponds to the size of the textarea in the block inspector.
 	width: 250px;
-}
-
-// Upload errors render inside the placeholder rather than in a snackbar so
-// they persist long enough to be read. See #81123.
-.wp-block-image__upload-error-notice {
-	// Undo the negative margins the placeholder applies to notice lists so the
-	// notice lines up with the rest of the placeholder content.
-	margin: 0 0 $grid-unit-15;
-	text-align: start;
-
-	.components-notice__content {
-		margin: 0;
-	}
-
-	p {
-		margin: 0 0 $grid-unit-10;
-	}
 }

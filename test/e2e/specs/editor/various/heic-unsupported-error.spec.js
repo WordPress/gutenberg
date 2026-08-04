@@ -12,7 +12,7 @@ test.describe( 'HEIC upload error message', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'reports an undecodable HEIC file in the Image block', async ( {
+	test( 'names the browser when a HEIC file cannot be decoded', async ( {
 		editor,
 		page,
 	} ) => {
@@ -37,25 +37,14 @@ test.describe( 'HEIC upload error message', () => {
 				buffer: Buffer.from( 'not a heic file' ),
 			} );
 
-		// The error is rendered in the block, not in a snackbar that would
-		// dismiss itself before it could be read.
-		const notice = imageBlock.locator(
-			'.wp-block-image__upload-error-notice'
-		);
+		// Playwright drives Chromium here, so the message names Chrome. Every
+		// browser gets its own name from the same detection.
+		const notice = page.locator( '.components-snackbar' ).filter( {
+			hasText: 'cannot convert HEIC images',
+		} );
 		await expect( notice ).toBeVisible( { timeout: 30_000 } );
-		await expect( notice ).toContainText( 'cannot convert HEIC images' );
+		await expect( notice ).toContainText( 'Chrome' );
 		await expect( notice ).toContainText( 'JPEG' );
-
-		await expect(
-			page.locator( '.components-snackbar' ).filter( {
-				hasText: 'cannot convert HEIC images',
-			} )
-		).toBeHidden();
-
-		// The message can be copied for pasting into a search or support request.
-		await expect(
-			notice.getByRole( 'button', { name: 'Copy error message' } )
-		).toBeVisible();
 
 		// The block falls back to the placeholder so another image can be chosen.
 		await expect(

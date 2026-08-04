@@ -32,7 +32,6 @@ import { store as uploadStore } from '@wordpress/upload-media';
  */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
-import UploadErrorNotice from './upload-error-notice';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
 
@@ -156,17 +155,8 @@ export function ImageEdit( {
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-
-	/*
-	 * Upload errors are shown in the placeholder rather than in a snackbar so
-	 * they stay put next to the image that failed. Messages such as the one
-	 * for undecodable HEIC files are too long to read before a snackbar
-	 * dismisses itself. See https://github.com/WordPress/gutenberg/issues/81123.
-	 */
-	const [ uploadError, setUploadError ] = useState();
-
 	function onUploadError( message ) {
-		setUploadError( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
@@ -177,7 +167,6 @@ export function ImageEdit( {
 	}
 
 	function onFilesPreUpload( files ) {
-		setUploadError();
 		if ( files.length === 1 ) {
 			setTemporaryURL( createBlobURL( files[ 0 ] ) );
 		}
@@ -224,8 +213,6 @@ export function ImageEdit( {
 	}
 
 	function onSelectImage( media ) {
-		setUploadError();
-
 		if ( Array.isArray( media ) ) {
 			onSelectImagesList( media );
 			return;
@@ -449,14 +436,6 @@ export function ImageEdit( {
 				}
 				withIllustration={ ! isSingleSelected || isSmallContainer }
 				label={ ! isSmallContainer && __( 'Image' ) }
-				notices={
-					!! uploadError && (
-						<UploadErrorNotice
-							message={ uploadError }
-							onRemove={ () => setUploadError() }
-						/>
-					)
-				}
 				instructions={
 					! lockUrlControls &&
 					! isSmallContainer &&
