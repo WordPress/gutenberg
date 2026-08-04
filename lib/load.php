@@ -83,6 +83,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/experimental/collaboration/rest-api.php';
 	require __DIR__ . '/experimental/collaboration/collaboration.php';
 
+	// Distributed editing prototype (server-authoritative blessing model).
+	require __DIR__ . '/experimental/distributed-editing/distributed-editing.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
