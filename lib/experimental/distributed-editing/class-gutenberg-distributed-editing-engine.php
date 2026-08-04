@@ -291,6 +291,11 @@ if ( ! class_exists( 'Gutenberg_Distributed_Editing_Engine' ) ) {
 			}
 
 			foreach ( $base_chunks as $index => $chunk ) {
+				if ( isset( $matched['edited_base'][ $index ] ) ) {
+					// Same identity, changed bytes: an edit (evaluated above via
+					// its incoming chunk), not a deletion.
+					continue;
+				}
 				if ( ! isset( $matched['base'][ $index ] ) && $this->is_protected_chunk( $chunk ) ) {
 					// Removing protected content carries no injection risk, so pure
 					// deletions are accepted without approval (classic kses would
@@ -393,22 +398,78 @@ if ( ! class_exists( 'Gutenberg_Distributed_Editing_Engine' ) ) {
 		}
 
 		/**
-		 * Aligns base and incoming chunks by exact bytes using a longest common
-		 * subsequence, so unchanged chunks pass through and only genuine changes
-		 * are evaluated.
+		 * Aligns base and incoming chunks, identity first, bytes second.
+		 *
+		 * Pass 1 pairs chunks by `metadata.syncId` from the block delimiter:
+		 * byte-identical pairs pass through even when reordered (a move is not
+		 * a change), and same-identity pairs with different bytes are recorded
+		 * as edits so the base chunk is not miscounted as a deletion. Pass 2
+		 * runs the original byte-exact longest-common-subsequence over
+		 * whatever the identity pass left unpaired (legacy content without
+		 * syncIds), preserving the previous behavior for id-less chunks.
 		 *
 		 * @param string[] $base_chunks     Chunks of the accepted content.
 		 * @param string[] $incoming_chunks Chunks of the proposed content.
-		 * @return array Two maps of matched indices: 'base' and 'incoming'.
+		 * @return array Maps of matched indices: 'base', 'incoming' (byte-identical
+		 *               pass-through pairs) and 'edited_base' (base chunks whose
+		 *               identity survives with changed bytes).
 		 */
 		private function match_common_chunks( $base_chunks, $incoming_chunks ) {
-			$n = count( $base_chunks );
-			$m = count( $incoming_chunks );
+			$matched = array(
+				'base'        => array(),
+				'incoming'    => array(),
+				'edited_base' => array(),
+			);
+
+			$base_by_id = array();
+			foreach ( $base_chunks as $i => $chunk ) {
+				$id = $this->chunk_sync_id( $chunk );
+				if ( null !== $id && ! isset( $base_by_id[ $id ] ) ) {
+					$base_by_id[ $id ] = $i;
+				}
+			}
+
+			$consumed_base     = array();
+			$consumed_incoming = array();
+			foreach ( $incoming_chunks as $j => $chunk ) {
+				$id = $this->chunk_sync_id( $chunk );
+				if ( null === $id || ! isset( $base_by_id[ $id ] ) ) {
+					continue;
+				}
+				$i = $base_by_id[ $id ];
+				if ( isset( $consumed_base[ $i ] ) ) {
+					continue;
+				}
+				if ( $base_chunks[ $i ] === $chunk ) {
+					$matched['base'][ $i ]     = $j;
+					$matched['incoming'][ $j ] = $i;
+				} else {
+					$matched['edited_base'][ $i ] = $j;
+				}
+				$consumed_base[ $i ]     = true;
+				$consumed_incoming[ $j ] = true;
+			}
+
+			$rest_base = array();
+			foreach ( $base_chunks as $i => $chunk ) {
+				if ( ! isset( $consumed_base[ $i ] ) ) {
+					$rest_base[] = $i;
+				}
+			}
+			$rest_incoming = array();
+			foreach ( $incoming_chunks as $j => $chunk ) {
+				if ( ! isset( $consumed_incoming[ $j ] ) ) {
+					$rest_incoming[] = $j;
+				}
+			}
+
+			$n = count( $rest_base );
+			$m = count( $rest_incoming );
 
 			$lengths = array_fill( 0, $n + 1, array_fill( 0, $m + 1, 0 ) );
 			for ( $i = $n - 1; $i >= 0; $i-- ) {
 				for ( $j = $m - 1; $j >= 0; $j-- ) {
-					if ( $base_chunks[ $i ] === $incoming_chunks[ $j ] ) {
+					if ( $base_chunks[ $rest_base[ $i ] ] === $incoming_chunks[ $rest_incoming[ $j ] ] ) {
 						$lengths[ $i ][ $j ] = $lengths[ $i + 1 ][ $j + 1 ] + 1;
 					} else {
 						$lengths[ $i ][ $j ] = max( $lengths[ $i + 1 ][ $j ], $lengths[ $i ][ $j + 1 ] );
@@ -416,17 +477,12 @@ if ( ! class_exists( 'Gutenberg_Distributed_Editing_Engine' ) ) {
 				}
 			}
 
-			$matched = array(
-				'base'     => array(),
-				'incoming' => array(),
-			);
-
 			$i = 0;
 			$j = 0;
 			while ( $i < $n && $j < $m ) {
-				if ( $base_chunks[ $i ] === $incoming_chunks[ $j ] ) {
-					$matched['base'][ $i ]     = $j;
-					$matched['incoming'][ $j ] = $i;
+				if ( $base_chunks[ $rest_base[ $i ] ] === $incoming_chunks[ $rest_incoming[ $j ] ] ) {
+					$matched['base'][ $rest_base[ $i ] ]         = $rest_incoming[ $j ];
+					$matched['incoming'][ $rest_incoming[ $j ] ] = $rest_base[ $i ];
 					++$i;
 					++$j;
 				} elseif ( $lengths[ $i + 1 ][ $j ] >= $lengths[ $i ][ $j + 1 ] ) {
@@ -437,6 +493,28 @@ if ( ! class_exists( 'Gutenberg_Distributed_Editing_Engine' ) ) {
 			}
 
 			return $matched;
+		}
+
+		/**
+		 * Extracts the `metadata.syncId` of a top-level chunk, if any.
+		 *
+		 * Uses the block parser rather than string matching so the ID is read
+		 * exactly as WordPress would. Freeform chunks and blocks without an ID
+		 * return null and fall back to byte-exact matching.
+		 *
+		 * @param string $chunk Serialized top-level chunk.
+		 * @return string|null syncId or null.
+		 */
+		private function chunk_sync_id( $chunk ) {
+			$blocks = parse_blocks( $chunk );
+			foreach ( $blocks as $block ) {
+				if ( null === $block['blockName'] ) {
+					continue;
+				}
+				$sync_id = isset( $block['attrs']['metadata']['syncId'] ) ? $block['attrs']['metadata']['syncId'] : null;
+				return ( is_string( $sync_id ) && '' !== $sync_id ) ? $sync_id : null;
+			}
+			return null;
 		}
 
 		/**

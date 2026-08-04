@@ -680,4 +680,66 @@ class Gutenberg_Distributed_Editing_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( '<script', $this->stored_content(), 'kses must be restored after a distributed-editing save.' );
 	}
+
+	const ID_PARAGRAPH_ONE = "<!-- wp:paragraph {\"metadata\":{\"syncId\":\"p-one\"}} -->\n<p>First.</p>\n<!-- /wp:paragraph -->";
+
+	const ID_PARAGRAPH_TWO = "<!-- wp:paragraph {\"metadata\":{\"syncId\":\"p-two\"}} -->\n<p>Second.</p>\n<!-- /wp:paragraph -->";
+
+	const ID_SCRIPT_BLOCK = "<!-- wp:html {\"metadata\":{\"syncId\":\"s-one\"}} -->\n<script>document.title = 'accepted';</script>\n<!-- /wp:html -->";
+
+	const ID_SCRIPT_BLOCK_EDITED = "<!-- wp:html {\"metadata\":{\"syncId\":\"s-one\"}} -->\n<script>document.title = 'proposed';</script>\n<!-- /wp:html -->";
+
+	/**
+	 * Stores content verbatim, bypassing request-time kses.
+	 *
+	 * @param string $content Content to store.
+	 */
+	private function store_verbatim( $content ) {
+		kses_remove_filters();
+		wp_update_post(
+			array(
+				'ID'           => $this->post_id,
+				'post_content' => wp_slash( $content ),
+			)
+		);
+		kses_init();
+	}
+
+	public function test_moved_protected_block_with_sync_id_passes_through_unprivileged_save() {
+		$base = self::ID_PARAGRAPH_ONE . "\n\n" . self::ID_SCRIPT_BLOCK . "\n\n" . self::ID_PARAGRAPH_TWO;
+		$this->store_verbatim( $base );
+
+		// The author moves the protected block to the top; every chunk is
+		// byte-identical to accepted content, only the order changed.
+		$moved  = self::ID_SCRIPT_BLOCK . "\n\n" . self::ID_PARAGRAPH_ONE . "\n\n" . self::ID_PARAGRAPH_TWO;
+		$result = $this->engine->save(
+			$this->post_id,
+			$moved,
+			$this->engine->get_version( $this->post_id ),
+			array(),
+			self::$author_id
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertSame( array(), $result['sequestered'], 'A moved, byte-identical protected block must not be sequestered.' );
+		$this->assertSame( 0, $result['deleted_protected'], 'A move must not be miscounted as a protected deletion.' );
+		$this->assertSame( $moved, $this->stored_content(), 'The reordered content must persist byte for byte.' );
+	}
+
+	public function test_edited_protected_block_with_sync_id_is_not_counted_as_deletion() {
+		$base = self::ID_PARAGRAPH_ONE . "\n\n" . self::ID_SCRIPT_BLOCK;
+		$this->store_verbatim( $base );
+
+		$result = $this->engine->save(
+			$this->post_id,
+			self::ID_PARAGRAPH_ONE . "\n\n" . self::ID_SCRIPT_BLOCK_EDITED,
+			$this->engine->get_version( $this->post_id ),
+			array(),
+			self::$author_id
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertCount( 1, $result['sequestered'], 'The identity-paired protected edit must still be sequestered.' );
+		$this->assertSame( 0, $result['deleted_protected'], 'An identity-paired edit is an edit, not a deletion of the base chunk.' );
+	}
 }
