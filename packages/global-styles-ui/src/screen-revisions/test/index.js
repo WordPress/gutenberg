@@ -303,9 +303,7 @@ describe( 'ScreenRevisions', () => {
 
 		renderScreen( { userConfig: { styles: STYLES_B, settings: {} } } );
 
-		expect(
-			screen.getByRole( 'button', { name: 'Reset to defaults' } )
-		).toBeEnabled();
+		expect( screen.getByRole( 'button', { name: 'Reset' } ) ).toBeEnabled();
 	} );
 
 	it( 'asks for confirmation before applying over unsaved changes', async () => {
