@@ -57,20 +57,15 @@ const variants = {
 
 /**
  * Renders the complementary area container, replacing the default `div` with
- * the element (or element factory) given via the `render` prop.
+ * the element given via the `render` prop.
  *
  * `className` and `style` are composed rather than overwritten, since the
  * container is also the scroll container for the sidebar.
  *
- * @param {Function|Object} [render] Replacement element, or a function
- *                                   returning one.
- * @param {Object}          props    Props for the container.
+ * @param {Object} [render] Replacement element.
+ * @param {Object} props    Props for the container.
  */
 function renderContainer( render, props ) {
-	if ( typeof render === 'function' ) {
-		return render( props );
-	}
-
 	if ( isValidElement( render ) ) {
 		return cloneElement( render, {
 			...props,
