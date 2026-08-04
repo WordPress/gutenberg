@@ -156,19 +156,15 @@ export function getClosestTabbable(
 			return false;
 		}
 
-		// Skip focusable elements such as links within content editable
-		// nodes: nodes whose closest editable host is an editable element
-		// within a block. When an editable root (e.g. the canvas wrapper)
-		// is the editing host, everything within it is content editable,
-		// but focusables like block wrappers are not text content.
+		// Skip elements that are not really tabbable: an element that is
+		// only focusable through inherited editability, without being made
+		// tabbable explicitly, is not in the browser's tab order within the
+		// editable, e.g. a link within editable text. The tabbable utility
+		// does not account for that.
 		if (
 			node.isContentEditable &&
 			node.contentEditable !== 'true' &&
-			// Rich text elements are the text content of blocks; the
-			// selected block's element carries no contenteditable attribute
-			// (it is editable by inheritance from the editing host), so they
-			// are matched by class.
-			getBlockClientId( node.closest( '.rich-text' ) )
+			! node.hasAttribute( 'tabindex' )
 		) {
 			return false;
 		}
