@@ -593,60 +593,60 @@ function MediaEditorContent( {
 			onChange={ handleChange }
 			settings={ { fields } }
 		>
-			{ ! media ? (
-				<div className="media-editor">
+			<div className="media-editor">
+				{ ! media ? (
 					<div className="media-editor__loading">
 						<Spinner />
 					</div>
-				</div>
-			) : (
-				<div className="media-editor">
-					<MediaEditorSidebar
-						tabs={ tabs }
-						activeTabId={ activeTabId }
-						onTabChange={ setSelectedTabId }
-					/>
-					<InterfaceSkeleton
-						className="media-editor__skeleton"
-						labels={ {
-							body: isImage
-								? __( 'Image editor' )
-								: __( 'Media preview' ),
-							sidebar: __( 'Media details' ),
-						} }
-						content={
-							<div className="media-editor__content">
-								<div className="media-editor__canvas-area">
-									{ isImage ? (
-										<MediaEditorCanvas
-											focusOnMount
-											isPlacementActive={
-												isPlacementActive
-											}
-											onGestureStart={
-												handleCanvasGestureStart
-											}
-											onGestureEnd={
-												handleCanvasGestureEnd
-											}
-										/>
-									) : (
-										<MediaPreview />
+				) : (
+					<>
+						<MediaEditorSidebar
+							tabs={ tabs }
+							activeTabId={ activeTabId }
+							onTabChange={ setSelectedTabId }
+						/>
+						<InterfaceSkeleton
+							className="media-editor__skeleton"
+							labels={ {
+								body: isImage
+									? __( 'Image editor' )
+									: __( 'Media preview' ),
+								sidebar: __( 'Media details' ),
+							} }
+							content={
+								<div className="media-editor__content">
+									<div className="media-editor__canvas-area">
+										{ isImage ? (
+											<MediaEditorCanvas
+												focusOnMount
+												isPlacementActive={
+													isPlacementActive
+												}
+												onGestureStart={
+													handleCanvasGestureStart
+												}
+												onGestureEnd={
+													handleCanvasGestureEnd
+												}
+											/>
+										) : (
+											<MediaPreview />
+										) }
+									</div>
+									{ isImage && (
+										<div className="media-editor__canvas-toolbar">
+											{ ruler }
+										</div>
 									) }
 								</div>
-								{ isImage && (
-									<div className="media-editor__canvas-toolbar">
-										{ ruler }
-									</div>
-								) }
-							</div>
-						}
-						sidebar={
-							<ComplementaryArea.Slot scope="media-editor" />
-						}
-					/>
-				</div>
-			) }
+							}
+							sidebar={
+								<ComplementaryArea.Slot scope="media-editor" />
+							}
+						/>
+					</>
+				) }
+			</div>
 			<ConfirmDialog
 				isOpen={ isDiscardDialogOpen }
 				confirmButtonText={ __( 'Discard' ) }
