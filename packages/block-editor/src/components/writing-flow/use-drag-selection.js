@@ -107,14 +107,14 @@ export default function useDragSelection() {
 					return;
 				}
 
-				// Check the attribute, not the contentEditable attribute. All
-				// child elements of the content editable wrapper are editable
-				// and return true for this property. We only want to start
-				// multi selecting when the mouse leaves the wrapper.
-				// In preview mode, allow drag selection from blocks since they
-				// are not contenteditable.
+				// Only start multi selecting when the mouse leaves editable
+				// content. The selected block's editable is editable by
+				// inheritance from the editing host, without a contenteditable
+				// attribute of its own, so ask the element. In preview mode,
+				// allow drag selection from blocks since they are not
+				// contenteditable.
 				if (
-					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					! target.isContentEditable &&
 					! getSettings().isPreviewMode
 				) {
 					return;
