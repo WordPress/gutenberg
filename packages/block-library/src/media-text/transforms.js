@@ -8,24 +8,27 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id, anchor } ) =>
+			transform: ( { alt, url, id, anchor, caption, lightbox } ) =>
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
 					mediaId: id,
 					mediaUrl: url,
 					mediaType: 'image',
 					anchor,
+					caption,
+					lightbox,
 				} ),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { src, id, anchor } ) =>
+			transform: ( { src, id, anchor, caption } ) =>
 				createBlock( 'core/media-text', {
 					mediaId: id,
 					mediaUrl: src,
 					mediaType: 'video',
 					anchor,
+					caption,
 				} ),
 		},
 		{
@@ -106,12 +109,21 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'image';
 			},
-			transform: ( { mediaAlt, mediaId, mediaUrl, anchor } ) => {
+			transform: ( {
+				mediaAlt,
+				mediaId,
+				mediaUrl,
+				anchor,
+				caption,
+				lightbox,
+			} ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
 					id: mediaId,
 					url: mediaUrl,
 					anchor,
+					caption,
+					lightbox,
 				} );
 			},
 		},
@@ -121,11 +133,12 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'video';
 			},
-			transform: ( { mediaId, mediaUrl, anchor } ) => {
+			transform: ( { mediaId, mediaUrl, anchor, caption } ) => {
 				return createBlock( 'core/video', {
 					id: mediaId,
 					src: mediaUrl,
 					anchor,
+					caption,
 				} );
 			},
 		},

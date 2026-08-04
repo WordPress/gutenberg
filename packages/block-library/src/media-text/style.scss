@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .wp-block-media-text {
 	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
@@ -82,6 +83,23 @@
 	vertical-align: middle;
 }
 
+.wp-block-media-text__media img {
+	@media not (prefers-reduced-motion) {
+		&.hide {
+			visibility: hidden;
+		}
+
+		&.show {
+			animation: show-content-image 0.4s;
+		}
+	}
+}
+
+// Supply caption styles even if the theme hasn't opted in.
+.wp-block-media-text__media :where(figcaption) {
+	@include caption-style();
+}
+
 /* `is-image-fill` is deprecated and the styles are kept for backwards compatibility. */
 .wp-block-media-text.is-image-fill > .wp-block-media-text__media {
 	height: 100%;
@@ -123,6 +141,13 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+}
+
+.wp-block-media-text.is-image-fill-element > .wp-block-media-text__media figcaption {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	z-index: 1;
 }
 
 /*

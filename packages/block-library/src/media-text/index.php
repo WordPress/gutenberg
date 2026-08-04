@@ -10,16 +10,33 @@
  *
  * @since 6.6.0
  *
- * @param array  $attributes The block attributes.
- * @param string $content    The block rendered content.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block rendered content.
+ * @param WP_Block $block      The block object.
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
-function render_block_core_media_text( $attributes, $content ) {
-	if ( false === $attributes['useFeaturedImage'] ) {
-		return $content;
+function render_block_core_media_text( $attributes, $content, $block ) {
+	if ( ! empty( $attributes['useFeaturedImage'] ) ) {
+		$content = block_core_media_text_render_featured_image( $attributes, $content );
 	}
 
+	$content = block_core_media_text_render_lightbox( $attributes, $content, $block );
+
+	return $content;
+}
+
+/**
+ * Renders the featured image into the Media & Text block content.
+ *
+ * @since 6.6.0
+ *
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
+ *
+ * @return string The updated block content.
+ */
+function block_core_media_text_render_featured_image( $attributes, $content ) {
 	if ( in_the_loop() ) {
 		update_post_thumbnail_cache();
 	}
@@ -122,6 +139,87 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 
 	return $content;
+}
+
+/**
+ * Gets the lightbox settings for a Media & Text block.
+ *
+ * @since 7.1.0
+ *
+ * @param array $block Block data.
+ *
+ * @return array|null Lightbox settings.
+ */
+function block_core_media_text_get_lightbox_settings( $block ) {
+	if ( isset( $block['attrs']['lightbox'] ) ) {
+		$lightbox_settings = $block['attrs']['lightbox'];
+	}
+
+	if ( ! isset( $lightbox_settings ) ) {
+		$lightbox_settings = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/media-text' ) );
+
+		/*
+		 * If not present in global settings, check the top-level global settings.
+		 *
+		 * NOTE: If no block-level settings are found, the previous call to
+		 * `wp_get_global_settings` will return the whole `theme.json` structure in
+		 * which case we can check if the "lightbox" key is present at the top-level
+		 * of the global settings and use its value.
+		 */
+		if ( isset( $lightbox_settings['lightbox'] ) ) {
+			$lightbox_settings = wp_get_global_settings( array( 'lightbox' ) );
+		}
+	}
+
+	return $lightbox_settings ?? null;
+}
+
+/**
+ * Adds lightbox behavior to the Media & Text media figure when enabled.
+ *
+ * Reuses the Image block lightbox renderer and interactivity view.
+ *
+ * @since 7.1.0
+ *
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block rendered content.
+ * @param WP_Block $block      The block object.
+ *
+ * @return string Filtered block content.
+ */
+function block_core_media_text_render_lightbox( $attributes, $content, $block ) {
+	$media_type = $attributes['mediaType'] ?? '';
+	if ( 'image' !== $media_type || ! empty( $attributes['href'] ) ) {
+		return $content;
+	}
+
+	if ( false === stripos( $content, '<img' ) ) {
+		return $content;
+	}
+
+	$lightbox_settings = block_core_media_text_get_lightbox_settings( $block->parsed_block );
+	if (
+		! isset( $lightbox_settings ) ||
+		! isset( $lightbox_settings['enabled'] ) ||
+		true !== $lightbox_settings['enabled']
+	) {
+		return $content;
+	}
+
+	wp_enqueue_script_module( '@wordpress/block-library/image/view' );
+	// Lightbox overlay and trigger styles live in the Image block stylesheet.
+	wp_enqueue_style( 'wp-block-image' );
+
+	$parsed_block                             = $block->parsed_block;
+	$parsed_block['attrs']['linkDestination'] = 'none';
+	$parsed_block['attrs']['id']              = $attributes['mediaId'] ?? null;
+
+	if ( empty( $parsed_block['attrs']['id'] ) && ! empty( $attributes['useFeaturedImage'] ) ) {
+		$thumbnail_id                = get_post_thumbnail_id();
+		$parsed_block['attrs']['id'] = ! empty( $thumbnail_id ) ? $thumbnail_id : null;
+	}
+
+	return block_core_image_render_lightbox( $content, $parsed_block, $block );
 }
 
 /**

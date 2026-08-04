@@ -94,9 +94,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				linkTarget: value.linkTarget,
 			} ),
 		},
+		{
+			id: 'caption',
+			label: __( 'Caption' ),
+			type: 'richtext',
+		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'media', 'link' ],
+		fields: [ 'media', 'link', 'caption' ],
 	};
 }
 
