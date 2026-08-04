@@ -19,7 +19,8 @@ import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { insertedBlock, setInsertedBlock } = useListViewContext();
+		const { insertedBlockClientId, setInsertedBlockClientId } =
+			useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
 		const { directInsert, hideInserter } = useSelect(
@@ -46,7 +47,7 @@ export const Appender = forwardRef(
 		} );
 
 		const insertedBlockTitle = useBlockDisplayTitle( {
-			clientId: insertedBlock?.clientId,
+			clientId: insertedBlockClientId,
 			context: 'list-view',
 		} );
 
@@ -92,7 +93,9 @@ export const Appender = forwardRef(
 					toggleProps={ { 'aria-describedby': descriptionId } }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
 						if ( maybeInsertedBlock?.clientId ) {
-							setInsertedBlock( maybeInsertedBlock );
+							setInsertedBlockClientId(
+								maybeInsertedBlock.clientId
+							);
 						}
 					} }
 				/>

@@ -101,6 +101,8 @@ There are four aspects to configure for each entity (and screen):
 - `view_list`: the preconfigured views displayed in the sidebar (e.g. "All", "Published", "Drafts", etc.)
 - `form`: the DataForm configuration used for the Quick Edit form (e.g. which fields are displayed in the form and their order)
 
+See the [View Configuration Reference](/docs/reference-guides/view-config-reference.md) for a description of every property.
+
 Each filter callback receives a `Gutenberg_View_Config_Data` object with the config for the given entity, which it can change by calling its methods (see below) and **return the object**.
 
 For example, update the view config for the Pages screen by hooking into this filter:
