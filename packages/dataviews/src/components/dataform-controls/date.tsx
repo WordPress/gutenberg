@@ -546,15 +546,18 @@ function CalendarDateRangeControl< Item >( {
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
-			if ( fromDate && toDate ) {
-				onChangeCallback( [
-					formatDate( fromDate ),
-					formatDate( toDate ),
-				] );
-			} else if ( ! fromDate && ! toDate ) {
+			if ( ! fromDate && ! toDate ) {
 				onChangeCallback( undefined );
+				return;
 			}
-			// Do nothing if only one date is set - wait for both
+			// An incomplete range is committed with an empty-string bound
+			// rather than held back until both dates are set: the inputs are
+			// controlled, so an uncommitted date would be wiped on blur. The
+			// `between` operator does not filter while a bound is unfilled.
+			onChangeCallback( [
+				formatDate( fromDate ),
+				formatDate( toDate ),
+			] );
 		},
 		[ onChangeCallback ]
 	);
