@@ -3,6 +3,8 @@
  * Block for testing the `renderElement()` API.
  *
  * @package e2e-interactivity
+ *
+ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 ?>
 <div
