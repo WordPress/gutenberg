@@ -78,31 +78,6 @@ export default function useMultiSelection() {
 			// happens BEFORE selection removal.
 			setContentEditableWrapper( node, true );
 
-			// Only remove the native selection when it does not already span
-			// the multi-selected blocks. When it does, the multi-selection
-			// was made natively, and the gesture that makes it can still be
-			// in progress: on a slow machine the selection change reaches
-			// the store before the mouse is released, and removing the
-			// ranges then destroys the selection being made.
-			const { anchorNode, focusNode } = defaultView.getSelection();
-			const firstElement = ownerDocument.getElementById(
-				'block-' + multiSelectedBlockClientIds[ 0 ]
-			);
-			const lastElement = ownerDocument.getElementById(
-				'block-' + multiSelectedBlockClientIds[ length - 1 ]
-			);
-
-			if (
-				anchorNode &&
-				focusNode &&
-				( ( firstElement?.contains( anchorNode ) &&
-					lastElement?.contains( focusNode ) ) ||
-					( firstElement?.contains( focusNode ) &&
-						lastElement?.contains( anchorNode ) ) )
-			) {
-				return;
-			}
-
 			defaultView.getSelection().removeAllRanges();
 		},
 		[
