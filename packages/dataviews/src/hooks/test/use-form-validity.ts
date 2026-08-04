@@ -2439,7 +2439,7 @@ describe( 'useFormValidity', () => {
 					id: 'title',
 					type: 'text',
 					isValid: {
-						// @ts-ignore returns wrong type for testing purposes
+						// @ts-expect-error Deliberately returns the wrong type, for testing purposes.
 						custom: async () =>
 							await new Promise( ( resolve ) =>
 								setTimeout( resolve, 5 )

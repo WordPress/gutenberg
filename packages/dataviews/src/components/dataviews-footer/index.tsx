@@ -55,7 +55,7 @@ export default function DataViewsFooter() {
 	return (
 		<div
 			className="dataviews-footer"
-			// @ts-ignore
+			// @ts-expect-error React's types do not accept the string form of `inert`.
 			inert={ isRefreshing ? 'true' : undefined }
 		>
 			<Stack

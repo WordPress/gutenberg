@@ -418,7 +418,7 @@ function ViewTable< Item >( {
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
-				// @ts-ignore Reason: inert is a recent HTML attribute
+				// @ts-expect-error React's types do not accept the string form of `inert`.
 				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
 			>
 				<colgroup>

@@ -57,7 +57,7 @@ function Disabled( {
 	return (
 		<Provider value={ isDisabled }>
 			<div
-				// @ts-ignore Reason: inert is a recent HTML attribute
+				// @ts-expect-error React's types do not accept the string form of `inert`.
 				inert={ isDisabled ? 'true' : undefined }
 				className={
 					isDisabled

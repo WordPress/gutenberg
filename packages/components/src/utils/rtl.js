@@ -75,11 +75,11 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
 		if ( rtlStyles ) {
-			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+			// @ts-expect-error `css` accepts an object, but its types omit that overload: https://emotion.sh/docs/object-styles#with-css
 			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+		// @ts-expect-error `css` accepts an object, but its types omit that overload: https://emotion.sh/docs/object-styles#with-css
 		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

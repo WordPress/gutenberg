@@ -438,7 +438,7 @@ export default function CompositeGrid< Item >( {
 						}
 						role="feed"
 						focusWrap
-						// @ts-ignore
+						// @ts-expect-error React's types do not accept the string form of `inert`.
 						inert={ inert }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
@@ -534,7 +534,7 @@ export default function CompositeGrid< Item >( {
 						aria-busy={ isLoading }
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
-						// @ts-ignore
+						// @ts-expect-error React's types do not accept the string form of `inert`.
 						inert={ inert }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (

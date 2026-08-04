@@ -52,7 +52,7 @@ export const InputWithSlider = ( {
 				min={ min }
 				max={ max }
 				value={ value }
-				// @ts-expect-error
+				// @ts-expect-error `onChange` signatures differ between the input and slider.
 				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }
