@@ -68,7 +68,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
 -   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
 -   Production code changes in a package require an entry in that package's `CHANGELOG.md`. See `docs/contributors/code/managing-packages.md`.
--   `apiFetch` rejects with a plain object (`{ code, message, data }`), not an `Error`. Never interpolate the rejection value into a string — `` `${ error }` `` renders as `[object Object]` — and never branch on `error instanceof Error`. Read `error.message` and `error.code` directly.
+-   A rejected `apiFetch` is not always an `Error`: a REST error arrives as a plain object (`{ code, message, data }`), `parse: false` rejects with the `Response`, an aborted request rethrows an `AbortError`, and a handler set via `setFetchHandler` can reject anything. Do not interpolate the rejection into a string (`` `${ error }` `` gives `[object Object]`) or branch on `instanceof Error`; read `error?.message` / `error?.code`.
 
 ## PR instructions
 
