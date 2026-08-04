@@ -47,14 +47,12 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'isEmptyBorder', () => {
 		it( 'should determine a undefined, null, and {} to be empty', () => {
 			expect( isEmptyBorder( undefined ) ).toBe( true );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( isEmptyBorder( null ) ).toBe( true );
 			expect( isEmptyBorder( {} ) ).toBe( true );
 		} );
 
 		it( 'should determine object missing all border props to be empty', () => {
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( isEmptyBorder( nonBorder ) ).toBe( true );
 		} );
@@ -114,14 +112,12 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'isCompleteBorder', () => {
 		it( 'should determine a undefined, null, and {} to be incomplete', () => {
 			expect( isCompleteBorder( undefined ) ).toBe( false );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( isCompleteBorder( null ) ).toBe( false );
 			expect( isCompleteBorder( {} ) ).toBe( false );
 		} );
 
 		it( 'should determine objects missing border props to be incomplete', () => {
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( isCompleteBorder( nonBorder ) ).toBe( false );
 			expect( isCompleteBorder( partialBorder ) ).toBe( false );
@@ -157,7 +153,6 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should determine undefined, non-border or empty object as not being mixed', () => {
 			expect( hasMixedBorders( undefined ) ).toBe( false );
 			expect( hasMixedBorders( {} ) ).toBe( false );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( hasMixedBorders( nonBorder ) ).toBe( false );
 		} );
@@ -178,14 +173,12 @@ describe( 'BorderBoxControl Utils', () => {
 	describe( 'getSplitBorders', () => {
 		it( 'should return undefined when no border provided', () => {
 			expect( getSplitBorders( undefined ) ).toEqual( undefined );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( getSplitBorders( null ) ).toEqual( undefined );
 		} );
 
 		it( 'should return undefined when supplied border is empty', () => {
 			expect( getSplitBorders( {} ) ).toEqual( undefined );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( getSplitBorders( nonBorder ) ).toEqual( undefined );
 		} );
@@ -207,7 +200,6 @@ describe( 'BorderBoxControl Utils', () => {
 		} );
 
 		it( 'should only return differences for border related properties', () => {
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			const diff = getBorderDiff( nonBorder, { caffeine: 'coffee' } );
 			expect( diff ).toEqual( {} );
@@ -217,7 +209,6 @@ describe( 'BorderBoxControl Utils', () => {
 			const diff = getBorderDiff( completeBorder, {
 				...completeBorder,
 				color: '#21759b',
-				// Checking for extra resilience, even if not a valid type.
 				// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 				caffeine: 'cola',
 			} );
@@ -316,7 +307,6 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should return undefined when no border provided', () => {
 			expect( getShorthandBorderStyle( undefined ) ).toEqual( undefined );
 			expect( getShorthandBorderStyle( {} ) ).toEqual( undefined );
-			// Checking for extra resilience, even if not a valid type.
 			// @ts-expect-error Deliberately invalid input, to check runtime resilience.
 			expect( getShorthandBorderStyle( nonBorder ) ).toEqual( undefined );
 		} );
