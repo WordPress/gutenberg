@@ -136,6 +136,20 @@ function gutenberg_notify_note_mentions( WP_Comment $comment, $request = null, b
 		gutenberg_send_note_notification( $user, $comment, $post );
 	}
 }
+/*
+ * Once the Core backport lands, WordPress registers its own
+ * wp_notify_note_mentions() on this same hook from default-filters.php. With
+ * both callbacks attached every mentioned user would be emailed twice, so the
+ * plugin's copy - the newer of the two - replaces Core's while Gutenberg is
+ * active. Core's post-author notification is deliberately left alone: this
+ * file never notifies the post author, so the two do not overlap.
+ */
+$gutenberg_note_mentions_priority = has_action( 'rest_insert_comment', 'wp_notify_note_mentions' );
+if ( false !== $gutenberg_note_mentions_priority ) {
+	remove_action( 'rest_insert_comment', 'wp_notify_note_mentions', $gutenberg_note_mentions_priority );
+}
+unset( $gutenberg_note_mentions_priority );
+
 add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
 
 /**
