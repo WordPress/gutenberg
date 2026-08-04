@@ -60,39 +60,38 @@ export default function useEditableRoot() {
 			// once the selection lands.
 			const { activeElement } = node.ownerDocument;
 			const selection = node.ownerDocument.defaultView.getSelection();
-			if (
+
+			// While the wrapper is the editing host it must hold focus. Take
+			// it only when the caret is in the selected block and the current
+			// focus state is one the host may take over: an editable within
+			// the wrapper containing the caret (the editing context moves up
+			// to the host), or the document's default target reading as
+			// active without being focused (the selected block's editable
+			// turned inert while focused and the browser dropped focus; the
+			// default target is the wrapper itself in an iframed editor and
+			// the page body in an inline editor such as the widgets screen).
+			// Anything else, e.g. a toolbar button or the post title, keeps
+			// focus: the caret lingering in the block does not mean the user
+			// is there. `hasFocus` keeps focus with other documents (e.g. the
+			// block toolbar of an iframed editor).
+			const isHandover =
 				activeElement !== node &&
 				activeElement?.isContentEditable &&
 				node.contains( activeElement ) &&
-				selection.anchorNode &&
-				activeElement.contains( selection.anchorNode ) &&
-				getBlockClientId( selection.anchorNode ) ===
-					getSelectedBlockClientId()
-			) {
-				node.focus();
-			} else if (
+				activeElement.contains( selection.anchorNode );
+			const isDroppedFocus =
 				( activeElement === node ||
 					activeElement === node.ownerDocument.body ) &&
 				node.ownerDocument.hasFocus() &&
-				! activeElement.matches( ':focus' ) &&
+				! activeElement.matches( ':focus' );
+
+			if (
+				( isHandover || isDroppedFocus ) &&
 				selection.anchorNode &&
 				node.contains( selection.anchorNode ) &&
 				getBlockClientId( selection.anchorNode ) ===
 					getSelectedBlockClientId()
 			) {
-				// Becoming the editing host turns the selected block's
-				// editable into an inert part of the host: if it held focus,
-				// the browser dropped focus onto the document's default
-				// target without actually focusing it. That target is the
-				// wrapper itself in an iframed editor (the wrapper is the
-				// body) and the page body in an inline editor (e.g. the
-				// widgets screen). The caret survived in the selected block,
-				// so reclaim focus for the host to keep an editing context.
-				// Focus must genuinely be within the document (`hasFocus`):
-				// the default activeElement also reads as active while the
-				// user works in another document (e.g. the block toolbar in
-				// an iframed editor), and stealing focus from there is never
-				// right.
 				node.focus( { preventScroll: true } );
 			}
 
