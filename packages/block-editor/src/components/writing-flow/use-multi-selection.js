@@ -78,7 +78,27 @@ export default function useMultiSelection() {
 			// happens BEFORE selection removal.
 			setContentEditableWrapper( node, true );
 
-			defaultView.getSelection().removeAllRanges();
+			// Make the native selection span the multi-selected blocks
+			// instead of clearing it: an editing host that holds focus with
+			// no selection gets a caret re-seeded at its start (Chromium),
+			// which the first block's rich text then syncs to the store,
+			// collapsing the multi-selection. A selection that agrees with
+			// the store is stable, and native copy matches what is selected.
+			const firstElement = ownerDocument.getElementById(
+				'block-' + multiSelectedBlockClientIds[ 0 ]
+			);
+			const lastElement = ownerDocument.getElementById(
+				'block-' + multiSelectedBlockClientIds[ length - 1 ]
+			);
+
+			if ( firstElement && lastElement ) {
+				const selection = defaultView.getSelection();
+				const range = ownerDocument.createRange();
+				range.setStartBefore( firstElement );
+				range.setEndAfter( lastElement );
+				selection.removeAllRanges();
+				selection.addRange( range );
+			}
 		},
 		[
 			hasMultiSelection,
