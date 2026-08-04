@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update the Ectoplasm admin color scheme's primary color to be brighter ([#81127](https://github.com/WordPress/gutenberg/pull/81127)).
+
 ## 2.6.0 (2026-07-14)
 
 ### Enhancements
