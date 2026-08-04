@@ -1,6 +1,5 @@
 export { privateApis } from './private-apis';
 export { ThemeProvider } from './theme-provider';
-export { getThemeProviderColorWarnings } from './use-theme-provider-styles';
 export type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,

@@ -27,6 +27,7 @@ const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
+const INACCESSIBLE_COLOR = 'rgb(40% 56% 24%)';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -134,8 +135,8 @@ describe( 'ThemeProvider', () => {
 		render(
 			<ThemeProvider
 				color={ {
-					primary: 'rgb(40% 56% 24%)',
-					background: 'rgb(40% 56% 24%)',
+					primary: INACCESSIBLE_COLOR,
+					background: INACCESSIBLE_COLOR,
 				} }
 			>
 				<div>x</div>
@@ -153,6 +154,66 @@ describe( 'ThemeProvider', () => {
 				} ),
 			] )
 		);
+
+		warn.mockRestore();
+	} );
+
+	it( 'reports generated color warnings through the callback', () => {
+		const onColorWarningsChange = jest.fn();
+		const warn = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
+
+		render(
+			<ThemeProvider
+				color={ {
+					primary: INACCESSIBLE_COLOR,
+					background: INACCESSIBLE_COLOR,
+				} }
+				onColorWarningsChange={ onColorWarningsChange }
+			>
+				<div>x</div>
+			</ThemeProvider>
+		);
+
+		expect( onColorWarningsChange ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					type: 'contrast',
+					ramp: 'primary',
+					backgroundStep: 'bgFill1',
+					foregroundStep: 'fgFill',
+				} ),
+			] )
+		);
+
+		warn.mockRestore();
+	} );
+
+	it( 'reports an empty warning list when contrast failures clear', () => {
+		const onColorWarningsChange = jest.fn();
+		const warn = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
+		const { rerender } = render(
+			<ThemeProvider
+				color={ {
+					primary: INACCESSIBLE_COLOR,
+					background: INACCESSIBLE_COLOR,
+				} }
+				onColorWarningsChange={ onColorWarningsChange }
+			/>
+		);
+
+		onColorWarningsChange.mockClear();
+		rerender(
+			<ThemeProvider
+				color={ { primary: PRIMARY, background: BACKGROUND } }
+				onColorWarningsChange={ onColorWarningsChange }
+			/>
+		);
+
+		expect( onColorWarningsChange ).toHaveBeenCalledWith( [] );
 
 		warn.mockRestore();
 	} );

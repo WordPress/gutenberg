@@ -1,4 +1,6 @@
-import { getThemeProviderColorWarnings } from '../index';
+import { renderHook } from '@testing-library/react';
+import { DEFAULT_SEED_COLORS } from '../color-ramps';
+import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
 const ADMIN_COLOR_SCHEME_CASES = [
 	{
@@ -39,11 +41,20 @@ const ADMIN_COLOR_SCHEME_CASES = [
 	},
 ] as const;
 
-describe( 'getThemeProviderColorWarnings', () => {
+function getColorWarnings( color: { primary: string; background: string } ) {
+	const { result } = renderHook( () => useThemeProviderStyles( { color } ) );
+
+	return result.current.colorWarnings;
+}
+
+describe( 'ThemeProvider color warnings', () => {
 	it.each( [
 		{
 			name: 'default colors',
-			color: {},
+			color: {
+				primary: DEFAULT_SEED_COLORS.primary,
+				background: DEFAULT_SEED_COLORS.background,
+			},
 		},
 		{
 			name: 'Ectoplasm colors',
@@ -53,18 +64,18 @@ describe( 'getThemeProviderColorWarnings', () => {
 			},
 		},
 	] )( 'returns no warnings for $name', ( { color } ) => {
-		expect( getThemeProviderColorWarnings( color ) ).toEqual( [] );
+		expect( getColorWarnings( color ) ).toEqual( [] );
 	} );
 
 	it.each( ADMIN_COLOR_SCHEME_CASES )(
 		'returns no warnings for the $name admin color scheme',
 		( { color } ) => {
-			expect( getThemeProviderColorWarnings( color ) ).toEqual( [] );
+			expect( getColorWarnings( color ) ).toEqual( [] );
 		}
 	);
 
 	it( 'returns structured warnings for unmet semantic contrast targets', () => {
-		const warnings = getThemeProviderColorWarnings( {
+		const warnings = getColorWarnings( {
 			primary: 'rgb(40% 56% 24%)',
 			background: 'rgb(40% 56% 24%)',
 		} );

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
@@ -21,6 +21,7 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
+	onColorWarningsChange,
 }: ThemeProviderProps ) => {
 	const { themeProviderStyles, resolvedSettings, colorWarnings } =
 		useThemeProviderStyles( {
@@ -55,6 +56,10 @@ export const ThemeProvider = ( {
 			);
 		}
 	}, [ colorWarnings, hasLocalColor ] );
+
+	useEffect( () => {
+		onColorWarningsChange?.( colorWarnings );
+	}, [ colorWarnings, onColorWarningsChange ] );
 
 	// For root providers, mirror the wrapper's custom properties and preset
 	// attributes onto the document element of the wrapper's own document

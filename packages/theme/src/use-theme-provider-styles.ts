@@ -204,21 +204,6 @@ function generateThemeProviderColors(
 	};
 }
 
-/**
- * Returns structured contrast warnings for the colors that a ThemeProvider
- * would generate from the supplied seeds.
- *
- * @param color ThemeProvider color settings.
- */
-export function getThemeProviderColorWarnings(
-	color: ThemeProviderProps[ 'color' ] = {}
-): ThemeProviderColorWarning[] {
-	return generateThemeProviderColors(
-		color.primary ?? DEFAULT_SEED_COLORS.primary,
-		color.background ?? DEFAULT_SEED_COLORS.background
-	).warnings;
-}
-
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add structured color ramp and semantic contrast warnings for `ThemeProvider` consumers ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+-   Add an `onColorWarningsChange` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
 
 ### Bug Fixes
 

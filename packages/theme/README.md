@@ -106,18 +106,23 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
-`ThemeProvider` logs a development warning when generated ramp steps or semantic foreground/background pairs do not meet their contrast targets. Use `getThemeProviderColorWarnings()` to inspect the same structured warnings directly, for example before accepting user-selected seeds:
+`ThemeProvider` logs a development warning when generated ramp steps or semantic foreground/background pairs do not meet their contrast targets. Use `onColorWarningsChange` to receive the same structured warnings from the provider's resolved colors:
 
 ```js
-import { getThemeProviderColorWarnings } from '@wordpress/theme';
-
-const warnings = getThemeProviderColorWarnings( {
-	primary: '#608010',
-	background: '#4f386e',
-} );
+<ThemeProvider
+	color={ {
+		primary: '#608010',
+		background: '#4f386e',
+	} }
+	onColorWarningsChange={ ( warnings ) => {
+		// Format or display the warnings for your users.
+	} }
+>
+	{ /* Your app content */ }
+</ThemeProvider>
 ```
 
-The function returns an empty array when all checked targets are met. Each warning identifies the affected ramp and either the ramp step or the semantic foreground/background pair, including the required and achieved contrast values for semantic pairs.
+The callback receives an empty array when all checked targets are met. Each warning identifies the affected ramp and either the ramp step or the semantic foreground/background pair, including the required and achieved contrast values for semantic pairs. React may invoke the callback more than once in development under Strict Mode.
 
 The `cursor` prop accepts an object with the following optional properties:
 
