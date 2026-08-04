@@ -196,7 +196,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 			// WP Ectoplasm
 			{
 				background: '#4f386e',
-				primary: '#646c3e',
+				primary: '#608010',
 			},
 			// WP Ocean
 			{

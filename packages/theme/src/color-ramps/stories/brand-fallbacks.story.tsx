@@ -55,7 +55,7 @@ const meta: Meta< typeof Verifier > = {
 					'#007cba', // light
 					'#437aa8', // blue
 					'#916745', // coffee
-					'#646c3e', // ectoplasm
+					'#608010', // ectoplasm
 					'#cf4339', // midnight
 					'#567958', // ocean
 					'#ad631e', // sunrise
