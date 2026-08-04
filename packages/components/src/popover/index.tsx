@@ -32,6 +32,7 @@ import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+import { ThemeProvider } from '@wordpress/theme';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -451,64 +452,66 @@ const UnforwardedPopover = (
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
 	let content = (
-		<motion.div
-			className={ clsx( className, {
-				'is-expanded': isExpanded,
-				'is-positioned': isPositioned,
-				// Use the 'alternate' classname for 'toolbar' variant for back compat.
-				[ `is-${
-					computedVariant === 'toolbar'
-						? 'alternate'
-						: computedVariant
-				}` ]: computedVariant,
-			} ) }
-			{ ...animationProps }
-			{ ...contentProps }
-			ref={ mergedFloatingRef }
-			{ ...dialogProps }
-			tabIndex={ -1 }
-		>
-			{ /* Prevents scroll on the document */ }
-			{ isExpanded && <ScrollLock /> }
-			{ isExpanded && (
-				<div className="components-popover__header">
-					<span className="components-popover__header-title">
-						{ headerTitle }
-					</span>
-					<Button
-						className="components-popover__close"
-						size="small"
-						icon={ close }
-						onClick={ onClose }
-						label={ __( 'Close' ) }
-					/>
-				</div>
-			) }
-			<div className="components-popover__content">{ children }</div>
-			{ hasArrow && (
-				<div
-					ref={ arrowCallbackRef }
-					className={ [
-						'components-popover__arrow',
-						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
-					].join( ' ' ) }
-					style={ {
-						left:
-							typeof arrowData?.x !== 'undefined' &&
-							Number.isFinite( arrowData.x )
-								? `${ arrowData.x }px`
-								: '',
-						top:
-							typeof arrowData?.y !== 'undefined' &&
-							Number.isFinite( arrowData.y )
-								? `${ arrowData.y }px`
-								: '',
-					} }
-				>
-					<ArrowTriangle />
-				</div>
-			) }
-		</motion.div>
+		<ThemeProvider>
+			<motion.div
+				className={ clsx( className, {
+					'is-expanded': isExpanded,
+					'is-positioned': isPositioned,
+					// Use the 'alternate' classname for 'toolbar' variant for back compat.
+					[ `is-${
+						computedVariant === 'toolbar'
+							? 'alternate'
+							: computedVariant
+					}` ]: computedVariant,
+				} ) }
+				{ ...animationProps }
+				{ ...contentProps }
+				ref={ mergedFloatingRef }
+				{ ...dialogProps }
+				tabIndex={ -1 }
+			>
+				{ /* Prevents scroll on the document */ }
+				{ isExpanded && <ScrollLock /> }
+				{ isExpanded && (
+					<div className="components-popover__header">
+						<span className="components-popover__header-title">
+							{ headerTitle }
+						</span>
+						<Button
+							className="components-popover__close"
+							size="small"
+							icon={ close }
+							onClick={ onClose }
+							label={ __( 'Close' ) }
+						/>
+					</div>
+				) }
+				<div className="components-popover__content">{ children }</div>
+				{ hasArrow && (
+					<div
+						ref={ arrowCallbackRef }
+						className={ [
+							'components-popover__arrow',
+							`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+						].join( ' ' ) }
+						style={ {
+							left:
+								typeof arrowData?.x !== 'undefined' &&
+								Number.isFinite( arrowData.x )
+									? `${ arrowData.x }px`
+									: '',
+							top:
+								typeof arrowData?.y !== 'undefined' &&
+								Number.isFinite( arrowData.y )
+									? `${ arrowData.y }px`
+									: '',
+						} }
+					>
+						<ArrowTriangle />
+					</div>
+				) }
+			</motion.div>
+		</ThemeProvider>
 	);
 
 	const shouldRenderWithinSlot = slot.ref && ! inline;
