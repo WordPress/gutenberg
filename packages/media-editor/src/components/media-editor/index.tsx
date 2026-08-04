@@ -3,7 +3,6 @@
  */
 import {
 	Button,
-	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -176,11 +175,11 @@ function HeaderActions( {
 }: HeaderActionsProps ) {
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
-		<Flex
+		<Stack
 			className="media-editor__header-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			{ isImage && (
 				<Button
@@ -206,7 +205,7 @@ function HeaderActions( {
 					onClose={ () => setIsShortcutsModalOpen( false ) }
 				/>
 			) }
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -248,10 +247,10 @@ function HistoryActions( {
 		endGesture();
 	};
 	return (
-		<Flex
+		<Stack
 			className="media-editor__history-actions"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				size="compact"
@@ -286,7 +285,7 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -307,11 +306,11 @@ function FooterActions( {
 }: FooterActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
-		<Flex
+		<Stack
 			className="media-editor__footer-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				__next40pxDefaultSize
@@ -332,7 +331,7 @@ function FooterActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
-		</Flex>
+		</Stack>
 	);
 }
 
