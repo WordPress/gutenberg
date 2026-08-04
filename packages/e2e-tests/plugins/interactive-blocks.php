@@ -81,6 +81,7 @@ add_action(
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
 					return rest_ensure_response(
+						'<button data-testid="add-item" data-wp-on--click="actions.addItem">Add item</button>' .
 						'<ul data-testid="list">' .
 						'<template data-wp-each="state.items">' .
 						'<li data-testid="item" data-wp-text="context.item"></li>' .

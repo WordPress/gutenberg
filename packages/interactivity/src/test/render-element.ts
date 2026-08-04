@@ -404,7 +404,7 @@ describe( 'renderHTML', () => {
 		);
 	} );
 
-	it( 'replaces children when position is "replace"', () => {
+	it( 'replaces children when position is "inner"', () => {
 		store( 'test/render-element', { state: {} } );
 		const container = el(
 			'<div data-wp-interactive="test/render-element">' +
@@ -420,7 +420,7 @@ describe( 'renderHTML', () => {
 		renderHTML(
 			target,
 			'<span data-testid="added">new</span>',
-			{ position: 'replace' }
+			{ position: 'inner' }
 		);
 
 		expect(
@@ -428,6 +428,85 @@ describe( 'renderHTML', () => {
 		).toBeNull();
 		expect(
 			target.querySelector( '[data-testid="added"]' )
+		).not.toBeNull();
+	} );
+
+	it( 'inserts before the container when position is "before"', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="added">new</span>',
+			{ position: 'before' }
+		);
+
+		expect(
+			target.previousElementSibling?.getAttribute( 'data-testid' )
+		).toBe( 'added' );
+		// The container is untouched.
+		expect( target.children.length ).toBe( 0 );
+	} );
+
+	it( 'inserts after the container when position is "after"', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="added">new</span>',
+			{ position: 'after' }
+		);
+
+		expect(
+			target.nextElementSibling?.getAttribute( 'data-testid' )
+		).toBe( 'added' );
+		// The container is untouched.
+		expect( target.children.length ).toBe( 0 );
+	} );
+
+	it( 'replaces the container itself when position is "outer"', () => {
+		store( 'test/render-element', { state: {} } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"><span>old</span></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		const parent = target.parentElement!;
+		renderHTML(
+			target,
+			'<section data-testid="added">new</section>',
+			{ position: 'outer' }
+		);
+
+		// The target itself is gone; the new element replaced it.
+		expect( target.isConnected ).toBe( false );
+		expect(
+			parent.querySelector( '[data-testid="added"]' )
 		).not.toBeNull();
 	} );
 

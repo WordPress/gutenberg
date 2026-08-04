@@ -49,7 +49,7 @@ test.describe( 'renderElement', () => {
 		// The island's own element must react to the fragment's write-through.
 		await expect( page.getByTestId( 'block-count' ) ).toHaveText( '2' );
 
-		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
 	test( 'inserted self-contained island fragment is fully interactive', async ( {
@@ -69,10 +69,12 @@ test.describe( 'renderElement', () => {
 		await expect( counter ).toHaveText( '1' );
 		await expect( page.getByTestId( 'block-count' ) ).toHaveText( '0' );
 
-		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
-	test( 'renders a data-wp-each list fragment', async ( { page } ) => {
+	test( 'renders a data-wp-each list fragment and its items are interactive', async ( {
+		page,
+	} ) => {
 		const items = page.getByTestId( 'item' );
 		await expect( items ).toHaveCount( 0 );
 
@@ -84,7 +86,12 @@ test.describe( 'renderElement', () => {
 		await expect( items.nth( 1 ) ).toHaveText( 'two' );
 		await expect( items.nth( 2 ) ).toHaveText( 'three' );
 
-		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+		// The list is hydrated: `data-wp-each` re-renders when state changes.
+		await page.getByTestId( 'add-item' ).click();
+		await expect( items ).toHaveCount( 4 );
+		await expect( items.nth( 3 ) ).toHaveText( 'item-4' );
+
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
 	test( 'runs lifecycle directives on inserted fragments', async ( {
@@ -97,7 +104,7 @@ test.describe( 'renderElement', () => {
 			'initialized'
 		);
 
-		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
 	test( 're-fetching with fresh server markup replaces the fragment', async ( {
@@ -112,6 +119,9 @@ test.describe( 'renderElement', () => {
 
 		// The old fragment's nodes are gone.
 		await expect( page.getByTestId( 'counter' ) ).toHaveCount( 0 );
+
+		// The new fragment's nodes are hydrated (the reactive flag flipped).
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
 	} );
 
 	test( 'fragment carrying data-wp-router-region is swappable on navigation', async ( {

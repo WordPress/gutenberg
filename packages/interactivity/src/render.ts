@@ -136,9 +136,9 @@ export function renderElement( element: Element | Element[] ): void {
 }
 
 /**
- * Parses a server-rendered HTML string, inserts the resulting element(s) into
- * the live DOM at the given position in `container`, and renders them with
- * `renderElement()` so all Interactivity API directives on them are processed.
+ * Parses a server-rendered HTML string and inserts the resulting element(s)
+ * into the live DOM, then renders them with `renderElement()` so all
+ * Interactivity API directives on them are processed.
  *
  * This is a convenience wrapper over the parse → insert → `renderElement()`
  * sequence, so callers don't need to write their own `DOMParser`/insertion
@@ -152,9 +152,9 @@ export function renderElement( element: Element | Element[] ): void {
  * ```
  *
  * Unlike `renderElement()`, each call creates fresh nodes — there is no
- * cross-call in-place diffing. With `position: 'replace'` the container's
+ * cross-call in-place diffing. With `position: 'inner'` the container's
  * previous children are removed first, making `renderHTML( ref, html, {
- * position: 'replace' } )` a drop-in replacement for `ref.innerHTML = html`
+ * position: 'inner' } )` a drop-in replacement for `ref.innerHTML = html`
  * that actually hydrates the markup.
  *
  * The inserted element(s) must have an enclosing island or their own
@@ -163,14 +163,22 @@ export function renderElement( element: Element | Element[] ): void {
  * @param container The element the parsed HTML is inserted into.
  * @param html      The server-rendered HTML string.
  * @param options   Options.
- * @param options.position Where to insert the parsed elements. `append` puts
- *                         them at the end (default), `prepend` at the start,
- *                         and `replace` clears the container first.
+ * @param options.position Where to insert the parsed elements:
+ *                         - `append`: as the container's last children (default)
+ *                         - `prepend`: as the container's first children
+ *                         - `before`: as siblings immediately before the container
+ *                         - `after`: as siblings immediately after the container
+ *                         - `inner`: replace the container's children
+ *                         - `outer`: replace the container itself
  */
 export function renderHTML(
 	container: Element,
 	html: string,
-	{ position = 'append' }: { position?: 'append' | 'prepend' | 'replace' } = {}
+	{
+		position = 'append',
+	}: {
+		position?: 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
+	} = {}
 ): void {
 	// Use a `<template>` to parse the HTML into nodes (same as the browser
 	// would) without triggering side effects like image loading.
@@ -185,8 +193,17 @@ export function renderHTML(
 		case 'prepend':
 			container.prepend( ...nodes );
 			break;
-		case 'replace':
+		case 'before':
+			container.before( ...nodes );
+			break;
+		case 'after':
+			container.after( ...nodes );
+			break;
+		case 'inner':
 			container.replaceChildren( ...nodes );
+			break;
+		case 'outer':
+			container.replaceWith( ...nodes );
 			break;
 		case 'append':
 		default:

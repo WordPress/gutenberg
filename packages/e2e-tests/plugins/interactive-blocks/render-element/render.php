@@ -62,7 +62,5 @@
 	<?php endif; ?>
 	<div data-testid="target"></div>
 	<p data-testid="block-count" data-wp-text="context.count">0</p>
-	<p data-testid="hydrated" data-wp-bind--hidden="!state.hydrated" hidden>
-		hydrated
-	</p>
+	<p data-testid="hydrated" data-wp-text="state.isHydrated">no</p>
 </div>

@@ -6,12 +6,12 @@ import {
 	getContext,
 	getElement,
 	withSyncEvent,
-	renderElement,
+	renderHTML,
 } from '@wordpress/interactivity';
 
 const { state } = store( 'test/render-element', {
 	state: {
-		hydrated: false,
+		isHydrated: 'no',
 		lifecycle: null,
 		items: [ 'one', 'two', 'three' ],
 	},
@@ -20,47 +20,45 @@ const { state } = store( 'test/render-element', {
 			const context = getContext();
 			context.count += 1;
 		},
+		addItem() {
+			state.items = [
+				...state.items,
+				`item-${ state.items.length + 1 }`,
+			];
+		},
 		initFragment() {
 			state.lifecycle = 'initialized';
-			state.hydrated = true;
+			state.isHydrated = 'yes';
 		},
 		*loadFragment() {
 			const { ref } = getElement();
 			const res = yield fetch( ref.dataset.fragmentUrl );
 			const html = yield res.json();
-			const doc = new DOMParser().parseFromString( html, 'text/html' );
-			const node = doc.body.firstElementChild;
-			document
-				.querySelector( '[data-testid="target"]' )
-				.appendChild( node );
-			renderElement( node );
-			state.hydrated = true;
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html );
+			state.isHydrated = 'yes';
 		},
 		*reloadFragment() {
 			const { ref } = getElement();
 			const res = yield fetch( ref.dataset.fragmentUrl );
 			const html = yield res.json();
-			const doc = new DOMParser().parseFromString( html, 'text/html' );
-			const node = doc.body.firstElementChild;
-			// Replace the previously inserted fragment with fresh markup.
 			const target = document.querySelector(
 				'[data-testid="target"]'
 			);
-			target.replaceChildren( node );
-			renderElement( node );
-			state.hydrated = true;
+			renderHTML( target, html, { position: 'inner' } );
+			state.isHydrated = 'yes';
 		},
 		*loadIslandFragment() {
 			const { ref } = getElement();
 			const res = yield fetch( ref.dataset.fragmentUrl );
 			const html = yield res.json();
-			const doc = new DOMParser().parseFromString( html, 'text/html' );
-			const node = doc.body.firstElementChild;
-			document
-				.querySelector( '[data-testid="target"]' )
-				.appendChild( node );
-			renderElement( node );
-			state.hydrated = true;
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html );
+			state.isHydrated = 'yes';
 		},
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
