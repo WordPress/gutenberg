@@ -17,6 +17,7 @@
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
+-   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 
 ## 16.0.0 (2026-07-14)
 
