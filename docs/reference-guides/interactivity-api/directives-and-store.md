@@ -1388,6 +1388,32 @@ Calling `renderElement()` again with the same element updates it in place (preac
 
 `renderElement()` is not supported during initial hydration or during an in-flight navigation.
 
+### renderHTML()
+
+Parses a server-rendered HTML string, inserts the resulting element(s) into the live DOM, and renders them with `renderElement()` so all Interactivity API directives on them are processed. It is a convenience wrapper over the parse → insert → `renderElement()` sequence — callers don't need to write their own `DOMParser` or insertion code.
+
+```js
+import { renderHTML } from '@wordpress/interactivity';
+
+const res = await fetch( '/wp-json/my-plugin/v1/cards' );
+renderHTML( document.querySelector( '#feed' ), await res.text() );
+```
+
+-   `container` (`Element`): The element the parsed HTML is inserted into.
+-   `html` (`string`): The server-rendered HTML string.
+-   `options` (`Object`): Options.
+    -   `options.position` (`string`): Where to insert the parsed elements. One of:
+        -   `append` (default): as the container's last children.
+        -   `prepend`: as the container's first children.
+        -   `before`: as siblings immediately before the container.
+        -   `after`: as siblings immediately after the container.
+        -   `inner`: replace the container's children.
+        -   `outer`: replace the container itself.
+
+Unlike `renderElement()`, each call creates fresh nodes — there is no cross-call in-place diffing. With `position: 'inner'`, `renderHTML( ref, html, { position: 'inner' } )` is a drop-in replacement for `ref.innerHTML = html` that actually hydrates the markup (plain `innerHTML` assignment leaves the inserted directives unprocessed — dead markup).
+
+The inserted element(s) must have an enclosing island or their own `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
+
 ## Server functions
 
 The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's sent to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
