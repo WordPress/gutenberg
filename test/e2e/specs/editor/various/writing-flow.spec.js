@@ -35,7 +35,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// The element owning the caret: the focused element, or the selected
 		// block while a focused editing host owns the selection.
 		const activeElementLocator = editor.canvas.locator(
-			'body:not(:focus) :focus, body:focus .is-selected'
+			'body :focus:not( .block-editor-block-list__layout[contenteditable="true"] ), :is( body, .block-editor-block-list__layout[contenteditable="true"] ):focus .is-selected'
 		);
 
 		// Arrow up into nested context focuses last text input.
@@ -121,7 +121,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		// Verify the element owning the caret has the paragraph content.
 		const activeElementLocator = editor.canvas.locator(
-			'body:not(:focus) :focus, body:focus .is-selected'
+			'body :focus:not( .block-editor-block-list__layout[contenteditable="true"] ), :is( body, .block-editor-block-list__layout[contenteditable="true"] ):focus .is-selected'
 		);
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 	} );
@@ -1381,7 +1381,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// The element owning the caret should be the second paragraph, which
 		// contains a link.
 		const focusedElement = editor.canvas.locator(
-			'body:not(:focus) :focus, body:focus .is-selected'
+			'body :focus:not( .block-editor-block-list__layout[contenteditable="true"] ), :is( body, .block-editor-block-list__layout[contenteditable="true"] ):focus .is-selected'
 		);
 		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
 	} );
