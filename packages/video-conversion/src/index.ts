@@ -40,6 +40,29 @@ const GIF_DEFAULT_FRAME_DURATION_US = 100_000;
 export const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
+ * Message prefix for GIFs skipped because they exceed the total-pixel budget.
+ *
+ * Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip
+ * as a graceful fallback (keep the uploaded GIF, no companion video); the
+ * longer prefix lets consumers distinguish it, e.g. to log a warning. Like
+ * UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only
+ * the message string survives the worker boundary.
+ */
+export const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF exceeds maximum conversion size`;
+
+/**
+ * Default budget for total decoded pixels (width × height × frame count)
+ * beyond which conversion is not attempted.
+ *
+ * Conversion cost is roughly proportional to the total number of decoded
+ * pixels. 300 megapixels approximates what a mid-range machine converts
+ * within the ~30s the caller is willing to wait (e.g. a 1920x1080 GIF at
+ * ~145 frames); anything larger would likely be abandoned anyway, so it is
+ * cheaper to not start. Pass `0` to disable the check.
+ */
+export const DEFAULT_MAX_TOTAL_PIXELS = 300_000_000;
+
+/**
  * Serializes encoder access. The upload-media concurrency limit already caps
  * this at 1, but the lock guards direct callers too.
  */
@@ -82,13 +105,18 @@ function padToEven( value: number ): number {
  * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param maxTotalPixels Optional budget for total decoded pixels
+ *                       (width × height × frame count) beyond which the
+ *                       conversion is rejected with SIZE_LIMIT_ERROR_PREFIX.
+ *                       Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
  * @return Encoded video buffer.
  */
 export async function convertGifToVideo(
 	id: ItemId,
 	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	maxTotalPixels?: number
 ): Promise< ArrayBuffer > {
 	inProgressOperations.add( id );
 
@@ -161,9 +189,43 @@ export async function convertGifToVideo(
 				throw new Error( 'GIF contains no decodable frames' );
 			}
 
+			/*
+			 * Enforce the total-pixel budget before any encoding work: an
+			 * over-budget GIF would churn the CPU for minutes only to be
+			 * abandoned. Track metadata does not expose dimensions, so decode
+			 * the first frame (cheap) to learn them.
+			 */
+			const pixelBudget = maxTotalPixels ?? DEFAULT_MAX_TOTAL_PIXELS;
+			if ( pixelBudget > 0 ) {
+				const { image: probe } = await decoder.decode( {
+					frameIndex: 0,
+				} );
+				const probeWidth = probe.displayWidth;
+				const probeHeight = probe.displayHeight;
+				probe.close();
+
+				if ( ! inProgressOperations.has( id ) ) {
+					throw new Error( 'Operation cancelled' );
+				}
+
+				const totalPixels = probeWidth * probeHeight * frameCount;
+				if ( totalPixels > pixelBudget ) {
+					throw new Error(
+						`${ SIZE_LIMIT_ERROR_PREFIX } (${ probeWidth }x${ probeHeight } x ${ frameCount } frames = ${ totalPixels } pixels; limit is ${ pixelBudget })`
+					);
+				}
+			}
+
 			const source = new VideoSampleSource( {
 				codec,
 				bitrate: QUALITY_HIGH,
+				/*
+				 * A sparser key frame cadence than mediabunny's 2s default
+				 * roughly halves the output size for long GIFs at no
+				 * encode-time or quality cost. These looping, autoplaying
+				 * GIF replacements don't need fine seek granularity.
+				 */
+				keyFrameInterval: 10,
 			} );
 			const target = new BufferTarget();
 			const output = new Output( {

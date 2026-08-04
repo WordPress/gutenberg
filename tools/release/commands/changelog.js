@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const Octokit = require( '@octokit/rest' );
+const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
 
@@ -13,7 +13,7 @@ const {
 	getMilestoneByTitle,
 	getIssuesByMilestone,
 } = require( '../lib/milestone' );
-const { log, formats } = require( '../lib/logger' );
+const { log, warn, formats } = require( '../lib/logger' );
 const config = require( '../config' );
 // @ts-ignore
 const manifest = require( '../../../package.json' );
@@ -710,19 +710,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
 
-	if ( ! issues.length ) {
-		if ( settings.unreleased ) {
-			throw new Error(
-				'There are no unreleased pull requests associated with the milestone.'
-			);
-		} else {
-			throw new Error(
-				'There are no pull requests associated with the milestone.'
-			);
-		}
+	const pullRequests = issues.filter( ( issue ) => issue.pull_request );
+
+	// When only unreleased pull requests are requested, an empty list is a
+	// legitimate outcome: nothing needs to have been cherry-picked since the
+	// previous release in the series. Callers report it to the release
+	// coordinator instead of failing.
+	if ( ! pullRequests.length && ! unreleased ) {
+		throw new Error(
+			`There are no pull requests associated with milestone "${ milestoneTitle }".`
+		);
 	}
 
-	return issues.filter( ( issue ) => issue.pull_request );
+	return pullRequests;
 }
 
 /**
@@ -1004,6 +1004,28 @@ function getContributorsList( pullRequests ) {
 }
 
 /**
+ * Returns the release notes placeholder used when a milestone has no unreleased
+ * pull requests, telling the release coordinator how to fill the notes in.
+ *
+ * @param {string} milestoneTitle Milestone title.
+ *
+ * @return {string} Release notes placeholder.
+ */
+function getManualChangelogInstructions( milestoneTitle ) {
+	return [
+		'**⚠️ The changelog could not be generated automatically. The release notes have to be filled in by hand before publishing this release.**',
+		'',
+		`No unreleased pull requests were found in the "${ milestoneTitle }" milestone. That is expected for a release that contains no pull requests, such as a security release or a re-release of an already published version.`,
+		'',
+		`If pull requests were expected, they are probably still assigned to another milestone. Assign each of them to the "${ milestoneTitle }" milestone, then regenerate the notes locally and paste the output here:`,
+		'',
+		'```sh',
+		`npm run other:changelog -- --milestone="${ milestoneTitle }" --unreleased`,
+		'```',
+	].join( '\n' );
+}
+
+/**
  * Generates and logs changelog for a milestone.
  *
  * @param {WPChangelogSettings} settings Changelog settings.
@@ -1019,25 +1041,23 @@ async function createChangelog( settings ) {
 		auth: settings.token,
 	} );
 
-	let releaselog = '';
+	const pullRequests = await fetchAllPullRequests( octokit, settings );
 
-	try {
-		const pullRequests = await fetchAllPullRequests( octokit, settings );
-
-		const changelog = getChangelog( pullRequests );
-		const contributorProps = getContributorProps( pullRequests );
-		const contributorsList = getContributorsList( pullRequests );
-
-		releaselog = releaselog.concat(
-			changelog,
-			contributorProps,
-			contributorsList
+	if ( ! pullRequests.length ) {
+		warn(
+			formats.warning(
+				`No unreleased pull requests were found in milestone "${ settings.milestone }". The release notes need to be filled in by hand.`
+			)
 		);
-	} catch ( error ) {
-		if ( error instanceof Error ) {
-			releaselog = formats.error( error.stack );
-		}
+		log( getManualChangelogInstructions( settings.milestone ) );
+		return;
 	}
+
+	const changelog = getChangelog( pullRequests );
+	const contributorProps = getContributorProps( pullRequests );
+	const contributorsList = getContributorsList( pullRequests );
+
+	const releaselog = changelog.concat( contributorProps, contributorsList );
 
 	log( releaselog );
 }
@@ -1089,4 +1109,7 @@ module.exports = {
 	getUniqueByUsername,
 	skipCreatedByBots,
 	mapLabelsToFeatures,
+	createChangelog,
+	fetchAllPullRequests,
+	getManualChangelogInstructions,
 };

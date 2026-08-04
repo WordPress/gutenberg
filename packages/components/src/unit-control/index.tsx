@@ -211,7 +211,6 @@ function UnforwardedUnitControl(
 	return (
 		<ValueInput
 			{ ...props }
-			__next40pxDefaultSize
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }

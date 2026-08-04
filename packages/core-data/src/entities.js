@@ -49,8 +49,10 @@ export const rootEntitiesConfig = [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_max_bit_depth',
 				'image_sizes',
 				'image_size_threshold',
+				'image_strip_meta',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -323,7 +325,7 @@ export const prePersistPostType = async (
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
 			objectId
 		);

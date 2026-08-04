@@ -1,24 +1,12 @@
-/**
- * External dependencies
- */
-import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useResponsiveValue } from '../../utils/use-responsive-value';
 import { space } from '../../utils/space';
-import * as styles from '../styles';
-import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
+import styles from '../style.module.scss';
 
 function useDeprecatedProps(
 	props: WordPressComponentProps< FlexProps, 'div' >
@@ -47,6 +35,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		expanded = true,
 		gap = 2,
 		justify = 'space-between',
+		style,
 		wrap = false,
 		...otherProps
 	} = useContextSystem( useDeprecatedProps( props ), 'Flex' );
@@ -59,36 +48,28 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
 
-	const cx = useCx();
+	const flexStyle = {
+		...style,
+		'--wp-components-flex-align':
+			align ?? ( isColumn ? 'normal' : 'center' ),
+		'--wp-components-flex-direction': direction,
+		'--wp-components-flex-wrap': wrap ? 'wrap' : 'nowrap',
+		'--wp-components-flex-gap': space( gap ),
+		'--wp-components-flex-justify': justify,
+	};
 
-	const classes = useMemo( () => {
-		const base = css( {
-			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
-			flexDirection: direction,
-			flexWrap: wrap ? 'wrap' : undefined,
-			gap: space( gap ),
-			justifyContent: justify,
-			height: isColumn && expanded ? '100%' : undefined,
-			width: ! isColumn && expanded ? '100%' : undefined,
-		} );
-
-		return cx(
-			styles.Flex,
-			base,
-			isColumn ? styles.ItemsColumn : styles.ItemsRow,
+	return {
+		...otherProps,
+		className: clsx(
+			styles.flex,
+			isColumn ? styles[ 'items-column' ] : styles[ 'items-row' ],
+			expanded &&
+				( isColumn
+					? styles[ 'expanded-column' ]
+					: styles[ 'expanded-row' ] ),
 			className
-		);
-	}, [
-		align,
-		className,
-		cx,
-		direction,
-		expanded,
-		gap,
+		),
+		style: flexStyle,
 		isColumn,
-		justify,
-		wrap,
-	] );
-
-	return { ...otherProps, className: classes, isColumn };
+	};
 }

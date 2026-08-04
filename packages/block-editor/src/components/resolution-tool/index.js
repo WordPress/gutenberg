@@ -51,7 +51,6 @@ export default function ResolutionTool( {
 				options={ options }
 				onChange={ onChange }
 				help={ __( 'Select the size of the source image.' ) }
-				size="__unstable-large"
 			/>
 		</ToolsPanelItem>
 	);

@@ -78,6 +78,69 @@ describe( 'useMediaResults', () => {
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
 	} );
 
+	it( 'omits the default first page from the fetch query', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useMediaResults(
+				category,
+				{ per_page: 20, page: 1, search: '' },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				search: '',
+			} )
+		);
+	} );
+
+	it( 'passes `page` to the fetch query when paging past the first page', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useMediaResults(
+				category,
+				{ per_page: 20, page: 2, search: '' },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				page: 2,
+				search: '',
+			} )
+		);
+	} );
+
+	it( 'leaves paging totals undefined for an array-returning source', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		const { result } = renderHook( () =>
+			useMediaResults( category, { search: '' }, 0 )
+		);
+		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
+		expect( result.current.totalItems ).toBeUndefined();
+		expect( result.current.totalPages ).toBeUndefined();
+	} );
+
+	it( 'surfaces paging totals from a source that returns them', async () => {
+		const category = {
+			name: 'images',
+			fetch: jest.fn( async () => ( {
+				mediaItems: [ { id: 1 } ],
+				totalItems: 42,
+				totalPages: 3,
+			} ) ),
+		};
+		const { result } = renderHook( () =>
+			useMediaResults( category, { search: '' }, 0 )
+		);
+		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
+		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
+		expect( result.current.totalItems ).toBe( 42 );
+		expect( result.current.totalPages ).toBe( 3 );
+	} );
+
 	it( 'clears the previous results when the query changes', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result, rerender } = renderHook(

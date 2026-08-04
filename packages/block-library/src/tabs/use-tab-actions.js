@@ -7,20 +7,21 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
- * Provides callbacks to insert and remove tabs for a tabs block.
+ * Provides callbacks to insert, remove and move tabs for a tabs block.
  *
  * The hook intentionally avoids subscribing to the store: all data is derived
  * lazily inside the callbacks via `registry.select`, so consumers don't
  * re-render when the tab structure changes.
  *
  * @param {string|null} tabsClientId The client ID of the parent tabs block.
- * @return {{ insertTab: Function, removeTab: Function }} Tab action callbacks.
+ * @return {{ insertTab: Function, removeTab: Function, moveTab: Function }} Tab action callbacks.
  */
 export default function useTabActions( tabsClientId ) {
 	const registry = useRegistry();
 	const {
 		insertBlock,
 		removeBlock,
+		moveBlocksToPosition,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -98,5 +99,33 @@ export default function useTabActions( tabsClientId ) {
 		removeBlock( target.clientId, false );
 	};
 
-	return { insertTab, removeTab };
+	// Move the active tab one position left or right by reordering the
+	// underlying tab-panel. The tab-list labels follow their panel
+	// automatically via useTabListItemsSync.
+	const moveTab = ( direction ) => {
+		const { tabPanelsClientId, tabPanelBlocks, activeIndex } =
+			getTabsState();
+		if ( ! tabPanelsClientId ) {
+			return;
+		}
+
+		const toIndex = activeIndex + direction;
+		const target = tabPanelBlocks[ activeIndex ];
+		if ( ! target || toIndex < 0 || toIndex >= tabPanelBlocks.length ) {
+			return;
+		}
+
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( tabsClientId, {
+			editorActiveTabIndex: toIndex,
+		} );
+		moveBlocksToPosition(
+			[ target.clientId ],
+			tabPanelsClientId,
+			tabPanelsClientId,
+			toIndex
+		);
+	};
+
+	return { insertTab, removeTab, moveTab };
 }

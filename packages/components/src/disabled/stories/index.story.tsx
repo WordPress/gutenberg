@@ -56,7 +56,6 @@ const Form = () => {
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [

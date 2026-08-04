@@ -116,7 +116,6 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Group by' ) }
 							options={ [
 								{ label: __( 'Year' ), value: 'yearly' },

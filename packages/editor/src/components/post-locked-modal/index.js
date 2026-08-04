@@ -185,7 +185,18 @@ function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+		// Re-register with fresh values once the lock state is hydrated from
+		// the server, so a stale `isLocked` doesn't keep `sendPostLock`
+		// refreshing a lock this user doesn't hold.
+	}, [
+		hookName,
+		isLocked,
+		activePostLock,
+		postId,
+		postLockUtils,
+		autosave,
+		updatePostLock,
+	] );
 
 	if ( ! isLocked ) {
 		return null;

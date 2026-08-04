@@ -68,10 +68,17 @@ const transforms = {
 			__experimentalConvert: ( blocks ) => {
 				const columnWidth = +( 100 / blocks.length ).toFixed( 2 );
 				const innerBlocksTemplate = blocks.map(
-					( { name, attributes, innerBlocks } ) => [
+					( { name, attributes, innerBlocks, innerContent } ) => [
 						'core/column',
 						{ width: `${ columnWidth }%` },
-						[ [ name, { ...attributes }, innerBlocks ] ],
+						[
+							[
+								name,
+								{ ...attributes },
+								innerBlocks,
+								innerContent,
+							],
+						],
 					]
 				);
 				return createBlock(

@@ -1,16 +1,11 @@
-/**
- * External dependencies
- */
-import { css } from '@emotion/react';
+import clsx from 'clsx';
+import type { CSSProperties } from 'react';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { space } from '../utils/space';
-import { rtl, useCx } from '../utils';
 import type { SpacerProps } from './types';
+import styles from './style.module.scss';
 
 function isDefined< T >( o: T ): o is Exclude< T, null | undefined > {
 	return typeof o !== 'undefined' && o !== null;
@@ -35,75 +30,96 @@ export function useSpacer(
 		paddingTop,
 		paddingX,
 		paddingY,
+		style,
 		...otherProps
 	} = useContextSystem( props, 'Spacer' );
 
-	const cx = useCx();
+	const spacingStyle: CSSProperties = {};
 
-	const spacerStyles = css(
-		isDefined( margin ) &&
-			css`
-				margin: ${ space( margin ) };
-			`,
-		isDefined( marginY ) &&
-			css`
-				margin-bottom: ${ space( marginY ) };
-				margin-top: ${ space( marginY ) };
-			`,
-		isDefined( marginX ) &&
-			css`
-				margin-left: ${ space( marginX ) };
-				margin-right: ${ space( marginX ) };
-			`,
-		isDefined( marginTop ) &&
-			css`
-				margin-top: ${ space( marginTop ) };
-			`,
-		isDefined( marginBottom ) &&
-			css`
-				margin-bottom: ${ space( marginBottom ) };
-			`,
-		isDefined( marginLeft ) &&
-			rtl( {
-				marginLeft: space( marginLeft ),
-			} )(),
-		isDefined( marginRight ) &&
-			rtl( {
-				marginRight: space( marginRight ),
-			} )(),
-		isDefined( padding ) &&
-			css`
-				padding: ${ space( padding ) };
-			`,
-		isDefined( paddingY ) &&
-			css`
-				padding-bottom: ${ space( paddingY ) };
-				padding-top: ${ space( paddingY ) };
-			`,
-		isDefined( paddingX ) &&
-			css`
-				padding-left: ${ space( paddingX ) };
-				padding-right: ${ space( paddingX ) };
-			`,
-		isDefined( paddingTop ) &&
-			css`
-				padding-top: ${ space( paddingTop ) };
-			`,
-		isDefined( paddingBottom ) &&
-			css`
-				padding-bottom: ${ space( paddingBottom ) };
-			`,
-		isDefined( paddingLeft ) &&
-			rtl( {
-				paddingLeft: space( paddingLeft ),
-			} )(),
-		isDefined( paddingRight ) &&
-			rtl( {
-				paddingRight: space( paddingRight ),
-			} )()
-	);
+	if ( isDefined( margin ) ) {
+		spacingStyle[ '--wp-components-spacer-margin' ] = space( margin );
+	}
 
-	const classes = cx( spacerStyles, className );
+	if ( isDefined( marginY ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-block-start' ] =
+			space( marginY );
+		spacingStyle[ '--wp-components-spacer-margin-block-end' ] =
+			space( marginY );
+	}
 
-	return { ...otherProps, className: classes };
+	if ( isDefined( marginX ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-inline-start' ] =
+			space( marginX );
+		spacingStyle[ '--wp-components-spacer-margin-inline-end' ] =
+			space( marginX );
+	}
+
+	if ( isDefined( marginTop ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-block-start' ] =
+			space( marginTop );
+	}
+
+	if ( isDefined( marginBottom ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-block-end' ] =
+			space( marginBottom );
+	}
+
+	if ( isDefined( marginLeft ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-inline-start' ] =
+			space( marginLeft );
+	}
+
+	if ( isDefined( marginRight ) ) {
+		spacingStyle[ '--wp-components-spacer-margin-inline-end' ] =
+			space( marginRight );
+	}
+
+	if ( isDefined( padding ) ) {
+		spacingStyle[ '--wp-components-spacer-padding' ] = space( padding );
+	}
+
+	if ( isDefined( paddingY ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-block-start' ] =
+			space( paddingY );
+		spacingStyle[ '--wp-components-spacer-padding-block-end' ] =
+			space( paddingY );
+	}
+
+	if ( isDefined( paddingX ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-inline-start' ] =
+			space( paddingX );
+		spacingStyle[ '--wp-components-spacer-padding-inline-end' ] =
+			space( paddingX );
+	}
+
+	if ( isDefined( paddingTop ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-block-start' ] =
+			space( paddingTop );
+	}
+
+	if ( isDefined( paddingBottom ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-block-end' ] =
+			space( paddingBottom );
+	}
+
+	if ( isDefined( paddingLeft ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-inline-start' ] =
+			space( paddingLeft );
+	}
+
+	if ( isDefined( paddingRight ) ) {
+		spacingStyle[ '--wp-components-spacer-padding-inline-end' ] =
+			space( paddingRight );
+	}
+
+	const spacerStyle: CSSProperties = {
+		...spacingStyle,
+		...style,
+	};
+
+	return {
+		...otherProps,
+		className: clsx( styles.spacer, className ),
+		style: spacerStyle,
+	};
 }

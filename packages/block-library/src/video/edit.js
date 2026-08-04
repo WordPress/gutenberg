@@ -42,7 +42,6 @@ import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { isGifVariation } from './variations';
-import GifRestoreControl from './gif-restore-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -53,7 +52,6 @@ function VideoEdit( {
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	clientId,
 } ) {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
@@ -225,12 +223,6 @@ function VideoEdit( {
 							variant="toolbar"
 						/>
 					</BlockControls>
-					{ isGif && (
-						<GifRestoreControl
-							attributes={ attributes }
-							clientId={ clientId }
-						/>
-					) }
 				</>
 			) }
 			<InspectorControls>

@@ -138,10 +138,16 @@ export function Note( {
 	if ( actionState === 'edit' ) {
 		body = (
 			<NoteForm
-				onSubmit={ ( value ) => {
-					onEditNote( { id: note.id, content: value } );
-					setActionState( null );
-					actionButtonRef.current?.focus();
+				onSubmit={ async ( value ) => {
+					const saved = await onEditNote( {
+						id: note.id,
+						content: value,
+					} );
+					// Keep the form open on failure so the edit isn't lost.
+					if ( saved ) {
+						handleCancel();
+					}
+					return saved;
 				} }
 				onCancel={ handleCancel }
 				note={ note }

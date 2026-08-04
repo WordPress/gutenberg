@@ -3,7 +3,7 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
@@ -14,11 +14,7 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import BlockGuidelines from './components/block-guidelines';
 import GuidelineActionsSection from './components/guideline-actions-section';
-import { useGuidelineData, scopeSlug } from './data';
-
-// The Blocks section is not a registry scope; it renders the per-block rows.
-// Placed between Images (30) and Additional (50) to keep the historical order.
-const BLOCKS_ORDER = 40;
+import { useGuidelineData, scopeSlug, BLOCKS_SCOPE } from './data';
 
 function GuidelinesPage() {
 	const { scopes, contentBlocks, bySlug, query, isLoading } =
@@ -33,24 +29,6 @@ function GuidelinesPage() {
 			setHasLoaded( true );
 		}
 	}, [ isLoading ] );
-
-	const sections = useMemo( () => {
-		const scopeSections = scopes.map( ( scope ) => ( {
-			key: scope.slug,
-			order: scope.order,
-			scope,
-		} ) );
-
-		const blocksSection = {
-			key: 'blocks',
-			order: BLOCKS_ORDER,
-			scope: null,
-		};
-
-		return [ ...scopeSections, blocksSection ].sort(
-			( a, b ) => a.order - b.order
-		);
-	}, [ scopes ] );
 
 	return (
 		<Page
@@ -71,60 +49,47 @@ function GuidelinesPage() {
 					 */
 					/* eslint-disable jsx-a11y/no-redundant-roles */ }
 					<ul role="list" className="guidelines__list">
-						{ sections.map( ( section ) =>
-							section.scope ? (
-								<li
-									key={ section.key }
-									className="guidelines__list-item"
-									data-slug={ section.key }
+						{ /*
+						 * Scopes come sorted by order from the registry. The
+						 * Blocks scope is rendered specially — its per-block rows
+						 * instead of a single textarea. Removing it from the
+						 * server registry drops the whole section here.
+						 */ }
+						{ scopes.map( ( scope ) => (
+							<li
+								key={ scope.slug }
+								className="guidelines__list-item"
+								data-slug={ scope.slug }
+							>
+								<GuidelineAccordion
+									title={ scope.title }
+									description={ scope.description }
 								>
-									<GuidelineAccordion
-										title={ section.scope.title }
-										description={
-											section.scope.description
-										}
-									>
-										<GuidelineAccordionForm
-											scope={ section.scope }
-											existingId={
-												bySlug[
-													scopeSlug(
-														section.scope.slug
-													)
-												]?.id
-											}
-											content={
-												bySlug[
-													scopeSlug(
-														section.scope.slug
-													)
-												]?.content ?? ''
-											}
-											query={ query }
-										/>
-									</GuidelineAccordion>
-								</li>
-							) : (
-								<li
-									key={ section.key }
-									className="guidelines__list-item"
-									data-slug="blocks"
-								>
-									<GuidelineAccordion
-										title={ __( 'Blocks' ) }
-										description={ __(
-											'Create tailored guidelines for specific block types.'
-										) }
-									>
+									{ scope.slug === BLOCKS_SCOPE ? (
 										<BlockGuidelines
 											contentBlocks={ contentBlocks }
 											bySlug={ bySlug }
 											query={ query }
 										/>
-									</GuidelineAccordion>
-								</li>
-							)
-						) }
+									) : (
+										<GuidelineAccordionForm
+											scope={ scope }
+											existingId={
+												bySlug[
+													scopeSlug( scope.slug )
+												]?.id
+											}
+											content={
+												bySlug[
+													scopeSlug( scope.slug )
+												]?.content ?? ''
+											}
+											query={ query }
+										/>
+									) }
+								</GuidelineAccordion>
+							</li>
+						) ) }
 					</ul>
 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 					<GuidelineActionsSection

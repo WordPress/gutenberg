@@ -49,8 +49,8 @@ async function addPageContent( editor, page ) {
 		.getByRole( 'document', {
 			name: 'Block: Content',
 		} )
-		.getByRole( 'document', {
-			name: 'Empty block; start writing or type forward slash to choose a block',
+		.getByRole( 'button', {
+			name: 'Add default block',
 		} )
 		.click();
 
@@ -263,6 +263,42 @@ test.describe( 'Pages', () => {
 				name: 'Block: Title',
 			} )
 		).toBeVisible();
+	} );
+
+	test( 'the writing prompt in an empty content block responds to the first click', async ( {
+		page,
+		editor,
+	} ) => {
+		await draftNewPage( page );
+
+		// Show the template so the Content block wraps the writing prompt.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Template options' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		const contentBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Content',
+		} );
+
+		// A single click on the prompt inserts a paragraph and moves the
+		// caret into it; no click to select the Content block is needed.
+		await contentBlock
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Typed after one click' );
+
+		await expect(
+			contentBlock.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toHaveText( 'Typed after one click' );
 	} );
 
 	test( 'swap template and reset to default', async ( {

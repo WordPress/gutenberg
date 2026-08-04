@@ -95,6 +95,7 @@ function Layout() {
 			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ canvas ] );
 
 	return (
@@ -103,7 +104,6 @@ function Layout() {
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
-				ref={ navigateRegionsProps.ref }
 				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
@@ -174,9 +174,6 @@ function Layout() {
 										{ showMobileSiteHub && (
 											<SiteHubMobile
 												ref={ mobileToggleRef }
-												isTransparent={
-													isResizableFrameOversized
-												}
 											/>
 										) }
 										{ areas.mobileContent ? (

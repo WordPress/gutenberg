@@ -3,9 +3,11 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
+	getBlockType,
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -14,6 +16,7 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getBlockMode,
 	getBlockListSettings,
 	getSettings,
 	canInsertBlockType,
@@ -41,9 +44,22 @@ import {
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
+
+function isViewportAvailable( state, viewport ) {
+	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {
+		return true;
+	}
+
+	return (
+		getViewportBreakpoints(
+			getSettings( state )?.__experimentalFeatures?.viewport
+		)[ viewport ] !== undefined
+	);
+}
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -228,6 +244,60 @@ function hasExplicitDisabledParent( state, clientId ) {
 
 	return false;
 }
+
+/**
+ * Returns true when the writing flow wrapper can host editing for the given
+ * block: it supports `editableRoot`, is edited visually in the default
+ * editing mode, and has sibling blocks for a native selection to extend
+ * into, all of them editable.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether an editing host can host the block.
+ */
+export const canHostEditableRoot = createSelector(
+	( state, clientId ) => {
+		if (
+			! clientId ||
+			getBlockEditingMode( state, clientId ) !== 'default' ||
+			// Not when the block is edited as HTML: there is no rich text to
+			// host then, only a textarea, which the editing host would
+			// interfere with.
+			getBlockMode( state, clientId ) !== 'visual' ||
+			! getBlockType( getBlockName( state, clientId ) )?.[
+				editableRootKey
+			]
+		) {
+			return false;
+		}
+
+		// Only host when the block has sibling blocks for a native selection to
+		// extend into, all of them editable. A lone block (e.g. a single
+		// paragraph nested in an HTML block) is edited on its own element, and
+		// read-only siblings (e.g. pattern content without overrides enabled)
+		// must not become editable by inheriting from the host.
+		const siblings = getBlockOrder(
+			state,
+			getBlockRootClientId( state, clientId )
+		);
+		return (
+			siblings.length > 1 &&
+			siblings.every(
+				( siblingClientId ) =>
+					getBlockEditingMode( state, siblingClientId ) === 'default'
+			)
+		);
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.blockEditingModes,
+		state.derivedBlockEditingModes,
+		state.blocksMode,
+	]
+);
 
 /**
  * Returns the block tree displayed by List View.
@@ -925,12 +995,12 @@ export function getInsertionPoint( state ) {
  * Returns true if the block is hidden anywhere, or false otherwise.
  *
  * This selector checks whether a block has visibility metadata set that would
- * hide it at any viewport or everywhere. It's useful for flagging blocks that
- * have visibility restrictions.
+ * hide it at any available viewport or everywhere. It's useful for flagging
+ * blocks that have active visibility restrictions.
  *
  * A block is considered hidden anywhere if:
  * - blockVisibility is false (hidden everywhere)
- * - blockVisibility.viewport has any viewport set to false (hidden at specific screen sizes)
+ * - blockVisibility.viewport has any available viewport set to false (hidden at specific screen sizes)
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -956,6 +1026,7 @@ export const isBlockHiddenAnywhere = ( state, clientId ) => {
 		// Check if the block is hidden at any viewport.
 		return Object.values( BLOCK_VISIBILITY_VIEWPORTS ).some(
 			( viewport ) =>
+				isViewportAvailable( state, viewport.key ) &&
 				blockVisibility?.viewport?.[ viewport.key ] === false
 		);
 	}
@@ -1010,7 +1081,7 @@ export const isBlockParentHiddenEverywhere = ( state, clientId ) => {
  *
  * A block is considered hidden at a viewport if:
  * - blockVisibility is false (hidden everywhere)
- * - blockVisibility is an object with the specified viewport set to false
+ * - blockVisibility is an object with an available specified viewport set to false
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1031,7 +1102,12 @@ export const isBlockHiddenAtViewport = ( state, clientId, viewport ) => {
 		blockVisibilityViewport !== null &&
 		typeof viewport === 'string'
 	) {
-		return blockVisibilityViewport?.[ viewport.toLowerCase() ] === false;
+		const viewportKey = viewport.toLowerCase();
+
+		return (
+			isViewportAvailable( state, viewportKey ) &&
+			blockVisibilityViewport?.[ viewportKey ] === false
+		);
 	}
 	return false;
 };

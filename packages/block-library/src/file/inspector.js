@@ -109,7 +109,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeLinkDestinationOption( href ) }
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Link to' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }

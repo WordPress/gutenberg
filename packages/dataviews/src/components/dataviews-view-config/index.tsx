@@ -125,7 +125,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
 			options={ orderOptions }

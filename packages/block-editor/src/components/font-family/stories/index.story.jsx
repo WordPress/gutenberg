@@ -44,7 +44,7 @@ export const Default = {
 			},
 			{
 				fontFamily:
-					'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+					'-apple-system,system-ui,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 				name: 'System Font',
 				slug: 'system-font',
 			},

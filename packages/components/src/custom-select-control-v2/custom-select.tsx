@@ -131,11 +131,7 @@ function CustomSelect(
 			>
 				{ label }
 			</Ariakit.SelectLabel>
-			<InputBase
-				__next40pxDefaultSize
-				size={ size }
-				suffix={ <SelectControlChevronDown /> }
-			>
+			<InputBase size={ size } suffix={ <SelectControlChevronDown /> }>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }

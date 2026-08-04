@@ -3,26 +3,15 @@
  */
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
-import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import rawJestDomPlugin from 'eslint-plugin-jest-dom';
-import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
+import jestDomPlugin from 'eslint-plugin-jest-dom';
+import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-
-// Wrap plugins that don't yet support ESLint v10's rule context API.
-const jestDomPlugin = {
-	...rawJestDomPlugin,
-	rules: fixupPluginRules( rawJestDomPlugin ).rules,
-};
-const testingLibraryPlugin = {
-	...rawTestingLibraryPlugin,
-	rules: fixupPluginRules( rawTestingLibraryPlugin ).rules,
-};
 
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
@@ -186,18 +175,22 @@ const restrictedSyntax = [
 		'BorderControl',
 		'BoxControl',
 		'ComboboxControl',
+		'CustomSelectControl',
 		'FocalPointPicker',
 		'FontAppearanceControl',
 		'FontFamilyControl',
 		'FontSizePicker',
 		'FormFileUpload',
 		'FormTokenField',
+		'InputControl',
 		'LetterSpacingControl',
 		'LineHeightControl',
+		'NumberControl',
 		'QueryControls',
 		'RangeControl',
 		'Radio',
 		'SearchControl',
+		'SelectControl',
 		'TextControl',
 		'TextIndentControl',
 		'ToggleGroupControl',
@@ -455,8 +448,7 @@ export default dedupePlugins( [
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
 	{
-		...rawJestDomPlugin.configs[ 'flat/recommended' ],
-		plugins: { 'jest-dom': jestDomPlugin },
+		...jestDomPlugin.configs[ 'flat/recommended' ],
 		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'test/e2e/**/*.[tj]s?(x)',
@@ -466,7 +458,6 @@ export default dedupePlugins( [
 	},
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
-		plugins: { 'testing-library': testingLibraryPlugin },
 		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'test/e2e/**/*.[tj]s?(x)',
@@ -482,6 +473,20 @@ export default dedupePlugins( [
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
 		],
+		rules: {
+			...jestPlugin.configs[ 'flat/recommended' ].rules,
+			/*
+			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
+			 * so the docblock pragma is redundant.
+			 */
+			'no-warning-comments': [
+				'error',
+				{
+					terms: [ '@jest-environment jsdom' ],
+					location: 'anywhere',
+				},
+			],
+		},
 	},
 
 	// Override: E2E test files (non-Playwright).
@@ -635,10 +640,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [
-			'packages/components/src/utils/colors-values.js',
-			'packages/components/src/theme/**',
-		],
+		ignores: [ 'packages/components/src/utils/colors-values.js' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',

@@ -15,7 +15,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget, WidgetGridSettings } from '../types';
+import type { DashboardWidget } from '../types';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -25,24 +25,16 @@ const layout: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },
 ];
 
-const gridSettings: WidgetGridSettings = {
-	model: 'grid',
-	minColumnWidth: 350,
-	rowHeight: 200,
-};
-
 interface HarnessProps {
 	initialEditMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	onLayoutChange?: ( next: DashboardWidget[] ) => void;
-	onGridSettingsChange?: ( next: WidgetGridSettings ) => void;
 }
 
 function Harness( {
 	initialEditMode = false,
 	onEditChange,
 	onLayoutChange = () => {},
-	onGridSettingsChange,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
@@ -50,8 +42,6 @@ function Harness( {
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ onLayoutChange }
-			gridSettings={ gridSettings }
-			onGridSettingsChange={ onGridSettingsChange }
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ ( next ) => {
@@ -146,72 +136,12 @@ describe( 'WidgetDashboard.Actions', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	describe( 'Layout settings', () => {
-		it( 'is hidden when editMode is false', () => {
-			render( <Harness onGridSettingsChange={ () => {} } /> );
+	it( 'does not render a Layout settings button', () => {
+		render( <Harness initialEditMode /> );
 
-			expect(
-				screen.queryByRole( 'button', { name: 'Layout settings' } )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'is visible in the edit toolbar when grid settings are editable', () => {
-			render(
-				<Harness initialEditMode onGridSettingsChange={ () => {} } />
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: 'Layout settings' } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'is hidden when onGridSettingsChange is not provided', () => {
-			render( <Harness initialEditMode /> );
-
-			expect(
-				screen.queryByRole( 'button', { name: 'Layout settings' } )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'opens the layout settings drawer when clicked', async () => {
-			render(
-				<Harness initialEditMode onGridSettingsChange={ () => {} } />
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Layout settings' } )
-			);
-
-			expect(
-				await screen.findByRole( 'dialog', { name: 'Layout settings' } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'is not in the more-actions menu', async () => {
-			const onLayoutReset = jest.fn();
-			render(
-				<WidgetDashboard
-					layout={ layout }
-					onLayoutChange={ () => {} }
-					onLayoutReset={ onLayoutReset }
-					gridSettings={ gridSettings }
-					onGridSettingsChange={ () => {} }
-					widgetTypes={ widgetTypes }
-					editMode
-					onEditChange={ () => {} }
-				>
-					<WidgetDashboard.Actions />
-				</WidgetDashboard>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'More options' } )
-			);
-
-			expect(
-				screen.queryByRole( 'menuitem', { name: 'Layout settings' } )
-			).not.toBeInTheDocument();
-		} );
+		expect(
+			screen.queryByRole( 'button', { name: 'Layout settings' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {

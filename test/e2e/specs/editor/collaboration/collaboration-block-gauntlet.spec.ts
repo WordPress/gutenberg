@@ -36,11 +36,13 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		// User A inserts all text blocks via slash commands.
-		// For blocks where Enter creates a new paragraph (paragraph,
-		// heading), we chain naturally. For blocks where Enter adds a
-		// newline within (code, preformatted, verse), we press Escape
-		// to deselect and then click the appender for a fresh paragraph.
+		// User A inserts all text blocks via slash commands. Whether the
+		// next block can be chained with Enter depends on the block we're
+		// currently in: paragraph and heading turn Enter into a new
+		// default block, so the block after them (heading, then code) is
+		// chained. Code, preformatted, and verse capture Enter as an
+		// in-block newline, so the block after each (preformatted, verse,
+		// pullquote) is inserted with the editor keyboard shortcut instead.
 
 		// Helper: insert a new default block (paragraph) after the
 		// currently focused block using the editor keyboard shortcut.
@@ -48,11 +50,17 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			await page.keyboard.press( 'ControlOrMeta+Alt+y' );
 		}
 
-		// Helper: type a slash command in the current empty paragraph,
-		// wait for the autocomplete, and confirm.
-		async function slashInsert( command: string ) {
+		// Helper: type a slash command in the current empty paragraph and
+		// confirm the insertion. We wait for the matching block to be the
+		// *selected* autocomplete option before pressing Enter. Confirming
+		// on listbox visibility alone races the asynchronous filtering, and
+		// Enter can land on a stale highlighted option (typically Heading),
+		// inserting the wrong block type.
+		async function slashInsert( command: string, blockTitle: string ) {
 			await page.keyboard.type( '/' + command );
-			await expect( page.locator( '[role="listbox"]' ) ).toBeVisible();
+			await expect(
+				page.locator( `role=option[name="${ blockTitle }"i][selected]` )
+			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 		}
 
@@ -65,27 +73,28 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		// Heading: Enter from paragraph creates a new paragraph for
 		// the slash command.
 		await page.keyboard.press( 'Enter' );
-		await slashInsert( 'heading' );
+		await slashInsert( 'heading', 'Heading' );
 		await page.keyboard.type( 'Gauntlet heading' );
 
 		// Code: Enter from heading creates a new paragraph.
 		await page.keyboard.press( 'Enter' );
-		await slashInsert( 'code' );
+		await slashInsert( 'code', 'Code' );
 		await page.keyboard.type( 'const x = 1;' );
 
-		// Preformatted: Escape out of code, then appender.
+		// Preformatted: fresh default block, then slash command.
 		await openFreshParagraph();
-		await slashInsert( 'preformatted' );
+		await slashInsert( 'preformatted', 'Preformatted' );
 		await page.keyboard.type( 'preformatted text' );
 
-		// Verse: Escape out of preformatted, then appender.
+		// Verse: fresh default block, then slash command. The verse block's
+		// inserter title is "Poetry".
 		await openFreshParagraph();
-		await slashInsert( 'verse' );
+		await slashInsert( 'verse', 'Poetry' );
 		await page.keyboard.type( 'roses are red' );
 
-		// Pullquote: Escape out of verse, then appender.
+		// Pullquote: fresh default block, then slash command.
 		await openFreshParagraph();
-		await slashInsert( 'pullquote' );
+		await slashInsert( 'pullquote', 'Pullquote' );
 		await page.keyboard.type( 'A great quote' );
 		await editor.canvas
 			.locator(
@@ -98,10 +107,24 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		await collaborationUtils.joinUser( post.id, SECOND_USER );
 		const { editor2, page2 } = collaborationUtils;
 
-		// Wait for User B to see all 6 blocks.
+		// Wait for User B to see all 6 blocks with their types fully
+		// converged, not just the right block count, before editing.
 		await expect
-			.poll( () => editor2.getBlocks(), { timeout: 10_000 } )
-			.toHaveLength( 6 );
+			.poll(
+				async () =>
+					( await editor2.getBlocks() ).map(
+						( block ) => block.name
+					),
+				{ timeout: 10_000 }
+			)
+			.toEqual( [
+				'core/paragraph',
+				'core/heading',
+				'core/code',
+				'core/preformatted',
+				'core/verse',
+				'core/pullquote',
+			] );
 
 		// User B modifies each block via keyboard/UI.
 

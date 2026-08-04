@@ -100,7 +100,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			>
 				<Stack direction="column" gap="lg">
 					<NumberControl
-						__next40pxDefaultSize
 						label={ __( 'Width' ) }
 						value={ editedWidth }
 						min={ 1 }

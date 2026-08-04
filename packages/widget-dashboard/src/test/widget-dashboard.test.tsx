@@ -45,6 +45,10 @@ const widgetTypes: WidgetType[] = [
 		apiVersion: 1,
 		name: 'test/greet',
 		title: 'Greet',
+		help: {
+			content: 'Greetings at a glance.',
+			links: [ { label: 'Learn more', href: 'options-general.php' } ],
+		},
 		renderModule: 'test-greet-module',
 	},
 ];
@@ -99,6 +103,26 @@ describe( 'WidgetDashboard', () => {
 		expect( await screen.findByTestId( 'greeting' ) ).toHaveTextContent(
 			'hello'
 		);
+	} );
+
+	it( 'surfaces the widget type help note in the header', async () => {
+		render( <Harness /> );
+
+		// The infotip trigger opens a popover holding the note.
+		await userEvent.click(
+			await screen.findByRole( 'button', {
+				name: 'More information',
+			} )
+		);
+
+		expect(
+			await screen.findByText( 'Greetings at a glance.' )
+		).toBeInTheDocument();
+
+		// The note's declared links render in the popover.
+		expect(
+			screen.getByRole( 'link', { name: 'Learn more' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {

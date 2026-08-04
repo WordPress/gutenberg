@@ -344,18 +344,24 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 
 	$style = gutenberg_get_state_style_with_fallback_dimension_styles( $style );
 
-	$compiled = gutenberg_style_engine_get_styles(
+	$compiled     = gutenberg_style_engine_get_styles(
 		gutenberg_normalize_state_style_for_css_output( $style )
 	);
+	$declarations = $compiled['declarations'] ?? array();
+	$text_align   = $style['typography']['textAlign'] ?? null;
+	// Base text alignment is class-based, so state styles need a declaration.
+	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
+		$declarations['text-align'] = $text_align;
+	}
 
-	if ( empty( $compiled['declarations'] ) ) {
+	if ( empty( $declarations ) ) {
 		return;
 	}
 
 	$css_rules[] = array(
 		'state'        => $state,
 		'selector'     => $selector,
-		'declarations' => $compiled['declarations'],
+		'declarations' => $declarations,
 	);
 	if ( ! empty( $rules_group ) ) {
 		$css_rules[ count( $css_rules ) - 1 ]['rules_group'] = $rules_group;
@@ -513,12 +519,14 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                   = gutenberg_resolve_style_state_aliases(
+	$supported_pseudo_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
+	$style                    = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block_name
 	);
-	$css_rules               = array();
+	$css_rules                = array();
+	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -534,7 +542,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 	}
 
-	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
 			continue;
 		}

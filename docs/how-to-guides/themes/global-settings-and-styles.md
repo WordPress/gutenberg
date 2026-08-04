@@ -505,13 +505,13 @@ body {
 .has-big-font-size { font-size: 32; }
 .has-normal-font-size { font-size: 16; }
 
-/* Block-level classes (bounded to the group block) */
-.wp-block-group.has-black-color { color: #a156b4 !important; }
-.wp-block-group.has-black-background-color { background-color: #a156b4 !important; }
-.wp-block-group.has-black-border-color { border-color: #a156b4 !important; }
-.wp-block-group.has-white-color { color: #444 !important; }
-.wp-block-group.has-white-background-color { background-color: #444 !important; }
-.wp-block-group.has-white-border-color { border-color: #444 !important; }
+/* Block-level classes (bounded to the group block, wrapped in :where() to keep the same specificity as top-level classes) */
+:where(.wp-block-group).has-black-color { color: #a156b4 !important; }
+:where(.wp-block-group).has-black-background-color { background-color: #a156b4 !important; }
+:where(.wp-block-group).has-black-border-color { border-color: #a156b4 !important; }
+:where(.wp-block-group).has-white-color { color: #444 !important; }
+:where(.wp-block-group).has-white-background-color { background-color: #444 !important; }
+:where(.wp-block-group).has-white-border-color { border-color: #444 !important; }
 
 ```
 {% end %}
@@ -1066,6 +1066,22 @@ Block styles can be scoped to two named breakpoints: `@mobile` and `@tablet`. An
 | --- | --- |
 | `@mobile` | `@media (width <= 480px)` |
 | `@tablet` | `@media (480px < width <= 782px)` |
+
+Themes can override the default breakpoint widths with `settings.viewport.mobile` and `settings.viewport.tablet`. Breakpoint values can use `px`, `em`, or `rem` units.
+
+If only one valid breakpoint is configured, the breakpoint keeps its viewport key and uses a single max-width query. For example, a theme with only `settings.viewport.tablet` will expose `@tablet` styles using `@media (width <= value)`.
+
+```json
+{
+	"version": 3,
+	"settings": {
+		"viewport": {
+			"mobile": "640px",
+			"tablet": "960px"
+		}
+	}
+}
+```
 
 Responsive overrides can be placed directly on a block node:
 

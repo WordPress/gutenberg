@@ -8,18 +8,14 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-import {
-	useInstanceId,
-	useMergeRefs,
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,
 	slice,
 	insert,
 	isCollapsed,
 	getTextContent,
+	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS } from '@wordpress/keycodes';
@@ -43,7 +39,7 @@ import type {
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -383,7 +379,11 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
-export function useAutocompleteProps( options: UseAutocompleteProps ) {
+// The popover is anchored to the element this hook's own `ref` lands on, so it
+// owns `contentRef` and callers don't provide one.
+export function useAutocompleteProps(
+	options: Omit< UseAutocompleteProps, 'contentRef' >
+) {
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
 		useRef< ( event: KeyboardEvent ) => void >( undefined );
@@ -409,7 +409,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			// fire at bubble phase and gate on `event.defaultPrevented`,
 			// so firing in capture lets us preventDefault first when the
 			// popover is active.
-			return subscribeDelegatedListener(
+			return subscribeOwnedListener(
 				element,
 				'keydown',
 				_onKeyDown,
@@ -425,12 +425,21 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		return { ref: mergedRefs };
 	}
 
+	// `aria-owns` and `aria-controls` point at the same list: either one lets
+	// `aria-activedescendant` resolve to an option rendered outside this
+	// element, and assistive technology support differs between them.
+	//
+	// No `aria-expanded`: consumers are `textbox` elements, which don't
+	// support it; that would mean `role="combobox"`, which in turn doesn't
+	// support the `aria-multiline` these fields set.
 	return {
 		ref: mergedRefs,
 		children: popover,
-		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-autocomplete': listBoxId ? ( 'list' as const ) : undefined,
+		'aria-haspopup': listBoxId ? ( 'listbox' as const ) : undefined,
+		'aria-controls': listBoxId,
 		'aria-owns': listBoxId,
-		'aria-activedescendant': activeId,
+		'aria-activedescendant': activeId ?? undefined,
 	};
 }
 

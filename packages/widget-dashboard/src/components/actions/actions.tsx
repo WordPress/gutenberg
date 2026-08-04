@@ -4,7 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { layout as layoutIcon, plus } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Stack } from '@wordpress/ui';
@@ -35,7 +35,6 @@ export function Actions(): React.ReactNode {
 		commit,
 		cancel: cancelStaging,
 		hasUncommittedChanges,
-		canEditGridSettings,
 	} = useDashboardInternalContext();
 
 	const [ isEditActionsMounted, setIsEditActionsMounted ] =
@@ -62,8 +61,7 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
-	const { setInserterOpen, setLayoutSettingsOpen, setResetDialogOpen } =
-		useDashboardUIContext();
+	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
 	// https://github.com/WordPress/gutenberg/issues/77628
 	const isMobileViewport = useSelect(
@@ -87,10 +85,6 @@ export function Actions(): React.ReactNode {
 		commit();
 	}, [ commit ] );
 
-	const openLayoutSettings = useCallback( () => {
-		setLayoutSettingsOpen( true );
-	}, [ setLayoutSettingsOpen ] );
-
 	const menuItems: ActionsMenuItem[] = [
 		{
 			label: __( 'Reset to default' ),
@@ -111,8 +105,8 @@ export function Actions(): React.ReactNode {
 					gap="sm"
 					className={
 						isExitingEditActions
-							? styles.editActionsExit
-							: styles.editActionsEnter
+							? styles[ 'edit-actions-exit' ]
+							: styles[ 'edit-actions-enter' ]
 					}
 				>
 					<Button
@@ -125,22 +119,8 @@ export function Actions(): React.ReactNode {
 						{ __( 'Add widget' ) }
 					</Button>
 
-					{ canEditGridSettings && (
-						<Button
-							variant="minimal"
-							tone="brand"
-							size="compact"
-							onClick={ openLayoutSettings }
-						>
-							{ ! isMobileViewport && (
-								<Button.Icon icon={ layoutIcon } />
-							) }
-							{ __( 'Layout settings' ) }
-						</Button>
-					) }
-
 					<div
-						className={ styles.editActionsDivider }
+						className={ styles[ 'edit-actions-divider' ] }
 						aria-hidden="true"
 					/>
 

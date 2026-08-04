@@ -20,6 +20,30 @@ import type { QueueItemId } from '../types';
 const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
+ * Message prefix used by @wordpress/video-conversion for GIFs skipped
+ * because they exceed the total-pixel budget. This MUST mirror the
+ * package's exported `SIZE_LIMIT_ERROR_PREFIX`; it is duplicated here for
+ * the same bundle-size reason as UNSUPPORTED_ERROR_PREFIX above.
+ */
+const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF exceeds maximum conversion size`;
+
+/**
+ * Message prefix for conversions abandoned by the timeout in
+ * `convertGifToVideo` below. Thrown and detected on the main thread, but
+ * kept as a message-prefix contract for consistency with the other
+ * conversion outcomes.
+ */
+const CONVERSION_TIMEOUT_ERROR_PREFIX = 'GIF to video conversion timed out';
+
+/**
+ * Default time in milliseconds a GIF-to-video conversion may run before it
+ * is abandoned and only the original GIF is kept.
+ *
+ * Beyond ~30 seconds the companion video stops being worth the CPU churn:
+ */
+export const DEFAULT_CONVERSION_TIMEOUT = 30_000;
+
+/**
  * Whether an error from GIF-to-video conversion represents an
  * unsupported-but-graceful outcome (caller should fall back to uploading the
  * original GIF) rather than a hard failure.
@@ -31,6 +55,36 @@ export function isUnsupportedConversionError( error: unknown ): boolean {
 	return (
 		error instanceof Error &&
 		error.message.startsWith( UNSUPPORTED_ERROR_PREFIX )
+	);
+}
+
+/**
+ * Whether an error from GIF-to-video conversion means the GIF was skipped
+ * for exceeding the total-pixel budget. Such errors are also "unsupported"
+ * (graceful) outcomes; this narrower check exists so callers can log why
+ * no companion video was produced.
+ *
+ * @param error Error thrown by `convertGifToVideo`.
+ * @return Whether the error is a size-limit skip.
+ */
+export function isSizeLimitConversionError( error: unknown ): boolean {
+	return (
+		error instanceof Error &&
+		error.message.startsWith( SIZE_LIMIT_ERROR_PREFIX )
+	);
+}
+
+/**
+ * Whether an error from GIF-to-video conversion means the conversion was
+ * abandoned because it exceeded the allowed time.
+ *
+ * @param error Error thrown by `convertGifToVideo`.
+ * @return Whether the error is a conversion timeout.
+ */
+export function isConversionTimeoutError( error: unknown ): boolean {
+	return (
+		error instanceof Error &&
+		error.message.startsWith( CONVERSION_TIMEOUT_ERROR_PREFIX )
 	);
 }
 
@@ -80,25 +134,96 @@ function loadVideoConversionModule(): Promise<
 	return videoConversionModulePromise;
 }
 
+interface ConvertGifToVideoOptions {
+	/** Maximum dimension for downscaling. */
+	maxDimensions?: number;
+	/**
+	 * Time in milliseconds before the conversion is abandoned and only the
+	 * original GIF is kept. `0` disables the timeout.
+	 */
+	timeout?: number;
+	/**
+	 * Budget for total decoded pixels (width × height × frame count) beyond
+	 * which the conversion is not attempted. Defaults to the
+	 * `@wordpress/video-conversion` package default; `0` disables the check.
+	 */
+	maxTotalPixels?: number;
+}
+
 /**
  * Converts an animated GIF to a video file using the video conversion worker.
  *
- * @param id             Queue item ID.
- * @param file           GIF file object.
- * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param maxDimensions  Optional maximum dimension for downscaling.
+ * The timeout only covers the conversion itself, not the initial lazy load
+ * of the worker module (which has its own retry handling). On timeout the
+ * worker-side operation is cancelled so it stops churning, and the returned
+ * promise rejects with an error recognized by `isConversionTimeoutError`.
+ *
+ * @param id                     Queue item ID.
+ * @param file                   GIF file object.
+ * @param outputMimeType         Output MIME type ('video/mp4' or 'video/webm').
+ * @param options                Conversion options.
+ * @param options.maxDimensions  Maximum dimension for downscaling.
+ * @param options.timeout        Milliseconds before the conversion is
+ *                               abandoned. `0` disables the timeout.
+ * @param options.maxTotalPixels Budget for total decoded pixels
+ *                               (width × height × frame count). `0` disables.
  * @return Converted video file.
  */
 export async function convertGifToVideo(
 	id: QueueItemId,
 	file: File,
 	outputMimeType: string,
-	maxDimensions?: number
+	{
+		maxDimensions,
+		timeout = DEFAULT_CONVERSION_TIMEOUT,
+		maxTotalPixels,
+	}: ConvertGifToVideoOptions = {}
 ) {
-	const { convertGifToVideo: convert } = await loadVideoConversionModule();
+	const mod = await loadVideoConversionModule();
 	// Pass the File straight through: the worker reads its bytes once, off
 	// the main thread, instead of materializing an ArrayBuffer here.
-	const buffer = await convert( id, file, outputMimeType, maxDimensions );
+	const conversion = mod.convertGifToVideo(
+		id,
+		file,
+		outputMimeType,
+		maxDimensions,
+		maxTotalPixels
+	);
+
+	let buffer: ArrayBuffer;
+	if ( timeout > 0 ) {
+		let timer: ReturnType< typeof setTimeout > | undefined;
+		try {
+			buffer = await Promise.race( [
+				conversion,
+				new Promise< never >( ( _, reject ) => {
+					timer = setTimeout( () => {
+						reject(
+							new Error(
+								`${ CONVERSION_TIMEOUT_ERROR_PREFIX } after ${ timeout }ms`
+							)
+						);
+					}, timeout );
+				} ),
+			] );
+		} catch ( error ) {
+			if ( isConversionTimeoutError( error ) ) {
+				/*
+				 * The race already settled; swallow the orphaned conversion
+				 * promise's eventual rejection ("Operation cancelled") so it
+				 * is not reported as unhandled.
+				 */
+				conversion.catch( () => {} );
+				// Stop the worker loop at its next async boundary.
+				mod.cancelGifToVideoOperations( id ).catch( () => {} );
+			}
+			throw error;
+		} finally {
+			clearTimeout( timer );
+		}
+	} else {
+		buffer = await conversion;
+	}
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;

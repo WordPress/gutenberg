@@ -1,9 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	GlobalStylesSettings,
+} from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * State definition with value and label.
@@ -83,10 +96,19 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
 /**
  * Get the valid viewport state definitions.
  *
+ * @param viewportSettings
  * @return Array of valid viewport state definitions.
  */
-export function getValidViewportStates(): StateDefinition[] {
-	return RESPONSIVE_STATES;
+export function getValidViewportStates(
+	viewportSettings?: GlobalStylesSettings[ 'viewport' ]
+): StateDefinition[] {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return RESPONSIVE_STATES.filter(
+		( state ) =>
+			( state.value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+			( state.value !== '@mobile' || breakpoints.mobile !== undefined )
+	);
 }
 
 /**

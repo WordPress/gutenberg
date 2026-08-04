@@ -96,13 +96,12 @@ const LineHeightControl = ( {
 	return (
 		<div className="block-editor-line-height-control">
 			<NumberControl
+				placeholder={ BASE_DEFAULT_VALUE }
 				{ ...otherProps }
-				__next40pxDefaultSize
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
-				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				spinFactor={ SPIN_FACTOR }
 				value={ value }

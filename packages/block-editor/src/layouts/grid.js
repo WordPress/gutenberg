@@ -452,7 +452,6 @@ function GridLayoutColumnsAndRowsControl( {
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size="__unstable-large"
 							onChange={ ( value ) => {
 								// Allow unsetting the column count when in auto mode.
 								const defaultNewColumnCount = isManualPlacement
@@ -477,7 +476,6 @@ function GridLayoutColumnsAndRowsControl( {
 					<FlexItem isBlock>
 						{ allowSizingOnChildren && isManualPlacement ? (
 							<NumberControl
-								size="__unstable-large"
 								onChange={ ( value ) => {
 									// Don't allow unsetting the row count.
 									const newRowCount =

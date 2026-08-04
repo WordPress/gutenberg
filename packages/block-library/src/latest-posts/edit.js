@@ -162,13 +162,10 @@ function Controls( { attributes, setAttributes } ) {
 			label: name,
 		} ) );
 	const categorySuggestions =
-		categoriesList?.reduce(
-			( accumulator, category ) => ( {
-				...accumulator,
-				[ category.name ]: category,
-			} ),
-			{}
-		) ?? {};
+		categoriesList?.reduce( ( accumulator, category ) => {
+			accumulator[ category.name ] = category;
+			return accumulator;
+		}, {} ) ?? {};
 	const selectCategories = ( tokens ) => {
 		const hasNoSuggestion = tokens.some(
 			( token ) =>
@@ -807,7 +804,7 @@ export default function LatestPostsEdit( {
 									<div
 										className="wp-block-latest-posts__post-full-content"
 										dangerouslySetInnerHTML={ {
-											__html: post.content.raw.trim(),
+											__html: post.content.rendered.trim(),
 										} }
 									/>
 								) }

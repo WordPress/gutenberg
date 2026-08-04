@@ -32,7 +32,7 @@ const meta: Meta< typeof NumberControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `InputControl` with `type="number"` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
@@ -49,7 +49,6 @@ const Template: StoryFn< typeof NumberControl > = ( {
 	return (
 		<>
 			<NumberControl
-				__next40pxDefaultSize
 				{ ...props }
 				value={ value }
 				onChange={ ( v, extra ) => {
@@ -69,5 +68,4 @@ const Template: StoryFn< typeof NumberControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
-	__next40pxDefaultSize: true,
 };

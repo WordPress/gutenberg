@@ -52,7 +52,6 @@ export default function FontFamilyControl( {
 		options.find( ( option ) => option.key === value ) ?? '';
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			label={ __( 'Font' ) }
 			value={ selectedValue }
 			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }

@@ -16,7 +16,7 @@ import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -35,6 +35,7 @@ import SiteEditorMoreMenu from '../more-menu';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import { ViewportSync } from '../block-editor/use-viewport-sync';
 import useEditorTitle from './use-editor-title';
+import useRevisionsURLSync from './use-revisions-url-sync';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
 import {
@@ -79,7 +80,7 @@ function getNavigationPath( location, postType ) {
 	) {
 		return getListPathForPostType( postType );
 	}
-	return addQueryArgs( path, { canvas: undefined } );
+	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
 }
 
 export default function EditSiteEditor( { isHomeRoute = false } ) {
@@ -97,13 +98,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		[]
 	);
 	const postWithTemplate = !! context?.postId;
-	useEditorTitle(
-		postWithTemplate ? context.postType : postType,
-		postWithTemplate ? context.postId : postId
-	);
+	const editorPostType = postWithTemplate ? context.postType : postType;
+	const editorPostId = postWithTemplate ? context.postId : postId;
+	useEditorTitle( editorPostType, editorPostId );
 	const _isPreviewingTheme = isPreviewingTheme();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
+	useRevisionsURLSync( isEditMode, editorPostType, editorPostId );
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
@@ -205,39 +206,31 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<div className="edit-site-editor__view-mode-toggle">
-										<Button
-											__next40pxDefaultSize
-											label={ __( 'Open Navigation' ) }
-											showTooltip
-											tooltipPosition="middle right"
-											onClick={ () => {
-												resetZoomLevel();
-												setCurrentRevisionId( null );
-												history.navigate(
-													getNavigationPath(
-														location,
-														postWithTemplate
-															? context.postType
-															: postType
-													),
-													{
-														transition:
-															'canvas-mode-view-transition',
-													}
-												);
-											} }
-										/>
-										<div className="edit-site-editor__back-icon">
-											<Icon
-												icon={
-													isRTL()
-														? chevronRight
-														: chevronLeft
+									<Button
+										size="compact"
+										label={ __( 'Open Navigation' ) }
+										showTooltip
+										tooltipPosition="middle right"
+										onClick={ () => {
+											resetZoomLevel();
+											setCurrentRevisionId( null );
+											history.navigate(
+												getNavigationPath(
+													location,
+													postWithTemplate
+														? context.postType
+														: postType
+												),
+												{
+													transition:
+														'canvas-mode-view-transition',
 												}
-											/>
-										</div>
-									</div>
+											);
+										} }
+										icon={
+											isRTL() ? chevronRight : chevronLeft
+										}
+									/>
 								)
 							}
 						</BackButton>

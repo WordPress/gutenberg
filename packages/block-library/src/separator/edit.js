@@ -39,7 +39,6 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 							'The <div> element should only be used if the block is a design element with no semantic meaning.'
 					  )
 			}
-			__next40pxDefaultSize
 		/>
 	);
 };

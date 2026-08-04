@@ -6,10 +6,22 @@ on:
         branches:
             - trunk
         paths:
+            - 'packages/admin-ui/**'
             - 'packages/components/**'
             - 'packages/dataviews/**'
-            - 'packages/ui/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
             - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
+            - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
 
@@ -27,25 +39,40 @@ jobs:
             fail-fast: false
             matrix:
                 package:
-                    - components
+                    # Bundled packages
+                    # Keep in sync with dependency-extraction-webpack-plugin
+                    - admin-ui
                     - dataviews
+                    - fields
+                    - grid
+                    - icons
+                    - interface
+                    - style-runtime
                     - ui
+                    - undo-manager
+                    - views
+                    # Other packages
                     - theme
+                    - components
+                    - private-apis
+                    - widget-dashboard
+                    - widget-primitives
+                    - wp-build
         steps:
             - name: 'Get PR commit count'
               env:
                   PR_COUNT: ${{ github.event.pull_request.commits }}
               run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
                   fetch-depth: ${{ env.PR_COMMIT_COUNT }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
-            - name: 'Fetch relevant history from origin'
-              run: git fetch origin "$GITHUB_BASE_REF"
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
             - name: Determine if package has relevant changes
               id: filter
               env:

@@ -60,7 +60,6 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 	return (
 		<StyledCustomSelectControl
-			__next40pxDefaultSize
 			className="components-font-size-picker__select"
 			label={ __( 'Font size' ) }
 			hideLabelFromVision

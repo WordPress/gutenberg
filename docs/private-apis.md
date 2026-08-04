@@ -40,7 +40,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 
@@ -191,6 +190,10 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
@@ -262,7 +265,6 @@ Private exports:
 Private exports:
 - `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
 - `PluginPostExcerpt`
 - `PostCardPanel`
@@ -302,7 +304,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post

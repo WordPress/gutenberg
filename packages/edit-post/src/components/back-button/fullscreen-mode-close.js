@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button, Icon as WCIcon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
@@ -32,21 +32,14 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	const buttonLabel = postType?.labels?.view_items ?? __( 'Back' );
 
 	return (
-		<div className="edit-post-fullscreen-mode-close__view-mode-toggle">
-			<Button
-				__next40pxDefaultSize
-				className="edit-post-fullscreen-mode-close"
-				href={ buttonHref }
-				label={ buttonLabel }
-				showTooltip={ showTooltip }
-				tooltipPosition="bottom"
-			/>
-			<div className="edit-post-fullscreen-mode-close__back-icon">
-				<WCIcon
-					icon={ icon ?? ( isRTL() ? chevronRight : chevronLeft ) }
-				/>
-			</div>
-		</div>
+		<Button
+			size="compact"
+			href={ buttonHref }
+			label={ buttonLabel }
+			showTooltip={ showTooltip }
+			tooltipPosition="bottom"
+			icon={ icon ?? ( isRTL() ? chevronRight : chevronLeft ) }
+		/>
 	);
 }
 

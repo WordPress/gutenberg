@@ -1088,10 +1088,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select the Post name permalink structure (/%postname%/)
-			await page.click( '#permalink-input-post-name' );
+			await page.locator( '#permalink-input-post-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
@@ -1129,10 +1129,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select Plain permalinks
-			await page.click( '#permalink-input-plain' );
+			await page.locator( '#permalink-input-plain' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
@@ -1541,24 +1541,27 @@ test.describe( 'Navigation block', () => {
 			const itemCount = await pageItems.count();
 			expect( itemCount ).toBeGreaterThan( 0 );
 
-			// Step 4: Convert Page List using Edit button
+			// Step 4: Convert Page List using the Detach button
 			// Select the Page List block
 			await editor.selectBlocks( pageListBlock );
 
-			// Try using the toolbar Edit button instead
-			const editButton = page
-				.getByRole( 'button', { name: 'Edit' } )
+			// Try using the toolbar Detach button instead
+			const detachButton = page
+				.getByRole( 'button', { name: 'Detach' } )
 				.first();
-			await expect( editButton ).toBeVisible();
+			await expect( detachButton ).toBeVisible();
 
-			await editButton.click();
+			await detachButton.click();
 
-			// Wait for modal and approve conversion
-			await expect(
-				page.getByRole( 'dialog', { name: 'Edit Page List' } )
-			).toBeVisible();
+			// Wait for the confirmation dialog and approve conversion
+			const detachDialog = page.getByRole( 'dialog', {
+				name: 'Detach Page List',
+			} );
+			await expect( detachDialog ).toBeVisible();
 
-			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+			await detachDialog
+				.getByRole( 'button', { name: 'Detach' } )
+				.click();
 
 			// Wait for conversion - check that Page List is gone
 			await expect( pageListBlock ).toBeHidden();
@@ -1863,7 +1866,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is shown
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 
@@ -1884,7 +1887,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is gone now
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeHidden();
 
 				await expect( linkInput ).toHaveValue(

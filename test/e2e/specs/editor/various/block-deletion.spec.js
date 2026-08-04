@@ -26,14 +26,16 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last()
-		).toBeFocused();
+		// Ensure the last paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas
+						.getByRole( 'document', { name: 'Block: Paragraph' } )
+						.last()
+				)
+			)
+			.toBe( true );
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
@@ -124,14 +126,16 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last()
-		).toBeFocused();
+		// Ensure the last paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas
+						.getByRole( 'document', { name: 'Block: Paragraph' } )
+						.last()
+				)
+			)
+			.toBe( true );
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
 		await pageUtils.pressKeys( 'access+z' );
@@ -171,9 +175,15 @@ test.describe( 'Block deletion', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Hit backspace to remove the empty paragraph.
 		await page.keyboard.press( 'Backspace' );
@@ -262,12 +272,16 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 		} );
 
-		// Ensure the empty paragraph is focused.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		// Ensure the empty paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Select the last two paragraphs.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -290,13 +304,17 @@ test.describe( 'Block deletion', () => {
 			{ name: 'core/paragraph', attributes: { content: '' } },
 		] );
 
-		// Ensure that the newly created empty block is focused.
+		// Ensure that the newly created empty block holds the selection.
 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 	} );
 
 	test( 'deleting all blocks', async ( { editor, page } ) => {
@@ -305,11 +323,15 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Remove that paragraph via its options menu.
 		await editor.showBlockToolbar();
@@ -319,12 +341,16 @@ test.describe( 'Block deletion', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
-		// Ensure an empty block was created and focused.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		// Ensure an empty block was created and holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 

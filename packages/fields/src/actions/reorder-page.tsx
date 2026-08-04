@@ -93,7 +93,6 @@ function ReorderModal( {
 					) }
 				</div>
 				<InputControl
-					__next40pxDefaultSize
 					label={ __( 'Order' ) }
 					type="number"
 					value={

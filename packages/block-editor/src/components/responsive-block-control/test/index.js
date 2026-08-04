@@ -39,11 +39,7 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
-			<SelectControl
-				__next40pxDefaultSize
-				label={ labelComponent }
-				options={ sizeOptions }
-			/>
+			<SelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.

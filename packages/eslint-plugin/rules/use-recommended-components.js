@@ -23,6 +23,7 @@ const ALLOWLIST = {
 			'EmptyState',
 			'Icon',
 			'Link',
+			'Skeleton',
 			'Stack',
 			'Tabs',
 			'Text',
@@ -46,12 +47,23 @@ const DENYLIST = {
 	'@wordpress/components': {
 		ExternalLink:
 			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
+		__experimentalDivider: '{{ name }} is planned for deprecation.',
+		__experimentalElevation:
+			'Use elevation tokens from `@wordpress/base-styles` instead.',
+		__experimentalGrid:
+			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
+		__experimentalScrollable: '{{ name }} is planned for deprecation.',
+		__experimentalSpacer: '{{ name }} is planned for deprecation.',
+		__experimentalSurface:
+			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		Animate: '{{ name }} is planned for deprecation.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',
@@ -59,7 +71,14 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FlexBlock:
+			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FlexItem:
+			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',

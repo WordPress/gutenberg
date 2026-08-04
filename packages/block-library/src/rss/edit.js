@@ -96,7 +96,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						className="wp-block-rss__placeholder-form"
 					>
 						<InputControl
-							__next40pxDefaultSize
 							label={ label }
 							type="url"
 							hideLabelFromVision

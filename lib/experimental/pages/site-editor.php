@@ -77,6 +77,16 @@ function gutenberg_site_editor_enable_admin_bar() {
 	bottom: 0;
 	height: calc(100vh - var(--wp-admin--admin-bar--height, 0)) !important;
 }
+
+@media (min-width: 782px) {
+	body:has(.editor-editor-interface.is-distraction-free) {
+		--wp-admin--admin-bar--height: 0px;
+	}
+
+	body:has(.editor-editor-interface.is-distraction-free) #wpadminbar {
+		display: none;
+	}
+}
 CSS;
 
 	wp_add_inline_style( 'admin-bar', $css );

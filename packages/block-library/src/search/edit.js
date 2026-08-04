@@ -376,7 +376,6 @@ export default function SearchEdit( {
 					>
 						<SelectControl
 							value={ buttonPosition }
-							__next40pxDefaultSize
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -493,7 +492,6 @@ export default function SearchEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					value={ tagName ?? '' }
 					options={ [

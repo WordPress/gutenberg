@@ -93,8 +93,6 @@ export function TreeSelect( props: TreeSelectProps ) {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
-			__shouldNotWarnDeprecated36pxSize
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
 			{ ...restProps }

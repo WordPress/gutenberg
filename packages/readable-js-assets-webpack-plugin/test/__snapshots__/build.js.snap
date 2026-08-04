@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file index.js should match snapshot 1`] = `
 "/******/ (() => { // webpackBootstrap

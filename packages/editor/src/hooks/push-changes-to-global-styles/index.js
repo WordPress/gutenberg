@@ -17,7 +17,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -28,6 +28,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
+import ApplyGloballyModal from './apply-globally-modal';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -112,56 +113,258 @@ const getValueFromObjectPath = ( object, path ) => {
 	return value;
 };
 
-const flatBorderProperties = [ 'borderColor', 'borderWidth', 'borderStyle' ];
 const sides = [ 'top', 'right', 'bottom', 'left' ];
 
-function getBorderStyleChanges( border, presetColor, userStyle ) {
-	if ( ! border && ! presetColor ) {
-		return [];
+/**
+ * One style change shown as a single row. It holds every `{ path, value }` pair
+ * the change covers so they all get pushed together.
+ *
+ * @typedef {Object} ChangeRow
+ * @property {string}                            id               Unique row id.
+ * @property {string[]}                          primaryPath      Path used to look up the current value.
+ * @property {Array<{path: string[], value: *}>} paths            The path/value pairs to push.
+ * @property {string[]}                          presetAttributes Preset block attributes to clear when pushed.
+ * @property {*}                                 newValue         Value shown in the "New" column.
+ * @property {string}                            [format]         How to display the value (`border`, `borderRadius`, `spacing`).
+ */
+
+// Builds the border rows, grouped so each one reads as a single CSS `border`
+// value (all sides, one side, and radius) instead of a row per property.
+function getBorderRows( supports, attributes, blockUserConfig ) {
+	const rows = [];
+	const border = attributes.style?.border;
+	const userBorder = blockUserConfig?.border;
+
+	const colorSupported = supports.includes( 'borderColor' );
+	const widthSupported = supports.includes( 'borderWidth' );
+	const styleSupported = supports.includes( 'borderStyle' );
+
+	// The all-sides border. A preset border color lives in a block attribute
+	// and is pushed as a preset value.
+	const presetBorderColor = attributes.borderColor;
+	const flatColor = presetBorderColor
+		? `var:preset|color|${ presetBorderColor }`
+		: border?.color;
+	const flatRow = buildBorderScopeRow( {
+		id: 'border',
+		primaryPath: [ 'border' ],
+		side: null,
+		color: colorSupported ? flatColor : undefined,
+		width: widthSupported ? border?.width : undefined,
+		style: styleSupported ? border?.style : undefined,
+		userBorder,
+		presetAttributes: presetBorderColor ? [ 'borderColor' ] : [],
+	} );
+	if ( flatRow ) {
+		rows.push( flatRow );
 	}
 
-	const changes = [
-		...getFallbackBorderStyleChange( 'top', border, userStyle ),
-		...getFallbackBorderStyleChange( 'right', border, userStyle ),
-		...getFallbackBorderStyleChange( 'bottom', border, userStyle ),
-		...getFallbackBorderStyleChange( 'left', border, userStyle ),
-	];
+	sides.forEach( ( side ) => {
+		const sideBorder = border?.[ side ];
+		const sideRow = buildBorderScopeRow( {
+			id: `border.${ side }`,
+			primaryPath: [ 'border', side ],
+			side,
+			color: colorSupported ? sideBorder?.color : undefined,
+			width: widthSupported ? sideBorder?.width : undefined,
+			style: styleSupported ? sideBorder?.style : undefined,
+			userBorder,
+			presetAttributes: [],
+		} );
+		if ( sideRow ) {
+			rows.push( sideRow );
+		}
+	} );
 
-	// Handle a flat border i.e. all sides the same, CSS shorthand.
-	const { color: customColor, style, width } = border || {};
-	const hasColorOrWidth = presetColor || customColor || width;
+	// Border radius, pushed as-is (a string or an object per corner) since
+	// Global Styles takes either.
+	if (
+		supports.includes( 'borderRadius' ) &&
+		border?.radius !== undefined &&
+		border?.radius !== ''
+	) {
+		rows.push( {
+			id: 'border.radius',
+			primaryPath: [ 'border', 'radius' ],
+			paths: [ { path: [ 'border', 'radius' ], value: border.radius } ],
+			presetAttributes: [],
+			newValue: border.radius,
+			format: 'borderRadius',
+		} );
+	}
 
-	if ( hasColorOrWidth && ! style ) {
-		// Global Styles need individual side configurations to overcome
-		// theme.json configurations which are per side as well.
-		sides.forEach( ( side ) => {
-			// Only add fallback border-style if global styles don't already
-			// have something set.
-			if ( ! userStyle?.[ side ]?.style ) {
-				changes.push( {
-					path: [ 'border', side, 'style' ],
+	return rows;
+}
+
+// Builds one border row (all sides or a single side) that pushes its color,
+// width and style together and shows them as one CSS value. Returns `null`
+// when there's nothing set.
+function buildBorderScopeRow( {
+	id,
+	primaryPath,
+	side,
+	color,
+	width,
+	style,
+	userBorder,
+	presetAttributes,
+} ) {
+	if ( ! color && ! width && ! style ) {
+		return null;
+	}
+
+	const paths = [];
+	// The all-sides value is also written to each side so it can override any
+	// per-side values from theme.json.
+	const targetSides = side ? [ side ] : sides;
+
+	const addChange = ( property, value ) => {
+		if ( value === undefined ) {
+			return;
+		}
+		if ( ! side ) {
+			paths.push( { path: [ 'border', property ], value } );
+		}
+		targetSides.forEach( ( targetSide ) => {
+			paths.push( { path: [ 'border', targetSide, property ], value } );
+		} );
+	};
+
+	addChange( 'color', color );
+	addChange( 'width', width );
+	addChange( 'style', style );
+
+	// A border only shows with a style, so use `solid` when a color or width
+	// is set without one (unless Global Styles already sets a style for that
+	// side, which is kept).
+	let effectiveStyle = style;
+	if ( ! style && ( color || width ) ) {
+		const sideStyles = targetSides.map(
+			( targetSide ) => userBorder?.[ targetSide ]?.style
+		);
+		targetSides.forEach( ( targetSide, index ) => {
+			if ( ! sideStyles[ index ] ) {
+				paths.push( {
+					path: [ 'border', targetSide, 'style' ],
 					value: 'solid',
 				} );
 			}
 		} );
+		// Show the style the border will actually have after Apply: the shared
+		// Global Styles style when every side agrees on one, else `solid`.
+		const sharedStyle = sideStyles.every(
+			( sideStyle ) => sideStyle === sideStyles[ 0 ]
+		)
+			? sideStyles[ 0 ]
+			: undefined;
+		effectiveStyle = sharedStyle || 'solid';
 	}
 
-	return changes;
+	return {
+		id,
+		primaryPath,
+		paths,
+		presetAttributes,
+		newValue: { color, width, style: effectiveStyle },
+		format: 'border',
+	};
 }
 
-function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
-	if ( ! border?.[ side ] || globalBorderStyle?.[ side ]?.style ) {
-		return [];
-	}
+/**
+ * Works out which of the block's style changes can be pushed to Global Styles,
+ * grouped into rows (see `ChangeRow`).
+ *
+ * @param {Array}  supports        Supported style keys for the block.
+ * @param {Object} attributes      Block attributes.
+ * @param {Object} blockUserConfig The block's user Global Styles config.
+ *
+ * @return {ChangeRow[]} The changes, grouped into rows.
+ */
+export function getChangesToPush( supports, attributes, blockUserConfig ) {
+	const rows = [];
 
-	const { color, style, width } = border[ side ];
-	const hasColorOrWidth = color || width;
+	supports.forEach( ( key ) => {
+		if ( ! STYLE_PROPERTY[ key ] ) {
+			return;
+		}
+		// Border styles are grouped and handled separately below.
+		if ( key.startsWith( 'border' ) ) {
+			return;
+		}
+		// Root-only properties (e.g. `--wp--style--root--padding`) repeat their
+		// normal version (`padding`) and only apply to the root, so skip them.
+		if ( STYLE_PROPERTY[ key ].rootOnly ) {
+			return;
+		}
+		const { value: path } = STYLE_PROPERTY[ key ];
+		const presetAttributeKey = path.join( '.' );
+		const presetAttributeName =
+			STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ];
+		const presetAttributeValue = presetAttributeName
+			? attributes[ presetAttributeName ]
+			: undefined;
+		const value = presetAttributeValue
+			? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+			: getValueFromObjectPath( attributes.style, path );
 
-	if ( ! hasColorOrWidth || style ) {
-		return [];
-	}
+		// A preset attribute is only removed from the block when its row is
+		// pushed (see `getStylesUpdate`).
+		const presetAttributes = presetAttributeValue
+			? [ presetAttributeName ]
+			: [];
 
-	return [ { path: [ 'border', side, 'style' ], value: 'solid' } ];
+		// Links have a single support but two styles: color and hover color.
+		// Add the hover color to the changes when it's set.
+		if ( key === 'linkColor' ) {
+			const paths = value ? [ { path, value } ] : [];
+			const hoverPath = [ 'elements', 'link', ':hover', 'color', 'text' ];
+			const hoverValue = getValueFromObjectPath(
+				attributes.style,
+				hoverPath
+			);
+
+			if ( hoverValue ) {
+				paths.push( { path: hoverPath, value: hoverValue } );
+			}
+
+			if ( paths.length === 0 ) {
+				return;
+			}
+
+			rows.push( {
+				id: presetAttributeKey,
+				primaryPath: path,
+				paths,
+				presetAttributes,
+				newValue: value ?? hoverValue,
+			} );
+			return;
+		}
+
+		if ( value ) {
+			// Padding and margin can be axial or per-side objects. The format
+			// hint lets them show as one CSS value instead of a row per side
+			// or a raw object. Block gap can be an axial `{ top, left }` object.
+			let format;
+			if ( key === 'padding' || key === 'margin' ) {
+				format = 'spacing';
+			} else if ( key === 'blockGap' ) {
+				format = 'blockGap';
+			}
+			rows.push( {
+				id: presetAttributeKey,
+				primaryPath: path,
+				paths: [ { path, value } ],
+				presetAttributes,
+				newValue: value,
+				format,
+			} );
+		}
+	} );
+
+	rows.push( ...getBorderRows( supports, attributes, blockUserConfig ) );
+
+	return rows;
 }
 
 function useChangesToPush( name, attributes, userConfig ) {
@@ -173,71 +376,68 @@ function useChangesToPush( name, attributes, userConfig ) {
 	);
 	const blockUserConfig = userConfig?.styles?.blocks?.[ name ];
 
-	return useMemo( () => {
-		const changes = supports.flatMap( ( key ) => {
-			if ( ! STYLE_PROPERTY[ key ] ) {
-				return [];
-			}
-			const { value: path } = STYLE_PROPERTY[ key ];
-			const presetAttributeKey = path.join( '.' );
-			const presetAttributeValue =
-				attributes[
-					STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
-				];
-			const value = presetAttributeValue
-				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-				: getValueFromObjectPath( attributes.style, path );
+	return useMemo(
+		() => getChangesToPush( supports, attributes, blockUserConfig ),
+		[ supports, attributes, blockUserConfig ]
+	);
+}
 
-			// Links only have a single support entry but have two element
-			// style properties, color and hover color. The following check
-			// will add the hover color to the changes if required.
-			if ( key === 'linkColor' ) {
-				const linkChanges = value ? [ { path, value } ] : [];
-				const hoverPath = [
-					'elements',
-					'link',
-					':hover',
-					'color',
-					'text',
-				];
-				const hoverValue = getValueFromObjectPath(
-					attributes.style,
-					hoverPath
-				);
+/**
+ * Works out the block attribute and user Global Styles updates for the chosen
+ * rows, without applying them. Returns `null` when there's nothing to push.
+ *
+ * @param {Object} options            Options.
+ * @param {Array}  options.rowsToPush The rows to push.
+ * @param {Object} options.attributes Current block attributes.
+ * @param {Object} options.userConfig Current user Global Styles config.
+ * @param {string} options.name       Block name.
+ *
+ * @return {?{newBlockAttributes: Object, newUserConfig: Object}} The updates,
+ *   or `null` when no rows were chosen.
+ */
+export function getStylesUpdate( {
+	rowsToPush,
+	attributes,
+	userConfig,
+	name,
+} ) {
+	if ( ! rowsToPush || rowsToPush.length === 0 ) {
+		return null;
+	}
 
-				if ( hoverValue ) {
-					linkChanges.push( { path: hoverPath, value: hoverValue } );
-				}
+	const selectedChanges = rowsToPush.flatMap( ( row ) => row.paths );
 
-				return linkChanges;
-			}
+	if ( selectedChanges.length === 0 ) {
+		return null;
+	}
 
-			// The shorthand border styles can't be mapped directly as global
-			// styles requires longhand config.
-			if ( flatBorderProperties.includes( key ) && value ) {
-				// The shorthand config path is included to clear the block attribute.
-				const borderChanges = [ { path, value } ];
-				sides.forEach( ( side ) => {
-					const currentPath = [ ...path ];
-					currentPath.splice( -1, 0, side );
-					borderChanges.push( { path: currentPath, value } );
-				} );
-				return borderChanges;
-			}
+	const { style: blockStyles } = attributes;
 
-			return value ? [ { path, value } ] : [];
-		} );
+	const newBlockStyles = structuredClone( blockStyles );
+	const newUserConfig = structuredClone( userConfig );
 
-		// To ensure display of a visible border, global styles require a
-		// default border style if a border color or width is present.
-		getBorderStyleChanges(
-			attributes.style?.border,
-			attributes.borderColor,
-			blockUserConfig?.border
-		).forEach( ( change ) => changes.push( change ) );
+	for ( const { path, value } of selectedChanges ) {
+		setNestedValue( newBlockStyles, path, undefined );
+		setNestedValue(
+			newUserConfig,
+			[ 'styles', 'blocks', name, ...path ],
+			value
+		);
+	}
 
-		return changes;
-	}, [ supports, attributes, blockUserConfig ] );
+	// Only clear the preset attributes from the rows being pushed. Clearing
+	// them all would wipe unselected preset styles from the block without
+	// pushing them to Global Styles.
+	const newBlockAttributes = {
+		style: cleanEmptyObject( newBlockStyles ),
+	};
+	for ( const presetAttribute of rowsToPush.flatMap(
+		( row ) => row.presetAttributes
+	) ) {
+		newBlockAttributes[ presetAttribute ] = undefined;
+	}
+
+	return { newBlockAttributes, newUserConfig };
 }
 
 function PushChangesToGlobalStylesControl( {
@@ -247,41 +447,28 @@ function PushChangesToGlobalStylesControl( {
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
-	const changes = useChangesToPush( name, attributes, userConfig );
+	const rows = useChangesToPush( name, attributes, userConfig );
+
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 ) {
-			return;
-		}
+	const pushChanges = useCallback(
+		( rowsToPush ) => {
+			const update = getStylesUpdate( {
+				rowsToPush,
+				attributes,
+				userConfig,
+				name,
+			} );
 
-		if ( changes.length > 0 ) {
-			const { style: blockStyles } = attributes;
-
-			const newBlockStyles = structuredClone( blockStyles );
-			const newUserConfig = structuredClone( userConfig );
-
-			for ( const { path, value } of changes ) {
-				setNestedValue( newBlockStyles, path, undefined );
-				setNestedValue(
-					newUserConfig,
-					[ 'styles', 'blocks', name, ...path ],
-					value
-				);
+			if ( ! update ) {
+				return;
 			}
 
-			const newBlockAttributes = {
-				borderColor: undefined,
-				backgroundColor: undefined,
-				textColor: undefined,
-				gradient: undefined,
-				fontSize: undefined,
-				fontFamily: undefined,
-				style: cleanEmptyObject( newBlockStyles ),
-			};
+			const { newBlockAttributes, newUserConfig } = update;
 
 			// @wordpress/core-data doesn't support editing multiple entity types in
 			// a single undo level. So for now, we disable @wordpress/core-data undo
@@ -312,17 +499,17 @@ function PushChangesToGlobalStylesControl( {
 					],
 				}
 			);
-		}
-	}, [
-		__unstableMarkNextChangeAsNotPersistent,
-		attributes,
-		changes,
-		createSuccessNotice,
-		name,
-		setAttributes,
-		setUserConfig,
-		userConfig,
-	] );
+		},
+		[
+			__unstableMarkNextChangeAsNotPersistent,
+			attributes,
+			createSuccessNotice,
+			name,
+			setAttributes,
+			setUserConfig,
+			userConfig,
+		]
+	);
 
 	return (
 		<BaseControl
@@ -330,7 +517,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					'Review and apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }
@@ -342,11 +529,19 @@ function PushChangesToGlobalStylesControl( {
 				__next40pxDefaultSize
 				variant="secondary"
 				accessibleWhenDisabled
-				disabled={ changes.length === 0 }
-				onClick={ pushChanges }
+				disabled={ rows.length === 0 }
+				onClick={ () => setIsModalOpen( true ) }
 			>
 				{ __( 'Apply globally' ) }
 			</Button>
+			{ isModalOpen && (
+				<ApplyGloballyModal
+					name={ name }
+					rows={ rows }
+					onApply={ pushChanges }
+					onRequestClose={ () => setIsModalOpen( false ) }
+				/>
+			) }
 		</BaseControl>
 	);
 }

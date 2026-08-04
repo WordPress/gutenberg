@@ -13,7 +13,11 @@
  * External dependencies
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-import type { Field } from '@wordpress/dataviews';
+
+/**
+ * Internal dependencies
+ */
+import type { ResolvableField } from './field-types';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -28,14 +32,97 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * Registered icon name (`collection/icon-name`), resolved into a
+ * `WidgetIcon` by the application's resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
+
+/**
+ * A link in a widget's help note.
+ */
+export interface WidgetHelpLink {
+	/**
+	 * Link label. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Link destination.
+	 */
+	href: string;
+}
+
+/**
+ * Declarative contextual help for a widget type, meant for compact
+ * surfaces such as tooltips.
+ */
+export interface WidgetHelp {
+	/**
+	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
+	 * in `links`.
+	 */
+	content: string;
+
+	/**
+	 * Links contextual to the note.
+	 */
+	links?: WidgetHelpLink[];
+}
+
+/**
  * How relevant an attribute is. Hosts may promote `'high'` to a prominent
  * surface; `'low'` (the default) is not. The widget declares importance,
  * not a surface.
  */
 type WidgetAttributeRelevance = 'high' | 'low';
 
-/** A DataViews `Field` plus the widget-layer `relevance` hint; what hosts read. */
-type WidgetAttribute< Item = unknown > = Field< Item > & {
+/**
+ * A user-triggerable verb a widget type declares. The declaration is
+ * serializable data: an envelope (`id`, `label`) plus exactly one
+ * fulfillment, named by the key carrying it. Today the only key is `href`,
+ * so the only fulfillment is a link.
+ *
+ * The host owns what follows: which primitive materializes the fulfillment,
+ * and where the affordance is placed. For a link that means mounting a real
+ * link primitive wherever the surface allows one, so middle-click, copy
+ * address, and the anchor role survive.
+ */
+export interface WidgetAction {
+	/**
+	 * Stable identifier, local to the widget type.
+	 */
+	id: string;
+
+	/**
+	 * Human-readable label naming the action. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Link fulfillment: the destination. A URL, an admin path, or a
+	 * widget-local file.
+	 */
+	href: string;
+
+	/**
+	 * Link only. When set, the destination downloads instead of navigating.
+	 * A string supplies the suggested filename.
+	 */
+	download?: string | boolean;
+
+	/**
+	 * Link only. Whether the destination opens in a new browser tab.
+	 */
+	openInNewTab?: boolean;
+}
+
+/**
+ * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
+ * read. Its `type` may also reference a registered field type by name
+ * (see `registerFieldType`); `useWidgetTypes` resolves such references
+ * into plain `Field` props.
+ */
+type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
 	relevance?: WidgetAttributeRelevance;
 };
 
@@ -78,6 +165,11 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
+	 * Contextual help note for compact surfaces.
+	 */
+	help?: WidgetHelp;
+
+	/**
 	 * Visual identifier for the widget type; hosts decide where, and
 	 * whether, to render it.
 	 */
@@ -93,8 +185,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Authoring intent about how the widget renders. Not a user-editable
 	 * attribute.
 	 *
-	 * - `'framed'` (default when absent): the widget renders its
-	 *   content only.
+	 * - `'framed'` (default when absent): the host paints a header from
+	 *   identity and pads the content area.
 	 * - `'content-bleed'`: the host's chrome stays visible while the
 	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
@@ -130,6 +222,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * a `relevance` hint.
 	 */
 	attributes?: WidgetAttribute< Item >[];
+
+	/**
+	 * Declarative actions the widget type exposes. Hosts materialize each
+	 * one as an affordance and decide where to place it.
+	 */
+	actions?: WidgetAction[];
 
 	/**
 	 * Structured example data hosts use for previews, and the default
@@ -193,11 +291,30 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
+ * The `WidgetTypeMetadata` subset a record may carry, resolved server-side
+ * (already translated) and overriding the metadata module's values. Every
+ * field is optional and nullable; `null`/absent means the module's value
+ * stands.
+ */
+type WidgetModuleRecordOverrides = {
+	[ K in keyof Pick<
+		WidgetTypeMetadata,
+		| 'title'
+		| 'description'
+		| 'help'
+		| 'category'
+		| 'presentation'
+		| 'keywords'
+		| 'actions'
+	> ]?: WidgetTypeMetadata[ K ] | null;
+};
+
+/**
  * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
  * format. The host fetches these however it likes; only the field shape is
  * part of the contract.
  */
-export interface WidgetModuleRecord {
+export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	/**
 	 * Stable widget type identifier.
 	 */
@@ -214,27 +331,8 @@ export interface WidgetModuleRecord {
 	widget_module?: string | null;
 
 	/**
-	 * Authoring presentation hint; overrides the metadata module's value.
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 * `null`/absent means the module's icon stands.
 	 */
-	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
-
-	/**
-	 * Grouping category; overrides the metadata module's value.
-	 */
-	category?: WidgetTypeMetadata[ 'category' ] | null;
-
-	/**
-	 * Translated title; overrides the metadata module's value.
-	 */
-	title?: WidgetTypeMetadata[ 'title' ] | null;
-
-	/**
-	 * Translated description; overrides the metadata module's value.
-	 */
-	description?: WidgetTypeMetadata[ 'description' ] | null;
-
-	/**
-	 * Translated search aliases; override the metadata module's value.
-	 */
-	keywords?: WidgetTypeMetadata[ 'keywords' ] | null;
+	icon?: WidgetIconReference | null;
 }

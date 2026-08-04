@@ -139,7 +139,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					isShownByDefault
 				>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Taxonomy' ) }
 						options={ getTaxonomyOptions() }
 						value={ taxonomy }

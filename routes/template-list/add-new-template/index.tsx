@@ -146,7 +146,7 @@ function TemplateListItem( {
 				>
 					<WCText
 						align="center"
-						weight={ 500 }
+						weight="var(--wpds-typography-font-weight-emphasis)"
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }

@@ -10,7 +10,7 @@
  * WordPress dependencies
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { dispatch, resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -130,18 +130,38 @@ const getCoreMediaQuery = ( query = {} ) => ( {
 } );
 
 const coreMediaFetch = async ( query = {} ) => {
-	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
+	// Use the same final query for the records fetch and the totals selectors so
+	// their cached query key matches and the totals resolve to this exact request.
+	const finalQuery = getCoreMediaQuery( query );
+	const records = await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		'attachment',
-		getCoreMediaQuery( query )
+		finalQuery
 	);
-	return mediaItems.map( ( mediaItem ) => ( {
-		...mediaItem,
-		alt: mediaItem.alt_text,
-		url: mediaItem.source_url,
-		previewUrl: mediaItem.media_details?.sizes?.medium?.source_url,
-		caption: mediaItem.caption?.raw,
-	} ) );
+	// Totals are read synchronously after resolution — the `getEntityRecords`
+	// resolver captures them from the `X-WP-Total` / `X-WP-TotalPages` response
+	// headers, and `resolveSelect().getEntityRecords()` only returns the records.
+	const totalItems = select( coreStore ).getEntityRecordsTotalItems(
+		'postType',
+		'attachment',
+		finalQuery
+	);
+	const totalPages = select( coreStore ).getEntityRecordsTotalPages(
+		'postType',
+		'attachment',
+		finalQuery
+	);
+	return {
+		mediaItems: records.map( ( record ) => ( {
+			...record,
+			alt: record.alt_text,
+			url: record.source_url,
+			previewUrl: record.media_details?.sizes?.medium?.source_url,
+			caption: record.caption?.raw,
+		} ) ),
+		totalItems,
+		totalPages,
+	};
 };
 
 const getAttachedImagesQuery = ( postId, query = {} ) => ( {
@@ -212,96 +232,131 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 	] );
 };
 
+// The inserter panel fetches imperatively into local state, so it can't react to
+// attachment cache invalidation on its own. Calls `onChange` on the resolved ->
+// unresolved edge of the resolution the grid reads, i.e. when that cache is
+// invalidated. `args` must match what `coreMediaFetch` resolves byte-for-byte,
+// since `invalidateResolution` keys on deep argument equality.
+const subscribeToMediaInvalidation = ( args, onChange ) => {
+	const isResolved = () =>
+		select( coreStore ).hasFinishedResolution( 'getEntityRecords', args );
+	let wasResolved = isResolved();
+	// Scoped to `coreStore` so the listener only runs on core-data changes.
+	return subscribe( () => {
+		const nowResolved = isResolved();
+		if ( wasResolved && ! nowResolved ) {
+			onChange();
+		}
+		wasResolved = nowResolved;
+	}, coreStore );
+};
+
+// Builds a core-data-backed category from a single `getQuery` mapper, so `fetch`
+// and `subscribe` can't drift apart on the resolution args. `coreMediaFetch`
+// applies `getCoreMediaQuery` internally, so `subscribe` mirrors it. External
+// sources (e.g. Openverse) don't use this and simply omit `subscribe`.
+const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
+	...category,
+	async fetch( query = {} ) {
+		return coreMediaFetch( getQuery( query ) );
+	},
+	subscribe( onChange, query = {} ) {
+		return subscribeToMediaInvalidation(
+			[
+				'postType',
+				'attachment',
+				getCoreMediaQuery( getQuery( query ) ),
+			],
+			onChange
+		);
+	},
+} );
+
 /**
  * Builds the "Attachments" media category for a given post. It behaves like
  * any other inserter media source (e.g. Openverse): it appears in the tab list
  * and renders through the shared media panel. In addition to `fetch`, it exposes
  * optional `attach`/`detach`/`invalidate` capabilities that the shared panel
  * picks up to offer an "Attach images" button and a per-item "Detach from post"
- * action in the same dropdown Openverse uses for "Report image".
+ * action in the same dropdown Openverse uses for "Report image". It also exposes
+ * `subscribe`, so the panel can refetch when the attachment cache is invalidated
+ * elsewhere (e.g. a media modal closing after an upload).
  *
  * @param {number}      postId      The current post id.
  * @param {string|null} [typeLabel] The post type's singular label to use in copy (e.g. "Page"),
  *                                  or null to fall back to the generic "post".
  * @return {InserterMediaCategory} The Attachments media category.
  */
-const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
-	name: 'attached-images',
-	labels: {
-		name: __( 'Attached images' ),
-		search_items: __( 'Search attachments' ),
-	},
-	mediaType: 'image',
-	// The post type's singular label (e.g. "Page"), threaded through so the
-	// shared panel can word its attach/detach copy for the current post type.
-	postTypeLabel: typeLabel,
-	// Empty-state message. Providing this also keeps the source in the tab list
-	// when it has no items, so it stays discoverable and the first image can be
-	// attached even with none yet.
-	emptyMessage: typeLabel
-		? sprintf(
-				// translators: %s: Name of the post type e.g: "Page".
-				__( 'No images attached to this %s.' ),
-				typeLabel
-		  )
-		: __( 'No images attached to this post.' ),
-	async fetch( query = {} ) {
-		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
-	},
-	async attach( mediaItems ) {
-		const attachmentIds = getImageAttachmentIds( mediaItems );
+const getAttachedImagesCategory = ( postId, typeLabel ) =>
+	createCoreMediaCategory( {
+		name: 'attached-images',
+		labels: {
+			name: __( 'Attached images' ),
+			search_items: __( 'Search attachments' ),
+		},
+		mediaType: 'image',
+		getQuery: ( query ) => getAttachedImagesQuery( postId, query ),
+		// The post type's singular label (e.g. "Page"), threaded through so the
+		// shared panel can word its attach/detach copy for the current post type.
+		postTypeLabel: typeLabel,
+		// Empty-state message. Providing this also keeps the source in the tab
+		// list when it has no items, so it stays discoverable and the first
+		// image can be attached even with none yet.
+		emptyMessage: typeLabel
+			? sprintf(
+					// translators: %s: Name of the post type e.g: "Page".
+					__( 'No images attached to this %s.' ),
+					typeLabel
+			  )
+			: __( 'No images attached to this post.' ),
+		async attach( mediaItems ) {
+			const attachmentIds = getImageAttachmentIds( mediaItems );
 
-		await Promise.all(
-			attachmentIds.map( ( attachmentId ) =>
-				saveAttachmentParent( attachmentId, postId )
-			)
-		);
+			await Promise.all(
+				attachmentIds.map( ( attachmentId ) =>
+					saveAttachmentParent( attachmentId, postId )
+				)
+			);
 
-		return attachmentIds.length;
-	},
-	async detach( mediaItem ) {
-		await saveAttachmentParent( mediaItem.id, 0 );
-	},
-	invalidate( query = {} ) {
-		invalidateAttachedImagesQueries( postId, query );
-	},
-} );
+			return attachmentIds.length;
+		},
+		async detach( mediaItem ) {
+			await saveAttachmentParent( mediaItem.id, 0 );
+		},
+		invalidate( query = {} ) {
+			invalidateAttachedImagesQueries( postId, query );
+		},
+	} );
 
 /** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
-	{
+	createCoreMediaCategory( {
 		name: 'images',
 		labels: {
 			name: __( 'Images' ),
 			search_items: __( 'Search images' ),
 		},
 		mediaType: 'image',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'image' } );
-		},
-	},
-	{
+		getQuery: ( query ) => ( { ...query, media_type: 'image' } ),
+	} ),
+	createCoreMediaCategory( {
 		name: 'videos',
 		labels: {
 			name: __( 'Videos' ),
 			search_items: __( 'Search videos' ),
 		},
 		mediaType: 'video',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'video' } );
-		},
-	},
-	{
+		getQuery: ( query ) => ( { ...query, media_type: 'video' } ),
+	} ),
+	createCoreMediaCategory( {
 		name: 'audio',
 		labels: {
 			name: __( 'Audio' ),
 			search_items: __( 'Search audio' ),
 		},
 		mediaType: 'audio',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'audio' } );
-		},
-	},
+		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
+	} ),
 	{
 		name: 'openverse',
 		labels: {
@@ -332,6 +387,13 @@ const inserterMediaCategories = [
 			} );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
+			// This external source returns a plain array, so it renders without a
+			// pager (the shared panel treats a non-object result as a single
+			// page). To paginate it later, return the same
+			// `{ mediaItems, totalItems, totalPages }` shape the core sources use,
+			// mapping `jsonResponse.result_count` -> `totalItems` and
+			// `jsonResponse.page_count` -> `totalPages` (Openverse already accepts
+			// a `page` query arg, which passes straight through above).
 			return results.map( ( result ) => ( {
 				...result,
 				// This is a temp solution for better titles, until Openverse API

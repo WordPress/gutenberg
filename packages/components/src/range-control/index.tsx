@@ -68,7 +68,6 @@ function UnforwardedRangeControl(
 		// Prevent passing legacy props to internal component.
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -326,7 +325,6 @@ function UnforwardedRangeControl(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						__unstableInputWidth={ space( 20 ) }
-						__next40pxDefaultSize
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
