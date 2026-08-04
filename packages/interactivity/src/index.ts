@@ -21,6 +21,7 @@ import {
 import { toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
+import { registerElementContext, getContextAt } from './context-registry';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 import {
@@ -70,6 +71,9 @@ export { useState, useRef } from 'preact/hooks';
  */
 export const watch = effect;
 export { renderElement } from './render';
+
+// Internal exports for tests and the `renderElement()` implementation.
+export { registerElementContext, getContextAt } from './context-registry';
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';

@@ -13,7 +13,7 @@ import {
 	type VNode,
 	type Context,
 } from 'preact';
-import { useRef, useCallback, useContext } from 'preact/hooks';
+import { useRef, useCallback, useContext, useLayoutEffect } from 'preact/hooks';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 import { PENDING_GETTER } from './proxies/state';
+import { registerElementContext } from './context-registry';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -117,6 +118,10 @@ interface DirectivesProps {
 
 // Main context.
 const context = createContext< any >( { client: {}, server: {} } );
+
+// Exported for `renderElement()` to inject a context base into fragments
+// inserted into the live DOM.
+export { context };
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -327,6 +332,32 @@ const Directives = ( {
 	// named as attributes (HTML Attributes).
 	element = cloneElement( element, { ref: scope.ref } );
 	scope.attributes = element.props;
+
+	/*
+	 * Register this element's rendered context in the context registry, so
+	 * `renderElement()` can find the live context at this position in the
+	 * DOM. Runs in a layout effect, which fires synchronously after the DOM
+	 * mutation (before paint), so the registry is populated by the time
+	 * `renderElement()` returns.
+	 *
+	 * Elements with a `context` directive render a Provider as their child
+	 * whose value holds the post-merge context (own value merged with the
+	 * inherited one) — that is what should be registered, since it is the
+	 * effective context at this element.
+	 */
+	useLayoutEffect( () => {
+		if ( scope.ref.current ) {
+			const providerValue = props.children?.props?.value;
+			registerElementContext( scope.ref.current, {
+				client:
+					providerValue?.client ??
+					scope.context,
+				server:
+					providerValue?.server ??
+					scope.serverContext,
+			} );
+		}
+	} );
 
 	// Recursively render the wrapper for the next priority level.
 	const children =

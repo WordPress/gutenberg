@@ -81,10 +81,17 @@ export const hydratedIslands = new WeakSet();
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param root The root element or node to start traversing on.
+ * @param root               The root element or node to start traversing on.
+ * @param inheritedNamespace Namespace to inherit for directives on elements
+ *                           without an enclosing `data-wp-interactive`
+ *                           attribute. Used by `renderElement()` when a
+ *                           fragment is inserted inside an existing island.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): ComponentChild {
+export function toVdom(
+	root: Node,
+	inheritedNamespace: string | null = null
+): ComponentChild {
 	const nodesToRemove = new Set< Node >();
 	const nodesToReplace = new Set< Node >();
 
@@ -93,7 +100,7 @@ export function toVdom( root: Node ): ComponentChild {
 		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
-	function walk( node: Node ): ComponentChild | null {
+	function walk( node: Node, isRoot = false ): ComponentChild | null {
 		const { nodeType } = node;
 
 		// TEXT_NODE (3)
@@ -124,6 +131,7 @@ export function toVdom( root: Node ): ComponentChild {
 		> = [];
 		let ignore = false;
 		let island = false;
+		let islandNamespace: string | null = null;
 
 		for ( let i = 0; i < attributes.length; i++ ) {
 			const attributeName = attributes[ i ].name;
@@ -145,14 +153,13 @@ export function toVdom( root: Node ): ComponentChild {
 					} catch {}
 					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
-						const islandNamespace =
+						islandNamespace =
 							// eslint-disable-next-line no-nested-ternary
 							typeof value === 'string'
 								? value
 								: typeof value?.namespace === 'string'
 								? value.namespace
 								: null;
-						namespaces.push( islandNamespace );
 					} else {
 						directives.push( [ attributeName, namespace, value ] );
 					}
@@ -186,6 +193,21 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 		if ( island ) {
 			hydratedIslands.add( elementNode );
+		}
+
+		/*
+		 * If this element starts an island, push its namespace onto the stack.
+		 * Otherwise, if this is the walk root and a namespace was inherited
+		 * (e.g. the fragment is inserted inside an existing island), push it
+		 * too so directives on this element and its descendants resolve
+		 * against it.
+		 */
+		let inherited = false;
+		if ( island ) {
+			namespaces.push( islandNamespace );
+		} else if ( isRoot && inheritedNamespace ) {
+			namespaces.push( inheritedNamespace );
+			inherited = true;
 		}
 
 		if ( directives.length ) {
@@ -236,7 +258,9 @@ export function toVdom( root: Node ): ComponentChild {
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			].map( ( childNode ) =>
+				toVdom( childNode, namespaces[ namespaces.length - 1 ] ?? null )
+			);
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
@@ -252,14 +276,14 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		// Restore previous namespace.
-		if ( island ) {
+		if ( island || inherited ) {
 			namespaces.pop();
 		}
 
 		return h( localName, props, children );
 	}
 
-	const vdom = walk( treeWalker.currentNode );
+	const vdom = walk( treeWalker.currentNode, true );
 
 	nodesToRemove.forEach( ( node: Node ) =>
 		( node as Comment | ProcessingInstruction ).remove()

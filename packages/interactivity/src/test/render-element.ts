@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { store } from '../store';
+import { getContext } from '../scopes';
 
 /**
  * Internal dependencies
@@ -174,5 +175,117 @@ describe( 'renderElement', () => {
 		expect( console ).toHaveWarnedWith(
 			'The data-wp-ignore directive is deprecated and will be removed in version 7.0.'
 		);
+	} );
+
+	it( 'hydrates a plain fragment inside an existing island, inheriting its namespace and context', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		// Existing island with its own context, already in the live DOM.
+		const island = el(
+			'<div data-wp-interactive="test/render-element" ' +
+				"data-wp-context='{ \"label\": \"ctx\" }'>" +
+				'<span data-testid="target"></span>' +
+				'</div>'
+		);
+		document.body.appendChild( island );
+
+		// The block's directives must be hydrated for the registry to have an
+		// entry at the insertion point. Render the island itself first.
+		renderElement( island );
+
+		// Plain fragment WITHOUT data-wp-interactive, inserted inside.
+		const node = el(
+			'<span data-testid="out" data-wp-text="state.message"></span>'
+		);
+		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
+
+		renderElement( node );
+
+		expect( node.textContent ).toBe( 'hello' );
+
+		// A second fragment reading context.
+		const ctxNode = el(
+			'<button data-testid="ctx-out" data-wp-text="context.label"></button>'
+		);
+		island.querySelector( '[data-testid="target"]' )!.appendChild( ctxNode );
+		renderElement( ctxNode );
+
+		expect( ctxNode.textContent ).toBe( 'ctx' );
+	} );
+
+	it( 'warns and skips when the element has no enclosing island', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const node = el(
+			'<div><span data-testid="out" data-wp-text="state.message"></span></div>'
+		);
+		document.body.appendChild( node );
+
+		renderElement( node );
+
+		// Directive unprocessed — server text intact.
+		expect(
+			node.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( '' );
+		// @ts-expect-error jest-console matcher is added by the test setup.
+		expect( console ).toHaveWarnedWith(
+			'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
+		);
+	} );
+
+	it( 'lets a fragment write through to the island context, and the island reacts', () => {
+		store( 'test/render-element', {
+			actions: {
+				increment() {
+					const context = getContext() as { count: number };
+					context.count += 1;
+				},
+			},
+		} );
+		const island = el(
+			'<div data-wp-interactive="test/render-element" ' +
+				"data-wp-context='{ \"count\": 0 }'>" +
+				'<span data-testid="island-count" data-wp-text="context.count"></span>' +
+				'<span data-testid="target"></span>' +
+				'</div>'
+		);
+		document.body.appendChild( island );
+		renderElement( island );
+
+		const node = el(
+			'<button data-testid="btn" data-wp-on--click="actions.increment"></button>'
+		);
+		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
+		renderElement( node );
+
+		const islandCount = island.querySelector(
+			'[data-testid="island-count"]'
+		)!;
+		const btn = node as HTMLButtonElement;
+		btn.click();
+		btn.click();
+
+		// The island's own element must react to the fragment's write-through.
+		expect( islandCount.textContent ).toBe( '2' );
+	} );
+
+	it( 'updates a kept node with fresh server markup in place', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const node = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<span data-testid="out" data-wp-text="state.message"></span>' +
+				'</div>'
+		);
+		document.body.appendChild( node );
+		renderElement( node );
+		expect(
+			node.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'hello' );
+
+		// Mutate the node's markup, re-insert, re-render.
+		store( 'test/render-element', { state: { message: 'updated' } } );
+		node.querySelector( '[data-testid="out"]' )!.textContent = 'server';
+		renderElement( node );
+		expect(
+			node.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'updated' );
 	} );
 } );
