@@ -197,6 +197,7 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getBlockOrder,
 		getBlockRootClientId,
 		getNextBlockClientId,
 		getPreviousBlockClientId,
@@ -218,6 +219,12 @@ export default function useArrowNav() {
 		}
 
 		function getAdjacentBlockInAnyLevel( clientId, isReverse ) {
+			// In document order, a block's own content is followed by its
+			// inner blocks and preceded by its ancestor's content.
+			if ( ! isReverse && getBlockOrder( clientId ).length ) {
+				return getBlockOrder( clientId )[ 0 ];
+			}
+
 			let current = clientId;
 
 			while ( current ) {
@@ -229,7 +236,13 @@ export default function useArrowNav() {
 					return adjacent;
 				}
 
-				current = getBlockRootClientId( current );
+				const parent = getBlockRootClientId( current );
+
+				if ( isReverse && parent ) {
+					return parent;
+				}
+
+				current = parent;
 			}
 
 			return null;
