@@ -57,8 +57,16 @@ add_action(
 				'methods'             => WP_REST_Server::READABLE,
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
+					// `?v=2` returns different markup to test re-fetching
+					// with fresh server content.
+					if ( isset( $_GET['v'] ) && '2' === $_GET['v'] ) {
+						return rest_ensure_response(
+							'<p data-testid="version">version 2</p>'
+						);
+					}
 					return rest_ensure_response(
-						'<button data-testid="counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>'
+						'<button data-testid="counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>' .
+						'<p data-testid="version">version 1</p>'
 					);
 				},
 			)
@@ -92,7 +100,28 @@ add_action(
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
 					return rest_ensure_response(
-						'<p data-testid="lifecycle" data-wp-init="actions.initFragment">not initialized</p>'
+						'<p data-testid="lifecycle" data-wp-init="actions.initFragment" data-wp-text="state.lifecycle">not initialized</p>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A fragment carrying `data-wp-router-region`. Once inserted and
+		 * rendered, it registers as a swappable router region, so navigating
+		 * to a page with the same region ID replaces its content.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/region',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<div data-wp-interactive="test/render-element" data-wp-router-region="test/region">' .
+						'<p data-testid="region-fragment">fragment content</p>' .
+						'</div>'
 					);
 				},
 			)
