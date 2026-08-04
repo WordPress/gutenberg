@@ -25,7 +25,7 @@ runs:
               BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
               # Packages cached under another runner image mostly miss.
               IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
-              echo "PREFIX=playwright-apt-${RUNNER_OS}-${RUNNER_ARCH}-${IMAGE}-${VERSION}-${BROWSERS_KEY}-" >> "$GITHUB_OUTPUT"
+              echo "PREFIX=playwright-apt--os-${RUNNER_OS}--arch-${RUNNER_ARCH}--img-${IMAGE}--pw-${VERSION}--browsers-${BROWSERS_KEY}--fingerprint-" >> "$GITHUB_OUTPUT"
 
               if [ -z "$BROWSERS" ] || [ "${BROWSERS#*webkit}" != "$BROWSERS" ]; then
                   echo "CACHE_DEPS=true" >> "$GITHUB_OUTPUT"
