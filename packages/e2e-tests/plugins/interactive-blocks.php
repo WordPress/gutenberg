@@ -92,6 +92,54 @@ add_action(
 			)
 		);
 
+		/*
+		 * Fragments for testing `renderHTML()` position modes. Each one is a
+		 * plain fragment reading the island's context, with a distinct
+		 * testid, so the e2e can assert both the position and that the
+		 * inserted content was hydrated.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/before',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<p data-testid="frag-before" data-wp-text="context.count">0</p>'
+					);
+				},
+			)
+		);
+
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/after',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<p data-testid="frag-after" data-wp-text="context.count">0</p>'
+					);
+				},
+			)
+		);
+
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/outer',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<p data-testid="frag-outer" data-wp-text="context.count">0</p>'
+					);
+				},
+			)
+		);
+
 		// A fragment that runs lifecycle directives (`data-wp-init`).
 		register_rest_route(
 			'test/render-element/v1',

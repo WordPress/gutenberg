@@ -51,6 +51,27 @@
 	>
 		Load island fragment
 	</button>
+	<button
+		data-wp-on--click="actions.loadBefore"
+		data-testid="load-before"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/before' ) ); ?>"
+	>
+		Load before fragment
+	</button>
+	<button
+		data-wp-on--click="actions.loadAfter"
+		data-testid="load-after"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/after' ) ); ?>"
+	>
+		Load after fragment
+	</button>
+	<button
+		data-wp-on--click="actions.loadOuter"
+		data-testid="load-outer"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/outer' ) ); ?>"
+	>
+		Load outer fragment
+	</button>
 	<?php if ( ! empty( $attributes['next'] ) ) : ?>
 		<a
 			data-wp-on--click="actions.navigate"

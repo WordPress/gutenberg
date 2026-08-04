@@ -60,6 +60,36 @@ const { state } = store( 'test/render-element', {
 			renderHTML( target, html );
 			state.isHydrated = 'yes';
 		},
+		*loadBefore() {
+			const { ref } = getElement();
+			const res = yield fetch( ref.dataset.fragmentUrl );
+			const html = yield res.json();
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html, { position: 'before' } );
+			state.isHydrated = 'yes';
+		},
+		*loadAfter() {
+			const { ref } = getElement();
+			const res = yield fetch( ref.dataset.fragmentUrl );
+			const html = yield res.json();
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html, { position: 'after' } );
+			state.isHydrated = 'yes';
+		},
+		*loadOuter() {
+			const { ref } = getElement();
+			const res = yield fetch( ref.dataset.fragmentUrl );
+			const html = yield res.json();
+			const target = document.querySelector(
+				'[data-testid="target"]'
+			);
+			renderHTML( target, html, { position: 'outer' } );
+			state.isHydrated = 'yes';
+		},
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
 			const { actions } = yield import(

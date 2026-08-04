@@ -140,4 +140,61 @@ test.describe( 'renderElement', () => {
 		);
 		await expect( page.getByTestId( 'region-fragment' ) ).toHaveCount( 0 );
 	} );
+
+	test( 'inserts a fragment before the target with position "before"', async ( {
+		page,
+	} ) => {
+		const target = page.getByTestId( 'target' );
+		await expect( page.getByTestId( 'frag-before' ) ).toHaveCount( 0 );
+
+		await page.getByTestId( 'load-before' ).click();
+
+		// The fragment is hydrated (reads the island context)...
+		const frag = page.getByTestId( 'frag-before' );
+		await expect( frag ).toHaveText( '0' );
+
+		// ...and is a sibling immediately before the target.
+		await expect( frag ).toBeVisible();
+		const beforeIsTarget = await frag.evaluate(
+			( el ) => el.nextElementSibling?.getAttribute( 'data-testid' )
+		);
+		expect( beforeIsTarget ).toBe( 'target' );
+		await expect( target ).toHaveCount( 1 );
+	} );
+
+	test( 'inserts a fragment after the target with position "after"', async ( {
+		page,
+	} ) => {
+		const target = page.getByTestId( 'target' );
+		await expect( page.getByTestId( 'frag-after' ) ).toHaveCount( 0 );
+
+		await page.getByTestId( 'load-after' ).click();
+
+		// The fragment is hydrated (reads the island context)...
+		const frag = page.getByTestId( 'frag-after' );
+		await expect( frag ).toHaveText( '0' );
+
+		// ...and is a sibling immediately after the target.
+		await expect( frag ).toBeVisible();
+		const afterIsTarget = await frag.evaluate(
+			( el ) => el.previousElementSibling?.getAttribute( 'data-testid' )
+		);
+		expect( afterIsTarget ).toBe( 'target' );
+		await expect( target ).toHaveCount( 1 );
+	} );
+
+	test( 'replaces the target itself with position "outer"', async ( {
+		page,
+	} ) => {
+		await expect( page.getByTestId( 'target' ) ).toHaveCount( 1 );
+		await expect( page.getByTestId( 'frag-outer' ) ).toHaveCount( 0 );
+
+		await page.getByTestId( 'load-outer' ).click();
+
+		// The target is replaced by the fragment...
+		await expect( page.getByTestId( 'target' ) ).toHaveCount( 0 );
+
+		// ...which is hydrated (reads the island context).
+		await expect( page.getByTestId( 'frag-outer' ) ).toHaveText( '0' );
+	} );
 } );
