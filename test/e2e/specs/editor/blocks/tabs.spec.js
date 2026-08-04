@@ -195,7 +195,6 @@ test.describe( 'Tabs', () => {
 			// Empty the tab label, then delete again to remove the tab.
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
-
 			await page.keyboard.press( 'Backspace' );
 
 			const tabs = editor.canvas.getByRole( 'tab' );
