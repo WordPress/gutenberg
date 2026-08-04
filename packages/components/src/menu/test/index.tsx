@@ -276,7 +276,25 @@ describe( 'Menu', () => {
 			);
 		} );
 
-		it( 'should retain outside focus when outside interaction closes the menu', async () => {
+		it( 'should close when clicking outside of the content', async () => {
+			render(
+				<Menu defaultOpen>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover>
+						<Menu.Item>Menu item</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
+			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+
+			// Click on the body (ie. outside of the dropdown menu)
+			await user.click( document.body );
+
+			await waitForClosedMenu();
+		} );
+
+		it( 'should retain outside focus when outside interaction closes a non-modal menu', async () => {
 			render(
 				<>
 					<Menu defaultOpen>
