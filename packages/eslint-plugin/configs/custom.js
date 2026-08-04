@@ -11,6 +11,7 @@ module.exports = [
 			'@wordpress': wpPlugin,
 		},
 		rules: {
+			'@wordpress/jsdoc-valid-since': 'error',
 			'@wordpress/no-unused-vars-before-return': 'error',
 			'@wordpress/no-base-control-with-label-without-id': 'error',
 			'@wordpress/no-unguarded-get-range-at': 'error',
