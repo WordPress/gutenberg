@@ -16,7 +16,10 @@
  * is a `WeakMap`, so entries are garbage-collected when elements are removed.
  */
 
-const contextRegistry = new WeakMap< Element, { client: object; server: object } >();
+const contextRegistry = new WeakMap<
+	Element,
+	{ client: object; server: object }
+>();
 
 /**
  * Registers (or updates) the context for a given element.

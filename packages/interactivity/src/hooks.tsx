@@ -349,12 +349,8 @@ const Directives = ( {
 		if ( scope.ref.current ) {
 			const providerValue = props.children?.props?.value;
 			registerElementContext( scope.ref.current, {
-				client:
-					providerValue?.client ??
-					scope.context,
-				server:
-					providerValue?.server ??
-					scope.serverContext,
+				client: providerValue?.client ?? scope.context,
+				server: providerValue?.server ?? scope.serverContext,
 			} );
 		}
 	} );

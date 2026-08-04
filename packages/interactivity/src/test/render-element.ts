@@ -182,7 +182,7 @@ describe( 'renderElement', () => {
 		// Existing island with its own context, already in the live DOM.
 		const island = el(
 			'<div data-wp-interactive="test/render-element" ' +
-				"data-wp-context='{ \"label\": \"ctx\" }'>" +
+				'data-wp-context=\'{ "label": "ctx" }\'>' +
 				'<span data-testid="target"></span>' +
 				'</div>'
 		);
@@ -206,7 +206,9 @@ describe( 'renderElement', () => {
 		const ctxNode = el(
 			'<button data-testid="ctx-out" data-wp-text="context.label"></button>'
 		);
-		island.querySelector( '[data-testid="target"]' )!.appendChild( ctxNode );
+		island
+			.querySelector( '[data-testid="target"]' )!
+			.appendChild( ctxNode );
 		renderElement( ctxNode );
 
 		expect( ctxNode.textContent ).toBe( 'ctx' );
@@ -222,9 +224,9 @@ describe( 'renderElement', () => {
 		renderElement( node );
 
 		// Directive unprocessed — server text intact.
-		expect(
-			node.querySelector( '[data-testid="out"]' )?.textContent
-		).toBe( '' );
+		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
+			''
+		);
 		// @ts-expect-error jest-console matcher is added by the test setup.
 		expect( console ).toHaveWarnedWith(
 			'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
@@ -242,9 +244,9 @@ describe( 'renderElement', () => {
 
 		renderElement( node );
 
-		expect(
-			node.querySelector( '[data-testid="out"]' )?.textContent
-		).toBe( 'hello' );
+		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
+			'hello'
+		);
 		// @ts-expect-error jest-console matcher is added by the test setup.
 		expect( console ).not.toHaveWarned();
 	} );
@@ -260,7 +262,7 @@ describe( 'renderElement', () => {
 		} );
 		const island = el(
 			'<div data-wp-interactive="test/render-element" ' +
-				"data-wp-context='{ \"count\": 0 }'>" +
+				'data-wp-context=\'{ "count": 0 }\'>' +
 				'<span data-testid="island-count" data-wp-text="context.count"></span>' +
 				'<span data-testid="target"></span>' +
 				'</div>'
@@ -300,7 +302,7 @@ describe( 'renderElement', () => {
 		} );
 		const island = el(
 			'<div data-wp-interactive="test/render-element" ' +
-				"data-wp-context='{ \"count\": 0 }'>" +
+				'data-wp-context=\'{ "count": 0 }\'>' +
 				'<span data-testid="island-count" data-wp-text="context.count"></span>' +
 				'<span data-testid="target"></span>' +
 				'</div>'
@@ -318,7 +320,9 @@ describe( 'renderElement', () => {
 		renderElement( node );
 
 		// The fragment's own context starts at 10.
-		const btn = node.querySelector( '[data-testid="btn"]' ) as HTMLButtonElement;
+		const btn = node.querySelector(
+			'[data-testid="btn"]'
+		) as HTMLButtonElement;
 		expect( btn.textContent ).toBe( '10' );
 
 		// Writing to the fragment's context must NOT affect the island's.
@@ -340,17 +344,17 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 		renderElement( node );
-		expect(
-			node.querySelector( '[data-testid="out"]' )?.textContent
-		).toBe( 'hello' );
+		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
+			'hello'
+		);
 
 		// Change the state and re-render the SAME node: the directive must
 		// re-evaluate against the new state, updating in place.
 		store( 'test/render-element', { state: { message: 'updated' } } );
 		renderElement( node );
-		expect(
-			node.querySelector( '[data-testid="out"]' )?.textContent
-		).toBe( 'updated' );
+		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
+			'updated'
+		);
 	} );
 
 	it( 'renders a data-wp-each list inside an inserted fragment', async () => {
@@ -385,7 +389,9 @@ describe( 'renderElement', () => {
 
 		// The list is reactive: adding an item re-renders it. Wait for the
 		// reactive flush (after the next animation frame).
-		( node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement ).click();
+		(
+			node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement
+		 ).click();
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		const updated = node.querySelectorAll( '[data-testid="item"]' );
@@ -455,7 +461,9 @@ describe( 'renderElement', () => {
 		expect( watch.textContent ).toBe( 'watched 3' );
 
 		// Re-runs when state changes.
-		( node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement ).click();
+		(
+			node.querySelector( '[data-testid="add"]' ) as HTMLButtonElement
+		 ).click();
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 		expect( watch.textContent ).toBe( 'watched 4' );
@@ -517,10 +525,7 @@ describe( 'renderHTML', () => {
 		const target = container.querySelector(
 			'[data-testid="target"]'
 		) as HTMLElement;
-		renderHTML(
-			target,
-			'<span data-testid="added">new</span>'
-		);
+		renderHTML( target, '<span data-testid="added">new</span>' );
 
 		expect(
 			target.querySelector( '[data-testid="existing"]' )
@@ -543,11 +548,9 @@ describe( 'renderHTML', () => {
 		const target = container.querySelector(
 			'[data-testid="target"]'
 		) as HTMLElement;
-		renderHTML(
-			target,
-			'<span data-testid="added">new</span>',
-			{ position: 'prepend' }
-		);
+		renderHTML( target, '<span data-testid="added">new</span>', {
+			position: 'prepend',
+		} );
 
 		expect( target.firstElementChild?.getAttribute( 'data-testid' ) ).toBe(
 			'added'
@@ -567,15 +570,11 @@ describe( 'renderHTML', () => {
 		const target = container.querySelector(
 			'[data-testid="target"]'
 		) as HTMLElement;
-		renderHTML(
-			target,
-			'<span data-testid="added">new</span>',
-			{ position: 'inner' }
-		);
+		renderHTML( target, '<span data-testid="added">new</span>', {
+			position: 'inner',
+		} );
 
-		expect(
-			target.querySelector( '[data-testid="existing"]' )
-		).toBeNull();
+		expect( target.querySelector( '[data-testid="existing"]' ) ).toBeNull();
 		expect(
 			target.querySelector( '[data-testid="added"]' )
 		).not.toBeNull();
@@ -594,11 +593,9 @@ describe( 'renderHTML', () => {
 		const target = container.querySelector(
 			'[data-testid="target"]'
 		) as HTMLElement;
-		renderHTML(
-			target,
-			'<span data-testid="added">new</span>',
-			{ position: 'before' }
-		);
+		renderHTML( target, '<span data-testid="added">new</span>', {
+			position: 'before',
+		} );
 
 		expect(
 			target.previousElementSibling?.getAttribute( 'data-testid' )
@@ -620,15 +617,13 @@ describe( 'renderHTML', () => {
 		const target = container.querySelector(
 			'[data-testid="target"]'
 		) as HTMLElement;
-		renderHTML(
-			target,
-			'<span data-testid="added">new</span>',
-			{ position: 'after' }
-		);
+		renderHTML( target, '<span data-testid="added">new</span>', {
+			position: 'after',
+		} );
 
-		expect(
-			target.nextElementSibling?.getAttribute( 'data-testid' )
-		).toBe( 'added' );
+		expect( target.nextElementSibling?.getAttribute( 'data-testid' ) ).toBe(
+			'added'
+		);
 		// The container is untouched.
 		expect( target.children.length ).toBe( 0 );
 	} );
@@ -647,11 +642,9 @@ describe( 'renderHTML', () => {
 			'[data-testid="target"]'
 		) as HTMLElement;
 		const parent = target.parentElement!;
-		renderHTML(
-			target,
-			'<section data-testid="added">new</section>',
-			{ position: 'outer' }
-		);
+		renderHTML( target, '<section data-testid="added">new</section>', {
+			position: 'outer',
+		} );
 
 		// The target itself is gone; the new element replaced it.
 		expect( target.isConnected ).toBe( false );
@@ -664,7 +657,7 @@ describe( 'renderHTML', () => {
 		store( 'test/render-element', { state: { message: 'hello' } } );
 		const container = el(
 			'<div data-wp-interactive="test/render-element" ' +
-				"data-wp-context='{ \"label\": \"ctx\" }'>" +
+				'data-wp-context=\'{ "label": "ctx" }\'>' +
 				'<div data-testid="target"></div>' +
 				'</div>'
 		);
@@ -709,10 +702,7 @@ describe( 'renderHTML', () => {
 
 	it( 'throws when a selector matches no element', () => {
 		expect( () =>
-			renderHTML(
-				'[data-testid="does-not-exist"]',
-				'<span>new</span>'
-			)
+			renderHTML( '[data-testid="does-not-exist"]', '<span>new</span>' )
 		).toThrow( /no element found for selector/ );
 	} );
 

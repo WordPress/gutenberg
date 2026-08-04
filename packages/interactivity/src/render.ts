@@ -99,7 +99,10 @@ export function renderElement( element: Element | Element[] ): void {
 	 * the nearest ancestor island. If there is no island at all, warn and
 	 * skip (atomic — the whole call is skipped).
 	 */
-	const resolved: Array< { node: Element; vdom: ReturnType< typeof toVdom > } > = [];
+	const resolved: Array< {
+		node: Element;
+		vdom: ReturnType< typeof toVdom >;
+	} > = [];
 	let base: { client: object; server: object } | null = null;
 	for ( const node of nodes ) {
 		const hasOwnIsland = node.hasAttribute( 'data-wp-interactive' );
@@ -129,7 +132,9 @@ export function renderElement( element: Element | Element[] ): void {
 			 * (and write through to) the same context as the surrounding
 			 * island.
 			 */
-			h( context.Provider, { value: base ?? { client: {}, server: {} } },
+			h(
+				context.Provider,
+				{ value: base ?? { client: {}, server: {} } },
 				resolved.map( ( { vdom } ) => vdom )
 			),
 			getRegionRootFragment( nodes )
@@ -187,7 +192,13 @@ export function renderHTML(
 	{
 		position = 'append',
 	}: {
-		position?: 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
+		position?:
+			| 'append'
+			| 'prepend'
+			| 'before'
+			| 'after'
+			| 'inner'
+			| 'outer';
 	} = {}
 ): void {
 	// Resolve a CSS selector to its element, if one was passed.

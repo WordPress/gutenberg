@@ -44,9 +44,7 @@ const { state } = store( 'test/render-element', {
 			const { ref } = getElement();
 			const res = yield fetch( ref.dataset.fragmentUrl );
 			const html = yield res.json();
-			const target = document.querySelector(
-				'[data-testid="target"]'
-			);
+			const target = document.querySelector( '[data-testid="target"]' );
 			renderHTML( target, html, {
 				position: ref.dataset.position ?? 'append',
 			} );
