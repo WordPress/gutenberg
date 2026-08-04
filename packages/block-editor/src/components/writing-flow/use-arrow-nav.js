@@ -164,10 +164,11 @@ export function getClosestTabbable(
 		if (
 			node.isContentEditable &&
 			node.contentEditable !== 'true' &&
-			// The editable element within the block may be editable by
-			// inheritance under an editing host (`contenteditable="inherit"`),
-			// so accept any explicit editable marker except an opt-out.
-			getBlockClientId( node.closest( '[contenteditable], .rich-text' ) )
+			// Rich text elements are the text content of blocks; the
+			// selected block's element carries no contenteditable attribute
+			// (it is editable by inheritance from the editing host), so they
+			// are matched by class.
+			getBlockClientId( node.closest( '.rich-text' ) )
 		) {
 			return false;
 		}
