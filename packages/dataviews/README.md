@@ -1256,7 +1256,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
+Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `time`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 -   Type: `string`.
 -   Optional.
@@ -1547,7 +1547,7 @@ Fields that provide a `type` will have a default Edit control:
 }
 ```
 
-Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
+Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `time`, `toggle`, `toggleGroup`, or `url`.
 
 ```js
 {
@@ -2031,12 +2031,17 @@ Valid operators per field type:
 -   password: none.
 -   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   time: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `between`.
 -   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   fields with no type: any operator.
 
+`time` shares the ordering operators with `date` and `datetime`, which compare temporal values generically: a date or datetime compares by its position on the calendar, a time by its position within the day. Comparisons are precision-insensitive, so a filter for `'09:00'` matches a stored `'09:00:00'`.
+
+`inThePast` and `over` are the exception, and are not valid for `time`: they measure backwards from now, which a time of day has no way to anchor to.
+
 ### `format`
 
-Display format configuration for fields. Supported for `datetime`, `date`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for `datetime`, `date`, `time`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
@@ -2078,6 +2083,30 @@ Example:
 	},
 }
 ```
+
+For `time` fields:
+
+-   Properties:
+    -   `time`: The format string using PHP date format (e.g., `'g:i a'` for `'2:30 pm'`). Optional, defaults to WordPress "Time Format" setting.
+
+Whether the `Edit` control offers a seconds field follows this format: it does when the format string renders seconds (e.g. `'H:i:s'`), and does not otherwise.
+
+Use time tokens only. Because a time carries no date, date and timezone tokens have nothing meaningful to render and will emit the placeholder date the value is internally anchored to — `'F j, Y g:i a'` renders `'January 1, 2000 2:30 pm'`. Use `datetime` if the field needs a date.
+
+Example:
+
+```js
+{
+	id: 'opensAt',
+	type: 'time',
+	label: 'Opens At',
+	format: {
+		time: 'g:i a',
+	},
+}
+```
+
+A `time` value is a time of day with no date attached, stored as `HH:mm` or `HH:mm:ss` (RFC 3339 `partial-time`). Values are wall-clock: a trailing UTC offset is accepted but ignored rather than applied, and the value renders identically no matter which timezone the visitor is in. If a time needs to denote a specific instant, use `datetime` instead.
 
 For `number` fields:
 

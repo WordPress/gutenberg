@@ -10,7 +10,10 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	applyFilters,
@@ -32,6 +35,8 @@ import {
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
+
+const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -467,7 +472,24 @@ export const autosave =
 			const title = select.getEditedPostAttribute( 'title' );
 			const content = select.getEditedPostAttribute( 'content' );
 			const excerpt = select.getEditedPostAttribute( 'excerpt' );
-			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
+
+			// Capture the CRDT snapshot in the same tick as the content reads
+			// so it describes exactly the content being backed up. Undefined
+			// when the post is not being synced.
+			const crdtSnapshot = getEntitySnapshot(
+				'postType',
+				post.type,
+				post.id
+			);
+
+			localAutosaveSet(
+				post.id,
+				isPostNew,
+				title,
+				content,
+				excerpt,
+				crdtSnapshot
+			);
 		} else {
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}

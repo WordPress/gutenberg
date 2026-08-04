@@ -9,7 +9,7 @@ import {
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
@@ -123,7 +123,12 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				gap="sm"
 				wrap="wrap"
 			>
-				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ onCancel }
+					shortcut="Escape"
+				>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button
@@ -132,6 +137,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					variant="primary"
 					type="submit"
 					disabled={ isDisabled }
+					shortcut={ displayShortcut.primary( 'Enter' ) }
 				>
 					<Truncate>{ labels?.submit ?? __( 'Add note' ) }</Truncate>
 				</Button>

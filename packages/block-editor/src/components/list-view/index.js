@@ -39,29 +39,26 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
-import { focusListItem } from './utils';
+import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
-const expanded = ( state, action ) => {
+const expansion = ( state, action ) => {
 	if ( action.type === 'clear' ) {
 		return {};
 	}
-	if ( Array.isArray( action.clientIds ) ) {
-		return {
-			...state,
-			...action.clientIds.reduce(
-				( newState, id ) => ( {
-					...newState,
-					[ id ]: action.type === 'expand',
-				} ),
-				{}
-			),
-		};
-	}
-	return state;
-};
 
-export const BLOCK_LIST_ITEM_HEIGHT = 32;
+	const clientIds = [ action.clientIds ].flat().filter( Boolean );
+	if ( ! clientIds.length ) {
+		return state;
+	}
+
+	return {
+		...state,
+		...Object.fromEntries(
+			clientIds.map( ( id ) => [ id, action.type === 'expand' ] )
+		),
+	};
+};
 
 /** @typedef {React.ComponentType} ComponentType */
 /** @typedef {React.Ref<HTMLElement>} Ref */
@@ -134,13 +131,14 @@ function ListViewComponent(
 
 	const { updateBlockSelection } = useBlockSelection();
 
-	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
 
-	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
-		setExpandedState,
+		updateExpansion,
 	} );
 	const selectEditorBlock = useCallback(
 		/**
@@ -160,8 +158,8 @@ function ListViewComponent(
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
 		dropZoneElement,
-		expandedState,
-		setExpandedState,
+		expansionState,
+		updateExpansion,
 	} );
 	const elementRef = useRef();
 
@@ -190,42 +188,12 @@ function ListViewComponent(
 		ref,
 	] );
 
-	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			const clientIds = Array.isArray( clientId )
-				? clientId
-				: [ clientId ];
-			setExpandedState( { type: 'expand', clientIds } );
-		},
-		[ setExpandedState ]
-	);
-	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
-		},
-		[ setExpandedState ]
-	);
-	const collapseAll = useCallback( () => {
-		setExpandedState( { type: 'clear' } );
-	}, [ setExpandedState ] );
-	const expandRow = useCallback(
-		( row ) => {
-			expand( row?.dataset?.block );
-		},
-		[ expand ]
-	);
-	const collapseRow = useCallback(
-		( row ) => {
-			collapse( row?.dataset?.block );
-		},
-		[ collapse ]
-	);
+	const expandRow = useCallback( ( row ) => {
+		updateExpansion( { type: 'expand', clientIds: row?.dataset?.block } );
+	}, [] );
+	const collapseRow = useCallback( ( row ) => {
+		updateExpansion( { type: 'collapse', clientIds: row?.dataset?.block } );
+	}, [] );
 	const focusRow = useCallback(
 		( event, startRow, endRow ) => {
 			if ( event.shiftKey ) {
@@ -239,10 +207,7 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
-	useListViewCollapseItems( {
-		collapseAll,
-		expand,
-	} );
+	useListViewCollapseItems( { updateExpansion } );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
@@ -290,16 +255,14 @@ function ListViewComponent(
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
+			updateExpansion,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			treeGridElementRef: elementRef,
 			rootClientId,
 		} ),
@@ -308,23 +271,18 @@ function ListViewComponent(
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
+			updateExpansion,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
+			insertedBlockClientId,
+			setInsertedBlockClientId,
 			rootClientId,
 		]
 	);
 
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
 		BLOCK_LIST_ITEM_HEIGHT,
@@ -335,7 +293,7 @@ function ListViewComponent(
 			// switch the list view to a tall list view with a scrollbar, and vice versa.
 			// When this happens, the windowing logic needs to be recalculated to ensure that
 			// the correct number of blocks are rendered, by rechecking for a scroll container.
-			expandedState,
+			expandedState: expansionState,
 			useWindowing: true,
 			windowOverscan: 40,
 		}

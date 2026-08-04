@@ -25,8 +25,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
-	const { block } = props;
-	const { clientId } = block;
+	const { clientId } = props;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -42,39 +41,40 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const rootClientId = useSelect(
+	const { rootClientId, blockName, attributes } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 
-			return getBlockRootClientId( clientId );
+			return {
+				rootClientId: getBlockRootClientId( clientId ),
+				blockName: getBlockName( clientId ),
+				attributes: getBlockAttributes( clientId ),
+			};
 		},
 		[ clientId ]
 	);
 
-	const onGoToPage = useCallback(
-		( selectedBlock ) => {
-			const { attributes, name } = selectedBlock;
-			if (
-				attributes.kind === 'post-type' &&
-				attributes.id &&
-				attributes.type &&
-				history
-			) {
-				history.navigate(
-					`/${ attributes.type }/${ attributes.id }?canvas=edit`,
-					{
-						state: { backPath: path },
-					}
-				);
-			}
-			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.navigate( `/page/${ attributes.id }?canvas=edit`, {
+	const onGoToPage = useCallback( () => {
+		if (
+			attributes.kind === 'post-type' &&
+			attributes.id &&
+			attributes.type &&
+			history
+		) {
+			history.navigate(
+				`/${ attributes.type }/${ attributes.id }?canvas=edit`,
+				{
 					state: { backPath: path },
-				} );
-			}
-		},
-		[ path, history ]
-	);
+				}
+			);
+		}
+		if ( blockName === 'core/page-list-item' && attributes.id && history ) {
+			history.navigate( `/page/${ attributes.id }?canvas=edit`, {
+				state: { backPath: path },
+			} );
+		}
+	}, [ path, history, attributes, blockName ] );
 
 	return (
 		<DropdownMenu
@@ -106,17 +106,16 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ block.attributes?.type === 'page' &&
-							block.attributes?.id && (
-								<MenuItem
-									onClick={ () => {
-										onGoToPage( block );
-										onClose();
-									} }
-								>
-									{ goToLabel }
-								</MenuItem>
-							) }
+						{ attributes?.type === 'page' && attributes?.id && (
+							<MenuItem
+								onClick={ () => {
+									onGoToPage();
+									onClose();
+								} }
+							>
+								{ goToLabel }
+							</MenuItem>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

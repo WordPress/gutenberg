@@ -590,3 +590,54 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Adds the autosave's CRDT snapshot to the block editor settings when
+ * real-time collaboration is enabled.
+ *
+ * The snapshot describes the document state the autosave captured. The editor
+ * verifies its own shared document against it, and suppresses the "there is a
+ * more recent autosave" notice when the shared document already contains
+ * everything the autosave holds.
+ *
+ * @param array                   $settings             Editor settings.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_autosave_details_to_editor_settings( $settings, $block_editor_context ) {
+	if ( ! isset( $settings['autosave'] ) || empty( $block_editor_context->post ) ) {
+		return $settings;
+	}
+
+	if ( ! wp_is_collaboration_enabled() ) {
+		return $settings;
+	}
+
+	$post = $block_editor_context->post;
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $settings;
+	}
+
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return $settings;
+	}
+
+	$snapshot = get_post_meta( $autosave->ID, Gutenberg_REST_Autosaves_Controller::CRDT_SNAPSHOT_META_KEY, true );
+
+	/*
+	 * Snapshots can be missing from a pre-collaboration autosave, classic editor autosave,
+	 * and other paths. The worst case is a "more recent autosave" notice when newer CRDT
+	 * content is already present in the shared document.
+	 */
+	if ( ! is_string( $snapshot ) || '' === $snapshot ) {
+		return $settings;
+	}
+
+	$settings['autosave']['crdtSnapshot'] = $snapshot;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_autosave_details_to_editor_settings', 10, 2 );

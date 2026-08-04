@@ -194,6 +194,9 @@ test.describe( 'Tabs', () => {
 			await expect(
 				newTab.locator( '[contenteditable="true"]' )
 			).toBeFocused();
+			await expect(
+				newTab.locator( '[data-rich-text-placeholder]' )
+			).toHaveAttribute( 'data-rich-text-placeholder', 'Tab title' );
 
 			// The new tab's panel is the active one and is visible.
 			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.

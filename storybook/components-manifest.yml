@@ -1,0 +1,1148 @@
+# Auto-generated snapshot of the Storybook components manifest.
+# Do not edit by hand. Regenerate with `npm run storybook:manifest-snapshot`
+# and commit the result. See `storybook/README.md` for details.
+- name: Badge
+  props:
+      - children
+      - className
+      - intent
+      - render
+      - style
+- name: BaseControl
+  props:
+      - __nextHasNoMarginBottom
+      - as
+      - children
+      - className
+      - help
+      - hideLabelFromVision
+      - id
+      - label
+  subcomponents:
+      - name: BaseControl.VisualLabel
+        props:
+            - as
+            - children
+- name: Button
+  props:
+      - __experimentalIsFocusable
+      - __next40pxDefaultSize
+      - accessibleWhenDisabled
+      - children
+      - describedBy
+      - description
+      - disabled
+      - href
+      - icon
+      - iconPosition
+      - iconSize
+      - isBusy
+      - isDefault
+      - isDestructive
+      - isLink
+      - isPressed
+      - isPrimary
+      - isSecondary
+      - isSmall
+      - isTertiary
+      - label
+      - shortcut
+      - showTooltip
+      - size
+      - target
+      - text
+      - tooltipPosition
+      - variant
+- name: Card.Root
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: Card.Content
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Card.FullBleed
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Card.Header
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Card.Title
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: CheckboxControl
+  props:
+      - __nextHasNoMarginBottom
+      - checked
+      - disabled
+      - heading
+      - help
+      - indeterminate
+      - label
+      - onChange
+- name: Collapsible.Root
+  props:
+      - children
+      - className
+      - defaultOpen
+      - disabled
+      - onOpenChange
+      - open
+      - render
+      - style
+  subcomponents:
+      - name: Collapsible.Panel
+        props:
+            - children
+            - className
+            - hiddenUntilFound
+            - keepMounted
+            - render
+            - style
+      - name: Collapsible.Trigger
+        props:
+            - children
+            - className
+            - nativeButton
+            - render
+            - style
+- name: CollapsibleCard.Root
+  props:
+      - children
+      - className
+      - defaultOpen
+      - disabled
+      - onOpenChange
+      - open
+      - render
+      - style
+  subcomponents:
+      - name: Card.FullBleed
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: CollapsibleCard.Content
+        props:
+            - children
+            - className
+            - hiddenUntilFound
+            - render
+            - style
+      - name: CollapsibleCard.Header
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: CollapsibleCard.HeaderDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: ColorIndicator
+  props:
+      - colorValue
+- name: ColorPalette
+  props:
+      - __experimentalIsRenderedInSidebar
+      - aria-label
+      - aria-labelledby
+      - as
+      - asButtons
+      - clearable
+      - colors
+      - disableCustomColors
+      - enableAlpha
+      - headingLevel
+      - loop
+      - onChange
+      - selectedSlug
+      - value
+- name: ColorPicker
+  props:
+      - as
+      - color
+      - copyFormat
+      - defaultValue
+      - enableAlpha
+      - onChange
+- name: ComboboxControl
+  props:
+      - __experimentalRenderItem
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - allowReset
+      - className
+      - expandOnFocus
+      - help
+      - hideLabelFromVision
+      - isLoading
+      - label
+      - messages
+      - onChange
+      - onFilterValueChange
+      - options
+      - placeholder
+      - value
+- name: Composite
+  props:
+      - accessibleWhenDisabled
+      - activeId
+      - children
+      - defaultActiveId
+      - disabled
+      - focusable
+      - focusLoop
+      - focusShift
+      - focusWrap
+      - onFocusVisible
+      - orientation
+      - render
+      - rtl
+      - setActiveId
+      - virtualFocus
+  subcomponents:
+      - name: Composite.Context
+        props: []
+      - name: Composite.Group
+        props:
+            - children
+            - render
+      - name: Composite.GroupLabel
+        props:
+            - children
+            - render
+      - name: Composite.Hover
+        props:
+            - children
+            - render
+      - name: Composite.Item
+        props:
+            - accessibleWhenDisabled
+            - children
+            - render
+      - name: Composite.Row
+        props:
+            - children
+            - render
+      - name: Composite.Typeahead
+        props:
+            - children
+            - render
+- name: ConfirmDialog
+  props:
+      - cancelButtonText
+      - children
+      - confirmButtonText
+      - isBusy
+      - isOpen
+      - onCancel
+      - onConfirm
+      - size
+- name: CustomSelectControl
+  props:
+      - __experimentalShowSelectedHint
+      - __next40pxDefaultSize
+      - __nextUnconstrainedWidth
+      - className
+      - describedBy
+      - hideLabelFromVision
+      - label
+      - onBlur
+      - onChange
+      - onFocus
+      - onMouseOut
+      - onMouseOver
+      - options
+      - showSelectedHint
+      - size
+      - value
+- name: DataForm
+  props:
+      - data
+      - fields
+      - form
+      - onChange
+      - validity
+- name: DataViews
+  props:
+      - actions
+      - children
+      - config
+      - data
+      - defaultLayouts
+      - empty
+      - fields
+      - getItemId
+      - getItemLevel
+      - header
+      - isItemClickable
+      - isLoading
+      - onChangeSelection
+      - onChangeView
+      - onClickItem
+      - onReset
+      - paginationInfo
+      - renderItemLink
+      - search
+      - searchLabel
+      - selection
+      - view
+- name: DataViewsPicker
+  props:
+      - actions
+      - children
+      - config
+      - data
+      - defaultLayouts
+      - empty
+      - fields
+      - getItemId
+      - isLoading
+      - itemListLabel
+      - onChangeSelection
+      - onChangeView
+      - onReset
+      - paginationInfo
+      - search
+      - searchLabel
+      - selection
+      - view
+- name: Disabled
+  props:
+      - as
+      - children
+      - isDisabled
+- name: Dropdown
+  props:
+      - as
+      - className
+      - contentClassName
+      - defaultOpen
+      - expandOnMobile
+      - focusOnMount
+      - headerTitle
+      - onClose
+      - onToggle
+      - open
+      - popoverProps
+      - position
+      - renderContent
+      - renderToggle
+      - style
+  subcomponents:
+      - name: DropdownContentWrapper
+        props:
+            - children
+            - paddingSize
+- name: DropZone
+  props:
+      - className
+      - icon
+      - isEligible
+      - label
+      - onDrop
+      - onFilesDrop
+      - onHTMLDrop
+- name: EmptyState.Root
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: EmptyState.Actions
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: EmptyState.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: EmptyState.Icon
+        props:
+            - className
+            - icon
+            - render
+            - style
+      - name: EmptyState.Title
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: EmptyState.Visual
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: FormFileUpload
+  props:
+      - __next40pxDefaultSize
+      - accept
+      - children
+      - icon
+      - multiple
+      - onChange
+      - onClick
+      - render
+- name: FormToggle
+  props:
+      - checked
+      - disabled
+      - onChange
+- name: FormTokenField
+  props:
+      - __experimentalAutoSelectFirstMatch
+      - __experimentalExpandOnFocus
+      - __experimentalRenderItem
+      - __experimentalShowHowTo
+      - __experimentalValidateInput
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - autoCapitalize
+      - autoComplete
+      - className
+      - disabled
+      - displayTransform
+      - help
+      - isBorderless
+      - label
+      - maxLength
+      - maxSuggestions
+      - messages
+      - onChange
+      - onFocus
+      - onInputChange
+      - placeholder
+      - saveTransform
+      - suggestions
+      - tokenizeOnBlur
+      - tokenizeOnSpace
+      - value
+- name: GradientPicker
+  props:
+      - __experimentalIsRenderedInSidebar
+      - __nextHasNoMargin
+      - aria-label
+      - aria-labelledby
+      - asButtons
+      - className
+      - clearable
+      - disableCustomGradients
+      - enableAlpha
+      - gradients
+      - headingLevel
+      - loop
+      - onChange
+      - selectedSlug
+      - value
+- name: Icon
+  props:
+      - icon
+      - size
+- name: InputControl
+  props:
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __unstableInputWidth
+      - __unstableStateReducer
+      - disabled
+      - dragDirection
+      - dragThreshold
+      - help
+      - hideLabelFromVision
+      - isDragEnabled
+      - isPressEnterToChange
+      - label
+      - labelPosition
+      - onChange
+      - onDrag
+      - onDragEnd
+      - onDragStart
+      - onValidate
+      - prefix
+      - size
+      - suffix
+      - type
+      - value
+  subcomponents:
+      - name: InputControlPrefixWrapper
+        props:
+            - as
+            - children
+            - size
+            - variant
+      - name: InputControlSuffixWrapper
+        props:
+            - as
+            - children
+            - size
+            - variant
+- name: ItemGroup
+  props:
+      - as
+      - children
+      - isBordered
+      - isRounded
+      - isSeparated
+      - size
+  subcomponents:
+      - name: Item
+        props:
+            - as
+            - children
+            - size
+- name: KeyboardShortcuts
+  props:
+      - bindGlobal
+      - children
+      - eventName
+      - shortcuts
+- name: Link
+  props:
+      - children
+      - className
+      - openInNewTab
+      - render
+      - style
+      - tone
+      - variant
+- name: MenuGroup
+  props:
+      - children
+      - className
+      - hideSeparator
+      - label
+- name: MenuItem
+  props:
+      - children
+      - className
+      - icon
+      - iconPosition
+      - info
+      - isDestructive
+      - isSelected
+      - label
+      - role
+      - shortcut
+      - suffix
+- name: MenuItemsChoice
+  props:
+      - choices
+      - onHover
+      - onSelect
+      - value
+- name: Modal
+  props:
+      - __experimentalHideHeader
+      - aria
+      - bodyOpenClassName
+      - children
+      - className
+      - closeButtonLabel
+      - contentLabel
+      - focusOnMount
+      - headerActions
+      - icon
+      - isDismissible
+      - isFullScreen
+      - key
+      - onKeyDown
+      - onRequestClose
+      - overlayClassName
+      - ref
+      - role
+      - shouldCloseOnClickOutside
+      - shouldCloseOnEsc
+      - size
+      - style
+      - title
+- name: Navigator
+  props:
+      - as
+      - children
+      - initialPath
+  subcomponents:
+      - name: BackButton
+        props:
+            - __next40pxDefaultSize
+            - accessibleWhenDisabled
+            - as
+            - children
+            - description
+            - disabled
+            - icon
+            - iconPosition
+            - iconSize
+            - isBusy
+            - isDestructive
+            - isPressed
+            - label
+            - shortcut
+            - showTooltip
+            - size
+            - text
+            - tooltipPosition
+            - variant
+      - name: Button
+        props:
+            - __next40pxDefaultSize
+            - accessibleWhenDisabled
+            - as
+            - attributeName
+            - children
+            - description
+            - disabled
+            - icon
+            - iconPosition
+            - iconSize
+            - isBusy
+            - isDestructive
+            - isPressed
+            - label
+            - path
+            - shortcut
+            - showTooltip
+            - size
+            - text
+            - tooltipPosition
+            - variant
+      - name: Screen
+        props:
+            - children
+            - path
+- name: Notice
+  props:
+      - __unstableHTML
+      - actions
+      - children
+      - className
+      - isDismissible
+      - onDismiss
+      - onRemove
+      - politeness
+      - spokenMessage
+      - status
+  subcomponents:
+      - name: NoticeList
+        props:
+            - children
+            - notices
+            - onRemove
+- name: NumberControl
+  props:
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __unstableInputWidth
+      - __unstableStateReducer
+      - disabled
+      - dragDirection
+      - dragThreshold
+      - help
+      - hideHTMLArrows
+      - hideLabelFromVision
+      - isDragEnabled
+      - isPressEnterToChange
+      - isShiftStepEnabled
+      - label
+      - labelPosition
+      - max
+      - min
+      - onChange
+      - onDrag
+      - onDragEnd
+      - onDragStart
+      - onValidate
+      - prefix
+      - required
+      - shiftStep
+      - size
+      - spinControls
+      - spinFactor
+      - step
+      - suffix
+      - type
+      - value
+- name: Popover
+  props:
+      - __unstableForcePosition
+      - __unstableSlotName
+      - anchor
+      - anchorRect
+      - anchorRef
+      - animate
+      - as
+      - children
+      - constrainTabbing
+      - expandOnMobile
+      - flip
+      - focusOnMount
+      - getAnchorRect
+      - headerTitle
+      - inline
+      - isAlternate
+      - noArrow
+      - offset
+      - onClose
+      - onFocusOutside
+      - placement
+      - position
+      - resize
+      - shift
+      - variant
+  subcomponents:
+      - name: Popover.Slot
+        props: []
+- name: ProgressBar
+  props:
+      - className
+      - value
+- name: RadioControl
+  props:
+      - disabled
+      - help
+      - hideLabelFromVision
+      - label
+      - onChange
+      - options
+      - selected
+- name: RangeControl
+  props:
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - afterIcon
+      - allowReset
+      - beforeIcon
+      - color
+      - currentInput
+      - disabled
+      - help
+      - hideLabelFromVision
+      - initialPosition
+      - isShiftStepEnabled
+      - label
+      - marks
+      - max
+      - min
+      - onBlur
+      - onChange
+      - onFocus
+      - onMouseLeave
+      - onMouseMove
+      - railColor
+      - renderTooltipContent
+      - resetFallbackValue
+      - separatorType
+      - shiftStep
+      - showTooltip
+      - step
+      - trackColor
+      - type
+      - value
+      - withInputField
+- name: ResizableBox
+  props:
+      - __experimentalShowTooltip
+      - __experimentalTooltipProps
+      - as
+      - bounds
+      - boundsByDirection
+      - children
+      - className
+      - defaultSize
+      - enable
+      - grid
+      - handleClasses
+      - handleComponent
+      - handleStyles
+      - handleWrapperClass
+      - handleWrapperStyle
+      - key
+      - lockAspectRatio
+      - lockAspectRatioExtraHeight
+      - lockAspectRatioExtraWidth
+      - maxHeight
+      - maxWidth
+      - minHeight
+      - minWidth
+      - onResize
+      - onResizeStart
+      - onResizeStop
+      - ref
+      - resizeRatio
+      - scale
+      - showHandle
+      - size
+      - snap
+      - snapGap
+      - style
+- name: SandBox
+  props:
+      - allowPopups
+      - allowSameOrigin
+      - html
+      - onFocus
+      - scripts
+      - styles
+      - tabIndex
+      - title
+      - type
+- name: ScrollLock
+  props: []
+- name: SearchControl
+  props:
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - help
+      - hideLabelFromVision
+      - label
+      - onChange
+      - onClose
+      - onDrag
+      - onDragEnd
+      - onDragStart
+      - placeholder
+      - size
+      - value
+- name: SelectControl
+  props:
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - children
+      - disabled
+      - help
+      - hideLabelFromVision
+      - label
+      - labelPosition
+      - multiple
+      - onChange
+      - options
+      - prefix
+      - ref
+      - size
+      - suffix
+      - value
+      - variant
+- name: Shortcut
+  props:
+      - className
+      - shortcut
+- name: Skeleton
+  props:
+      - className
+      - render
+      - style
+- name: Slot
+  props:
+      - as
+      - bubblesVirtually
+      - children
+      - className
+      - fillProps
+      - name
+      - style
+  subcomponents:
+      - name: Fill
+        props:
+            - children
+            - name
+      - name: SlotFillProvider
+        props:
+            - children
+            - passthrough
+- name: Snackbar
+  props:
+      - actions
+      - as
+      - children
+      - className
+      - explicitDismiss
+      - icon
+      - listRef
+      - onDismiss
+      - onRemove
+      - politeness
+      - spokenMessage
+- name: Spinner
+  props: []
+- name: Stack
+  props:
+      - align
+      - children
+      - className
+      - direction
+      - gap
+      - justify
+      - render
+      - style
+      - wrap
+- name: Tabs.Root
+  props:
+      - children
+      - className
+      - defaultValue
+      - onValueChange
+      - orientation
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: Tabs.List
+        props:
+            - activateOnFocus
+            - children
+            - className
+            - loopFocus
+            - render
+            - style
+            - variant
+      - name: Tabs.Panel
+        props:
+            - children
+            - className
+            - keepMounted
+            - render
+            - style
+            - value
+      - name: Tabs.Tab
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - render
+            - style
+            - value
+- name: Text
+  props:
+      - children
+      - className
+      - render
+      - style
+      - variant
+- name: TextareaControl
+  props:
+      - __nextHasNoMarginBottom
+      - help
+      - hideLabelFromVision
+      - label
+      - onChange
+      - rows
+      - value
+- name: TextControl
+  props:
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - className
+      - help
+      - hideLabelFromVision
+      - label
+      - onChange
+      - type
+      - value
+- name: TextHighlight
+  props:
+      - highlight
+      - text
+- name: ToggleControl
+  props:
+      - __nextHasNoMarginBottom
+      - checked
+      - className
+      - disabled
+      - help
+      - label
+      - onChange
+- name: ToggleGroupControl
+  props:
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - children
+      - disabled
+      - help
+      - hideLabelFromVision
+      - isAdaptiveWidth
+      - isBlock
+      - isDeselectable
+      - label
+      - onChange
+      - size
+      - value
+  subcomponents:
+      - name: ToggleGroupControlOption
+        props:
+            - label
+            - showTooltip
+            - value
+      - name: ToggleGroupControlOptionIcon
+        props:
+            - icon
+            - label
+            - value
+- name: Tooltip.Root
+  props:
+      - children
+      - disabled
+  subcomponents:
+      - name: Tooltip.Popup
+        props:
+            - children
+            - className
+            - portal
+            - positioner
+            - render
+            - style
+      - name: Tooltip.Portal
+        props:
+            - className
+            - container
+            - keepMounted
+            - render
+            - style
+      - name: Tooltip.Positioner
+        props:
+            - align
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
+      - name: Tooltip.Provider
+        props:
+            - children
+            - closeDelay
+            - delay
+            - timeout
+      - name: Tooltip.Trigger
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: TreeGrid
+  props:
+      - applicationAriaLabel
+      - children
+      - onCollapseRow
+      - onExpandRow
+      - onFocusRow
+  subcomponents:
+      - name: TreeGridCell
+        props:
+            - children
+            - withoutGridItem
+      - name: TreeGridRow
+        props:
+            - children
+            - isExpanded
+            - level
+            - positionInSet
+            - setSize
+- name: TreeSelect
+  props:
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __nextHasNoMarginBottom
+      - children
+      - disabled
+      - help
+      - hideLabelFromVision
+      - label
+      - labelPosition
+      - noOptionLabel
+      - onChange
+      - options
+      - prefix
+      - selectedId
+      - size
+      - suffix
+      - tree
+      - variant
+- name: Truncate
+  props:
+      - as
+      - children
+      - ellipsis
+      - ellipsizeMode
+      - limit
+      - numberOfLines
+- name: UnitControl
+  props:
+      - __next36pxDefaultSize
+      - __next40pxDefaultSize
+      - __unstableInputWidth
+      - __unstableStateReducer
+      - disabled
+      - disableUnits
+      - dragDirection
+      - dragThreshold
+      - help
+      - hideHTMLArrows
+      - hideLabelFromVision
+      - isDragEnabled
+      - isPressEnterToChange
+      - isResetValueOnUnitChange
+      - isShiftStepEnabled
+      - isUnitSelectTabbable
+      - label
+      - labelPosition
+      - max
+      - min
+      - onBlur
+      - onChange
+      - onDrag
+      - onDragEnd
+      - onDragStart
+      - onFocus
+      - onUnitChange
+      - onValidate
+      - prefix
+      - required
+      - shiftStep
+      - size
+      - spinFactor
+      - step
+      - unit
+      - units
+      - value
+- name: VisuallyHidden
+  props:
+      - children
+      - className
+      - render
+      - style

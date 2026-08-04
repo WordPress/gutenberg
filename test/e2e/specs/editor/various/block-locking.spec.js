@@ -16,8 +16,12 @@ test.describe( 'Block Locking', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
 
-		await page.click( 'role=checkbox[name="Lock removal"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock removal', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		await expect(
 			page.locator( 'role=menuitem[name="Delete"]' )
@@ -35,8 +39,12 @@ test.describe( 'Block Locking', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
 
-		await page.click( 'role=checkbox[name="Lock movement"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock movement', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		// Hide options.
 		await editor.clickBlockToolbarButton( 'Options' );
@@ -58,8 +66,12 @@ test.describe( 'Block Locking', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
 
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph {"lock":{"move":true,"remove":true}} -->
@@ -75,12 +87,20 @@ test.describe( 'Block Locking', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
 
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		await editor.clickBlockToolbarButton( 'Unlock' );
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		await expect(
 			page
@@ -123,8 +143,12 @@ test.describe( 'Block Locking', () => {
 		await paragraph.click();
 
 		await editor.clickBlockToolbarButton( 'Unlock' );
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		await expect(
 			page

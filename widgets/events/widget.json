@@ -2,6 +2,7 @@
 	"name": "core/events",
 	"title": "WordPress events",
 	"description": "Displays upcoming WordPress community events.",
+	"icon": "core/calendar",
 	"category": "dashboard",
 	"presentation": "content-bleed",
 	"textdomain": "default"
