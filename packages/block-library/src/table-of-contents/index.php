@@ -371,7 +371,13 @@ function block_core_table_of_contents_build_list_items( $nested_headings, $list_
 function block_core_table_of_contents_render( $attributes, $content ) {
 	global $wp_current_filter;
 
-	if ( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) {
+	// The REST block renderer provides the edited post as the global post, so
+	// use the same dynamic output for its editor preview as on the front end.
+	$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
+	if (
+		( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) &&
+		! $is_rest_request
+	) {
 		return block_core_table_of_contents_add_aria_label( $attributes, $content );
 	}
 
