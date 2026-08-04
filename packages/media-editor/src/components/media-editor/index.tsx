@@ -110,11 +110,17 @@ export interface MediaEditorProps {
 	shouldCloseOnEsc?: boolean;
 }
 
-function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	// The tab list and panels must share one `<Tabs.Root>`, but they render in
-	// separate `ComplementaryArea` regions (header vs body). A non-virtual Slot
-	// reconciles both inline at the Slot, so the `Root` is lifted to wrap this
-	// Fill and that Slot together — see `MediaEditorContent`.
+interface MediaEditorSidebarProps {
+	tabs: EditorTab[];
+	activeTabId?: string;
+	onTabChange: ( tabId: string ) => void;
+}
+
+function MediaEditorSidebar( {
+	tabs,
+	activeTabId,
+	onTabChange,
+}: MediaEditorSidebarProps ) {
 	return (
 		<ComplementaryArea
 			scope="media-editor"
@@ -126,6 +132,16 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
 			closeLabel={ __( 'Close media panel' ) }
+			// Makes `Tabs.Root` the container, so the tab list passed as
+			// `header` and the panels below share a subtree across the fill.
+			render={
+				<Tabs.Root
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						onTabChange( value as string )
+					}
+				/>
+			}
 			header={
 				<Tabs.List variant="minimal">
 					{ tabs.map( ( tab ) => (
@@ -585,14 +601,12 @@ function MediaEditorContent( {
 					</div>
 				</div>
 			) : (
-				<Tabs.Root
-					className="media-editor"
-					value={ activeTabId }
-					onValueChange={ ( value ) =>
-						setSelectedTabId( value as string )
-					}
-				>
-					<MediaEditorSidebar tabs={ tabs } />
+				<div className="media-editor">
+					<MediaEditorSidebar
+						tabs={ tabs }
+						activeTabId={ activeTabId }
+						onTabChange={ setSelectedTabId }
+					/>
 					<InterfaceSkeleton
 						className="media-editor__skeleton"
 						labels={ {
@@ -632,7 +646,7 @@ function MediaEditorContent( {
 							<ComplementaryArea.Slot scope="media-editor" />
 						}
 					/>
-				</Tabs.Root>
+				</div>
 			) }
 			<ConfirmDialog
 				isOpen={ isDiscardDialogOpen }
