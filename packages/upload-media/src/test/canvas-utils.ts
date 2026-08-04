@@ -143,7 +143,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				'cannot convert HEIC images'
 			);
 			expect( mockBitmap.close ).toHaveBeenCalled();
 		} );
@@ -164,7 +164,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				'cannot convert HEIC images'
 			);
 		} );
 
@@ -187,7 +187,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				'cannot convert HEIC images'
 			);
 
 			expect(
