@@ -20,7 +20,6 @@ const ALLOWLIST = {
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
-			'DirectionProvider',
 			'EmptyState',
 			'Icon',
 			'Link',

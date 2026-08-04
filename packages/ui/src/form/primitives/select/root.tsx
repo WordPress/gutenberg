@@ -1,5 +1,6 @@
 import { Select as _Select } from '@base-ui/react/select';
 import type { SelectRootProps } from './types';
+import { DirectionProvider } from '../../../utils/direction-provider';
 
 /**
  * A component that lets users choose one option from a list.
@@ -13,5 +14,9 @@ import type { SelectRootProps } from './types';
  * provide `isItemEqualToValue`.
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
-	return <_Select.Root< Value, false > { ...props } />;
+	return (
+		<DirectionProvider>
+			<_Select.Root< Value, false > { ...props } />
+		</DirectionProvider>
+	);
 }
