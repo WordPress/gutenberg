@@ -414,6 +414,9 @@ export const saveDirtyEntities =
 			} else if ( typeof error === 'string' ) {
 				message = error;
 			} else if (
+				// Only consider own method, lest we erroneously end up calling
+				// `Object#toString` at the end of the prototype chain, thereby
+				// returning `"[object Object]"`.
 				Object.hasOwn( error, 'toString' ) &&
 				typeof error.toString === 'function'
 			) {
