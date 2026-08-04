@@ -62,6 +62,15 @@ if ( ! function_exists( 'gutenberg_distributed_editing_enqueue_assets' ) ) {
 	 * Enqueues the build-free editor client for the prototype.
 	 */
 	function gutenberg_distributed_editing_enqueue_assets() {
+		$sync_id_path = __DIR__ . '/sync-id.js';
+		wp_enqueue_script(
+			'gutenberg-distributed-editing-sync-id',
+			gutenberg_url( 'lib/experimental/distributed-editing/sync-id.js' ),
+			array( 'wp-data' ),
+			(string) filemtime( $sync_id_path ),
+			true
+		);
+
 		$script_path = __DIR__ . '/distributed-editing.js';
 		wp_enqueue_script(
 			'gutenberg-distributed-editing',
