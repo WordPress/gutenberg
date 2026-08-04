@@ -53,7 +53,9 @@ describe( 'getHeicUnsupportedMessage', () => {
 		const message = getHeicUnsupportedMessage();
 
 		expect( message ).toContain( 'Firefox cannot convert HEIC images' );
-		expect( message ).toContain( 'Safari, Chrome, Edge, and Brave' );
+		expect( message ).toContain(
+			'Safari, Chrome, Edge, and other Chromium-based browsers'
+		);
 		expect( message ).toContain( 'JPEG' );
 	} );
 
@@ -98,9 +100,9 @@ describe( 'getHeicUnsupportedMessage', () => {
 
 		const message = getHeicUnsupportedMessage();
 
-		expect( message ).toContain( 'Microsoft Store' );
+		expect( message ).toContain( 'requires HEVC video support' );
 		// Suggesting the browser that just failed would be nonsense.
-		expect( message ).not.toContain( 'Chrome, Edge, and Brave can' );
+		expect( message ).not.toContain( 'Chrome, Edge, and other browsers' );
 	} );
 
 	it( 'suggests only Safari to a failing Chromium browser on macOS', () => {
@@ -110,7 +112,9 @@ describe( 'getHeicUnsupportedMessage', () => {
 
 		expect( message ).toContain( 'Chrome cannot convert HEIC images' );
 		expect( message ).toContain( 'Safari can convert them on macOS' );
-		expect( message ).not.toContain( 'Safari, Chrome, Edge, and Brave' );
+		expect( message ).not.toContain(
+			'Safari, Chrome, Edge, and other Chromium-based browsers'
+		);
 	} );
 
 	it( 'identifies Edge as a Chromium browser rather than as Safari', () => {

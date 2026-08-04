@@ -150,7 +150,7 @@ export function getHeicConversionAdvice(): string {
 
 		if ( family !== 'safari' ) {
 			return __(
-				'Safari, Chrome, Edge, and Brave can convert them on macOS. You can also convert the image to JPEG before uploading.'
+				'Safari, Chrome, Edge, and other Chromium-based browsers can convert them on macOS. You can also convert the image to JPEG before uploading.'
 			);
 		}
 	}
@@ -161,12 +161,12 @@ export function getHeicConversionAdvice(): string {
 		// browser is the wrong one.
 		if ( family === 'chromium' ) {
 			return __(
-				'Installing HEVC video support from the Microsoft Store lets this browser convert them. You can also convert the image to JPEG before uploading.'
+				'This browser requires HEVC video support to handle HEIC uploads. You can also convert the image to JPEG before uploading.'
 			);
 		}
 
 		return __(
-			'Chrome, Edge, and Brave can convert them on Windows when HEVC video support is installed. You can also convert the image to JPEG before uploading.'
+			'Chrome, Edge, and other browsers built on Chromium can convert them on Windows when HEVC video support is installed. You can also convert the image to JPEG before uploading.'
 		);
 	}
 
