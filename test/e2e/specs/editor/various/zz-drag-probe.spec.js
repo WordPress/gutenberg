@@ -121,24 +121,14 @@ test.describe( 'drag probe (@webkit)', () => {
 			const f = document.querySelector( 'iframe[name="editor-canvas"]' );
 			return f.contentWindow.__rec.splice( 0 );
 		} );
-		const blocks = await editor.getBlocks();
-		const payload =
-			'\n' +
-			rec.join( '\n' ) +
-			'\nFINAL: ' +
-			JSON.stringify(
-				blocks.map(
-					( b ) =>
-						( b.attributes.content ?? b.name ) +
-						'(' +
-						b.innerBlocks
-							.map( ( i ) => i.attributes.content ?? i.name )
-							.join( ',' ) +
-						')'
-				)
-			);
-		// Deliberate failure: the recording travels in the assertion diff,
-		// the only output CI reporters preserve.
-		expect( payload ).toBe( 'REC' );
+		// eslint-disable-next-line no-console
+		console.log( 'REC-START' );
+		for ( const line of rec ) {
+			// eslint-disable-next-line no-console
+			console.log( 'REC', line );
+		}
+		// eslint-disable-next-line no-console
+		console.log( 'REC-END' );
+		expect( true ).toBe( true );
 	} );
 } );
