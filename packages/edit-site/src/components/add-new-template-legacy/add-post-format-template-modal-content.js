@@ -3,11 +3,7 @@
  */
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Flex,
-	__experimentalGrid as Grid,
-} from '@wordpress/components';
+import { Button, __experimentalGrid as Grid } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { Stack, Text } from '@wordpress/ui';
@@ -69,7 +65,7 @@ function AddPostFormatTemplateModalContent( {
 					</Button>
 				) ) }
 			</Grid>
-			<Flex justify="right">
+			<Stack direction="row" justify="flex-end">
 				<Button
 					__next40pxDefaultSize
 					variant="tertiary"
@@ -77,7 +73,7 @@ function AddPostFormatTemplateModalContent( {
 				>
 					{ __( 'Back' ) }
 				</Button>
-			</Flex>
+			</Stack>
 		</Stack>
 	);
 }

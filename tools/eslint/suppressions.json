@@ -1109,34 +1109,19 @@
 			"count": 2
 		}
 	},
-	"packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 2
 		}
 	},
 	"packages/edit-site/src/components/add-new-template-legacy/index.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
-		}
-	},
-	"packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js": {
-		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/index.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 2
 		}
 	},
 	"packages/edit-site/src/components/editor/use-resolve-edited-entity.js": {
