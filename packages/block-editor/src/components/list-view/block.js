@@ -169,12 +169,10 @@ function ListViewBlock( {
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
 	const {
-		expand,
-		collapse,
-		collapseAll,
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expandedState,
+		expansionState,
+		updateExpansion,
 		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
@@ -372,10 +370,9 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { firstBlockClientId } = getBlocksToUpdate();
 			const blockParents = getBlockParents( firstBlockClientId, false );
-			// Collapse all blocks.
-			collapseAll();
-			// Expand all parents of the current block.
-			expand( blockParents );
+			// Collapse all blocks and expand the block's parents.
+			updateExpansion( { type: 'clear' } );
+			updateExpansion( { type: 'expand', clientIds: blockParents } );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
@@ -467,13 +464,15 @@ function ListViewBlock( {
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
-			if ( isExpanded === true ) {
-				collapse( clientId );
-			} else if ( isExpanded === false ) {
-				expand( clientId );
+			if ( isExpanded === undefined ) {
+				return;
 			}
+			updateExpansion( {
+				type: isExpanded ? 'collapse' : 'expand',
+				clientIds: clientId,
+			} );
 		},
-		[ clientId, expand, collapse, isExpanded ]
+		[ clientId, updateExpansion, isExpanded ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
@@ -740,8 +739,8 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expand={ expand }
-							expandedState={ expandedState }
+							expansionState={ expansionState }
+							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
 								setInsertedBlockClientId
 							}

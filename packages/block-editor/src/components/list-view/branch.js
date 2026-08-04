@@ -30,14 +30,14 @@ import useBlockDisplayInformation from '../use-block-display-information';
  * implementation dragged blocks and their children are not counted.
  *
  * @param {Object}  block               block tree
- * @param {Object}  expandedState       state that notes which branches are collapsed
+ * @param {Object}  expansionState      state that notes which branches are collapsed
  * @param {Array}   draggedClientIds    a list of dragged client ids
  * @param {boolean} isExpandedByDefault flag to determine the default fallback expanded state.
  * @return {number} block count
  */
 function countBlocks(
 	block,
-	expandedState,
+	expansionState,
 	draggedClientIds,
 	isExpandedByDefault
 ) {
@@ -45,7 +45,7 @@ function countBlocks(
 	if ( isDragged ) {
 		return 0;
 	}
-	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
+	const isExpanded = expansionState[ block.clientId ] ?? isExpandedByDefault;
 	if ( ! isExpanded ) {
 		return 1;
 	}
@@ -54,7 +54,7 @@ function countBlocks(
 			count +
 			countBlocks(
 				innerBlock,
-				expandedState,
+				expansionState,
 				draggedClientIds,
 				isExpandedByDefault
 			),
@@ -100,7 +100,7 @@ function ListViewBranch( props ) {
 		blockDropTargetIndex,
 		firstDraggedBlockIndex,
 		blockIndexes,
-		expandedState,
+		expansionState,
 		draggedClientIds,
 	} = useListViewContext();
 
@@ -150,7 +150,7 @@ function ListViewBranch( props ) {
 		const blockListPosition = nextPosition;
 		nextPosition += countBlocks(
 			block,
-			expandedState,
+			expansionState,
 			draggedClientIds,
 			isExpanded
 		);
@@ -167,7 +167,7 @@ function ListViewBranch( props ) {
 
 		const shouldExpand =
 			hasNestedBlocks && shouldShowInnerBlocks
-				? expandedState[ clientId ] ?? isExpanded
+				? expansionState[ clientId ] ?? isExpanded
 				: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
