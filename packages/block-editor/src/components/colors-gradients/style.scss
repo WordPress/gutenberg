@@ -24,13 +24,6 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
-.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
-	&,
-	& > div:not(:first-of-type) {
-		display: block;
-	}
-}
-
 .block-editor-panel-color-gradient-settings {
 	@media screen and (min-width: $break-medium) {
 		.components-circular-option-picker__swatches {
@@ -46,6 +39,12 @@ $swatch-gap: 12px;
 		margin-bottom: inherit;
 	}
 
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.block-editor-panel-color-gradient-settings__inner-wrapper {
+			row-gap: 0;
+		}
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
