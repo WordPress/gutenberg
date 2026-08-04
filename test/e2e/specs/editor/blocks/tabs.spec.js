@@ -169,12 +169,12 @@ test.describe( 'Tabs', () => {
 			await pageUtils.pressKeys( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
-			// A new tab is appended with the default label and an empty panel.
+			// A new tab is appended with an empty label and an empty panel.
 			await expect
 				.poll( editor.getBlocks )
 				.toMatchObject( [
 					createTabs(
-						[ 'Tab 1', 'Tab 2', 'Tab' ],
+						[ 'Tab 1', 'Tab 2', '' ],
 						[ 'Panel 1', 'Panel 2', '' ]
 					),
 				] );
