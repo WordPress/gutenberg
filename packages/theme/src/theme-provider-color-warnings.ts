@@ -1,5 +1,10 @@
 import { getContrast } from './color-ramps/lib/color-utils';
 import type { Ramp, RampResult } from './color-ramps/lib/types';
+import {
+	getSemanticColorCustomProperty,
+	SEMANTIC_COLOR_CONTRAST_PAIRS,
+	type SemanticColorToken,
+} from './semantic-color-contrast-pairs';
 
 export type ThemeProviderColorRampName =
 	| 'background'
@@ -10,6 +15,8 @@ export type ThemeProviderColorRampName =
 	| 'warning'
 	| 'error';
 
+export type ThemeProviderSemanticColorToken = SemanticColorToken;
+
 export type ThemeProviderColorWarning =
 	| {
 			type: 'ramp';
@@ -18,92 +25,19 @@ export type ThemeProviderColorWarning =
 	  }
 	| {
 			type: 'contrast';
-			ramp: ThemeProviderColorRampName;
-			backgroundStep: keyof Ramp;
+			backgroundToken: ThemeProviderSemanticColorToken;
 			backgroundColor: string;
-			foregroundStep: keyof Ramp;
+			foregroundToken: ThemeProviderSemanticColorToken;
 			foregroundColor: string;
 			requiredContrast: number;
 			achievedContrast: number;
 	  };
 
-type ContrastPair = {
-	backgroundStep: keyof Ramp;
-	foregroundStep: keyof Ramp;
-	requiredContrast: number;
-};
-
 const MINIMUM_TEXT_CONTRAST = 4.5;
 
-const SURFACE_CONTRAST_PAIRS: ContrastPair[] = [
-	{
-		backgroundStep: 'surface4',
-		foregroundStep: 'fgSurface4',
-		requiredContrast: MINIMUM_TEXT_CONTRAST,
-	},
-	{
-		backgroundStep: 'surface2',
-		foregroundStep: 'fgSurface3',
-		requiredContrast: MINIMUM_TEXT_CONTRAST,
-	},
-];
-
-const FILL_CONTRAST_PAIRS: ContrastPair[] = [
-	{
-		backgroundStep: 'bgFill1',
-		foregroundStep: 'fgFill',
-		requiredContrast: MINIMUM_TEXT_CONTRAST,
-	},
-	{
-		backgroundStep: 'bgFill2',
-		foregroundStep: 'fgFill',
-		requiredContrast: MINIMUM_TEXT_CONTRAST,
-	},
-];
-
-const CONTRAST_PAIRS: Record< ThemeProviderColorRampName, ContrastPair[] > = {
-	background: [
-		{
-			backgroundStep: 'surface1',
-			foregroundStep: 'fgSurface4',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-		{
-			backgroundStep: 'surface2',
-			foregroundStep: 'fgSurface4',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-		{
-			backgroundStep: 'surface3',
-			foregroundStep: 'fgSurface4',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-		{
-			backgroundStep: 'surface2',
-			foregroundStep: 'fgSurface3',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-		{
-			backgroundStep: 'bgFillInverted1',
-			foregroundStep: 'fgFillInverted',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-		{
-			backgroundStep: 'bgFillInverted2',
-			foregroundStep: 'fgFillInverted',
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
-		},
-	],
-	primary: FILL_CONTRAST_PAIRS,
-	info: SURFACE_CONTRAST_PAIRS,
-	success: SURFACE_CONTRAST_PAIRS,
-	caution: SURFACE_CONTRAST_PAIRS,
-	warning: SURFACE_CONTRAST_PAIRS,
-	error: [ ...SURFACE_CONTRAST_PAIRS, ...FILL_CONTRAST_PAIRS ],
-};
-
 export function collectThemeProviderColorWarnings(
-	ramps: Map< ThemeProviderColorRampName, RampResult >
+	ramps: ReadonlyMap< ThemeProviderColorRampName, RampResult >,
+	colorValues: ReadonlyMap< string, string >
 ): ThemeProviderColorWarning[] {
 	const warnings: ThemeProviderColorWarning[] = [];
 
@@ -115,31 +49,38 @@ export function collectThemeProviderColorWarnings(
 				step,
 			} );
 		}
+	}
 
-		for ( const {
-			backgroundStep,
-			foregroundStep,
-			requiredContrast,
-		} of CONTRAST_PAIRS[ rampName ] ) {
-			const backgroundColor = result.ramp[ backgroundStep ];
-			const foregroundColor = result.ramp[ foregroundStep ];
-			const achievedContrast = getContrast(
+	for ( const {
+		background: backgroundToken,
+		foreground: foregroundToken,
+	} of SEMANTIC_COLOR_CONTRAST_PAIRS ) {
+		const backgroundColor = colorValues.get(
+			getSemanticColorCustomProperty( backgroundToken )
+		);
+		const foregroundColor = colorValues.get(
+			getSemanticColorCustomProperty( foregroundToken )
+		);
+
+		if ( backgroundColor === undefined || foregroundColor === undefined ) {
+			continue;
+		}
+
+		const achievedContrast = getContrast(
+			backgroundColor,
+			foregroundColor
+		);
+
+		if ( achievedContrast < MINIMUM_TEXT_CONTRAST ) {
+			warnings.push( {
+				type: 'contrast',
+				backgroundToken,
 				backgroundColor,
-				foregroundColor
-			);
-
-			if ( achievedContrast < requiredContrast ) {
-				warnings.push( {
-					type: 'contrast',
-					ramp: rampName,
-					backgroundStep,
-					backgroundColor,
-					foregroundStep,
-					foregroundColor,
-					requiredContrast,
-					achievedContrast,
-				} );
-			}
+				foregroundToken,
+				foregroundColor,
+				requiredContrast: MINIMUM_TEXT_CONTRAST,
+				achievedContrast,
+			} );
 		}
 	}
 

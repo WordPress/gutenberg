@@ -86,3 +86,14 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 		foreground: 'foreground.interactive.neutral-strong-active',
 	},
 ] as const;
+
+type SemanticColorContrastPair =
+	( typeof SEMANTIC_COLOR_CONTRAST_PAIRS )[ number ];
+
+export type SemanticColorToken =
+	| SemanticColorContrastPair[ 'background' ]
+	| SemanticColorContrastPair[ 'foreground' ];
+
+export function getSemanticColorCustomProperty( token: SemanticColorToken ) {
+	return `--wpds-color-${ token.replaceAll( '.', '-' ) }`;
+}

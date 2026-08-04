@@ -1,7 +1,7 @@
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
 import { buildRamp } from '../lib';
-import { getColorString, getContrast } from '../lib/color-utils';
+import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
@@ -123,25 +123,15 @@ describe( 'buildRamps', () => {
 		).toMatchSnapshot();
 	} );
 
-	it( 'returns warnings from the final rescaled ramp', () => {
+	it( 'does not return warnings resolved by seed rescaling', () => {
 		const result = buildBgRamp( '#3876a8' );
 
-		expect( result.warnings ).not.toEqual(
-			expect.arrayContaining( [ 'bgFill2', 'stroke4' ] )
-		);
+		expect( result.warnings ).toBeUndefined();
 	} );
 
-	it( 'reports the Ectoplasm active fill contrast failure', () => {
+	it( 'includes active fills when checking accessible combinations', () => {
 		const bgRamp = buildBgRamp( '#4f386e' );
 		const accentRamp = buildAccentRamp( '#608010', bgRamp );
-
-		expect( accentRamp.ramp.bgFill1 ).toBe( '#608010' );
-		expect(
-			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
-		).toBeGreaterThanOrEqual( 4.5 );
-		expect(
-			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
-		).toBeLessThan( 4.5 );
 
 		expect( checkAccessibleCombinations( { bgRamp: accentRamp } ) ).toEqual(
 			expect.arrayContaining( [

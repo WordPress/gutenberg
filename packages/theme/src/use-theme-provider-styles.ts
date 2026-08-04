@@ -151,15 +151,15 @@ function colorTokensCSS(
 
 function generateStyles( {
 	primary,
-	computedColorRamps,
+	colorEntries,
 }: {
 	primary: string;
-	computedColorRamps: Map< ThemeProviderColorRampName, RampResult >;
+	colorEntries: Entry[];
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
 			// Semantic color tokens
-			colorTokensCSS( computedColorRamps ),
+			colorEntries,
 			// Legacy overrides
 			legacyWpAdminThemeOverridesCSS( primary ),
 			legacyWpComponentsOverridesCSS,
@@ -194,13 +194,17 @@ function generateThemeProviderColors(
 				: getCachedAccentRamp( seed, bgRamp )
 		);
 	}
+	const colorEntries = colorTokensCSS( computedColorRamps );
 
 	return {
 		styles: generateStyles( {
 			primary: seeds.primary,
-			computedColorRamps,
+			colorEntries,
 		} ),
-		warnings: collectThemeProviderColorWarnings( computedColorRamps ),
+		warnings: collectThemeProviderColorWarnings(
+			computedColorRamps,
+			new Map( colorEntries )
+		),
 	};
 }
 

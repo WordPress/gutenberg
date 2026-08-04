@@ -122,7 +122,7 @@ Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `
 </ThemeProvider>
 ```
 
-The callback receives an empty array when all checked targets are met. Each warning identifies the affected ramp and either the ramp step or the semantic foreground/background pair, including the required and achieved contrast values for semantic pairs. React may invoke the callback more than once in development under Strict Mode.
+The callback receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
 The `cursor` prop accepts an object with the following optional properties:
 
