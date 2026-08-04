@@ -116,8 +116,12 @@ describe( 'Modal', () => {
 		expect( modalFrame ).toHaveFocus();
 
 		// Disable reason: No semantic query can reach the overlay.
-		// eslint-disable-next-line testing-library/no-node-access
-		await user.click( modalFrame.parentElement! );
+		/* eslint-disable testing-library/no-node-access */
+		const overlay = document.querySelector(
+			'.components-modal__screen-overlay'
+		)!;
+		/* eslint-enable testing-library/no-node-access */
+		await user.click( overlay );
 		expect( opener ).toHaveFocus();
 	} );
 
@@ -241,8 +245,11 @@ describe( 'Modal', () => {
 		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
 
 		// Disable reason: No semantic query can reach the overlay.
-		// eslint-disable-next-line testing-library/no-node-access
-		const outer = screen.getByRole( 'dialog' ).parentElement!;
+		/* eslint-disable testing-library/no-node-access */
+		const outer = document.querySelector(
+			'.components-modal__screen-overlay'
+		)!;
+		/* eslint-enable testing-library/no-node-access */
 
 		// Opens inner modal > hides outer modal.
 		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );
