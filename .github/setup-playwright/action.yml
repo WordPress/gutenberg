@@ -21,7 +21,7 @@ runs:
               BROWSERS: ${{ inputs.browsers }}
               WORKSPACE: ${{ inputs.workspace }}
           run: |
-              VERSION="$(npm exec --workspace "$WORKSPACE" -- node -p "require('playwright/package.json').version")"
+              VERSION="$(npm exec --no --workspace "$WORKSPACE" -- node -p "require('playwright/package.json').version")"
               BROWSERS_KEY="$(echo "${BROWSERS:-all}" | tr ' ' '-')"
               # Packages cached under another runner image mostly miss.
               IMAGE="${ImageOS:-unknown}-${ImageVersion:-unknown}"
@@ -68,7 +68,7 @@ runs:
               sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
 
               # shellcheck disable=SC2086 # The browser list is intentionally split into separate arguments.
-              npm exec --workspace "$WORKSPACE" -- playwright install $BROWSERS --with-deps
+              npm exec --no --workspace "$WORKSPACE" -- playwright install $BROWSERS --with-deps
 
               sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
               sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
