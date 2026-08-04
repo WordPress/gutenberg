@@ -1396,10 +1396,10 @@ Parses an HTML string, inserts the resulting element(s) into the live DOM, and r
 import { renderHTML } from '@wordpress/interactivity';
 
 const res = await fetch( '/wp-json/my-plugin/v1/cards' );
-renderHTML( document.querySelector( '#feed' ), await res.text() );
+renderHTML( '#feed', await res.text() ); // or: renderHTML( document.querySelector( '#feed' ), await res.text() );
 ```
 
--   `container` (`Element`): The element the parsed HTML is inserted into.
+-   `container` (`Element | string`): The element the parsed HTML is inserted into, or a CSS selector for it (resolved via `document.querySelector`; a selector matching nothing throws).
 -   `html` (`string`): The HTML string.
 -   `options` (`Object`): Options.
     -   `options.position` (`string`): Where to insert the parsed elements. One of:

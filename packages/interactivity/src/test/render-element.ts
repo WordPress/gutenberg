@@ -289,6 +289,48 @@ describe( 'renderElement', () => {
 		).toBe( '2' );
 	} );
 
+	it( 'scopes context writes to a fragment with its own data-wp-context, leaving the island unaffected', async () => {
+		store( 'test/render-element', {
+			actions: {
+				increment() {
+					const context = getContext() as { count: number };
+					context.count += 1;
+				},
+			},
+		} );
+		const island = el(
+			'<div data-wp-interactive="test/render-element" ' +
+				"data-wp-context='{ \"count\": 0 }'>" +
+				'<span data-testid="island-count" data-wp-text="context.count"></span>' +
+				'<span data-testid="target"></span>' +
+				'</div>'
+		);
+		document.body.appendChild( island );
+		renderElement( island );
+
+		// Plain fragment (no data-wp-interactive) WITH its own context.
+		const node = el(
+			'<div data-wp-context=\'{ "count": 10 }\'>' +
+				'<button data-testid="btn" data-wp-on--click="actions.increment" data-wp-text="context.count">10</button>' +
+				'</div>'
+		);
+		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
+		renderElement( node );
+
+		// The fragment's own context starts at 10.
+		const btn = node.querySelector( '[data-testid="btn"]' ) as HTMLButtonElement;
+		expect( btn.textContent ).toBe( '10' );
+
+		// Writing to the fragment's context must NOT affect the island's.
+		btn.click();
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		expect( btn.textContent ).toBe( '11' );
+		expect(
+			island.querySelector( '[data-testid="island-count"]' )?.textContent
+		).toBe( '0' );
+	} );
+
 	it( 'updates a kept node with fresh server markup in place', () => {
 		store( 'test/render-element', { state: { message: 'hello' } } );
 		const node = el(
@@ -640,5 +682,65 @@ describe( 'renderHTML', () => {
 		expect(
 			target.querySelector( '[data-testid="out"]' )?.textContent
 		).toBe( 'ctx' );
+	} );
+
+	it( 'accepts a CSS selector for the container', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		renderHTML(
+			'[data-testid="target"]',
+			'<span data-testid="out" data-wp-text="state.message"></span>'
+		);
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		expect(
+			target.querySelector( '[data-testid="out"]' )?.textContent
+		).toBe( 'hello' );
+	} );
+
+	it( 'throws when a selector matches no element', () => {
+		expect( () =>
+			renderHTML(
+				'[data-testid="does-not-exist"]',
+				'<span>new</span>'
+			)
+		).toThrow( /no element found for selector/ );
+	} );
+
+	it( 'inserts and hydrates multiple top-level sibling elements', () => {
+		store( 'test/render-element', { state: { message: 'hello' } } );
+		const container = el(
+			'<div data-wp-interactive="test/render-element">' +
+				'<div data-testid="target"></div>' +
+				'</div>'
+		);
+		document.body.appendChild( container );
+		renderElement( container );
+
+		const target = container.querySelector(
+			'[data-testid="target"]'
+		) as HTMLElement;
+		renderHTML(
+			target,
+			'<span data-testid="a" data-wp-text="state.message"></span>' +
+				'<span data-testid="b" data-wp-text="state.message"></span>'
+		);
+
+		// Both siblings are inserted and both are hydrated.
+		const a = target.querySelector( '[data-testid="a"]' );
+		const b = target.querySelector( '[data-testid="b"]' );
+		expect( a ).not.toBeNull();
+		expect( b ).not.toBeNull();
+		expect( a?.textContent ).toBe( 'hello' );
+		expect( b?.textContent ).toBe( 'hello' );
 	} );
 } );

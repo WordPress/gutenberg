@@ -151,8 +151,11 @@ export function renderElement( element: Element | Element[] ): void {
  * import { renderHTML } from '@wordpress/interactivity';
  *
  * const res = await fetch( '/wp-json/my-plugin/v1/cards' );
- * renderHTML( document.querySelector( '#feed' ), await res.text() );
+ * renderHTML( '#feed', await res.text() ); // or: renderHTML( document.querySelector( '#feed' ), ... )
  * ```
+ *
+ * The container can be passed as an element or as a CSS selector, which is
+ * resolved with `document.querySelector` (a selector matching nothing throws).
  *
  * Because `renderHTML()` parses fresh nodes on every call, repeated calls
  * mount fresh content rather than diffing against the previous call's nodes —
@@ -166,7 +169,8 @@ export function renderElement( element: Element | Element[] ): void {
  * The inserted element(s) must have an enclosing island or their own
  * `data-wp-interactive`; otherwise nothing is hydrated (see `renderElement()`).
  *
- * @param container The element the parsed HTML is inserted into.
+ * @param container The element the parsed HTML is inserted into, or a CSS
+ *                  selector for it (resolved via `document.querySelector`).
  * @param html      The HTML string.
  * @param options   Options.
  * @param options.position Where to insert the parsed elements:
@@ -178,7 +182,7 @@ export function renderElement( element: Element | Element[] ): void {
  *                         - `outer`: replace the container itself
  */
 export function renderHTML(
-	container: Element,
+	container: Element | string,
 	html: string,
 	{
 		position = 'append',
@@ -186,6 +190,17 @@ export function renderHTML(
 		position?: 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
 	} = {}
 ): void {
+	// Resolve a CSS selector to its element, if one was passed.
+	const containerElement =
+		typeof container === 'string'
+			? document.querySelector( container )
+			: container;
+	if ( ! containerElement ) {
+		throw new Error(
+			`renderHTML(): no element found for selector "${ container }".`
+		);
+	}
+
 	// Use a `<template>` to parse the HTML into nodes (same as the browser
 	// would) without triggering side effects like image loading.
 	const template = document.createElement( 'template' );
@@ -197,23 +212,23 @@ export function renderHTML(
 
 	switch ( position ) {
 		case 'prepend':
-			container.prepend( ...nodes );
+			containerElement.prepend( ...nodes );
 			break;
 		case 'before':
-			container.before( ...nodes );
+			containerElement.before( ...nodes );
 			break;
 		case 'after':
-			container.after( ...nodes );
+			containerElement.after( ...nodes );
 			break;
 		case 'inner':
-			container.replaceChildren( ...nodes );
+			containerElement.replaceChildren( ...nodes );
 			break;
 		case 'outer':
-			container.replaceWith( ...nodes );
+			containerElement.replaceWith( ...nodes );
 			break;
 		case 'append':
 		default:
-			container.append( ...nodes );
+			containerElement.append( ...nodes );
 	}
 
 	renderElement( nodes.length === 1 ? nodes[ 0 ] : nodes );
