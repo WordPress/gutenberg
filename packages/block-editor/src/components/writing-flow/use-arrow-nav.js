@@ -174,6 +174,7 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
+		getBlockRootClientId,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getNextBlockClientId,
@@ -193,15 +194,6 @@ export default function useArrowNav() {
 
 		function onMouseDown() {
 			verticalRect = null;
-		}
-
-		function isClosestTabbableABlock( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
@@ -280,6 +272,36 @@ export default function useArrowNav() {
 							event.preventDefault();
 						}
 					}
+
+					// A partial multi-selection extends natively, keeping
+					// character granularity. The extension can enter a block
+					// beyond the engaged editing host (e.g. the paragraph
+					// before a list): a native selection cannot leave its
+					// host, so the host must become the block list
+					// containing both the selection and that block.
+					if ( ! event.defaultPrevented ) {
+						let endClientId = getMultiSelectedBlocksEndClientId();
+						let adjacentClientId;
+						while ( endClientId && ! adjacentClientId ) {
+							adjacentClientId = isReverse
+								? getPreviousBlockClientId( endClientId )
+								: getNextBlockClientId( endClientId );
+							if ( ! adjacentClientId ) {
+								endClientId =
+									getBlockRootClientId( endClientId );
+							}
+						}
+						const within =
+							adjacentClientId &&
+							ownerDocument.getElementById(
+								'block-' + adjacentClientId
+							);
+						if ( within ) {
+							setContentEditableWrapper( node, true, {
+								within,
+							} );
+						}
+					}
 					return;
 				}
 
@@ -346,8 +368,23 @@ export default function useArrowNav() {
 
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
-					if ( isClosestTabbableABlock( target, isReverse ) ) {
-						setContentEditableWrapper( node, true );
+					const closestTabbable = getClosestTabbable(
+						target,
+						isReverse,
+						node
+					);
+					if (
+						closestTabbable &&
+						getBlockClientId( closestTabbable )
+					) {
+						// The selection is about to extend into the adjacent
+						// block, which can lie outside the engaged editing
+						// host (e.g. the paragraph after a list): a native
+						// selection cannot leave its host, so the host must
+						// be the block list containing both.
+						setContentEditableWrapper( node, true, {
+							within: closestTabbable,
+						} );
 					} else if ( getEditableRootElement( node ) ) {
 						// There is no block to extend the selection into.
 						// Within an editable wrapper the selection could

@@ -124,14 +124,16 @@ function toPlainText( html ) {
  * active editing host it must present as a named multiline textbox, per the
  * WAI-ARIA textbox role, which requires an accessible name.
  *
- * @param {HTMLElement} node          Wrapper element.
- * @param {boolean}     value         Whether the wrapper should be an
- *                                    editing host.
- * @param {Object}      options
- * @param {boolean}     options.focus Move focus to the wrapper when it
- *                                    becomes an editing host (Firefox does
- *                                    not automatically move it). Default
- *                                    true.
+ * @param {HTMLElement}  node           Wrapper element.
+ * @param {boolean}      value          Whether the wrapper should be an
+ *                                      editing host.
+ * @param {Object}       options
+ * @param {boolean}      options.focus  Move focus to the wrapper when it
+ *                                      becomes an editing host (Firefox
+ *                                      does not automatically move it).
+ *                                      Default true.
+ * @param {?HTMLElement} options.within An element the host must contain,
+ *                                      in addition to the selection.
  *
  * @return {boolean} Whether the wrapper is an editing host now.
  */
@@ -165,11 +167,14 @@ export function getEditableRootElement( node ) {
  * block content (never e.g. the post title), and nests with the block
  * structure. Falls back to the root block list container, then the wrapper.
  *
- * @param {HTMLElement} node Wrapper element.
+ * @param {HTMLElement}  node   Wrapper element.
+ * @param {?HTMLElement} within An element the host must contain, in
+ *                              addition to the selection (e.g. the block a
+ *                              selection is about to extend into).
  *
  * @return {HTMLElement} The element to make the editing host.
  */
-function resolveEditableRootElement( node ) {
+function resolveEditableRootElement( node, within ) {
 	const selection = node.ownerDocument.defaultView.getSelection();
 
 	if ( ! selection.rangeCount ) {
@@ -198,11 +203,12 @@ function resolveEditableRootElement( node ) {
 	while (
 		layout &&
 		node.contains( layout ) &&
-		! layout.contains( focusBlock )
+		( ! layout.contains( focusBlock ) ||
+			( within && ! layout.contains( within ) ) )
 	) {
-		layout =
-			layout.parentElement?.closest( '[data-block]' )?.parentElement ??
-			null;
+		// The next list up is the parent of the block containing this list.
+		// A list that is a block's own element counts as its own container.
+		layout = layout.closest( '[data-block]' )?.parentElement ?? null;
 	}
 
 	return layout && node.contains( layout ) ? layout : node;
@@ -211,7 +217,7 @@ function resolveEditableRootElement( node ) {
 export function setContentEditableWrapper(
 	node,
 	value,
-	{ focus = true } = {}
+	{ focus = true, within } = {}
 ) {
 	const engaged = editableRootElements.get( node );
 
@@ -228,7 +234,7 @@ export function setContentEditableWrapper(
 		return false;
 	}
 
-	const host = resolveEditableRootElement( node );
+	const host = resolveEditableRootElement( node, within );
 
 	// Check first: this is called on every selection change, and setting
 	// contentEditable triggers a style recalculation.
