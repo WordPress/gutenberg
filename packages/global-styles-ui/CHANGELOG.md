@@ -20,7 +20,7 @@
 ### Enhancements
 
 -   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
--   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset to defaults rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ## 1.19.0 (2026-07-29)
 

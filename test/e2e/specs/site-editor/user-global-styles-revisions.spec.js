@@ -126,7 +126,7 @@ test.describe( 'Style Revisions', () => {
 		await lastRevisionItem.click();
 		// The footer action relabels for the reset entry.
 		await expect(
-			page.getByRole( 'button', { name: 'Reset to defaults' } )
+			page.getByRole( 'button', { name: 'Reset' } )
 		).toBeEnabled();
 	} );
 

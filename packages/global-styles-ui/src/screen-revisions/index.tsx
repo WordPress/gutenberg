@@ -140,9 +140,7 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 			{
 				id: 'apply-revision',
 				label: ( items: Revision[] ) =>
-					items[ 0 ]?.id === 'parent'
-						? __( 'Reset to defaults' )
-						: __( 'Apply' ),
+					items[ 0 ]?.id === 'parent' ? __( 'Reset' ) : __( 'Apply' ),
 				isPrimary: true,
 				isEligible: ( item: Revision ) =>
 					'unsaved' !== item.id &&
