@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	useState,
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/element';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { ThemeProvider } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
 import ErrorBoundary from '../error-boundary';
 import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
