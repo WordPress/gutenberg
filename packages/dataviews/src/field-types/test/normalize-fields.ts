@@ -374,12 +374,22 @@ describe( 'normalizeFields: default getValue', () => {
 						max: 10,
 					},
 				},
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
 			];
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
 			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
 			expect( normalizedFields[ 1 ].isValid.min ).toBeUndefined();
 			expect( normalizedFields[ 1 ].isValid.max ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.max ).toBeUndefined();
 		} );
 	} );
 
