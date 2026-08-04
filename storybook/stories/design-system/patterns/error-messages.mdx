@@ -1,0 +1,61 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Patterns/Error Messages" />
+
+# Error Messages
+
+An error message can be the only conversation a user has with the software when something breaks. A good one turns a dead end into a next step or an action item. These guidelines describe how to write error messages that explain what happened, why, and what the user can do about it.
+
+## Principles
+
+### Explain the _why_
+
+Don't report only that something failed. Explain the reason, because the reason is usually what points to the fix.
+
+If the cause genuinely isn't known, don't invent a plausible-sounding one. Say that something went wrong and still offer a next step, but a guessed reason that turns out wrong sends the user down the wrong path.
+
+### Write it like you'd describe it to a friend
+
+Use plain, natural language. Skip error codes, internal component names, and jargon. If you wouldn't say it out loud to a colleague looking over your shoulder, don't put it in the message. A little warmth (and even a little fun) is welcome: an error is a frustrating moment, and the tone can soften it.
+
+### Don't blame the user
+
+Keep the tone nonjudgmental and describe the situation, not a fault. Avoid words that pin the problem on the reader, such as _invalid_, _illegal_, _incorrect_, or phrasing it like "you failed to" or "you didn't." Say what needs to happen next instead: "Enter a date in the future," not "You entered an invalid date."
+
+### Be specific
+
+Vague subjects ("this browser", "the server", "something") force the user to guess. Name the thing that didn't work: the specific browser, platform, file type, or field. Specificity also makes the message searchable and easier for the user to reason about.
+
+### Offer a way forward
+
+Every error should leave the user with at least one thing to try next: a supported alternative, a format that will work, a setting to change. When you name a constraint, name the escape from it also.
+
+### Fail gracefully
+
+When something goes wrong, minimize harm or exposure. Preserve the user's work, avoid destructive side effects, and never leak sensitive or internal details in the message.
+
+### Make errors easy to act on
+
+A message the user can't read or copy isn't actionable:
+
+-   **Persist it.** Errors that require a decision should not auto-dismiss. Give the user time to read, understand, and act.
+-   **Place it near the problem.** If possible, place the message where the failure happened.
+-   **Let people copy it.** Optionally offer a copy-to-clipboard affordance so users can paste messages into search, documentation, or an AI assistant.
+
+## Anatomy of a good error message
+
+A strong message answers three questions in order:
+
+1. **What happened?** The outcome, stated plainly.
+2. **Why?** The specific cause.
+3. **What now?** One or more next steps to try.
+
+> _{Browser} can't read {format} photos, so we couldn't convert this one. {Supported option} usually can, or {fallback} instead._
+
+Keep it to a sentence or two. If a message needs a paragraph, the underlying flow probably needs rethinking more than the copy does.
+
+## Displaying error messages
+
+-   Use [`Notice`](https://wordpress.github.io/gutenberg/?path=/docs/components-notice--docs) with `status="error"` for errors that need the user's attention and a decision. A `Notice` persists until dismissed or resolved. Optionally you can use a [`Snackbar` with explicit dismiss](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--with-explicit-dismiss) if it is closer to the context of the error-source.
+-   Generally avoid [`Snackbar`](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) for errors that require action: it's designed to clear itself after a short delay.
+-   For validation of user input on save or submit, follow the [Save & Submit](https://wordpress.github.io/gutenberg/?path=/docs/design-system-patterns-save-submit--docs) pattern: scroll to the first invalid field and show the message there.
