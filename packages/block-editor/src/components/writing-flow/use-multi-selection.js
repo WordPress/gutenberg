@@ -78,12 +78,13 @@ export default function useMultiSelection() {
 			// happens BEFORE selection removal.
 			setContentEditableWrapper( node, true );
 
-			// Make the native selection span the multi-selected blocks
-			// instead of clearing it: an editing host that holds focus with
-			// no selection gets a caret re-seeded at its start (Chromium),
-			// which the first block's rich text then syncs to the store,
-			// collapsing the multi-selection. A selection that agrees with
-			// the store is stable, and native copy matches what is selected.
+			// Make the native selection agree with the store: a range
+			// spanning the multi-selected blocks. Clearing it instead makes
+			// the focused host re-seed a caret at its start (Chromium),
+			// which the first block's rich text syncs back, collapsing the
+			// multi-selection; leaving the text-level range that formed the
+			// multi-selection makes block-level operations act on the wrong
+			// selection. Both alternatives were measured against this.
 			const firstElement = ownerDocument.getElementById(
 				'block-' + multiSelectedBlockClientIds[ 0 ]
 			);
