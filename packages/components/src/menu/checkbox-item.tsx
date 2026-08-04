@@ -11,12 +11,12 @@ export const CheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CheckboxItemProps, 'div', false >
 >( function CheckboxItem(
-	{ suffix, children, disabled = false, ...props },
+	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {
 	const menuContext = useContext( Context );
 	const store = menuContext?.store;
-	const hideOnClick = useMenuItemHideOnClick( store );
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
 	if ( ! store ) {
 		throw new Error(
@@ -30,7 +30,7 @@ export const CheckboxItem = forwardRef<
 			accessibleWhenDisabled
 			disabled={ disabled }
 			store={ store }
-			hideOnClick={ hideOnClick }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
 				store={ store }

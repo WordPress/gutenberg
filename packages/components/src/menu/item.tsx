@@ -9,12 +9,23 @@ export const Item = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< ItemProps, 'div', false >
 >( function Item(
-	{ prefix, suffix, children, disabled = false, store, ...props },
+	{
+		prefix,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = true,
+		store,
+		...props
+	},
 	ref
 ) {
 	const menuContext = useContext( Context );
 	const computedStore = store ?? menuContext?.store;
-	const hideOnClick = useMenuItemHideOnClick( computedStore );
+	const computedHideOnClick = useMenuItemHideOnClick(
+		computedStore,
+		hideOnClick
+	);
 
 	if ( ! menuContext?.store || ! computedStore ) {
 		throw new Error(
@@ -33,7 +44,7 @@ export const Item = forwardRef<
 			accessibleWhenDisabled
 			disabled={ disabled }
 			store={ computedStore }
-			hideOnClick={ hideOnClick }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 

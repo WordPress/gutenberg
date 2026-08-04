@@ -17,10 +17,13 @@ const radioCheck = (
 export const RadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< RadioItemProps, 'div', false >
->( function RadioItem( { suffix, children, disabled = false, ...props }, ref ) {
+>( function RadioItem(
+	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+	ref
+) {
 	const menuContext = useContext( Context );
 	const store = menuContext?.store;
-	const hideOnClick = useMenuItemHideOnClick( store );
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
 	if ( ! store ) {
 		throw new Error(
@@ -34,7 +37,7 @@ export const RadioItem = forwardRef<
 			accessibleWhenDisabled
 			disabled={ disabled }
 			store={ store }
-			hideOnClick={ hideOnClick }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
 				store={ store }

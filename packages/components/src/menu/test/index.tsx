@@ -425,7 +425,7 @@ describe( 'Menu', () => {
 			await waitFor( () => expect( isBodyScrollLocked() ).toBe( false ) );
 		} );
 
-		it( 'should close when `hideOnClick` is `false`', async () => {
+		it( 'should stay open when `hideOnClick` is `false`', async () => {
 			render(
 				<Menu defaultOpen>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -439,10 +439,10 @@ describe( 'Menu', () => {
 
 			await user.click( screen.getByRole( 'menuitem' ) );
 
-			await waitForClosedMenu();
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
 		} );
 
-		it( 'should close without invoking a `hideOnClick` callback', async () => {
+		it( 'should use a `hideOnClick` callback to decide whether to close', async () => {
 			const hideOnClick = jest.fn( () => false );
 			render(
 				<Menu defaultOpen>
@@ -457,9 +457,66 @@ describe( 'Menu', () => {
 
 			await user.click( screen.getByRole( 'menuitem' ) );
 
-			await waitForClosedMenu();
-			expect( hideOnClick ).not.toHaveBeenCalled();
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+			expect( hideOnClick ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		it( 'should close when a `hideOnClick` callback returns `true`', async () => {
+			const hideOnClick = jest.fn( () => true );
+			render(
+				<Menu defaultOpen>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover>
+						<Menu.Item hideOnClick={ hideOnClick }>
+							Menu item
+						</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			await waitForClosedMenu();
+			expect( hideOnClick ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it.each( [ 'checkbox', 'radio' ] )(
+			'should close a %s item when `hideOnClick` is `true`',
+			async ( itemType ) => {
+				render(
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover>
+							{ itemType === 'checkbox' ? (
+								<Menu.CheckboxItem
+									name="checkbox"
+									value="checkbox"
+									hideOnClick
+								>
+									Checkbox item
+								</Menu.CheckboxItem>
+							) : (
+								<Menu.RadioItem
+									name="radio"
+									value="radio"
+									hideOnClick
+								>
+									Radio item
+								</Menu.RadioItem>
+							) }
+						</Menu.Popover>
+					</Menu>
+				);
+
+				await user.click( screen.getByRole( `menuitem${ itemType }` ) );
+
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'menu' )
+					).not.toBeInTheDocument()
+				);
+			}
+		);
 
 		it( 'should retain focus moved outside by an item click handler', async () => {
 			let outsideDestination: HTMLButtonElement | null = null;
@@ -477,6 +534,39 @@ describe( 'Menu', () => {
 						<Menu.Popover modal={ false }>
 							<Menu.Item
 								onClick={ () => outsideDestination?.focus() }
+							>
+								Menu item
+							</Menu.Item>
+						</Menu.Popover>
+					</Menu>
+				</>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			await waitForClosedMenu();
+			expect( outsideDestination ).toHaveFocus();
+		} );
+
+		it( 'should retain focus moved outside by a `hideOnClick` callback', async () => {
+			let outsideDestination: HTMLButtonElement | null = null;
+			render(
+				<>
+					<button
+						ref={ ( element ) => {
+							outsideDestination = element;
+						} }
+					>
+						Outside destination
+					</button>
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover modal={ false }>
+							<Menu.Item
+								hideOnClick={ () => {
+									outsideDestination?.focus();
+									return true;
+								} }
 							>
 								Menu item
 							</Menu.Item>
@@ -664,9 +754,8 @@ describe( 'Menu', () => {
 			).toHaveFocus();
 		} );
 
-		it( 'should check radio items and close the menu when clicking (controlled)', async () => {
+		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
 			const onRadioValueChangeSpy = jest.fn();
-			const hideOnClickSpy = jest.fn( () => false );
 
 			const ControlledRadioGroup = () => {
 				const [ radioValue, setRadioValue ] = useState( 'two' );
@@ -686,7 +775,6 @@ describe( 'Menu', () => {
 									value="radio-one"
 									checked={ radioValue === 'radio-one' }
 									onChange={ onRadioChange }
-									hideOnClick={ hideOnClickSpy }
 								>
 									Radio item one
 								</Menu.RadioItem>
@@ -695,7 +783,6 @@ describe( 'Menu', () => {
 									value="radio-two"
 									checked={ radioValue === 'radio-two' }
 									onChange={ onRadioChange }
-									hideOnClick={ hideOnClickSpy }
 								>
 									Radio item two
 								</Menu.RadioItem>
@@ -725,13 +812,12 @@ describe( 'Menu', () => {
 			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			);
-			await waitForClosedMenu();
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
 				'radio-one'
 			);
 
-			await openMenu( user );
+			// Make sure that first radio is checked
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			).toBeChecked();
@@ -742,23 +828,21 @@ describe( 'Menu', () => {
 			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			);
-			await waitForClosedMenu();
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
 				'radio-two'
 			);
 
-			await openMenu( user );
+			// Make sure that second radio is selected
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			).not.toBeChecked();
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			).toBeChecked();
-			expect( hideOnClickSpy ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should check radio items and close the menu when clicking (uncontrolled)', async () => {
+		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
 			const onRadioValueChangeSpy = jest.fn();
 			render(
 				<Menu>
@@ -807,16 +891,39 @@ describe( 'Menu', () => {
 			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			);
-			await waitForClosedMenu();
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
 				'radio-one'
 			);
+
+			// Make sure that first radio is checked
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
+			).not.toBeChecked();
+
+			// Click second radio item, make sure that the callback fires
+			await user.click(
+				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
+			);
+			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
+			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
+				'radio-two'
+			);
+
+			// Make sure that second radio is selected
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
+			).toBeChecked();
 		} );
 
-		it( 'should check checkbox items and close the menu when clicking (controlled)', async () => {
+		it( 'should check checkbox items and keep the menu open when clicking (controlled)', async () => {
 			const onCheckboxValueChangeSpy = jest.fn();
-			const hideOnClickSpy = jest.fn( () => false );
 
 			const ControlledRadioGroup = () => {
 				const [ itemOneChecked, setItemOneChecked ] =
@@ -832,7 +939,6 @@ describe( 'Menu', () => {
 								name="item-one"
 								value="item-one-value"
 								checked={ itemOneChecked }
-								hideOnClick={ hideOnClickSpy }
 								onChange={ ( e ) => {
 									onCheckboxValueChangeSpy(
 										e.target.name,
@@ -849,7 +955,6 @@ describe( 'Menu', () => {
 								name="item-two"
 								value="item-two-value"
 								checked={ itemTwoChecked }
-								hideOnClick={ hideOnClickSpy }
 								onChange={ ( e ) => {
 									onCheckboxValueChangeSpy(
 										e.target.name,
@@ -894,7 +999,6 @@ describe( 'Menu', () => {
 					name: 'Checkbox item one',
 				} )
 			);
-			await waitForClosedMenu();
 			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
 				'item-one',
@@ -902,7 +1006,6 @@ describe( 'Menu', () => {
 				true
 			);
 
-			await openMenu( user );
 			// Make sure that first checkbox is checked
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
@@ -916,7 +1019,6 @@ describe( 'Menu', () => {
 					name: 'Checkbox item two',
 				} )
 			);
-			await waitForClosedMenu();
 			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
 				'item-two',
@@ -924,7 +1026,6 @@ describe( 'Menu', () => {
 				true
 			);
 
-			await openMenu( user );
 			// Make sure that second checkbox is selected
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
@@ -938,7 +1039,6 @@ describe( 'Menu', () => {
 					name: 'Checkbox item two',
 				} )
 			);
-			await waitForClosedMenu();
 			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
 				'item-two',
@@ -946,17 +1046,15 @@ describe( 'Menu', () => {
 				false
 			);
 
-			await openMenu( user );
 			// Make sure that second checkbox is unselected
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
 			).not.toBeChecked();
-			expect( hideOnClickSpy ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should check checkbox items and close the menu when clicking (uncontrolled)', async () => {
+		it( 'should check checkbox items and keep the menu open when clicking (uncontrolled)', async () => {
 			const onCheckboxValueChangeSpy = jest.fn();
 
 			render(
@@ -1015,19 +1113,65 @@ describe( 'Menu', () => {
 				} )
 			).toBeChecked();
 
-			// Click the checked item, make sure that the callback fires
+			// Click first checkbox item, make sure that the callback fires
+			await user.click(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Checkbox item one',
+				} )
+			);
+			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
+				'item-one',
+				'item-one-value',
+				true
+			);
+
+			// Make sure that first checkbox is checked
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Checkbox item one',
+				} )
+			).toBeChecked();
+
+			// Click second checkbox item, make sure that the callback fires
 			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
 			);
-			await waitForClosedMenu();
-			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
 				'item-two',
 				'item-two-value',
 				false
 			);
+
+			// Make sure that second checkbox is unchecked
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Checkbox item two',
+				} )
+			).not.toBeChecked();
+
+			// Click second checkbox item, make sure that the callback fires
+			await user.click(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Checkbox item two',
+				} )
+			);
+			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 3 );
+			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
+				'item-two',
+				'item-two-value',
+				true
+			);
+
+			// Make sure that second checkbox is selected
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Checkbox item two',
+				} )
+			).toBeChecked();
 		} );
 	} );
 

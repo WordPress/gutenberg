@@ -169,12 +169,13 @@ export interface ItemProps {
 	 */
 	suffix?: React.ReactNode;
 	/**
-	 * This prop has no effect and remains available for backward compatibility.
-	 * Boolean and callback values are ignored, and callback values are not
-	 * invoked. Every eligible `Menu.Item` activation closes the menu.
+	 * Determines if the menu should hide when this item is clicked.
 	 *
-	 * Ariakit's safeguards for disabled items, prevented events, modified links,
-	 * downloads, and submenu triggers still apply.
+	 * **Note**: This behavior isn't triggered if this menu item is rendered as a
+	 * link and modifier keys are used to either open the link in a new tab or
+	 * download it.
+	 *
+	 * @default true
 	 */
 	hideOnClick?: Ariakit.MenuItemProps[ 'hideOnClick' ];
 	/**
@@ -196,7 +197,7 @@ export interface ItemProps {
 	 * The ariakit menu store. This prop is only meant for internal use.
 	 * @ignore
 	 */
-	store?: Ariakit.MenuStore;
+	store?: Ariakit.MenuItemProps[ 'store' ];
 }
 
 export interface CheckboxItemProps {
@@ -211,12 +212,13 @@ export interface CheckboxItemProps {
 	 */
 	suffix?: React.ReactNode;
 	/**
-	 * This prop has no effect and remains available for backward compatibility.
-	 * Boolean and callback values are ignored, and callback values are not
-	 * invoked. Every eligible `Menu.CheckboxItem` activation closes the menu.
+	 * Determines if the menu should hide when this item is clicked.
 	 *
-	 * Ariakit's safeguards for disabled items, prevented events, modified links,
-	 * downloads, and submenu triggers still apply.
+	 * **Note**: This behavior isn't triggered if this menu item is rendered as a
+	 * link and modifier keys are used to either open the link in a new tab or
+	 * download it.
+	 *
+	 * @default false
 	 */
 	hideOnClick?: Ariakit.MenuItemCheckboxProps[ 'hideOnClick' ];
 	/**
@@ -274,12 +276,13 @@ export interface RadioItemProps {
 	 */
 	suffix?: React.ReactNode;
 	/**
-	 * This prop has no effect and remains available for backward compatibility.
-	 * Boolean and callback values are ignored, and callback values are not
-	 * invoked. Every eligible `Menu.RadioItem` activation closes the menu.
+	 * Determines if the menu should hide when this item is clicked.
 	 *
-	 * Ariakit's safeguards for disabled items, prevented events, modified links,
-	 * downloads, and submenu triggers still apply.
+	 * **Note**: This behavior isn't triggered if this menu item is rendered as a
+	 * link and modifier keys are used to either open the link in a new tab or
+	 * download it.
+	 *
+	 * @default false
 	 */
 	hideOnClick?: Ariakit.MenuItemRadioProps[ 'hideOnClick' ];
 	/**
