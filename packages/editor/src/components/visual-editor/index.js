@@ -192,6 +192,7 @@ function VisualEditor( {
 
 	const localRef = useRef();
 	const [ isResizingCanvas, setIsResizingCanvas ] = useState( false );
+	const [ resizingCanvasHeight, setResizingCanvasHeight ] = useState();
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -347,13 +348,14 @@ function VisualEditor( {
 	);
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
-	const shouldExpandIframeBody =
-		canvasHeight !== undefined &&
-		! isResizablePostType &&
-		! isResizingCanvas;
-	const iframeBodyMinHeightCSS = shouldExpandIframeBody
-		? 'min-height:100vh;'
-		: '';
+	// A dragged width drops the device height, so hold the starting height
+	// until the drag ends.
+	const effectiveCanvasHeight = isResizingCanvas
+		? resizingCanvasHeight
+		: canvasHeight;
+	// Fill the frame at any constrained width, not just device presets.
+	const iframeBodyMinHeightCSS =
+		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -433,11 +435,14 @@ function VisualEditor( {
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
 				}
 				height={
-					enableResizing && canvasHeight && ! isResizingCanvas
-						? canvasHeight + 'px'
+					enableResizing && effectiveCanvasHeight
+						? effectiveCanvasHeight + 'px'
 						: '100%'
 				}
-				onResizeStart={ () => setIsResizingCanvas( true ) }
+				onResizeStart={ () => {
+					setResizingCanvasHeight( canvasHeight );
+					setIsResizingCanvas( true );
+				} }
 				onResizeStop={ () => setIsResizingCanvas( false ) }
 			>
 				<BlockCanvas
