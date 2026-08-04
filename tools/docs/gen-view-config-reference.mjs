@@ -1,8 +1,8 @@
 /**
- * Generates the view config reference documentation from the REST controller
- * schema — the single source of truth.
+ * Generates the view config reference documentation from the view config REST
+ * schema — the single source of truth, also consumed by the REST controller.
  *
- * Reads from  : lib/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php
+ * Reads from  : lib/compat/wordpress-7.1/view-config-schema.php
  *               (extracted via tools/docs/dump-view-config-schema.php)
  * Publishes to: docs/reference-guides/view-config-reference.md
  */
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import execa from 'execa';
 
 /**
- * Path to the PHP script that dumps the controller schema as JSON.
+ * Path to the PHP script that dumps the view config schema as JSON.
  *
  * @type {string}
  */
@@ -306,7 +306,7 @@ async function main() {
 	} catch ( error ) {
 		if ( error.code === 'ENOENT' ) {
 			throw new Error(
-				'PHP is required to generate the view config reference: the schema is extracted from the REST controller via `php`. Install PHP and make sure it is available on your PATH.'
+				'PHP is required to generate the view config reference: the schema is extracted from its PHP source file via `php`. Install PHP and make sure it is available on your PATH.'
 			);
 		}
 		throw error;
