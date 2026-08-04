@@ -28,6 +28,7 @@ import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
+import useEditableRootHost from '../block-list/use-editable-root-host';
 import useBlockDropZone from '../use-block-drop-zone';
 import { unlock } from '../../lock-unlock';
 
@@ -263,6 +264,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		parentClientId,
 	} );
 
+	const hostProps = useEditableRootHost( clientId );
+
 	const ref = useMergeRefs( [
 		props.ref,
 		__unstableDisableDropZone ||
@@ -289,6 +292,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	return {
 		...props,
+		...hostProps,
 		ref,
 		className: clsx(
 			props.className,
