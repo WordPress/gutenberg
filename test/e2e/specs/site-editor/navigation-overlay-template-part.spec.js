@@ -38,12 +38,14 @@ const createNavigationOverlay = async ( {
 	const settingsTab = page.getByRole( 'tab', {
 		name: 'Settings',
 	} );
+	await expect( settingsTab ).toBeVisible();
 	await settingsTab.click();
 
 	const createOverlayButton = page.getByRole( 'button', {
 		name: 'Create overlay',
 		exact: true,
 	} );
+	await expect( createOverlayButton ).toBeVisible();
 	await createOverlayButton.click();
 
 	await expect(
@@ -57,10 +59,12 @@ test.describe( 'Navigation Overlay Template Part', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-		await requestUtils.deleteAllPages();
-		await requestUtils.deleteAllMenus();
+		await Promise.all( [
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllTemplates( 'wp_template_part' ),
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllMenus(),
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
