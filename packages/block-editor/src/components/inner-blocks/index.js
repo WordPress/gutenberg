@@ -28,9 +28,7 @@ import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
-import useEditableRootHost, {
-	registerBlockListLayout,
-} from '../block-list/use-editable-root-host';
+import useEditableRootHost from '../block-list/use-editable-root-host';
 import useBlockDropZone from '../use-block-drop-zone';
 import { unlock } from '../../lock-unlock';
 
@@ -270,7 +268,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const ref = useMergeRefs( [
 		props.ref,
-		registerBlockListLayout,
 		__unstableDisableDropZone ||
 		isDropZoneDisabled ||
 		( layout?.isManualPlacement &&

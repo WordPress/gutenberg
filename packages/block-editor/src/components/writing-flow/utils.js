@@ -16,7 +16,6 @@ import {
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/pasting';
-import { isBlockListLayout } from '../block-list/use-editable-root-host';
 import { store as blockEditorStore } from '../../store';
 
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
@@ -167,21 +166,36 @@ function resolveEditableRootElement( node ) {
 		return node;
 	}
 
-	const { commonAncestorContainer } = selection.getRangeAt( 0 );
-	let element =
-		commonAncestorContainer.nodeType ===
-		commonAncestorContainer.ELEMENT_NODE
-			? commonAncestorContainer
-			: commonAncestorContainer.parentElement;
+	const closestBlock = ( selectionNode ) => {
+		const element =
+			selectionNode?.nodeType === selectionNode?.ELEMENT_NODE
+				? selectionNode
+				: selectionNode?.parentElement;
+		return element?.closest( '[data-block]' ) ?? null;
+	};
+	const anchorBlock = closestBlock( selection.anchorNode );
+	const focusBlock = closestBlock( selection.focusNode ) ?? anchorBlock;
 
-	while ( element && element !== node ) {
-		if ( isBlockListLayout( element ) ) {
-			return element;
-		}
-		element = element.parentElement;
+	if ( ! anchorBlock ) {
+		return node;
 	}
 
-	return node;
+	// A block list is the direct parent of its blocks. Promote to the outer
+	// list, through the block wrapping it, until the list contains the whole
+	// selection.
+	let layout = anchorBlock.parentElement;
+
+	while (
+		layout &&
+		node.contains( layout ) &&
+		! layout.contains( focusBlock )
+	) {
+		layout =
+			layout.parentElement?.closest( '[data-block]' )?.parentElement ??
+			null;
+	}
+
+	return layout && node.contains( layout ) ? layout : node;
 }
 
 export function setContentEditableWrapper(
