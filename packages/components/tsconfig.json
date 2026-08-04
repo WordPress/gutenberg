@@ -29,6 +29,7 @@
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-runtime" },
+		{ "path": "../theme" },
 		{ "path": "../ui" },
 		{ "path": "../warning" }
 	],
