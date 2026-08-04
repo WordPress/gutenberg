@@ -73,12 +73,10 @@ function gutenberg_get_note_mentioned_user_ids( string $content ): array {
  * @since 7.1.0
  *
  * @param WP_Comment $comment  The note that was just inserted.
- * @param mixed      $request  The REST request (unused).
+ * @param mixed      $request  The REST request. Unused.
  * @param bool       $creating Whether this is a create (true) or update (false).
  */
 function gutenberg_notify_note_mentions( WP_Comment $comment, $request = null, bool $creating = true ): void {
-	unset( $request );
-
 	if ( ! $creating ) {
 		return;
 	}
