@@ -73,20 +73,20 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
-				// While the wrapper is an editing host, it holds focus on
-				// behalf of the caret inside it. When the caret lives in a
-				// descendant block, focus arriving on the wrapper is host
-				// engagement, not the user targeting this block: the caret
-				// decides the selection.
-				if (
-					event.target === node &&
-					node.contentEditable === 'true'
-				) {
+				// An engaged editing host (the block's own element, or its
+				// inner block list) holds focus on behalf of the caret
+				// inside it. When the caret lives in a descendant block,
+				// focus arriving on such an editable is host engagement,
+				// not the user targeting this block: the caret decides the
+				// selection. Only block lists contain other blocks, so an
+				// editable target containing another block's caret can only
+				// be an engaged host.
+				if ( event.target.contentEditable === 'true' ) {
 					const { anchorNode } =
 						node.ownerDocument.defaultView.getSelection();
 					if (
 						anchorNode &&
-						node.contains( anchorNode ) &&
+						event.target.contains( anchorNode ) &&
 						getBlockClientId( anchorNode ) !== clientId
 					) {
 						return;
