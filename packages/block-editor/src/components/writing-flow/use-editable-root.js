@@ -90,11 +90,19 @@ export default function useEditableRoot() {
 				// If the wrapper held focus, return focus to the editable
 				// element containing the selection, which is focusable
 				// again now that the wrapper is no longer an editing host.
-				// Only do so if that element belongs to the selected block:
-				// when the selection moved to another block through the
-				// store, the stale DOM selection must not reclaim block
-				// selection through its focus handler.
-				if ( node.ownerDocument.activeElement === disengaged ) {
+				// Focus can also have dropped to the document default
+				// already: a focus restore attempt targeting the host after
+				// it lost editability falls through to the body. Only do so
+				// if that element belongs to the selected block: when the
+				// selection moved to another block through the store, the
+				// stale DOM selection must not reclaim block selection
+				// through its focus handler.
+				if (
+					node.ownerDocument.activeElement === disengaged ||
+					( node.ownerDocument.activeElement ===
+						node.ownerDocument.body &&
+						node.ownerDocument.hasFocus() )
+				) {
 					const editable = getSelectionEditableElement(
 						node.ownerDocument.defaultView.getSelection(),
 						node
