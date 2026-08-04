@@ -604,20 +604,24 @@ test.describe( 'Post revisions slider pagination', () => {
 		// Adjacent revision contents differ by exactly 1 (we created them
 		// as sequential integers), so the boundary diff must show N as
 		// added and N-1 as removed inside a modified paragraph.
+		// Poll both reads together: one-shot reads can straddle the canvas
+		// re-renders that follow the Home keypress (see #80154).
 		const canvas = page
 			.locator( 'iframe[name="editor-canvas"]' )
 			.contentFrame()
 			.locator( '.is-revision-modified' );
 		await expect( canvas ).toBeVisible();
-		const added = parseInt(
-			await canvas.locator( '.revision-diff-added' ).textContent(),
-			10
-		);
-		const removed = parseInt(
-			await canvas.locator( '.revision-diff-removed' ).textContent(),
-			10
-		);
-		expect( added - removed ).toBe( 1 );
+		await expect( async () => {
+			const added = parseInt(
+				await canvas.locator( '.revision-diff-added' ).textContent(),
+				10
+			);
+			const removed = parseInt(
+				await canvas.locator( '.revision-diff-removed' ).textContent(),
+				10
+			);
+			expect( added - removed ).toBe( 1 );
+		} ).toPass();
 
 		// Navigate to page 2 via the chevron.
 		await prevPageButton.click();
