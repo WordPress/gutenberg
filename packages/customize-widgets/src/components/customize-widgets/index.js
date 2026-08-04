@@ -1,8 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, createPortal } from '@wordpress/element';
+import { getAdminThemeColors } from '@wordpress/admin-ui';
+import {
+	useState,
+	useEffect,
+	useRef,
+	createPortal,
+	useMemo,
+} from '@wordpress/element';
 import { SlotFillProvider, Popover } from '@wordpress/components';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -23,6 +31,7 @@ export default function CustomizeWidgets( {
 		'customize-theme-controls'
 	);
 	const popoverRef = useRef();
+	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
 
 	useClearSelectedBlock( activeSidebarControl, popoverRef );
 
@@ -68,15 +77,20 @@ export default function CustomizeWidgets( {
 
 	return (
 		<SlotFillProvider>
-			<SidebarControls
-				sidebarControls={ sidebarControls }
-				activeSidebarControl={ activeSidebarControl }
-			>
-				<FocusControl api={ api } sidebarControls={ sidebarControls }>
-					{ activeSidebar }
-					{ popover }
-				</FocusControl>
-			</SidebarControls>
+			<ThemeProvider isRoot color={ { primary: adminPrimary } }>
+				<SidebarControls
+					sidebarControls={ sidebarControls }
+					activeSidebarControl={ activeSidebarControl }
+				>
+					<FocusControl
+						api={ api }
+						sidebarControls={ sidebarControls }
+					>
+						{ activeSidebar }
+						{ popover }
+					</FocusControl>
+				</SidebarControls>
+			</ThemeProvider>
 		</SlotFillProvider>
 	);
 }
