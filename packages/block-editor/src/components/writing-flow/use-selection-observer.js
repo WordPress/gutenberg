@@ -14,7 +14,7 @@ import { isSelectionForward } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { setContentEditableWrapper } from './utils';
+import { getEditableRootElement, setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -195,21 +195,22 @@ export default function useSelectionObserver() {
 						// (e.g. buttons) or editables outside the block (e.g.
 						// the post title). The rich text instance owning the
 						// selection syncs it to the store itself.
+						const host = getEditableRootElement( node );
 						const { activeElement } = ownerDocument;
 						if (
-							activeElement !== node &&
+							activeElement !== host &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
 							getBlockClientId( activeElement ) ===
 								collapsedClientId
 						) {
-							node.focus();
+							host.focus();
 						}
 						return;
 					}
 
 					if (
-						node.contentEditable === 'true' &&
+						getEditableRootElement( node ) &&
 						! isMultiSelecting()
 					) {
 						setContentEditableWrapper( node, false );

@@ -135,45 +135,109 @@ function toPlainText( html ) {
  *
  * @return {boolean} Whether the wrapper is an editing host now.
  */
+const editableRootElements = new WeakMap();
+
+/**
+ * Returns the element currently acting as the editing host for the wrapper,
+ * or null when none is engaged.
+ *
+ * @param {HTMLElement} node Wrapper element.
+ *
+ * @return {?HTMLElement} The engaged editing host.
+ */
+export function getEditableRootElement( node ) {
+	return editableRootElements.get( node ) ?? null;
+}
+
+/**
+ * Resolves the element that should act as the editing host: the closest
+ * block list container of the current selection, so the host wraps only
+ * block content (never e.g. the post title), and nests with the block
+ * structure. Falls back to the root block list container, then the wrapper.
+ *
+ * @param {HTMLElement} node Wrapper element.
+ *
+ * @return {HTMLElement} The element to make the editing host.
+ */
+function resolveEditableRootElement( node ) {
+	const selection = node.ownerDocument.defaultView.getSelection();
+	let element = null;
+
+	if ( selection.rangeCount ) {
+		const { commonAncestorContainer } = selection.getRangeAt( 0 );
+		element =
+			commonAncestorContainer.nodeType ===
+			commonAncestorContainer.ELEMENT_NODE
+				? commonAncestorContainer
+				: commonAncestorContainer.parentElement;
+	}
+
+	const host = element?.closest( '.block-editor-block-list__layout' );
+
+	if ( host && node.contains( host ) ) {
+		return host;
+	}
+
+	return node.querySelector( '.is-root-container' ) ?? node;
+}
+
 export function setContentEditableWrapper(
 	node,
 	value,
 	{ focus = true } = {}
 ) {
-	// Check first: this is called on every selection change, and setting
-	// contentEditable triggers a style recalculation.
-	if ( node.contentEditable === String( value ) ) {
-		return value;
-	}
-
-	node.contentEditable = value;
+	const engaged = editableRootElements.get( node );
 
 	if ( ! value ) {
-		node.removeAttribute( 'role' );
-		node.removeAttribute( 'aria-multiline' );
-		node.removeAttribute( 'aria-label' );
+		if ( ! engaged ) {
+			return false;
+		}
+		editableRootElements.delete( node );
+		engaged.contentEditable = false;
+		engaged.removeAttribute( 'contenteditable' );
+		engaged.removeAttribute( 'role' );
+		engaged.removeAttribute( 'aria-multiline' );
+		engaged.removeAttribute( 'aria-label' );
 		return false;
 	}
 
+	const host = resolveEditableRootElement( node );
+
+	// Check first: this is called on every selection change, and setting
+	// contentEditable triggers a style recalculation.
+	if ( engaged === host && host.contentEditable === 'true' ) {
+		return true;
+	}
+
+	if ( engaged && engaged !== host ) {
+		setContentEditableWrapper( node, false );
+	}
+
+	const target = host;
+	editableRootElements.set( node, target );
+
+	target.contentEditable = value;
+
 	// Only act as an editing host if the environment supports it (JSDOM
 	// does not implement contentEditable): without editing host semantics
-	// the wrapper must not claim focus or textbox semantics.
-	if ( ! node.isContentEditable ) {
-		node.removeAttribute( 'contenteditable' );
+	// the element must not claim focus or textbox semantics.
+	if ( ! target.isContentEditable ) {
+		target.removeAttribute( 'contenteditable' );
+		editableRootElements.delete( node );
 		return false;
 	}
 
 	// Expose the host as a named multiline textbox so it has a role and
 	// accessible name once it takes focus. The label is generic because the
 	// host can span several blocks.
-	node.setAttribute( 'role', 'textbox' );
-	node.setAttribute( 'aria-multiline', 'true' );
-	node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
+	target.setAttribute( 'role', 'textbox' );
+	target.setAttribute( 'aria-multiline', 'true' );
+	target.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 	if ( focus ) {
-		// Without preventScroll, focusing the wrapper scrolls the
-		// viewport to the top of the wrapper.
-		node.focus( { preventScroll: true } );
+		// Without preventScroll, focusing the host scrolls the viewport to
+		// the top of the host.
+		target.focus( { preventScroll: true } );
 	}
 
 	return true;

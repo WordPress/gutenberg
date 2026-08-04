@@ -28,6 +28,7 @@ import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
+import { getEditableRootElement } from './utils';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
@@ -73,7 +74,7 @@ export function useWritingFlow() {
 						// The wrapper may remain the editing host (the
 						// collapsed block supports `editableRoot`): keep it
 						// named, as the textbox role requires.
-						if ( node.contentEditable === 'true' ) {
+						if ( getEditableRootElement( node ) ) {
 							node.setAttribute(
 								'aria-label',
 								__( 'Editor canvas' )

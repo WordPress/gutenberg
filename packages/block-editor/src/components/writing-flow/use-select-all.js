@@ -10,6 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getEditableRootElement } from './utils';
 import {
 	isInsideRootBlock,
 	getBlockClientId,
@@ -35,7 +36,7 @@ export default function useSelectAll() {
 			// selected block supports `editableRoot`), the event targets the
 			// wrapper; resolve the editable element containing the selection.
 			const editable =
-				( event.target === node &&
+				( event.target === getEditableRootElement( node ) &&
 					getSelectionEditableElement( selection, node ) ) ||
 				event.target;
 
@@ -47,7 +48,10 @@ export default function useSelectAll() {
 				// would select the entire canvas. Select the contents of the
 				// editable element instead, like the default does when the
 				// element itself holds focus.
-				if ( event.target === node && editable !== node ) {
+				if (
+					event.target === getEditableRootElement( node ) &&
+					editable !== getEditableRootElement( node )
+				) {
 					event.preventDefault();
 					const range = ownerDocument.createRange();
 					range.selectNodeContents( editable );

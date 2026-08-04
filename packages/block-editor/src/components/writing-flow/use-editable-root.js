@@ -8,7 +8,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { setContentEditableWrapper } from './utils';
+import { getEditableRootElement, setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
@@ -58,10 +58,11 @@ export default function useEditableRoot() {
 			// placed the caret yet; moving focus now would cancel the
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
+			const host = getEditableRootElement( node );
 			const { activeElement } = node.ownerDocument;
 			const selection = node.ownerDocument.defaultView.getSelection();
 			if (
-				activeElement !== node &&
+				activeElement !== host &&
 				activeElement?.isContentEditable &&
 				node.contains( activeElement ) &&
 				getBlockClientId( activeElement ) ===
@@ -69,7 +70,7 @@ export default function useEditableRoot() {
 				selection.anchorNode &&
 				activeElement.contains( selection.anchorNode )
 			) {
-				node.focus();
+				host.focus();
 			}
 
 			return () => {
@@ -83,6 +84,7 @@ export default function useEditableRoot() {
 					return;
 				}
 
+				const disengaged = getEditableRootElement( node );
 				setContentEditableWrapper( node, false );
 
 				// If the wrapper held focus, return focus to the editable
@@ -92,7 +94,7 @@ export default function useEditableRoot() {
 				// when the selection moved to another block through the
 				// store, the stale DOM selection must not reclaim block
 				// selection through its focus handler.
-				if ( node.ownerDocument.activeElement === node ) {
+				if ( node.ownerDocument.activeElement === disengaged ) {
 					const editable = getSelectionEditableElement(
 						node.ownerDocument.defaultView.getSelection(),
 						node

@@ -11,6 +11,7 @@ import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';
+import { getEditableRootElement } from './utils';
 
 // The React `on*` props the host bridges, mapped to their DOM event type. Only
 // editing events are redirected under `editableRoot` (the wrapper becomes the
@@ -187,9 +188,9 @@ export default function useEditableRootEventHandlers() {
 				// handler to call.
 				if (
 					! eventHandlers.size ||
-					event.target !== node ||
+					event.target !== getEditableRootElement( node ) ||
 					! event.isTrusted ||
-					node.contentEditable !== 'true' ||
+
 					hasMultiSelection()
 				) {
 					return;

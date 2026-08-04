@@ -20,7 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
-import { setContentEditableWrapper } from './utils';
+import { getEditableRootElement, setContentEditableWrapper } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -216,7 +216,7 @@ export default function useArrowNav() {
 			// selected block supports `editableRoot`), the event targets the
 			// wrapper; resolve the editable element containing the selection.
 			const target =
-				( event.target === node &&
+				( event.target === getEditableRootElement( node ) &&
 					getSelectionEditableElement(
 						node.ownerDocument.defaultView.getSelection(),
 						node
@@ -342,7 +342,7 @@ export default function useArrowNav() {
 				if ( isNavEdge( target, isReverse ) ) {
 					if ( isClosestTabbableABlock( target, isReverse ) ) {
 						setContentEditableWrapper( node, true );
-					} else if ( node.contentEditable === 'true' ) {
+					} else if ( getEditableRootElement( node ) ) {
 						// There is no block to extend the selection into.
 						// Within an editable wrapper the selection could
 						// natively escape into surrounding editable elements

@@ -16,7 +16,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { setContentEditableWrapper } from './utils';
+import { getEditableRootElement, setContentEditableWrapper } from './utils';
 import { getSelectionEditableElement } from '../../utils/dom';
 
 /**
@@ -54,7 +54,7 @@ export default function useInput() {
 			// a single selection when the selected block supports
 			// `editableRoot`; in that case edits within the block's editable
 			// element are handled by its rich text instance.
-			if ( node.contentEditable !== 'true' ) {
+			if ( ! getEditableRootElement( node ) ) {
 				return;
 			}
 
