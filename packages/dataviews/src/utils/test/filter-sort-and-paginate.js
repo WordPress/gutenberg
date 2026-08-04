@@ -964,12 +964,30 @@ describe( 'filters', () => {
 			);
 		} );
 
+		it( 'should exclude values that are not times when the BETWEEN bounds are times', () => {
+			// Fractional seconds are not a valid time. Without parsing, the
+			// value would match the bounds as a string and `between` would be
+			// the only operator to include it.
+			const withDirty = [
+				...timeData,
+				{ title: 'Dirty', opensAt: '13:00:15.500' },
+			];
+			expect(
+				filterBy( 'between', [ '09:00', '17:00' ], withDirty )
+			).toStrictEqual( [ 'Mid' ] );
+		} );
+
 		it( 'should not apply a BETWEEN filter until both bounds are filled', () => {
 			const all = [ 'Early', 'Mid', 'Late' ];
 			expect(
 				filterBy( 'between', [ '13:00', undefined ] )
 			).toStrictEqual( all );
 			expect( filterBy( 'between', [ '', '13:00' ] ) ).toStrictEqual(
+				all
+			);
+			// An `undefined` bound becomes `null` when a persisted view
+			// round-trips through JSON.
+			expect( filterBy( 'between', [ '13:00', null ] ) ).toStrictEqual(
 				all
 			);
 		} );

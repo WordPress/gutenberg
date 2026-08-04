@@ -236,22 +236,26 @@ const OPERATORS: {
 			if (
 				! Array.isArray( filterValue ) ||
 				filterValue.length !== 2 ||
-				// An unfilled bound is `undefined` from the controls, or `''`
-				// when it arrives from a persisted view.
+				// An unfilled bound is `undefined` from the controls, `''`
+				// when it arrives from a persisted view, or `null` once
+				// `undefined` round-trips through JSON persistence.
 				filterValue.includes( undefined ) ||
-				filterValue.includes( '' )
+				filterValue.includes( '' ) ||
+				filterValue.includes( null )
 			) {
 				return true;
 			}
 
 			const fieldValue = field.getValue( { item } );
 
-			// Times compare as seconds since midnight, so that bounds and value
-			// match regardless of which of them carry seconds.
-			const times = [ fieldValue, ...filterValue ].map( parseTime );
-			if ( times.every( ( time ) => time !== null ) ) {
-				const [ value, min, max ] = times as number[];
-				return value >= min && value <= max;
+			// Time bounds pick the scale, as in `toComparableTemporals`:
+			// values compare as seconds since midnight so precision does not
+			// matter, and a value that is not a time is excluded rather than
+			// compared as a string.
+			const [ min, max ] = filterValue.map( parseTime );
+			if ( min !== null && max !== null ) {
+				const value = parseTime( fieldValue );
+				return value !== null && value >= min && value <= max;
 			}
 
 			if (

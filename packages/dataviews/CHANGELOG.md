@@ -14,6 +14,7 @@
 
 ### Bug Fix
 
+-   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataForms: Stop the `card` and `details` layouts from hijacking focus when they reveal validation errors. Errors for every field in the container are now shown once focus leaves it, instead of on each internal blur, and revealing them no longer moves focus, so the natural tab sequence is preserved. [#80685](https://github.com/WordPress/gutenberg/pull/80685)
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
