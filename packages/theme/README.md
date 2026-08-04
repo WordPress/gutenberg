@@ -106,6 +106,19 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
+`ThemeProvider` logs a development warning when generated ramp steps or semantic foreground/background pairs do not meet their contrast targets. Use `getThemeProviderColorWarnings()` to inspect the same structured warnings directly, for example before accepting user-selected seeds:
+
+```js
+import { getThemeProviderColorWarnings } from '@wordpress/theme';
+
+const warnings = getThemeProviderColorWarnings( {
+	primary: '#608010',
+	background: '#4f386e',
+} );
+```
+
+The function returns an empty array when all checked targets are met. Each warning identifies the affected ramp and either the ramp step or the semantic foreground/background pair, including the required and achieved contrast values for semantic pairs.
+
 The `cursor` prop accepts an object with the following optional properties:
 
 -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).

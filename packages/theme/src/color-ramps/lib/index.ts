@@ -55,7 +55,7 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: string[] | undefined;
+	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -68,6 +68,7 @@ function calculateRamp( {
 	for ( const stepName of sortedSteps ) {
 		const {
 			contrast,
+			oppositeDirectionFallback,
 			lightness: stepLightnessConstraint,
 			taperChromaOptions,
 			sameAsIfPossible,
@@ -77,6 +78,28 @@ function calculateRamp( {
 		if ( ! referenceColor ) {
 			throw new Error(
 				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
+			);
+		}
+
+		const fallbackReferenceColor = oppositeDirectionFallback
+			? calculatedColors.get( oppositeDirectionFallback.reference )
+			: undefined;
+		if ( oppositeDirectionFallback && ! fallbackReferenceColor ) {
+			throw new Error(
+				`Fallback reference color for step ${ stepName } not found: ${ oppositeDirectionFallback.reference }`
+			);
+		}
+
+		function meetsFallbackContrast(
+			candidateColor: PlainColorObject
+		): boolean {
+			if ( ! oppositeDirectionFallback || ! fallbackReferenceColor ) {
+				return true;
+			}
+
+			return (
+				getContrast( fallbackReferenceColor, candidateColor ) >=
+				adjustContrastTarget( oppositeDirectionFallback.target )
 			);
 		}
 
@@ -95,7 +118,10 @@ function calculateRamp( {
 			);
 			const adjustedTarget = adjustContrastTarget( contrast.target );
 			// If the candidate meets the contrast requirement, use it
-			if ( candidateContrast >= adjustedTarget ) {
+			if (
+				candidateContrast >= adjustedTarget &&
+				meetsFallbackContrast( candidateColor )
+			) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
@@ -133,22 +159,26 @@ function calculateRamp( {
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );
 
-		// Define the lightness constraint, if needed.
-		let lightnessConstraint;
-		if ( pinLightness?.stepName === stepName ) {
-			lightnessConstraint = {
-				value: pinLightness.value,
-				type: 'force',
-			} as const;
-		} else if ( stepLightnessConstraint ) {
-			lightnessConstraint = {
-				value: stepLightnessConstraint( computedDir ),
-				type: 'onlyIfSucceeds',
-			} as const;
+		function getLightnessConstraint( direction: RampDirection ) {
+			if ( pinLightness?.stepName === stepName ) {
+				return {
+					value: pinLightness.value,
+					type: 'force',
+				} as const;
+			}
+			if ( stepLightnessConstraint ) {
+				return {
+					value: stepLightnessConstraint( direction ),
+					type: 'onlyIfSucceeds',
+				} as const;
+			}
+			return undefined;
 		}
 
+		const lightnessConstraint = getLightnessConstraint( computedDir );
+
 		// Calculate the color meeting the requirements
-		const searchResults = findColorMeetingRequirements(
+		let searchResults = findColorMeetingRequirements(
 			referenceColor,
 			seed,
 			adjustedTarget,
@@ -158,6 +188,32 @@ function calculateRamp( {
 				taperChromaOptions,
 			}
 		);
+
+		if (
+			oppositeDirectionFallback &&
+			! meetsFallbackContrast( searchResults.color )
+		) {
+			const fallbackDirection =
+				computedDir === 'lighter' ? 'darker' : 'lighter';
+			const fallbackResults = findColorMeetingRequirements(
+				referenceColor,
+				seed,
+				adjustedTarget,
+				fallbackDirection,
+				{
+					lightnessConstraint:
+						getLightnessConstraint( fallbackDirection ),
+					taperChromaOptions,
+				}
+			);
+
+			if (
+				fallbackResults.reached &&
+				meetsFallbackContrast( fallbackResults.color )
+			) {
+				searchResults = fallbackResults;
+			}
+		}
 
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
@@ -177,7 +233,11 @@ function calculateRamp( {
 		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
 
-		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
+		if (
+			( ! searchResults.reached ||
+				! meetsFallbackContrast( searchResults.color ) ) &&
+			! contrast.ignoreWhenAdjustingSeed
+		) {
 			warnings ??= [];
 			warnings.push( stepName );
 		}
@@ -255,6 +315,7 @@ export function buildRamp(
 	} );
 
 	let bestRamp = rampResults;
+	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -299,14 +360,16 @@ export function buildRamp(
 		);
 
 		// Calculate the final ramp with adjusted seed.
-		bestRamp = calculateRamp( {
+		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
 			mainDir,
 			oppDir,
 			pinLightness,
-		} ).rampResults;
+		} );
+		bestRamp = finalResult.rampResults;
+		bestWarnings = finalResult.warnings;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
@@ -320,7 +383,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings,
+		warnings: bestWarnings,
 		direction: mainDir,
 	};
 }

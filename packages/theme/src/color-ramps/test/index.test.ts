@@ -1,6 +1,7 @@
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
 import { buildRamp } from '../lib';
-import { getColorString } from '../lib/color-utils';
+import { getColorString, getContrast } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
@@ -95,10 +96,10 @@ describe( 'buildRamps', () => {
 
 		const allPrimaryColors = [
 			...Object.values( DEFAULT_SEED_COLORS ),
-			'#52accc', // WP Admin "blue" theme accent
-			'#c7a589', // WP Admin "coffee" theme accent
-			'#a3b745', // WP Admin "ectoplasm" theme accent
-			'#dd823b', // WP Admin "sunrise" theme accent
+			'#437aa8', // WP Admin "blue" theme accent
+			'#916745', // WP Admin "coffee" theme accent
+			'#646c3e', // WP Admin "ectoplasm" theme accent
+			'#ad631e', // WP Admin "sunrise" theme accent
 		];
 
 		expect(
@@ -120,5 +121,50 @@ describe( 'buildRamps', () => {
 				} )
 			)
 		).toMatchSnapshot();
+	} );
+
+	it( 'returns warnings from the final rescaled ramp', () => {
+		const result = buildBgRamp( '#3876a8' );
+
+		expect( result.warnings ).not.toEqual(
+			expect.arrayContaining( [ 'bgFill2', 'stroke4' ] )
+		);
+	} );
+
+	it( 'keeps normal and active fill text accessible without changing the seed', () => {
+		const bgRamp = buildBgRamp( '#4f386e' );
+		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+
+		expect( accentRamp.ramp.bgFill1 ).toBe( '#608010' );
+		expect(
+			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect(
+			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
+	it( 'reports an inaccessible active fill and foreground pair', () => {
+		const bgRamp = buildBgRamp( '#4f386e' );
+		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+		const inaccessibleRamp = {
+			...accentRamp,
+			ramp: {
+				...accentRamp.ramp,
+				bgFill2: '#ffffff',
+			},
+		};
+
+		expect(
+			checkAccessibleCombinations( { bgRamp: inaccessibleRamp } )
+		).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					bgName: 'bgFill2',
+					fgName: 'fgFill',
+					unmetContrast: 4.5,
+				} ),
+			] )
+		);
 	} );
 } );

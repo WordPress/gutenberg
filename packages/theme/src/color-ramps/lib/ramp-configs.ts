@@ -270,6 +270,13 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 			target: 1,
 		},
 	},
+	bgFill2: {
+		...BG_RAMP_CONFIG.bgFill2,
+		oppositeDirectionFallback: {
+			reference: 'fgFill',
+			target: 4.5,
+		},
+	},
 	stroke1: {
 		...BG_RAMP_CONFIG.stroke1,
 	},

@@ -22,13 +22,16 @@ export const ThemeProvider = ( {
 	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
-		color,
-		cursor,
-		cornerRadius,
-	} );
+	const { themeProviderStyles, resolvedSettings, colorWarnings } =
+		useThemeProviderStyles( {
+			color,
+			cursor,
+			cornerRadius,
+		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
+	const hasLocalColor =
+		color.primary !== undefined || color.background !== undefined;
 
 	const contextValue = useMemo(
 		() => ( {
@@ -38,6 +41,20 @@ export const ThemeProvider = ( {
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	useIsomorphicLayoutEffect( () => {
+		if (
+			process.env.NODE_ENV !== 'production' &&
+			hasLocalColor &&
+			colorWarnings.length > 0
+		) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'ThemeProvider: Generated color tokens do not meet contrast targets.',
+				colorWarnings
+			);
+		}
+	}, [ colorWarnings, hasLocalColor ] );
 
 	// For root providers, mirror the wrapper's custom properties and preset
 	// attributes onto the document element of the wrapper's own document

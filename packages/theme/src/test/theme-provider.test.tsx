@@ -126,6 +126,37 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
 	} );
 
+	it( 'warns when generated color tokens miss a semantic contrast target', () => {
+		const warn = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
+
+		render(
+			<ThemeProvider
+				color={ {
+					primary: 'rgb(40% 56% 24%)',
+					background: 'rgb(40% 56% 24%)',
+				} }
+			>
+				<div>x</div>
+			</ThemeProvider>
+		);
+
+		expect( warn ).toHaveBeenCalledWith(
+			'ThemeProvider: Generated color tokens do not meet contrast targets.',
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					type: 'contrast',
+					ramp: 'primary',
+					backgroundStep: 'bgFill1',
+					foregroundStep: 'fgFill',
+				} ),
+			] )
+		);
+
+		warn.mockRestore();
+	} );
+
 	it( 'does not define the custom property outside of the provider', () => {
 		render(
 			<ThemeProvider color={ { primary: PRIMARY } }>

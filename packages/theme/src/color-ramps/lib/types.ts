@@ -63,6 +63,14 @@ export type ContrastRequirement = {
 
 export type RampStepConfig = {
 	contrast: ContrastRequirement;
+	/**
+	 * If the color generated in the configured direction does not meet this
+	 * contrast target, retry the primary requirement in the opposite direction.
+	 */
+	oppositeDirectionFallback?: Pick<
+		ContrastRequirement,
+		'reference' | 'target'
+	>;
 	lightness?: ( direction: RampDirection ) => number;
 	taperChromaOptions?: TaperChromaOptions;
 	/**
@@ -77,6 +85,6 @@ export type RampConfig = Record< keyof Ramp, RampStepConfig >;
 
 export type RampResult = {
 	ramp: Record< keyof Ramp, string >;
-	warnings?: string[];
+	warnings?: ( keyof Ramp )[];
 	direction: RampDirection;
 };
