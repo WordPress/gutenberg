@@ -32,6 +32,7 @@ npm run build # Production build
 Read only what your task needs, when it needs it:
 
 -   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
+-   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
 ## Code quality
@@ -67,6 +68,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
 -   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
 -   Production code changes in a package require an entry in that package's `CHANGELOG.md`. See `docs/contributors/code/managing-packages.md`.
+-   `apiFetch` rejects with a plain object (`{ code, message, data }`), not an `Error`. Never interpolate the rejection value into a string — `` `${ error }` `` renders as `[object Object]` — and never branch on `error instanceof Error`. Read `error.message` and `error.code` directly.
 
 ## PR instructions
 

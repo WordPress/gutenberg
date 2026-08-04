@@ -10,7 +10,7 @@ Safe defaults for code that can lose someone's work or leave them stuck. Apply t
 ## Errors the user sees
 
 -   Say the cause, not just the symptom. If an error object is in scope, put its `message` (and `code` where it helps) in what the user reads. A `catch` that receives an error and shows a fixed string is a defect.
--   `apiFetch` rejects with a **plain object** `{ code, message, data }`, not an `Error` (`packages/api-fetch/src/utils/response.ts`). Never interpolate it (`` `${ error }` `` gives `[object Object]`) and never branch on `error instanceof Error`. Read `error.message` / `error.code` directly.
+-   Mind the rejection shape `apiFetch` uses — see the pitfall in the root `AGENTS.md`. It decides how you read a cause out of a failed request.
 -   REST validation failures carry per-field reasons in `error.data.params`. The top-level message only names the field.
 -   An error message containing HTML is still useful: strip the tags with `__unstableStripHTML` from `@wordpress/dom` rather than discarding the message.
 -   Never swallow. `catch {}` with no logging is only acceptable when the failure is genuinely expected and the fallback is correct; say so in a comment naming the expected failure.
