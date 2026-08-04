@@ -1,6 +1,6 @@
 {
 	"vitest": {
-		"files": [ "packages/html-entities/src/test/entities.ts" ],
+		"files": [ "packages/html-entities/src/test/entities.jsdom.test.ts" ],
 		"directories": []
 	}
 }

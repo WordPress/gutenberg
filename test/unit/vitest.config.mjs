@@ -1,12 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
-
 import {
 	discoverTestFiles,
-	getVitestTests,
+	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
 
 const ROOT_DIR = path.resolve(
@@ -19,7 +18,7 @@ const testMigration = JSON.parse(
 		'utf8'
 	)
 );
-const vitestTests = getVitestTests(
+const vitestTests = getVitestTestsByProject(
 	discoverTestFiles( ROOT_DIR ),
 	testMigration
 );
@@ -31,14 +30,43 @@ process.env.TZ = 'UTC';
 export default defineConfig( {
 	root: ROOT_DIR,
 	test: {
-		environment: 'jsdom',
-		environmentOptions: {
-			jsdom: {
-				url: 'http://localhost/',
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'node',
+					environment: 'node',
+					include: vitestTests.node,
+				},
 			},
-		},
+			{
+				extends: true,
+				test: {
+					name: 'jsdom',
+					environment: 'jsdom',
+					environmentOptions: {
+						jsdom: {
+							url: 'http://localhost/',
+						},
+					},
+					include: vitestTests.jsdom,
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: 'browser',
+					include: vitestTests.browser,
+					browser: {
+						enabled: true,
+						headless: true,
+						instances: [ { browser: 'chromium' } ],
+						provider: playwright(),
+					},
+				},
+			},
+		],
 		globals: false,
-		include: vitestTests,
 		includeTaskLocation: true,
 		passWithNoTests: false,
 		reporters:

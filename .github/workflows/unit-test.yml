@@ -78,6 +78,29 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
+            - name: Detect Browser Mode tests
+              id: browser-tests
+              run: |
+                  TESTS="$(npm exec --no --workspace @wordpress/unit-tests -- \
+                    vitest list \
+                    --config vitest.config.mjs \
+                    --project browser \
+                    --filesOnly \
+                    --shard="${{ matrix.shard }}" \
+                    --passWithNoTests)"
+                  if [[ -n "$TESTS" ]]; then
+                      echo "found=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "found=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Install Chromium for Browser Mode tests
+              if: ${{ steps.browser-tests.outputs.found == 'true' }}
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
