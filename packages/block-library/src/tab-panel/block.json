@@ -10,9 +10,6 @@
 		"label": {
 			"type": "string",
 			"default": ""
-		},
-		"placeholder": {
-			"type": "string"
 		}
 	},
 	"parent": [ "core/tab-panels" ],

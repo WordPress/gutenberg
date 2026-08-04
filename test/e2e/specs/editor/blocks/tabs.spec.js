@@ -26,10 +26,7 @@ test.describe( 'Tabs', () => {
 							},
 							{
 								name: 'core/tab-panel',
-								attributes: {
-									label: 'Tab 2',
-									placeholder: 'Section name',
-								},
+								attributes: { label: 'Tab 2' },
 								innerBlocks: [
 									{
 										name: 'core/paragraph',
@@ -198,9 +195,6 @@ test.describe( 'Tabs', () => {
 			// Empty the tab label, then delete again to remove the tab.
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
-			await expect(
-				tab2.locator( '[data-rich-text-placeholder]' )
-			).toHaveAttribute( 'data-rich-text-placeholder', 'Section name' );
 
 			await page.keyboard.press( 'Backspace' );
 

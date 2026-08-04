@@ -58,7 +58,6 @@ export default function useTabActions( tabsClientId ) {
 
 		const newIndex = atIndex ?? tabPanelBlocks.length;
 
-		// The label is left empty so the new tab prompts for a title.
 		insertBlock(
 			createBlock( 'core/tab-panel' ),
 			newIndex,
