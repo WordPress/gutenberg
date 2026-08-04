@@ -2,14 +2,22 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter() {
+	const { getSelectedBlockClientId, getBlockOrder, getBlockParents } =
+		useSelect( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
@@ -196,12 +204,15 @@ export function useTypewriter() {
 		}
 
 		function isLastEditableNode() {
-			const editableNodes = Array.from(
-				node.querySelectorAll( '[contenteditable], .rich-text' )
-			).filter( ( editable ) => editable.isContentEditable );
-			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			const { anchorNode } = defaultView.getSelection();
-			return !! lastEditableNode?.contains( anchorNode );
+			const clientId = getSelectedBlockClientId();
+
+			if ( ! clientId ) {
+				return false;
+			}
+
+			const [ topLevelClientId = clientId ] = getBlockParents( clientId );
+			const order = getBlockOrder();
+			return order[ order.length - 1 ] === topLevelClientId;
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
