@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Wrap the widgets editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color.
+
 ## 6.51.0 (2026-07-14)
 
 ### Enhancements
