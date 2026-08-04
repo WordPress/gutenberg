@@ -70,6 +70,30 @@ export default function useEditableRoot() {
 					getSelectedBlockClientId()
 			) {
 				node.focus();
+			} else if (
+				( activeElement === node ||
+					activeElement === node.ownerDocument.body ) &&
+				node.ownerDocument.hasFocus() &&
+				! activeElement.matches( ':focus' ) &&
+				selection.anchorNode &&
+				node.contains( selection.anchorNode ) &&
+				getBlockClientId( selection.anchorNode ) ===
+					getSelectedBlockClientId()
+			) {
+				// Becoming the editing host turns the selected block's
+				// editable into an inert part of the host: if it held focus,
+				// the browser dropped focus onto the document's default
+				// target without actually focusing it. That target is the
+				// wrapper itself in an iframed editor (the wrapper is the
+				// body) and the page body in an inline editor (e.g. the
+				// widgets screen). The caret survived in the selected block,
+				// so reclaim focus for the host to keep an editing context.
+				// Focus must genuinely be within the document (`hasFocus`):
+				// the default activeElement also reads as active while the
+				// user works in another document (e.g. the block toolbar in
+				// an iframed editor), and stealing focus from there is never
+				// right.
+				node.focus( { preventScroll: true } );
 			}
 
 			return () => {
