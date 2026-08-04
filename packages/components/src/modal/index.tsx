@@ -17,6 +17,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { ThemeProvider } from '@wordpress/theme';
 import { close } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
 import * as ariaHelper from './aria-helper';
@@ -252,104 +253,106 @@ function UnforwardedModal(
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
-				<div
-					className={ clsx(
-						'components-modal__frame',
-						sizeClass,
-						className
-					) }
-					style={ style }
-					ref={ useMergeRefs( [
-						frameRef,
-						constrainedTabbingRef,
-						focusReturnRef,
-						focusOnMount !== 'firstContentElement'
-							? focusOnMountRef
-							: null,
-					] ) }
-					role={ role }
-					aria-label={ contentLabel }
-					aria-labelledby={ contentLabel ? undefined : headingId }
-					aria-describedby={ aria.describedby }
-					tabIndex={ -1 }
-					onKeyDown={ onKeyDown }
-				>
+				<ThemeProvider>
 					<div
-						className={ clsx( 'components-modal__content', {
-							'hide-header': __experimentalHideHeader,
-							'is-scrollable': hasScrollableContent,
-							'has-scrolled-content': hasScrolledContent,
-						} ) }
-						role="document"
-						onScroll={ onContentContainerScroll }
-						ref={ contentRef }
-						aria-label={
-							hasScrollableContent
-								? __( 'Scrollable section' )
-								: undefined
-						}
-						tabIndex={ hasScrollableContent ? 0 : undefined }
+						className={ clsx(
+							'components-modal__frame',
+							sizeClass,
+							className
+						) }
+						style={ style }
+						ref={ useMergeRefs( [
+							frameRef,
+							constrainedTabbingRef,
+							focusReturnRef,
+							focusOnMount !== 'firstContentElement'
+								? focusOnMountRef
+								: null,
+						] ) }
+						role={ role }
+						aria-label={ contentLabel }
+						aria-labelledby={ contentLabel ? undefined : headingId }
+						aria-describedby={ aria.describedby }
+						tabIndex={ -1 }
+						onKeyDown={ onKeyDown }
 					>
-						{ ! __experimentalHideHeader && (
-							<div className="components-modal__header">
-								<div className="components-modal__header-heading-container">
-									{ icon && (
-										<span
-											className="components-modal__icon-container"
-											aria-hidden
-										>
-											{ icon }
-										</span>
-									) }
-									{ title && (
-										<h1
-											id={ headingId }
-											className="components-modal__header-heading"
-										>
-											{ title }
-										</h1>
+						<div
+							className={ clsx( 'components-modal__content', {
+								'hide-header': __experimentalHideHeader,
+								'is-scrollable': hasScrollableContent,
+								'has-scrolled-content': hasScrolledContent,
+							} ) }
+							role="document"
+							onScroll={ onContentContainerScroll }
+							ref={ contentRef }
+							aria-label={
+								hasScrollableContent
+									? __( 'Scrollable section' )
+									: undefined
+							}
+							tabIndex={ hasScrollableContent ? 0 : undefined }
+						>
+							{ ! __experimentalHideHeader && (
+								<div className="components-modal__header">
+									<div className="components-modal__header-heading-container">
+										{ icon && (
+											<span
+												className="components-modal__icon-container"
+												aria-hidden
+											>
+												{ icon }
+											</span>
+										) }
+										{ title && (
+											<h1
+												id={ headingId }
+												className="components-modal__header-heading"
+											>
+												{ title }
+											</h1>
+										) }
+									</div>
+									{ headerActions }
+									{ isDismissible && (
+										<>
+											<Spacer
+												marginBottom={ 0 }
+												marginLeft={ 2 }
+											/>
+											<Button
+												size="compact"
+												onClick={ (
+													event: React.MouseEvent< HTMLButtonElement >
+												) =>
+													closeModal().then( () =>
+														onRequestClose( event )
+													)
+												}
+												icon={ close }
+												label={
+													closeButtonLabel ||
+													__( 'Close' )
+												}
+											/>
+										</>
 									) }
 								</div>
-								{ headerActions }
-								{ isDismissible && (
-									<>
-										<Spacer
-											marginBottom={ 0 }
-											marginLeft={ 2 }
-										/>
-										<Button
-											size="compact"
-											onClick={ (
-												event: React.MouseEvent< HTMLButtonElement >
-											) =>
-												closeModal().then( () =>
-													onRequestClose( event )
-												)
-											}
-											icon={ close }
-											label={
-												closeButtonLabel ||
-												__( 'Close' )
-											}
-										/>
-									</>
-								) }
-							</div>
-						) }
+							) }
 
-						<div
-							ref={ useMergeRefs( [
-								childrenContainerRef,
-								focusOnMount === 'firstContentElement'
-									? focusOnMountRef
-									: null,
-							] ) }
-							className="components-modal__children-container"
-						>
-							{ children }
+							<div
+								ref={ useMergeRefs( [
+									childrenContainerRef,
+									focusOnMount === 'firstContentElement'
+										? focusOnMountRef
+										: null,
+								] ) }
+								className="components-modal__children-container"
+							>
+								{ children }
+							</div>
 						</div>
 					</div>
-				</div>
+				</ThemeProvider>
 			</StyleProvider>
 		</div>
 	);
