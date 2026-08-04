@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `Button`, `Link`, `Combobox`, `Select`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 -   Keep overlays in the compat overlay slot available to assistive technologies when used alongside `@wordpress/components` Modal ([#80310](https://github.com/WordPress/gutenberg/pull/80310)).
 
 ## 0.18.0 (2026-07-14)

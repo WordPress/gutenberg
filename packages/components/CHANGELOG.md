@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 -   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `Autocomplete`: Omit `aria-activedescendant` while no suggestion is highlighted, instead of returning `null` for it ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
