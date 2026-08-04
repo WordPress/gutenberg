@@ -10,6 +10,31 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const layoutElements = new WeakSet();
+
+/**
+ * Registers a block list layout element. A ref callback: every layout
+ * element rendered by useInnerBlocksProps registers itself.
+ *
+ * @param {?HTMLElement} element Layout element.
+ */
+export function registerBlockListLayout( element ) {
+	if ( element ) {
+		layoutElements.add( element );
+	}
+}
+
+/**
+ * Whether the element is a block list layout element.
+ *
+ * @param {HTMLElement} element Element to check.
+ *
+ * @return {boolean} Whether the element is a block list layout.
+ */
+export function isBlockListLayout( element ) {
+	return layoutElements.has( element );
+}
+
 /**
  * Makes the block list layout element declare itself the editing host while
  * it is the nearest block list containing the selection: the selected block

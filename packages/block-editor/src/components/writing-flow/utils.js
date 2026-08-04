@@ -16,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/pasting';
+import { isBlockListLayout } from '../block-list/use-editable-root-host';
 import { store as blockEditorStore } from '../../store';
 
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
@@ -161,24 +162,26 @@ export function getEditableRootElement( node ) {
  */
 function resolveEditableRootElement( node ) {
 	const selection = node.ownerDocument.defaultView.getSelection();
-	let element = null;
 
-	if ( selection.rangeCount ) {
-		const { commonAncestorContainer } = selection.getRangeAt( 0 );
-		element =
-			commonAncestorContainer.nodeType ===
-			commonAncestorContainer.ELEMENT_NODE
-				? commonAncestorContainer
-				: commonAncestorContainer.parentElement;
+	if ( ! selection.rangeCount ) {
+		return node;
 	}
 
-	const host = element?.closest( '.block-editor-block-list__layout' );
+	const { commonAncestorContainer } = selection.getRangeAt( 0 );
+	let element =
+		commonAncestorContainer.nodeType ===
+		commonAncestorContainer.ELEMENT_NODE
+			? commonAncestorContainer
+			: commonAncestorContainer.parentElement;
 
-	if ( host && node.contains( host ) ) {
-		return host;
+	while ( element && element !== node ) {
+		if ( isBlockListLayout( element ) ) {
+			return element;
+		}
+		element = element.parentElement;
 	}
 
-	return node.querySelector( '.is-root-container' ) ?? node;
+	return node;
 }
 
 export function setContentEditableWrapper(
