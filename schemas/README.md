@@ -4,6 +4,8 @@ The collection of schemas used in WordPress, including the `theme.json`, `block.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
+Unlike the schemas above, `view-config.json` does not describe a file authored by developers: it documents the response of the `/wp/v2/view-config` REST API endpoint. It is kept in sync with the endpoint's PHP schema and used to generate the [view configuration reference docs](../docs/reference-guides/view-config-reference.md) via `npm run docs:view-config-ref`.
+
 ## JSON schema usage
 
 Many editors recognize the `$schema` property in JSON files.

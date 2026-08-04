@@ -1,0 +1,915 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "view-config",
+	"type": "object",
+	"properties": {
+		"kind": {
+			"description": "Entity kind (e.g. `postType`).",
+			"type": "string",
+			"readonly": true
+		},
+		"name": {
+			"description": "Entity name (e.g. `page`).",
+			"type": "string",
+			"readonly": true
+		},
+		"version": {
+			"description": "The schema version of the configuration.",
+			"type": "integer",
+			"readonly": true
+		},
+		"default_view": {
+			"description": "The default DataViews configuration for the screen: layout type, visible fields, sorting, filtering, and pagination.",
+			"type": "object",
+			"readonly": true,
+			"properties": {
+				"type": {
+					"description": "The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.",
+					"type": "string"
+				},
+				"layout": {
+					"$ref": "#/definitions/combinedLayout"
+				},
+				"filters": {
+					"$ref": "#/definitions/filters"
+				},
+				"sort": {
+					"$ref": "#/definitions/sort"
+				},
+				"perPage": {
+					"$ref": "#/definitions/perPage"
+				},
+				"fields": {
+					"$ref": "#/definitions/fields"
+				},
+				"titleField": {
+					"$ref": "#/definitions/titleField"
+				},
+				"mediaField": {
+					"$ref": "#/definitions/mediaField"
+				},
+				"descriptionField": {
+					"$ref": "#/definitions/descriptionField"
+				},
+				"showTitle": {
+					"$ref": "#/definitions/showTitle"
+				},
+				"showMedia": {
+					"$ref": "#/definitions/showMedia"
+				},
+				"showDescription": {
+					"$ref": "#/definitions/showDescription"
+				},
+				"showLevels": {
+					"$ref": "#/definitions/showLevels"
+				},
+				"groupBy": {
+					"$ref": "#/definitions/groupBy"
+				},
+				"infiniteScrollEnabled": {
+					"$ref": "#/definitions/infiniteScrollEnabled"
+				}
+			}
+		},
+		"default_layouts": {
+			"description": "The layout types the user can switch between, and the view overrides each one applies.",
+			"type": "object",
+			"readonly": true,
+			"properties": {
+				"table": {
+					"description": "View overrides applied when the table layout is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/tableLayout"
+						}
+					}
+				},
+				"list": {
+					"description": "View overrides applied when the list layout is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/listLayout"
+						}
+					}
+				},
+				"grid": {
+					"description": "View overrides applied when the grid layout is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/gridLayout"
+						}
+					}
+				},
+				"activity": {
+					"description": "View overrides applied when the activity layout is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/listLayout"
+						}
+					}
+				},
+				"pickerGrid": {
+					"description": "View overrides applied when the grid layout of a picker (DataViewsPicker) is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/gridLayout"
+						}
+					}
+				},
+				"pickerTable": {
+					"description": "View overrides applied when the table layout of a picker (DataViewsPicker) is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/tableLayout"
+						}
+					}
+				}
+			}
+		},
+		"view_list": {
+			"description": "The preconfigured views displayed in the screen's sidebar.",
+			"type": "array",
+			"readonly": true,
+			"items": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"description": "Title of the view, displayed in the sidebar.",
+						"type": "string"
+					},
+					"slug": {
+						"description": "Unique identifier for the view. Used as the member identity when merging patches.",
+						"type": "string"
+					},
+					"view": {
+						"description": "Partial view configuration applied on top of `default_view` when the view is selected — typically locked `filters`, but any view property works. Optional.",
+						"type": "object",
+						"properties": {
+							"type": {
+								"description": "The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.",
+								"type": "string"
+							},
+							"layout": {
+								"$ref": "#/definitions/combinedLayout"
+							},
+							"filters": {
+								"$ref": "#/definitions/filters"
+							},
+							"sort": {
+								"$ref": "#/definitions/sort"
+							},
+							"perPage": {
+								"$ref": "#/definitions/perPage"
+							},
+							"fields": {
+								"$ref": "#/definitions/fields"
+							},
+							"titleField": {
+								"$ref": "#/definitions/titleField"
+							},
+							"mediaField": {
+								"$ref": "#/definitions/mediaField"
+							},
+							"descriptionField": {
+								"$ref": "#/definitions/descriptionField"
+							},
+							"showTitle": {
+								"$ref": "#/definitions/showTitle"
+							},
+							"showMedia": {
+								"$ref": "#/definitions/showMedia"
+							},
+							"showDescription": {
+								"$ref": "#/definitions/showDescription"
+							},
+							"showLevels": {
+								"$ref": "#/definitions/showLevels"
+							},
+							"groupBy": {
+								"$ref": "#/definitions/groupBy"
+							},
+							"infiniteScrollEnabled": {
+								"$ref": "#/definitions/infiniteScrollEnabled"
+							}
+						}
+					}
+				}
+			}
+		},
+		"form": {
+			"description": "The DataForm configuration for the Quick Edit form: which fields are displayed, in which order, and how each one is laid out.",
+			"type": "object",
+			"readonly": true,
+			"properties": {
+				"layout": {
+					"$ref": "#/definitions/formLayout"
+				},
+				"fields": {
+					"description": "The fields of the form, in display order. Each entry is a field id, or an object for further configuration.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/formField"
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"filters": {
+			"description": "Filters applied to the dataset. A filter with `isLocked` set cannot be changed or removed by the user.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"field": {
+						"description": "The field to filter by.",
+						"type": "string"
+					},
+					"operator": {
+						"description": "The operator to use, one of `is`, `isNot`, `isAny`, `isNone`, `isAll`, `isNotAll`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, or `after`.",
+						"type": "string",
+						"enum": [
+							"is",
+							"isNot",
+							"isAny",
+							"isNone",
+							"isAll",
+							"isNotAll",
+							"lessThan",
+							"greaterThan",
+							"lessThanOrEqual",
+							"greaterThanOrEqual",
+							"before",
+							"after"
+						]
+					},
+					"value": {
+						"description": "The value to filter by."
+					},
+					"isLocked": {
+						"description": "Whether the filter is locked. A locked filter cannot be changed or removed by the user.",
+						"type": "boolean"
+					}
+				}
+			}
+		},
+		"sort": {
+			"description": "The default sort: the field id and the direction (`asc` or `desc`).",
+			"type": "object",
+			"properties": {
+				"field": {
+					"description": "The field to sort by.",
+					"type": "string"
+				},
+				"direction": {
+					"description": "The direction to sort by, `asc` or `desc`.",
+					"type": "string",
+					"enum": [ "asc", "desc" ]
+				}
+			}
+		},
+		"perPage": {
+			"description": "Number of records per page. Also used as the batch size when infinite scroll is enabled.",
+			"type": "integer"
+		},
+		"fields": {
+			"description": "Ids of the fields that are visible, in display order.",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"titleField": {
+			"description": "Id of the field used as the record title.",
+			"type": "string"
+		},
+		"mediaField": {
+			"description": "Id of the field used as the record media (e.g. featured image or preview).",
+			"type": "string"
+		},
+		"descriptionField": {
+			"description": "Id of the field used as the record description.",
+			"type": "string"
+		},
+		"showTitle": {
+			"description": "Whether the title is shown. Defaults to `true`.",
+			"type": "boolean"
+		},
+		"showMedia": {
+			"description": "Whether the media is shown. Defaults to `true`.",
+			"type": "boolean"
+		},
+		"showDescription": {
+			"description": "Whether the description is shown. Defaults to `true`.",
+			"type": "boolean"
+		},
+		"showLevels": {
+			"description": "Whether to display hierarchical levels for the records (e.g. child pages indented under their parent). Defaults to `false`.",
+			"type": "boolean"
+		},
+		"groupBy": {
+			"description": "The grouping configuration: the field to group by, the direction (`asc` or `desc`), and whether to show the field label in each group header (`showLabel`, defaults to `true`).",
+			"type": "object",
+			"properties": {
+				"field": {
+					"description": "The field to group by.",
+					"type": "string"
+				},
+				"direction": {
+					"description": "The direction to sort the groups by, `asc` or `desc`.",
+					"type": "string",
+					"enum": [ "asc", "desc" ]
+				},
+				"showLabel": {
+					"description": "Whether to show the field label in the group header.",
+					"type": "boolean",
+					"default": true
+				}
+			}
+		},
+		"infiniteScrollEnabled": {
+			"description": "Whether infinite scroll is enabled instead of pagination.",
+			"type": "boolean"
+		},
+		"columnStyle": {
+			"description": "The style of a single field column.",
+			"type": "object",
+			"properties": {
+				"width": {
+					"description": "The width of the field column, as a CSS value or a number of pixels.",
+					"type": [ "string", "number" ]
+				},
+				"maxWidth": {
+					"description": "The maximum width of the field column, as a CSS value or a number of pixels.",
+					"type": [ "string", "number" ]
+				},
+				"minWidth": {
+					"description": "The minimum width of the field column, as a CSS value or a number of pixels.",
+					"type": [ "string", "number" ]
+				},
+				"align": {
+					"description": "The alignment of the field column: `start`, `center`, or `end`. Defaults to `start`.",
+					"type": "string",
+					"enum": [ "start", "center", "end" ]
+				}
+			}
+		},
+		"tableLayout": {
+			"description": "Options specific to table-type layouts (`table`, `pickerTable`).",
+			"type": "object",
+			"properties": {
+				"styles": {
+					"description": "The styles for the columns, keyed by field id. Each column style accepts `width`, `maxWidth`, and `minWidth` (a CSS value or a number of pixels) and `align` (`start`, `center`, or `end`).",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/columnStyle"
+					}
+				},
+				"density": {
+					"description": "The density of the layout: `compact`, `balanced`, or `comfortable`.",
+					"type": "string",
+					"enum": [ "compact", "balanced", "comfortable" ]
+				},
+				"enableMoving": {
+					"description": "Whether the user can reorder columns.",
+					"type": "boolean"
+				}
+			}
+		},
+		"listLayout": {
+			"description": "Options specific to list-type layouts (`list`, `activity`).",
+			"type": "object",
+			"properties": {
+				"density": {
+					"description": "The density of the layout: `compact`, `balanced`, or `comfortable`.",
+					"type": "string",
+					"enum": [ "compact", "balanced", "comfortable" ]
+				}
+			}
+		},
+		"gridLayout": {
+			"description": "Options specific to grid-type layouts (`grid`, `pickerGrid`).",
+			"type": "object",
+			"properties": {
+				"badgeFields": {
+					"description": "Ids of the fields to display as badges instead of regular fields.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"previewSize": {
+					"description": "The preview size of the grid.",
+					"type": "number"
+				},
+				"density": {
+					"description": "The density of the grid layout: `compact`, `balanced`, or `comfortable`.",
+					"type": "string",
+					"enum": [ "compact", "balanced", "comfortable" ]
+				}
+			}
+		},
+		"combinedLayout": {
+			"description": "Configuration specific to the selected layout type. Accepts the `layout` options of any layout type; see [`default_layouts`](#default_layouts).",
+			"type": "object",
+			"properties": {
+				"styles": {
+					"$ref": "#/definitions/tableLayout/properties/styles"
+				},
+				"density": {
+					"description": "The density of the layout: `compact`, `balanced`, or `comfortable`.",
+					"type": "string",
+					"enum": [ "compact", "balanced", "comfortable" ]
+				},
+				"enableMoving": {
+					"$ref": "#/definitions/tableLayout/properties/enableMoving"
+				},
+				"badgeFields": {
+					"$ref": "#/definitions/gridLayout/properties/badgeFields"
+				},
+				"previewSize": {
+					"$ref": "#/definitions/gridLayout/properties/previewSize"
+				}
+			}
+		},
+		"formLayout": {
+			"description": "The layout used to render the form fields, discriminated by its `type`. See the form layout types.",
+			"oneOf": [
+				{
+					"description": "The default layout: the field controls are rendered directly in the form, one after another.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The layout type.",
+							"type": "string",
+							"enum": [ "regular" ]
+						},
+						"labelPosition": {
+							"description": "Position of the field label: `top`, `side`, or `none`.",
+							"type": "string",
+							"enum": [ "top", "side", "none" ]
+						}
+					}
+				},
+				{
+					"description": "The field is rendered as a button that opens a dropdown or modal with the field controls.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The layout type.",
+							"type": "string",
+							"enum": [ "panel" ]
+						},
+						"labelPosition": {
+							"description": "Position of the field label: `top`, `side`, or `none`.",
+							"type": "string",
+							"enum": [ "top", "side", "none" ]
+						},
+						"openAs": {
+							"description": "How the panel opens: as a `dropdown` or as a `modal`. The object form allows customizing the labels of the modal buttons.",
+							"oneOf": [
+								{
+									"description": "The type of container to open, `dropdown` or `modal`.",
+									"type": "string",
+									"enum": [ "dropdown", "modal" ]
+								},
+								{
+									"description": "The type of container to open, with custom labels for the modal buttons.",
+									"type": "object",
+									"properties": {
+										"type": {
+											"description": "The type of container to open, `dropdown` or `modal`.",
+											"type": "string",
+											"enum": [ "dropdown", "modal" ]
+										},
+										"applyLabel": {
+											"description": "Label of the modal button that applies the changes.",
+											"type": "string"
+										},
+										"cancelLabel": {
+											"description": "Label of the modal button that discards the changes.",
+											"type": "string"
+										}
+									}
+								}
+							]
+						},
+						"summary": {
+							"description": "Id(s) of the field(s) whose values are rendered in the panel button.",
+							"oneOf": [
+								{
+									"description": "A single field id.",
+									"type": "string"
+								},
+								{
+									"description": "A list of field ids.",
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							]
+						},
+						"editVisibility": {
+							"description": "When the edit button is visible: `always` or `on-hover`.",
+							"type": "string",
+							"enum": [ "always", "on-hover" ]
+						}
+					}
+				},
+				{
+					"description": "The fields are grouped in a card container.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The layout type.",
+							"type": "string",
+							"enum": [ "card" ]
+						},
+						"withHeader": {
+							"description": "Whether the card renders a header. Defaults to `true`.",
+							"type": "boolean"
+						},
+						"isOpened": {
+							"description": "Whether the card content is opened. Defaults to `true`.",
+							"type": "boolean"
+						},
+						"isCollapsible": {
+							"description": "Whether the card can be collapsed by the user.",
+							"type": "boolean"
+						},
+						"summary": {
+							"description": "Id(s) of the field(s) whose values are rendered in the card header. An entry declared as an object controls when it is visible: `always` or `when-collapsed`.",
+							"oneOf": [
+								{
+									"description": "A single field id.",
+									"type": "string"
+								},
+								{
+									"description": "A list of field ids, optionally with their visibility.",
+									"type": "array",
+									"items": {
+										"oneOf": [
+											{
+												"description": "A field id.",
+												"type": "string"
+											},
+											{
+												"description": "A field id with its visibility.",
+												"type": "object",
+												"properties": {
+													"id": {
+														"description": "Id of the field.",
+														"type": "string"
+													},
+													"visibility": {
+														"description": "When the field value is visible in the card header: `always` or `when-collapsed`.",
+														"type": "string",
+														"enum": [
+															"always",
+															"when-collapsed"
+														]
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"description": "The fields are rendered horizontally in a single row.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The layout type.",
+							"type": "string",
+							"enum": [ "row" ]
+						},
+						"alignment": {
+							"description": "Vertical alignment of the fields in the row: `start`, `center`, or `end`.",
+							"type": "string",
+							"enum": [ "start", "center", "end" ]
+						},
+						"styles": {
+							"description": "The styles for the fields in the row, keyed by field id. Each style accepts a `flex` value controlling how the field grows or shrinks.",
+							"type": "object",
+							"additionalProperties": {
+								"type": "object",
+								"properties": {
+									"flex": {
+										"description": "The CSS `flex` value for the field.",
+										"type": [ "string", "number" ]
+									}
+								}
+							}
+						}
+					}
+				},
+				{
+					"description": "The fields are rendered inside a collapsible disclosure (details) element.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The layout type.",
+							"type": "string",
+							"enum": [ "details" ]
+						},
+						"summary": {
+							"description": "Label displayed as the summary of the disclosure element.",
+							"type": "string"
+						}
+					}
+				}
+			]
+		},
+		"formField": {
+			"description": "A form field: a field id, or an object for further configuration.",
+			"oneOf": [
+				{
+					"description": "A field id.",
+					"type": "string"
+				},
+				{
+					"description": "A form field with additional configuration.",
+					"type": "object",
+					"properties": {
+						"id": {
+							"description": "Id of the field. Used as the member identity when merging patches.",
+							"type": "string"
+						},
+						"label": {
+							"description": "Label displayed for the field, overriding the field's own.",
+							"type": "string"
+						},
+						"description": {
+							"description": "Description displayed for the field.",
+							"type": "string"
+						},
+						"layout": {
+							"$ref": "#/definitions/formLayout"
+						},
+						"children": {
+							"description": "Fields combined under this entry, following the same shape as `fields`.",
+							"type": "array",
+							"items": {
+								"oneOf": [
+									{
+										"description": "A field id.",
+										"type": "string"
+									},
+									{
+										"description": "A nested form field, following the same shape as an object entry of `fields`.",
+										"type": "object"
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}
