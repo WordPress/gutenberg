@@ -113,6 +113,19 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
+	it( 'does not define color tokens if neither customized nor inherited', () => {
+		render(
+			<ThemeProvider>
+				<div data-testid="child">x</div>
+			</ThemeProvider>
+		);
+
+		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
+		expect( readProp( provider, BRAND_BG ) ).toBe( '' );
+		expect( readProp( provider, SURFACE_BG ) ).toBe( '' );
+		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
+	} );
+
 	it( 'does not define the custom property outside of the provider', () => {
 		render(
 			<ThemeProvider color={ { primary: PRIMARY } }>
@@ -356,7 +369,8 @@ describe( 'ThemeProvider', () => {
 				screen.getByTestId( 'overriding' )
 			);
 
-			// A nested provider with no settings of its own inherits everything.
+			// A nested provider with no settings of its own inherits everything
+			// and re-applies color tokens so portaled descendants have them.
 			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
 			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
