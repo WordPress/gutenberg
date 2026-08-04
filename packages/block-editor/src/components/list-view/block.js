@@ -177,7 +177,7 @@ function ListViewBlock( {
 	const {
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expansionState,
+		getExpansionState,
 		updateExpansion,
 		setInsertedBlockClientId,
 		treeGridElementRef,
@@ -664,10 +664,6 @@ function ListViewBlock( {
 							onToggleExpanded={
 								isDisabled ? undefined : toggleExpanded
 							}
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
@@ -745,7 +741,7 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expansionState={ expansionState }
+							getExpansionState={ getExpansionState }
 							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
 								setInsertedBlockClientId

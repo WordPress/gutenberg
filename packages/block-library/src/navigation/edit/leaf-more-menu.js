@@ -36,7 +36,7 @@ function AddSubmenuItem( {
 	clientId,
 	onClose,
 	isDisabled,
-	expansionState,
+	getExpansionState,
 	updateExpansion,
 	setInsertedBlockClientId,
 } ) {
@@ -91,7 +91,7 @@ function AddSubmenuItem( {
 				// the Link UI for this new block.
 				setInsertedBlockClientId( newLink.clientId );
 
-				if ( ! expansionState[ clientId ] ) {
+				if ( ! getExpansionState()[ clientId ] ) {
 					updateExpansion( { type: 'expand', clientIds: clientId } );
 				}
 				onClose();
@@ -210,7 +210,7 @@ export default function LeafMoreMenu( props ) {
 							clientId={ clientId }
 							onClose={ onClose }
 							isDisabled={ isSubmenuDisabled }
-							expansionState={ props.expansionState }
+							getExpansionState={ props.getExpansionState }
 							updateExpansion={ props.updateExpansion }
 							setInsertedBlockClientId={
 								props.setInsertedBlockClientId

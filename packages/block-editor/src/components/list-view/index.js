@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	useEvent,
 	useInstanceId,
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
@@ -29,7 +30,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ListViewBranch from './branch';
-import { ListViewContext } from './context';
+import {
+	ListViewContext,
+	ListViewInsertedBlockContext,
+	ListViewTreeStateContext,
+} from './context';
 import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
@@ -132,6 +137,10 @@ function ListViewComponent(
 	const { updateBlockSelection } = useBlockSelection();
 
 	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
+
+	// A getter keeps the block settings menu out of the expansion state
+	// subscription, which would otherwise re-render every row on expand.
+	const getExpansionState = useEvent( () => expansionState );
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] =
 		useState( null );
@@ -249,22 +258,38 @@ function ListViewComponent(
 			};
 		}, [ blockDropTarget, blockIndexes, firstDraggedBlockClientId ] );
 
+	// Values that stay stable for the lifetime of the List View.
 	const contextValue = useMemo(
+		() => ( {
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			getExpansionState,
+			listViewInstanceId: instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			treeGridElementRef: elementRef,
+			updateExpansion,
+		} ),
+		[
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			getExpansionState,
+			instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			updateExpansion,
+		]
+	);
+
+	// Values that change while expanding, collapsing, or dragging.
+	const treeStateContextValue = useMemo(
 		() => ( {
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
 			expansionState,
-			updateExpansion,
 			firstDraggedBlockIndex,
-			BlockSettingsMenu,
-			listViewInstanceId: instanceId,
-			AdditionalBlockContent,
-			insertedBlockClientId,
-			setInsertedBlockClientId,
-			treeGridElementRef: elementRef,
-			rootClientId,
 		} ),
 		[
 			blockDropPosition,
@@ -272,14 +297,7 @@ function ListViewComponent(
 			blockIndexes,
 			draggedClientIds,
 			expansionState,
-			updateExpansion,
 			firstDraggedBlockIndex,
-			BlockSettingsMenu,
-			instanceId,
-			AdditionalBlockContent,
-			insertedBlockClientId,
-			setInsertedBlockClientId,
-			rootClientId,
 		]
 	);
 
@@ -344,16 +362,24 @@ function ListViewComponent(
 				} }
 			>
 				<ListViewContext.Provider value={ contextValue }>
-					<ListViewBranch
-						blocks={ clientIdsTree }
-						parentId={ rootClientId }
-						selectBlock={ selectEditorBlock }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						isExpanded={ isExpanded }
-						showAppender={ showAppender }
-					/>
+					<ListViewInsertedBlockContext.Provider
+						value={ insertedBlockClientId }
+					>
+						<ListViewTreeStateContext.Provider
+							value={ treeStateContextValue }
+						>
+							<ListViewBranch
+								blocks={ clientIdsTree }
+								parentId={ rootClientId }
+								selectBlock={ selectEditorBlock }
+								showBlockMovers={ showBlockMovers }
+								fixedListWindow={ fixedListWindow }
+								selectedClientIds={ selectedClientIds }
+								isExpanded={ isExpanded }
+								showAppender={ showAppender }
+							/>
+						</ListViewTreeStateContext.Provider>
+					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
