@@ -269,11 +269,11 @@ export function RichTextWrapper(
 				return canHostEditableRoot( getSelectedBlockClientId() );
 			}
 
-			if ( isBlockMultiSelected( clientId ) ) {
-				return canHostEditableRoot( clientId );
-			}
-
-			return false;
+			// Any multi-selection makes the wrapper the editing host,
+			// regardless of editableRoot support: a block within the
+			// selection is inside the host's live range and must not be an
+			// editing area of its own there.
+			return isBlockMultiSelected( clientId );
 		},
 		[
 			shouldDisableEditing,
