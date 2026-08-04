@@ -74,6 +74,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
