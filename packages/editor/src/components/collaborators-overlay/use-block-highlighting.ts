@@ -7,6 +7,7 @@ import {
 	type PostEditorAwarenessState as ActiveCollaborator,
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
@@ -23,6 +24,7 @@ import { getOrderedBlockRange } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { isElementVisible } = unlock( blockEditorPrivateApis );
 const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
 	CoreDataPrivateApis,
 	'SelectionType'
@@ -276,6 +278,16 @@ export function useBlockHighlighting(
 			blockElement.classList.remove( 'is-collaborator-selected' );
 			blockElement.style.removeProperty( '--collaborator-outline-color' );
 			currentHighlightedIds.delete( blockId );
+
+			// The block may be hidden inside collapsed content (e.g. a closed
+			// core/details or an inactive core/accordion panel). Skip drawing
+			// a new outline or avatar for it rather than misplacing them at
+			// the collapsed wrapper's position — the reset above still runs so
+			// a block that was outlined before collapsing doesn't keep a
+			// stale outline class or dangling entry in currentHighlightedIds.
+			if ( ! isElementVisible( blockElement ) ) {
+				return;
+			}
 
 			// WholeBlock (single block entirely selected): always outline.
 			// SelectionInMultipleBlocks: outline only on non-text blocks
