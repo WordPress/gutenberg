@@ -14,7 +14,7 @@
 			"readonly": true
 		},
 		"version": {
-			"description": "The schema version of the configuration.",
+			"description": "The schema version (currently, 1).",
 			"type": "integer",
 			"readonly": true
 		},
@@ -24,9 +24,18 @@
 			"readonly": true,
 			"properties": {
 				"type": {
-					"description": "The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.",
-					"type": "string"
+					"description": "The layout type.",
+					"type": "string",
+					"enum": [
+						"table",
+						"grid",
+						"list",
+						"activity",
+						"pickerGrid",
+						"pickerTable"
+					]
 				},
+
 				"layout": {
 					"$ref": "#/definitions/combinedLayout"
 				},

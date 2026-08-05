@@ -66,6 +66,18 @@ function getTokens( section ) {
 const MAX_INLINE_OBJECT_KEYS = 5;
 
 /**
+ * Maximum length of a type serialized inline in the Type column — an enum
+ * as `"a" | "b" | "c"`, an object with its property types as
+ * `{ a: string, b: boolean }`. Longer enums fall back to their base type
+ * and longer objects to the key summary form (`{ a, b }`); their values or
+ * types are expected to be covered by the property description or a
+ * dedicated section.
+ *
+ * @type {number}
+ */
+const MAX_INLINE_LENGTH = 80;
+
+/**
  * Whether a schema is a union of objects discriminated by a single-value
  * `type` enum (e.g. the form layout variants). Those unions are documented
  * with their own per-variant tables, so the Type column summarizes them
@@ -101,28 +113,51 @@ function serializeType( schema ) {
 	if ( Array.isArray( schema.type ) ) {
 		return schema.type.join( ' | ' );
 	}
-	if ( schema.enum?.length === 1 ) {
-		return `"${ schema.enum[ 0 ] }"`;
-	}
-	if ( schema.type === 'array' ) {
+	if ( schema.enum?.length >= 1 ) {
+		const values = schema.enum
+			.map( ( value ) => `"${ value }"` )
+			.join( ' | ' );
+		if ( values.length <= MAX_INLINE_LENGTH ) {
+			return values;
+		}
+	} else if ( schema.type === 'array' ) {
 		return schema.items
 			? `[ ${ serializeType( schema.items ) } ]`
 			: 'array';
-	}
-	if ( schema.type === 'object' ) {
-		const keys = Object.keys( schema.properties ?? {} );
-		if ( keys.length > 0 && keys.length <= MAX_INLINE_OBJECT_KEYS ) {
-			return `{ ${ keys.join( ', ' ) } }`;
-		}
-		const additionalKeys = Object.keys(
-			schema.additionalProperties?.properties ?? {}
-		);
-		if ( additionalKeys.length > 0 ) {
-			return `{ [ field ]: { ${ additionalKeys.join( ', ' ) } } }`;
-		}
-		return 'object';
+	} else if ( schema.type === 'object' ) {
+		return serializeObject( schema );
 	}
 	return schema.type ?? 'any';
+}
+
+/**
+ * Serialize an object schema. Small objects are serialized inline with
+ * their property types (`{ field: string, direction: "asc" | "desc" }`),
+ * falling back to a key summary (`{ field, direction }`) when the typed
+ * form is too long, and to `object` when there are too many keys.
+ *
+ * @param {JSONSchema} schema Object JSON schema.
+ * @return {string} Serialized object type.
+ */
+function serializeObject( schema ) {
+	const properties = schema.properties ?? {};
+	const keys = Object.keys( properties );
+	if ( keys.length > 0 && keys.length <= MAX_INLINE_OBJECT_KEYS ) {
+		const typed = `{ ${ keys
+			.map(
+				( key ) => `${ key }: ${ serializeType( properties[ key ] ) }`
+			)
+			.join( ', ' ) } }`;
+		return typed.length <= MAX_INLINE_LENGTH
+			? typed
+			: `{ ${ keys.join( ', ' ) } }`;
+	}
+	if ( schema.additionalProperties?.properties ) {
+		return `{ [ field ]: ${ serializeObject(
+			schema.additionalProperties
+		) } }`;
+	}
+	return 'object';
 }
 
 /**
@@ -145,16 +180,6 @@ function codeCell( value ) {
 }
 
 /**
- * Generate the Type column content from a schema.
- *
- * @param {JSONSchema} schema JSON schema.
- * @return {string} Serialized type, wrapped as inline code.
- */
-function generateType( schema ) {
-	return codeCell( serializeType( schema ) );
-}
-
-/**
  * Escape a value for use inside a markdown table cell.
  *
  * @param {string} value Cell content.
@@ -168,10 +193,13 @@ function escapeCell( value ) {
  * Generate a property table from a schema properties map. A Default column
  * is added when at least one property declares a default.
  *
- * @param {Record<string, JSONSchema>} properties Schema properties map.
+ * @param {Record<string, JSONSchema>} properties    Schema properties map.
+ * @param {Record<string, string>}     typeOverrides Per-property Type column
+ *                                                   content, replacing the
+ *                                                   serialized schema type.
  * @return {string} Markdown table.
  */
-function generateTable( properties ) {
+function generateTable( properties, typeOverrides = {} ) {
 	const entries = Object.entries( properties );
 	const hasDefaults = entries.some( ( [ , schema ] ) => 'default' in schema );
 
@@ -182,7 +210,9 @@ function generateTable( properties ) {
 		const cells = [
 			property,
 			escapeCell( schema.description ?? '' ),
-			escapeCell( generateType( schema ) ),
+			escapeCell(
+				codeCell( typeOverrides[ property ] ?? serializeType( schema ) )
+			),
 		];
 		if ( hasDefaults ) {
 			cells.push(
@@ -203,7 +233,11 @@ function generateTable( properties ) {
  * @return {string} Markdown content.
  */
 function generateDefaultView( schema ) {
-	return generateTable( schema.properties.default_view.properties );
+	// The `layout` keys are documented per layout type in the
+	// `default_layouts` subsections, which the description links to.
+	return generateTable( schema.properties.default_view.properties, {
+		layout: 'object',
+	} );
 }
 
 /**

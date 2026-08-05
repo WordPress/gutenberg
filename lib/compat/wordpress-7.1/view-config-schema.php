@@ -28,7 +28,7 @@ return array(
 			'readonly' => true,
 		),
 		'version' => array(
-			'description' => __( 'The schema version of the configuration.', 'gutenberg' ),
+			'description' => __( 'The schema version (currently, 1).', 'gutenberg' ),
 			'type' => 'integer',
 			'readonly' => true,
 		),
@@ -38,8 +38,16 @@ return array(
 			'readonly' => true,
 			'properties' => array(
 				'type' => array(
-					'description' => __( 'The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.', 'gutenberg' ),
+					'description' => __( 'The layout type.', 'gutenberg' ),
 					'type' => 'string',
+					'enum' => array(
+						'table',
+						'grid',
+						'list',
+						'activity',
+						'pickerGrid',
+						'pickerTable',
+					),
 				),
 				'layout' => array(
 					'description' => __( 'Configuration specific to the selected layout type. Accepts the `layout` options of any layout type; see [`default_layouts`](#default_layouts).', 'gutenberg' ),
