@@ -20,6 +20,32 @@ test.describe( 'InnerBlocks Template Sync', () => {
 		);
 	} );
 
+	test( 'warns that the template props are deprecated', async ( {
+		editor,
+		page,
+	} ) => {
+		const templateWarning = page.waitForEvent( 'console', ( message ) =>
+			message
+				.text()
+				.startsWith(
+					'The template prop of InnerBlocks and useInnerBlocksProps is deprecated since version 7.2.'
+				)
+		);
+		const selectionWarning = page.waitForEvent( 'console', ( message ) =>
+			message
+				.text()
+				.startsWith(
+					'The templateInsertUpdatesSelection prop of InnerBlocks and useInnerBlocksProps is deprecated since version 7.2.'
+				)
+		);
+
+		await editor.insertBlock( {
+			name: 'test/test-inner-blocks-deprecated-props',
+		} );
+
+		await Promise.all( [ templateWarning, selectionWarning ] );
+	} );
+
 	test( 'Ensures blocks without locking are kept intact even if they do not match the template', async ( {
 		editor,
 		page,

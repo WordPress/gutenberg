@@ -14,8 +14,27 @@ import save from './save';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[ 'core/post-title' ],
+	[
+		'core/post-date',
+		{
+			metadata: {
+				bindings: {
+					datetime: {
+						source: 'core/post-data',
+						args: { field: 'date' },
+					},
+				},
+			},
+		},
+	],
+	[ 'core/post-excerpt' ],
+];
+
 export const settings = {
 	icon: layout,
+	template: TEMPLATE,
 	edit,
 	save,
 };

@@ -208,7 +208,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const ids = useMemo(
 		() =>
 			data?.map(
-				// @ts-ignore
+				// @ts-expect-error `data` is `unknown[]`, so the callback signature does not line up.
 				( record: RecordType ) => record[ entityConfig?.key ?? 'id' ]
 			) ?? [],
 		[ data, entityConfig?.key ]
@@ -227,7 +227,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const dataWithPermissions = useMemo(
 		() =>
 			data?.map( ( record, index ) => ( {
-				// @ts-ignore
+				// @ts-expect-error `record` is `unknown`, which cannot be spread.
 				...record,
 				permissions: permissions[ index ],
 			} ) ) ?? [],
