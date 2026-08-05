@@ -81,18 +81,8 @@ jobs:
             - name: Detect Browser Mode tests
               id: browser-tests
               run: |
-                  TESTS="$(npm exec --no --workspace @wordpress/unit-tests -- \
-                    vitest list \
-                    --config vitest.config.mjs \
-                    --project browser \
-                    --filesOnly \
-                    --shard="${{ matrix.shard }}" \
-                    --passWithNoTests)"
-                  if [[ -n "$TESTS" ]]; then
-                      echo "found=true" >> "$GITHUB_OUTPUT"
-                  else
-                      echo "found=false" >> "$GITHUB_OUTPUT"
-                  fi
+                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
+                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
 
             - name: Install Chromium for Browser Mode tests
               if: ${{ steps.browser-tests.outputs.found == 'true' }}
