@@ -47,6 +47,7 @@
 		]
 	},
 	"dependencies": {
+		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
