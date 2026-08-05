@@ -6,6 +6,11 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import type { EngineSessionCodec } from './engines/session';
+import {
+	createYjsSessionCodec,
+	type YjsSessionOptions,
+} from './engines/yjs-relay';
 import { createSyncManager } from './manager';
 import type { SyncManager } from './types';
 
@@ -42,6 +47,15 @@ export interface SyncEngineAdapter {
 
 	/** Creates the sync manager implementing this engine. */
 	createManager: ( debug?: boolean ) => SyncManager;
+
+	/**
+	 * Creates the transport-facing session codec for one entity/room. The
+	 * options are engine-specific — the engine's manager calls this, closing
+	 * the codec over engine state (for the Yjs relay, a Y.Doc and Awareness)
+	 * — so they are typed opaquely here. Transports only ever receive the
+	 * engine-generic codec.
+	 */
+	createSessionCodec?: ( options?: unknown ) => EngineSessionCodec;
 }
 
 /**
@@ -84,6 +98,8 @@ function getDefaultEngineAdapters(): SyncEngineAdapter[] {
 			slug: YJS_RELAY_ENGINE_SLUG,
 			protocolVersion: YJS_RELAY_ENGINE_PROTOCOL,
 			createManager: createSyncManager,
+			createSessionCodec: ( options?: unknown ) =>
+				createYjsSessionCodec( options as YjsSessionOptions ),
 		},
 	];
 }

@@ -263,9 +263,17 @@ inside intent payloads, not the transport.
   - Excluded from tsc (`checkJs` vs generic JSDoc) with a precedented
     tsconfig exclude; proper typing lands with the Phase 2 adapter, the
     first TS consumer.
-  - Still open from Phase 1: provider narrowing to envelopes (transports
-    still receive Y.Doc/Awareness) — the next work item, prerequisite for
-    the Phase 2 intent-log transport payloads.
+  - Provider narrowing: DONE (2026-08-05). Transports are payload-opaque:
+    `EngineSessionCodec` (`src/engines/session.ts`) carries the engine's
+    client half — initial announcements, receive/respond, awareness
+    encode/apply, compaction payloads, local-update subscription with
+    byte sizes for transport limits. The extracted yjs implementation
+    lives in `src/engines/yjs-relay/session.ts` (13 focused tests);
+    `ProviderCreatorOptions` is `{ objectType, objectId, session }` and
+    the polling manager/provider import nothing from Yjs. SyncManager
+    still owns Y.Doc/Awareness and hands a codec closed over them to the
+    transport. Zero wire-format change; behavioral assertions relocated
+    with the code they pin. **Phase 1 is complete.**
 - **Phase 2 — intent-log end to end.** Capture v1 in the bridge, server
   engine behind the filter, dispositions in the poll response, escalations
   surfaced minimally (notice + console; proposal-lane UI comes from the

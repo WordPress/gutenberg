@@ -12,7 +12,16 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
+import type { EngineSessionCodec } from './engines/session';
 import type { ConnectionError } from './errors';
+
+export type {
+	AwarenessState,
+	EngineLocalUpdateListener,
+	EngineSessionCodec,
+	EngineUpdate,
+	LocalAwarenessState,
+} from './engines/session';
 
 /* globalThis */
 declare global {
@@ -106,13 +115,14 @@ export type OnStatusChangeCallback = (
 ) => void;
 
 /**
- * Options passed to a provider creator function when initializing a sync provider.
+ * Options passed to a provider creator function when initializing a sync
+ * provider. Providers receive an engine session codec — never the engine's
+ * internal state (e.g. a Y.Doc) — so transports stay engine-agnostic.
  */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
-	ydoc: Y.Doc;
-	awareness?: Awareness;
+	session: EngineSessionCodec;
 }
 
 export type ProviderCreator = (

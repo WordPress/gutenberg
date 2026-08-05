@@ -9,33 +9,9 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import { type SyncPayload, type SyncResponse } from '../types';
+import { type SyncPayload, type SyncResponse, type SyncUpdate } from '../types';
 
 // Mock all external dependencies before imports.
-jest.mock( 'yjs', () => ( {
-	mergeUpdatesV2: jest.fn( () => new Uint8Array() ),
-	applyUpdateV2: jest.fn(),
-	encodeStateAsUpdateV2: jest.fn( () => new Uint8Array() ),
-} ) );
-
-jest.mock( 'lib0/encoding', () => ( {
-	createEncoder: jest.fn( () => ( {} ) ),
-	toUint8Array: jest.fn( () => new Uint8Array( [ 0 ] ) ),
-} ) );
-
-jest.mock( 'lib0/decoding', () => ( {
-	createDecoder: jest.fn( () => ( {} ) ),
-} ) );
-
-jest.mock( 'y-protocols/sync', () => ( {
-	writeSyncStep1: jest.fn(),
-	readSyncMessage: jest.fn(),
-} ) );
-
-jest.mock( 'y-protocols/awareness', () => ( {
-	removeAwarenessStates: jest.fn(),
-} ) );
-
 jest.mock( '@wordpress/hooks', () => ( {
 	applyFilters: jest.fn(
 		( _hook: string, defaultValue: unknown ) => defaultValue
@@ -64,8 +40,7 @@ jest.mock( '../utils', () => ( {
 interface PollingManager {
 	registerRoom: ( options: {
 		room: string;
-		doc: unknown;
-		awareness: unknown;
+		session: unknown;
 		log: () => void;
 		onStatusChange: () => void;
 	} ) => void;
@@ -83,30 +58,57 @@ function createDeferred< T >() {
 	return { promise, resolve };
 }
 
-function createMockDoc( clientID = 1 ) {
-	return { clientID, on: jest.fn(), off: jest.fn() };
+/**
+ * Base64-encode `sizeInBytes` zero bytes, mirroring the wire encoding of a
+ * real update payload of that raw size.
+ *
+ * @param sizeInBytes Raw payload size to encode.
+ */
+function encodeMockData( sizeInBytes: number ): string {
+	return globalThis.btoa( '\0'.repeat( sizeInBytes ) );
 }
 
-// Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
-function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
-	const call = doc.on.mock.calls.find(
-		( args: unknown[] ) => args[ 0 ] === 'updateV2'
-	);
-	if ( ! call ) {
-		throw new Error( 'onDocUpdate not registered' );
-	}
-	return call[ 1 ] as ( update: Uint8Array, origin: unknown ) => void;
+/**
+ * A wire-shaped local update of the given raw payload size.
+ *
+ * @param sizeInBytes Raw payload size of the mock update.
+ */
+function createMockUpdate( sizeInBytes: number ): SyncUpdate {
+	return { data: encodeMockData( sizeInBytes ), type: 'update' };
 }
 
-function createMockAwareness() {
+// Mock engine session codec handed to registerRoom. The initial update
+// mirrors the Yjs codec's single sync_step1 announcement (1 payload byte,
+// matching the previously mocked y-protocols encoder output).
+function createMockSession( clientId = 1 ) {
 	return {
-		clientID: 1,
-		getLocalState: jest.fn( () => ( {} ) ),
-		getStates: jest.fn( () => new Map() ),
-		on: jest.fn(),
-		off: jest.fn(),
-		emit: jest.fn(),
+		applyRemoteAwareness: jest.fn(),
+		clientId,
+		createCompactionUpdate: jest.fn( () => ( {
+			data: '',
+			type: 'compaction',
+		} ) ),
+		createCompactionFromUpdates: jest.fn( () => ( {
+			data: '',
+			type: 'compaction',
+		} ) ),
+		destroy: jest.fn(),
+		getInitialUpdates: jest.fn( () => [
+			{ data: encodeMockData( 1 ), type: 'sync_step1' },
+		] ),
+		getLocalAwareness: jest.fn( () => ( {} ) ),
+		onLocalUpdate: jest.fn(),
+		receiveUpdate: jest.fn(),
 	};
+}
+
+// Helper to extract the local-update listener attached via session.onLocalUpdate.
+function getOnLocalUpdate( session: ReturnType< typeof createMockSession > ) {
+	const call = session.onLocalUpdate.mock.calls[ 0 ];
+	if ( ! call ) {
+		throw new Error( 'onLocalUpdate listener not registered' );
+	}
+	return call[ 0 ] as ( update: SyncUpdate, sizeInBytes: number ) => void;
 }
 
 function simulateVisibilityChange( state: string ) {
@@ -185,19 +187,18 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
 			const onStatusChange = jest.fn();
-			const doc = createMockDoc( 1 );
+			const session = createMockSession( 1 );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc,
-				awareness: createMockAwareness(),
+				session,
 				log: jest.fn(),
 				onStatusChange,
 			} );
 
-			// Simulate a doc update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
-			const onDocUpdate = getOnDocUpdate( doc );
-			onDocUpdate( new Uint8Array( 11 ), 'some-origin' );
+			// Simulate a local update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
+			const onLocalUpdate = getOnLocalUpdate( session );
+			onLocalUpdate( createMockUpdate( 11 ), 11 );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( {
 				status: 'disconnected',
@@ -210,18 +211,17 @@ describe( 'polling-manager', () => {
 		it( 'unregisters the room when the limit is exceeded', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
-			const doc = createMockDoc( 1 );
+			const session = createMockSession( 1 );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc,
-				awareness: createMockAwareness(),
+				session,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
-			const onDocUpdate = getOnDocUpdate( doc );
-			onDocUpdate( new Uint8Array( 11 ), 'some-origin' );
+			const onLocalUpdate = getOnLocalUpdate( session );
+			onLocalUpdate( createMockUpdate( 11 ), 11 );
 
 			// unregisterRoom sends a disconnect signal via postSyncUpdateNonBlocking.
 			expect( mockPostSyncUpdateNonBlocking ).toHaveBeenCalledWith(
@@ -235,23 +235,19 @@ describe( 'polling-manager', () => {
 				} )
 			);
 
-			// The doc listener should be removed.
-			expect( doc.off ).toHaveBeenCalledWith(
-				'updateV2',
-				expect.any( Function )
-			);
+			// The session's transport subscriptions should be detached.
+			expect( session.destroy ).toHaveBeenCalled();
 		} );
 
 		it( 'does not trigger for updates within the size limit', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
 			const onStatusChange = jest.fn();
-			const doc = createMockDoc( 1 );
+			const session = createMockSession( 1 );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc,
-				awareness: createMockAwareness(),
+				session,
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -261,8 +257,8 @@ describe( 'polling-manager', () => {
 			onStatusChange.mockClear();
 
 			// Send an update within the limit (10 bytes).
-			const onDocUpdate = getOnDocUpdate( doc );
-			onDocUpdate( new Uint8Array( 10 ), 'some-origin' );
+			const onLocalUpdate = getOnLocalUpdate( session );
+			onLocalUpdate( createMockUpdate( 10 ), 10 );
 
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -300,8 +296,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -339,8 +334,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -371,8 +365,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'first-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -409,8 +402,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'second-room',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -448,8 +440,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -510,8 +501,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'my-custom-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -552,8 +542,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -597,16 +586,14 @@ describe( 'polling-manager', () => {
 			// Register primary room first (becomes isPrimaryRoom).
 			pollingManager.registerRoom( {
 				room: 'primary-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -667,16 +654,14 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'primary-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -713,20 +698,18 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const collectionDoc = createMockDoc( 2 );
+			const collectionSession = createMockSession( 2 );
 
 			pollingManager.registerRoom( {
 				room: 'primary-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
-				doc: collectionDoc,
-				awareness: createMockAwareness(),
+				session: collectionSession,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -735,8 +718,8 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 
 			// Simulate a local doc update on the collection room (e.g., a note was saved).
-			const onDocUpdate = getOnDocUpdate( collectionDoc );
-			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+			const onLocalUpdate = getOnLocalUpdate( collectionSession );
+			onLocalUpdate( createMockUpdate( 3 ), 3 );
 
 			// Second poll: still no collaborators, collection room updates should be empty.
 			mockPostSyncUpdate.mockResolvedValue( {
@@ -841,16 +824,14 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'room-a',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'room-b',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
 			} );
@@ -888,8 +869,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -916,8 +896,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -939,8 +918,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -960,8 +938,7 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 			pollingManager.registerRoom( {
 				room: 'new-room',
-				doc: createMockDoc( 3 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 3 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -982,8 +959,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -1021,15 +997,14 @@ describe( 'polling-manager', () => {
 				} )
 			);
 
-			const docs: ReturnType< typeof createMockDoc >[] = [];
+			const sessions: ReturnType< typeof createMockSession >[] = [];
 
 			for ( let i = 0; i < 10; i++ ) {
-				const doc = createMockDoc( i + 1 );
-				docs.push( doc );
+				const session = createMockSession( i + 1 );
+				sessions.push( session );
 				pollingManager.registerRoom( {
 					room: `room-${ i }`,
-					doc,
-					awareness: createMockAwareness(),
+					session,
 					log: jest.fn(),
 					onStatusChange: jest.fn(),
 				} );
@@ -1039,8 +1014,8 @@ describe( 'polling-manager', () => {
 			// which resumes all queues.
 			await jest.advanceTimersByTimeAsync( 0 );
 
-			docs.forEach( ( doc ) => {
-				getOnDocUpdate( doc )( new Uint8Array( 8 ), 'user' );
+			sessions.forEach( ( session ) => {
+				getOnLocalUpdate( session )( createMockUpdate( 8 ), 8 );
 			} );
 
 			await jest.advanceTimersByTimeAsync( 1000 );
@@ -1087,18 +1062,17 @@ describe( 'polling-manager', () => {
 				responseWithCollaborator
 			);
 
-			const doc = createMockDoc( 1 );
+			const session = createMockSession( 1 );
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc,
-				awareness: createMockAwareness(),
+				session,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
 
-			getOnDocUpdate( doc )( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
+			getOnLocalUpdate( session )( createMockUpdate( 3 ), 3 );
 
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_sync_body_too_large',
@@ -1153,11 +1127,10 @@ describe( 'polling-manager', () => {
 				responseWithCollaborator
 			);
 
-			const doc = createMockDoc( 1 );
+			const session = createMockSession( 1 );
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc,
-				awareness: createMockAwareness(),
+				session,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1167,8 +1140,8 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Add a document update (queue is now resumed due to collaborators).
-			const onDocUpdate = getOnDocUpdate( doc );
-			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
+			const onLocalUpdate = getOnLocalUpdate( session );
+			onLocalUpdate( createMockUpdate( 3 ), 3 );
 
 			// Second poll: fail with a network error.
 			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
@@ -1213,8 +1186,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1261,8 +1233,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc(),
-				awareness: createMockAwareness(),
+				session: createMockSession(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1283,8 +1254,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc(),
-				awareness: createMockAwareness(),
+				session: createMockSession(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1328,15 +1298,13 @@ describe( 'polling-manager', () => {
 			const onStatusChangeB = jest.fn();
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
 			} );
 			pollingManager.registerRoom( {
 				room: 'other-room',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
 			} );
@@ -1407,33 +1375,30 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const keepDoc = createMockDoc( 1 );
+			const keepSession = createMockSession( 1 );
 			pollingManager.registerRoom( {
 				room: 'keep-room',
-				doc: keepDoc,
-				awareness: createMockAwareness(),
+				session: keepSession,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-a',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-b',
-				doc: createMockDoc( 3 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 3 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
 
-			const onDocUpdate = getOnDocUpdate( keepDoc );
-			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+			const onLocalUpdate = getOnLocalUpdate( keepSession );
+			onLocalUpdate( createMockUpdate( 3 ), 3 );
 
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_cannot_edit',
@@ -1487,19 +1452,17 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const primaryDoc = createMockDoc( 1 );
+			const primarySession = createMockSession( 1 );
 			pollingManager.registerRoom( {
 				room: 'primary',
-				doc: primaryDoc,
-				awareness: createMockAwareness(),
+				session: primarySession,
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
 			for ( let i = 1; i <= 10; i++ ) {
 				pollingManager.registerRoom( {
 					room: `overflow-${ i }`,
-					doc: createMockDoc( i + 1 ),
-					awareness: createMockAwareness(),
+					session: createMockSession( i + 1 ),
 					log: jest.fn(),
 					onStatusChange: jest.fn(),
 				} );
@@ -1508,8 +1471,8 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
-			const onPrimaryDocUpdate = getOnDocUpdate( primaryDoc );
-			onPrimaryDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+			const onPrimaryLocalUpdate = getOnLocalUpdate( primarySession );
+			onPrimaryLocalUpdate( createMockUpdate( 3 ), 3 );
 
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_cannot_edit',
@@ -1568,8 +1531,7 @@ describe( 'polling-manager', () => {
 			const onStatusChange = jest.fn();
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange,
 			} );
@@ -1603,8 +1565,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1629,8 +1590,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1658,8 +1618,7 @@ describe( 'polling-manager', () => {
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1692,8 +1651,7 @@ describe( 'polling-manager', () => {
 			} );
 			pollingManager.registerRoom( {
 				room: 'new-room',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 2 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );
@@ -1717,8 +1675,7 @@ describe( 'polling-manager', () => {
 		function registerRoom( pollingMgr: PollingManager, room: string ) {
 			pollingMgr.registerRoom( {
 				room,
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
+				session: createMockSession( 1 ),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 			} );

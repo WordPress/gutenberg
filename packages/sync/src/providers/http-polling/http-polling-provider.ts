@@ -1,25 +1,23 @@
 /**
  * External dependencies
  */
-import type * as Y from 'yjs';
 import { ObservableV2 } from 'lib0/observable';
-import { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
  */
 import type {
 	ConnectionStatus,
+	EngineSessionCodec,
 	ProviderCreator,
 	ProviderCreatorResult,
 } from '../../types';
 import { pollingManager } from './polling-manager';
 
 export interface ProviderOptions {
-	awareness?: Awareness;
 	debug?: boolean;
 	room: string;
-	ydoc: Y.Doc;
+	session: EngineSessionCodec;
 }
 
 /**
@@ -31,18 +29,17 @@ type HttpPollingEvents = {
 };
 
 /**
- * Yjs provider that uses HTTP polling for real-time synchronization. It manages
- * document updates and awareness states through a central sync server.
+ * Sync provider that uses HTTP polling for real-time synchronization. It moves
+ * typed updates and awareness states between a central sync server and the
+ * engine session codec, without interpreting either.
  */
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
-	protected awareness: Awareness;
 	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
 		this.log( 'Initializing', { room: options.room } );
 
-		this.awareness = options.awareness ?? new Awareness( options.ydoc );
 		this.connect();
 	}
 
@@ -54,8 +51,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 		pollingManager.registerRoom( {
 			room: this.options.room,
-			doc: this.options.ydoc,
-			awareness: this.awareness,
+			session: this.options.session,
 			log: this.log,
 			onStatusChange: this.emitStatus,
 		} );
@@ -139,18 +135,16 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
  */
 export function createHttpPollingProvider(): ProviderCreator {
 	return async ( {
-		awareness,
 		objectType,
 		objectId,
-		ydoc,
+		session,
 	} ): Promise< ProviderCreatorResult > => {
 		// Generate room name from objectType and objectId
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
 		const provider = new HttpPollingProvider( {
-			awareness,
 			// debug: true,
 			room,
-			ydoc,
+			session,
 		} );
 
 		return {

@@ -4,16 +4,6 @@
 import { applyFilters } from '@wordpress/hooks';
 
 /**
- * External dependencies
- */
-import * as Y from 'yjs';
-import * as encoding from 'lib0/encoding';
-import * as decoding from 'lib0/decoding';
-import type { Awareness } from 'y-protocols/awareness';
-import { removeAwarenessStates } from 'y-protocols/awareness';
-import * as syncProtocol from 'y-protocols/sync';
-
-/**
  * Internal dependencies
  */
 import {
@@ -31,26 +21,21 @@ import {
 	MANUAL_RETRY_INTERVAL_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
+import type { EngineSessionCodec } from '../../engines/session';
 import type { ConnectionStatus } from '../../types';
-import {
-	type AwarenessState,
-	type LocalAwarenessState,
-	type SyncPayload,
-	type SyncUpdate,
-	SyncUpdateType,
-	type UpdateQueue,
+import type {
+	AwarenessState,
+	SyncPayload,
+	SyncUpdate,
+	UpdateQueue,
 } from './types';
 import {
-	base64ToUint8Array,
-	createSyncUpdate,
 	createUpdateQueue,
 	intValueOrDefault,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 	rotateWindow,
 } from './utils';
-
-const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
 type LogFunction = (
 	message: string,
@@ -70,23 +55,18 @@ interface PollingManager {
 
 interface RegisterRoomOptions {
 	room: string;
-	doc: Y.Doc;
-	awareness: Awareness;
+	session: EngineSessionCodec;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 }
 
 interface RoomState {
-	clientId: number;
-	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
 	isPrimaryRoom: boolean;
-	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	processAwarenessUpdate: ( state: AwarenessState ) => void;
-	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	room: string;
+	session: EngineSessionCodec;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
@@ -212,177 +192,6 @@ function handleForbiddenError(
 const roomStates: Map< string, RoomState > = new Map();
 
 /**
- * Create a compaction update by merging existing updates. This preserves
- * the original operation metadata (client IDs, logical clocks) so that
- * Yjs deduplication works correctly when the compaction is applied.
- *
- * Deprecated: The server is moving towards full state updates for compaction.
- *
- * @param updates The updates to merge
- */
-function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
-	// Extract only compaction and update types for merging (skip sync-step updates).
-	// Decode base64 updates to Uint8Array for merging.
-	const mergeable = updates
-		.filter( ( u ) =>
-			[ SyncUpdateType.COMPACTION, SyncUpdateType.UPDATE ].includes(
-				u.type
-			)
-		)
-		.map( ( u ) => base64ToUint8Array( u.data ) );
-
-	// Merge all updates while preserving operation metadata.
-	return createSyncUpdate(
-		Y.mergeUpdatesV2( mergeable ),
-		SyncUpdateType.COMPACTION
-	);
-}
-
-/**
- * Create sync step 1 update (announce our state vector).
- *
- * @param doc The Yjs document
- */
-function createSyncStep1Update( doc: Y.Doc ): SyncUpdate {
-	const encoder = encoding.createEncoder();
-	syncProtocol.writeSyncStep1( encoder, doc );
-	return createSyncUpdate(
-		encoding.toUint8Array( encoder ),
-		SyncUpdateType.SYNC_STEP_1
-	);
-}
-
-/**
- * Create sync step 2 update (acknowledge sync step 1).
- *
- * @param doc   The Yjs document
- * @param step1 The sync step 1 update received
- */
-function createSyncStep2Update( doc: Y.Doc, step1: Uint8Array ): SyncUpdate {
-	const decoder = decoding.createDecoder( step1 );
-	const encoder = encoding.createEncoder();
-	syncProtocol.readSyncMessage(
-		decoder,
-		encoder,
-		doc,
-		POLLING_MANAGER_ORIGIN
-	);
-	return createSyncUpdate(
-		encoding.toUint8Array( encoder ),
-		SyncUpdateType.SYNC_STEP_2
-	);
-}
-
-/**
- * Process an incoming awareness update from the server.
- *
- * @param state     The awareness state received
- * @param awareness The local Awareness instance
- */
-function processAwarenessUpdate(
-	state: AwarenessState,
-	awareness: Awareness
-): void {
-	const currentStates = awareness.getStates();
-	const added = new Set< number >();
-	const updated = new Set< number >();
-
-	// Removed clients are missing from the server state.
-	const removed = new Set< number >(
-		Array.from( currentStates.keys() ).filter(
-			( clientId ) => ! state[ clientId ]
-		)
-	);
-
-	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
-		const clientId = Number( clientIdString );
-
-		// Skip our own state (we already have it locally).
-		if ( clientId === awareness.clientID ) {
-			return;
-		}
-
-		// A null state should be removed by the server, but handle it here just in case.
-		if ( null === awarenessState ) {
-			currentStates.delete( clientId );
-			removed.add( clientId );
-			return;
-		}
-
-		if ( ! currentStates.has( clientId ) ) {
-			currentStates.set( clientId, awarenessState );
-			added.add( clientId );
-			return;
-		}
-
-		const currentState = currentStates.get( clientId );
-
-		if (
-			JSON.stringify( currentState ) !== JSON.stringify( awarenessState )
-		) {
-			currentStates.set( clientId, awarenessState );
-			updated.add( clientId );
-		}
-	} );
-
-	if ( added.size + updated.size > 0 ) {
-		awareness.emit( 'change', [
-			{
-				added: Array.from( added ),
-				updated: Array.from( updated ),
-				// Left blank on purpose, as the removal of clients is handled in the if condition below.
-				removed: [],
-			},
-		] );
-	}
-
-	if ( removed.size > 0 ) {
-		removeAwarenessStates(
-			awareness,
-			Array.from( removed ),
-			POLLING_MANAGER_ORIGIN
-		);
-	}
-}
-
-/**
- * Process an incoming sync / document update based on its type.
- *
- * @param update The typed update received
- * @param doc    The Yjs document
- * @return A response update if needed (e.g., sync_step2 in response to sync_step1)
- */
-function processDocUpdate( update: SyncUpdate, doc: Y.Doc ): SyncUpdate | void {
-	const data = base64ToUint8Array( update.data );
-
-	switch ( update.type ) {
-		case SyncUpdateType.SYNC_STEP_1: {
-			// Respond to sync step 1 with sync step 2.
-			return createSyncStep2Update( doc, data );
-		}
-
-		case SyncUpdateType.SYNC_STEP_2: {
-			// Apply sync step 2 (potentially contains missing updates).
-			const decoder = decoding.createDecoder( data );
-			const encoder = encoding.createEncoder();
-			syncProtocol.readSyncMessage(
-				decoder,
-				encoder,
-				doc,
-				POLLING_MANAGER_ORIGIN
-			);
-			return;
-		}
-
-		case SyncUpdateType.COMPACTION:
-		case SyncUpdateType.UPDATE: {
-			// Apply document update directly.
-			Y.applyUpdateV2( doc, data, POLLING_MANAGER_ORIGIN );
-		}
-	}
-}
-
-/**
  * Check whether the awareness state exceeds the configured connection limit.
  *
  * @param awareness The awareness state from the server response.
@@ -466,7 +275,7 @@ function handlePageHide(): void {
 		( [ room, state ] ) => ( {
 			after: 0,
 			awareness: null,
-			client_id: state.clientId,
+			client_id: state.session.clientId,
 			room,
 			updates: [],
 		} )
@@ -569,8 +378,8 @@ function createPayloadRoom(
 ): SyncPayload[ 'rooms' ][ number ] {
 	return {
 		after: state.endCursor ?? 0,
-		awareness: state.localAwarenessState,
-		client_id: state.clientId,
+		awareness: state.session.getLocalAwareness(),
+		client_id: state.session.clientId,
 		room: state.room,
 		updates,
 	};
@@ -727,7 +536,7 @@ function poll(): void {
 				}
 
 				// Process awareness update.
-				roomState.processAwarenessUpdate( room.awareness );
+				roomState.session.applyRemoteAwareness( room.awareness );
 
 				// If there is another collaborator on the primary entity,
 				// resume all room queues for the next poll and increase
@@ -749,7 +558,8 @@ function poll(): void {
 				const responseUpdates: SyncUpdate[] = [];
 				for ( const update of room.updates ) {
 					try {
-						const response = roomState.processDocUpdate( update );
+						const response =
+							roomState.session.receiveUpdate( update );
 						if ( response ) {
 							responseUpdates.push( response );
 						}
@@ -772,13 +582,13 @@ function poll(): void {
 					roomState.log( 'Server requested compaction update' );
 					roomState.updateQueue.clear();
 					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
+						roomState.session.createCompactionUpdate()
 					);
 				} else if ( room.compaction_request ) {
 					// Deprecated
 					roomState.log( 'Server requested (old) compaction update' );
 					roomState.updateQueue.add(
-						createDeprecatedCompactionUpdate(
+						roomState.session.createCompactionFromUpdates(
 							room.compaction_request
 						)
 					);
@@ -895,7 +705,9 @@ function poll(): void {
 
 					if ( room.updates.length > 0 && state.endCursor > 0 ) {
 						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
+						state.updateQueue.add(
+							state.session.createCompactionUpdate()
+						);
 					} else if ( room.updates.length > 0 ) {
 						state.updateQueue.restore( room.updates );
 					}
@@ -943,8 +755,7 @@ function poll(): void {
 
 function registerRoom( {
 	room,
-	doc,
-	awareness,
+	session,
 	log,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
@@ -953,7 +764,7 @@ function registerRoom( {
 	}
 
 	// Note: Queue is initially paused. Call .resume() to unpause.
-	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
+	const updateQueue = createUpdateQueue( session.getInitialUpdates() );
 
 	/**
 	 * Connection limits are enforced on the first entity to be loaded for sync.
@@ -988,16 +799,8 @@ function registerRoom( {
 	 */
 	const isPrimaryRoom = 0 === roomStates.size;
 
-	function onAwarenessUpdate(): void {
-		roomState.localAwarenessState = awareness.getLocalState() ?? {};
-	}
-
-	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
-		if ( POLLING_MANAGER_ORIGIN === origin ) {
-			return;
-		}
-
-		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+	function onLocalUpdate( update: SyncUpdate, sizeInBytes: number ): void {
+		if ( sizeInBytes > MAX_UPDATE_SIZE_IN_BYTES ) {
 			const state = roomStates.get( room );
 			if ( ! state ) {
 				return;
@@ -1005,7 +808,7 @@ function registerRoom( {
 
 			state.log( 'Document size limit exceeded', {
 				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
-				updateSizeInBytes: update.byteLength,
+				updateSizeInBytes: sizeInBytes,
 			} );
 
 			state.onStatusChange( {
@@ -1021,39 +824,26 @@ function registerRoom( {
 			return;
 		}
 
-		// Tag local document changes as 'update' type.
-		updateQueue.add( createSyncUpdate( update, SyncUpdateType.UPDATE ) );
+		updateQueue.add( update );
 	}
 
 	function unregister(): void {
-		doc.off( 'updateV2', onDocUpdate );
-		awareness.off( 'change', onAwarenessUpdate );
+		session.destroy();
 		updateQueue.clear();
 	}
 
 	const roomState: RoomState = {
-		clientId: doc.clientID,
-		createCompactionUpdate: () =>
-			createSyncUpdate(
-				Y.encodeStateAsUpdateV2( doc ),
-				SyncUpdateType.COMPACTION
-			),
 		endCursor: 0,
 		isPrimaryRoom,
-		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
-		processAwarenessUpdate: ( state: AwarenessState ) =>
-			processAwarenessUpdate( state, awareness ),
-		processDocUpdate: ( update: SyncUpdate ) =>
-			processDocUpdate( update, doc ),
 		room,
+		session,
 		unregister,
 		updateQueue,
 	};
 
-	doc.on( 'updateV2', onDocUpdate );
-	awareness.on( 'change', onAwarenessUpdate );
+	session.onLocalUpdate( onLocalUpdate );
 	roomStates.set( room, roomState );
 
 	if ( ! areListenersRegistered ) {
@@ -1081,7 +871,7 @@ function unregisterRoom(
 				{
 					after: 0,
 					awareness: null,
-					client_id: state.clientId,
+					client_id: state.session.clientId,
 					room,
 					updates: [],
 				},

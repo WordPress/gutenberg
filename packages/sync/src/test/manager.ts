@@ -147,11 +147,16 @@ describe( 'SyncManager', () => {
 			);
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+			// Providers receive an engine session codec, never the Y.Doc or
+			// Awareness themselves.
 			expect( mockProviderCreator ).toHaveBeenCalledWith( {
 				objectType: 'postType/post',
 				objectId: '123',
-				ydoc: expect.any( Y.Doc ),
-				awareness: expect.any( Awareness ),
+				session: expect.objectContaining( {
+					clientId: expect.any( Number ),
+					onLocalUpdate: expect.any( Function ),
+					receiveUpdate: expect.any( Function ),
+				} ),
 			} );
 		} );
 
@@ -604,12 +609,14 @@ describe( 'SyncManager', () => {
 
 	describe( 'update', () => {
 		it( 'updates CRDT document with local changes', async () => {
-			// Capture the Y.Doc from provider creator
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -643,11 +650,9 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
 
 			const initialRecord = {
 				id: '123',
@@ -663,6 +668,7 @@ describe( 'SyncManager', () => {
 				...mockSyncConfig,
 				applyChangesToCRDTDoc: jest.fn(
 					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+						capturedDoc = ydoc;
 						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 						Object.entries( changes ).forEach(
 							( [ key, value ] ) => {
@@ -825,12 +831,14 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'applies changes with specified origin', async () => {
-			// Capture the Y.Doc from provider creator
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -866,12 +874,14 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'updates save metadata when the update is associated with a save', async () => {
-			// Capture the Y.Doc from provider creator.
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -914,10 +924,11 @@ describe( 'SyncManager', () => {
 	describe( 'autosave snapshots', () => {
 		async function loadEntityCapturingDoc() {
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -1167,12 +1178,14 @@ describe( 'SyncManager', () => {
 
 	describe( 'CRDT doc observation', () => {
 		it( 'edits the local entity record when remote updates arrive', async () => {
-			// Capture the Y.Doc from provider creator.
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -1210,12 +1223,14 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'refetches the entity record when a remote save updates save metadata', async () => {
-			// Capture the Y.Doc from provider creator.
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 
@@ -1248,12 +1263,14 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {
-			// Capture the Y.Doc from provider creator.
+			// Providers no longer receive the Y.Doc; capture it via the sync
+			// config, which receives it during load.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc ) => {
+					capturedDoc = ydoc;
+				}
+			);
 
 			const manager = createSyncManager();
 

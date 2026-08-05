@@ -24,6 +24,26 @@ The Awareness protocol should not be considered a public API. It is a third-part
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 
+### AwarenessState
+
+Undocumented declaration.
+
+### EngineLocalUpdateListener
+
+Undocumented declaration.
+
+### EngineSessionCodec
+
+Undocumented declaration.
+
+### EngineUpdate
+
+Undocumented declaration.
+
+### LocalAwarenessState
+
+Undocumented declaration.
+
 ### privateApis
 
 Private @wordpress/sync APIs.

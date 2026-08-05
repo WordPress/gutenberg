@@ -1,0 +1,110 @@
+/**
+ * Engine session codec types.
+ *
+ * A session codec is the seam between a sync ENGINE (which owns the meaning
+ * of update payloads) and a TRANSPORT (which owns their movement: rooms,
+ * cursors, polling cadence, connection status). The engine's manager creates
+ * one codec per entity/room and hands it to each transport provider; the
+ * transport delegates all payload creation and interpretation to the codec
+ * and treats every payload as opaque.
+ *
+ * Nothing in this module may reference a specific engine's types (e.g. Yjs):
+ * the same transport must be able to carry any engine's payloads.
+ */
+
+/**
+ * The local client's awareness state as sent to the server, or null when the
+ * client is disconnecting.
+ */
+export type LocalAwarenessState = object | null;
+
+/**
+ * Awareness states for all clients in a room, keyed by client ID, as received
+ * from the server.
+ */
+export type AwarenessState = Record< string, LocalAwarenessState >;
+
+/**
+ * A typed sync update as it travels over the wire: an engine-defined kind and
+ * a base64-encoded payload. Transports move these without interpreting them.
+ */
+export interface EngineUpdate {
+	/** Base64-encoded update payload. Opaque to transports. */
+	data: string;
+
+	/** Engine-defined update kind (a wire value, e.g. 'update'). */
+	type: string;
+}
+
+/**
+ * Listener for updates produced by local edits. The codec reports the raw
+ * payload size alongside the wire-shaped update so transports can enforce
+ * size limits without decoding the payload.
+ */
+export type EngineLocalUpdateListener = (
+	update: EngineUpdate,
+	sizeInBytes: number
+) => void;
+
+/**
+ * The transport-facing session for one entity/room: creates outgoing updates,
+ * interprets received ones, and encodes/applies awareness states. Created by
+ * the engine (closed over its internal state — the transport never sees that
+ * state) and consumed by transport providers.
+ */
+export interface EngineSessionCodec {
+	/** Applies awareness states received from the server. */
+	applyRemoteAwareness: ( state: AwarenessState ) => void;
+
+	/**
+	 * The client identifier this session announces to the server
+	 * (the `client_id` wire field).
+	 */
+	clientId: number;
+
+	/**
+	 * Creates a single update representing the full local state, replacing
+	 * all prior updates (compaction-on-request and idempotent error
+	 * recovery).
+	 */
+	createCompactionUpdate: () => EngineUpdate;
+
+	/**
+	 * Creates a compaction by merging the given server-provided updates,
+	 * preserving their operation metadata.
+	 *
+	 * @deprecated The server is moving towards full state updates for
+	 *             compaction (`createCompactionUpdate`).
+	 */
+	createCompactionFromUpdates: ( updates: EngineUpdate[] ) => EngineUpdate;
+
+	/**
+	 * Detaches the transport-facing subscriptions registered via
+	 * `onLocalUpdate`. Safe to call repeatedly; a subsequent
+	 * `onLocalUpdate` call re-attaches (reconnection).
+	 */
+	destroy: () => void;
+
+	/**
+	 * Returns the updates announcing this session to a room it just joined
+	 * (e.g. a state-vector announcement answered by peers with the missing
+	 * state).
+	 */
+	getInitialUpdates: () => EngineUpdate[];
+
+	/** Encodes the local awareness state for a sync request. */
+	getLocalAwareness: () => LocalAwarenessState;
+
+	/**
+	 * Subscribes to updates produced by local edits, replacing any previous
+	 * listener. Updates the engine applies via `receiveUpdate` are not
+	 * reported back.
+	 */
+	onLocalUpdate: ( listener: EngineLocalUpdateListener ) => void;
+
+	/**
+	 * Processes one received update. May return a response update to be
+	 * queued for the server (e.g. a state answer to a peer's announcement).
+	 */
+	receiveUpdate: ( update: EngineUpdate ) => EngineUpdate | void;
+}

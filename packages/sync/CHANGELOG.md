@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Extract the Yjs relay engine logic out of the HTTP polling transport into an engine session codec (`src/engines/yjs-relay/`). Transport providers now receive an engine-generic session codec via `ProviderCreatorOptions.session` instead of `ydoc`/`awareness`, so transports no longer depend on Yjs. No wire-format or behavior change.
+
 ## 1.51.0 (2026-07-14)
 
 ## 1.50.0 (2026-07-01)

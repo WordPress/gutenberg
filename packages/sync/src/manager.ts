@@ -13,6 +13,7 @@ import {
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
+import { createYjsSessionCodec } from './engines/yjs-relay';
 import { logPerformanceTiming, passThru } from './performance';
 import { getProviderCreators } from './providers';
 import type {
@@ -286,15 +287,16 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
-		// Create providers for the given entity and its Yjs document.
+		// Create providers for the given entity. Each provider receives its
+		// own engine session codec closed over the Yjs document and awareness,
+		// so transports never handle Yjs objects directly.
 		log( 'loadEntity', 'connecting', entityId );
 		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					objectType,
 					objectId,
-					ydoc,
-					awareness,
+					session: createYjsSessionCodec( { awareness, doc: ydoc } ),
 				} );
 
 				// Attach listeners after provider creation.
@@ -425,15 +427,16 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		collectionStates.set( objectType, collectionState );
 
-		// Create providers for the given entity and its Yjs document.
+		// Create providers for the given collection. Each provider receives
+		// its own engine session codec closed over the Yjs document and
+		// awareness, so transports never handle Yjs objects directly.
 		log( 'loadCollection', 'connecting', entityId );
 		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
-					awareness,
 					objectType,
 					objectId: null,
-					ydoc,
+					session: createYjsSessionCodec( { awareness, doc: ydoc } ),
 				} );
 
 				// Attach status listener after provider creation.

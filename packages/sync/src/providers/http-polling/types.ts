@@ -1,13 +1,22 @@
-export type LocalAwarenessState = object | null;
+/**
+ * Internal dependencies
+ */
+import type {
+	AwarenessState,
+	EngineUpdate,
+	LocalAwarenessState,
+} from '../../engines/session';
 
-export type AwarenessState = Record< string, LocalAwarenessState >;
+export type { AwarenessState, LocalAwarenessState };
 
 /**
- * Update types for the sync protocol:
+ * Update types of the Yjs relay engine (see engines/yjs-relay):
  * - sync_step1: State vector announcement
  * - sync_step2: Acknowledgment, missing updates response
  * - update: Regular document update (persisted until save)
  * - compaction: Merged updates using Y.mergeUpdates replacing all prior updates
+ *
+ * The transport does not interpret these; it moves typed updates opaquely.
  */
 export enum SyncUpdateType {
 	COMPACTION = 'compaction',
@@ -16,10 +25,11 @@ export enum SyncUpdateType {
 	UPDATE = 'update',
 }
 
-export interface SyncUpdate {
-	data: string; // base64-encoded Yjs update
-	type: SyncUpdateType;
-}
+/**
+ * A typed update on the wire. The engine-defined `type` and base64 `data`
+ * are opaque to the transport.
+ */
+export type SyncUpdate = EngineUpdate;
 
 interface SyncEnvelopeFromClient {
 	after: number;
