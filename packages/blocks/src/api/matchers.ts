@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// @ts-expect-error `hpq` does not ship type declarations.
 export { attr, prop, text, query } from 'hpq';
 
 /**
