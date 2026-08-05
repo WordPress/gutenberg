@@ -24,6 +24,7 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getSiblingBlockAttributes } from '../../utils/sibling-block-attributes';
 import { getAppenderLabel } from './get-appender-label';
 
 const UnforwardedInserterToggle = (
@@ -197,10 +198,6 @@ const UnforwardedInserter = (
 		const blockName = blockToInsert?.name ?? allowedBlockType.name;
 
 		function getAdjacentBlockAttributes( attributesToCopy ) {
-			if ( ! attributesToCopy?.length ) {
-				return {};
-			}
-
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
 			// an existing block, otherwise the last child of the root.
@@ -221,14 +218,10 @@ const UnforwardedInserter = (
 				}
 			}
 
-			if ( ! adjacentAttributes ) {
-				return {};
-			}
-
-			return Object.fromEntries(
+			return getSiblingBlockAttributes(
+				blockName,
+				adjacentAttributes,
 				attributesToCopy
-					.filter( ( attr ) => attr in adjacentAttributes )
-					.map( ( attr ) => [ attr, adjacentAttributes[ attr ] ] )
 			);
 		}
 
