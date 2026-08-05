@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -23,7 +24,25 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 	const newOrder = getFootnotesOrder( blocks );
 
-	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
+	// This meta is a string that something else may have written: a plugin, an
+	// import, or a direct database edit can leave it malformed or holding
+	// something other than an array. Parsing it unguarded throws inside a store
+	// subscriber, where no error boundary catches it and the edit is dropped
+	// before it reaches editEntityRecord, so the post silently stops saving.
+	let footnotes = [];
+	if ( meta.footnotes ) {
+		try {
+			const parsed = JSON.parse( meta.footnotes );
+			if ( Array.isArray( parsed ) ) {
+				footnotes = parsed;
+			} else {
+				warning( 'Footnotes post meta is not an array; ignoring it.' );
+			}
+		} catch {
+			warning( 'Footnotes post meta is not valid JSON; ignoring it.' );
+		}
+	}
+
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
 
 	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
