@@ -351,7 +351,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error
+							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
 							onClick={ ( event ) => {
 								event.preventDefault();
 								onClickItemCallback( item );
@@ -690,7 +690,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error
+							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
 							onClick={ ( event ) => {
 								event.preventDefault();
 								mediaClickItemCallback( item );

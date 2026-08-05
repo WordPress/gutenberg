@@ -229,7 +229,7 @@ export default function Filter( {
 			activeElements = [
 				{
 					value: filterInView.value,
-					// @ts-ignore
+					// @ts-expect-error `label` is a `string[]` here, but the element type expects a `string`.
 					label,
 				},
 			];

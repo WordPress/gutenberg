@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-// @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**

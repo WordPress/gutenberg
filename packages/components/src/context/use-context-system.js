@@ -34,7 +34,7 @@ export function useContextSystem( props, namespace ) {
 	const contextProps = contextSystemProps?.[ namespace ] || {};
 
 	/** @type {ConnectedProps<P>} */
-	// @ts-ignore We fill in the missing properties below
+	// @ts-expect-error The initial object cannot satisfy the generic `P`, whose props are copied in below.
 	const finalComponentProps = {
 		...getConnectedNamespace(),
 		...getNamespace( namespace ),
@@ -60,19 +60,19 @@ export function useContextSystem( props, namespace ) {
 			: initialMergedProps.children;
 
 	for ( const key in initialMergedProps ) {
-		// @ts-ignore filling in missing props
+		// @ts-expect-error A string key cannot index the merged props type.
 		finalComponentProps[ key ] = initialMergedProps[ key ];
 	}
 
 	for ( const key in overrideProps ) {
-		// @ts-ignore filling in missing props
+		// @ts-expect-error A string key cannot index the merged props type.
 		finalComponentProps[ key ] = overrideProps[ key ];
 	}
 
 	// Setting an `undefined` explicitly can cause unintended overwrites
 	// when a `cloneElement()` is involved.
 	if ( rendered !== undefined ) {
-		// @ts-ignore
+		// @ts-expect-error `children` does not exist on `ConnectedProps<P>`.
 		finalComponentProps.children = rendered;
 	}
 

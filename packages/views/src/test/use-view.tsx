@@ -7,7 +7,6 @@ import { act, renderHook } from '@testing-library/react';
  * WordPress dependencies
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-// @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
 import type { View } from '@wordpress/dataviews';
 

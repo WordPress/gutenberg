@@ -201,7 +201,6 @@ function findDefaultSourcePath( dir ) {
 	if ( ! defaultPathMatches.length ) {
 		throw new Error( `Cannot find default source file in ${ dir }` );
 	}
-	// @ts-ignore
 	return defaultPathMatches[ 0 ];
 }
 

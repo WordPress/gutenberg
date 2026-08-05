@@ -75,11 +75,11 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
 		if ( rtlStyles ) {
-			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+			// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+		// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

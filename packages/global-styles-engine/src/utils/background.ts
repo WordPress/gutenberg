@@ -11,7 +11,7 @@ export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 export function setBackgroundStyleDefaults( backgroundStyle: BackgroundStyle ) {
 	if (
 		! backgroundStyle ||
-		// @ts-expect-error
+		// @ts-expect-error `backgroundImage` is a union whose other members have no `url`.
 		! backgroundStyle?.backgroundImage?.url
 	) {
 		return;
