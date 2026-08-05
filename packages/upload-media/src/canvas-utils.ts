@@ -3,6 +3,7 @@
  */
 import { getFileBasename } from './utils';
 import { parseHeic } from './heic-parser';
+import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
@@ -165,9 +166,7 @@ export async function canvasConvertToJpeg(
 		}
 	}
 
-	throw new Error(
-		'This browser cannot decode HEIC images. Please use Safari or convert to JPEG before uploading.'
-	);
+	throw new Error( getHeicUnsupportedMessage() );
 }
 
 /**

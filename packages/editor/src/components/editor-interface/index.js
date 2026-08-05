@@ -30,7 +30,11 @@ import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
-import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
+import {
+	RevisionsHeader,
+	RevisionsCanvas,
+	RevisionsCodeDiff,
+} from '../post-revisions-preview';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
@@ -174,7 +178,13 @@ export default function EditorInterface( {
 						onToggleDiff={ () => setShowRevisionDiff( ! showDiff ) }
 					/>
 				}
-				content={ <RevisionsCanvas /> }
+				content={
+					mode === 'text' ? (
+						<RevisionsCodeDiff />
+					) : (
+						<RevisionsCanvas />
+					)
+				}
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);

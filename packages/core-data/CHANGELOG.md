@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+
+### Bug Fixes
+
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

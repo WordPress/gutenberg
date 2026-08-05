@@ -7,7 +7,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,10 +18,7 @@ import TabToolbarControls from '../tabs/tab-toolbar-controls';
  * inner blocks are empty). templateLock is false, so this is never applied to
  * existing blocks that already have tab panels saved.
  */
-const TAB_PANELS_TEMPLATE = [
-	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
-	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
-];
+const TAB_PANELS_TEMPLATE = [ [ 'core/tab-panel' ], [ 'core/tab-panel' ] ];
 
 export default function Edit( { clientId } ) {
 	const blockProps = useBlockProps();

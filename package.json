@@ -173,6 +173,7 @@
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
+		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug --",
 		"test:unit:profile": "npm run --workspace @wordpress/unit-tests test:unit:profile --",

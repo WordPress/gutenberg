@@ -6,7 +6,7 @@ import { join } from 'path';
 import type { Page, Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
-// @ts-expect-error
+// @ts-expect-error `web-vitals` is ESM, so a type-only import needs a `resolution-mode`.
 import type { Metric } from 'web-vitals';
 
 type EventType =

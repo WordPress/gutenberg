@@ -17,6 +17,25 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
 
+const flakinessOptions = {
+	/*
+	 * Tests dashboard is available at https://flakiness.io/WordPress/gutenberg
+	 */
+	flakinessProject: 'WordPress/gutenberg',
+	/*
+	 * Use historical test-duration data to balance shards.
+	 * Documentation is available at https://github.com/flakiness/playwright
+	 */
+	shardBalancing: {
+		timingsFile: './timings.json',
+	},
+	/*
+	 * Only upload to Flakiness.io for the official WordPress/Gutenberg
+	 * repository. Forks and private mirrors are not configured on the service.
+	 */
+	disableUpload: process.env.GITHUB_REPOSITORY !== 'WordPress/gutenberg',
+};
+
 const config = defineConfig( {
 	...baseConfig,
 	webServer: {
@@ -28,20 +47,9 @@ const config = defineConfig( {
 				[ 'github' ],
 				[ './config/flaky-tests-reporter.ts' ],
 				[ 'blob' ],
-				/*
-				 * Only interact with flakiness.io for the official WordPress/Gutenberg
-				 * repository. Forks and private mirrors are not configured on the service.
-				 */
-				...( process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
-					? ( [
-							[
-								'@flakiness/playwright',
-								{ flakinessProject: 'WordPress/gutenberg' },
-							],
-					  ] as const )
-					: [] ),
+				[ '@flakiness/playwright', flakinessOptions ],
 		  ]
-		: 'list',
+		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
