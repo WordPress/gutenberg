@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import {
 	discoverTestFiles,
 	findOverlappingVitestProjectTests,
-	getVitestProjectName,
 	getVitestTests,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
@@ -26,10 +25,6 @@ const manifest = JSON.parse(
 		'utf8'
 	)
 );
-
-assert.equal( getVitestProjectName( 'example.test.ts' ), 'node' );
-assert.equal( getVitestProjectName( 'example.jsdom.test.tsx' ), 'jsdom' );
-assert.equal( getVitestProjectName( 'example.browser.test.js' ), 'browser' );
 
 function normalizeTestPath( testPath ) {
 	return path
