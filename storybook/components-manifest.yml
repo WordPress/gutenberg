@@ -316,6 +316,7 @@
             - style
       - name: CollapsibleCard.Header
         props:
+            - aria-describedby
             - children
             - className
             - render
