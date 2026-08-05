@@ -219,21 +219,19 @@ export const WithHeadingElement: Story = {
  * relationship. Multiple descriptions are announced in render order.
  */
 export const WithHeaderDescription: Story = {
-	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
-	// used together — disable the `open` control to avoid confusion.
-	argTypes: { open: { control: false } },
-	args: {
-		defaultOpen: true,
+	argTypes: {
+		open: { control: false },
+		defaultOpen: { control: false },
+		onOpenChange: { control: false },
 	},
-	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
+	render: ( {
+		open: _open,
+		defaultOpen: _defaultOpen,
+		onOpenChange: _onOpenChange,
+		...restArgs
+	} ) => (
 		<Stack direction="column" gap="lg">
-			<CollapsibleCard.Root
-				open={ open }
-				defaultOpen={ defaultOpen }
-				onOpenChange={ onOpenChange }
-				disabled={ disabled }
-				{ ...restArgs }
-			>
+			<CollapsibleCard.Root defaultOpen { ...restArgs }>
 				<CollapsibleCard.Header>
 					<Stack justify="space-between">
 						<Card.Title>Settings</Card.Title>
@@ -249,13 +247,7 @@ export const WithHeaderDescription: Story = {
 					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
-			<CollapsibleCard.Root
-				open={ open }
-				defaultOpen={ defaultOpen }
-				onOpenChange={ onOpenChange }
-				disabled={ disabled }
-				{ ...restArgs }
-			>
+			<CollapsibleCard.Root defaultOpen { ...restArgs }>
 				<CollapsibleCard.Header>
 					<Stack direction="column" gap="sm">
 						<Stack justify="space-between">
