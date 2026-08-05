@@ -26,8 +26,7 @@ export default function useListViewCollapseItems( { updateExpansion } ) {
 		if ( expandedBlock ) {
 			const blockParents = getBlockParents( expandedBlock, false );
 			// Collapse all blocks and expand the block's parents.
-			updateExpansion( { type: 'clear' } );
-			updateExpansion( { type: 'expand', clientIds: blockParents } );
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		}
 	}, [ updateExpansion, expandedBlock, getBlockParents ] );
 }
