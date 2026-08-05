@@ -18,7 +18,7 @@ const DEFAULT_TAG = <div />;
  * Multiple header descriptions are combined in render order into the
  * trigger's accessible description. Pass `id` to control the ID used in
  * that relationship; otherwise, an ID is generated automatically.
- * Uses small body typography and a weak neutral text color by default.
+ * Uses medium body typography and a weak neutral text color by default.
  *
  * Avoid interactive elements (buttons, links, inputs) inside this
  * component — the entire header is the toggle trigger.
@@ -48,7 +48,7 @@ export const HeaderDescription = forwardRef<
 	return (
 		<Text
 			ref={ ref }
-			variant="body-sm"
+			variant="body-md"
 			render={ render }
 			id={ descriptionId }
 			aria-hidden="true"
