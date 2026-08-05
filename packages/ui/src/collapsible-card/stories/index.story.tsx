@@ -203,7 +203,7 @@ export const WithHeadingElement: Story = {
 /**
  * A collapsible card with `HeaderDescription` components that provide
  * supplementary information (e.g. status, summary) as an `aria-describedby`
- * relationship. Multiple descriptions are announced in render order.
+ * relationship. The examples show inline and second-row layouts.
  */
 export const WithHeaderDescription: Story = {
 	argTypes: {
@@ -237,12 +237,7 @@ export const WithHeaderDescription: Story = {
 			<CollapsibleCard.Root { ...restArgs }>
 				<CollapsibleCard.Header>
 					<Stack direction="column" gap="sm">
-						<Stack justify="space-between" align="center">
-							<Card.Title>Settings</Card.Title>
-							<CollapsibleCard.HeaderDescription>
-								3 items configured
-							</CollapsibleCard.HeaderDescription>
-						</Stack>
+						<Card.Title>Settings</Card.Title>
 						<CollapsibleCard.HeaderDescription>
 							Review your settings here.
 						</CollapsibleCard.HeaderDescription>
@@ -250,8 +245,8 @@ export const WithHeaderDescription: Story = {
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<BodyText>
-						This header uses two descriptions in different rows.
-						Assistive technologies announce both after the button
+						This header renders its description below the title.
+						Assistive technologies announce it after the button
 						label.
 					</BodyText>
 				</CollapsibleCard.Content>
