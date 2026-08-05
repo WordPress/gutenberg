@@ -229,8 +229,7 @@ export const WithHeaderDescription: Story = {
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<BodyText>
-						This header uses one description. Assistive technologies
-						announce it after the button label.
+						The description appears next to the title.
 					</BodyText>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
@@ -245,9 +244,7 @@ export const WithHeaderDescription: Story = {
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<BodyText>
-						This header renders its description below the title.
-						Assistive technologies announce it after the button
-						label.
+						The description appears below the title.
 					</BodyText>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
