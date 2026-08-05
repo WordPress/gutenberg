@@ -3,8 +3,10 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 
 /**
@@ -57,6 +59,9 @@ export default function SavePublishPanels( {
 		[]
 	);
 
+	const instanceId = useInstanceId( SavePublishPanels );
+	const saveButtonDescriptionId = `editor-save-publish-panels__save-button-description-${ instanceId }`;
+
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
 	let unmountableContent;
@@ -91,11 +96,19 @@ export default function SavePublishPanels( {
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 					aria-haspopup="dialog"
+					aria-describedby={
+						isDirty ? undefined : saveButtonDescriptionId
+					}
 					disabled={ ! isDirty }
 					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>
+				{ ! isDirty && (
+					<VisuallyHidden id={ saveButtonDescriptionId }>
+						{ __( 'No changes to save.' ) }
+					</VisuallyHidden>
+				) }
 			</div>
 		);
 	}
