@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-// @ts-expect-error `hpq` does not ship type declarations.
 import { parse as hpqParse } from 'hpq';
+import type { MatcherObj } from 'hpq';
 import memoize from 'memize';
 
 /**
@@ -39,9 +39,9 @@ import type { BlockAttribute, BlockType } from '../../types';
  * @return Enhanced hpq matcher.
  */
 export const toBooleanAttributeMatcher =
-	( matcher: ( value: unknown ) => unknown ) =>
-	( value: unknown ): boolean =>
-		matcher( value ) !== undefined;
+	( matcher: ( domNode: Element ) => unknown ) =>
+	( domNode: Element ): boolean =>
+		matcher( domNode ) !== undefined;
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -205,12 +205,12 @@ export const matcherFromSource = memoize(
 	): ( ( domNode: Element ) => unknown ) | undefined => {
 		switch ( sourceConfig.source ) {
 			case 'attribute': {
-				let matcher = attr(
+				const matcher = attr(
 					sourceConfig.selector,
-					sourceConfig.attribute
+					sourceConfig.attribute!
 				);
 				if ( sourceConfig.type === 'boolean' ) {
-					matcher = toBooleanAttributeMatcher( matcher );
+					return toBooleanAttributeMatcher( matcher );
 				}
 				return matcher;
 			}
@@ -228,6 +228,11 @@ export const matcherFromSource = memoize(
 			case 'node':
 				return node( sourceConfig.selector );
 			case 'query':
+				/*
+				 * Sub-matchers may be undefined for unknown source types. hpq
+				 * tolerates this and matches such keys as undefined, but its
+				 * types don't allow for it.
+				 */
 				const subMatchers = Object.fromEntries(
 					Object.entries( sourceConfig.query! ).map(
 						( [ key, subSourceConfig ] ) => [
@@ -235,12 +240,12 @@ export const matcherFromSource = memoize(
 							matcherFromSource( subSourceConfig ),
 						]
 					)
-				);
-				return query( sourceConfig.selector, subMatchers );
+				) as MatcherObj;
+				return query( sourceConfig.selector!, subMatchers );
 			case 'tag': {
 				const matcher = prop( sourceConfig.selector, 'nodeName' );
-				return ( domNode: Node ) =>
-					( matcher( domNode ) as string )?.toLowerCase();
+				return ( domNode: Element ) =>
+					matcher( domNode )?.toLowerCase();
 			}
 			default:
 				// eslint-disable-next-line no-console
@@ -259,8 +264,8 @@ export const matcherFromSource = memoize(
  *
  * @return Parsed DOM node.
  */
-function parseHtml( innerHTML: string | Node ): Node {
-	return hpqParse( innerHTML, ( h: Node ) => h );
+function parseHtml( innerHTML: string | Node ): Element {
+	return hpqParse( innerHTML as string | Element, ( h: Element ) => h );
 }
 
 /**
