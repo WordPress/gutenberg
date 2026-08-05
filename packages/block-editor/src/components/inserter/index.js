@@ -197,7 +197,7 @@ const UnforwardedInserter = (
 	function insertOnlyAllowedBlock() {
 		const blockName = blockToInsert?.name ?? allowedBlockType.name;
 
-		function getAdjacentBlockAttributes( attributesToCopy ) {
+		function getAdjacentBlockAttributes() {
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
 			// an existing block, otherwise the last child of the root.
@@ -218,11 +218,7 @@ const UnforwardedInserter = (
 				}
 			}
 
-			return getSiblingBlockAttributes(
-				blockName,
-				adjacentAttributes,
-				attributesToCopy
-			);
+			return getSiblingBlockAttributes( blockName, adjacentAttributes );
 		}
 
 		function getInsertionIndex() {
@@ -248,9 +244,7 @@ const UnforwardedInserter = (
 		// Attempt to augment the inserted block with attributes from an adjacent block.
 		// This ensures styling from nearby blocks is preserved in the newly inserted block.
 		// See: https://github.com/WordPress/gutenberg/issues/37904
-		const newAttributes = getAdjacentBlockAttributes(
-			blockToInsert?.attributesToCopy
-		);
+		const newAttributes = getAdjacentBlockAttributes();
 
 		const newBlock = createBlock( blockName, {
 			...blockToInsert?.attributes,

@@ -1913,8 +1913,7 @@ export const insertBeforeBlock =
 			...( select.getBlockName( clientId ) === directInsertBlock.name
 				? getSiblingBlockAttributes(
 						directInsertBlock.name,
-						select.getBlockAttributes( clientId ),
-						directInsertBlock.attributesToCopy
+						select.getBlockAttributes( clientId )
 				  )
 				: {} ),
 		} );
@@ -1952,8 +1951,7 @@ export const insertAfterBlock =
 			...( select.getBlockName( clientId ) === directInsertBlock.name
 				? getSiblingBlockAttributes(
 						directInsertBlock.name,
-						select.getBlockAttributes( clientId ),
-						directInsertBlock.attributesToCopy
+						select.getBlockAttributes( clientId )
 				  )
 				: {} ),
 		} );
