@@ -578,15 +578,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Disable server-side EXIF rotation so the client can handle it.
 			// This preserves the original orientation value in the metadata.
 			add_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
-			/*
-			 * Disable server-side "big image" downscaling; the client supplies
-			 * its own scaled version through the sideload endpoint. Scaling
-			 * here would create a conflicting `-scaled` file and orphan the
-			 * full-size upload. Uses the same callback and priority as
-			 * WP_REST_Attachments_Controller::create_item() so the two
-			 * registrations collapse into one on WordPress versions that
-			 * apply it themselves.
-			 */
+			// Disable server-side "big image" downscaling; the client supplies its
+			// own scaled version via the sideload endpoint. Scaling here would
+			// create a conflicting "-scaled" file and orphan the full-size upload.
 			add_filter( 'big_image_size_threshold', '__return_false', 100 );
 		}
 
