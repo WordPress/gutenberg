@@ -5,6 +5,7 @@
 .widget-chrome {
 	display: flex;
 	flex-direction: column;
+	--wp-ui-card-padding: var(--wpds-dimension-padding-lg);
 }
 
 /* Outward tile focus ring; paint space reserved on `.grid`. */

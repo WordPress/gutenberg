@@ -9,6 +9,8 @@
 
 ### Enhancements
 
+-   Widget chrome, picker preview chrome, and the lifted toolbar overlay: tile
+    padding is now 16px instead of the `Card` default of 24px ([#81207](https://github.com/WordPress/gutenberg/pull/81207)).
 -   Widget chrome and picker preview chrome: preserve their flex-column layout
     when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
 -   Widget settings: use the `drawerRight` icon for the per-tile settings

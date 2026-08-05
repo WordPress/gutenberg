@@ -56,14 +56,14 @@
 	margin-inline-start: auto;
 }
 
-/* Floats over the tile; re-declares card padding outside Card.Root. */
+/* Floats over the tile; re-declares the tile's card padding outside Card.Root. */
 .overlay {
 	position: absolute;
 	inset-block-start: 0;
 	inset-inline: 0;
 	z-index: 1;
 	pointer-events: none;
-	--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+	--wp-ui-card-padding: var(--wpds-dimension-padding-lg);
 }
 
 .overlay .toolbar {

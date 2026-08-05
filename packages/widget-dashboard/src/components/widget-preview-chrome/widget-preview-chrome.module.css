@@ -25,4 +25,5 @@
 	flex-direction: column;
 	height: 100%;
 	min-height: 0;
+	--wp-ui-card-padding: var(--wpds-dimension-padding-lg);
 }
