@@ -1313,7 +1313,9 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selectionStart.clientId === clientId;
+	// Both sides are `undefined` when nothing is selected and the caller
+	// passes an optional client ID.
+	return !! clientId && selectionStart.clientId === clientId;
 }
 
 /**
