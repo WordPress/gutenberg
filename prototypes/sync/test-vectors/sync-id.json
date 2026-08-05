@@ -1,0 +1,97 @@
+{
+	"description": "Frozen cross-language vectors for the genesis syncId function: base64url(sha256(utf8(canonicalInput))[0..16)). Every implementation must reproduce these exactly.",
+	"hash": "sha256, first 16 bytes, base64url (unpadded)",
+	"vectors": [
+		{
+			"postId": 1,
+			"revisionId": 1,
+			"path": [],
+			"canonicalInput": "1:1:",
+			"syncId": "Nqh-IiHxVpuCHJ0WoDsH9w"
+		},
+		{
+			"postId": 1,
+			"revisionId": 1,
+			"path": [ 0 ],
+			"canonicalInput": "1:1:0",
+			"syncId": "kTCxVVDHoBpM2g1MlciXww"
+		},
+		{
+			"postId": 1,
+			"revisionId": 1,
+			"path": [ 1 ],
+			"canonicalInput": "1:1:1",
+			"syncId": "m04_pCqCeOaI2UpdpDWLLw"
+		},
+		{
+			"postId": 1,
+			"revisionId": 1,
+			"path": [ 0, 0 ],
+			"canonicalInput": "1:1:0.0",
+			"syncId": "sp9yxOOkP-j_4U54CQ5uUA"
+		},
+		{
+			"postId": 1,
+			"revisionId": 1,
+			"path": [ 0, 1, 2 ],
+			"canonicalInput": "1:1:0.1.2",
+			"syncId": "wxC8Mvyu7abdrc1z5i6KCA"
+		},
+		{
+			"postId": 1,
+			"revisionId": 2,
+			"path": [ 0 ],
+			"canonicalInput": "1:2:0",
+			"syncId": "3nfWmBTBtSXzzMSeJI_G8A"
+		},
+		{
+			"postId": 2,
+			"revisionId": 1,
+			"path": [ 0 ],
+			"canonicalInput": "2:1:0",
+			"syncId": "Z3rxfo78YMwpXBJ7Pui7wQ"
+		},
+		{
+			"postId": 123456789,
+			"revisionId": 987654321,
+			"path": [ 42 ],
+			"canonicalInput": "123456789:987654321:42",
+			"syncId": "8b4lVDqLt0gAL_BAOFiYnA"
+		},
+		{
+			"postId": 0,
+			"revisionId": 0,
+			"path": [ 0 ],
+			"canonicalInput": "0:0:0",
+			"syncId": "6Mor1RKT1kolj6BtYYCdJg"
+		},
+		{
+			"postId": 7,
+			"revisionId": 3,
+			"path": [ 2 ],
+			"canonicalInput": "7:3:2",
+			"syncId": "yT8FEHCTnN7jfBkDOi4YtQ"
+		},
+		{
+			"postId": 7,
+			"revisionId": 3,
+			"path": [ 0, 2 ],
+			"canonicalInput": "7:3:0.2",
+			"syncId": "K32MTkPqRjA8riwrthTJ9A"
+		},
+		{
+			"postId": 7,
+			"revisionId": 3,
+			"path": [ 0, 2, 0 ],
+			"canonicalInput": "7:3:0.2.0",
+			"syncId": "KaV2-vO5idCB2pGrHaT_8g"
+		},
+		{
+			"postId": 99,
+			"revisionId": 100,
+			"path": [ 3, 1, 4, 1, 5, 9, 2, 6 ],
+			"canonicalInput": "99:100:3.1.4.1.5.9.2.6",
+			"syncId": "htDaGwPGmr9FPmOHdS6fHw"
+		}
+	]
+}
