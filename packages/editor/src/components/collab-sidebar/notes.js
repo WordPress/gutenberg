@@ -106,7 +106,11 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
 
-		await onDelete( note );
+		const deleted = await onDelete( note );
+		// Leave the selection alone when the delete failed; the note is still there.
+		if ( ! deleted ) {
+			return;
+		}
 
 		if ( note.parent !== 0 ) {
 			// Move focus to the parent thread when a reply was deleted.

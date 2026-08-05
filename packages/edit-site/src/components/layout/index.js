@@ -104,7 +104,6 @@ function Layout() {
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
-				ref={ navigateRegionsProps.ref }
 				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,

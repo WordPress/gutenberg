@@ -104,18 +104,21 @@ export function Overlay( {
 		resizeObserverRef,
 	] );
 
-	// Track cursor element refs for registry registration.
+	// Track cursor and highlight avatar element refs for registry registration.
 	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
 
-	// Keep the registry in sync whenever the rendered cursors change.
+	// Keep the registry in sync whenever cursors or highlights change.
 	useEffect( () => {
 		if ( ! cursorRegistry ) {
 			return;
 		}
 		const refs = cursorRefsMap.current;
-		const currentIds = new Set( cursors.map( ( c ) => c.clientId ) );
+		const currentIds = new Set( [
+			...cursors.map( ( c ) => c.clientId ),
+			...highlights.map( ( h ) => h.clientId ),
+		] );
 
-		// Unregister cursors that are no longer rendered.
+		// Unregister elements that are no longer rendered.
 		for ( const id of refs.keys() ) {
 			if ( ! currentIds.has( id ) ) {
 				cursorRegistry.unregisterCursor( id );
@@ -123,13 +126,13 @@ export function Overlay( {
 			}
 		}
 
-		// Register or update cursors that are currently rendered.
+		// Register or update elements that are currently rendered.
 		for ( const [ id, el ] of refs.entries() ) {
 			cursorRegistry.registerCursor( id, el );
 		}
 
 		return () => cursorRegistry.removeAll();
-	}, [ cursors, cursorRegistry ] );
+	}, [ cursors, highlights, cursorRegistry ] );
 
 	// Callback ref factory to capture each cursor's DOM element.
 	const setCursorRef = useCallback(
@@ -164,49 +167,56 @@ export function Overlay( {
 								} }
 							/>
 						) ) }
-					<div
-						ref={ setCursorRef( cursor.clientId ) }
-						className="collaborators-overlay-user"
-						style={ {
-							left: `${ cursor.x }px`,
-							top: `${ cursor.y }px`,
-						} }
-					>
-						{ ! cursor.isMe && (
-							<div
-								className="collaborators-overlay-user-cursor"
-								style={ {
-									backgroundColor: cursor.color,
-									height: `${ cursor.height }px`,
-								} }
+					{ cursor.x !== undefined && (
+						<div
+							ref={ setCursorRef( cursor.clientId ) }
+							className="collaborators-overlay-user"
+							style={ {
+								left: `${ cursor.x }px`,
+								top: `${ cursor.y }px`,
+							} }
+						>
+							{ ! cursor.isMe && (
+								<div
+									className="collaborators-overlay-user-cursor"
+									style={ {
+										backgroundColor: cursor.color,
+										height: `${ cursor.height }px`,
+									} }
+								/>
+							) }
+							<Avatar
+								className="collaborators-overlay-user-label"
+								variant="badge"
+								size="small"
+								src={ cursor.avatarUrl }
+								name={ cursor.userName }
+								label={ cursor.isMe ? __( 'You' ) : undefined }
+								borderColor={ cursor.color }
 							/>
-						) }
-						<Avatar
-							className="collaborators-overlay-user-label"
-							variant="badge"
-							size="small"
-							src={ cursor.avatarUrl }
-							name={ cursor.userName }
-							label={ cursor.isMe ? __( 'You' ) : undefined }
-							borderColor={ cursor.color }
-						/>
-					</div>
+						</div>
+					) }
 				</div>
 			) ) }
 			{ highlights.map( ( highlight ) => (
-				<Avatar
+				<div
 					key={ highlight.blockId }
-					className="collaborators-overlay-block-label"
-					variant="badge"
-					size="small"
-					src={ highlight.avatarUrl }
-					name={ highlight.userName }
-					borderColor={ highlight.color }
+					ref={ setCursorRef( highlight.clientId ) }
 					style={ {
+						position: 'absolute',
 						left: `${ highlight.x }px`,
 						top: `${ highlight.y }px`,
 					} }
-				/>
+				>
+					<Avatar
+						className="collaborators-overlay-block-label"
+						variant="badge"
+						size="small"
+						src={ highlight.avatarUrl }
+						name={ highlight.userName }
+						borderColor={ highlight.color }
+					/>
+				</div>
 			) ) }
 		</div>
 	);

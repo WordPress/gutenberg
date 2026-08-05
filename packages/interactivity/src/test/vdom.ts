@@ -31,7 +31,7 @@ expect.extend( {
 
 describe( 'toVdom', () => {
 	beforeEach( () => {
-		// @ts-ignore - Accessing private property for testing.
+		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
 	} );
 

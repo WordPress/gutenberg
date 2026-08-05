@@ -19,7 +19,7 @@ const withInstanceId = createHigherOrderComponent(
 	) => {
 		return ( props: WithoutInjectedProps< C, InstanceIdProps > ) => {
 			const instanceId = useInstanceId( WrappedComponent );
-			// @ts-ignore
+			// @ts-expect-error `LibraryManagedAttributes` cannot see the injected `instanceId` prop.
 			return <WrappedComponent { ...props } instanceId={ instanceId } />;
 		};
 	},

@@ -28,4 +28,31 @@ test.describe( 'Post Title block', () => {
 		await expect( titleBlock ).toBeVisible();
 		await expect( titleBlock ).toHaveText( 'Just tweaking the post title' );
 	} );
+
+	test( 'should not insert a block on Enter at the end of the title in a locked template', async ( {
+		editor,
+		page,
+	} ) => {
+		// A parent with `templateLock` makes the editor pass an undefined
+		// `insertBlocksAfter` prop to the inner blocks.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { templateLock: 'all' },
+			innerBlocks: [ { name: 'core/post-title' } ],
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Title' } )
+			.click();
+		await page.keyboard.type( 'Hello' );
+		await page.keyboard.press( 'Enter' );
+
+		// No block should have been inserted after the title.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [ { name: 'core/post-title' } ],
+			},
+		] );
+	} );
 } );

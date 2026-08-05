@@ -51,6 +51,7 @@ export default function TypographyPanel( {
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
+			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }

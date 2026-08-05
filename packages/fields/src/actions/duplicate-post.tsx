@@ -98,7 +98,7 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
+					// @ts-expect-error `property` is a dynamic string key on both objects.
 					newItemObject[ property ] = item[ property ];
 				}
 			} );
