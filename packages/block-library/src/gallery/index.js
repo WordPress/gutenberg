@@ -41,6 +41,7 @@ export const settings = {
 	},
 	transforms,
 	variations,
+	defaultBlock: { name: 'core/image' },
 	edit,
 	save,
 	deprecated,

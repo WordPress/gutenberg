@@ -43,7 +43,6 @@ import {
 	selectLabelText,
 } from './shared';
 
-const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
@@ -341,7 +340,6 @@ export default function NavigationLinkEdit( {
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
-			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 			renderAppender: false,
 		}

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block types support a `defaultBlock` setting describing the default child block, as `{ name, attributes, attributesToCopy }`. It replaces the `defaultBlock` option of `InnerBlocks`/`useInnerBlocksProps`.
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

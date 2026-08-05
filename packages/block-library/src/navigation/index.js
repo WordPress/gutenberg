@@ -11,6 +11,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
+import { DEFAULT_BLOCK } from './constants';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -53,6 +54,7 @@ export const settings = {
 			},
 		],
 	},
+	defaultBlock: DEFAULT_BLOCK,
 	edit,
 	save,
 	__experimentalLabel: ( { ref } ) => {

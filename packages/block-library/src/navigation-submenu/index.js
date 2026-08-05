@@ -9,6 +9,7 @@ import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -44,6 +45,7 @@ export const settings = {
 
 		return label;
 	},
+	defaultBlock: DEFAULT_BLOCK,
 	edit,
 	example: {
 		attributes: {

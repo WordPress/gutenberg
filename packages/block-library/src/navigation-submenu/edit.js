@@ -47,7 +47,6 @@ import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
-import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -274,7 +273,6 @@ export default function NavigationSubmenuEdit( {
 		getNavigationChildBlockProps( innerBlocksColors );
 	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
 		allowedBlocks,
-		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 
 		// Ensure block toolbar is not too far removed from item

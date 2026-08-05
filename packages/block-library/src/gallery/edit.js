@@ -119,7 +119,6 @@ const PLACEHOLDER_TEXT = __(
 	'Drag and drop images, upload, or choose from your library.'
 );
 
-const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 export default function GalleryEdit( props ) {
@@ -647,7 +646,6 @@ export default function GalleryEdit( props ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,

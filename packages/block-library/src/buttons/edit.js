@@ -8,10 +8,6 @@ import clsx from 'clsx';
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-const DEFAULT_BLOCK = {
-	name: 'core/button',
-};
-
 function ButtonsEdit( { attributes, className } ) {
 	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
@@ -21,7 +17,6 @@ function ButtonsEdit( { attributes, className } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );
 

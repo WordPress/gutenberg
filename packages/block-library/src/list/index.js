@@ -49,6 +49,7 @@ const settings = {
 	transforms,
 	template: TEMPLATE,
 	templateInsertUpdatesSelection: true,
+	defaultBlock: { name: 'core/list-item' },
 	edit,
 	save,
 	deprecated,

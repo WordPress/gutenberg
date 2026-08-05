@@ -43,10 +43,6 @@ import {
 } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const DEFAULT_BLOCK = {
-	name: 'core/column',
-};
-
 function ColumnInspectorControls( {
 	clientId,
 	setAttributes,
@@ -218,7 +214,6 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		className: classes,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,

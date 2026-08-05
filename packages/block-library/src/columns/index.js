@@ -80,6 +80,7 @@ export const settings = {
 		],
 	},
 	deprecated,
+	defaultBlock: { name: 'core/column' },
 	edit,
 	save,
 	transforms,

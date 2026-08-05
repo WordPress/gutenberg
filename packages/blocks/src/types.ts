@@ -305,6 +305,15 @@ export interface BlockType<
 	 */
 	templateInsertUpdatesSelection?: boolean;
 	/**
+	 * The default child block, created when appending into the block, as
+	 * `{ name, attributes, attributesToCopy }`.
+	 */
+	defaultBlock?: {
+		name: string;
+		attributes?: Record< string, unknown >;
+		attributesToCopy?: string[];
+	};
+	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
 	 * a context name to one of the block's own attributes.

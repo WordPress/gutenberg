@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -77,12 +78,23 @@ function UncontrolledInnerBlocks( props ) {
 		defaultLayout,
 	} = props;
 
+	if ( defaultBlock !== undefined ) {
+		deprecated(
+			'The defaultBlock prop of InnerBlocks and useInnerBlocksProps',
+			{
+				since: '7.2',
+				alternative:
+					'`defaultBlock` declared in the block type settings',
+			}
+		);
+	}
+
 	useNestedSettingsUpdate(
 		clientId,
 		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
-		defaultBlock,
+		defaultBlock ?? blockType?.defaultBlock,
 		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,

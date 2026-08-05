@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `InnerBlocks`/`useInnerBlocksProps`: The `defaultBlock` option is deprecated. Declare `defaultBlock` in the block type settings instead.
+
 ### Enhancements
 
 -   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.

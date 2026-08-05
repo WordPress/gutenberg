@@ -29,10 +29,6 @@ import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
 
-const DEFAULT_BLOCK = {
-	name: 'core/list-item',
-};
-
 /**
  * At the moment, deprecations don't handle create blocks from attributes
  * (like when using CPT templates). For this reason, this hook is necessary
@@ -135,7 +131,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		templateLock: false,
 		__experimentalCaptureToolbars: true,

@@ -52,6 +52,7 @@ export const settings = {
 	},
 	template: TEMPLATE,
 	templateInsertUpdatesSelection: true,
+	defaultBlock: { name: 'core/accordion-item' },
 	edit,
 	save,
 };

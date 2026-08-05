@@ -44,6 +44,7 @@ export const settings = {
 	transforms,
 	template: TEMPLATE,
 	templateInsertUpdatesSelection: true,
+	defaultBlock: { name: 'core/button' },
 	edit,
 	save,
 };

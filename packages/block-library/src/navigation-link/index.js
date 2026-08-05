@@ -52,6 +52,7 @@ export const settings = {
 		};
 	},
 
+	defaultBlock: { name: 'core/navigation-link' },
 	edit,
 
 	save,

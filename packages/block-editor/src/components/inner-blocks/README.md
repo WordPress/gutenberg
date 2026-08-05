@@ -190,6 +190,8 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 ### `defaultBlock`
 
+-   **Deprecated:** Declare `defaultBlock` in the block type settings passed to `registerBlockType` instead.
+
 - **Type:** `Object`
 - **Default:** - `undefined`
 

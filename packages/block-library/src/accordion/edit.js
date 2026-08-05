@@ -30,9 +30,6 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
 const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
-const ACCORDION_BLOCK = {
-	name: ACCORDION_BLOCK_NAME,
-};
 
 export default function Edit( {
 	attributes: {
@@ -58,7 +55,6 @@ export default function Edit( {
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
 	} );
 
