@@ -6,12 +6,13 @@
 # Setup
 nvm use                    # Use the required node version
 npm install && composer install
-npm run wp-env status      # Always check status first.
-npm run wp-env start       # Only start if not already running.
+npm run wp-env-test status      # Always check status first.
+npm run wp-env-test start       # Only start if not already running.
 
 # Development
 npm start     # Development with watch
 npm run build # Production build
+npm run build -- --skip-types # Faster build; skips type generation
 ```
 
 ### Key Directories
