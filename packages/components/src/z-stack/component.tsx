@@ -14,6 +14,7 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
+import { PolymorphicElement } from '../utils/polymorphic-element';
 import styles from './style.module.scss';
 import type { ZStackProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -57,7 +58,7 @@ function UnconnectedZStack(
 	} );
 
 	return (
-		<div
+		<PolymorphicElement
 			{ ...otherProps }
 			className={ clsx(
 				styles[ 'z-stack' ],
@@ -67,7 +68,7 @@ function UnconnectedZStack(
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }
-		</div>
+		</PolymorphicElement>
 	);
 }
 

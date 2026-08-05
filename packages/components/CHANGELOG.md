@@ -19,6 +19,7 @@
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
+    -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
 
 ### Internal
 
