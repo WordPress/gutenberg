@@ -60,6 +60,8 @@ function useShallowMemo( value ) {
  * @param {string}               orientation                The direction in which the block
  *                                                          should face.
  * @param {Object}               layout                     The layout object for the block container.
+ * @param {?boolean}             defaultAppender            Whether the block renders the default
+ *                                                          appender: no `renderAppender` was passed.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
@@ -73,7 +75,8 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	layout
+	layout,
+	defaultAppender
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -101,6 +104,11 @@ export default function useNestedSettingsUpdate(
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
 			templateLock: _templateLock,
 		};
+
+		// Not defined for RN, so only include the value when defined.
+		if ( defaultAppender !== undefined ) {
+			newSettings.defaultAppender = defaultAppender;
+		}
 
 		// These values are not defined for RN, so only include them if they
 		// are defined.
@@ -177,6 +185,7 @@ export default function useNestedSettingsUpdate(
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
 		_templateLock,
+		defaultAppender,
 		defaultBlock,
 		directInsert,
 		__experimentalDefaultBlock,
