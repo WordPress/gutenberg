@@ -76,8 +76,8 @@ function ListViewBlockSelectButton(
 			const attributes = getBlockAttributes( clientId );
 			const blockName = getBlockName( clientId );
 
-			// A block that came from a pattern is displayed as a pattern,
-			// matching the identity `useBlockDisplayInformation` returns.
+			// Pattern-sourced section blocks show the pattern icon.
+			// Everything else resolves its variation or block type icon.
 			let blockIcon = symbol;
 			if (
 				! attributes?.metadata?.patternName ||
