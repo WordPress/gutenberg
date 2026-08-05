@@ -2,12 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   `IconButton`: Require shortcut metadata to include a human-readable label and render it as an accessible description. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
-
 ### Enhancements
 
+-   `IconButton`: Add an accessible shortcut description with an optional human-readable label, falling back to the ARIA-compatible shortcut value. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 

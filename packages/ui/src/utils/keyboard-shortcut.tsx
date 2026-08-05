@@ -19,10 +19,11 @@ export type KeyboardShortcut = {
 	ariaKeyShortcut: string;
 
 	/**
-	 * The plain-text label for the shortcut, used in its accessible description
-	 * (e.g., "Command Shift S").
+	 * An optional plain-text label for the shortcut, used in its accessible
+	 * description (e.g., "Command Shift S"). When omitted, `ariaKeyShortcut`
+	 * is used instead.
 	 */
-	label: string;
+	label?: string;
 };
 
 type ShortcutAriaProps = Pick<
@@ -64,9 +65,9 @@ function KeyboardShortcutDescription( {
 			render={ <span /> }
 		>
 			{ sprintf(
-				/* translators: %s: human-readable keyboard shortcut. */
+				/* translators: %s: keyboard shortcut. */
 				__( 'Keyboard shortcut: %s' ),
-				shortcut.label
+				shortcut.label ?? shortcut.ariaKeyShortcut
 			) }
 		</VisuallyHidden>
 	);

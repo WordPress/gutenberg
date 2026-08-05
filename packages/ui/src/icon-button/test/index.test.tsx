@@ -67,7 +67,7 @@ describe( 'IconButton', () => {
 	} );
 
 	describe( 'shortcut', () => {
-		it( 'uses shortcut metadata for the button and its accessible description', () => {
+		it( 'uses ariaKeyShortcut as the accessible-description fallback when label is omitted', () => {
 			const externalDescriptionId = 'external-description';
 
 			const { rerender } = render(
@@ -80,7 +80,6 @@ describe( 'IconButton', () => {
 						shortcut={ {
 							displayShortcut: '⌘S',
 							ariaKeyShortcut: 'Meta+S',
-							label: 'Command S',
 						} }
 					/>
 				</>
@@ -89,7 +88,7 @@ describe( 'IconButton', () => {
 			const button = screen.getByRole( 'button', { name: 'Save' } );
 			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
 			expect( button ).toHaveAccessibleDescription(
-				'Available offline. Keyboard shortcut: Command S'
+				'Available offline. Keyboard shortcut: Meta+S'
 			);
 
 			// The aria-keyshortcuts attribute is removed when there is no
@@ -98,6 +97,26 @@ describe( 'IconButton', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Save' } )
 			).not.toHaveAttribute( 'aria-keyshortcuts' );
+		} );
+
+		it( 'uses the explicit human-readable label when provided', () => {
+			render(
+				<IconButton
+					label="Save"
+					icon={ <svg /> }
+					shortcut={ {
+						displayShortcut: '⌘S',
+						ariaKeyShortcut: 'Meta+S',
+						label: 'Command S',
+					} }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Save',
+				} )
+			).toHaveAccessibleDescription( 'Keyboard shortcut: Command S' );
 		} );
 
 		it( 'displays the shortcut in the tooltip but hides it from assistive technology', async () => {
