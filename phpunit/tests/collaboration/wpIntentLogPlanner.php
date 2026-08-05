@@ -185,4 +185,173 @@ class Tests_Collaboration_WpIntentLogPlanner extends WP_UnitTestCase {
 			);
 		}
 	}
+
+	/**
+	 * Builds an intent envelope for the adversarial-id tests.
+	 *
+	 * @param string $actor    Actor id.
+	 * @param string $id       Intent id.
+	 * @param int    $base_seq Base sequence.
+	 * @param string $type     Intent type.
+	 * @param array  $payload  Payload.
+	 * @param string|null $txn Transaction id.
+	 * @return array Intent envelope.
+	 */
+	private static function intent( string $actor, string $id, int $base_seq, string $type, array $payload, ?string $txn = null ): array {
+		return array(
+			'intentId' => $id,
+			'actorId'  => $actor,
+			'baseSeq'  => $base_seq,
+			'txnId'    => $txn,
+			'type'     => $type,
+			'payload'  => $payload,
+		);
+	}
+
+	/**
+	 * PHP silently casts numeric-string array keys to integers. The frozen
+	 * vectors never contain purely numeric syncIds, so the frame-state maps
+	 * (`broken`, keyed by bare block id) are only exercised here with
+	 * adversarial ids. The lookups must behave identically to the JS engine's
+	 * string-keyed Maps.
+	 */
+	public function test_frame_rules_survive_purely_numeric_sync_ids_in_broken_map() {
+		$server = WP_Intent_Log_Planner::create_server(
+			WP_Intent_Log_Document::create_document(
+				array(
+					array(
+						'syncId'    => '111',
+						'blockType' => 'core/group',
+						'children'  => array(
+							array(
+								'syncId'    => '222',
+								'blockType' => 'core/paragraph',
+								'text'      => 'Numeric ids',
+							),
+						),
+					),
+				)
+			)
+		);
+
+		// alice removes the group; accepted at seq 1.
+		WP_Intent_Log_Planner::server_ingest_batch(
+			$server,
+			array(
+				self::intent( 'alice', 'a-1', 0, 'remove_block', array( 'syncId' => '111' ) ),
+			)
+		);
+
+		// bob, offline from seq 0: inserts a numeric-id block INTO the
+		// deleted group (escalates target-deleted, poisoning created id
+		// '333' in the broken map), then edits the phantom block.
+		$dispositions = WP_Intent_Log_Planner::server_ingest_batch(
+			$server,
+			array(
+				self::intent(
+					'bob',
+					'b-1',
+					0,
+					'insert_block',
+					array(
+						'block'          => array(
+							'syncId'    => '333',
+							'blockType' => 'core/paragraph',
+						),
+						'parentId'       => '111',
+						'afterSiblingId' => null,
+					)
+				),
+				self::intent(
+					'bob',
+					'b-2',
+					0,
+					'insert_text',
+					array(
+						'syncId' => '333',
+						'field'  => 'content',
+						'offset' => 0,
+						'text'   => 'lost',
+					)
+				),
+			)
+		);
+
+		$this->assertSame( 'escalated', $dispositions[0]['status'] );
+		$this->assertSame( 'target-deleted', $dispositions[0]['reason'] );
+		$this->assertSame( 'escalated', $dispositions[1]['status'] );
+		$this->assertSame( 'dependent-on-escalated', $dispositions[1]['reason'] );
+	}
+
+	/**
+	 * A merge writes a bare block-level frame key for the absorbed block.
+	 * With a purely numeric absorbed id that key int-casts in `ownWrites`;
+	 * the overlap check must still match the string field key
+	 * `222::content` of a later intent.
+	 */
+	public function test_frame_rules_survive_purely_numeric_sync_ids_in_own_writes_map() {
+		$server = WP_Intent_Log_Planner::create_server(
+			WP_Intent_Log_Document::create_document(
+				array(
+					array(
+						'syncId'    => '111',
+						'blockType' => 'core/paragraph',
+						'text'      => 'First',
+					),
+					array(
+						'syncId'    => '222',
+						'blockType' => 'core/paragraph',
+						'text'      => 'Second',
+					),
+				)
+			)
+		);
+
+		// alice removes block 222; accepted at seq 1.
+		WP_Intent_Log_Planner::server_ingest_batch(
+			$server,
+			array(
+				self::intent( 'alice', 'a-1', 0, 'remove_block', array( 'syncId' => '222' ) ),
+			)
+		);
+
+		// bob, offline from seq 0: merges 222 into 111 (escalates
+		// target-deleted; ownWrites gains phantom keys including the bare
+		// numeric '222'), then edits 222's content — authored on a frame
+		// containing the phantom merge, so it must follow it into review.
+		$dispositions = WP_Intent_Log_Planner::server_ingest_batch(
+			$server,
+			array(
+				self::intent(
+					'bob',
+					'b-1',
+					0,
+					'merge_blocks',
+					array(
+						'survivorId' => '111',
+						'absorbedId' => '222',
+						'field'      => 'content',
+						'joinOffset' => 5,
+					)
+				),
+				self::intent(
+					'bob',
+					'b-2',
+					0,
+					'insert_text',
+					array(
+						'syncId' => '222',
+						'field'  => 'content',
+						'offset' => 0,
+						'text'   => 'x',
+					)
+				),
+			)
+		);
+
+		$this->assertSame( 'escalated', $dispositions[0]['status'] );
+		$this->assertSame( 'target-deleted', $dispositions[0]['reason'] );
+		$this->assertSame( 'escalated', $dispositions[1]['status'] );
+		$this->assertSame( 'dependent-on-escalated', $dispositions[1]['reason'] );
+	}
 }
