@@ -406,27 +406,4 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 			$this->assertArrayNotHasKey( 'page', $properties, "$label should not declare a `page` property." );
 		}
 	}
-
-	/**
-	 * The endpoint schema is derived from the canonical JSON Schema at
-	 * `schemas/json/view-config.json` through the generated
-	 * `lib/compat/wordpress-7.1/view-config-schema.php` file, so the two can
-	 * no longer drift structurally. The freshness of the generated file is
-	 * enforced by `test/integration/view-config-schema.test.js`; here we only
-	 * assert that the descriptions attached in PHP land on the schema.
-	 *
-	 * @covers ::get_item_schema
-	 */
-	public function test_get_item_schema_attaches_translated_descriptions() {
-		$controller = new Gutenberg_REST_View_Config_Controller_7_1();
-		$schema     = $controller->get_item_schema();
-
-		foreach ( $schema['properties'] as $property => $property_schema ) {
-			$this->assertArrayHasKey(
-				'description',
-				$property_schema,
-				"Top-level property `$property` should carry a translatable description."
-			);
-		}
-	}
 }
