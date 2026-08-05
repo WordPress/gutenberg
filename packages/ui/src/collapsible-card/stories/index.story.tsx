@@ -214,8 +214,9 @@ export const WithHeadingElement: Story = {
 };
 
 /**
- * A collapsible card with a `HeaderDescription` that provides supplementary
- * information (e.g. status, summary) as an `aria-describedby` relationship.
+ * A collapsible card with `HeaderDescription` components that provide
+ * supplementary information (e.g. status, summary) as an `aria-describedby`
+ * relationship. Multiple descriptions are announced in render order.
  */
 export const WithHeaderDescription: Story = {
 	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
@@ -235,23 +236,37 @@ export const WithHeaderDescription: Story = {
 			<CollapsibleCard.Header>
 				<Stack justify="space-between">
 					<Card.Title>Settings</Card.Title>
-					<CollapsibleCard.HeaderDescription>
-						<span
-							style={ {
-								fontSize: 'var(--wpds-typography-font-size-sm)',
-								color: 'var(--wpds-color-foreground-content-neutral-weak)',
-							} }
-						>
-							3 items configured
-						</span>
-					</CollapsibleCard.HeaderDescription>
+					<Stack direction="row" gap="sm">
+						<CollapsibleCard.HeaderDescription>
+							<span
+								style={ {
+									fontSize:
+										'var(--wpds-typography-font-size-sm)',
+									color: 'var(--wpds-color-foreground-content-neutral-weak)',
+								} }
+							>
+								3 items configured
+							</span>
+						</CollapsibleCard.HeaderDescription>
+						<CollapsibleCard.HeaderDescription>
+							<span
+								style={ {
+									fontSize:
+										'var(--wpds-typography-font-size-sm)',
+									color: 'var(--wpds-color-foreground-content-neutral-weak)',
+								} }
+							>
+								Needs review
+							</span>
+						</CollapsibleCard.HeaderDescription>
+					</Stack>
 				</Stack>
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content>
 				<Text>
-					The header description provides supplementary context to the
-					trigger button. Assistive technologies will announce the
-					description alongside the button label.
+					The header descriptions provide supplementary context to the
+					trigger button. Assistive technologies will announce both
+					descriptions after the button label.
 				</Text>
 			</CollapsibleCard.Content>
 		</CollapsibleCard.Root>

@@ -10,6 +10,8 @@ import type { HeaderDescriptionProps } from './types';
  * The content is visually rendered but marked `aria-hidden` so that
  * assistive technologies consume it only through the `aria-describedby`
  * relationship on the trigger, avoiding double announcements.
+ * Multiple header descriptions are combined in render order into the
+ * trigger's accessible description.
  *
  * Avoid interactive elements (buttons, links, inputs) inside this
  * component — the entire header is the toggle trigger.
@@ -22,12 +24,18 @@ export const HeaderDescription = forwardRef<
 	ref
 ) {
 	const descriptionId = useId();
-	const { setDescriptionId } = useContext( HeaderDescriptionIdContext );
+	const context = useContext( HeaderDescriptionIdContext );
+
+	if ( process.env.NODE_ENV !== 'production' && ! context ) {
+		throw new Error(
+			'CollapsibleCard.HeaderDescription: Missing parent <CollapsibleCard.Header>. ' +
+				'Render <CollapsibleCard.HeaderDescription> inside <CollapsibleCard.Header>.'
+		);
+	}
 
 	useEffect( () => {
-		setDescriptionId( descriptionId );
-		return () => setDescriptionId( undefined );
-	}, [ descriptionId, setDescriptionId ] );
+		return context?.registerDescriptionId( descriptionId );
+	}, [ context, descriptionId ] );
 
 	return (
 		<div

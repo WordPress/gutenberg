@@ -43,6 +43,7 @@ export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
 	 * `aria-describedby`. Rendered visually but marked `aria-hidden`
 	 * so assistive technologies consume it only through the description
 	 * relationship, avoiding double announcements.
+	 * Multiple header descriptions are combined in render order.
 	 *
 	 * Avoid interactive elements — the entire header is the toggle trigger.
 	 */

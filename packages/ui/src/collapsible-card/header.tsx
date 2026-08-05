@@ -1,6 +1,6 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { forwardRef, useMemo, useState } from '@wordpress/element';
+import { forwardRef, useCallback, useMemo, useState } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
@@ -33,12 +33,33 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		{ children, className, render, ...restProps },
 		ref
 	) {
-		const [ descriptionId, setDescriptionId ] = useState< string >();
+		const [ descriptionIds, setDescriptionIds ] = useState< string[] >(
+			[]
+		);
+
+		const registerDescriptionId = useCallback( ( id: string ) => {
+			setDescriptionIds( ( currentDescriptionIds ) => {
+				if ( currentDescriptionIds.includes( id ) ) {
+					return currentDescriptionIds;
+				}
+
+				return [ ...currentDescriptionIds, id ];
+			} );
+
+			return () => {
+				setDescriptionIds( ( currentDescriptionIds ) =>
+					currentDescriptionIds.filter(
+						( descriptionId ) => descriptionId !== id
+					)
+				);
+			};
+		}, [] );
 
 		const contextValue = useMemo(
-			() => ( { setDescriptionId } ),
-			[ setDescriptionId ]
+			() => ( { registerDescriptionId } ),
+			[ registerDescriptionId ]
 		);
+		const ariaDescribedBy = descriptionIds.join( ' ' ) || undefined;
 
 		return useRender( {
 			defaultTagName: 'div',
@@ -56,7 +77,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 							className={ styles.header }
 							render={ <Card.Header /> }
 							nativeButton={ false }
-							aria-describedby={ descriptionId }
+							aria-describedby={ ariaDescribedBy }
 						>
 							<div className={ styles[ 'header-content' ] }>
 								{ children }
