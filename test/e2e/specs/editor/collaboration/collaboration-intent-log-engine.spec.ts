@@ -7,6 +7,7 @@ import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+import { SECOND_USER } from './fixtures/collaboration-utils';
 
 /**
  * Two-client collaboration through the intent-log sync engine.
@@ -29,8 +30,43 @@ async function setSyncEngine(
 	} );
 }
 
+/**
+ * Opens a two-user session WITHOUT the presence-based mutual-discovery
+ * gate: the intent-log manager does not implement awareness/presence yet
+ * (tracked in ARCHITECTURE.md), so the collaborators-list UI the shared
+ * fixture waits for never appears. Sessions are instead considered open
+ * once both pages announce the intent-log engine; each spec's own
+ * convergence assertions do the rest.
+ *
+ * @param collaborationUtils Collaboration fixture instance.
+ * @param postId             Post to open.
+ */
+async function openIntentLogSession(
+	collaborationUtils: InstanceType<
+		typeof import('./fixtures/collaboration-utils').default
+	>,
+	postId: number
+) {
+	await collaborationUtils.openPost( postId );
+	await collaborationUtils.joinUser( postId, SECOND_USER );
+	await Promise.all(
+		collaborationUtils.allPages.map( ( page ) =>
+			page.waitForFunction(
+				() =>
+					( window as { _wpCollaborationSync?: { engine?: string } } )
+						._wpCollaborationSync?.engine === 'intent-log',
+				undefined,
+				{ timeout: 10000 }
+			)
+		)
+	);
+}
+
 test.describe( 'Collaboration - intent-log engine', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	// Per TEST, after fixture setup: the collaboration fixture's
+	// writing-form toggle must never be able to wipe the engine selection
+	// between the flip and the pages loading.
+	test.beforeEach( async ( { requestUtils } ) => {
 		await setSyncEngine( requestUtils, 'intent-log' );
 	} );
 
@@ -51,7 +87,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2 } = collaborationUtils;
 
 		// User 1 appends a paragraph.
@@ -109,7 +145,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -163,7 +199,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -219,7 +255,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -228,7 +264,12 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			pageErrors.push( String( error ) )
 		);
 		page2.on( 'console', ( message ) => {
-			if ( 'error' === message.type() ) {
+			// Resource-load 403s are generic editor noise for the second
+			// user's capabilities, not sync errors.
+			if (
+				'error' === message.type() &&
+				! message.text().includes( 'Failed to load resource' )
+			) {
 				pageErrors.push( message.text() );
 			}
 		} );
@@ -262,7 +303,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -289,6 +330,201 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		expect( pageErrors ).toEqual( [] );
 	} );
 
+	test( 'splitting a settled paragraph converges with stable identities while the peer edits the sibling', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// The durable-id split regression: once the stamper has assigned
+		// metadata.syncIds, Gutenberg's split copies ALL attributes — the
+		// syncId included — onto the second half. The head must keep its
+		// identity, the second half must re-mint, and the FOLLOWING block's
+		// identity must survive untouched even while the peer is typing
+		// into it (the stolen-identity bug duplicated content here).
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Durable Split Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await openIntentLogSession( collaborationUtils, post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page1.keyboard.type( 'HelloWorld' );
+		await page1.keyboard.press( 'Enter' );
+		await page1.keyboard.type( 'SecondBlock' );
+
+		// Wait for identity to become DURABLE: both blocks stamped, and the
+		// peer converged on the same ids.
+		const idsOf = async ( targetEditor: typeof editor ) => {
+			const blocks = await targetEditor.getBlocks();
+			return blocks.map(
+				( block ) =>
+					( block.attributes.metadata as { syncId?: string } )?.syncId
+			);
+		};
+		let settledIds: Array< string | undefined > = [];
+		await expect( async () => {
+			settledIds = await idsOf( editor );
+			expect( settledIds ).toHaveLength( 2 );
+			expect( settledIds.every( Boolean ) ).toBe( true );
+			expect( await idsOf( editor2 ) ).toEqual( settledIds );
+		} ).toPass( { timeout: 15000 } );
+
+		// Split the first paragraph mid-text while the peer edits the
+		// second block.
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page1.keyboard.press( 'End' );
+		for ( let i = 0; i < 5; i++ ) {
+			await page1.keyboard.press( 'ArrowLeft' );
+		}
+		await page1.keyboard.press( 'Enter' );
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.nth( 1 )
+			.click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.type( '-B' );
+
+		// Both editors converge on the same 3 blocks with correct texts…
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				expect(
+					blocks.map( ( block ) => block.attributes.content )
+				).toEqual( [ 'Hello', 'World', 'SecondBlock-B' ] );
+			} ).toPass( { timeout: 15000 } );
+		}
+		// …and identities. The engine contract: both editors agree on every
+		// id; the SIBLING's identity survives the split untouched (the
+		// stolen-identity bug landed the peer's edits in the wrong block
+		// here); and the split resolves to exactly one half continuing the
+		// settled identity plus one freshly minted — which half continues
+		// is Gutenberg's split implementation detail, not pinned.
+		await expect( async () => {
+			const ids1 = await idsOf( editor );
+			const ids2 = await idsOf( editor2 );
+			expect( ids1 ).toEqual( ids2 );
+			expect( ids1.every( Boolean ) ).toBe( true );
+			expect( ids1[ 2 ] ).toBe( settledIds[ 1 ] );
+			const halves = [ ids1[ 0 ], ids1[ 1 ] ];
+			expect( halves ).toContain( settledIds[ 0 ] );
+			expect(
+				halves.filter( ( id ) => ! settledIds.includes( id ) )
+			).toHaveLength( 1 );
+		} ).toPass( { timeout: 15000 } );
+	} );
+
+	test( 'splitting immediately while typing (pre-stamp window) converges without duplication', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// The id-less split shape: the capture may run before the stamper
+		// assigns ids, so identity is inferred. Adoption must keep the
+		// following block's identity by content, never positionally.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Fast Split Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await openIntentLogSession( collaborationUtils, post.id );
+		const { editor2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page1.keyboard.type( 'HelloWorld' );
+		await page1.keyboard.press( 'Enter' );
+		await page1.keyboard.type( 'SecondBlock' );
+		// No settle wait: split immediately.
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page1.keyboard.press( 'End' );
+		for ( let i = 0; i < 5; i++ ) {
+			await page1.keyboard.press( 'ArrowLeft' );
+		}
+		await page1.keyboard.press( 'Enter' );
+
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				expect(
+					blocks.map( ( block ) => block.attributes.content )
+				).toEqual( [ 'Hello', 'World', 'SecondBlock' ] );
+			} ).toPass( { timeout: 15000 } );
+		}
+		// Sustained: no delete/reinsert war after a settle window.
+		await page1.waitForTimeout( 3000 );
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect(
+				currentEditor.canvas.locator( '[data-type="core/paragraph"]' )
+			).toHaveCount( 3 );
+		}
+	} );
+
+	test( 'syncIds are durable: they persist into saved content and survive reload', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Durable Ids Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await openIntentLogSession( collaborationUtils, post.id );
+		const page1 = editor.page;
+
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page1.keyboard.type( 'Durable paragraph' );
+
+		const idsOf = async () => {
+			const blocks = await editor.getBlocks();
+			return blocks.map(
+				( block ) =>
+					( block.attributes.metadata as { syncId?: string } )?.syncId
+			);
+		};
+		let stampedId: string | undefined;
+		await expect( async () => {
+			[ stampedId ] = await idsOf();
+			expect( stampedId ).toBeTruthy();
+		} ).toPass( { timeout: 15000 } );
+
+		await editor.saveDraft();
+
+		// The id rides the block delimiter into persisted content…
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain( `"syncId":"${ stampedId }"` );
+
+		// …and survives a full reload unchanged.
+		await page1.reload();
+		await expect( async () => {
+			expect( ( await idsOf() )[ 0 ] ).toBe( stampedId );
+		} ).toPass( { timeout: 15000 } );
+	} );
+
 	test( 'concurrent edits to different blocks both survive', async ( {
 		collaborationUtils,
 		requestUtils,
@@ -302,7 +538,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await openIntentLogSession( collaborationUtils, post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 

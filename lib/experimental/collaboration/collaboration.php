@@ -151,10 +151,17 @@ if ( ! function_exists( 'gutenberg_register_sync_engine_setting' ) ) {
 	 * REST exposure makes the swap scriptable (`wp option update`, the
 	 * settings endpoint, e2e fixtures). Unknown slugs are harmless — the
 	 * registry falls back to the default engine.
+	 *
+	 * Registered under a dedicated group, NOT 'writing': options.php sets
+	 * every registered option of a submitted group that is absent from the
+	 * POST body to null, so any writing-form save (including the e2e
+	 * fixtures' collaboration toggle) would silently wipe the engine
+	 * selection. Custom groups are never posted by core forms; the REST
+	 * settings endpoint exposes the option regardless of group.
 	 */
 	function gutenberg_register_sync_engine_setting() {
 		register_setting(
-			'writing',
+			'wp_collaboration',
 			'wp_sync_engine',
 			array(
 				'type'              => 'string',

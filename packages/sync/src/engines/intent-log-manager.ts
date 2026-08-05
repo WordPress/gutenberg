@@ -60,6 +60,8 @@ interface EntityState {
 	 * reconcile in place.
 	 */
 	clientIds: Map< string, string >;
+	/** Monotonic push counter, guarding delayed re-push staleness. */
+	pushSeq: number;
 	/** Canonical form of the last state pushed to (or from) the editor. */
 	lastPushedState: string | null;
 	/**
@@ -211,6 +213,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			prevDocIds: new Set(),
 			docTombstones: new Set(),
 			clientIds: new Map(),
+			pushSeq: 0,
 		};
 		entityStates.set( key, state );
 
@@ -397,15 +400,65 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			const treeHasTombstoned = [ ...treeIds ].some( ( id ) =>
 				state.docTombstones.has( id )
 			);
+			/*
+			 * Identity remapping also counts as "behind": when adoption
+			 * resolved a tree id onto a different document identity (or
+			 * minted one), the editor must receive the document's
+			 * authoritative ids — the document is the identity authority,
+			 * and saved content must carry ITS ids, identical across all
+			 * peers, for identity to be durable across sessions.
+			 */
+			const specIdSet = new Set< string >();
+			const collectFromSpecs = ( specs: typeof derived.specs ) => {
+				for ( const spec of specs ) {
+					specIdSet.add( spec.syncId as string );
+					collectFromSpecs(
+						( spec.children as typeof derived.specs ) ?? []
+					);
+				}
+			};
+			collectFromSpecs( derived.specs );
+			const idsRemapped = [ ...specIdSet ].some(
+				( id ) => ! treeIds.has( id )
+			);
 			const editorIsBehind =
 				! editorHadAllIds ||
 				derived.retainedIds.size > 0 ||
-				treeHasTombstoned;
+				treeHasTombstoned ||
+				idsRemapped;
 			if ( editorIsBehind && capturedJson !== state.lastPushedState ) {
 				state.handlers.editRecord(
 					{ blocks: toEditorBlocks( captured, state.clientIds ) },
 					{ undoIgnore: true }
 				);
+				/*
+				 * The push can lose a race with the editor's own in-flight
+				 * echo (its tree overwrites the record after us). While the
+				 * user keeps typing, the next capture re-pushes — but the
+				 * LAST capture of a burst has no successor, leaving the
+				 * tree's identity metadata stale until the next
+				 * interaction. One delayed re-dispatch of the same state
+				 * closes that window; if the first push stuck, the repeat
+				 * is a no-op for the editor.
+				 */
+				const pushSeq = ++state.pushSeq;
+				setTimeout( () => {
+					if (
+						! state.unloaded &&
+						pushSeq === state.pushSeq &&
+						capturedJson === state.lastPushedState
+					) {
+						state.handlers.editRecord(
+							{
+								blocks: toEditorBlocks(
+									captured,
+									state.clientIds
+								),
+							},
+							{ undoIgnore: true }
+						);
+					}
+				}, 1200 );
 			}
 			state.lastPushedState = capturedJson;
 		},

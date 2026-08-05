@@ -411,3 +411,101 @@ describe( 'identity adoption under splits', () => {
 		).toEqual( [ 'insert_block', 'remove_block' ] );
 	} );
 } );
+
+describe( 'adoption edge cases', () => {
+	const idless = ( content: string ): BridgeBlock => ( {
+		name: 'core/paragraph',
+		attributes: { content },
+		innerBlocks: [],
+	} );
+
+	it( 'two empty id-less paragraphs against one empty doc block stay stable', () => {
+		// Repeated Enter creates empty paragraphs with identical (empty)
+		// content. Exact-content adoption must claim at most one doc
+		// identity; the second mints — and repeating the derivation is
+		// deterministic (no oscillation).
+		const doc = docFromBlocks( [ paragraph( 'p1', '' ) ] );
+		const derived = deriveIntents( doc, [ idless( '' ), idless( '' ) ] )!;
+		expect( derived.specs[ 0 ].syncId ).toBe( 'p1' );
+		expect( derived.specs[ 1 ].syncId ).not.toBe( 'p1' );
+		expect( derived.intents.map( ( intent ) => intent.type ) ).toEqual( [
+			'insert_block',
+		] );
+	} );
+
+	it( 'split at the END (empty tail) keeps the head identity and mints the tail', () => {
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'HelloWorld' ),
+			paragraph( 'p2', 'Second' ),
+		] );
+		const derived = deriveIntents( doc, [
+			idless( 'HelloWorld' ),
+			idless( '' ),
+			idless( 'Second' ),
+		] )!;
+		const ids = derived.specs.map( ( spec ) => spec.syncId );
+		expect( ids[ 0 ] ).toBe( 'p1' );
+		expect( ids[ 2 ] ).toBe( 'p2' );
+		expect( ids[ 1 ] ).not.toBe( 'p1' );
+		expect( ids[ 1 ] ).not.toBe( 'p2' );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'split at the START anchors identity to the surviving content', () => {
+		// With no ids anywhere, identity follows CONTENT: the (empty) new
+		// head mints, the tail carrying the original text keeps the
+		// original identity — anchors and history stay with the words.
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'HelloWorld' ),
+			paragraph( 'p2', 'Second' ),
+		] );
+		const derived = deriveIntents( doc, [
+			idless( '' ),
+			idless( 'HelloWorld' ),
+			idless( 'Second' ),
+		] )!;
+		const ids = derived.specs.map( ( spec ) => spec.syncId );
+		expect( ids[ 1 ] ).toBe( 'p1' );
+		expect( ids[ 2 ] ).toBe( 'p2' );
+		expect( ids[ 0 ] ).not.toBe( 'p1' );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'derivation is idempotent: re-deriving the converged tree is a no-op', () => {
+		// After any derivation, applying the intents and re-deriving with
+		// the resulting specs must produce null — the fixed point that
+		// prevents capture oscillation.
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'HelloWorld' ),
+			paragraph( 'p2', 'Second' ),
+		] );
+		const derived = deriveIntents( doc, [
+			idless( 'Hello' ),
+			idless( 'World' ),
+			idless( 'Second' ),
+		] )!;
+		const echo = derived.specs.map( ( spec ) => ( {
+			name: 'core/paragraph',
+			attributes: {
+				content: spec.text as string,
+				metadata: { syncId: spec.syncId as string },
+			},
+			innerBlocks: [],
+		} ) );
+		// Simulate the post-apply document: apply the derived intents.
+		const server = createServer( doc );
+		serverIngestBatch(
+			server,
+			derived.intents.map( ( intent, index ) => ( {
+				intentId: `i-${ index }`,
+				actorId: 'a',
+				baseSeq: 0,
+				txnId: null,
+				type: intent.type,
+				payload: intent.payload,
+			} ) )
+		);
+		const applied = serverDocAt( server, server.log.length );
+		expect( deriveIntents( applied, echo ) ).toBeNull();
+	} );
+} );
