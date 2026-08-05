@@ -317,6 +317,133 @@ HTML;
 	}
 
 	/**
+	 * Tests if the block content is updated with the value returned by the source
+	 * for the Media & Text block, whose supported attributes are added via the
+	 * `block_bindings_supported_attributes_core/media-text` filter.
+	 *
+	 * @covers ::register_block_bindings_source
+	 */
+	public function test_update_block_with_value_from_source_media_text() {
+		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
+			if ( 'mediaUrl' === $attribute_name ) {
+				return 'https://example.com/updated-image.jpg';
+			}
+			if ( 'mediaAlt' === $attribute_name ) {
+				return 'Updated alt text';
+			}
+		};
+
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => $get_value_callback,
+			)
+		);
+
+		$this->assertContains(
+			'mediaUrl',
+			get_block_bindings_supported_attributes( 'core/media-text' ),
+			'The mediaUrl attribute should be supported for block bindings.'
+		);
+		$this->assertContains(
+			'mediaAlt',
+			get_block_bindings_supported_attributes( 'core/media-text' ),
+			'The mediaAlt attribute should be supported for block bindings.'
+		);
+		$this->assertContains(
+			'mediaId',
+			get_block_bindings_supported_attributes( 'core/media-text' ),
+			'The mediaId attribute should be supported for block bindings.'
+		);
+
+		$block_content = <<<HTML
+<!-- wp:media-text {"metadata":{"bindings":{"mediaUrl":{"source":"test/source"},"mediaAlt":{"source":"test/source"}}},"mediaId":11,"mediaType":"image","mediaUrl":"https://example.com/original.jpg"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img class="wp-image-11 size-full" src="https://example.com/original.jpg" alt="original alt"/></figure><div class="wp-block-media-text__content"><p></p></div></div>
+<!-- /wp:media-text -->
+HTML;
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = $block->render();
+
+		$this->assertSame(
+			'https://example.com/updated-image.jpg',
+			$block->attributes['mediaUrl'],
+			"The 'mediaUrl' attribute should be updated with the value returned by the source."
+		);
+		$this->assertSame(
+			'Updated alt text',
+			$block->attributes['mediaAlt'],
+			"The 'mediaAlt' attribute should be updated with the value returned by the source."
+		);
+		$this->assertStringContainsString(
+			'<img class="wp-image-11 size-full" src="https://example.com/updated-image.jpg" alt="Updated alt text"/>',
+			$result,
+			'The block content should be updated with the value returned by the source.'
+		);
+	}
+
+	public function data_update_block_with_value_from_source_media_text_empty_figure() {
+		return array(
+			'media on the left'  => array(
+				'left',
+				'<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div>',
+			),
+			'media on the right' => array(
+				'right',
+				'<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div>',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a Media & Text block saved without media renders the image
+	 * bound via block bindings, for both media positions.
+	 *
+	 * @covers ::register_block_bindings_source
+	 *
+	 * @dataProvider data_update_block_with_value_from_source_media_text_empty_figure
+	 */
+	public function test_update_block_with_value_from_source_media_text_empty_figure( $media_position, $block_markup ) {
+		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
+			if ( 'mediaUrl' === $attribute_name ) {
+				return 'https://example.com/updated-image.jpg';
+			}
+			if ( 'mediaAlt' === $attribute_name ) {
+				return 'Updated alt text';
+			}
+		};
+
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => $get_value_callback,
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:media-text {"metadata":{"bindings":{"mediaUrl":{"source":"test/source"},"mediaAlt":{"source":"test/source"}}},"mediaPosition":"{$media_position}"} -->
+{$block_markup}
+<!-- /wp:media-text -->
+HTML;
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = $block->render();
+
+		$this->assertStringContainsString(
+			'<img src="https://example.com/updated-image.jpg" alt="Updated alt text" />',
+			$result,
+			'The block should render the bound image in an empty media figure.'
+		);
+		$this->assertStringNotContainsString(
+			'id="wp-block-media-text__media-',
+			$result,
+			'The temporary figure id used to insert the media should be removed.'
+		);
+	}
+
+	/**
 	 * Tests if the `__default` attribute is replaced with real attributes for
 	 * pattern overrides.
 	 *
