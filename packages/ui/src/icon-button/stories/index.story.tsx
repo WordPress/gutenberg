@@ -129,9 +129,13 @@ export const Pressed: Story = {
 const EXAMPLE_SHORTCUT_OBJECT = {
 	displayShortcut: displayShortcut.primary( 'c' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
-	description: shortcutAriaLabel.primary( 'c' ),
+	label: shortcutAriaLabel.primary( 'c' ),
 };
 
+/**
+ * Use the `displayShortcut`, `ariaKeyShortcut`, and `shortcutAriaLabel` helpers
+ * from `@wordpress/keycodes` to create platform-appropriate shortcut metadata.
+ */
 export const WithShortcut: Story = {
 	...Default,
 	args: {

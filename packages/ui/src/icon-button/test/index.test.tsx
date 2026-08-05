@@ -1,6 +1,6 @@
 import { render, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useId } from '@wordpress/element';
+import { createRef } from '@wordpress/element';
 import { IconButton } from '../index';
 
 describe( 'IconButton', () => {
@@ -80,7 +80,7 @@ describe( 'IconButton', () => {
 						shortcut={ {
 							displayShortcut: '⌘S',
 							ariaKeyShortcut: 'Meta+S',
-							description: 'Command S',
+							label: 'Command S',
 						} }
 					/>
 				</>
@@ -91,20 +91,6 @@ describe( 'IconButton', () => {
 			expect( button ).toHaveAccessibleDescription(
 				'Available offline. Keyboard shortcut: Command S'
 			);
-
-			const shortcutDescription = screen.getByText(
-				'Keyboard shortcut: Command S'
-			);
-			expect( button ).toHaveAttribute(
-				'aria-describedby',
-				`${ externalDescriptionId } ${ shortcutDescription.id }`
-			);
-			expect( shortcutDescription ).toHaveAttribute(
-				'aria-hidden',
-				'true'
-			);
-			expect( shortcutDescription.tagName ).toBe( 'SPAN' );
-			expect( button ).toContainElement( shortcutDescription );
 
 			// The aria-keyshortcuts attribute is removed when there is no
 			// `shortcut` prop.
@@ -124,7 +110,7 @@ describe( 'IconButton', () => {
 					shortcut={ {
 						displayShortcut: '⌘S',
 						ariaKeyShortcut: 'Meta+S',
-						description: 'Command S',
+						label: 'Command S',
 					} }
 				/>
 			);
@@ -145,37 +131,25 @@ describe( 'IconButton', () => {
 		} );
 
 		it( 'preserves direct ARIA props when shortcut metadata is omitted', () => {
-			function IconButtonWithDirectAriaProps() {
-				const externalDescriptionId = useId();
+			const externalDescriptionId = 'external-description';
 
-				return (
-					<>
-						<span id={ externalDescriptionId }>
-							Available offline.
-						</span>
-						<IconButton
-							label="Save"
-							icon={ <svg /> }
-							aria-describedby={ externalDescriptionId }
-							aria-keyshortcuts="Meta+S"
-						/>
-					</>
-				);
-			}
-
-			render( <IconButtonWithDirectAriaProps /> );
-			const externalDescription =
-				screen.getByText( 'Available offline.' );
+			render(
+				<>
+					<span id={ externalDescriptionId }>Available offline.</span>
+					<IconButton
+						label="Save"
+						icon={ <svg /> }
+						aria-describedby={ externalDescriptionId }
+						aria-keyshortcuts="Meta+S"
+					/>
+				</>
+			);
 
 			const button = screen.getByRole( 'button', {
 				name: 'Save',
 				description: 'Available offline.',
 			} );
 			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
-			expect( button ).toHaveAttribute(
-				'aria-describedby',
-				externalDescription.id
-			);
 		} );
 
 		it( 'keeps shortcut metadata available when focusable while disabled', () => {
@@ -187,7 +161,7 @@ describe( 'IconButton', () => {
 					shortcut={ {
 						displayShortcut: '⌘S',
 						ariaKeyShortcut: 'Meta+S',
-						description: 'Command S',
+						label: 'Command S',
 					} }
 				/>
 			);

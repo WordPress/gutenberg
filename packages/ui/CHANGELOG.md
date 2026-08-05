@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `IconButton`: Require shortcut metadata to include a human-readable description and render that description for assistive technologies. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
+-   `IconButton`: Require shortcut metadata to include a human-readable label and render it as an accessible description. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
 
 ### Enhancements
 

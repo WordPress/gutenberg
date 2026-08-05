@@ -41,7 +41,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		ref
 	) {
 		const classes = clsx( styles[ 'icon-button' ], className );
-		const { descriptionId, shortcutAriaProps } = useKeyboardShortcut( {
+		const { descriptionId, targetProps } = useKeyboardShortcut( {
 			'aria-describedby': ariaDescribedBy,
 			'aria-keyshortcuts': ariaKeyShortcuts,
 			shortcut,
@@ -51,7 +51,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			<Tooltip.Root>
 				<Tooltip.Trigger
 					ref={ ref }
-					{ ...shortcutAriaProps }
+					{ ...targetProps }
 					disabled={ disabled && ! focusableWhenDisabled }
 					render={
 						<Button

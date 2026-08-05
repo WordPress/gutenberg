@@ -3,11 +3,10 @@ import { useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '../visually-hidden';
 
-export interface KeyboardShortcut {
+export type KeyboardShortcut = {
 	/**
-	 * The human-readable representation of the shortcut, displayed visually.
-	 * Use platform-appropriate symbols (e.g., "⌘S" on macOS, "Ctrl+S" on
-	 * Windows).
+	 * The visual representation of the shortcut (e.g., "⌘S" on macOS or
+	 * "Ctrl+S" on Windows).
 	 */
 	displayShortcut: string;
 
@@ -20,10 +19,11 @@ export interface KeyboardShortcut {
 	ariaKeyShortcut: string;
 
 	/**
-	 * A human-readable description of the shortcut for assistive technology.
+	 * The plain-text label for the shortcut, used in its accessible description
+	 * (e.g., "Command Shift S").
 	 */
-	description: string;
-}
+	label: string;
+};
 
 type ShortcutAriaProps = Pick<
 	AriaAttributes,
@@ -43,7 +43,7 @@ function useKeyboardShortcut( {
 
 	return {
 		descriptionId,
-		shortcutAriaProps: {
+		targetProps: {
 			'aria-describedby': describedBy || undefined,
 			'aria-keyshortcuts': shortcut?.ariaKeyShortcut ?? ariaKeyShortcuts,
 		},
@@ -66,7 +66,7 @@ function KeyboardShortcutDescription( {
 			{ sprintf(
 				/* translators: %s: human-readable keyboard shortcut. */
 				__( 'Keyboard shortcut: %s' ),
-				shortcut.description
+				shortcut.label
 			) }
 		</VisuallyHidden>
 	);
