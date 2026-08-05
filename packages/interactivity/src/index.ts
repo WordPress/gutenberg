@@ -16,6 +16,7 @@ import { routerRegions } from './directives/router-region';
 import {
 	initialVdomPromise,
 	hydrateRegions,
+	hydrateAllRemaining,
 	getRegionRootFragment,
 } from './hydration';
 import { toVdom } from './vdom';
@@ -80,6 +81,7 @@ export const privateApis = (
 		return {
 			getRegionRootFragment,
 			initialVdomPromise,
+			hydrateAllRemaining,
 			toVdom,
 			directive,
 			getNamespace,
