@@ -70,6 +70,27 @@ describe( 'SandBox', () => {
 		);
 	} );
 
+	it( 'should not include allow-forms by default', () => {
+		render( <SandBox html="<p>Hello</p>" title="No Forms" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'No Forms' );
+
+		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
+			'allow-forms'
+		);
+	} );
+
+	it( 'should include allow-forms when allowForms is set', () => {
+		render( <SandBox html="<p>Hello</p>" title="Forms" allowForms /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Forms' );
+
+		expect( iframe ).toHaveAttribute(
+			'sandbox',
+			'allow-scripts allow-presentation allow-forms'
+		);
+	} );
+
 	it( 'should set srcdoc with the provided html content', () => {
 		render( <SandBox html="<p>Hello</p>" title="Test Title" /> );
 

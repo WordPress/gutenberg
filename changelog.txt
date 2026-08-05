@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 23.7.0-rc.1 =
+= 23.7.0 =
 
 
 ## Changelog
@@ -73,6 +73,8 @@
 - Writing flow: Extend block selections with shift+arrow when there is no native selection. ([80687](https://github.com/WordPress/gutenberg/pull/80687))
 - Writing flow: Mark shift+click as a multi-selection gesture. ([80286](https://github.com/WordPress/gutenberg/pull/80286))
 - Writing flow: Stop the page scrolling on caret moves within blocks taller than the viewport. ([80708](https://github.com/WordPress/gutenberg/pull/80708))
+- RichText: Don't apply input transform when there's no onReplace. ([80978](https://github.com/WordPress/gutenberg/pull/80978))
+- RichText: Fix paste handler crash when pasting files. ([81010](https://github.com/WordPress/gutenberg/pull/81010))
 
 #### Post Editor
 - Editor: Leave undo to the browser in fields that handle their own undo. ([80768](https://github.com/WordPress/gutenberg/pull/80768))
@@ -229,6 +231,7 @@
 - Resolve Prettier explicitly for isolated layout. ([80529](https://github.com/WordPress/gutenberg/pull/80529))
 - Storybook: Remove Emotion as JSX import source. ([80647](https://github.com/WordPress/gutenberg/pull/80647))
 - WP Build: Avoid infinite worker build loop. ([80361](https://github.com/WordPress/gutenberg/pull/80361))
+- Improve pre-flight npm access checks. ([80334](https://github.com/WordPress/gutenberg/pull/80334))
 
 #### Testing
 - Jest: Fix ignore pattern for TypeScript declaration files. ([80737](https://github.com/WordPress/gutenberg/pull/80737))
@@ -260,6 +263,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @aduth @andrewserong @chriszarate @ciampo @CookieDarb @DarkMatter-999 @desrosj @dhananjaykuber @dilipom13 @dpmehta @ellatrix @enejb @faisalahammad @getdave @himanshupathak95 @i-am-chitti @im3dabasia @Imran92 @jeryj @jorgefilipecosta @jsnajdr @juanfra @Kgupta62 @MaggieCabrera @Mamaduka @manzoorwanijk @maxschmeling @mirka @Mustafabharmal @nickchomey @noruzzamans @ntsekouras @oandregal @obenland @ocean90 @peterwilsoncc @ramonjd @retrofox @scruffian @shail-mehta @shekharnwagh @shimotmk @simison @sirreal @Soean @t-hamano @westonruter @yashjawale
+
+
 
 
 = 23.6.2 =

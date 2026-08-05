@@ -848,6 +848,29 @@ export function isSectionBlock( state, clientId ) {
 }
 
 /**
+ * Returns whether the block is displayed as a synced block, meaning a synced
+ * pattern or a template part. A block that carries pattern metadata is
+ * displayed as a pattern instead, so it is not considered synced.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is displayed as a synced block.
+ */
+export function isSyncedBlock( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	// Checked first so that the section lookup below, which walks the block's
+	// ancestors, is only reached for the few blocks that can be synced.
+	if ( blockName !== 'core/block' && blockName !== 'core/template-part' ) {
+		return false;
+	}
+
+	const patternName = getBlockAttributes( state, clientId )?.metadata
+		?.patternName;
+	return ! ( patternName && isSectionBlock( state, clientId ) );
+}
+
+/**
  * Retrieves the client ID of the block that is a contentOnly section but is
  * currently being temporarily edited (contentOnly is deactivated).
  *

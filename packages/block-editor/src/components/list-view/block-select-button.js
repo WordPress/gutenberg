@@ -12,7 +12,15 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	symbol,
+	unseen,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 
 import { Tooltip } from '@wordpress/ui';
@@ -21,11 +29,10 @@ import { Tooltip } from '@wordpress/ui';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
-import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
+import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
@@ -50,15 +57,52 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isLocked } = useBlockLock( clientId );
+	const { icon, anchor, isSticky, isLocked } = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlock,
+				isSectionBlock,
+				isLockedBlock,
+			} = unlock( select( blockEditorStore ) );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
+
+			const attributes = getBlockAttributes( clientId );
+			const blockName = getBlockName( clientId );
+
+			// Pattern-sourced section blocks show the pattern icon.
+			// Everything else resolves its variation or block type icon.
+			let blockIcon = symbol;
+			if (
+				! attributes?.metadata?.patternName ||
+				! isSectionBlock( clientId )
+			) {
+				const match = getActiveBlockVariation(
+					blockName,
+					attributes,
+					undefined,
+					getBlock( clientId )?.innerContent
+				);
+				blockIcon = match?.icon || getBlockType( blockName )?.icon;
+			}
+
+			return {
+				icon: blockIcon,
+				anchor: attributes?.anchor,
+				isSticky: attributes?.style?.position?.type === 'sticky',
+				isLocked: isLockedBlock( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const shouldShowLockIcon = isLocked;
-	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
@@ -103,11 +147,7 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
-			<BlockIcon
-				icon={ blockInformation?.icon }
-				showColors
-				context="list-view"
-			/>
+			<BlockIcon icon={ icon } showColors context="list-view" />
 			<HStack
 				alignment="center"
 				className="block-editor-list-view-block-select-button__label-wrapper"
@@ -117,10 +157,10 @@ function ListViewBlockSelectButton(
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
-				{ blockInformation?.anchor && (
+				{ !! anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
 						<WCBadge className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
+							{ anchor }
 						</WCBadge>
 					</span>
 				) }

@@ -19,6 +19,7 @@
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
 -   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
+-   `SandBox`: Add `allowForms` prop to opt into `allow-forms` in the iframe's sandbox attribute ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).
 -   Validated form controls: Only move focus to the invalid control for trusted `invalid` events (form submission, `reportValidity()`). Consumers can now dispatch a synthetic `invalid` event to reveal a control's error message without disturbing the user's place in the form ([#80685](https://github.com/WordPress/gutenberg/pull/80685)).
 
 ### Bug Fixes

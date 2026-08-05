@@ -11,6 +11,9 @@
 
 ### Performance
 
+-   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on each call. `BlockListBlock` asks once per rendered block, so the old cost was the block count multiplied by the selection size ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `BlockListBlock`: Skip that deep check behind `isSelectionWithinCurrentSection` when the block is not within a section block, where it was passed an `undefined` client ID that never matches. Together the two changes take selecting all blocks on a 1000 paragraph post from 16.8s to 0.4s ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).
 -   `ListView`: Collapse the placeholder rows that stand in for blocks outside of the render window into a single spacer row per run, instead of rendering a `<tr>`/`<td>` pair for every block. On a post with 1000 top-level blocks this removes ~1900 elements (about 60% of the List View's DOM and nearly half of the document's elements), which cuts the style recalculation and layout work done when the List View opens ([#80953](https://github.com/WordPress/gutenberg/pull/80953)).
 
 ### Internal
@@ -21,6 +24,7 @@
 
 ### Bug Fixes
 
+-   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
