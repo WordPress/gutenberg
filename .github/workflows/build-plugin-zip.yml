@@ -60,7 +60,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
         permissions: {}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
 
         steps:
             # Request the same elevated permissions as create-release so invalid
@@ -460,10 +460,9 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
-        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' && needs.bump-version.outputs.new_version }}
         permissions: {}
         environment: 'GitHub Releases'
-        if: ${{ needs.bump-version.outputs.new_version }}
 
         steps:
             - name: Generate application token
