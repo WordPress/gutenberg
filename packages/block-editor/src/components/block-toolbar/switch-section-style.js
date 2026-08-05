@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -18,7 +19,9 @@ import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';
 import { globalStylesDataKey } from '../../store/private-keys';
-import { getVariationStylesWithRefValues } from '../../hooks/block-style-variation';
+import { unlock } from '../../lock-unlock';
+
+const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const styleIcon = (
 	<SVG
@@ -59,7 +62,7 @@ function SwitchSectionStyle( { clientId } ) {
 
 	// Get the background color for the active style
 	const activeStyleBackground = activeStyle?.name
-		? getVariationStylesWithRefValues(
+		? getVariationStyle(
 				{
 					settings: globalSettings,
 					styles: globalStyles,

@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-// @ts-ignore -- No declaration file available.
+// @ts-expect-error -- Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
-// @ts-ignore -- No declaration file available.
 import { isValidElementType } from 'react-is';
 
 /**

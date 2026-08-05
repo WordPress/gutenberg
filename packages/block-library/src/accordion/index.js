@@ -16,6 +16,8 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/accordion-item' ] ];
+
 export const settings = {
 	icon,
 	example: {
@@ -48,6 +50,8 @@ export const settings = {
 			},
 		],
 	},
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };

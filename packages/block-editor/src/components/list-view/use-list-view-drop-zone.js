@@ -410,17 +410,15 @@ const EXPAND_THROTTLE_OPTIONS = {
 /**
  * A react hook for implementing a drop zone in list view.
  *
- * @param {Object}       props                    Named parameters.
- * @param {?HTMLElement} [props.dropZoneElement]  Optional element to be used as the drop zone.
- * @param {Object}       [props.expandedState]    The expanded state of the blocks in the list view.
- * @param {Function}     [props.setExpandedState] Function to set the expanded state of a list of block clientIds.
+ * @param {Object}       props                   Named parameters.
+ * @param {?HTMLElement} [props.dropZoneElement] Optional element to be used as the drop zone.
+ * @param {Function}     [props.updateExpansion] Dispatch to update the expansion state of a list of block clientIds.
  *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
 export default function useListViewDropZone( {
 	dropZoneElement,
-	expandedState,
-	setExpandedState,
+	updateExpansion,
 } ) {
 	const {
 		getBlockRootClientId,
@@ -440,25 +438,22 @@ export default function useListViewDropZone( {
 	const previousRootClientId = usePrevious( targetRootClientId );
 
 	const maybeExpandBlock = useCallback(
-		( _expandedState, _target ) => {
+		( _target ) => {
 			// If the user is attempting to drop a block inside a collapsed block,
 			// that is, using a nesting gesture flagged by 'inside' dropPosition,
-			// expand the block within the list view, if it isn't already.
+			// expand the block within the list view.
 			const { rootClientId } = _target || {};
 			if ( ! rootClientId ) {
 				return;
 			}
-			if (
-				_target?.dropPosition === 'inside' &&
-				! _expandedState[ rootClientId ]
-			) {
-				setExpandedState( {
+			if ( _target?.dropPosition === 'inside' ) {
+				updateExpansion( {
 					type: 'expand',
 					clientIds: [ rootClientId ],
 				} );
 			}
 		},
-		[ setExpandedState ]
+		[ updateExpansion ]
 	);
 
 	// Throttle the maybeExpandBlock function to avoid expanding the block
@@ -478,13 +473,8 @@ export default function useListViewDropZone( {
 			throttledMaybeExpandBlock.cancel();
 			return;
 		}
-		throttledMaybeExpandBlock( expandedState, target );
-	}, [
-		expandedState,
-		previousRootClientId,
-		target,
-		throttledMaybeExpandBlock,
-	] );
+		throttledMaybeExpandBlock( target );
+	}, [ previousRootClientId, target, throttledMaybeExpandBlock ] );
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(

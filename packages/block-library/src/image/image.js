@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -390,6 +395,12 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	// URL of a freshly generated file (crop/rotate result) from the media
+	// editor that the browser may not have finished loading; cleared by the
+	// <img> load/error handlers, or by the settle effect below when the
+	// rendered image already shows it.
+	const [ pendingSwapUrl, setPendingSwapUrl ] = useState();
+	const isSwappingMedia = !! pendingSwapUrl;
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
 		[]
@@ -398,6 +409,7 @@ export default function Image( {
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
+		onUrlChange: setPendingSwapUrl,
 	} );
 
 	const {
@@ -485,18 +497,34 @@ export default function Image( {
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
+	// A media editor update can be undone or superseded before its
+	// attributes land, leaving the rendered image untouched. No load event
+	// fires in that case, so clear the pending swap whenever the rendered
+	// image already shows the pending URL.
+	useEffect( () => {
+		if (
+			pendingSwapUrl &&
+			pendingSwapUrl === url &&
+			imageElement?.complete
+		) {
+			setPendingSwapUrl( undefined );
+		}
+	}, [ pendingSwapUrl, url, imageElement ] );
+
 	function onImageError() {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
 
 	function onImageLoad( event ) {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -902,6 +930,10 @@ export default function Image( {
 							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (
@@ -1173,7 +1205,9 @@ export default function Image( {
 						onError={ onImageError }
 						onLoad={ onImageLoad }
 						ref={ setRefs }
-						className={ borderProps.className }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
 						width={ naturalWidth }
 						height={ naturalHeight }
 						style={ {
@@ -1222,7 +1256,7 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ isUploading && <Spinner /> }
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
 				</>
 			) }
 		</ImageWrapper>

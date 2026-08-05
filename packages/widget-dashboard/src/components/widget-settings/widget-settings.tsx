@@ -16,7 +16,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
 import styles from './widget-settings.module.css';
-import type { WidgetAttributes } from '../../types';
+import type { WidgetAttributeValues } from '../../types';
 
 /**
  * Side drawer that edits one instance's attributes, mounted once at the
@@ -65,8 +65,10 @@ export function WidgetSettings(): React.ReactNode {
 		? widgetTypes.find( ( type ) => type.name === widget.type )
 		: undefined;
 
-	const fields = useMemo< Field< WidgetAttributes >[] >(
-		() => ( widgetType?.attributes ?? [] ) as Field< WidgetAttributes >[],
+	const fields = useMemo< Field< WidgetAttributeValues >[] >(
+		() =>
+			( widgetType?.attributes ??
+				[] ) as Field< WidgetAttributeValues >[],
 		[ widgetType?.attributes ]
 	);
 
@@ -131,7 +133,7 @@ export function WidgetSettings(): React.ReactNode {
 	const title = getWidgetSettingsTitle( widgetType );
 	const data = ( widget?.attributes ??
 		widgetType?.example?.attributes ??
-		{} ) as WidgetAttributes;
+		{} ) as WidgetAttributeValues;
 
 	return (
 		<Drawer.Root
@@ -148,7 +150,7 @@ export function WidgetSettings(): React.ReactNode {
 				</Drawer.Header>
 
 				<Drawer.Content>
-					<DataForm< WidgetAttributes >
+					<DataForm< WidgetAttributeValues >
 						data={ data }
 						fields={ fields }
 						form={ form }

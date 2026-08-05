@@ -24,7 +24,7 @@
  *     this REST sees `_wp_suggestion` as unregistered and silently
  *     no-ops on writes, masking real failures.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $admin_id;

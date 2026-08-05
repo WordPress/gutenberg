@@ -110,7 +110,7 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 					>
 						{ __( 'Restore' ) }
 					</Button>
-					<MoreMenu disabled />
+					<MoreMenu isRevisionMode />
 				</>
 			}
 		/>
