@@ -1,28 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Stack } from '@wordpress/ui';
+import { forwardRef } from '@wordpress/element';
+import { Stack } from '../../stack';
+import { Text } from '../../text';
 import * as Card from '../index';
 
-/**
- * Temporary text component for story examples. This will be replaced by an
- * official DS `<Text />` component once it's available.
- */
-function Text( { children }: { children: React.ReactNode } ) {
-	return (
-		<p
-			style={ {
-				margin: 0,
-				fontFamily: 'var(--wpds-typography-font-family-body)',
-				fontSize: 'var(--wpds-typography-font-size-md)',
-				fontWeight: 'var(--wpds-typography-font-weight-default)',
-				lineHeight: 'var(--wpds-typography-line-height-sm)',
-				textWrap: 'pretty',
-				color: 'var(--wpds-color-foreground-content-neutral-weak)',
-			} }
-		>
-			{ children }
-		</p>
-	);
-}
+const BodyText = forwardRef<
+	HTMLSpanElement,
+	React.ComponentProps< typeof Text >
+>( ( props, ref ) => (
+	<Text
+		{ ...props }
+		ref={ ref }
+		render={ props.render ?? <p /> }
+		style={ {
+			color: 'var(--wpds-color-foreground-content-neutral-weak)',
+			...props.style,
+		} }
+	/>
+) );
 
 const meta: Meta< typeof Card.Root > = {
 	tags: [ 'manifest' ],
@@ -52,17 +47,17 @@ export const Default: Story = {
 				<Card.Title>Card title</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<Text>
+				<BodyText>
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
-				</Text>
-				<Text>
+				</BodyText>
+				<BodyText>
 					This is the main content area. It can contain any elements.
-				</Text>
+				</BodyText>
 			</Card.Content>,
 		],
 	},
@@ -139,7 +134,7 @@ export const WithFullBleed: Story = {
 						} }
 					/>
 				</Card.FullBleed>
-				<Text>Content below the full-bleed area.</Text>
+				<BodyText>Content below the full-bleed area.</BodyText>
 			</Card.Content>,
 		],
 	},
@@ -182,10 +177,10 @@ export const FullBleedHeroWithTitle: Story = {
 				<Card.Title>Hero image card</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<Text>
+				<BodyText>
 					The image above bleeds to the card&apos;s top and side
 					edges.
-				</Text>
+				</BodyText>
 			</Card.Content>,
 		],
 	},
@@ -211,10 +206,10 @@ export const FullBleedHeroOnly: Story = {
 				</Card.FullBleed>
 			</Card.Header>,
 			<Card.Content key="content">
-				<Text>
+				<BodyText>
 					The image above bleeds to the card&apos;s top and side
 					edges.
-				</Text>
+				</BodyText>
 			</Card.Content>,
 		],
 	},
@@ -233,7 +228,7 @@ export const CustomSemantics: Story = {
 				<Card.Title render={ <h2 /> }>Section heading</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<Text>Semantically meaningful card content.</Text>
+				<BodyText>Semantically meaningful card content.</BodyText>
 			</Card.Content>,
 		],
 	},
