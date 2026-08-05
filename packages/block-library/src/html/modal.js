@@ -13,7 +13,11 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	PlainText,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -25,6 +29,7 @@ import Preview from './preview';
 import { parseContent, serializeContent } from './utils';
 
 const { Tabs } = unlock( componentsPrivateApis );
+const { useNativeUndo } = unlock( blockEditorPrivateApis );
 
 export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 	// Parse content into separate sections and use as initial state
@@ -33,6 +38,9 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 	const [ editedCss, setEditedCss ] = useState( css );
 	const [ editedJs, setEditedJs ] = useState( js );
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
+	// The fields hold local state that is only committed when the dialog is
+	// saved, so undo and redo within them must remain the browser's own.
+	const nativeUndoRef = useNativeUndo();
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 
@@ -132,7 +140,10 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 							align="stretch"
 							gap={ 8 }
 						>
-							<div className="block-library-html__modal-content">
+							<div
+								ref={ nativeUndoRef }
+								className="block-library-html__modal-content"
+							>
 								<Tabs.TabPanel
 									tabId="html"
 									focusable={ false }

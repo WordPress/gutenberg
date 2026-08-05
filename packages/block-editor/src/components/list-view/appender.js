@@ -12,14 +12,15 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import { useListViewContext } from './context';
+import { useInsertedBlockClientId, useListViewContext } from './context';
 import Inserter from '../inserter';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { insertedBlock, setInsertedBlock } = useListViewContext();
+		const { setInsertedBlockClientId } = useListViewContext();
+		const insertedBlockClientId = useInsertedBlockClientId();
 
 		const instanceId = useInstanceId( Appender );
 		const { directInsert, hideInserter } = useSelect(
@@ -46,7 +47,7 @@ export const Appender = forwardRef(
 		} );
 
 		const insertedBlockTitle = useBlockDisplayTitle( {
-			clientId: insertedBlock?.clientId,
+			clientId: insertedBlockClientId,
 			context: 'list-view',
 		} );
 
@@ -92,7 +93,9 @@ export const Appender = forwardRef(
 					toggleProps={ { 'aria-describedby': descriptionId } }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
 						if ( maybeInsertedBlock?.clientId ) {
-							setInsertedBlock( maybeInsertedBlock );
+							setInsertedBlockClientId(
+								maybeInsertedBlock.clientId
+							);
 						}
 					} }
 				/>

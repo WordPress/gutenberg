@@ -16,7 +16,13 @@
 	height: 100%;
 }
 
+/*
+ * Keep the structural layout local to the preview chrome. Host styles may
+ * reset `section` elements and override the layered Card styles.
+ */
 .card {
+	display: flex;
+	flex-direction: column;
 	height: 100%;
 	min-height: 0;
 }

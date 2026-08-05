@@ -239,7 +239,9 @@ const EmbedEdit = ( props ) => {
 					value={ url }
 					cannotEmbed={ cannotEmbed }
 					onChange={ ( value ) => setURL( value ) }
-					fallback={ () => fallback( url, onReplace ) }
+					fallback={
+						onReplace ? () => fallback( url, onReplace ) : undefined
+					}
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }

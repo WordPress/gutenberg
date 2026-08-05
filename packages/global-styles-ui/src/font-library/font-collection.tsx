@@ -158,8 +158,11 @@ function FontCollection( { slug }: { slug: string } ) {
 		setPage( 1 );
 	};
 
-	// @ts-expect-error
-	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+	const debouncedUpdateSearchInput = debounce(
+		// @ts-expect-error `debounce` expects a `(...args: unknown[]) => unknown` callback.
+		handleUpdateSearchInput,
+		300
+	);
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
@@ -307,6 +310,7 @@ function FontCollection( { slug }: { slug: string } ) {
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
 								<SearchControl
+									className="font-library__search"
 									value={ filters.search }
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }

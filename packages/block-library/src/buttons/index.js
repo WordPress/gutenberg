@@ -18,6 +18,8 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/button' ] ];
+
 export const settings = {
 	icon,
 	example: {
@@ -40,6 +42,8 @@ export const settings = {
 	},
 	deprecated,
 	transforms,
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };
