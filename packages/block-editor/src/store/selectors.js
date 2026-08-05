@@ -2779,11 +2779,14 @@ export function getDirectInsertBlock( state, rootClientId = null ) {
 	}
 	const { defaultBlock, directInsert } =
 		state.blockListSettings.get( rootClientId ) ?? {};
-	if ( ! defaultBlock || ! directInsert ) {
+	const resolvedDefaultBlock =
+		defaultBlock ??
+		getBlockType( getBlockName( state, rootClientId ) )?.defaultBlock;
+	if ( ! resolvedDefaultBlock || ! directInsert ) {
 		return;
 	}
 
-	return defaultBlock;
+	return resolvedDefaultBlock;
 }
 
 export function __experimentalGetDirectInsertBlock(

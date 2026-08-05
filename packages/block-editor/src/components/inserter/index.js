@@ -122,6 +122,7 @@ const UnforwardedInserter = (
 		( select ) => {
 			const {
 				getBlockRootClientId,
+				getBlockName,
 				hasInserterItems,
 				getAllowedBlocks,
 				getDirectInsertBlock,
@@ -136,8 +137,12 @@ const UnforwardedInserter = (
 			const directInsertBlock =
 				shouldDirectInsert &&
 				getDirectInsertBlock( _targetRootClientId );
-			const { defaultBlock } =
-				getBlockListSettings( _targetRootClientId ) ?? {};
+			const defaultBlock =
+				getBlockListSettings( _targetRootClientId )?.defaultBlock ??
+				( _targetRootClientId
+					? getBlockType( getBlockName( _targetRootClientId ) )
+							?.defaultBlock
+					: undefined );
 
 			const _hasSingleBlockType =
 				allowedBlocks?.length === 1 &&

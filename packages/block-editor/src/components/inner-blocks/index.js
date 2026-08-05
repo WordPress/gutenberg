@@ -94,7 +94,7 @@ function UncontrolledInnerBlocks( props ) {
 		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
-		defaultBlock ?? blockType?.defaultBlock,
+		defaultBlock,
 		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
