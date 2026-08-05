@@ -26,7 +26,8 @@ Prefer the reversible form of a change, and make both the change and the way bac
 -   Confirm dialogs echo what is affected: the item's title, or the count for bulk actions.
 -   Irreversible confirms use `isDestructive` on the confirm button and say so in the label ("Delete permanently", not "Delete"). Follow the [destructive actions pattern](../../../storybook/stories/design-system/patterns/destructive-actions.mdx).
 -   A mutation that succeeds silently is not visible. Announce it, and offer Undo when the prior value is in scope — capture the old value explicitly rather than popping the undo stack, which would also revert unrelated edits.
--   `Snackbar` renders exactly **one** action; more logs a warning and truncates to `actions[0]` (`packages/components/src/snackbar/index.tsx`). Choose between Undo and any other button.
+-   `Snackbar` renders exactly **one** action; more logs a warning and truncates to `actions[0]` (`packages/components/src/snackbar/index.tsx`). Choose between Undo and any other button. It also dismisses itself six seconds after it appears, so keep the text short enough to read in that time, and use `explicitDismiss` or a notice that is not a snackbar for anything the user must finish reading.
+-   When a mutation fails, leave the user able to try again: keep their input, restore consistent state, release any control left busy or disabled, and make a second attempt safe to make.
 -   `saveEntityRecord` and `deleteEntityRecord` add nothing to the undo stack, so anything already persisted needs its own recovery path. `editEntityRecord` records an undo level unless called with `undoIgnore`.
 
 ## Legibility
@@ -40,4 +41,4 @@ Guard where untrusted data enters — a REST response, post meta, `theme.json`, 
 
 -   `JSON.parse` at a boundary goes in a `try`/`catch`, and the result is shape-checked (`Array.isArray`, `is_array`) before it is mapped or iterated: valid JSON of the wrong shape is the common case, not malformed JSON.
 -   In PHP, know which failure you are risking. `foreach` over a non-iterable emits a warning and carries on, so it degrades quietly. Using a non-scalar as an array offset throws a `TypeError`, and during rendering that is a white screen for every visitor rather than an admin-only error, so guard the offsets first.
--   Check where a throw lands. React error boundaries only catch render-phase errors — a throw inside a `registry.subscribe` callback, an async click handler, or a promise chain escapes them entirely and can silently drop the user's edit.
+-   Check where a throw lands. [React error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) only catch render-phase errors — a throw inside a `registry.subscribe` callback, an async click handler, or a promise chain escapes them entirely and can silently drop the user's edit.
