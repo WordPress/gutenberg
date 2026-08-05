@@ -345,7 +345,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expect_doing_it_wrong' => true,
 			),
 
-
 			'returns value where font size is 0'         => array(
 				'font_size'       => array(
 					'size' => 0,
