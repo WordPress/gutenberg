@@ -19,13 +19,14 @@ import {
 	useMemo,
 	useCallback,
 } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { getDefaultBlockName, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import ButtonBlockAppender from '../button-block-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -182,6 +183,7 @@ function Items( {
 } ) {
 	// Avoid passing CustomAppender to useSelect because it could be a new
 	// function on every render.
+	const hasAppenderProp = CustomAppender !== undefined;
 	const hasAppender = CustomAppender !== false;
 	const hasCustomAppender = !! CustomAppender;
 	const {
@@ -189,6 +191,7 @@ function Items( {
 		isZoomOut,
 		selectedBlocks,
 		visibleBlocks,
+		showButtonAppender,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -216,6 +219,24 @@ function Items( {
 				};
 			}
 
+			// Without a renderAppender option, the appender is resolved
+			// from the block type: no appender, a button appender while
+			// the block is empty, or the default appender.
+			let _hasAppender = hasAppender;
+			let _hasCustomAppender = hasCustomAppender;
+			let _showButtonAppender = false;
+			if ( ! hasAppenderProp && rootClientId ) {
+				const appender = select( blocksStore ).getBlockType(
+					getBlockName( rootClientId )
+				)?.appender;
+				if ( appender === 'none' ) {
+					_hasAppender = false;
+				} else if ( appender === 'button' && ! _order.length ) {
+					_hasCustomAppender = true;
+					_showButtonAppender = true;
+				}
+			}
+
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 			const showRootAppender =
@@ -239,6 +260,7 @@ function Items( {
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
+				showButtonAppender: _showButtonAppender,
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(
@@ -247,14 +269,14 @@ function Items( {
 						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					( ! templateLock || templateLock === 'contentOnly' ) &&
-					hasAppender &&
+					_hasAppender &&
 					! _isZoomOut() &&
-					( hasCustomAppender ||
+					( _hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
 			};
 		},
-		[ rootClientId, hasAppender, hasCustomAppender ]
+		[ rootClientId, hasAppenderProp, hasAppender, hasCustomAppender ]
 	);
 
 	return (
@@ -294,7 +316,11 @@ function Items( {
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }
-					CustomAppender={ CustomAppender }
+					CustomAppender={
+						showButtonAppender
+							? ButtonBlockAppender
+							: CustomAppender
+					}
 				/>
 			) }
 		</LayoutProvider>

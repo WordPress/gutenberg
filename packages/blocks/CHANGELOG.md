@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block types support an `appender` setting describing the appender rendered after their inner blocks: `'none'`, `'button'` (while the block is empty), or `'default'`.
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

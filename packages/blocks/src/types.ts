@@ -292,6 +292,14 @@ export interface BlockType<
 	 */
 	allowedBlocks?: string[];
 	/**
+	 * The appender rendered after the block's inner blocks: 'none' renders
+	 * no appender, 'button' renders the button appender while the block is
+	 * empty, and 'default' (also the default when omitted) renders the
+	 * default block appender while the block is selected. A `renderAppender`
+	 * option passed to `InnerBlocks` overrides it.
+	 */
+	appender?: 'none' | 'button' | 'default';
+	/**
 	 * Initial child blocks created when an empty block of this type
 	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
 	 * items.
