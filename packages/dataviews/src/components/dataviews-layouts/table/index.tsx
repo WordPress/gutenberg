@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import { isAppleOS } from '@wordpress/keycodes';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
-import { sortValues } from '../../../constants';
+import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -33,6 +33,7 @@ import {
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
+	MediaAspectRatio,
 	NormalizedField,
 	ViewTable as ViewTableType,
 	ViewTableProps,
@@ -76,6 +77,7 @@ interface TableRowProps< Item > {
 	view: ViewTableType;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
+	mediaAspectRatio?: MediaAspectRatio;
 	descriptionField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
@@ -127,6 +129,7 @@ function TableRow< Item >( {
 	view,
 	titleField,
 	mediaField,
+	mediaAspectRatio,
 	descriptionField,
 	selection,
 	getItemId,
@@ -204,6 +207,7 @@ function TableRow< Item >( {
 						level={ level }
 						titleField={ showTitle ? titleField : undefined }
 						mediaField={ showMedia ? mediaField : undefined }
+						mediaAspectRatio={ mediaAspectRatio }
 						descriptionField={
 							showDescription ? descriptionField : undefined
 						}
@@ -390,6 +394,21 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
+	// Consumer-configured aspect ratio for the primary column's media preview,
+	// validated against the presets (like `density`) so arbitrary values are
+	// ignored, and surfaced to CSS as a custom property the media stylesheet
+	// reads. The property is always set (with the square default), so an
+	// identically-named variable set by a consumer on an ancestor can't leak
+	// into the previews when the view doesn't configure a ratio. The sizing
+	// itself only engages behind the `has-media-aspect-ratio` modifier below.
+	const mediaAspectRatio =
+		view.layout?.aspectRatio &&
+		MEDIA_ASPECT_RATIOS.includes( view.layout.aspectRatio )
+			? view.layout.aspectRatio
+			: undefined;
+	const tableStyle = {
+		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
+	} as CSSProperties;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -414,7 +433,9 @@ function ViewTable< Item >( {
 						),
 					'has-bulk-actions': hasBulkActions,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
+				style={ tableStyle }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
@@ -618,6 +639,9 @@ function ViewTable< Item >( {
 											view={ view }
 											titleField={ titleField }
 											mediaField={ mediaField }
+											mediaAspectRatio={
+												mediaAspectRatio
+											}
 											descriptionField={
 												descriptionField
 											}
@@ -662,6 +686,7 @@ function ViewTable< Item >( {
 										view={ view }
 										titleField={ titleField }
 										mediaField={ mediaField }
+										mediaAspectRatio={ mediaAspectRatio }
 										descriptionField={ descriptionField }
 										selection={ selection }
 										getItemId={ getItemId }
