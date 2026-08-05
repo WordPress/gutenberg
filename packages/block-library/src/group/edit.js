@@ -3,6 +3,7 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	InnerBlocks,
 	useBlockProps,
 	InspectorControls,
 	useInnerBlocksProps,
@@ -86,11 +87,19 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		hasInnerBlocks,
 	} );
 
-	// In the placeholder state, ensure the appender is not rendered.
-	// This is needed because `...innerBlocksProps` is used in the placeholder
-	// state so that blocks can dragged onto the placeholder area
-	// from both the list view and in the editor canvas.
-	const renderAppender = showPlaceholder ? false : undefined;
+	// Default to the regular appender being rendered.
+	let renderAppender;
+	if ( showPlaceholder ) {
+		// In the placeholder state, ensure the appender is not rendered.
+		// This is needed because `...innerBlocksProps` is used in the placeholder
+		// state so that blocks can dragged onto the placeholder area
+		// from both the list view and in the editor canvas.
+		renderAppender = false;
+	} else if ( ! hasInnerBlocks ) {
+		// When there is no placeholder, but the block is also empty,
+		// use the larger button appender.
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	}
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled

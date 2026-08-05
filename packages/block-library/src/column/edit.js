@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
@@ -73,7 +74,7 @@ function ColumnEdit( {
 	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-	const { columnsIds, rootClientId } = useSelect(
+	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } =
 				select( blockEditorStore );
@@ -81,6 +82,7 @@ function ColumnEdit( {
 			const rootId = getBlockRootClientId( clientId );
 
 			return {
+				hasChildBlocks: getBlockOrder( clientId ).length > 0,
 				rootClientId: rootId,
 				columnsIds: getBlockOrder( rootId ),
 			};
@@ -121,6 +123,9 @@ function ColumnEdit( {
 		{
 			templateLock,
 			allowedBlocks,
+			renderAppender: hasChildBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
 		}
 	);
 

@@ -2,14 +2,20 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	useBlockProps,
+	useInnerBlocksProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * External dependencies
  */
 import clsx from 'clsx';
 
-const Edit = ( { attributes } ) => {
+const Edit = ( { attributes, clientId } ) => {
 	const { type } = attributes;
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-form-submission-notification', {
@@ -17,7 +23,22 @@ const Edit = ( { attributes } ) => {
 		} ),
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps );
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	return (
 		<div

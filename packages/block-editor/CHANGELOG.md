@@ -14,6 +14,10 @@
 -   Add support for the `blockStatesEditingEnabled` editor setting, which hides state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
 -   `InnerBlocks`/`useInnerBlocksProps`: When no `renderAppender` option is passed, the appender now resolves from the block type's `appender` setting.
 
+### Deprecations
+
+-   `InnerBlocks`/`useInnerBlocksProps`: Passing `InnerBlocks.DefaultBlockAppender` as `renderAppender` is deprecated. Set `appender: 'default'` in the block type settings instead.
+
 ### Performance
 
 -   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on each call. `BlockListBlock` asks once per rendered block, so the old cost was the block count multiplied by the selection size ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).

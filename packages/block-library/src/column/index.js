@@ -18,7 +18,6 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	appender: 'button',
 	edit,
 	save,
 	deprecated,

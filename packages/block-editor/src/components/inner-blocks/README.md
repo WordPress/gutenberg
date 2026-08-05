@@ -139,7 +139,7 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 ### `renderAppender`
 
 -   **Type:** `Component|false`
--   **Default:** - `undefined`. When `renderAppender` is not specified, the appender resolves from the block type's `appender` setting: `'none'` renders no appender, `'button'` renders the button appender while the block is empty, and `'default'` (also the fallback when the setting is omitted) renders the default appender. If a `false` value is provided, no appender is rendered.
+-   **Default:** - `undefined`. When `renderAppender` is not specified, the appender resolves from the block type's `appender` setting: `'none'` renders no appender, and `'default'` renders the default appender while the block is selected or empty. Without the setting, the default appender renders while the block is selected. If a `false` value is provided, no appender is rendered. Passing `InnerBlocks.DefaultBlockAppender` is deprecated in favor of the block type setting.
 
 A component to show as the trailing appender for the inner blocks list.
 

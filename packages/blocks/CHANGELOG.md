@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Block types support an `appender` setting describing the appender rendered after their inner blocks: `'none'`, `'button'` (while the block is empty), or `'default'`.
+-   Block types support an `appender` setting describing the appender rendered after their inner blocks: `'none'` renders no appender, `'default'` renders the default block appender while the block is selected or empty.
 
 ### Internal
 
