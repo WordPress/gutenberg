@@ -7,6 +7,7 @@ import {
 	useState,
 	useEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -29,6 +30,12 @@ import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
+import {
+	getTrashedNotes,
+	setTrashedNoteState,
+	subscribeTrashedNotes,
+	trackTrashedNote,
+} from './trashed-notes';
 import {
 	applyNoteFormat,
 	calculateNotePositions,
@@ -285,8 +292,12 @@ export function useNoteActions() {
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
+	const { undo } = useDispatch( editorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -503,11 +514,18 @@ export function useNoteActions() {
 				);
 			}
 
-			// The attribute value as stripped below; the Undo action compares
-			// against it to decide whether the inline marker can be restored.
-			let strippedKey;
-			let strippedValue;
-			let previousValue;
+			/*
+			 * Whether the delete leaves an undo level behind. It only does
+			 * when the note was actually attached to a block: replies and
+			 * orphaned notes have no footprint in the content, so there's
+			 * nothing for the editor's undo to restore.
+			 */
+			const isUndoable =
+				isTrashed &&
+				!! clientId &&
+				getNoteIdsFromMetadata(
+					getBlockAttributes( clientId )?.metadata
+				).includes( note.id );
 
 			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );
@@ -529,23 +547,41 @@ export function useNoteActions() {
 					);
 					if ( next ) {
 						newAttributes[ found.attributeKey ] = next;
-						strippedKey = found.attributeKey;
-						strippedValue = next;
-						previousValue = attributes[ found.attributeKey ];
 					}
 				}
-				/*
-				 * Keep the cleanup out of undo history: the record deletion it
-				 * mirrors isn't part of that history, so undoing it alone
-				 * would resurrect a marker whose note stays trashed. The
-				 * snackbar's Undo action restores both sides together.
-				 */
-				__unstableMarkNextChangeAsNotPersistent( {
-					history: 'ignore',
-				} );
+				if ( isUndoable ) {
+					/*
+					 * Land the cleanup as its own undo level so undo restores
+					 * the note id and its inline marker; `useNoteTrashSync`
+					 * then follows the metadata back out of the trash. Closing
+					 * the previous level first keeps the strip from merging
+					 * into an in-progress typing session.
+					 */
+					__unstableMarkLastChangeAsPersistent();
+				} else {
+					/*
+					 * Nothing to restore, either because the note was purged
+					 * outright (the site has the trash disabled) or because it
+					 * wasn't attached here. Keep the change out of history
+					 * rather than let undo resurrect a marker for a note
+					 * that's gone.
+					 */
+					__unstableMarkNextChangeAsNotPersistent( {
+						history: 'ignore',
+					} );
+				}
 				updateBlockAttributes( clientId, newAttributes );
 			}
 
+			if ( isUndoable ) {
+				trackTrashedNote( note.id, clientId );
+			}
+
+			/*
+			 * Restore path for trashed notes that left no undo level: with no
+			 * block metadata to put back, untrashing the comment is the whole
+			 * job.
+			 */
 			const restoreNote = async () => {
 				try {
 					// `untrash` restores the comment's pre-trash status.
@@ -555,40 +591,6 @@ export function useNoteActions() {
 						{ id: note.id, status: 'untrash' },
 						{ throwOnError: true }
 					);
-
-					const attributes = clientId
-						? getBlockAttributes( clientId )
-						: null;
-					// The block may have been removed in the meantime; the
-					// note then reappears as an orphan in the sidebar.
-					if ( attributes ) {
-						const newAttributes = {
-							metadata: cleanEmptyObject(
-								addNoteIdToMetadata(
-									attributes?.metadata,
-									note.id
-								)
-							),
-						};
-						/*
-						 * Re-attach the inline marker only when the text is
-						 * unchanged since the delete stripped it, so Undo
-						 * can't clobber edits made in the meantime. When it
-						 * changed, the note falls back to a block-level note.
-						 */
-						if (
-							strippedKey &&
-							String( attributes[ strippedKey ] ?? '' ) ===
-								String( strippedValue )
-						) {
-							newAttributes[ strippedKey ] = previousValue;
-						}
-						__unstableMarkNextChangeAsNotPersistent( {
-							history: 'ignore',
-						} );
-						updateBlockAttributes( clientId, newAttributes );
-					}
-
 					createNotice( 'snackbar', __( 'Note restored.' ), {
 						type: 'snackbar',
 						isDismissible: true,
@@ -605,7 +607,12 @@ export function useNoteActions() {
 					actions: [
 						{
 							label: __( 'Undo' ),
-							onClick: restoreNote,
+							/*
+							 * Route undoable deletes through the editor's undo
+							 * so the button and the undo shortcut are the same
+							 * action, and redo re-deletes.
+							 */
+							onClick: isUndoable ? undo : restoreNote,
 						},
 					],
 				} ),
@@ -618,6 +625,107 @@ export function useNoteActions() {
 	};
 
 	return { onCreate, onEdit, onDelete };
+}
+
+/**
+ * Keeps a trashed note's comment in step with its block metadata.
+ *
+ * Deleting a note strips its id from the block as an ordinary undo level, so
+ * undo restores the id on its own and the comment has to follow it out of the
+ * trash - and back in again on redo. Mount this once, above the notes panel,
+ * so it keeps working while the panel is closed.
+ */
+export function useNoteTrashSync() {
+	const trackedNotes = useSyncExternalStore(
+		subscribeTrashedNotes,
+		getTrashedNotes,
+		getTrashedNotes
+	);
+	const { createNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	// Requests in flight, so a re-render mid-round-trip doesn't fire a second.
+	const pending = useRef( new Set() );
+
+	/*
+	 * Whether each tracked note is still referenced by its block, positionally
+	 * matched to `trackedNotes`. `null` means the block itself is gone: the
+	 * note is an orphan now, and orphans stay in the sidebar rather than being
+	 * trashed behind the user's back.
+	 */
+	const isReferenced = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			return trackedNotes.map( ( { noteId, clientId } ) => {
+				const attributes = getBlockAttributes( clientId );
+				if ( ! attributes ) {
+					return null;
+				}
+				return getNoteIdsFromMetadata( attributes.metadata ).includes(
+					noteId
+				);
+			} );
+		},
+		[ trackedNotes ]
+	);
+
+	useEffect( () => {
+		trackedNotes.forEach( async ( { noteId, isTrashed }, index ) => {
+			const referenced = isReferenced[ index ];
+			if (
+				referenced === null ||
+				referenced === ! isTrashed ||
+				pending.current.has( noteId )
+			) {
+				return;
+			}
+			pending.current.add( noteId );
+			try {
+				if ( referenced ) {
+					// `untrash` restores the comment's pre-trash status.
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{ id: noteId, status: 'untrash' },
+						{ throwOnError: true }
+					);
+					createNotice( 'snackbar', __( 'Note restored.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				} else {
+					await deleteEntityRecord(
+						'root',
+						'comment',
+						noteId,
+						undefined,
+						{ throwOnError: true }
+					);
+				}
+				setTrashedNoteState( noteId, ! referenced );
+			} catch ( error ) {
+				/*
+				 * Leave the tracked state alone so the next block change
+				 * retries; the note and its marker are briefly out of step
+				 * until then.
+				 */
+				createNotice(
+					'error',
+					error.message && error.code !== 'unknown_error'
+						? decodeEntities( error.message )
+						: __( 'An error occurred while performing an update.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+			} finally {
+				pending.current.delete( noteId );
+			}
+		} );
+	}, [
+		trackedNotes,
+		isReferenced,
+		saveEntityRecord,
+		deleteEntityRecord,
+		createNotice,
+	] );
 }
 
 export function useEnableFloatingSidebar( enabled = false ) {

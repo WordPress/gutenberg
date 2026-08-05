@@ -218,6 +218,42 @@ test.describe( 'Block Notes', () => {
 		).toHaveText( 'Test comment to restore.' );
 	} );
 
+	test( 'can restore a deleted block note with the undo shortcut', async ( {
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Undo me with the keyboard.',
+		} );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toBeHidden();
+
+		// The delete leaves an ordinary undo level, so the editor's undo
+		// shortcut restores the note without touching the snackbar.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toHaveText( 'Undo me with the keyboard.' );
+
+		// And redo deletes it again.
+		await pageUtils.pressKeys( 'primaryShift+z' );
+
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toBeHidden();
+	} );
+
 	test( 'can resolve and reopen a block note', async ( {
 		page,
 		blockNoteUtils,
