@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+
+/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
@@ -13,7 +18,10 @@ import { test, expect } from './fixtures';
  * done so the remaining collaboration specs keep exercising the yjs relay.
  */
 
-async function setSyncEngine( requestUtils, engine: string | null ) {
+async function setSyncEngine(
+	requestUtils: RequestUtils,
+	engine: string | null
+) {
 	await requestUtils.rest( {
 		method: 'POST',
 		path: '/wp/v2/settings',
@@ -81,6 +89,61 @@ test.describe( 'Collaboration - intent-log engine', () => {
 				'Existing content plus user two'
 			);
 		} ).toPass( { timeout: 10000 } );
+	} );
+
+	test( 'appending to an existing paragraph keeps it visible and identity-stable on the peer', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// Regression: id-less editor blocks (freshly parsed post content)
+		// used to re-mint a syncId every capture cycle, deriving
+		// remove_block + insert_block per keystroke — the paragraph
+		// flickered out of existence on the peer's CANVAS even though
+		// store-level polling assertions eventually converged.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Append Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Steady paragraph</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page1.keyboard.press( 'End' );
+		await page1.keyboard.type( ' appended' );
+
+		// The peer's CANVAS shows the appended text…
+		await expect(
+			editor2.canvas.locator( '[data-type="core/paragraph"]' ).first()
+		).toContainText( 'Steady paragraph appended', { timeout: 10000 } );
+		// …and exactly one paragraph exists (no remove/insert churn residue).
+		await expect(
+			editor2.canvas.locator( '[data-type="core/paragraph"]' )
+		).toHaveCount( 1 );
+
+		// A second append still targets the SAME block (identity adoption is
+		// stable across capture cycles): the paragraph neither duplicates
+		// nor flickers, and both canvases converge on the full text.
+		await page1.keyboard.type( ' again' );
+		await expect(
+			editor2.canvas.locator( '[data-type="core/paragraph"]' ).first()
+		).toContainText( 'Steady paragraph appended again', {
+			timeout: 10000,
+		} );
+		await expect(
+			editor2.canvas.locator( '[data-type="core/paragraph"]' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' )
+		).toHaveCount( 1 );
 	} );
 
 	test( 'concurrent edits to different blocks both survive', async ( {

@@ -514,11 +514,33 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					}
 				}
 
+				/*
+				 * The editor's `content` attribute is the INNER HTML of a
+				 * block's single wrapper element ('<p>Hi</p>' → 'Hi'), and
+				 * the client bridge captures in that form. Genesis must
+				 * store the same form or every text offset disagrees between
+				 * client and server. The stripped wrapper is kept in an
+				 * internal `_wrapper` attr (excluded from client capture)
+				 * so materialize() can rebuild the full markup.
+				 */
+				$text    = trim( $block['innerHTML'] );
+				$wrapper = null;
+				if ( preg_match( '/^<([a-zA-Z][a-zA-Z0-9-]*)(\s[^>]*)?>(.*)<\/\1>$/s', $text, $matches ) ) {
+					$wrapper = array(
+						'open'  => '<' . $matches[1] . ( $matches[2] ?? '' ) . '>',
+						'close' => '</' . $matches[1] . '>',
+					);
+					$text    = $matches[3];
+				}
+				if ( null !== $wrapper ) {
+					$attrs['_wrapper'] = $wrapper;
+				}
+
 				$specs[] = array(
 					'syncId'    => $sync_id,
 					'blockType' => $block['blockName'],
 					'attrs'     => $attrs,
-					'text'      => trim( $block['innerHTML'] ),
+					'text'      => $text,
 					'children'  => self::blocks_to_specs( $block['innerBlocks'], $post_id, $block_path ),
 				);
 				++$index;
@@ -536,12 +558,17 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 * @return array WP_Block_Parser_Block-shaped array.
 		 */
 		private static function to_serializable_block( array $block ): array {
-			$attrs                       = $block['attrs'];
+			$attrs   = $block['attrs'];
+			$wrapper = $attrs['_wrapper'] ?? null;
+			unset( $attrs['_wrapper'] );
 			$attrs['metadata']           = is_array( $attrs['metadata'] ?? null ) ? $attrs['metadata'] : array();
 			$attrs['metadata']['syncId'] = $block['syncId'];
 
-			$inner_blocks  = array_map( array( __CLASS__, 'to_serializable_block' ), $block['children'] );
-			$text          = $block['fields']['content']['text'] ?? '';
+			$inner_blocks = array_map( array( __CLASS__, 'to_serializable_block' ), $block['children'] );
+			$text         = $block['fields']['content']['text'] ?? '';
+			if ( is_array( $wrapper ) ) {
+				$text = ( $wrapper['open'] ?? '' ) . $text . ( $wrapper['close'] ?? '' );
+			}
 			$inner_content = array();
 			if ( '' !== $text ) {
 				$inner_content[] = $text;

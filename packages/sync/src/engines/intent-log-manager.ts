@@ -135,6 +135,15 @@ export function createIntentLogManager( debug = false ): SyncManager {
 				return;
 			}
 			const blocks = engineDocumentToBlocks( session.getDocument()! );
+			/*
+			 * Never push an EMPTY shared document over a live editor as the
+			 * first push (fresh post: the genesis is empty while the user
+			 * may already be typing). The first capture seeds the document
+			 * instead.
+			 */
+			if ( 0 === blocks.length && null === state.lastPushedState ) {
+				return;
+			}
 			const canonical = canonicalBlocksJson( blocks );
 			if ( canonical === state.lastPushedState ) {
 				return; // Echo of our own capture; nothing new for the editor.
@@ -218,9 +227,32 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			}
 			// Record the state we just captured so later change events do
 			// not bounce it back into the editor.
-			state.lastPushedState = canonicalBlocksJson(
-				engineDocumentToBlocks( state.session.getDocument()! )
+			const captured = engineDocumentToBlocks(
+				state.session.getDocument()!
 			);
+			state.lastPushedState = canonicalBlocksJson( captured );
+
+			/*
+			 * Write identities back: when the editor's tree lacked syncIds
+			 * (freshly parsed content, newly created blocks), the bridge
+			 * adopted or minted them — the editor must carry them so the
+			 * NEXT capture cycle sees stable identities instead of
+			 * re-minting (the insert/remove churn bug).
+			 */
+			const editorHadAllIds = blocks.every( function hasId(
+				block: BridgeBlock
+			): boolean {
+				const metadata = block.attributes?.metadata as
+					| { syncId?: string }
+					| undefined;
+				return !! metadata?.syncId && block.innerBlocks.every( hasId );
+			} );
+			if ( ! editorHadAllIds ) {
+				state.handlers.editRecord(
+					{ blocks: captured },
+					{ undoIgnore: true }
+				);
+			}
 		},
 
 		getAwareness: ( objectType, objectId ) => {

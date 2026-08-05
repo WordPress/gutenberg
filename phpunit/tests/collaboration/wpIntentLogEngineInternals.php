@@ -85,7 +85,7 @@ class Tests_Collaboration_WpIntentLogEngineInternals extends WP_UnitTestCase {
 			WP_Intent_Log_Planner::genesis_sync_id( $post_id, 0, array( 0, 0 ) ),
 			$group['children'][0]['syncId']
 		);
-		$this->assertSame( '<p>Inner</p>', $group['children'][0]['fields']['content']['text'] );
+		$this->assertSame( 'Inner', $group['children'][0]['fields']['content']['text'] );
 		$this->assertSame(
 			WP_Intent_Log_Planner::genesis_sync_id( $post_id, 0, array( 1 ) ),
 			$doc['root'][1]['syncId']

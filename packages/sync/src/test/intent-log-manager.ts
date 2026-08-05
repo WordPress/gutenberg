@@ -224,6 +224,119 @@ describe( 'intent-log manager', () => {
 		);
 	} );
 
+	it( 'REGRESSION: id-less editor blocks keep a stable identity across updates (no insert/remove churn)', async () => {
+		// The editor parses post content without metadata.syncId. Repeated
+		// update() calls with id-less blocks must adopt the document's
+		// existing identities — never mint fresh ids per call, which turns
+		// every keystroke into remove_block + insert_block and makes blocks
+		// flicker out of existence on peers.
+		const { manager, handlers, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'genesis-p1',
+					blockType: 'core/paragraph',
+					text: 'Hello world',
+				},
+			] )
+		);
+
+		const editorBlocks = ( content: string ) => [
+			{
+				name: 'core/paragraph',
+				// No metadata.syncId — exactly what a fresh editor holds.
+				attributes: { content },
+				innerBlocks: [],
+			},
+		];
+
+		manager.update(
+			'postType/post',
+			'1',
+			{ blocks: editorBlocks( 'Hello world!' ) },
+			'gutenberg'
+		);
+		manager.update(
+			'postType/post',
+			'1',
+			{ blocks: editorBlocks( 'Hello world!!' ) },
+			'gutenberg'
+		);
+
+		const sentTypes = transport.captured.sent.map(
+			( update ) => JSON.parse( update.data ).type
+		);
+		expect( sentTypes ).toEqual( [ 'insert_text', 'insert_text' ] );
+		// Both edits target the genesis identity.
+		for ( const update of transport.captured.sent ) {
+			expect( JSON.parse( update.data ).payload.syncId ).toBe(
+				'genesis-p1'
+			);
+		}
+		// The editor was handed the adopted identity so its next tree
+		// carries it (the write-back half of the fix).
+		const lastPush = handlers.edits.at( -1 ) as {
+			blocks: Array< { attributes: { metadata?: { syncId?: string } } } >;
+		};
+		expect( lastPush.blocks[ 0 ].attributes.metadata?.syncId ).toBe(
+			'genesis-p1'
+		);
+	} );
+
+	it( 'REGRESSION: a genuinely new id-less block is inserted once and stays stable', async () => {
+		const { manager, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'genesis-p1',
+					blockType: 'core/paragraph',
+					text: 'Hello',
+				},
+			] )
+		);
+
+		const withNewBlock = ( content: string ) => [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Hello',
+					metadata: { syncId: 'genesis-p1' },
+				},
+				innerBlocks: [],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content },
+				innerBlocks: [],
+			},
+		];
+
+		manager.update(
+			'postType/post',
+			'1',
+			{ blocks: withNewBlock( 'typed' ) },
+			'gutenberg'
+		);
+		manager.update(
+			'postType/post',
+			'1',
+			{ blocks: withNewBlock( 'typed more' ) },
+			'gutenberg'
+		);
+
+		const sent = transport.captured.sent.map( ( update ) =>
+			JSON.parse( update.data )
+		);
+		expect( sent.map( ( intent ) => intent.type ) ).toEqual( [
+			'insert_block',
+			'insert_text',
+		] );
+		// The second edit addresses the SAME identity the insert created.
+		expect( sent[ 1 ].payload.syncId ).toBe(
+			sent[ 0 ].payload.block.syncId
+		);
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

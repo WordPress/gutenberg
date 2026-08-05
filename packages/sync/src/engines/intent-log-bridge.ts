@@ -91,11 +91,14 @@ function serializeAttribute( value: unknown ): unknown {
  * Maps one Gutenberg-shaped block (and its subtree) onto an engine block
  * spec, minting creation syncIds for blocks that lack one.
  *
- * @param block Bridge block.
+ * @param block  Bridge block.
+ * @param minted Optional set collecting the ids minted here (so the caller
+ *               can distinguish minted ids from editor-authored ones).
  * @return Engine block spec (makeBlock input shape).
  */
 export function blockToEngineSpec(
-	block: BridgeBlock
+	block: BridgeBlock,
+	minted?: Set< string >
 ): Record< string, unknown > {
 	const attributes = { ...block.attributes };
 	const metadata = {
@@ -104,6 +107,7 @@ export function blockToEngineSpec(
 	let syncId = metadata.syncId as string | undefined;
 	if ( ! syncId ) {
 		syncId = mintSyncId();
+		minted?.add( syncId );
 	}
 	delete metadata.syncId;
 	if ( Object.keys( metadata ).length > 0 ) {
@@ -125,7 +129,9 @@ export function blockToEngineSpec(
 		blockType: block.name,
 		attrs,
 		text: 'string' === typeof text ? text : '',
-		children: block.innerBlocks.map( blockToEngineSpec ),
+		children: block.innerBlocks.map( ( child ) =>
+			blockToEngineSpec( child, minted )
+		),
 	};
 }
 
@@ -138,7 +144,14 @@ export function blockToEngineSpec(
  * @return Bridge block.
  */
 export function engineBlockToBlock( block: EngineBlock ): BridgeBlock {
-	const attributes: Record< string, unknown > = { ...block.attrs };
+	const attributes: Record< string, unknown > = {};
+	for ( const [ key, value ] of Object.entries( block.attrs ) ) {
+		// Engine-internal attrs (e.g. the server's _wrapper markup capture)
+		// never reach the editor.
+		if ( ! key.startsWith( '_' ) ) {
+			attributes[ key ] = value;
+		}
+	}
 	const metadata = {
 		...( attributes.metadata as Record< string, unknown > | undefined ),
 		syncId: block.syncId,
@@ -289,6 +302,66 @@ function diffText(
 }
 
 /**
+ * Aligns id-less specs with the document's existing identities.
+ *
+ * The editor parses post content without metadata.syncId, so every incoming
+ * tree may lack ids for blocks the document already knows. Minting a fresh
+ * id in that situation is the churn bug: each capture cycle would derive
+ * remove_block + insert_block for the same block, making it flicker out of
+ * existence on peers. Instead, an id-less spec ADOPTS the id of the
+ * positionally corresponding document block of the same type (recursively),
+ * provided no id-bearing spec in the tree already claims it. Only blocks
+ * with no such counterpart keep their minted (creation) id.
+ *
+ * Mutates the spec objects in place (they are bridge-created).
+ *
+ * @param specs     Engine block specs at one level.
+ * @param docBlocks Document blocks at the same level.
+ * @param claimed   Ids claimed by id-bearing specs anywhere in the tree.
+ * @param minted    Ids minted by blockToEngineSpec (adoption candidates).
+ */
+function adoptExistingIds(
+	specs: Array< Record< string, unknown > >,
+	docBlocks: EngineBlock[],
+	claimed: Set< string >,
+	minted: Set< string >
+): void {
+	for ( let index = 0; index < specs.length; index++ ) {
+		const spec = specs[ index ];
+		const docBlock = docBlocks[ index ];
+		if (
+			docBlock &&
+			minted.has( spec.syncId as string ) &&
+			docBlock.blockType === spec.blockType &&
+			! claimed.has( docBlock.syncId )
+		) {
+			spec.syncId = docBlock.syncId;
+			claimed.add( docBlock.syncId );
+		}
+		adoptExistingIds(
+			( spec.children as Array< Record< string, unknown > > ) ?? [],
+			docBlock?.children ?? [],
+			claimed,
+			minted
+		);
+	}
+}
+
+function collectSpecIds(
+	specs: Array< Record< string, unknown > >,
+	into: Set< string >
+): Set< string > {
+	for ( const spec of specs ) {
+		into.add( spec.syncId as string );
+		collectSpecIds(
+			( spec.children as Array< Record< string, unknown > > ) ?? [],
+			into
+		);
+	}
+	return into;
+}
+
+/**
  * Derives intents that transform `doc` into the tree described by `blocks`.
  *
  * The result is verified by application; on divergence the affected blocks
@@ -299,17 +372,25 @@ function diffText(
  * its session (which applies them optimistically).
  *
  * @param doc    The session's current engine document.
- * @param blocks The editor's new block tree (bridge shape). Blocks without
- *               a metadata.syncId are treated as newly created and minted
- *               an id — callers should write the minted ids back to the
- *               editor via the returned specs.
- * @return Derived intents + the specs (with minted ids), or null.
+ * @param blocks The editor's new block tree (bridge shape). Id-less blocks
+ *               adopt the positionally corresponding document identity when
+ *               one exists (see adoptExistingIds); otherwise they are
+ *               treated as newly created with a minted id. Callers MUST
+ *               write the resulting ids back to the editor via the returned
+ *               specs, or the next capture cycle re-mints.
+ * @return Derived intents + the specs (with adopted/minted ids), or null.
  */
 export function deriveIntents(
 	doc: EngineDocument,
 	blocks: BridgeBlock[]
 ): ( DerivedIntents & { specs: Array< Record< string, unknown > > } ) | null {
-	const specs = blocks.map( blockToEngineSpec );
+	const minted = new Set< string >();
+	const specs = blocks.map( ( block ) => blockToEngineSpec( block, minted ) );
+	const claimed = collectSpecIds( specs, new Set() );
+	for ( const id of minted ) {
+		claimed.delete( id );
+	}
+	adoptExistingIds( specs, doc.root, claimed, minted );
 	const target = specsToDocument( specs );
 	const targetJson = bridgeCanonical( target );
 	if ( targetJson === bridgeCanonical( doc ) ) {
@@ -396,7 +477,9 @@ export function deriveIntents(
 			}
 		}
 		for ( const key of Object.keys( oldBlock.attrs ) ) {
-			if ( ! ( key in newAttrs ) ) {
+			// Engine-internal attrs never appear in editor trees; their
+			// absence there is not a removal.
+			if ( ! ( key in newAttrs ) && ! key.startsWith( '_' ) ) {
 				intents.push( {
 					type: 'remove_attr',
 					payload: {
@@ -491,9 +574,11 @@ function bridgeCanonical( doc: EngineDocument ): string {
 		syncId: block.syncId,
 		blockType: block.blockType,
 		attrs: Object.fromEntries(
-			Object.entries( block.attrs ).sort( ( [ a ], [ b ] ) =>
-				a < b ? -1 : 1
-			)
+			Object.entries( block.attrs )
+				// Engine-internal attrs are not part of the editor-visible
+				// projection (editor trees never carry them).
+				.filter( ( [ key ] ) => ! key.startsWith( '_' ) )
+				.sort( ( [ a ], [ b ] ) => ( a < b ? -1 : 1 ) )
 		),
 		text: block.fields.content?.text ?? '',
 		children: block.children.map( project ),

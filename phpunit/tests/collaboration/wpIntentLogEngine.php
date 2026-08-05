@@ -123,7 +123,16 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$block    = $snapshot['doc']['root'][0];
 		$this->assertSame( 'core/paragraph', $block['blockType'] );
 		$this->assertSame( self::paragraph_id(), $block['syncId'] );
-		$this->assertSame( '<p>Hello world</p>', $block['fields']['content']['text'] );
+		// Attribute-form content (wrapper stripped into the internal attr),
+		// matching what the client bridge captures.
+		$this->assertSame( 'Hello world', $block['fields']['content']['text'] );
+		$this->assertSame(
+			array(
+				'open'  => '<p>',
+				'close' => '</p>',
+			),
+			$block['attrs']['_wrapper']
+		);
 		$this->assertArrayNotHasKey( 'dispositions', $room_response );
 	}
 
@@ -233,7 +242,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 					'field'       => 'content',
 					'start'       => 0,
 					'end'         => 3,
-					'removedText' => '<p>',
+					'removedText' => 'Hel',
 				),
 			)
 		);
