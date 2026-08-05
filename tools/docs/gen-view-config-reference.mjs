@@ -133,7 +133,7 @@ function serializeType( schema ) {
  * may not. A raw HTML code tag with pipes as HTML entities
  * renders correctly in both.
  *
- * @link https://github.com/WordPress/gutenberg/pull/81168#discussion_r3719197568
+ * @see https://github.com/WordPress/gutenberg/pull/81168#discussion_r3719197568
  *
  * @param {string} value Code content.
  * @return {string} Inline code markup.
