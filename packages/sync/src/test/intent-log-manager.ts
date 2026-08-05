@@ -548,6 +548,49 @@ describe( 'intent-log manager', () => {
 		expect( sent[ 0 ].payload.syncId ).toBe( 'b1' );
 	} );
 
+	it( 'REGRESSION: pushed blocks carry stable clientIds so the block editor accepts them', async () => {
+		// The block-editor store keys blocks by clientId. Pushing blocks
+		// without one makes the canvas silently drop the tree (dev bundles)
+		// or remount every block per push. Ids must also be STABLE across
+		// pushes for the same syncId so React reconciles in place.
+		const { handlers, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{ syncId: 'p1', blockType: 'core/paragraph', text: 'Hello' },
+			] )
+		);
+
+		const firstPush = handlers.edits.at( -1 ) as {
+			blocks: Array< { clientId?: string; isValid?: boolean } >;
+		};
+		expect( firstPush.blocks[ 0 ].clientId ).toBeTruthy();
+		expect( firstPush.blocks[ 0 ].isValid ).toBe( true );
+
+		// A remote edit triggers another push: same syncId → same clientId.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intentId: 'remote-1',
+				actorId: 'u9c9',
+				baseSeq: 0,
+				txnId: null,
+				type: 'insert_text',
+				payload: {
+					syncId: 'p1',
+					field: 'content',
+					offset: 0,
+					text: 'x',
+				},
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.INTENT,
+		} );
+		const secondPush = handlers.edits.at( -1 ) as {
+			blocks: Array< { clientId?: string } >;
+		};
+		expect( secondPush.blocks[ 0 ].clientId ).toBe(
+			firstPush.blocks[ 0 ].clientId
+		);
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

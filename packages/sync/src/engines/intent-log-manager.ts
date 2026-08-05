@@ -52,6 +52,14 @@ interface EntityState {
 	handlers: RecordHandlers;
 	providers: ProviderCreatorResult[];
 	unloaded: boolean;
+	/**
+	 * Stable clientId per syncId for blocks pushed to the editor. The
+	 * block-editor store keys blocks by clientId; pushing without one makes
+	 * the canvas silently drop the tree (debug bundles) or remount blocks
+	 * on every push (losing selection). Stability across pushes lets React
+	 * reconcile in place.
+	 */
+	clientIds: Map< string, string >;
 	/** Canonical form of the last state pushed to (or from) the editor. */
 	lastPushedState: string | null;
 	/**
@@ -109,6 +117,46 @@ function canonicalBlocksJson( blocks: BridgeBlock[] ): string {
 }
 
 /**
+ * A bridge block extended with the editor-required clientId.
+ */
+type EditorBlock = BridgeBlock & {
+	clientId: string;
+	isValid: boolean;
+	innerBlocks: EditorBlock[];
+};
+
+/**
+ * Assigns stable clientIds (keyed by syncId) to a bridge block tree so the
+ * block-editor store accepts and reconciles it.
+ *
+ * @param blocks    Bridge blocks (syncId present in metadata).
+ * @param clientIds syncId → clientId map (grown as needed).
+ * @return Editor-ready blocks.
+ */
+function toEditorBlocks(
+	blocks: BridgeBlock[],
+	clientIds: Map< string, string >
+): EditorBlock[] {
+	return blocks.map( ( block ) => {
+		const syncId = ( block.attributes?.metadata as { syncId?: string } )
+			?.syncId;
+		let clientId = syncId ? clientIds.get( syncId ) : undefined;
+		if ( ! clientId ) {
+			clientId = globalThis.crypto.randomUUID();
+			if ( syncId ) {
+				clientIds.set( syncId, clientId );
+			}
+		}
+		return {
+			...block,
+			clientId,
+			isValid: true,
+			innerBlocks: toEditorBlocks( block.innerBlocks, clientIds ),
+		};
+	} );
+}
+
+/**
  * Creates an intent-log sync manager.
  *
  * @param debug Whether to log debug output.
@@ -162,6 +210,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			editorIds: null,
 			prevDocIds: new Set(),
 			docTombstones: new Set(),
+			clientIds: new Map(),
 		};
 		entityStates.set( key, state );
 
@@ -212,7 +261,10 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			 * rendered it. Ids become removable when the editor itself
 			 * hands us a tree containing them (its echo of this push).
 			 */
-			handlers.editRecord( { blocks }, { undoIgnore: true } );
+			handlers.editRecord(
+				{ blocks: toEditorBlocks( blocks, state.clientIds ) },
+				{ undoIgnore: true }
+			);
 		} );
 
 		session.onProposal( ( proposal ) => {
@@ -351,7 +403,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 				treeHasTombstoned;
 			if ( editorIsBehind && capturedJson !== state.lastPushedState ) {
 				state.handlers.editRecord(
-					{ blocks: captured },
+					{ blocks: toEditorBlocks( captured, state.clientIds ) },
 					{ undoIgnore: true }
 				);
 			}
