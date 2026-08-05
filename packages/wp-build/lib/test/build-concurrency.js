@@ -18,12 +18,12 @@ const flushPromises = () =>
 	} );
 
 describe( 'getDefaultBuildConcurrency()', () => {
-	it( 'uses half the available parallelism clamped to the default range', () => {
+	it( 'uses the available parallelism clamped to the default range', () => {
 		expect( getDefaultBuildConcurrency( 1 ) ).toBe( 2 );
 		expect( getDefaultBuildConcurrency( 2 ) ).toBe( 2 );
-		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 2 );
-		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
-		expect( getDefaultBuildConcurrency( 16 ) ).toBe( 8 );
+		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 4 );
+		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 12 );
+		expect( getDefaultBuildConcurrency( 16 ) ).toBe( 16 );
 		expect( getDefaultBuildConcurrency( 32 ) ).toBe( 16 );
 		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 16 );
 	} );

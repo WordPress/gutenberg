@@ -30,10 +30,7 @@ export function getDefaultBuildConcurrency(
 ) {
 	return Math.max(
 		MIN_DEFAULT_BUILD_CONCURRENCY,
-		Math.min(
-			MAX_DEFAULT_BUILD_CONCURRENCY,
-			Math.ceil( availableParallelism / 2 )
-		)
+		Math.min( MAX_DEFAULT_BUILD_CONCURRENCY, availableParallelism )
 	);
 }
 
