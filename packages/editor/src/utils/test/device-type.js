@@ -3,6 +3,7 @@
  */
 import {
 	getCanvasWidthByDeviceType,
+	getDevicePreviewWidthByDeviceType,
 	getDeviceTypeByCanvasWidth,
 } from '../device-type';
 
@@ -16,6 +17,30 @@ describe( 'device type utilities', () => {
 		expect( getDeviceTypeByCanvasWidth( 782 ) ).toBe( 'Tablet' );
 		expect( getDeviceTypeByCanvasWidth( 783 ) ).toBe( 'Desktop' );
 		expect( getDeviceTypeByCanvasWidth( undefined ) ).toBe( 'Desktop' );
+	} );
+
+	it( 'places default device preview widths one pixel inside their breakpoints', () => {
+		expect( getDevicePreviewWidthByDeviceType( 'Mobile' ) ).toBe( 479 );
+		expect( getDevicePreviewWidthByDeviceType( 'Tablet' ) ).toBe( 781 );
+		expect(
+			getDevicePreviewWidthByDeviceType( 'Desktop' )
+		).toBeUndefined();
+	} );
+
+	it( 'keeps a tablet preview inside a tablet range narrower than one pixel', () => {
+		const viewportSettings = {
+			mobile: '480px',
+			tablet: '480.5px',
+		};
+		const previewWidth = getDevicePreviewWidthByDeviceType(
+			'Tablet',
+			viewportSettings
+		);
+
+		expect( previewWidth ).toBe( 480.25 );
+		expect(
+			getDeviceTypeByCanvasWidth( previewWidth, viewportSettings )
+		).toBe( 'Tablet' );
 	} );
 
 	it( 'uses default viewport breakpoints when viewport settings are provided', () => {
