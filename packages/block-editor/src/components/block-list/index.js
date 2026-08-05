@@ -226,11 +226,10 @@ function Items( {
 						getDefaultBlockName(),
 						rootClientId
 					) );
-			const hasSelectedRoot = !! (
-				rootClientId &&
-				selectedBlockClientId &&
-				rootClientId === selectedBlockClientId
-			);
+			// Inside a block, the default appender is the block's empty
+			// state: it renders while there are no inner blocks, whether or
+			// not the block is selected, and never renders next to content.
+			const showEmptyAppender = !! rootClientId && ! _order.length;
 
 			const templateLock = getTemplateLock( rootClientId );
 
@@ -250,7 +249,7 @@ function Items( {
 					hasAppender &&
 					! _isZoomOut() &&
 					( hasCustomAppender ||
-						hasSelectedRoot ||
+						showEmptyAppender ||
 						showRootAppender ),
 			};
 		},
