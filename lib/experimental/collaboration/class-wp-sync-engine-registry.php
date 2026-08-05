@@ -45,6 +45,7 @@ if ( ! class_exists( 'WP_Sync_Engine_Registry' ) ) {
 		 */
 		public function __construct( WP_Sync_Storage $storage ) {
 			$this->register( new WP_Yjs_Relay_Engine( $storage ) );
+			$this->register( new WP_Intent_Log_Engine( $storage ) );
 
 			/**
 			 * Filters the registered sync engines.
