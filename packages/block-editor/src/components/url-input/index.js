@@ -203,11 +203,9 @@ export default function URLInput( props ) {
 	const debouncedUpdateSuggestions = useDebounce( updateSuggestions, 200 );
 
 	// Keep the suggestions in sync with the value being searched for. An empty
-	// value requests the initial suggestions, when those are enabled. The sync
-	// is skipped while characters are being composed with an IME: intermediate
-	// composition updates must not fire search requests.
-	// `handleCompositionEnd` updates the suggestions once the composed value
-	// is confirmed.
+	// 	value requests the initial suggestions, when those are enabled.
+	// Composition state is a dependency, so the composed value is picked up
+	// whether the browser reports it before or after `compositionend`.
 	useEffect( () => {
 		if (
 			! disableSuggestions &&
