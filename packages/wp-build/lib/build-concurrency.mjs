@@ -20,24 +20,13 @@ let activeBuilds = 0;
 const queuedBuilds = [];
 
 /**
- * Gets the number of CPUs available to the current process.
- *
- * @return {number} Available parallelism.
- */
-function getAvailableParallelism() {
-	return typeof os.availableParallelism === 'function'
-		? os.availableParallelism()
-		: os.cpus().length;
-}
-
-/**
  * Get the default number of concurrent esbuild builds.
  *
  * @param {number} availableParallelism Available parallelism to use.
  * @return {number} Default build concurrency.
  */
 export function getDefaultBuildConcurrency(
-	availableParallelism = getAvailableParallelism()
+	availableParallelism = os.availableParallelism()
 ) {
 	return Math.max(
 		MIN_DEFAULT_BUILD_CONCURRENCY,
