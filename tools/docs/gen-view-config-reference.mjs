@@ -293,11 +293,11 @@ async function main() {
 			);
 		}
 		doc = doc.replace(
-			// `.` does not match new lines, but `[^]` will.
 			new RegExp(
-				`${ escapeRegExp( startToken ) }[^]*${ escapeRegExp(
+				`${ escapeRegExp( startToken ) }.*${ escapeRegExp(
 					endToken
-				) }`
+				) }`,
+				's'
 			),
 			() => `${ startToken }\n${ generate( schema ) }\n${ endToken }`
 		);
