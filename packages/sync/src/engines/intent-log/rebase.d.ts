@@ -54,3 +54,7 @@ export function serverIngestBatch(
 	server: IntentLogServer,
 	intents: IntentEnvelope[]
 ): IntentDisposition[];
+
+export function frameReadTargets( intent: IntentEnvelope ): string[];
+
+export function frameWriteTargets( intent: IntentEnvelope ): string[];
