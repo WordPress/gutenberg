@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import { createRef, useId } from '@wordpress/element';
 import * as Card from '../../card';
 import * as CollapsibleCard from '../index';
 
@@ -239,15 +239,15 @@ describe( 'CollapsibleCard', () => {
 	} );
 
 	describe( 'HeaderDescription', () => {
-		it( 'associates multiple descriptions with the trigger in render order', () => {
+		it( 'combines multiple descriptions into the trigger accessible description', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
 						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription data-testid="first-desc">
+						<CollapsibleCard.HeaderDescription>
 							3 errors
 						</CollapsibleCard.HeaderDescription>
-						<CollapsibleCard.HeaderDescription data-testid="second-desc">
+						<CollapsibleCard.HeaderDescription>
 							Requires attention
 						</CollapsibleCard.HeaderDescription>
 					</CollapsibleCard.Header>
@@ -260,18 +260,83 @@ describe( 'CollapsibleCard', () => {
 			const trigger = screen.getByRole( 'button', {
 				name: 'Settings',
 			} );
-			const firstDescription = screen.getByTestId( 'first-desc' );
-			const secondDescription = screen.getByTestId( 'second-desc' );
 
-			expect( firstDescription ).toHaveAttribute( 'id' );
-			expect( secondDescription ).toHaveAttribute( 'id' );
-			expect( trigger ).toHaveAttribute(
-				'aria-describedby',
-				`${ firstDescription.id } ${ secondDescription.id }`
-			);
 			expect( trigger ).toHaveAccessibleName( 'Settings' );
 			expect( trigger ).toHaveAccessibleDescription(
 				'3 errors Requires attention'
+			);
+		} );
+
+		it( 'uses explicit description IDs for the trigger accessible description', () => {
+			function TestCard() {
+				const errorsDescriptionId = useId();
+				const attentionDescriptionId = useId();
+
+				return (
+					<CollapsibleCard.Root>
+						<CollapsibleCard.Header>
+							<Card.Title>Settings</Card.Title>
+							<CollapsibleCard.HeaderDescription
+								id={ errorsDescriptionId }
+							>
+								3 errors
+							</CollapsibleCard.HeaderDescription>
+							<CollapsibleCard.HeaderDescription
+								id={ attentionDescriptionId }
+							>
+								Requires attention
+							</CollapsibleCard.HeaderDescription>
+						</CollapsibleCard.Header>
+					</CollapsibleCard.Root>
+				);
+			}
+
+			render( <TestCard /> );
+
+			const trigger = screen.getByRole( 'button', { name: 'Settings' } );
+			const errorsDescription = screen.getByText( '3 errors' );
+			const attentionDescription =
+				screen.getByText( 'Requires attention' );
+			expect( errorsDescription ).toHaveAttribute( 'id' );
+			expect( attentionDescription ).toHaveAttribute( 'id' );
+			expect( trigger ).toHaveAttribute(
+				'aria-describedby',
+				`${ errorsDescription.id } ${ attentionDescription.id }`
+			);
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
+			);
+		} );
+
+		it( 'preserves an existing trigger accessible description', () => {
+			function TestCard() {
+				const existingDescriptionId = useId();
+
+				return (
+					<>
+						<p id={ existingDescriptionId }>Existing description</p>
+						<CollapsibleCard.Root>
+							<CollapsibleCard.Header
+								aria-describedby={ existingDescriptionId }
+							>
+								<Card.Title>Settings</Card.Title>
+								<CollapsibleCard.HeaderDescription>
+									3 errors
+								</CollapsibleCard.HeaderDescription>
+								<CollapsibleCard.HeaderDescription>
+									Requires attention
+								</CollapsibleCard.HeaderDescription>
+							</CollapsibleCard.Header>
+						</CollapsibleCard.Root>
+					</>
+				);
+			}
+
+			render( <TestCard /> );
+
+			const trigger = screen.getByRole( 'button', { name: 'Settings' } );
+			expect( trigger ).toHaveAccessibleDescription(
+				'Existing description 3 errors Requires attention'
 			);
 		} );
 
@@ -280,19 +345,19 @@ describe( 'CollapsibleCard', () => {
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
 						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription data-testid="first-desc">
-							<span>Status: OK</span>
+						<CollapsibleCard.HeaderDescription>
+							Status: OK
 						</CollapsibleCard.HeaderDescription>
-						<CollapsibleCard.HeaderDescription data-testid="second-desc">
-							<span>Up to date</span>
+						<CollapsibleCard.HeaderDescription>
+							Up to date
 						</CollapsibleCard.HeaderDescription>
 					</CollapsibleCard.Header>
 				</CollapsibleCard.Root>
 			);
 
 			for ( const descriptionWrapper of [
-				screen.getByTestId( 'first-desc' ),
-				screen.getByTestId( 'second-desc' ),
+				screen.getByText( 'Status: OK' ),
+				screen.getByText( 'Up to date' ),
 			] ) {
 				expect( descriptionWrapper ).toHaveAttribute(
 					'aria-hidden',
@@ -307,11 +372,11 @@ describe( 'CollapsibleCard', () => {
 					<CollapsibleCard.Header>
 						<Card.Title>Settings</Card.Title>
 						{ showFirstDescription && (
-							<CollapsibleCard.HeaderDescription data-testid="first-desc">
+							<CollapsibleCard.HeaderDescription>
 								3 errors
 							</CollapsibleCard.HeaderDescription>
 						) }
-						<CollapsibleCard.HeaderDescription data-testid="second-desc">
+						<CollapsibleCard.HeaderDescription>
 							Requires attention
 						</CollapsibleCard.HeaderDescription>
 					</CollapsibleCard.Header>
@@ -320,14 +385,9 @@ describe( 'CollapsibleCard', () => {
 
 			const { rerender } = render( getCard( true ) );
 			const trigger = screen.getByRole( 'button', { name: 'Settings' } );
-			const secondDescription = screen.getByTestId( 'second-desc' );
 
 			rerender( getCard( false ) );
 
-			expect( trigger ).toHaveAttribute(
-				'aria-describedby',
-				secondDescription.id
-			);
 			expect( trigger ).toHaveAccessibleDescription(
 				'Requires attention'
 			);

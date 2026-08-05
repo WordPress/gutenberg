@@ -11,7 +11,8 @@ import type { HeaderDescriptionProps } from './types';
  * assistive technologies consume it only through the `aria-describedby`
  * relationship on the trigger, avoiding double announcements.
  * Multiple header descriptions are combined in render order into the
- * trigger's accessible description.
+ * trigger's accessible description. Pass `id` to control the ID used in
+ * that relationship; otherwise, an ID is generated automatically.
  *
  * Avoid interactive elements (buttons, links, inputs) inside this
  * component — the entire header is the toggle trigger.
@@ -20,10 +21,11 @@ export const HeaderDescription = forwardRef<
 	HTMLDivElement,
 	HeaderDescriptionProps
 >( function CollapsibleCardHeaderDescription(
-	{ children, className, ...restProps },
+	{ children, className, id: idProp, ...restProps },
 	ref
 ) {
-	const descriptionId = useId();
+	const generatedId = useId();
+	const descriptionId = idProp ?? generatedId;
 	const context = useContext( HeaderDescriptionIdContext );
 
 	if ( process.env.NODE_ENV !== 'production' && ! context ) {

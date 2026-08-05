@@ -59,7 +59,10 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 			() => ( { registerDescriptionId } ),
 			[ registerDescriptionId ]
 		);
-		const ariaDescribedBy = descriptionIds.join( ' ' ) || undefined;
+		const ariaDescribedBy =
+			[ restProps[ 'aria-describedby' ], ...descriptionIds ]
+				.filter( Boolean )
+				.join( ' ' ) || undefined;
 
 		return useRender( {
 			defaultTagName: 'div',
