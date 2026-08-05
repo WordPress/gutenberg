@@ -32,7 +32,7 @@ const variations = [
 		name: 'video',
 		title: __( 'Video' ),
 		description: __(
-			'Embed a video from your media library or upload a new one.'
+			'A video with customizable playback and interaction controls.'
 		),
 		icon: videoIcon,
 		attributes: { controls: true },
