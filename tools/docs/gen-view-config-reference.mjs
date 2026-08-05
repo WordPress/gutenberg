@@ -126,13 +126,32 @@ function serializeType( schema ) {
 }
 
 /**
+ * Wrap a value as inline code for use inside a markdown table cell.
+ *
+ * A backtick code span does not protect pipes from being parsed as cell
+ * delimiters. GitHub requires escaping them (`\|`) but other renderers
+ * may not. A raw HTML code tag with pipes as HTML entities
+ * renders correctly in both.
+ *
+ * @link https://github.com/WordPress/gutenberg/pull/81168#discussion_r3719197568
+ *
+ * @param {string} value Code content.
+ * @return {string} Inline code markup.
+ */
+function codeCell( value ) {
+	return value.includes( '|' )
+		? `<code>${ value.replace( /\|/g, '&#124;' ) }</code>`
+		: `\`${ value }\``;
+}
+
+/**
  * Generate the Type column content from a schema.
  *
  * @param {JSONSchema} schema JSON schema.
- * @return {string} Serialized type, wrapped in backticks.
+ * @return {string} Serialized type, wrapped as inline code.
  */
 function generateType( schema ) {
-	return `\`${ serializeType( schema ) }\``;
+	return codeCell( serializeType( schema ) );
 }
 
 /**
@@ -168,7 +187,7 @@ function generateTable( properties ) {
 		if ( hasDefaults ) {
 			cells.push(
 				'default' in schema
-					? `\`${ JSON.stringify( schema.default ) }\``
+					? codeCell( JSON.stringify( schema.default ) )
 					: ''
 			);
 		}

@@ -213,7 +213,7 @@ $form = array(
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | layout | The layout used to render the form fields, discriminated by its `type`. See the form layout types. | `object` |
-| fields | The fields of the form, in display order. Each entry is a field id, or an object for further configuration. | `[ string \| { id, label, description, layout, children } ]` |
+| fields | The fields of the form, in display order. Each entry is a field id, or an object for further configuration. | <code>[ string &#124; { id, label, description, layout, children } ]</code> |
 
 ### Form fields
 
@@ -225,7 +225,7 @@ An entry of `fields` declared as an object accepts:
 | label | Label displayed for the field, overriding the field's own. | `string` |
 | description | Description displayed for the field. | `string` |
 | layout | The layout used to render the form fields, discriminated by its `type`. See the form layout types. | `object` |
-| children | Fields combined under this entry, following the same shape as `fields`. | `[ string \| object ]` |
+| children | Fields combined under this entry, following the same shape as `fields`. | <code>[ string &#124; object ]</code> |
 
 ### Form layout types
 
@@ -248,8 +248,8 @@ The field is rendered as a button that opens a dropdown or modal with the field 
 | -------- | ----------- | ---- |
 | type | The layout type. | `"panel"` |
 | labelPosition | Position of the field label: `top`, `side`, or `none`. | `string` |
-| openAs | How the panel opens: as a `dropdown` or as a `modal`. The object form allows customizing the labels of the modal buttons. | `string \| { type, applyLabel, cancelLabel }` |
-| summary | Id(s) of the field(s) whose values are rendered in the panel button. | `string \| [ string ]` |
+| openAs | How the panel opens: as a `dropdown` or as a `modal`. The object form allows customizing the labels of the modal buttons. | <code>string &#124; { type, applyLabel, cancelLabel }</code> |
+| summary | Id(s) of the field(s) whose values are rendered in the panel button. | <code>string &#124; [ string ]</code> |
 | editVisibility | When the edit button is visible: `always` or `on-hover`. | `string` |
 
 #### card
@@ -262,7 +262,7 @@ The fields are grouped in a card container.
 | withHeader | Whether the card renders a header. Defaults to `true`. | `boolean` |
 | isOpened | Whether the card content is opened. Defaults to `true`. | `boolean` |
 | isCollapsible | Whether the card can be collapsed by the user. | `boolean` |
-| summary | Id(s) of the field(s) whose values are rendered in the card header. An entry declared as an object controls when it is visible: `always` or `when-collapsed`. | `string \| [ string \| { id, visibility } ]` |
+| summary | Id(s) of the field(s) whose values are rendered in the card header. An entry declared as an object controls when it is visible: `always` or `when-collapsed`. | <code>string &#124; [ string &#124; { id, visibility } ]</code> |
 
 #### row
 
