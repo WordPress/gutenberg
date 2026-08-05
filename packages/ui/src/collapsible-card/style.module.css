@@ -27,6 +27,10 @@
 			min-width: 0;
 		}
 
+		.header-description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
 		.header-trigger-positioner {
 			flex-shrink: 0;
 			align-self: center;

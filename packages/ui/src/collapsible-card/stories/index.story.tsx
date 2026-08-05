@@ -25,11 +25,6 @@ function Text( { children }: { children: React.ReactNode } ) {
 	);
 }
 
-const headerDescriptionTextStyle = {
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	color: 'var(--wpds-color-foreground-content-neutral-weak)',
-};
-
 const meta: Meta< typeof CollapsibleCard.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/CollapsibleCard',
@@ -243,9 +238,7 @@ export const WithHeaderDescription: Story = {
 					<Stack justify="space-between">
 						<Card.Title>Settings</Card.Title>
 						<CollapsibleCard.HeaderDescription>
-							<span style={ headerDescriptionTextStyle }>
-								3 items configured
-							</span>
+							3 items configured
 						</CollapsibleCard.HeaderDescription>
 					</Stack>
 				</CollapsibleCard.Header>
@@ -268,15 +261,11 @@ export const WithHeaderDescription: Story = {
 						<Stack justify="space-between">
 							<Card.Title>Settings</Card.Title>
 							<CollapsibleCard.HeaderDescription>
-								<span style={ headerDescriptionTextStyle }>
-									3 items configured
-								</span>
+								3 items configured
 							</CollapsibleCard.HeaderDescription>
 						</Stack>
 						<CollapsibleCard.HeaderDescription>
-							<span style={ headerDescriptionTextStyle }>
-								Needs review
-							</span>
+							Needs review
 						</CollapsibleCard.HeaderDescription>
 					</Stack>
 				</CollapsibleCard.Header>

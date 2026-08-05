@@ -53,6 +53,7 @@ export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
 	 * relationship, avoiding double announcements.
 	 * Multiple header descriptions are combined in render order.
 	 * Pass `id` to control the ID used in the relationship.
+	 * Uses small body typography and a weak neutral text color by default.
 	 *
 	 * Avoid interactive elements — the entire header is the toggle trigger.
 	 */

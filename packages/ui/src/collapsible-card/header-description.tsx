@@ -1,6 +1,11 @@
+import clsx from 'clsx';
 import { forwardRef, useContext, useEffect, useId } from '@wordpress/element';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderDescriptionProps } from './types';
+import { Text } from '../text';
+import styles from './style.module.css';
+
+const DEFAULT_TAG = <div />;
 
 /**
  * Secondary content placed in the collapsible card header that describes
@@ -13,6 +18,7 @@ import type { HeaderDescriptionProps } from './types';
  * Multiple header descriptions are combined in render order into the
  * trigger's accessible description. Pass `id` to control the ID used in
  * that relationship; otherwise, an ID is generated automatically.
+ * Uses small body typography and a weak neutral text color by default.
  *
  * Avoid interactive elements (buttons, links, inputs) inside this
  * component — the entire header is the toggle trigger.
@@ -21,7 +27,7 @@ export const HeaderDescription = forwardRef<
 	HTMLDivElement,
 	HeaderDescriptionProps
 >( function CollapsibleCardHeaderDescription(
-	{ children, className, id: idProp, ...restProps },
+	{ children, className, id: idProp, render = DEFAULT_TAG, ...restProps },
 	ref
 ) {
 	const generatedId = useId();
@@ -40,14 +46,16 @@ export const HeaderDescription = forwardRef<
 	}, [ context, descriptionId ] );
 
 	return (
-		<div
+		<Text
 			ref={ ref }
+			variant="body-sm"
+			render={ render }
 			id={ descriptionId }
 			aria-hidden="true"
-			className={ className }
+			className={ clsx( styles[ 'header-description' ], className ) }
 			{ ...restProps }
 		>
 			{ children }
-		</div>
+		</Text>
 	);
 } );
