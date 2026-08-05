@@ -17,6 +17,11 @@ test.describe( 'Preload', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.resetPreferences();
+		// Posts left behind by earlier specs change the startup requests:
+		// with at least one post, emptytheme's index template query loop
+		// renders the Post Excerpt block, whose editor component fetches
+		// /wp/v2/types/post?context=edit.
+		await requestUtils.deleteAllPosts();
 		const pg = await requestUtils.createPage( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
