@@ -306,3 +306,62 @@ describe( 'intent-log bridge', () => {
 		} );
 	} );
 } );
+
+describe( 'identity adoption under splits', () => {
+	it( 'REGRESSION: splitting the first of two id-less blocks does not steal the sibling identity', () => {
+		// The active tab's tree carries no syncIds (write-back does not
+		// stick while typing). A mid-text split turns [HelloWorld, Second]
+		// into [Hello, World, Second]; blind positional adoption made
+		// "World" steal Second's identity and re-minted Second — concurrent
+		// edits to Second then landed under the stolen id (content
+		// duplication in the field).
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'HelloWorld' ),
+			paragraph( 'p2', 'SecondBlock' ),
+		] );
+		const idless = ( content: string ) => ( {
+			name: 'core/paragraph',
+			attributes: { content },
+			innerBlocks: [],
+		} );
+		const derived = deriveIntents( doc, [
+			idless( 'Hello' ),
+			idless( 'World' ),
+			idless( 'SecondBlock' ),
+		] )!;
+
+		expect( derived.coarseBlockCount ).toBe( 0 );
+		const specIds = derived.specs.map( ( spec ) => spec.syncId );
+		// Head keeps p1 (similar text), Second keeps p2 (exact text), the
+		// split's second half mints a NEW id.
+		expect( specIds[ 0 ] ).toBe( 'p1' );
+		expect( specIds[ 2 ] ).toBe( 'p2' );
+		expect( specIds[ 1 ] ).not.toBe( 'p2' );
+		expect( specIds[ 1 ] ).not.toBe( 'p1' );
+		// And no destructive or content intent targets p2 (a redundant
+		// identity-addressed move is tolerable; deletions/rewrites are not).
+		const destructive = derived.intents
+			.filter( ( intent ) => 'move_block' !== intent.type )
+			.flatMap( ( intent ) => [
+				intent.payload.syncId,
+				( intent.payload.block as { syncId?: string } | undefined )
+					?.syncId,
+			] );
+		expect( destructive ).not.toContain( 'p2' );
+	} );
+
+	it( 'a fully rewritten id-less block re-mints instead of adopting unrelated content', () => {
+		const doc = docFromBlocks( [ paragraph( 'p1', 'HelloWorld' ) ] );
+		const derived = deriveIntents( doc, [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'zzz' },
+				innerBlocks: [],
+			},
+		] )!;
+		expect( derived.specs[ 0 ].syncId ).not.toBe( 'p1' );
+		expect(
+			derived.intents.map( ( intent ) => intent.type ).sort()
+		).toEqual( [ 'insert_block', 'remove_block' ] );
+	} );
+} );

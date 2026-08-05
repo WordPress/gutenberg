@@ -344,27 +344,118 @@ function diffText(
  * @param claimed   Ids claimed by id-bearing specs anywhere in the tree.
  * @param minted    Ids minted by blockToEngineSpec (adoption candidates).
  */
+/**
+ * Whether two content strings are similar enough that positional adoption
+ * is safe: their common prefix plus common suffix covers the shorter one.
+ * True for typing/truncation relationships (a split's head vs its source,
+ * an edited paragraph vs its previous text); false for unrelated content
+ * (a split's SECOND half vs the following block — the case where blind
+ * positional adoption steals a neighbor's identity).
+ *
+ * @param a One text.
+ * @param b Other text.
+ * @return Whether positionally adopting across a/b is safe.
+ */
+function textsAreSimilar( a: string, b: string ): boolean {
+	if ( a === b ) {
+		return true;
+	}
+	const shorter = Math.min( a.length, b.length );
+	if ( 0 === shorter ) {
+		// One side empty: safe only when the other is short (a block just
+		// being started), not when replacing a full paragraph.
+		return Math.max( a.length, b.length ) <= 4;
+	}
+	let prefix = 0;
+	while ( prefix < shorter && a[ prefix ] === b[ prefix ] ) {
+		prefix++;
+	}
+	let suffix = 0;
+	while (
+		suffix < shorter - prefix &&
+		a[ a.length - 1 - suffix ] === b[ b.length - 1 - suffix ]
+	) {
+		suffix++;
+	}
+	return ( prefix + suffix ) * 2 >= shorter;
+}
+
 function adoptExistingIds(
 	specs: Array< Record< string, unknown > >,
 	docBlocks: EngineBlock[],
 	claimed: Set< string >,
 	minted: Set< string >
 ): void {
+	const unclaimedAt = ( index: number ): EngineBlock | undefined => {
+		const docBlock = docBlocks[ index ];
+		return docBlock && ! claimed.has( docBlock.syncId )
+			? docBlock
+			: undefined;
+	};
+	const docText = ( docBlock: EngineBlock ) =>
+		docBlock.fields.content?.text ?? '';
+
+	// Pass 1: exact-content matches (same type AND same text), preferring
+	// the same position. This keeps identity with a block that merely
+	// SHIFTED (e.g. the paragraph following a split point) instead of
+	// letting a positional neighbor steal it.
 	for ( let index = 0; index < specs.length; index++ ) {
 		const spec = specs[ index ];
-		const docBlock = docBlocks[ index ];
+		if ( ! minted.has( spec.syncId as string ) ) {
+			continue;
+		}
+		const text = ( spec.text as string ) ?? '';
+		let match = unclaimedAt( index );
+		if (
+			! match ||
+			match.blockType !== spec.blockType ||
+			docText( match ) !== text
+		) {
+			match = docBlocks.find(
+				( docBlock ) =>
+					! claimed.has( docBlock.syncId ) &&
+					docBlock.blockType === spec.blockType &&
+					docText( docBlock ) === text
+			);
+		}
+		if ( match ) {
+			spec.syncId = match.syncId;
+			claimed.add( match.syncId );
+		}
+	}
+
+	// Pass 2: positional fallback, guarded by content similarity — adopts
+	// across an edit (typing, truncation) but never across unrelated
+	// content, which would be a different block.
+	for ( let index = 0; index < specs.length; index++ ) {
+		const spec = specs[ index ];
+		if ( ! minted.has( spec.syncId as string ) ) {
+			continue;
+		}
+		const docBlock = unclaimedAt( index );
 		if (
 			docBlock &&
-			minted.has( spec.syncId as string ) &&
 			docBlock.blockType === spec.blockType &&
-			! claimed.has( docBlock.syncId )
+			textsAreSimilar(
+				( spec.text as string ) ?? '',
+				docText( docBlock )
+			)
 		) {
 			spec.syncId = docBlock.syncId;
 			claimed.add( docBlock.syncId );
 		}
+	}
+
+	// Recurse: children pair with the children of the doc block the spec
+	// resolved to (adopted or id-carrying), falling back to position.
+	for ( let index = 0; index < specs.length; index++ ) {
+		const spec = specs[ index ];
+		const counterpart =
+			docBlocks.find( ( docBlock ) => docBlock.syncId === spec.syncId ) ??
+			docBlocks[ index ];
 		adoptExistingIds(
 			( spec.children as Array< Record< string, unknown > > ) ?? [],
-			docBlock?.children ?? [],
+			counterpart?.children ?? [],
 			claimed,
 			minted
 		);
