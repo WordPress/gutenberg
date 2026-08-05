@@ -30,6 +30,11 @@
 				"@mobile": {
 					"typography": {
 						"fontSize": "14px"
+					},
+					":hover": {
+						"color": {
+							"background": "var(--wp--preset--color--secondary)"
+						}
 					}
 				},
 				"elements": {
@@ -44,6 +49,20 @@
 						":hover": {
 							"color": {
 								"text": "var(--wp--preset--color--secondary)"
+							}
+						},
+						"@mobile": {
+							":hover": {
+								"color": {
+									"text": "var(--wp--preset--color--secondary)"
+								}
+							}
+						},
+						"elements": {
+							"link": {
+								"color": {
+									"text": "currentColor"
+								}
 							}
 						}
 					}
@@ -83,12 +102,40 @@
 				"@mobile": {
 					"typography": {
 						"fontSize": "14px"
+					},
+					":hover": {
+						"color": {
+							"text": "var(--wp--preset--color--secondary)"
+						}
 					}
 				},
 				"elements": {
 					"link": {
 						"color": {
 							"text": "currentColor"
+						}
+					}
+				},
+				"variations": {
+					"outline": {
+						":hover": {
+							"color": {
+								"text": "var(--wp--preset--color--secondary)"
+							}
+						},
+						"@tablet": {
+							":focus": {
+								"color": {
+									"text": "var(--wp--preset--color--secondary)"
+								}
+							}
+						},
+						"elements": {
+							"link": {
+								"color": {
+									"text": "currentColor"
+								}
+							}
 						}
 					}
 				}
