@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useRegistry } from '@wordpress/data';
@@ -59,7 +58,7 @@ export default function useTabActions( tabsClientId ) {
 
 		const newIndex = atIndex ?? tabPanelBlocks.length;
 		insertBlock(
-			createBlock( 'core/tab-panel', { label: __( 'Tab' ) } ),
+			createBlock( 'core/tab-panel' ),
 			newIndex,
 			tabPanelsClientId,
 			false

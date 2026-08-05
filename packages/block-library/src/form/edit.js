@@ -21,40 +21,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import {
-	formSubmissionNotificationSuccess,
-	formSubmissionNotificationError,
-} from './utils.js';
-
-const TEMPLATE = [
-	formSubmissionNotificationSuccess,
-	formSubmissionNotificationError,
-	[
-		'core/form-input',
-		{
-			type: 'text',
-			label: __( 'Name' ),
-			required: true,
-		},
-	],
-	[
-		'core/form-input',
-		{
-			type: 'email',
-			label: __( 'Email' ),
-			required: true,
-		},
-	],
-	[
-		'core/form-input',
-		{
-			type: 'textarea',
-			label: __( 'Comment' ),
-			required: true,
-		},
-	],
-	[ 'core/form-submit-button', {} ],
-];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -83,7 +49,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

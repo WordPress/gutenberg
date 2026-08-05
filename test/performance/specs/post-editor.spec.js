@@ -28,6 +28,7 @@ const results = {
 	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
+	selectAll: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -328,6 +329,67 @@ test.describe( 'Post Editor Performance', () => {
 							return acc + sum( eventDurations );
 						}, 0 )
 					);
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Selecting all blocks', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraphs = canvas.getByRole( 'document', {
+				name: /Block: Paragraph/i,
+			} );
+
+			// Fewer samples than the other metrics take. The comparison runs
+			// this spec against builds that predate the selection fix, where a
+			// single iteration costs seconds, and ten of them exceed the test
+			// timeout.
+			const samples = 3;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Put the caret in a paragraph, so the selection is a single
+				// block with a collapsed caret again.
+				await paragraphs.nth( i ).click();
+
+				// The first press selects the contents of the block; only the
+				// second one multi-selects every block.
+				await page.keyboard.press( 'ControlOrMeta+a' );
+
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Select all blocks.
+				await page.keyboard.press( 'ControlOrMeta+a' );
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-select-all'
+				);
+
+				// Get the durations.
+				const [ keyDownEvents ] = metrics.getTypingEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.selectAll.push( sum( keyDownEvents ) );
 				}
 			}
 		} );

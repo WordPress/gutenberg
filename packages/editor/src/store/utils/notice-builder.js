@@ -8,6 +8,14 @@ import { __ } from '@wordpress/i18n';
  */
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
+const AUTO_SAVE_FAILURE_NOTICE = __(
+	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.'
+);
+
+const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
+	'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.'
+);
+
 /**
  * Builds the arguments for a success notification dispatch.
  *
@@ -89,7 +97,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
-	const { post, edits, error } = data;
+	const { post, edits, error, options } = data;
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.
@@ -115,19 +123,31 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			),
 		};
 
-		const noticeMessage =
+		let noticeMessage =
 			! isPublished && edits.status in messages
 				? messages[ edits.status ]
 				: messages.default;
+
+		if ( options?.isAutosave ) {
+			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
+		}
 
 		return [ noticeMessage, { id: 'editor-save' } ];
 	}
 
 	const messages = {
-		publish: __( 'Publishing failed.' ),
-		private: __( 'Publishing failed.' ),
-		future: __( 'Scheduling failed.' ),
-		default: __( 'Updating failed.' ),
+		publish: __(
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+		),
+		private: __(
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+		),
+		future: __(
+			'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.'
+		),
+		default: __(
+			'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
+		),
 	};
 
 	let noticeMessage =
@@ -135,11 +155,10 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			? messages[ edits.status ]
 			: messages.default;
 
-	// Check if message string contains HTML. Notice text is currently only
-	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
-		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
+	if ( options?.isAutosave ) {
+		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
 	}
+
 	return [
 		noticeMessage,
 		{

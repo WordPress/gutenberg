@@ -12,10 +12,10 @@ test.describe( 'adding patterns', () => {
 		await page.getByLabel( 'Block Inserter' ).click();
 
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'Standard'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Standard' );
 
 		await page.getByRole( 'option', { name: 'Standard' } ).click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [

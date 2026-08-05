@@ -8,9 +8,11 @@ test.describe( 'data-wp-text', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/directive-text' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/directive-text' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();

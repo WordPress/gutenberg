@@ -20,7 +20,7 @@ import {
 	OPERATOR_OVER,
 } from '../constants';
 import isValidRequired from './utils/is-valid-required';
-import { isValidMaxDate, isValidMinDate } from './utils/is-valid-date-boundary';
+import { isValidMaxDate, isValidMinDate } from './utils/is-valid-boundary';
 import render from './utils/render-default';
 
 const format = {
