@@ -29,7 +29,7 @@ function render_block_core_media_text( $attributes, $content ) {
 		 * with the resolved values.
 		 */
 		$media_url = $attributes['mediaUrl'] ?? null;
-		if ( null === $media_url ) {
+		if ( '' === $media_url ) {
 			return $content;
 		}
 
