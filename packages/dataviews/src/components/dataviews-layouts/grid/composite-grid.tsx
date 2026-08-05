@@ -2,7 +2,12 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
+import type {
+	ComponentProps,
+	ReactElement,
+	HTMLAttributes,
+	CSSProperties,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -27,6 +32,7 @@ import {
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
+import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
@@ -364,6 +370,19 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	// Consumer-configured aspect ratio for item previews, validated against
+	// the presets (like `density`) so arbitrary values are ignored, and
+	// surfaced to CSS as a custom property the media field's stylesheet
+	// reads. Always set (with the square default), so an identically-named
+	// variable set by a consumer on an ancestor can't leak into the previews
+	// when the view doesn't configure a ratio.
+	const gridStyle = {
+		'--wp-dataviews-media-aspect-ratio':
+			view.layout?.aspectRatio &&
+			MEDIA_ASPECT_RATIOS.includes( view.layout.aspectRatio )
+				? view.layout.aspectRatio
+				: '1/1',
+	} as CSSProperties;
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -432,6 +451,7 @@ export default function CompositeGrid< Item >( {
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
+								style={ gridStyle }
 								aria-busy={ isLoading }
 								ref={ resizeObserverRef }
 							/>
@@ -523,6 +543,7 @@ export default function CompositeGrid< Item >( {
 				! isInfiniteScroll && (
 					<Composite
 						role="grid"
+						style={ gridStyle }
 						className={ clsx( 'dataviews-view-grid', className, {
 							[ `has-${ view.layout?.density }-density` ]:
 								view.layout?.density &&

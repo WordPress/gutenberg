@@ -11,6 +11,7 @@
 -   DataViews: Generalize the ordering filter operators (`on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `between`) from dates to temporal values, so they also compare times of day. Comparisons for `date` and `datetime` are unchanged. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
+-   DataViews: Add an `aspectRatio` layout option to the `grid` and `table` layouts so consumers can configure the aspect ratio of item media previews from a set of preset ratios, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
 
 ### Bug Fix
 
