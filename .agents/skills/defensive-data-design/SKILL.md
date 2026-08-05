@@ -14,16 +14,25 @@ Safe defaults for code that can lose someone's work or leave them stuck. Apply t
 -   REST validation failures carry per-field reasons in `error.data.params`. The top-level message only names the field.
 -   An error message containing HTML is still useful: strip the tags with `__unstableStripHTML` from `@wordpress/dom` rather than discarding the message.
 -   Never swallow. `catch {}` with no logging is only acceptable when the failure is genuinely expected and the fallback is correct; say so in a comment naming the expected failure.
+-   Show enough of a failure to act on, and make it copyable where there is room for it. Redact what should not travel: the user's content does not belong in an error payload, and the current URL can carry a nonce.
 -   Read the [copy guide's Error Messaging section](../../../docs/contributors/documentation/copy-guide.md#error-messaging) before writing the string. Plain words, name the cause, offer a next step.
 
-## Destructive and irreversible actions
+## Mutations and destructive actions
 
+Prefer the reversible form of a change, and make both the change and the way back visible. Where a change cannot be reversed, triggering it should cost more than triggering one that can.
+
+-   Before a consequential mutation, show what it targets, who will be able to see the result, and the state it leaves behind. Default to the draft, private or reversible option and make the public or permanent one the deliberate choice.
 -   Trash must be cheaper than delete. If both sit in the same menu behind the same confirmation, the confirmation is doing no work.
 -   Confirm dialogs echo what is affected: the item's title, or the count for bulk actions.
 -   Irreversible confirms use `isDestructive` on the confirm button and say so in the label ("Delete permanently", not "Delete"). Follow the [destructive actions pattern](../../../storybook/stories/design-system/patterns/destructive-actions.mdx).
 -   A mutation that succeeds silently is not visible. Announce it, and offer Undo when the prior value is in scope — capture the old value explicitly rather than popping the undo stack, which would also revert unrelated edits.
 -   `Snackbar` renders exactly **one** action; more logs a warning and truncates to `actions[0]` (`packages/components/src/snackbar/index.tsx`). Choose between Undo and any other button.
 -   `saveEntityRecord` and `deleteEntityRecord` add nothing to the undo stack, so anything already persisted needs its own recovery path. `editEntityRecord` records an undo level unless called with `undoIgnore`.
+
+## Legibility
+
+-   Use the space you have. Where there is room, render the value rather than a label that flattens it — a record's real status, whether a template is customised or came from the theme, which template applies — instead of making someone open a panel to find out.
+-   A display that hides a qualifier states something untrue. "Published" on a password-protected post, or a template that reads as the theme's when it carries local edits, both mislead the person deciding what to do next.
 
 ## Data you did not create
 
