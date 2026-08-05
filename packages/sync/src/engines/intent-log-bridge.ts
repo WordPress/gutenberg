@@ -115,24 +115,38 @@ function serializeAttribute( value: unknown ): unknown {
  * Maps one Gutenberg-shaped block (and its subtree) onto an engine block
  * spec, minting creation syncIds for blocks that lack one.
  *
- * @param block  Bridge block.
- * @param minted Optional set collecting the ids minted here (so the caller
- *               can distinguish minted ids from editor-authored ones).
+ * @param block   Bridge block.
+ * @param minted  Optional set collecting the ids minted here (so the caller
+ *                can distinguish minted ids from editor-authored ones).
+ * @param seenIds Optional set of ids already used in this tree; later
+ *                duplicates re-mint (the first occurrence keeps identity).
  * @return Engine block spec (makeBlock input shape).
  */
 export function blockToEngineSpec(
 	block: BridgeBlock,
-	minted?: Set< string >
+	minted?: Set< string >,
+	seenIds?: Set< string >
 ): Record< string, unknown > {
 	const attributes = { ...block.attributes };
 	const metadata = {
 		...( attributes.metadata as Record< string, unknown > | undefined ),
 	};
 	let syncId = metadata.syncId as string | undefined;
+	/*
+	 * Duplicate ids in one tree: the FIRST occurrence keeps the identity
+	 * (split policy: the head keeps its id); later occurrences re-mint.
+	 * Gutenberg's split copies all attributes — metadata.syncId included —
+	 * to the second half, so this is the normal shape of a split arriving
+	 * before the id stamper's dedupe lands.
+	 */
+	if ( syncId && seenIds?.has( syncId ) ) {
+		syncId = undefined;
+	}
 	if ( ! syncId ) {
 		syncId = mintSyncId();
 		minted?.add( syncId );
 	}
+	seenIds?.add( syncId );
 	delete metadata.syncId;
 	if ( Object.keys( metadata ).length > 0 ) {
 		attributes.metadata = metadata;
@@ -154,7 +168,7 @@ export function blockToEngineSpec(
 		attrs,
 		text: 'string' === typeof text ? text : '',
 		children: block.innerBlocks.map( ( child ) =>
-			blockToEngineSpec( child, minted )
+			blockToEngineSpec( child, minted, seenIds )
 		),
 	};
 }
@@ -342,7 +356,7 @@ function diffText(
  * @param specs     Engine block specs at one level.
  * @param docBlocks Document blocks at the same level.
  * @param claimed   Ids claimed by id-bearing specs anywhere in the tree.
- * @param minted    Ids minted by blockToEngineSpec (adoption candidates).
+ * @param eligible  Ids unknown to the document (adoption candidates).
  */
 /**
  * Whether two content strings are similar enough that positional adoption
@@ -384,7 +398,7 @@ function adoptExistingIds(
 	specs: Array< Record< string, unknown > >,
 	docBlocks: EngineBlock[],
 	claimed: Set< string >,
-	minted: Set< string >
+	eligible: Set< string >
 ): void {
 	const unclaimedAt = ( index: number ): EngineBlock | undefined => {
 		const docBlock = docBlocks[ index ];
@@ -401,7 +415,7 @@ function adoptExistingIds(
 	// letting a positional neighbor steal it.
 	for ( let index = 0; index < specs.length; index++ ) {
 		const spec = specs[ index ];
-		if ( ! minted.has( spec.syncId as string ) ) {
+		if ( ! eligible.has( spec.syncId as string ) ) {
 			continue;
 		}
 		const text = ( spec.text as string ) ?? '';
@@ -429,7 +443,7 @@ function adoptExistingIds(
 	// content, which would be a different block.
 	for ( let index = 0; index < specs.length; index++ ) {
 		const spec = specs[ index ];
-		if ( ! minted.has( spec.syncId as string ) ) {
+		if ( ! eligible.has( spec.syncId as string ) ) {
 			continue;
 		}
 		const docBlock = unclaimedAt( index );
@@ -457,7 +471,7 @@ function adoptExistingIds(
 			( spec.children as Array< Record< string, unknown > > ) ?? [],
 			counterpart?.children ?? [],
 			claimed,
-			minted
+			eligible
 		);
 	}
 }
@@ -502,12 +516,35 @@ export function deriveIntents(
 	options: DeriveOptions = {}
 ): ( DerivedIntents & { specs: Array< Record< string, unknown > > } ) | null {
 	const minted = new Set< string >();
-	let specs = blocks.map( ( block ) => blockToEngineSpec( block, minted ) );
-	const claimed = collectSpecIds( specs, new Set() );
-	for ( const id of minted ) {
-		claimed.delete( id );
+	const seenIds = new Set< string >();
+	let specs = blocks.map( ( block ) =>
+		blockToEngineSpec( block, minted, seenIds )
+	);
+	/*
+	 * Adoption eligibility: a spec may take over a document identity when
+	 * its own id is UNKNOWN to the document — freshly minted here, or an
+	 * editor-stamped creation id for content the document already tracks
+	 * under a different identity (e.g. the server's deterministic genesis
+	 * ids). Ids the document knows are fixed points; they claim themselves.
+	 */
+	const docIds = new Set< string >();
+	const collectDocumentIds = ( docBlocks: EngineBlock[] ) => {
+		for ( const docBlock of docBlocks ) {
+			docIds.add( docBlock.syncId );
+			collectDocumentIds( docBlock.children );
+		}
+	};
+	collectDocumentIds( doc.root );
+	const eligible = new Set< string >();
+	const claimed = new Set< string >();
+	for ( const id of collectSpecIds( specs, new Set() ) ) {
+		if ( docIds.has( id ) ) {
+			claimed.add( id );
+		} else {
+			eligible.add( id );
+		}
 	}
-	adoptExistingIds( specs, doc.root, claimed, minted );
+	adoptExistingIds( specs, doc.root, claimed, eligible );
 	if ( options.excludeIds && options.excludeIds.size > 0 ) {
 		specs = filterExcludedSpecs( specs, options.excludeIds );
 	}
@@ -519,16 +556,8 @@ export function deriveIntents(
 		 * Equal up to blocks absent from the tree. Absent-but-REMOVABLE
 		 * blocks are deletions and need full derivation; when every absent
 		 * block is non-removable (never displayed), there is nothing to
-		 * author — only retention to report.
+		 * author — only retention to report. (docIds collected above.)
 		 */
-		const docIds = new Set< string >();
-		const collectDocIds = ( docBlocks: EngineBlock[] ) => {
-			for ( const block of docBlocks ) {
-				docIds.add( block.syncId );
-				collectDocIds( block.children );
-			}
-		};
-		collectDocIds( doc.root );
 		const missing = [ ...docIds ].filter( ( id ) => ! targetIds.has( id ) );
 		const hasRemovableMissing = missing.some(
 			( id ) => ! options.removableIds || options.removableIds.has( id )

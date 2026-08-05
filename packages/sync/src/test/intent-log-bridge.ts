@@ -232,14 +232,60 @@ describe( 'intent-log bridge', () => {
 			expect( derived.intents.length ).toBeGreaterThanOrEqual( 4 );
 		} );
 
-		it( 'fails loudly on duplicate syncIds instead of diverging silently', () => {
+		it( 'duplicate syncIds re-mint: the first occurrence keeps the identity', () => {
+			// Gutenberg's split (and duplication) copies metadata.syncId to
+			// the new block. The head keeps the identity; the copy re-mints
+			// and inserts as a new block — never a throw, never divergence.
 			const doc = docFromBlocks( [ paragraph( 'p1', 'A' ) ] );
-			expect( () =>
-				deriveIntents( doc, [
-					paragraph( 'p1', 'A' ),
-					paragraph( 'p1', 'A copy' ),
-				] )
-			).toThrow( 'verification' );
+			const derived = deriveIntents( doc, [
+				paragraph( 'p1', 'A' ),
+				paragraph( 'p1', 'A copy' ),
+			] )!;
+			expect( derived.specs[ 0 ].syncId ).toBe( 'p1' );
+			expect( derived.specs[ 1 ].syncId ).not.toBe( 'p1' );
+			expect( derived.intents ).toHaveLength( 1 );
+			expect( derived.intents[ 0 ].type ).toBe( 'insert_block' );
+			expect( derived.intents[ 0 ].payload.afterSiblingId ).toBe( 'p1' );
+		} );
+
+		it( 'a split with copied metadata (duplicate ids, id-carrying tree) keeps head and sibling identities', () => {
+			// The durable-id shape of the split bug: ids ARE present, and
+			// the split's second half carries the HEAD's id verbatim.
+			const doc = docFromBlocks( [
+				paragraph( 'p1', 'HelloWorld' ),
+				paragraph( 'p2', 'SecondBlock' ),
+			] );
+			const derived = deriveIntents( doc, [
+				paragraph( 'p1', 'Hello' ),
+				paragraph( 'p1', 'World' ), // duplicate id from split
+				paragraph( 'p2', 'SecondBlock' ),
+			] )!;
+			const specIds = derived.specs.map( ( spec ) => spec.syncId );
+			expect( specIds[ 0 ] ).toBe( 'p1' );
+			expect( specIds[ 2 ] ).toBe( 'p2' );
+			expect( specIds[ 1 ] ).not.toBe( 'p1' );
+			expect( specIds[ 1 ] ).not.toBe( 'p2' );
+			expect( derived.coarseBlockCount ).toBe( 0 );
+		} );
+
+		it( 'editor-stamped ids unknown to the document adopt matching document identities', () => {
+			// An id stamper assigns random creation ids in the editor before
+			// the server snapshot (deterministic genesis ids) arrives. The
+			// content is the same; the unknown ids must reconcile onto the
+			// document's identities instead of deriving remove+insert churn.
+			const doc = docFromBlocks( [
+				paragraph( 'genesis-1', 'Alpha' ),
+				paragraph( 'genesis-2', 'Beta' ),
+			] );
+			const derived = deriveIntents( doc, [
+				paragraph( 'stamped-a', 'Alpha' ),
+				paragraph( 'stamped-b', 'Beta edited' ),
+			] )!;
+			expect( derived.specs[ 0 ].syncId ).toBe( 'genesis-1' );
+			expect( derived.specs[ 1 ].syncId ).toBe( 'genesis-2' );
+			expect( derived.intents.map( ( intent ) => intent.type ) ).toEqual(
+				[ 'insert_text' ]
+			);
 		} );
 	} );
 

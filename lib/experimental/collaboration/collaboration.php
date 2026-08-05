@@ -114,6 +114,35 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
+if ( ! function_exists( 'gutenberg_enqueue_sync_id_stamper' ) ) {
+	/**
+	 * Enqueues the block identity stamper for intent-log sites.
+	 *
+	 * The stamper fills `metadata.syncId` for blocks that lack one and
+	 * re-mints duplicates (split/duplication copy metadata wholesale),
+	 * directly in the editor store — making block identity DURABLE: it
+	 * rides the block comment delimiters into saved content and arrives
+	 * with every captured tree instead of being re-inferred per keystroke.
+	 */
+	function gutenberg_enqueue_sync_id_stamper() {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+		$registry = new WP_Sync_Engine_Registry( new WP_Sync_Post_Meta_Storage() );
+		if ( WP_Intent_Log_Engine::SLUG !== $registry->get_engine_slug_for_room( '' ) ) {
+			return;
+		}
+		wp_enqueue_script(
+			'gutenberg-collaboration-sync-id',
+			gutenberg_url( 'lib/experimental/collaboration/sync-id.js' ),
+			array( 'wp-data' ),
+			filemtime( __DIR__ . '/sync-id.js' ),
+			true
+		);
+	}
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_sync_id_stamper' );
+}
+
 if ( ! function_exists( 'gutenberg_register_sync_engine_setting' ) ) {
 	/**
 	 * Registers the sync engine selection setting.
