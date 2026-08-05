@@ -3,9 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	// @ts-ignore
 	BlockPreview,
-	// @ts-ignore
+	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
@@ -17,7 +16,6 @@ import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { EditorProvider } from '../../../components/provider';
 import { useStyle } from '../../../components/global-styles';
 import { unlock } from '../../../lock-unlock';
-// @ts-ignore
 import { store as editorStore } from '../../../store';
 
 function PostPreviewContainer( {
@@ -71,7 +69,7 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 				name: 'wp_template',
 			} );
 			const _settings = select( editorStore ).getEditorSettings();
-			// @ts-ignore
+			// @ts-expect-error Editor settings are typed as a bare `Object`.
 			const supportsTemplateMode = _settings.supportsTemplateMode;
 			const isViewable = getPostType( item.type )?.viewable ?? false;
 

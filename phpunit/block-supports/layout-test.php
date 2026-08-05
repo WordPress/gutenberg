@@ -1193,4 +1193,173 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'Layout support should render the expected markup when className is not a string'
 		);
 	}
+
+	/**
+	 * Tests that layout support returns early, without resolving global settings,
+	 * for a block that cannot produce any layout output.
+	 *
+	 * Resolving global settings reads the user's `wp_global_styles` post with a
+	 * `WP_Query`, which fires `the_posts`. A callback on that hook that renders
+	 * blocks re-enters this filter, so the bail-out has to happen before the
+	 * lookup or the recursion has no base case.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_returns_early_before_resolving_global_settings() {
+		$user_data_resolutions = 0;
+		add_filter(
+			'wp_theme_json_data_user',
+			static function ( $theme_json ) use ( &$user_data_resolutions ) {
+				++$user_data_resolutions;
+				return $theme_json;
+			}
+		);
+
+		// A block with no layout support and no child layout, as produced by
+		// parsing content that has no block delimiters.
+		$block_content = '<p>Not a block.</p>';
+		$block         = array(
+			'blockName' => null,
+			'attrs'     => array(),
+		);
+
+		// Start from a cold cache, as on a front-end request.
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Block content should be returned unchanged when the block has no layout support.'
+		);
+		$this->assertSame(
+			0,
+			$user_data_resolutions,
+			'Global settings should not be resolved for a block that cannot produce layout output.'
+		);
+
+		// A block that does support layout still resolves global settings, which
+		// confirms the assertion above is not passing because of a warm cache.
+		_gutenberg_clean_theme_json_caches();
+
+		gutenberg_render_layout_support_flag(
+			'<div class="wp-block-group"></div>',
+			array(
+				'blockName' => 'core/group',
+				'attrs'     => array( 'layout' => array( 'type' => 'constrained' ) ),
+			)
+		);
+
+		$this->assertGreaterThan(
+			0,
+			$user_data_resolutions,
+			'Global settings should still be resolved for a block that supports layout.'
+		);
+	}
+
+	/**
+	 * Tests that a constrained layout with non-string contentSize/wideSize/justifyContent
+	 * values (e.g. from hand-edited, imported, or AI-generated content) does not cause a
+	 * fatal error in the explode() calls.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_with_non_string_constrained_sizes() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'           => 'constrained',
+				'contentSize'    => array( '800px' ),
+				'wideSize'       => array( '1200px' ),
+				'justifyContent' => array( 'center' ),
+			)
+		);
+
+		$this->assertIsString( $layout_styles, 'Constrained layout should not fatal when sizes are not strings.' );
+		$this->assertStringNotContainsString( 'Array', $layout_styles, 'A non-string size value should not leak into the output.' );
+	}
+
+	/**
+	 * Tests that a flex layout with non-string justifyContent/verticalAlignment values
+	 * does not cause a fatal error in the array_key_exists() calls.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_with_non_string_flex_alignment() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'flex',
+				'orientation'       => 'horizontal',
+				'justifyContent'    => array( 'right' ),
+				'verticalAlignment' => array( 'center' ),
+			)
+		);
+
+		$this->assertIsString( $layout_styles, 'Flex layout should not fatal when alignment values are not strings.' );
+	}
+
+	/**
+	 * Tests that a responsive grid child with a non-string parent minimumColumnWidth
+	 * does not cause a fatal error in the explode() call.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_with_non_string_minimum_column_width() {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnSpan' => '2' ),
+			array( 'minimumColumnWidth' => array( '12rem' ) ),
+			null
+		);
+
+		$this->assertIsArray( $actual_output, 'Child layout rules should not fatal when minimumColumnWidth is not a string.' );
+	}
+
+	/**
+	 * Tests that layout classname generation does not fatal when the layout type,
+	 * orientation, or justifyContent attributes are not strings.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_with_non_string_layout_values() {
+		$block_content = '<div class="wp-block-group"></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'layout' => array(
+					'type'           => array( 'constrained' ),
+					'orientation'    => array( 'horizontal' ),
+					'justifyContent' => array( 'center' ),
+				),
+			),
+		);
+
+		$this->assertIsString(
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Layout support should not fatal when layout values are not strings.'
+		);
+	}
+
+	/**
+	 * Tests that restoring the group inner container does not fatal when the tagName
+	 * attribute is not a string (which would break the preg_quote() calls).
+	 *
+	 * @covers ::gutenberg_restore_group_inner_container
+	 */
+	public function test_restore_group_inner_container_with_non_string_tag_name() {
+		// The "default" theme doesn't have theme.json support, so the preg_quote() path runs.
+		switch_theme( 'default' );
+		$block_content = '<div class="wp-block-group"><p>Test</p></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'tagName' => array( 'div' ),
+			),
+		);
+
+		$this->assertIsString(
+			gutenberg_restore_group_inner_container( $block_content, $block ),
+			'Group inner container restore should not fatal when tagName is not a string.'
+		);
+	}
 }

@@ -1,11 +1,24 @@
 /**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
 	setBackgroundStyleDefaults,
 	backgroundResetAllFilter,
+	BackgroundImagePanel,
 	BACKGROUND_BLOCK_DEFAULT_VALUES,
 } from '../background';
+import { BackgroundToolsPanel } from '../../components/global-styles/background-panel';
 
 describe( 'background', () => {
 	describe( 'backgroundResetAllFilter', () => {
@@ -114,6 +127,116 @@ describe( 'background', () => {
 		] )( 'should %s', ( message, styles, expected ) => {
 			const result = setBackgroundStyleDefaults( styles );
 			expect( result ).toEqual( expected );
+		} );
+	} );
+
+	describe( 'BackgroundImagePanel gradient routing', () => {
+		const BLOCK_NAME = 'core/test-background-gradient';
+		const baseSettings = {
+			color: {
+				background: true,
+				gradients: {
+					theme: [
+						{
+							name: 'Vivid',
+							slug: 'vivid',
+							gradient:
+								'linear-gradient(135deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)',
+						},
+					],
+				},
+			},
+		};
+
+		beforeAll( () => {
+			registerBlockType( BLOCK_NAME, {
+				apiVersion: 3,
+				title: 'Test background gradient',
+				supports: {
+					background: {
+						gradient: true,
+						__experimentalDefaultControls: { gradient: true },
+					},
+					color: {
+						gradients: true,
+						__experimentalDefaultControls: { background: true },
+					},
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( BLOCK_NAME );
+		} );
+
+		it( 'stores the gradient in the background style when the setting is enabled', async () => {
+			const settings = {
+				...baseSettings,
+				background: { gradient: true },
+			};
+			const user = userEvent.setup();
+			const setAttributes = jest.fn();
+
+			render(
+				<BackgroundImagePanel
+					clientId="block-1"
+					name={ BLOCK_NAME }
+					setAttributes={ setAttributes }
+					settings={ settings }
+					asWrapper={ BackgroundToolsPanel }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			);
+			await user.click( await screen.findByRole( 'option' ) );
+
+			// The gradient is kept whole in the style, not extracted to the
+			// legacy attribute.
+			expect( setAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					style: {
+						background: {
+							gradient: 'var:preset|gradient|vivid',
+						},
+					},
+					gradient: undefined,
+				} )
+			);
+		} );
+
+		it( 'stores the gradient in the legacy attribute when the setting is disabled', async () => {
+			const settings = {
+				...baseSettings,
+				background: { gradient: false },
+			};
+			const user = userEvent.setup();
+			const setAttributes = jest.fn();
+
+			render(
+				<BackgroundImagePanel
+					clientId="block-1"
+					name={ BLOCK_NAME }
+					setAttributes={ setAttributes }
+					settings={ settings }
+					asWrapper={ BackgroundToolsPanel }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			);
+			await user.click( await screen.findByRole( 'option' ) );
+
+			// The panel writes to the legacy `color.gradient` when the theme
+			// opts out, and the slug leaves nothing inline in the style.
+			expect( setAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					style: undefined,
+					gradient: 'vivid',
+				} )
+			);
 		} );
 	} );
 } );

@@ -29,8 +29,8 @@ test.describe( 'adding inline tokens', () => {
 		await page.keyboard.type( 'a ' );
 
 		await editor.showBlockToolbar();
-		await page.click( 'role=button[name="More"i]' );
-		await page.click( 'role=menuitem[name="Inline image"i]' );
+		await page.getByRole( 'button', { name: 'More' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Inline image' } ).click();
 
 		const testImagePath = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const fileName = randomUUID();
@@ -41,7 +41,9 @@ test.describe( 'adding inline tokens', () => {
 			.setInputFiles( tmpFileName );
 
 		// Insert the uploaded image.
-		await page.click( 'role=button[name="Select"i]' );
+		await page
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
 
 		// Check the content.
 		const contentRegex = new RegExp(
@@ -60,9 +62,11 @@ test.describe( 'adding inline tokens', () => {
 		await expect(
 			page.locator( 'role=spinbutton[name="Width"i]' )
 		).toBeFocused();
-		await page.fill( 'role=spinbutton[name="Width"i]', '20' );
-		await page.fill( 'role=textbox[name="Alternative text"i]', 'Alt' );
-		await page.click( 'role=button[name="Apply"i]' );
+		await page.getByRole( 'spinbutton', { name: 'Width' } ).fill( '20' );
+		await page
+			.getByRole( 'textbox', { name: 'Alternative text' } )
+			.fill( 'Alt' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Check the content.
 		const contentRegex2 = new RegExp(

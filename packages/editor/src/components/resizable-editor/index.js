@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 
@@ -42,24 +42,17 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 	return containerWidth > 0 && currentWidth >= containerWidth - tolerance;
 }
 
-function ResizableEditor( { className, enableResizing, height, children } ) {
+function ResizableEditor( {
+	className,
+	enableResizing,
+	width = '100%',
+	height = '100%',
+	onResizeStart,
+	onResizeStop,
+	children,
+} ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
-	const { canvasWidth, canvasHeight } = useSelect(
-		( select ) => {
-			if ( ! enableResizing ) {
-				return { canvasWidth: undefined, canvasHeight: undefined };
-			}
-			const { getCanvasWidth, getCanvasHeight } = unlock(
-				select( editorStore )
-			);
-			return {
-				canvasWidth: getCanvasWidth(),
-				canvasHeight: getCanvasHeight(),
-			};
-		},
-		[ enableResizing ]
-	);
 
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback(
@@ -103,22 +96,20 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 				resizableRef.current = api?.resizable;
 			} }
 			size={ {
-				width:
-					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
-				height:
-					enableResizing && canvasHeight
-						? canvasHeight + 'px'
-						: height || '100%',
+				width,
+				height,
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
+				onResizeStart?.();
 			} }
 			onResize={ ( event, direction, element ) => {
 				updateCanvasWidth( element );
 			} }
 			onResizeStop={ ( event, direction, element ) => {
-				setIsResizing( false );
 				updateCanvasWidth( element );
+				setIsResizing( false );
+				onResizeStop?.();
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"

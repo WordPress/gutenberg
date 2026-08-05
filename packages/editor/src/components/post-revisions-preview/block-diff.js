@@ -29,6 +29,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { DIFF_DESCRIPTION_IDS } from './diff-format-types';
 
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
@@ -562,7 +563,9 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				removedSlice,
 				{
 					type: 'revision/diff-removed',
-					attributes: { title: __( 'Removed' ) },
+					attributes: {
+						'aria-describedby': DIFF_DESCRIPTION_IDS.removed,
+					},
 				},
 				0,
 				part.value.length
@@ -580,7 +583,9 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				addedSlice,
 				{
 					type: 'revision/diff-added',
-					attributes: { title: __( 'Added' ) },
+					attributes: {
+						'aria-describedby': DIFF_DESCRIPTION_IDS.added,
+					},
 				},
 				0,
 				part.value.length
@@ -619,26 +624,40 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 					);
 
 					if ( rangeFormatChanged ) {
-						// Get type and description of what changed
-						const { type, description } = describeFormatChange(
+						// Get type of what changed. `description` (e.g. "2
+						// formats changed") is no longer used for the
+						// accessible name: aria-describedby must point to a
+						// static element already in the document, so we
+						// reference one of a fixed set of shared hidden
+						// descriptions instead of building one per instance.
+						const { type } = describeFormatChange(
 							currentFormats,
 							previousFormats,
 							currentIdx + rangeStart,
 							previousIdx + rangeStart
 						);
 
-						// Map change type to format type for styling
+						// Map change type to format type for styling, and
+						// the id of its shared hidden description element.
 						const formatType = {
 							added: 'revision/diff-format-added',
 							removed: 'revision/diff-format-removed',
 							changed: 'revision/diff-format-changed',
 						}[ type ];
 
+						const descriptionId = {
+							added: DIFF_DESCRIPTION_IDS.formatAdded,
+							removed: DIFF_DESCRIPTION_IDS.formatRemoved,
+							changed: DIFF_DESCRIPTION_IDS.formatChanged,
+						}[ type ];
+
 						const marked = applyFormat(
 							rangeSlice,
 							{
 								type: formatType,
-								attributes: { title: description },
+								attributes: {
+									'aria-describedby': descriptionId,
+								},
 							},
 							0,
 							i - rangeStart

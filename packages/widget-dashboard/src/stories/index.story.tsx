@@ -265,7 +265,7 @@ const GOAL_ACTIONS: WidgetAction[] = [
 	{
 		id: 'export-progress',
 		label: 'Export progress',
-		href: 'data:text/csv;charset=utf-8,metric,target,current,percent%0Arevenue,5000,3600,72',
+		href: new URL( './goal-progress.csv', import.meta.url ).href,
 		download: 'goal-progress.csv',
 	},
 ];

@@ -840,8 +840,17 @@ export interface TypographyProps {
 export interface SpacingProps {
 	/**
 	 * Enable block gap control.
+	 *
+	 * The object form declares the sides the control applies to, and the gap
+	 * value to fall back to when neither the theme nor the user has set one.
 	 */
-	blockGap: boolean | AxialDirection[];
+	blockGap:
+		| boolean
+		| AxialDirection[]
+		| {
+				__experimentalDefault?: string;
+				sides?: AxialDirection[];
+		  };
 
 	/**
 	 * Enable margin control UI for all or specified element directions.

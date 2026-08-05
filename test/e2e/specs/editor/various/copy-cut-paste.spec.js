@@ -864,4 +864,71 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	test( 'should copy the block when its entire text is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'A heading', level: 3 },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await editor.canvas.getByText( 'A heading' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// Pasting into an empty paragraph inserts the heading, proving
+		// the clipboard holds the block, not bare text.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
+
+		// Pasting into existing text inserts the text inline instead of
+		// splitting the paragraph.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'existing ' },
+		} );
+		await editor.canvas.getByText( 'existing' ).click();
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'existing A heading' },
+			},
+		] );
+
+		// Pasting over an entirely selected block replaces it, like
+		// pasting into an empty block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
+	} );
 } );

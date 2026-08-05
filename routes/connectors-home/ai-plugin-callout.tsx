@@ -255,7 +255,7 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
-						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						// @ts-expect-error `children` is injected by `createInterpolateElement` at runtime.
 						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
