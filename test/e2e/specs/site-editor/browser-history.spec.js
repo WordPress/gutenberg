@@ -18,7 +18,9 @@ test.describe( 'Site editor browser history', () => {
 		await expect( page ).toHaveURL( 'wp-admin/site-editor.php' );
 
 		// Navigate to a single template
-		await page.click( 'role=button[name="Templates"]' );
+		await page
+			.getByRole( 'button', { name: 'Templates', exact: true } )
+			.click();
 		await page
 			.locator( '.fields-field__title', { hasText: 'Index' } )
 			.click();

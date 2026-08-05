@@ -21,6 +21,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
@@ -898,8 +899,7 @@ export function prepareItem( id: QueueItemId ) {
 					id,
 					new UploadError( {
 						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						message: getHeicUnsupportedMessage(),
 						file,
 					} )
 				);

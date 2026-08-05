@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepmerge from 'deepmerge';
-// @ts-ignore - is-plain-object doesn't have proper types
+// @ts-expect-error Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
 
 /**

@@ -1422,9 +1422,10 @@ class WritingFlowUtils {
 		} );
 		await firstColumn.focus();
 		await firstColumn.getByRole( 'button', { name: 'Add block' } ).click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
 		await this.editor.canvas
@@ -1433,9 +1434,10 @@ class WritingFlowUtils {
 		await this.editor.canvas
 			.locator( 'role=button[name="Add block"i]' )
 			.click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await this.page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 		await this.editor.showBlockToolbar();
 		await this.page.keyboard.press( 'Shift+Tab' ); // Move to toolbar to select parent

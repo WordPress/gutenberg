@@ -56,7 +56,8 @@ const DENYLIST = {
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalScrollable: '{{ name }} is planned for deprecation.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
-		__experimentalSurface: '{{ name }} is planned for deprecation.',
+		__experimentalSurface:
+			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',

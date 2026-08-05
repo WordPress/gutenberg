@@ -8,6 +8,10 @@
 
 ## 8.3.0 (2026-07-14)
 
+### Breaking Changes
+
+-   Move `react` and `react-dom` from `dependencies` to `peerDependencies`. Consumers must now provide `react` and `react-dom` themselves. `@types/react` and `@types/react-dom` become optional peer dependencies ([#80053](https://github.com/WordPress/gutenberg/pull/80053)).
+
 ## 8.2.0 (2026-07-01)
 
 ## 8.1.0 (2026-06-24)

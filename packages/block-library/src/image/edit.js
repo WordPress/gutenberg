@@ -156,7 +156,15 @@ export function ImageEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
+		/*
+		 * Upload errors explain what went wrong and what to do about it, which
+		 * can take a couple of sentences, so they stay put until dismissed
+		 * instead of timing out like a success message.
+		 */
+		createErrorNotice( message, {
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
 		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
