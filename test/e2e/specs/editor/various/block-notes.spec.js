@@ -182,6 +182,42 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'can restore a deleted block note from the snackbar', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment to restore.',
+		} );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toBeHidden();
+
+		// Deleting moves the note to the trash, so the snackbar offers Undo.
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note deleted.' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note restored.' } )
+		).toBeVisible();
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toHaveText( 'Test comment to restore.' );
+	} );
+
 	test( 'can resolve and reopen a block note', async ( {
 		page,
 		blockNoteUtils,
@@ -1489,6 +1525,68 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 			await expect( paragraph ).toHaveText( 'Delete the whole note.' );
+		} );
+
+		test( 'restores the inline marker when a deleted note is restored', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Bring the whole note back.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Restore my marker' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+
+			// Undo from the snackbar untrashes the note and re-attaches its
+			// inline marker.
+			await page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note deleted.' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				1
+			);
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', {
+						name: 'Note: Restore my marker',
+					} )
+			).toBeVisible();
+			await expect( paragraph ).toHaveText(
+				'Bring the whole note back.'
+			);
 		} );
 
 		test( 'removes the inline marker when the note is resolved', async ( {

@@ -285,7 +285,8 @@ export function useNoteActions() {
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -469,9 +470,44 @@ export function useNoteActions() {
 				? note.blockClientId || getSelectedBlockClientId()
 				: null;
 
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
-				throwOnError: true,
-			} );
+			/*
+			 * Deleting without `force` moves the comment to the trash, which
+			 * keeps the record recoverable for the snackbar's Undo action.
+			 * Trashed notes are purged later along with other trashed
+			 * comments. Sites with the trash disabled (EMPTY_TRASH_DAYS = 0)
+			 * reject the trash request; fall back to permanent deletion
+			 * there, without offering Undo.
+			 */
+			let isTrashed = true;
+			try {
+				await deleteEntityRecord(
+					'root',
+					'comment',
+					note.id,
+					undefined,
+					{
+						throwOnError: true,
+					}
+				);
+			} catch ( error ) {
+				if ( error?.code !== 'rest_trash_not_supported' ) {
+					throw error;
+				}
+				isTrashed = false;
+				await deleteEntityRecord(
+					'root',
+					'comment',
+					note.id,
+					{ force: true },
+					{ throwOnError: true }
+				);
+			}
+
+			// The attribute value as stripped below; the Undo action compares
+			// against it to decide whether the inline marker can be restored.
+			let strippedKey;
+			let strippedValue;
+			let previousValue;
 
 			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );
@@ -484,8 +520,7 @@ export function useNoteActions() {
 					),
 				};
 				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
+				// highlight doesn't linger in the content.
 				const found = findNoteInBlock( attributes, note.id );
 				if ( found ) {
 					const next = removeNoteFormat(
@@ -494,14 +529,86 @@ export function useNoteActions() {
 					);
 					if ( next ) {
 						newAttributes[ found.attributeKey ] = next;
+						strippedKey = found.attributeKey;
+						strippedValue = next;
+						previousValue = attributes[ found.attributeKey ];
 					}
 				}
+				/*
+				 * Keep the cleanup out of undo history: the record deletion it
+				 * mirrors isn't part of that history, so undoing it alone
+				 * would resurrect a marker whose note stays trashed. The
+				 * snackbar's Undo action restores both sides together.
+				 */
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				updateBlockAttributes( clientId, newAttributes );
 			}
+
+			const restoreNote = async () => {
+				try {
+					// `untrash` restores the comment's pre-trash status.
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{ id: note.id, status: 'untrash' },
+						{ throwOnError: true }
+					);
+
+					const attributes = clientId
+						? getBlockAttributes( clientId )
+						: null;
+					// The block may have been removed in the meantime; the
+					// note then reappears as an orphan in the sidebar.
+					if ( attributes ) {
+						const newAttributes = {
+							metadata: cleanEmptyObject(
+								addNoteIdToMetadata(
+									attributes?.metadata,
+									note.id
+								)
+							),
+						};
+						/*
+						 * Re-attach the inline marker only when the text is
+						 * unchanged since the delete stripped it, so Undo
+						 * can't clobber edits made in the meantime. When it
+						 * changed, the note falls back to a block-level note.
+						 */
+						if (
+							strippedKey &&
+							String( attributes[ strippedKey ] ?? '' ) ===
+								String( strippedValue )
+						) {
+							newAttributes[ strippedKey ] = previousValue;
+						}
+						__unstableMarkNextChangeAsNotPersistent( {
+							history: 'ignore',
+						} );
+						updateBlockAttributes( clientId, newAttributes );
+					}
+
+					createNotice( 'snackbar', __( 'Note restored.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				} catch ( error ) {
+					onError( error );
+				}
+			};
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
+				...( isTrashed && {
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: restoreNote,
+						},
+					],
+				} ),
 			} );
 
 			return true;
