@@ -3,6 +3,7 @@
  */
 import type {
 	AwarenessState,
+	EngineDisposition,
 	EngineUpdate,
 	LocalAwarenessState,
 } from '../../engines/session';
@@ -42,6 +43,7 @@ interface SyncEnvelopeFromClient {
 interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
 	compaction_request?: SyncUpdate[]; // deprecated
+	dispositions?: EngineDisposition[];
 	end_cursor: number; // use as `after` in next request
 	should_compact?: boolean;
 	room: string;

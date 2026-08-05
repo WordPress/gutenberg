@@ -480,6 +480,83 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
+		it( 'delivers dispositions to the session AFTER the same response’s updates', async () => {
+			const update = { data: 'e30=', type: 'intent' };
+			const dispositions = [
+				{ intentId: 'i-1', status: 'applied' },
+				{
+					intentId: 'i-2',
+					status: 'escalated',
+					reason: 'attr-conflict',
+				},
+			];
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [ update ],
+						dispositions,
+					},
+				],
+			} );
+
+			const session = {
+				...createMockSession( 1 ),
+				receiveDispositions: jest.fn(),
+			};
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				session,
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( session.receiveUpdate ).toHaveBeenCalledWith( update );
+			expect( session.receiveDispositions ).toHaveBeenCalledWith(
+				dispositions
+			);
+			// Rows settle the state they supersede before the ack arrives.
+			expect(
+				session.receiveUpdate.mock.invocationCallOrder[ 0 ]
+			).toBeLessThan(
+				session.receiveDispositions.mock.invocationCallOrder[ 0 ]
+			);
+		} );
+
+		it( 'a session without receiveDispositions ignores them safely', async () => {
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+						dispositions: [
+							{ intentId: 'i-1', status: 'applied' },
+						],
+					},
+				],
+			} );
+
+			const onStatusChange = jest.fn();
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				session: createMockSession( 1 ),
+				log: jest.fn(),
+				onStatusChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( { status: 'disconnected' } )
+			);
+		} );
+
 		it( 'passes room name to applyFilters for per-room customization', async () => {
 			const awareness = {
 				1: {},

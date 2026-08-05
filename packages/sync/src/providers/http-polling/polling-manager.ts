@@ -575,6 +575,31 @@ function poll(): void {
 
 				roomState.updateQueue.addBulk( responseUpdates );
 
+				/*
+				 * Deliver per-update dispositions (the server's ack for the
+				 * batch this client sent) AFTER the updates above: rows
+				 * already settle the pending state they supersede, so the
+				 * ack covers only outcomes without a row and the session's
+				 * state never regresses mid-response.
+				 */
+				if (
+					room.dispositions &&
+					roomState.session.receiveDispositions
+				) {
+					try {
+						roomState.session.receiveDispositions(
+							room.dispositions
+						);
+					} catch ( error ) {
+						roomState.log(
+							'Failed to apply dispositions',
+							{ error },
+							'error',
+							true // force
+						);
+					}
+				}
+
 				// Respond to compaction requests from server. The server asks only one
 				// client at a time to compact (lowest active client ID). We encode our
 				// full document state to replace all prior updates on the server.

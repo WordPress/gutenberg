@@ -47,6 +47,23 @@ export type EngineLocalUpdateListener = (
 ) => void;
 
 /**
+ * A per-update outcome reported by the server for a batch this client sent
+ * (e.g. an intent log's applied / escalated / voided dispositions). Opaque to
+ * transports beyond this envelope shape; engines that produce none never see
+ * the callback.
+ */
+export interface EngineDisposition {
+	/** The update's engine-assigned identifier (e.g. an intent id). */
+	intentId: string;
+
+	/** Terminal outcome, engine-defined (e.g. 'applied'). */
+	status: string;
+
+	/** Engine-defined reason for non-applied outcomes. */
+	reason?: string;
+}
+
+/**
  * The transport-facing session for one entity/room: creates outgoing updates,
  * interprets received ones, and encodes/applies awareness states. Created by
  * the engine (closed over its internal state — the transport never sees that
@@ -107,4 +124,15 @@ export interface EngineSessionCodec {
 	 * queued for the server (e.g. a state answer to a peer's announcement).
 	 */
 	receiveUpdate: ( update: EngineUpdate ) => EngineUpdate | void;
+
+	/**
+	 * Processes the server's per-update dispositions for a batch this client
+	 * sent — its delivery ack. Transports MUST invoke this AFTER processing
+	 * the same response's updates: rows already settle the pending state
+	 * they supersede (an accepted update's authoritative form, an
+	 * escalation's proposal), so the ack only settles what has no row and
+	 * the session's document never regresses mid-response. Optional:
+	 * engines without dispositions (e.g. the Yjs relay) omit it.
+	 */
+	receiveDispositions?: ( dispositions: EngineDisposition[] ) => void;
 }
