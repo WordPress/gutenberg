@@ -254,6 +254,45 @@ test.describe( 'Block Notes', () => {
 		).toBeHidden();
 	} );
 
+	test( 'undoes edits made after a delete before restoring the note', async ( {
+		editor,
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Ordering check' },
+			comment: 'Undo me last.',
+		} );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await pageUtils.pressKeys( 'End' );
+		await page.keyboard.type( ' plus typing' );
+		await expect( paragraph ).toHaveText( 'Ordering check plus typing' );
+
+		// The delete is its own undo level, so the later typing comes off
+		// first and the note stays deleted.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph ).toHaveText( 'Ordering check' );
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toBeHidden();
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toHaveText( 'Undo me last.' );
+	} );
+
 	test( 'can resolve and reopen a block note', async ( {
 		page,
 		blockNoteUtils,
