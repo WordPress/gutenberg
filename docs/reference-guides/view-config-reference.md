@@ -213,7 +213,7 @@ $form = array(
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | layout | The layout used to render the form fields, discriminated by its `type`. See the form layout types. | `object` |
-| fields | The fields of the form, in display order. Each entry is a field id, or an object for further configuration. | `[ string | { id, label, description, layout, children } ]` |
+| fields | The fields of the form, in display order. Each entry is a field id, or an object for further configuration. | `[ string \| { id, label, description, layout, children } ]` |
 
 ### Form fields
 
