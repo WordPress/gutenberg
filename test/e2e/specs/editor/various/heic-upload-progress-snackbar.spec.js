@@ -11,13 +11,15 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Disable full client-side media processing while leaving the
-		// HEIC canvas-conversion mode active (`window.__heicUploadSupport`
-		// is set regardless). This mirrors Safari, where full client-side
-		// processing is unsupported but HEIC files are still converted to
-		// JPEG via createImageBitmap + OffscreenCanvas before upload.
+		// Disable cross-origin isolation while leaving client-side media
+		// processing enabled: without SharedArrayBuffer the full VIPS
+		// pipeline fails feature detection, so the editor falls back to the
+		// HEIC canvas-conversion mode. This mirrors Safari, where full
+		// client-side processing is unsupported but HEIC files are still
+		// converted to JPEG via createImageBitmap + OffscreenCanvas before
+		// upload.
 		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
+			'gutenberg-test-plugin-disable-cross-origin-isolation'
 		);
 	} );
 
@@ -31,7 +33,7 @@ test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () 
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
+			'gutenberg-test-plugin-disable-cross-origin-isolation'
 		);
 	} );
 
@@ -59,6 +61,19 @@ test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
+
+		// The canvas conversion mode sideloads the converted JPEG. A plain
+		// server-side upload never hits the sideload endpoint, so waiting for
+		// it proves the HEIC canvas path actually ran: the server also
+		// content-sniffs the fake HEIC's JPEG bytes and renames the file, so
+		// the src assertion below cannot tell the two paths apart on its own.
+		const sideloadRequest = page.waitForRequest(
+			( request ) =>
+				request.method() === 'POST' &&
+				request.url().includes( 'sideload' ),
+			{ timeout: 60_000 }
+		);
+
 		await imageBlock
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( {
@@ -66,6 +81,8 @@ test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () 
 				mimeType: 'image/heic',
 				buffer,
 			} );
+
+		await sideloadRequest;
 
 		const snackbarList = page.locator( '.components-snackbar-list' );
 

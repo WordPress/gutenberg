@@ -269,6 +269,19 @@ test.describe( 'Image', () => {
 		expect( id ).not.toBe( initialId );
 		expect( url ).not.toBe( initialUrl );
 		await expect( image ).toHaveAttribute( 'src', url );
+
+		// The swap loading state must clear once the new file has loaded.
+		await expect( image ).not.toHaveClass( /is-swapping-media/ );
+		await expect(
+			imageBlock.locator( '.components-spinner' )
+		).toBeHidden();
+
+		// Closing the modal returns focus to the Crop toolbar button. The
+		// button is disabled (not hidden) while the edit loads, so it stays in
+		// the DOM to receive focus rather than dropping it to the canvas.
+		await expect(
+			page.locator( 'role=button[name="Crop"i]' )
+		).toBeFocused();
 	} );
 
 	test( 'should undo without broken temporary state', async ( {

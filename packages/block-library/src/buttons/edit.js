@@ -33,8 +33,6 @@ function ButtonsEdit( { attributes, className } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
-		template: [ [ 'core/button' ] ],
-		templateInsertUpdatesSelection: true,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );
 

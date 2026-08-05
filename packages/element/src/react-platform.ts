@@ -1,17 +1,19 @@
 /**
  * External dependencies
  */
-import {
+import * as ReactDOM from 'react-dom';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+
+const {
 	createPortal,
-	findDOMNode,
 	flushSync,
 	/* eslint-disable react/no-deprecated */
+	findDOMNode,
 	render,
 	hydrate,
 	unmountComponentAtNode,
 	/* eslint-enable react/no-deprecated */
-} from 'react-dom';
-import { createRoot, hydrateRoot } from 'react-dom/client';
+} = ReactDOM;
 
 /**
  * Creates a portal into which a component can be rendered.

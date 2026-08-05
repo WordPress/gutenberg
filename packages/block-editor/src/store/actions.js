@@ -393,18 +393,26 @@ export const replaceBlocks =
 				return;
 			}
 		}
+		const blocksWithTemplates = applyBlockTypeTemplates( blocks );
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				clientIds,
-				blocks,
+				blocks: blocksWithTemplates,
 				time: Date.now(),
 				indexToSelect,
 				initialPosition,
 				meta,
 			} );
+			selectBlockTypeTemplate(
+				select,
+				dispatch,
+				blocks,
+				blocksWithTemplates,
+				initialPosition
+			);
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
@@ -551,6 +559,89 @@ export function insertBlock(
 }
 
 /**
+ * Applies block type templates to empty blocks. When a block type declares a
+ * `template` in its settings, an empty block of that type receives the
+ * template's child blocks at creation, so insertion needs no follow-up
+ * template synchronization.
+ *
+ * @param {Object[]} blocks        Block objects.
+ * @param {Set}      expandedTypes Block names whose templates are already
+ *                                 being expanded higher up the tree. A
+ *                                 template that transitively contains its
+ *                                 own block type would otherwise expand
+ *                                 forever; the nested occurrence stays
+ *                                 empty instead.
+ *
+ * @return {Object[]} Block objects with templates applied.
+ */
+function applyBlockTypeTemplates( blocks, expandedTypes = new Set() ) {
+	let hasChanges = false;
+	const result = blocks.map( ( block ) => {
+		let { innerBlocks } = block;
+		if ( innerBlocks?.length ) {
+			innerBlocks = applyBlockTypeTemplates( innerBlocks, expandedTypes );
+		} else if ( ! expandedTypes.has( block.name ) ) {
+			const { template } = getBlockType( block.name ) ?? {};
+			if ( template?.length ) {
+				innerBlocks = applyBlockTypeTemplates(
+					synchronizeBlocksWithTemplate( [], template ),
+					new Set( expandedTypes ).add( block.name )
+				);
+			}
+		}
+		if ( innerBlocks === block.innerBlocks ) {
+			return block;
+		}
+		hasChanges = true;
+		return { ...block, innerBlocks };
+	} );
+	return hasChanges ? result : blocks;
+}
+
+/**
+ * Moves the selection into the first inner leaf block of a freshly
+ * scaffolded block, when the block ended up selected and its block type
+ * opts in with `templateInsertUpdatesSelection`. Expects the state to
+ * reflect the insertion, and applies the same selection a template
+ * insertion updates the selection to.
+ *
+ * @param {Function}  select              Store select function.
+ * @param {Function}  dispatch            Store dispatch function.
+ * @param {Object[]}  originalBlocks      Block objects before templates were applied.
+ * @param {Object[]}  blocksWithTemplates Block objects after templates were applied.
+ * @param {0|-1|null} initialPosition     Initial focus position.
+ */
+function selectBlockTypeTemplate(
+	select,
+	dispatch,
+	originalBlocks,
+	blocksWithTemplates,
+	initialPosition
+) {
+	const selectedClientId = select.getSelectedBlockClientId();
+	if ( ! selectedClientId ) {
+		return;
+	}
+	const index = blocksWithTemplates.findIndex(
+		( block ) => block.clientId === selectedClientId
+	);
+	if (
+		index === -1 ||
+		blocksWithTemplates[ index ] === originalBlocks[ index ] ||
+		! blocksWithTemplates[ index ].innerBlocks.length ||
+		! getBlockType( blocksWithTemplates[ index ].name )
+			?.templateInsertUpdatesSelection
+	) {
+		return;
+	}
+	let block = blocksWithTemplates[ index ];
+	while ( block.innerBlocks[ 0 ] ) {
+		block = block.innerBlocks[ 0 ];
+	}
+	dispatch.selectBlock( block.clientId, initialPosition );
+}
+
+/**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
@@ -574,7 +665,7 @@ export const insertBlocks =
 		initialPosition = 0,
 		meta
 	) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -599,15 +690,26 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
-			dispatch( {
-				type: 'INSERT_BLOCKS',
-				blocks: allowedBlocks,
-				index,
-				rootClientId,
-				time: Date.now(),
-				updateSelection,
-				initialPosition: updateSelection ? initialPosition : null,
-				meta,
+			const blocksWithTemplates =
+				applyBlockTypeTemplates( allowedBlocks );
+			registry.batch( () => {
+				dispatch( {
+					type: 'INSERT_BLOCKS',
+					blocks: blocksWithTemplates,
+					index,
+					rootClientId,
+					time: Date.now(),
+					updateSelection,
+					initialPosition: updateSelection ? initialPosition : null,
+					meta,
+				} );
+				selectBlockTypeTemplate(
+					select,
+					dispatch,
+					allowedBlocks,
+					blocksWithTemplates,
+					initialPosition
+				);
 			} );
 		}
 	};
@@ -1253,10 +1355,16 @@ export const mergeBlocks =
 		}
 
 		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
+			const isASelected = select.isBlockSelected( clientIdA );
+
+			if ( isASelected ) {
+				registry.batch( () => {
+					dispatch.removeBlock( clientIdA, false );
+					dispatch.selectBlock( clientIdB, 0 );
+				} );
+			} else {
+				dispatch.removeBlock( clientIdA, false );
+			}
 			return;
 		}
 

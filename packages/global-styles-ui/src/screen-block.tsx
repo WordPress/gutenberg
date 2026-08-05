@@ -99,6 +99,7 @@ interface ScreenBlockProps {
 	variation?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function ScreenBlock( {
@@ -106,6 +107,7 @@ function ScreenBlock( {
 	variation,
 	selectedViewport: controlledSelectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -367,7 +369,7 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
-				pseudoStates={ validPseudoStates }
+				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={
@@ -404,6 +406,7 @@ function ScreenBlock( {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -413,6 +416,7 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -422,6 +426,7 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -431,6 +436,7 @@ function ScreenBlock( {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -439,6 +445,7 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -447,6 +454,7 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

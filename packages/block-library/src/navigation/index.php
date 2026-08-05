@@ -16,7 +16,7 @@
  * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
  * attribute first to preserve original behavior for blocks saved before the migration.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
@@ -615,12 +615,13 @@ class WP_Navigation_Block_Renderer {
 			'space-between' => 'items-justified-space-between',
 		);
 
-		$layout_class = '';
+		$layout_class        = '';
+		$nav_justify_content = $attributes['layout']['justifyContent'] ?? null;
 		if (
-			isset( $attributes['layout']['justifyContent'] ) &&
-			isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
+			is_string( $nav_justify_content ) &&
+			isset( $layout_justification[ $nav_justify_content ] )
 		) {
-			$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+			$layout_class .= $layout_justification[ $nav_justify_content ];
 		}
 		if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 			$layout_class .= ' is-vertical';
@@ -1250,7 +1251,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 			)
 		) ) {
 			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
-			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isSubmenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
 		// Add directives to the submenu.
