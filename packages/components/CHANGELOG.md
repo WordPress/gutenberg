@@ -9,6 +9,7 @@
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
     -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
+    -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Deprecations
