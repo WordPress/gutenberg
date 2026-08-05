@@ -278,16 +278,16 @@ describe( 'getCanvasHeight', () => {
 		};
 	}
 
-	it( 'returns the portrait height at the mobile preset width', () => {
-		// Mobile aspect ratio is 8/5 (portrait): 480 * 8/5 = 768.
+	it( 'keeps the portrait aspect ratio at the inset mobile preview width', () => {
+		// Mobile aspect ratio is 8/5 (portrait): 479 * 8/5 = 766 (rounded).
 		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 480 } ) ).toBe( 768 );
+		expect( getCanvasHeight( { canvasWidth: 479 } ) ).toBe( 766 );
 	} );
 
-	it( 'returns the portrait height at the tablet preset width', () => {
-		// Tablet aspect ratio is 4/3 (portrait): 782 * 4/3 = 1043.
+	it( 'keeps the portrait aspect ratio at the inset tablet preview width', () => {
+		// Tablet aspect ratio is 4/3 (portrait): 781 * 4/3 = 1041 (rounded).
 		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 782 } ) ).toBe( 1043 );
+		expect( getCanvasHeight( { canvasWidth: 781 } ) ).toBe( 1041 );
 	} );
 
 	it( 'returns undefined for desktop (no aspect ratio applies)', () => {
@@ -297,12 +297,12 @@ describe( 'getCanvasHeight', () => {
 
 	it( 'returns undefined when zoom-out is active', () => {
 		setupRegistry( { isZoomOut: true } );
-		expect( getCanvasHeight( { canvasWidth: 480 } ) ).toBeUndefined();
+		expect( getCanvasHeight( { canvasWidth: 479 } ) ).toBeUndefined();
 	} );
 
 	it( 'returns undefined when the width is dragged within a device band but is not the preset', () => {
 		// 400 resolves to Mobile (at or below the 480 breakpoint) but is not the
-		// 480 preset, so the device height does not apply and the canvas fills.
+		// 479 preset, so the device height does not apply and the canvas fills.
 		setupRegistry();
 		expect( getCanvasHeight( { canvasWidth: 400 } ) ).toBeUndefined();
 	} );
@@ -313,12 +313,12 @@ describe( 'getCanvasHeight', () => {
 	} );
 
 	it( 'uses custom viewport breakpoints when provided', () => {
-		// Custom mobile preset 640: 640 * 8/5 = 1024.
+		// Custom mobile preset 639: 639 * 8/5 = 1022 (rounded).
 		setupRegistry( {
 			viewport: { mobile: '640px', tablet: '1024px' },
 		} );
-		expect( getCanvasHeight( { canvasWidth: 640 } ) ).toBe( 1024 );
-		// Custom tablet preset 1024: 1024 * 4/3 = 1365 (rounded).
-		expect( getCanvasHeight( { canvasWidth: 1024 } ) ).toBe( 1365 );
+		expect( getCanvasHeight( { canvasWidth: 639 } ) ).toBe( 1022 );
+		// Custom tablet preset 1023: 1023 * 4/3 = 1364.
+		expect( getCanvasHeight( { canvasWidth: 1023 } ) ).toBe( 1364 );
 	} );
 } );

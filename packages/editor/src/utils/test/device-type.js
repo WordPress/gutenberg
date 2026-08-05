@@ -7,10 +7,7 @@ import {
 } from '../device-type';
 
 describe( 'device type utilities', () => {
-	it( 'uses default viewport breakpoints when viewport settings are not provided', () => {
-		expect( getCanvasWidthByDeviceType( 'Mobile' ) ).toBe( 480 );
-		expect( getCanvasWidthByDeviceType( 'Tablet' ) ).toBe( 782 );
-
+	it( 'classifies widths using default viewport breakpoints when viewport settings are not provided', () => {
 		expect( getDeviceTypeByCanvasWidth( 480 ) ).toBe( 'Mobile' );
 		expect( getDeviceTypeByCanvasWidth( 481 ) ).toBe( 'Tablet' );
 		expect( getDeviceTypeByCanvasWidth( 782 ) ).toBe( 'Tablet' );
@@ -18,10 +15,29 @@ describe( 'device type utilities', () => {
 		expect( getDeviceTypeByCanvasWidth( undefined ) ).toBe( 'Desktop' );
 	} );
 
-	it( 'uses default viewport breakpoints when viewport settings are provided', () => {
-		expect( getCanvasWidthByDeviceType( 'Mobile', {} ) ).toBe( 480 );
-		expect( getCanvasWidthByDeviceType( 'Tablet', {} ) ).toBe( 782 );
+	it( 'places default device preview widths one pixel inside their breakpoints', () => {
+		expect( getCanvasWidthByDeviceType( 'Mobile' ) ).toBe( 479 );
+		expect( getCanvasWidthByDeviceType( 'Tablet' ) ).toBe( 781 );
+		expect( getCanvasWidthByDeviceType( 'Desktop' ) ).toBeUndefined();
+	} );
 
+	it( 'keeps a tablet preview inside a tablet range narrower than one pixel', () => {
+		const viewportSettings = {
+			mobile: '480px',
+			tablet: '480.5px',
+		};
+		const previewWidth = getCanvasWidthByDeviceType(
+			'Tablet',
+			viewportSettings
+		);
+
+		expect( previewWidth ).toBe( 480.25 );
+		expect(
+			getDeviceTypeByCanvasWidth( previewWidth, viewportSettings )
+		).toBe( 'Tablet' );
+	} );
+
+	it( 'classifies widths using default viewport breakpoints when viewport settings are empty', () => {
 		expect( getDeviceTypeByCanvasWidth( '480px', {} ) ).toBe( 'Mobile' );
 		expect( getDeviceTypeByCanvasWidth( 782, {} ) ).toBe( 'Tablet' );
 	} );
@@ -33,10 +49,10 @@ describe( 'device type utilities', () => {
 		};
 
 		expect( getCanvasWidthByDeviceType( 'Mobile', viewportSettings ) ).toBe(
-			640
+			639
 		);
 		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
-			1024
+			1023
 		);
 
 		expect( getDeviceTypeByCanvasWidth( 640, viewportSettings ) ).toBe(
@@ -57,7 +73,7 @@ describe( 'device type utilities', () => {
 		};
 
 		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
-			1024
+			1023
 		);
 		expect( getDeviceTypeByCanvasWidth( 640, viewportSettings ) ).toBe(
 			'Mobile'
@@ -76,7 +92,7 @@ describe( 'device type utilities', () => {
 			undefined
 		);
 		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
-			1024
+			1023
 		);
 		expect( getDeviceTypeByCanvasWidth( 800, viewportSettings ) ).toBe(
 			'Tablet'
@@ -93,7 +109,7 @@ describe( 'device type utilities', () => {
 		};
 
 		expect( getCanvasWidthByDeviceType( 'Mobile', viewportSettings ) ).toBe(
-			1024
+			1023
 		);
 		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
 			undefined
