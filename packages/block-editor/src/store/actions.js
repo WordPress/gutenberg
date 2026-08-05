@@ -564,21 +564,28 @@ export function insertBlock(
  * template's child blocks at creation, so insertion needs no follow-up
  * template synchronization.
  *
- * @param {Object[]} blocks Block objects.
+ * @param {Object[]} blocks        Block objects.
+ * @param {Set}      expandedTypes Block names whose templates are already
+ *                                 being expanded higher up the tree. A
+ *                                 template that transitively contains its
+ *                                 own block type would otherwise expand
+ *                                 forever; the nested occurrence stays
+ *                                 empty instead.
  *
  * @return {Object[]} Block objects with templates applied.
  */
-function applyBlockTypeTemplates( blocks ) {
+function applyBlockTypeTemplates( blocks, expandedTypes = new Set() ) {
 	let hasChanges = false;
 	const result = blocks.map( ( block ) => {
 		let { innerBlocks } = block;
 		if ( innerBlocks?.length ) {
-			innerBlocks = applyBlockTypeTemplates( innerBlocks );
-		} else {
+			innerBlocks = applyBlockTypeTemplates( innerBlocks, expandedTypes );
+		} else if ( ! expandedTypes.has( block.name ) ) {
 			const { template } = getBlockType( block.name ) ?? {};
 			if ( template?.length ) {
 				innerBlocks = applyBlockTypeTemplates(
-					synchronizeBlocksWithTemplate( [], template )
+					synchronizeBlocksWithTemplate( [], template ),
+					new Set( expandedTypes ).add( block.name )
 				);
 			}
 		}

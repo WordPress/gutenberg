@@ -524,6 +524,54 @@ describe( 'actions', () => {
 			);
 		} );
 
+		it( 'should leave a nested occurrence of the same block type empty', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item' ], [ 'core/test-container' ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						expect.objectContaining( {
+							name: 'core/test-container',
+							innerBlocks: [
+								expect.objectContaining( {
+									name: 'core/test-item',
+									innerBlocks: [],
+								} ),
+								expect.objectContaining( {
+									name: 'core/test-container',
+									innerBlocks: [],
+								} ),
+							],
+						} ),
+					],
+				} )
+			);
+		} );
+
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
