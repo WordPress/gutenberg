@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 import { useGlobalStyles } from './hooks';
 
 /**
@@ -26,9 +27,29 @@ export function GlobalStylesActionMenu( {
 		( Object.keys( user?.styles ?? {} ).length > 0 ||
 			Object.keys( user?.settings ?? {} ).length > 0 );
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
 	// Reset function to clear all user customizations
 	const onReset = () => {
+		// Keep the config that is being replaced so the notice can put it back.
+		// It carries `_links` as well as styles and settings, so restoring it
+		// does not drop the capability links the menu reads.
+		const previousUser = user;
+
 		setUser( { styles: {}, settings: {} } );
+
+		createSuccessNotice( __( 'Custom styles reset.' ), {
+			type: 'snackbar',
+			id: 'global-styles-reset',
+			actions: [
+				{
+					label: __( 'Undo' ),
+					onClick: () => {
+						setUser( previousUser );
+					},
+				},
+			],
+		} );
 	};
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
