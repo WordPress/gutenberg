@@ -18,6 +18,12 @@ import type { ConnectionError } from './errors';
 declare global {
 	interface Window {
 		_wpCollaborationEnabled?: string;
+		_wpCollaborationSync?: {
+			engine?: string;
+			engineProtocol?: number;
+			transports?: string[];
+			transportProtocol?: number;
+		};
 	}
 }
 

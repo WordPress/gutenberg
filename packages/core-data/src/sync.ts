@@ -13,12 +13,12 @@ import { unlock } from './lock-unlock';
 
 const {
 	ConnectionErrorCode,
-	createSyncManager,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
+	resolveEngineAdapter,
 	retrySyncConnection,
 } = unlock( syncPrivateApis );
 
@@ -43,13 +43,34 @@ export {
 export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
 
 let syncManager: SyncManager;
+let engineMismatchWarned = false;
 
 export function getSyncManager(): SyncManager | undefined {
 	if ( syncManager ) {
 		return syncManager;
 	}
 
-	syncManager = createSyncManager();
+	/*
+	 * Engine handshake: the server announces the sync engine it speaks
+	 * (window._wpCollaborationSync) and enforces it per-request with a 409.
+	 * When this client cannot provide the announced engine at the announced
+	 * protocol version, do not create a sync manager at all — entity syncing
+	 * stays off and WordPress's regular post locking applies, the same
+	 * posture as collaboration disabled.
+	 */
+	const adapter = resolveEngineAdapter();
+	if ( ! adapter ) {
+		if ( ! engineMismatchWarned ) {
+			engineMismatchWarned = true;
+			// eslint-disable-next-line no-console
+			console.warn(
+				'Real-time collaboration is unavailable: this client does not support the sync engine announced by the server. Falling back to exclusive post locking.'
+			);
+		}
+		return undefined;
+	}
+
+	syncManager = adapter.createManager();
 
 	return syncManager;
 }

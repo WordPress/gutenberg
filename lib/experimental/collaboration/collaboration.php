@@ -9,6 +9,9 @@ require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
+	require_once __DIR__ . '/interface-wp-sync-engine.php';
+	require_once __DIR__ . '/class-wp-yjs-relay-engine.php';
+	require_once __DIR__ . '/class-wp-sync-engine-registry.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
@@ -298,10 +301,29 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		)
 	);
 
+	/*
+	 * Engine/transport handshake. The client refuses to join sync rooms
+	 * whose engine (or protocol version) its adapter registry cannot
+	 * provide, or when no announced transport is supported — degrading to
+	 * the classic exclusive post lock instead of corrupting a session.
+	 * Per-room engine overrides (`wp_sync_engine_for_room`) are enforced
+	 * server-side by the 409 mismatch check; this announcement covers the
+	 * site default.
+	 */
+	$registry = new WP_Sync_Engine_Registry( new WP_Sync_Post_Meta_Storage() );
+	$engine   = $registry->get_engine_for_room( '' );
+	$sync     = array(
+		'engine'            => $engine->get_slug(),
+		'engineProtocol'    => $engine->get_protocol_version(),
+		'transports'        => array( 'http-polling' ),
+		'transportProtocol' => 1,
+	);
+
 	wp_add_inline_script(
 		'wp-core-data',
 		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
-		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';',
+		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';' .
+		'window._wpCollaborationSync = ' . wp_json_encode( $sync ) . ';',
 		'after'
 	);
 }

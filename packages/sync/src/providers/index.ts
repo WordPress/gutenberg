@@ -7,6 +7,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { createHttpPollingProvider } from './http-polling/http-polling-provider';
+import { getAnnouncedSync, HTTP_POLLING_TRANSPORT_SLUG } from '../engines';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
@@ -43,6 +44,21 @@ export function getProviderCreators(): ProviderCreator[] {
 
 	// Check if real-time collaboration is enabled via WordPress setting.
 	if ( ! window._wpCollaborationEnabled ) {
+		return [];
+	}
+
+	/*
+	 * Transport handshake: when the server announces its supported
+	 * transports and HTTP polling is not among them, this client has no
+	 * mutually supported transport — do not connect at all (the same
+	 * degraded posture as collaboration disabled: regular post locking
+	 * applies).
+	 */
+	const announced = getAnnouncedSync();
+	if (
+		announced &&
+		! announced.transports.includes( HTTP_POLLING_TRANSPORT_SLUG )
+	) {
 		return [];
 	}
 

@@ -12,7 +12,20 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 	/**
-	 * Core class that contains an HTTP server used for collaborative editing.
+	 * HTTP short-polling transport for collaborative editing.
+	 *
+	 * The transport owns movement: routes, authentication, room permission
+	 * checks, cursors, awareness, and request/response shape. The MEANING of
+	 * update payloads is owned by the room's engine (WP_Sync_Engine, resolved
+	 * through WP_Sync_Engine_Registry) — this class never interprets update
+	 * data, so engines are swappable without transport changes.
+	 *
+	 * Engine mismatch protection: a client may stamp the engine it is
+	 * speaking (`engine` / `engine_protocol` per room). If the stamp does not
+	 * match the room's engine, or the room's storage lineage was written by a
+	 * different engine, the request fails with 409 `rest_sync_engine_mismatch`
+	 * and the client is expected to leave the session (falling back to a
+	 * post lock). A room's lineage is fixed by its first write.
 	 *
 	 * @since 7.0.0
 	 * @access private
@@ -39,6 +52,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Threshold used to signal clients to send a compaction update.
 		 *
 		 * @since 7.0.0
+		 * @deprecated 7.2.0 Compaction policy is engine-owned. Use
+		 *             WP_Yjs_Relay_Engine::COMPACTION_THRESHOLD.
 		 * @var int
 		 */
 		const COMPACTION_THRESHOLD = 50;
@@ -71,6 +86,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Sync update type: compaction.
 		 *
 		 * @since 7.0.0
+		 * @deprecated 7.2.0 Update types are engine-owned. Use
+		 *             WP_Yjs_Relay_Engine::UPDATE_TYPE_COMPACTION.
 		 * @var string
 		 */
 		const UPDATE_TYPE_COMPACTION = 'compaction';
@@ -79,6 +96,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Sync update type: sync step 1.
 		 *
 		 * @since 7.0.0
+		 * @deprecated 7.2.0 Update types are engine-owned. Use
+		 *             WP_Yjs_Relay_Engine::UPDATE_TYPE_SYNC_STEP1.
 		 * @var string
 		 */
 		const UPDATE_TYPE_SYNC_STEP1 = 'sync_step1';
@@ -87,6 +106,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Sync update type: sync step 2.
 		 *
 		 * @since 7.0.0
+		 * @deprecated 7.2.0 Update types are engine-owned. Use
+		 *             WP_Yjs_Relay_Engine::UPDATE_TYPE_SYNC_STEP2.
 		 * @var string
 		 */
 		const UPDATE_TYPE_SYNC_STEP2 = 'sync_step2';
@@ -95,6 +116,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * Sync update type: regular update.
 		 *
 		 * @since 7.0.0
+		 * @deprecated 7.2.0 Update types are engine-owned. Use
+		 *             WP_Yjs_Relay_Engine::UPDATE_TYPE_UPDATE.
 		 * @var string
 		 */
 		const UPDATE_TYPE_UPDATE = 'update';
@@ -107,14 +130,24 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		private WP_Sync_Storage $storage;
 
 		/**
+		 * Engine registry used to resolve the engine for each room.
+		 *
+		 * @since 7.2.0
+		 */
+		private WP_Sync_Engine_Registry $engines;
+
+		/**
 		 * Constructor.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param WP_Sync_Storage $storage Storage backend for sync updates.
+		 * @param WP_Sync_Storage              $storage Storage backend for sync updates.
+		 * @param WP_Sync_Engine_Registry|null $engines Engine registry. Defaults to a
+		 *                                              registry over the given storage.
 		 */
-		public function __construct( WP_Sync_Storage $storage ) {
+		public function __construct( WP_Sync_Storage $storage, ?WP_Sync_Engine_Registry $engines = null ) {
 			$this->storage = $storage;
+			$this->engines = $engines ?? new WP_Sync_Engine_Registry( $storage );
 		}
 
 		/**
@@ -133,12 +166,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'type' => array(
 						'type'     => 'string',
 						'required' => true,
-						'enum'     => array(
-							self::UPDATE_TYPE_COMPACTION,
-							self::UPDATE_TYPE_SYNC_STEP1,
-							self::UPDATE_TYPE_SYNC_STEP2,
-							self::UPDATE_TYPE_UPDATE,
-						),
+						'enum'     => $this->engines->get_all_update_types(),
 					),
 				),
 				'required'   => true,
@@ -146,26 +174,37 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			);
 
 			$room_args = array(
-				'after'     => array(
+				'after'           => array(
 					'minimum'  => 0,
 					'required' => true,
 					'type'     => 'integer',
 				),
-				'awareness' => array(
+				'awareness'       => array(
 					'required' => true,
 					'type'     => array( 'object', 'null' ),
 				),
-				'client_id' => array(
+				'client_id'       => array(
 					'minimum'  => 1,
 					'required' => true,
 					'type'     => 'integer',
 				),
-				'room'      => array(
+				// Optional engine handshake stamp: when present, the request
+				// fails with 409 unless it matches the room's engine.
+				'engine'          => array(
+					'required' => false,
+					'type'     => 'string',
+				),
+				'engine_protocol' => array(
+					'minimum'  => 1,
+					'required' => false,
+					'type'     => 'integer',
+				),
+				'room'            => array(
 					'required' => true,
 					'type'     => 'string',
 					'pattern'  => '^[^/]+/[^/:]+(?::\\S+)?$',
 				),
-				'updates'   => array(
+				'updates'         => array(
 					'items'    => $typed_update_args,
 					'minItems' => 0,
 					'required' => true,
@@ -302,32 +341,105 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$client_id = $room_request['client_id'];
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
+				$updates   = $room_request['updates'];
+
+				$engine = $this->engines->get_engine_for_room( $room );
+
+				$mismatch = $this->check_engine_mismatch( $engine, $room, $room_request, $updates );
+				if ( is_wp_error( $mismatch ) ) {
+					return $mismatch;
+				}
 
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
 
-				// The lowest client ID is nominated to perform compaction when needed.
-				$is_compactor = false;
-				if ( count( $merged_awareness ) > 0 ) {
-					$is_compactor = min( array_keys( $merged_awareness ) ) === $client_id;
+				$context = array(
+					'awareness' => $merged_awareness,
+				);
+
+				// Engine ingests this client's updates.
+				$ingest = $engine->handle_updates( $room, $client_id, $cursor, $updates, $context );
+				if ( is_wp_error( $ingest ) ) {
+					return $ingest;
 				}
 
-				// Process each update according to its type.
-				foreach ( $room_request['updates'] as $update ) {
-					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
-					if ( is_wp_error( $result ) ) {
-						return $result;
-					}
-				}
-
-				// Get updates for this client.
-				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
+				// Engine produces the catch-up payload for this client.
+				$room_response              = $engine->get_updates_since( $room, $client_id, $cursor, $context );
 				$room_response['awareness'] = $merged_awareness;
+
+				// Engines that produce per-update dispositions (e.g. an
+				// intent log's applied/escalated/voided outcomes) surface
+				// them; relay-style engines omit the key entirely.
+				if ( isset( $ingest['dispositions'] ) && null !== $ingest['dispositions'] ) {
+					$room_response['dispositions'] = $ingest['dispositions'];
+				}
 
 				$response['rooms'][] = $room_response;
 			}
 
 			return new WP_REST_Response( $response, 200 );
+		}
+
+		/**
+		 * Enforces engine consistency for a room.
+		 *
+		 * Two checks, both failing with 409 `rest_sync_engine_mismatch`:
+		 *
+		 * 1. Client stamp: when the request carries `engine` /
+		 *    `engine_protocol` for the room, they must match the engine the
+		 *    server resolved. A stale tab speaking yesterday's engine is
+		 *    fenced here, before any of its updates are stored.
+		 * 2. Storage lineage: a room's first write stamps the engine slug;
+		 *    later writes through a different engine are rejected even if the
+		 *    site configuration changed mid-session. Mixed-engine payloads in
+		 *    one room would be mutual garbage — the lineage check makes the
+		 *    swap scenario degrade to a post lock instead of corruption.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param WP_Sync_Engine       $engine       Engine resolved for the room.
+		 * @param string               $room         Room identifier.
+		 * @param array<string, mixed> $room_request The room's request payload.
+		 * @param array<int, mixed>    $updates      Updates the client wants to store.
+		 * @return true|WP_Error True when consistent, WP_Error on mismatch.
+		 */
+		private function check_engine_mismatch( WP_Sync_Engine $engine, string $room, array $room_request, array $updates ) {
+			$mismatch = null;
+
+			if ( isset( $room_request['engine'] ) && $room_request['engine'] !== $engine->get_slug() ) {
+				$mismatch = $room_request['engine'];
+			} elseif ( isset( $room_request['engine_protocol'] ) && $room_request['engine_protocol'] !== $engine->get_protocol_version() ) {
+				$mismatch = $engine->get_slug() . ' protocol ' . $room_request['engine_protocol'];
+			} else {
+				$lineage = $this->storage->get_room_engine( $room );
+				if ( null !== $lineage && $lineage !== $engine->get_slug() ) {
+					$mismatch = $lineage;
+				} elseif ( null === $lineage && count( $updates ) > 0 ) {
+					// First write fixes the room's engine lineage. Failure to
+					// stamp is not fatal: the next write retries.
+					$this->storage->set_room_engine( $room, $engine->get_slug() );
+				}
+			}
+
+			if ( null === $mismatch ) {
+				return true;
+			}
+
+			return new WP_Error(
+				'rest_sync_engine_mismatch',
+				sprintf(
+					/* translators: 1: Room identifier. 2: Sync engine identifier. */
+					__( 'Sync engine mismatch for room %1$s: the room requires engine %2$s.', 'gutenberg' ),
+					$room,
+					$engine->get_slug() . ' v' . $engine->get_protocol_version()
+				),
+				array(
+					'status'          => 409,
+					'room'            => $room,
+					'engine'          => $engine->get_slug(),
+					'engine_protocol' => $engine->get_protocol_version(),
+				)
+			);
 		}
 
 		/**
@@ -379,158 +491,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			}
 
 			return $response;
-		}
-
-		/**
-		 * Processes a sync update based on its type.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string                            $room      Room identifier.
-		 * @param int                               $client_id Client identifier.
-		 * @param int                               $cursor    Client cursor (marker of last seen update).
-		 * @param array{data: string, type: string} $update    Sync update.
-		 * @return true|WP_Error True on success, WP_Error on storage failure.
-		 */
-		private function process_sync_update( string $room, int $client_id, int $cursor, array $update ) {
-			$data = $update['data'];
-			$type = $update['type'];
-
-			switch ( $type ) {
-				case self::UPDATE_TYPE_COMPACTION:
-					/*
-					 * Compaction replaces updates the client has already seen. Only remove
-					 * updates with markers before the client's cursor to preserve updates
-					 * that arrived since the client's last sync.
-					 *
-					 * Check for a newer compaction update first. If one exists, skip this
-					 * compaction to avoid overwriting it.
-					 */
-					$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
-
-					$has_newer_compaction = array_any(
-						$updates_after_cursor,
-						fn( $existing ) => self::UPDATE_TYPE_COMPACTION === $existing['type']
-					);
-
-					if ( ! $has_newer_compaction ) {
-						if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor ) ) {
-							return new WP_Error(
-								'rest_sync_storage_error',
-								__( 'Failed to remove updates during compaction.', 'gutenberg' ),
-								array( 'status' => 500 )
-							);
-						}
-
-						return $this->add_update( $room, $client_id, $type, $data );
-					}
-
-					/*
-					 * A newer compaction already advanced the cursor, but we
-					 * can not safely drop an update. The incoming bytes still encode
-					 * operations other clients may not have seen, so store them as a
-					 * regular update. Y.applyUpdateV2 merges state-as-update blobs
-					 * idempotently, so overlap with the existing compaction is safe.
-					 */
-					return $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $data );
-
-				case self::UPDATE_TYPE_SYNC_STEP1:
-				case self::UPDATE_TYPE_SYNC_STEP2:
-				case self::UPDATE_TYPE_UPDATE:
-					/*
-					 * Sync step 1 announces a client's state vector. Other clients need
-					 * to see it so they can respond with sync_step2 containing missing
-					 * updates. The cursor-based filtering prevents re-delivery.
-					 *
-					 * Sync step 2 contains updates for a specific client.
-					 *
-					 * All updates are stored persistently.
-					 */
-					return $this->add_update( $room, $client_id, $type, $data );
-			}
-
-			return new WP_Error(
-				'rest_invalid_update_type',
-				__( 'Invalid sync update type.', 'gutenberg' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		/**
-		 * Adds an update to a room's update list via storage.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string $room      Room identifier.
-		 * @param int    $client_id Client identifier.
-		 * @param string $type      Update type (sync_step1, sync_step2, update, compaction).
-		 * @param string $data      Base64-encoded update data.
-		 * @return true|WP_Error True on success, WP_Error on storage failure.
-		 */
-		private function add_update( string $room, int $client_id, string $type, string $data ) {
-			$update = array(
-				'client_id' => $client_id,
-				'data'      => $data,
-				'type'      => $type,
-			);
-
-			if ( ! $this->storage->add_update( $room, $update ) ) {
-				return new WP_Error(
-					'rest_sync_storage_error',
-					__( 'Failed to store sync update.', 'gutenberg' ),
-					array( 'status' => 500 )
-				);
-			}
-
-			return true;
-		}
-
-		/**
-		 * Gets sync updates for a specific client from a room after a given cursor.
-		 *
-		 * Delegates cursor-based retrieval to the storage layer, then applies
-		 * client-specific filtering and compaction logic.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string $room         Room identifier.
-		 * @param int    $client_id    Client identifier.
-		 * @param int    $cursor       Return updates after this cursor.
-		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
-		 * @return array{
-		 *   end_cursor: int,
-		 *   should_compact: bool,
-		 *   room: string,
-		 *   total_updates: int,
-		 *   updates: array<int, array{data: string, type: string}>,
-		 * } Response data for this room.
-		 */
-		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor ): array {
-			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
-			$total_updates        = $this->storage->get_update_count( $room );
-
-			// Filter out this client's updates, except compaction updates.
-			$typed_updates = array();
-			foreach ( $updates_after_cursor as $update ) {
-				if ( $client_id === $update['client_id'] && self::UPDATE_TYPE_COMPACTION !== $update['type'] ) {
-					continue;
-				}
-
-				$typed_updates[] = array(
-					'data' => $update['data'],
-					'type' => $update['type'],
-				);
-			}
-
-			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
-
-			return array(
-				'end_cursor'     => $this->storage->get_cursor( $room ),
-				'room'           => $room,
-				'should_compact' => $should_compact,
-				'total_updates'  => $total_updates,
-				'updates'        => $typed_updates,
-			);
 		}
 	}
 }
