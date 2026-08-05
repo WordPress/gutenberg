@@ -35,14 +35,6 @@ export interface HeaderProps extends ComponentProps< 'div' > {
 	 * The content to be rendered inside the header.
 	 */
 	children?: ReactNode;
-	/**
-	 * IDs of elements that describe the header trigger. IDs from
-	 * `CollapsibleCard.HeaderDescription` components are appended in render
-	 * order.
-	 *
-	 * The attribute is also forwarded to the outer header wrapper.
-	 */
-	'aria-describedby'?: string;
 }
 
 export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
@@ -51,9 +43,6 @@ export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
 	 * `aria-describedby`. Rendered visually but marked `aria-hidden`
 	 * so assistive technologies consume it only through the description
 	 * relationship, avoiding double announcements.
-	 * Multiple header descriptions are combined in render order.
-	 * Pass `id` to control the ID used in the relationship.
-	 * Uses small body typography and a weak neutral text color by default.
 	 *
 	 * Avoid interactive elements — the entire header is the toggle trigger.
 	 */
