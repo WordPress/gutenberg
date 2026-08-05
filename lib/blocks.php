@@ -386,3 +386,23 @@ function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
 add_action( 'init', '_gutenberg_footnotes_kses_init' );
 add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
+
+/**
+ * Strips serializer generated separator whitespace from block inner content,
+ * allowing CSS :empty to match if all inner blocks rendered empty.
+ *
+ * @param array $parsed_block The parsed block array.
+ * @return array Filtered parsed block array.
+ */
+function gutenberg_remove_inner_blocks_separator_whitespace( $parsed_block ) {
+	if ( ! empty( $parsed_block['innerContent'] ) ) {
+		foreach ( $parsed_block['innerContent'] as $key => $item ) {
+			// Replace newline separator with empty string.
+			if ( is_string( $item ) && '' === trim( $item ) ) {
+				$parsed_block['innerContent'][ $key ] = '';
+			}
+		}
+	}
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_remove_inner_blocks_separator_whitespace' );
