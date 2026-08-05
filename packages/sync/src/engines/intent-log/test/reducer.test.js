@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
 
 import {
 	allSyncIds,
@@ -7,9 +6,9 @@ import {
 	createDocument,
 	documentsEqual,
 	getBlock,
-} from '../src/document.js';
-import { IntentTypes, createIntent } from '../src/intents.js';
-import { applyIntent, replay } from '../src/reducer.js';
+} from '../document.js';
+import { IntentTypes, createIntent } from '../intents.js';
+import { applyIntent, replay } from '../reducer.js';
 
 const ENVELOPE = { actorId: 'dana', baseSeq: 0 };
 

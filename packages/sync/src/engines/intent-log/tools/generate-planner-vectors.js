@@ -17,9 +17,9 @@
  * machine yields identical output.
  */
 
-import { canonicalJson } from '../src/document.js';
-import { serverDocAt } from '../src/rebase.js';
-import { runSimulation } from '../src/simulator.js';
+import { canonicalJson } from '../document.js';
+import { serverDocAt } from '../rebase.js';
+import { runSimulation } from '../simulator.js';
 
 const CASES = [];
 

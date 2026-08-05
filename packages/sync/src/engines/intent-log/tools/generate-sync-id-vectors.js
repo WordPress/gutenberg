@@ -7,7 +7,7 @@
  * Usage: node tools/generate-sync-id-vectors.js > test-vectors/sync-id.json
  */
 
-import { canonicalGenesisInput, genesisSyncId } from '../src/sync-id.js';
+import { canonicalGenesisInput, genesisSyncId } from '../sync-id.js';
 
 const CASES = [
 	{ revision: { postId: 1, revisionId: 1 }, path: [] },

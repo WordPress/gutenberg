@@ -9,7 +9,7 @@
  * deterministic: same arguments → same output.
  */
 
-import { runSimulation } from '../src/simulator.js';
+import { runSimulation } from '../simulator.js';
 
 const seedCount = Number( process.argv[ 2 ] ?? 60 );
 const steps = Number( process.argv[ 3 ] ?? 400 );

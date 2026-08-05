@@ -7,8 +7,6 @@
  * carry removed content so they are invertible; atomic groups via txnId.
  */
 
-import { randomUUID } from 'node:crypto';
-
 export const IntentTypes = {
 	// Map family (the sync-map layer riding the same log).
 	SET_ATTR: 'set_attr',
@@ -200,7 +198,7 @@ export function createIntent( type, payload, envelope ) {
 		throw new TypeError( 'Envelope requires a non-negative baseSeq' );
 	}
 	return Object.freeze( {
-		intentId: envelope.intentId ?? randomUUID(),
+		intentId: envelope.intentId ?? globalThis.crypto.randomUUID(),
 		actorId: envelope.actorId,
 		baseSeq: envelope.baseSeq,
 		txnId: envelope.txnId ?? null,

@@ -246,6 +246,26 @@ inside intent payloads, not the transport.
   `packages/sync/src/engines/intent-log/`, no Yjs imports); PHP planner
   twin (`planBatch` port) validated against the frozen `test-vectors/` and
   ported matrix/scenario suites. No editor wiring yet.
+
+  **Status (2026-08-05): LANDED except provider narrowing.**
+  - PHP twin: `WP_Intent_Log_Document` + `WP_Intent_Log_Planner` in
+    `lib/experimental/collaboration/`, validated by frozen golden
+    transcripts (`test-vectors/planner.json`: 6 seeded simulations, 220
+    batches, 1065 intents — every disposition, proposal, transformed log
+    entry, and canonical final doc must match) plus the 30 genesis syncId
+    vectors, redelivery idempotency, and fresh-replay convergence.
+  - JS core graduated to `packages/sync/src/engines/intent-log/` (engine
+    modules + simulator + SPEC.md + vectors + tools; `prototypes/sync/`
+    is docs-only now). Browser-safe: `node:crypto` replaced with a
+    vector-pinned pure-JS SHA-256 and `globalThis.crypto.randomUUID`.
+    All 81 engine tests converted to jest; vector generator reproduces
+    byte-identical output post-move.
+  - Excluded from tsc (`checkJs` vs generic JSDoc) with a precedented
+    tsconfig exclude; proper typing lands with the Phase 2 adapter, the
+    first TS consumer.
+  - Still open from Phase 1: provider narrowing to envelopes (transports
+    still receive Y.Doc/Awareness) — the next work item, prerequisite for
+    the Phase 2 intent-log transport payloads.
 - **Phase 2 — intent-log end to end.** Capture v1 in the bridge, server
   engine behind the filter, dispositions in the poll response, escalations
   surfaced minimally (notice + console; proposal-lane UI comes from the

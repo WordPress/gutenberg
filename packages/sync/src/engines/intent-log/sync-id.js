@@ -8,7 +8,10 @@
  * contract for the genesis function.
  */
 
-import { createHash, randomUUID } from 'node:crypto';
+/**
+ * Internal dependencies
+ */
+import { base64UrlEncode, sha256Utf8 } from './sha256.js';
 
 const GENESIS_ID_BYTES = 16;
 
@@ -54,10 +57,8 @@ export function canonicalGenesisInput( revision, path ) {
  * @return {string} 22-character base64url syncId.
  */
 export function genesisSyncId( revision, path ) {
-	const digest = createHash( 'sha256' )
-		.update( canonicalGenesisInput( revision, path ), 'utf8' )
-		.digest();
-	return digest.subarray( 0, GENESIS_ID_BYTES ).toString( 'base64url' );
+	const digest = sha256Utf8( canonicalGenesisInput( revision, path ) );
+	return base64UrlEncode( digest.subarray( 0, GENESIS_ID_BYTES ) );
 }
 
 /**
@@ -73,7 +74,9 @@ export function genesisSyncId( revision, path ) {
  */
 export function mintSyncId( random ) {
 	if ( ! random ) {
-		return randomUUID();
+		// Browser and Node (>=19) global; secure contexts only, like the
+		// rest of the collaboration stack.
+		return globalThis.crypto.randomUUID();
 	}
 	let id = '';
 	for ( let i = 0; i < 32; i++ ) {

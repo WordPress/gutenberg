@@ -14,7 +14,7 @@ class Tests_Collaboration_WpIntentLogPlanner extends WP_UnitTestCase {
 	 * @return array Decoded vectors.
 	 */
 	private static function load_vectors( string $name ): array {
-		$path = dirname( __DIR__, 3 ) . '/prototypes/sync/test-vectors/' . $name;
+		$path = dirname( __DIR__, 3 ) . '/packages/sync/src/engines/intent-log/test-vectors/' . $name;
 		if ( ! file_exists( $path ) ) {
 			self::fail( "Missing vector file: $path" );
 		}

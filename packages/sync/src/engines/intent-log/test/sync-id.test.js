@@ -1,16 +1,11 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import test from 'node:test';
 
 import {
 	canonicalGenesisInput,
 	genesisSyncId,
 	mintSyncId,
-} from '../src/sync-id.js';
-
-const FROZEN = JSON.parse(
-	readFileSync( new URL( '../test-vectors/sync-id.json', import.meta.url ) )
-);
+} from '../sync-id.js';
+import FROZEN from '../test-vectors/sync-id.json';
 
 test( 'genesis matches every frozen cross-language vector', () => {
 	for ( const vector of FROZEN.vectors ) {
