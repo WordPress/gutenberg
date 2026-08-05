@@ -11,6 +11,7 @@
 
 ### Performance
 
+-   Select all: Make the writing flow wrapper the editing host before dispatching the multi-selection, instead of from the layout effect that follows the render. Editability is inherited, so the wrapper invalidates the whole subtree, which cost a second full style recalculation on top of the render's. On a 1000 paragraph post this takes the interaction from 253ms to 207ms of main thread work.
 -   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on each call. `BlockListBlock` asks once per rendered block, so the old cost was the block count multiplied by the selection size ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
 -   `BlockListBlock`: Skip that deep check behind `isSelectionWithinCurrentSection` when the block is not within a section block, where it was passed an `undefined` client ID that never matches. Together the two changes take selecting all blocks on a 1000 paragraph post from 16.8s to 0.4s ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
 -   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).

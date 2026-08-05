@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `Metrics.startTracing()`: Run a trivial script once tracing is on, to absorb the isolate interrupt that enabling the V8 sampling profiler queues. Its cost otherwise lands in the first thing the test does, usually the interaction being measured, and grows through a spec's iterations: a stable 220ms interaction reported anywhere from 200ms to 650ms.
 -   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero. Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
 
 ## 1.51.0 (2026-07-14)

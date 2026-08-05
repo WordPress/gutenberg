@@ -15,6 +15,7 @@ import {
 	getBlockClientId,
 	getSelectionEditableElement,
 } from '../../utils/dom';
+import { setContentEditableWrapper } from './utils';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -100,6 +101,13 @@ export default function useSelectAll() {
 				}
 				return;
 			}
+
+			// `useMultiSelection` does this from a layout effect, after the
+			// render has already changed every block. Editability is
+			// inherited, so the wrapper invalidates the whole subtree, and the
+			// focus it takes fires `focusout` mid-commit. Setting it first
+			// merges both into the render.
+			setContentEditableWrapper( node, true );
 
 			multiSelect(
 				blockClientIds[ 0 ],
