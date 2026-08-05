@@ -1,0 +1,239 @@
+import { describe, expect, test } from 'vitest';
+import {
+	serializeGradientColor,
+	serializeGradientPosition,
+	serializeGradientColorStop,
+	serializeGradientOrientation,
+	serializeGradient,
+} from '../serializer';
+
+describe( 'It should serialize a gradient', () => {
+	test( 'serializeGradientColor', () => {
+		expect(
+			serializeGradientColor( {
+				type: 'rgba',
+				value: [ '1', '2', '3', '0.5' ],
+			} )
+		).toBe( 'rgba(1,2,3,0.5)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'rgb',
+				value: [ '255', '0', '0' ],
+			} )
+		).toBe( 'rgb(255,0,0)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'hsl',
+				value: [ '1', '2', '3' ],
+			} )
+		).toBe( 'hsl(1,2%,3%)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'hsla',
+				value: [ '1', '2', '3', '0.5' ],
+			} )
+		).toBe( 'hsla(1,2%,3%,0.5)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'var',
+				value: '--my-color',
+			} as any )
+		).toBe( 'var(--my-color)' );
+	} );
+
+	test( 'serializeGradientPosition', () => {
+		expect( serializeGradientPosition( { type: '%', value: '70' } ) ).toBe(
+			'70%'
+		);
+
+		expect( serializeGradientPosition( { type: '%', value: '0' } ) ).toBe(
+			'0%'
+		);
+
+		expect( serializeGradientPosition( { type: 'px', value: '4' } ) ).toBe(
+			'4px'
+		);
+
+		expect(
+			serializeGradientPosition( { type: 'calc', value: '50% + 10px' } )
+		).toBe( 'calc(50% + 10px)' );
+	} );
+
+	test( 'serializeGradientColorStop', () => {
+		expect(
+			serializeGradientColorStop( {
+				type: 'rgba',
+				value: [ '1', '2', '3', '0.5' ],
+				length: { type: '%', value: '70' },
+			} )
+		).toBe( 'rgba(1,2,3,0.5) 70%' );
+
+		expect(
+			serializeGradientColorStop( {
+				type: 'rgb',
+				value: [ '255', '0', '0' ],
+				length: { type: '%', value: '0' },
+			} )
+		).toBe( 'rgb(255,0,0) 0%' );
+
+		expect(
+			serializeGradientColorStop( {
+				type: 'rgba',
+				value: [ '1', '2', '3', '0.5' ],
+				length: { type: 'px', value: '100' },
+			} )
+		).toBe( 'rgba(1,2,3,0.5) 100px' );
+	} );
+
+	test( 'serializeGradientOrientation', () => {
+		expect(
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '40',
+				unit: 'deg',
+			} )
+		).toBe( '40deg' );
+
+		expect(
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0',
+				unit: 'deg',
+			} )
+		).toBe( '0deg' );
+
+		expect(
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0.25',
+				unit: 'turn',
+			} )
+		).toBe( '0.25turn' );
+	} );
+
+	test( 'serializeGradient', () => {
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				orientation: { type: 'angular', value: '40', unit: 'deg' },
+				colorStops: [
+					{
+						type: 'rgba',
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '70' },
+					},
+					{
+						type: 'rgba',
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
+					},
+				],
+			} )
+		).toBe(
+			'linear-gradient(40deg,rgba(255,1,1,0.9) 40%,rgba(1,2,3,0.5) 70%)'
+		);
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				colorStops: [
+					{
+						type: 'rgba',
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '70' },
+					},
+					{
+						type: 'rgba',
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
+					},
+				],
+			} )
+		).toBe( 'linear-gradient(rgba(255,1,1,0.9) 40%,rgba(1,2,3,0.5) 70%)' );
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				colorStops: [
+					{
+						type: 'hex',
+						value: '000',
+						length: { type: '%', value: '70' },
+					},
+					{
+						type: 'hex',
+						value: 'fff',
+						length: { type: '%', value: '40' },
+					},
+				],
+			} )
+		).toBe( 'linear-gradient(#fff 40%,#000 70%)' );
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				orientation: { type: 'angular', value: '0', unit: 'deg' },
+				colorStops: [
+					{
+						type: 'rgba',
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '0' },
+					},
+					{
+						type: 'rgba',
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
+					},
+					{
+						type: 'rgba',
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '100' },
+					},
+					{
+						type: 'rgba',
+						value: [ '10', '20', '30', '0.5' ],
+						length: { type: '%', value: '20' },
+					},
+				],
+			} )
+		).toBe(
+			'linear-gradient(0deg,rgba(1,2,3,0.5) 0%,rgba(10,20,30,0.5) 20%,rgba(255,1,1,0.9) 40%,rgba(1,2,3,0.5) 100%)'
+		);
+	} );
+
+	test( 'serializeGradient writes the interpolation method before the angle', () => {
+		const colorStops = [
+			{
+				type: 'hex' as const,
+				value: '000',
+				length: { type: '%' as const, value: '0' },
+			},
+			{
+				type: 'hex' as const,
+				value: 'fff',
+				length: { type: '%' as const, value: '100' },
+			},
+		];
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				colorInterpolation: 'in oklch',
+				orientation: { type: 'angular', value: '160', unit: 'deg' },
+				colorStops,
+			} )
+		).toBe( 'linear-gradient(in oklch 160deg,#000 0%,#fff 100%)' );
+
+		expect(
+			serializeGradient( {
+				type: 'radial-gradient',
+				colorInterpolation: 'in oklab',
+				colorStops,
+			} )
+		).toBe( 'radial-gradient(in oklab,#000 0%,#fff 100%)' );
+	} );
+} );

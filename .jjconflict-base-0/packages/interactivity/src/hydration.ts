@@ -1,0 +1,109 @@
+/**
+ * External dependencies
+ */
+import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
+/**
+ * Internal dependencies
+ */
+import { toVdom, hydratedIslands } from './vdom';
+import { createRootFragment, splitTask } from './utils';
+
+// Keep the same root fragment for each interactive region node.
+const regionRootFragments = new WeakMap();
+export const getRegionRootFragment = (
+	regions: Element | Element[]
+): ContainerNode => {
+	const region = Array.isArray( regions ) ? regions[ 0 ] : regions;
+	if ( ! region.parentElement ) {
+		throw Error( 'The passed region should be an element with a parent.' );
+	}
+	if ( ! regionRootFragments.has( region ) ) {
+		regionRootFragments.set(
+			region,
+			createRootFragment( region.parentElement, regions )
+		);
+	}
+	return regionRootFragments.get( region );
+};
+
+// Initial vDOM regions associated with its DOM element.
+export const initialVdom = new WeakMap< Element, ComponentChild >();
+
+// Promise that resolves with the populated initialVdom after hydration completes.
+let resolveInitialVdom!: ( map: WeakMap< Element, ComponentChild > ) => void;
+export const initialVdomPromise = new Promise<
+	WeakMap< Element, ComponentChild >
+>( ( resolve ) => {
+	resolveInitialVdom = resolve;
+} );
+
+/*
+ * Lazily hydrates all interactive regions: instead of hydrating every island
+ * at DOMContentLoaded, an IntersectionObserver hydrates each island when it
+ * approaches the viewport (within one viewport height, from the top or
+ * bottom). This avoids running hydration JS for off-screen blocks during page
+ * load.
+ */
+export const hydrateRegions = async () => {
+	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
+
+	let observedNodeCount = 0;
+
+	const intersectionObserver = new window.IntersectionObserver(
+		async ( entries ) => {
+			for ( const entry of entries ) {
+				if ( ! entry.isIntersecting ) {
+					continue;
+				}
+
+				const node = entry.target;
+				intersectionObserver.unobserve( node );
+				observedNodeCount--;
+				if ( observedNodeCount === 0 ) {
+					intersectionObserver.disconnect();
+				}
+
+				if ( ! hydratedIslands.has( node ) ) {
+					const fragment = getRegionRootFragment( node );
+					const vdom = toVdom( node );
+					initialVdom.set( node, vdom );
+					await splitTask();
+					hydrate( vdom, fragment );
+					await splitTask();
+				}
+			}
+		},
+		{
+			root: null, // To watch for intersection relative to the device's viewport.
+			rootMargin: '100% 0% 100% 0%', // Intersect when within 1 viewport approaching from top or bottom.
+			threshold: 0.0, // As soon as even one pixel is visible.
+		}
+	);
+
+	/*
+	 * This `await` with setTimeout is required to apparently ensure that the
+	 * interactive blocks have their stores fully initialized prior to
+	 * hydrating the blocks. If this is not present, then an error occurs, for
+	 * example:
+	 * > view.js:46 Uncaught (in promise) ReferenceError: Cannot access 'state' before initialization
+	 * This occurs when splitTask() is implemented with scheduler.yield() as
+	 * opposed to setTimeout(), as with the former split tasks are added to the
+	 * front of the task queue whereas with the latter they are added to the
+	 * end of the queue.
+	 */
+	await new Promise( ( resolve ) => {
+		setTimeout( resolve, 0 );
+	} );
+
+	observedNodeCount = nodes.length;
+	for ( const node of nodes ) {
+		if ( hydratedIslands.has( node ) ) {
+			observedNodeCount--;
+			continue;
+		}
+		intersectionObserver.observe( node );
+	}
+
+	// Resolve the promise with the fully populated initialVdom after all regions are hydrated.
+	resolveInitialVdom( initialVdom );
+};

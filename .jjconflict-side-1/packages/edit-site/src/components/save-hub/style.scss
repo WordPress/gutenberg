@@ -1,0 +1,31 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-save-hub {
+	color: var(--wpds-color-foreground-content-neutral);
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
+	flex-shrink: 0;
+	margin: 0;
+	padding: $grid-unit-20;
+}
+
+.edit-site-save-hub__button {
+	color: inherit;
+	width: 100%;
+	justify-content: center;
+
+	&[aria-disabled="true"] {
+		opacity: 1;
+	}
+
+	&[aria-disabled="true"],
+	&[aria-disabled="true"]:hover {
+		color: inherit;
+	}
+
+	&:not(.is-primary) {
+		&.is-busy,
+		&.is-busy[aria-disabled="true"]:hover {
+			color: var(--wpds-color-foreground-interactive-neutral);
+		}
+	}
+}

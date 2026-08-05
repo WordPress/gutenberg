@@ -1,0 +1,127 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/video",
+	"title": "Video",
+	"category": "media",
+	"description": "Embed a video from your media library or upload a new one.",
+	"keywords": [ "movie" ],
+	"textdomain": "default",
+	"attributes": {
+		"autoplay": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "autoplay"
+		},
+		"caption": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "figcaption",
+			"role": "content"
+		},
+		"controls": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "controls",
+			"default": true
+		},
+		"id": {
+			"type": "number",
+			"role": "content"
+		},
+		"loop": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "loop"
+		},
+		"muted": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "muted"
+		},
+		"poster": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "poster"
+		},
+		"preload": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "preload",
+			"default": "metadata"
+		},
+		"blob": {
+			"type": "string",
+			"role": "local"
+		},
+		"src": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "src",
+			"role": "content"
+		},
+		"width": {
+			"type": "number"
+		},
+		"height": {
+			"type": "number"
+		},
+		"playsInline": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "playsinline"
+		},
+		"tracks": {
+			"role": "content",
+			"type": "array",
+			"items": {
+				"type": "object"
+			},
+			"default": []
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"filter": {
+			"duotone": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
+		"dimensions": {
+			"minWidth": true,
+			"minHeight": true,
+			"__experimentalSkipSerialization": true
+		}
+	},
+	"selectors": {
+		"dimensions": ".wp-block-video video",
+		"shadow": ".wp-block-video video",
+		"filter": {
+			"duotone": ".wp-block-video video"
+		}
+	},
+	"editorStyle": "wp-block-video-editor",
+	"style": "wp-block-video"
+}

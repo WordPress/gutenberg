@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/code",
+		"isValid": true,
+		"attributes": {
+			"content": "export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}"
+		},
+		"innerBlocks": []
+	}
+]

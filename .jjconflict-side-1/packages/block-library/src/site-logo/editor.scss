@@ -1,0 +1,141 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block[data-align="center"] > .wp-block-site-logo,
+.wp-block-site-logo.aligncenter > div {
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.wp-block-site-logo {
+	// Make the block selectable.
+	a {
+		pointer-events: none;
+	}
+
+	.custom-logo-link {
+		cursor: inherit;
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	img {
+		display: block;
+		height: auto;
+		max-width: 100%;
+	}
+
+	&.is-transient {
+		position: relative;
+
+		img {
+			opacity: 0.3;
+		}
+
+		// Shown while image is being uploaded.
+		.components-spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			margin: 0;
+		}
+	}
+}
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-site-logo.wp-block-site-logo {
+
+	&.is-default-size .components-placeholder {
+		height: 60px;
+		width: 60px;
+	}
+
+	// Inherit radius.
+	> div, // A 60px width div shown only in the editor on mobile.
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
+	// Style the placeholder.
+	.components-placeholder {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+		border-radius: inherit;
+
+		// Provide a minimum size for the placeholder, for when the logo is resized.
+		// @todo resizing is currently only possible by adding an image, resizing,
+		// and then removing the image again. We might want to enable resizing on the
+		// placeholder itself.
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
+
+		// Hide the upload button, as it's also available in the media library.
+		.components-form-file-upload {
+			display: none;
+		}
+
+		// Hide items.
+		.components-drop-zone__content-text {
+			display: none;
+		}
+
+		// Style the upload button.
+		.components-button.components-button {
+			padding: 0;
+			margin: auto;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: $grid-unit-60;
+			height: $grid-unit-60;
+			border-radius: 50%;
+			position: relative;
+			background: var(--wp-admin-theme-color);
+			border-color: var(--wp-admin-theme-color);
+			border-style: solid;
+			color: $white;
+
+			> svg {
+				color: inherit;
+			}
+		}
+	}
+}
+
+.block-library-site-logo__inspector-media-replace-container {
+	// For readonly preview: ensure proper positioning
+	position: relative;
+
+	.block-library-site-logo__inspector-media-replace-title {
+		word-break: break-all;
+		// The Button component is white-space: nowrap, and that won't work with line-clamp.
+		white-space: normal;
+
+		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+		text-align: start;
+		text-align-last: center;
+	}
+
+	img {
+		width: 20px;
+		min-width: 20px;
+		aspect-ratio: 1;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		border-radius: 2px;
+	}
+
+	.block-library-site-logo__inspector-readonly-logo-preview {
+		padding: 6px 12px;
+		display: flex;
+		height: $grid-unit-50;
+	}
+}

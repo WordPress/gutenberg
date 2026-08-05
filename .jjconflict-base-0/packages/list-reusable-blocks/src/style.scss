@@ -1,0 +1,10 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "./components/import-dropdown/style.scss" as *;
+@use "./components/import-form/style.scss" as *;
+
+.list-reusable-blocks__container {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	top: -3px;
+}

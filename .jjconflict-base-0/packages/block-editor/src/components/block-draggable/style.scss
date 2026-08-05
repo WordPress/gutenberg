@@ -1,0 +1,87 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-block-draggable-chip-wrapper {
+	position: absolute;
+	// Offset position so that cursor is centered over the drag handle.
+	top: -#{$block-toolbar-height * 0.5};
+	left: 0;
+}
+
+.block-editor-block-draggable-chip {
+	background-color: $gray-900;
+	border-radius: $radius-small;
+	box-shadow: $elevation-small;
+	color: $white;
+	cursor: grabbing;
+	display: inline-flex;
+	height: $block-toolbar-height;
+	padding: 0 ( $grid-unit-15 + $border-width );
+	position: relative;
+	user-select: none;
+	width: max-content;
+
+	svg {
+		fill: currentColor;
+	}
+
+	.block-editor-block-draggable-chip__content {
+		margin: auto;
+		justify-content: flex-start;
+
+		> .components-flex__item {
+			margin-right: $grid-unit-15 * 0.5;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		// Drag handle is smaller than the others.
+		.block-editor-block-icon svg {
+			min-width: 18px;
+			min-height: 18px;
+		}
+	}
+
+	.components-flex__item {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+}
+
+// Specificity bump to override native component style.
+.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: transparent;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.1s linear 0.1s;
+	}
+
+	.block-editor-block-draggable-chip__disabled-icon {
+		width: $grid-unit-50 * 0.5;
+		height: $grid-unit-50 * 0.5;
+		box-shadow: inset 0 0 0 1.5px $white;
+		border-radius: 50%;
+		display: inline-block;
+		padding: 0;
+		background: transparent linear-gradient(-45deg, transparent 47.5%, $white 47.5%, $white 52.5%, transparent 52.5%);
+
+	}
+}
+
+.block-draggable-invalid-drag-token {
+	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
+		background-color: $gray-700;
+		opacity: 1;
+		box-shadow: $elevation-small;
+	}
+}

@@ -1,0 +1,30 @@
+.wp-block[data-align="center"] {
+	.wp-block-search {
+		.wp-block-search__inside-wrapper {
+			margin: auto;
+		}
+	}
+}
+
+.wp-block-search {
+	:where(.wp-block-search__button) {
+		height: auto;
+		border-radius: initial;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+}
+
+// Mirrors MIN_WIDTH in utils.js, as a stylesheet rule so a minimum width from Global Styles can win.
+:where(.wp-block-search__inside-wrapper) {
+	min-width: 220px;
+}
+
+.wp-block-search__inspector-controls {
+	.components-base-control {
+		// Counteract the margin added by the block inspector.
+		margin-bottom: 0;
+	}
+}

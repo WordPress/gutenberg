@@ -1,0 +1,100 @@
+const minimist = require( 'minimist' );
+const spawn = require( 'cross-spawn' );
+const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
+const { exit, getArgsFromCLI } = require( './process' );
+
+const getArgFromCLI = ( arg ) => {
+	for ( const cliArg of getArgsFromCLI() ) {
+		const [ name, value ] = cliArg.split( '=' );
+		if ( name === arg ) {
+			return value || null;
+		}
+	}
+};
+
+const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
+
+// Flags that never take a value, so `--fix file.js` isn't read as `--fix=file.js`.
+// stylelint's `--fix` does take an optional mode though, so drop that first.
+const getFileArgsFromCLI = () => {
+	const args = getArgsFromCLI().filter(
+		( arg, index, all ) =>
+			! (
+				all[ index - 1 ] === '--fix' &&
+				[ 'strict', 'lax' ].includes( arg )
+			)
+	);
+
+	return minimist( args, { boolean: [ 'fix', 'require-pragma' ] } )._;
+};
+
+const getNodeArgsFromCLI = () => {
+	const args = getArgsFromCLI();
+	const scripts = getScripts();
+	const scriptIndex = args.findIndex( ( arg ) => scripts.includes( arg ) );
+	return {
+		nodeArgs: args.slice( 0, scriptIndex ),
+		scriptName: args[ scriptIndex ],
+		scriptArgs: args.slice( scriptIndex + 1 ),
+	};
+};
+
+const hasFileArgInCLI = () => getFileArgsFromCLI().length > 0;
+
+const handleSignal = ( signal ) => {
+	if ( signal === 'SIGKILL' ) {
+		console.log(
+			'The script failed because the process exited too early. ' +
+				'This probably means the system ran out of memory or someone called ' +
+				'`kill -9` on the process.'
+		);
+	} else if ( signal === 'SIGTERM' ) {
+		console.log(
+			'The script failed because the process exited too early. ' +
+				'Someone might have called `kill` or `killall`, or the system could ' +
+				'be shutting down.'
+		);
+	}
+	exit( 1 );
+};
+
+const spawnScript = ( scriptName, args = [], nodeArgs = [] ) => {
+	if ( ! scriptName ) {
+		console.log( 'Script name is missing.' );
+		exit( 1 );
+	}
+
+	if ( ! hasScriptFile( scriptName ) ) {
+		console.log(
+			'Unknown script "' +
+				scriptName +
+				'". ' +
+				'Perhaps you need to update @wordpress/scripts?'
+		);
+		exit( 1 );
+	}
+
+	const { signal, status } = spawn.sync(
+		'node',
+		[ ...nodeArgs, fromScriptsRoot( scriptName ), ...args ],
+		{
+			stdio: 'inherit',
+		}
+	);
+
+	if ( signal ) {
+		handleSignal( signal );
+	}
+
+	exit( status );
+};
+
+module.exports = {
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
+	spawnScript,
+};

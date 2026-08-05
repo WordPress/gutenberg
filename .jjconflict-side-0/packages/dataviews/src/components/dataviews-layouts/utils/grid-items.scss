@@ -1,0 +1,21 @@
+.dataviews-view-grid-items {
+	margin-bottom: auto;
+	display: grid;
+	gap: var(--wpds-dimension-gap-xl);
+	grid-template-rows: max-content;
+	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+	container-type: inline-size;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
+	&.has-compact-density {
+		gap: var(--wpds-dimension-gap-lg);
+	}
+
+	&.has-comfortable-density {
+		gap: var(--wpds-dimension-gap-2xl);
+	}
+}

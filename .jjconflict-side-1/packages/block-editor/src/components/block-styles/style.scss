@@ -1,0 +1,40 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-styles__preview-panel {
+	display: none;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+
+	// Only show in narrow widths.
+	@include break-medium() {
+		display: block;
+	}
+
+	.block-editor-block-icon {
+		display: none;
+	}
+}
+
+.block-editor-block-styles {
+	grid-column: 1 / -1;
+}
+
+.block-editor-block-styles__variants {
+	display: grid;
+	gap: $grid-unit-10;
+
+	.block-editor-block-styles__row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: $grid-unit-10;
+	}
+
+	.block-editor-block-styles__item-text {
+		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+		text-align: start;
+		text-align-last: center;
+	}
+}
+

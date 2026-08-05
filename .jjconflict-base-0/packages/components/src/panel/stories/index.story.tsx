@@ -1,0 +1,110 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { wordpress } from '@wordpress/icons';
+import Panel from '../';
+import PanelRow from '../row';
+import PanelBody from '../body';
+import InputControl from '../../input-control';
+
+const meta: Meta< typeof Panel > = {
+	title: 'Components/@wordpress-components/Containers/Panel',
+	id: 'components-panel',
+	component: Panel,
+	subcomponents: { PanelRow, PanelBody },
+	argTypes: {
+		children: { control: false },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+			notes: 'Intended for the block inspector sidebar. For collapsible sections elsewhere, use [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof Panel > = ( props ) => <Panel { ...props } />;
+
+export const Default: StoryFn< typeof Panel > = Template.bind( {} );
+Default.args = {
+	header: 'My panel',
+	children: (
+		<>
+			<PanelBody title="First section">
+				<PanelRow>
+					<div
+						style={ {
+							background: '#ddd',
+							height: 100,
+							width: '100%',
+						} }
+					/>
+				</PanelRow>
+			</PanelBody>
+			<PanelBody title="Second section" initialOpen={ false }>
+				<PanelRow>
+					<div
+						style={ {
+							background: '#ddd',
+							height: 100,
+							width: '100%',
+						} }
+					/>
+				</PanelRow>
+			</PanelBody>
+		</>
+	),
+};
+
+/**
+ * `PanelRow` is a generic container for rows within a `PanelBody`.
+ * It is a flex container with a top margin for spacing.
+ */
+export const _PanelRow: StoryFn< typeof Panel > = Template.bind( {} );
+_PanelRow.args = {
+	children: (
+		<PanelBody title="My Profile">
+			<PanelRow>
+				<InputControl label="First name" />
+				<InputControl label="Last name" />
+			</PanelRow>
+			<PanelRow>
+				<div style={ { flex: 1 } }>
+					<InputControl label="Email" />
+				</div>
+			</PanelRow>
+		</PanelBody>
+	),
+};
+
+export const DisabledSection: StoryFn< typeof Panel > = Template.bind( {} );
+DisabledSection.args = {
+	...Default.args,
+	children: (
+		<PanelBody
+			title="Disabled section"
+			initialOpen={ false }
+			buttonProps={ { disabled: true } }
+		/>
+	),
+};
+
+export const WithIcon: StoryFn< typeof Panel > = Template.bind( {} );
+WithIcon.args = {
+	...Default.args,
+	children: (
+		<PanelBody title="Section title" icon={ wordpress }>
+			<PanelRow>
+				<div
+					style={ {
+						background: '#ddd',
+						height: 100,
+						width: '100%',
+					} }
+				/>
+			</PanelRow>
+		</PanelBody>
+	),
+};

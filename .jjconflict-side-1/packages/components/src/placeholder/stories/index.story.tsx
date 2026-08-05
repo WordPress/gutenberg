@@ -1,0 +1,56 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
+import Placeholder from '../';
+import TextControl from '../../text-control';
+
+const ICONS = { starEmpty, starFilled, styles, wordpress };
+
+const meta: Meta< typeof Placeholder > = {
+	component: Placeholder,
+	id: 'components-placeholder',
+	title: 'Components/@wordpress-components/Placeholder',
+	argTypes: {
+		children: { control: false },
+		notices: { control: false },
+		preview: { control: false },
+		icon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof Placeholder > = ( args ) => {
+	const [ value, setValue ] = useState( '' );
+
+	return (
+		<Placeholder { ...args }>
+			<div>
+				<TextControl
+					label="Sample Field"
+					placeholder="Enter something here"
+					value={ value }
+					onChange={ setValue }
+				/>
+			</div>
+		</Placeholder>
+	);
+};
+
+export const Default: StoryFn< typeof Placeholder > = Template.bind( {} );
+Default.args = {
+	icon: 'wordpress',
+	label: 'My Placeholder Label',
+	instructions: 'Here are instructions you should follow',
+};
