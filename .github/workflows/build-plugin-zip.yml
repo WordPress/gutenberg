@@ -218,14 +218,16 @@ jobs:
             contents: read
         needs: bump-version
         if: |
-            always() &&
-            github.event_name == 'pull_request' || (
-                github.repository == 'WordPress/gutenberg' &&
-                (
-                  github.event_name == 'workflow_dispatch' &&
-                  needs.bump-version.result == 'success'
-                ) ||
-                github.event_name != 'workflow_dispatch'
+            always() && (
+              github.event_name == 'pull_request' || (
+                github.repository == 'WordPress/gutenberg' && (
+                  (
+                    github.event_name == 'workflow_dispatch' &&
+                    needs.bump-version.result == 'success'
+                  ) ||
+                  github.event_name != 'workflow_dispatch'
+                )
+              )
             )
         strategy:
             matrix:
