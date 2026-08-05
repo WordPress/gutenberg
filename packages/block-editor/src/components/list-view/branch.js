@@ -13,7 +13,7 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
  */
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useListViewContext } from './context';
+import { useListViewTreeState } from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -77,7 +77,6 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
-		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 	} = props;
@@ -107,7 +106,7 @@ function ListViewBranch( props ) {
 		blockIndexes,
 		expansionState,
 		draggedClientIds,
-	} = useListViewContext();
+	} = useListViewTreeState();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -170,10 +169,9 @@ function ListViewBranch( props ) {
 			path.length > 0 ? `${ path }_${ position }` : `${ position }`;
 		const hasNestedBlocks = !! innerBlocks?.length;
 
-		const shouldExpand =
-			hasNestedBlocks && shouldShowInnerBlocks
-				? expansionState[ clientId ] ?? isExpanded
-				: undefined;
+		const shouldExpand = hasNestedBlocks
+			? expansionState[ clientId ] ?? isExpanded
+			: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
 		// but asynchronous for any other block.
@@ -239,7 +237,6 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						path={ updatedPath }
 						isExpanded={ isDragged ? false : shouldExpand }
-						listPosition={ blockListPosition }
 						selectedClientIds={ selectedClientIds }
 						isSyncedBranch={ syncedBranch }
 						displacement={ displacement }
