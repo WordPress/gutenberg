@@ -19,6 +19,8 @@ export default [
 						'internal', // Aliased modules
 						[ 'parent', 'sibling', 'index' ], // Relative imports
 					],
+					'newlines-between': 'never',
+					warnOnUnassignedImports: true,
 				},
 			],
 		},
