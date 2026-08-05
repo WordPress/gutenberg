@@ -235,7 +235,7 @@ export const WithHeaderDescription: Story = {
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root { ...restArgs }>
 				<CollapsibleCard.Header>
-					<Stack direction="column" gap="sm">
+					<Stack direction="column" gap="xs">
 						<Card.Title>Settings</Card.Title>
 						<CollapsibleCard.HeaderDescription>
 							Review your settings here.
