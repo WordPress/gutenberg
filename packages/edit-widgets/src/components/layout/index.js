@@ -1,15 +1,11 @@
-/**
- * WordPress dependencies
- */
+import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { store as noticesStore } from '@wordpress/notices';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { ThemeProvider } from '@wordpress/theme';
 import ErrorBoundary from '../error-boundary';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Sidebar from '../sidebar';
@@ -33,21 +29,26 @@ function Layout( { blockEditorSettings } ) {
 	}
 
 	const navigateRegionsProps = useNavigateRegions();
+	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
 
 	return (
-		<ErrorBoundary>
-			<div { ...navigateRegionsProps }>
-				<WidgetAreasBlockEditorProvider
-					blockEditorSettings={ blockEditorSettings }
-				>
-					<Interface blockEditorSettings={ blockEditorSettings } />
-					<Sidebar />
-					<PluginArea onError={ onPluginAreaError } />
-					<UnsavedChangesWarning />
-					<WelcomeGuide />
-				</WidgetAreasBlockEditorProvider>
-			</div>
-		</ErrorBoundary>
+		<ThemeProvider isRoot color={ { primary: adminPrimary } }>
+			<ErrorBoundary>
+				<div { ...navigateRegionsProps }>
+					<WidgetAreasBlockEditorProvider
+						blockEditorSettings={ blockEditorSettings }
+					>
+						<Interface
+							blockEditorSettings={ blockEditorSettings }
+						/>
+						<Sidebar />
+						<PluginArea onError={ onPluginAreaError } />
+						<UnsavedChangesWarning />
+						<WelcomeGuide />
+					</WidgetAreasBlockEditorProvider>
+				</div>
+			</ErrorBoundary>
+		</ThemeProvider>
 	);
 }
 
