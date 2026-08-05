@@ -94,7 +94,7 @@ function HeadingEdit( props ) {
 			onChange={ onContentChange }
 			onMerge={ mergeBlocks }
 			onReplace={ onReplace }
-			onRemove={ () => onReplace( [] ) }
+			onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 			placeholder={ placeholder || __( 'Heading' ) }
 			{ ...blockProps }
 		/>

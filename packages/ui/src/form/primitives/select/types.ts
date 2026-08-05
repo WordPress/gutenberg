@@ -44,6 +44,16 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
+export type SelectGroupProps = ComponentProps< typeof _Select.Group > & {
+	children?: React.ReactNode;
+};
+
+export type SelectGroupLabelProps = ComponentProps<
+	typeof _Select.GroupLabel
+> & {
+	children?: React.ReactNode;
+};
+
 export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
 	 * The content to be rendered inside the popup.

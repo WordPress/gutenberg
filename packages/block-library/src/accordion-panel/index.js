@@ -15,8 +15,11 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/paragraph', {} ] ];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 };

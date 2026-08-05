@@ -120,19 +120,21 @@ export default ( props ) => ( element ) => {
 
 		const value = getValue();
 
-		const transforms = getBlockTransforms( 'from' ).filter(
-			( transform ) => transform.type === 'input'
-		);
-		const transformation = findTransform( transforms, ( item ) => {
-			return item.regExp.test( value.text );
-		} );
+		if ( onReplace ) {
+			const transforms = getBlockTransforms( 'from' ).filter(
+				( transform ) => transform.type === 'input'
+			);
+			const transformation = findTransform( transforms, ( item ) =>
+				item.regExp.test( value.text )
+			);
 
-		if ( transformation ) {
-			onReplace( transformation.transform() );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkAutomaticChange();
-			return;
+			if ( transformation ) {
+				onReplace( transformation.transform() );
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkAutomaticChange();
+				return;
+			}
 		}
 
 		const transformed = formatTypes.reduce(

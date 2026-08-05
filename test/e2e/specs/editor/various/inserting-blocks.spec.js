@@ -103,18 +103,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'Heading'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Heading' );
 
-		await page.hover(
-			'role=listbox[name="Blocks"i] >> role=option[name="Heading"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.hover();
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
@@ -174,18 +176,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'Heading'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Heading' );
 
-		await page.hover(
-			'role=listbox[name="Blocks"i] >> role=option[name="Heading"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.hover();
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await page.mouse.down();
@@ -239,20 +243,22 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
 		const PATTERN_NAME = 'Standard';
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
 
-		await page.hover(
-			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
 		// @see https://github.com/WordPress/gutenberg/issues/45183
@@ -337,16 +343,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Insert a synced pattern.
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
-		await page.hover(
-			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
@@ -409,20 +417,22 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
 		const PATTERN_NAME = 'Standard';
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
 
-		await page.hover(
-			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 

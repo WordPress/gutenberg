@@ -149,14 +149,26 @@ export function getBlockAttributes( state, clientId ) {
  * blocks module registration store.
  *
  * getBlock recurses through its inner blocks until all its children blocks have
- * been retrieved. Note that getBlock will not return the child inner blocks of
- * an inner block controller. This is because an inner block controller syncs
- * itself with its own entity, and should therefore not be included with the
- * blocks of a different entity. For example, say you call `getBlocks( TP )` to
- * get the blocks of a template part. If another template part is a child of TP,
- * then the nested template part's child blocks will not be returned. This way,
- * the template block itself is considered part of the parent, but the children
- * are not.
+ * been retrieved, with one exception: the children of an "inner block
+ * controller" are not part of its tree, so `innerBlocks` usually comes back
+ * empty even though the block clearly has children in the editor. Never rely on
+ * a controller's `innerBlocks`; ask for its children directly:
+ *
+ * ```js
+ * getBlock( syncedPatternClientId ).innerBlocks; // Usually [].
+ * getBlocks( syncedPatternClientId ); // The pattern's blocks.
+ * ```
+ *
+ * A block is an inner block controller when its children belong to, and are
+ * synced with, an entity other than the one being edited. Synced patterns
+ * (`core/block`) and template parts (`core/template-part`) are the usual
+ * examples: each owns its own blocks, and editing them saves to that pattern or
+ * template part, not to the post or template it sits in. Leaving their children
+ * out of the tree is what keeps the two entities separate, so walking a
+ * template's blocks stops at a template part placed inside it.
+ *
+ * `areInnerBlocksControlled( clientId )` tells whether a block is such a
+ * controller.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
@@ -790,6 +802,30 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
+ * Returns the ancestor client ID when one selection endpoint is nested
+ * inside the other, or undefined for any other selection shape. Such a
+ * selection has no sibling range; the ancestor contains all of it.
+ *
+ * @param {Object} state Editor state.
+ * @return {?string} The ancestor client ID, if any.
+ */
+function getSelectionNestingAncestor( state ) {
+	const { selectionStart, selectionEnd } = state.selection;
+	const startClientId = selectionStart.clientId;
+	const endClientId = selectionEnd.clientId;
+	if ( ! startClientId || ! endClientId || startClientId === endClientId ) {
+		return undefined;
+	}
+	if ( getBlockParents( state, endClientId ).includes( startClientId ) ) {
+		return startClientId;
+	}
+	if ( getBlockParents( state, startClientId ).includes( endClientId ) ) {
+		return endClientId;
+	}
+	return undefined;
+}
+
+/**
  * Returns the current selection set of block client IDs (multiselection or single selection).
  *
  * @param {Object} state Editor state.
@@ -806,6 +842,11 @@ export const getSelectedBlockClientIds = createSelector(
 
 		if ( selectionStart.clientId === selectionEnd.clientId ) {
 			return [ selectionStart.clientId ];
+		}
+
+		const nestingAncestorClientId = getSelectionNestingAncestor( state );
+		if ( nestingAncestorClientId ) {
+			return [ nestingAncestorClientId ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
@@ -832,6 +873,7 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+		state.blocks.parents,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -1014,6 +1056,12 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsFullySelected( state ) {
+	// A text selection with one endpoint nested inside the other has no
+	// sibling range; it resolves to the ancestor, which is presented and
+	// treated as fully selected.
+	if ( getSelectionNestingAncestor( state ) ) {
+		return true;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 	return (
@@ -1265,8 +1313,39 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selectionStart.clientId === clientId;
+	// Both sides are `undefined` when nothing is selected and the caller
+	// passes an optional client ID.
+	return !! clientId && selectionStart.clientId === clientId;
 }
+
+/**
+ * Returns the ancestors of the current selection, as a set. A block is not its
+ * own ancestor, so the selected blocks themselves are not in the set.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Set<string>} Client IDs of the ancestors of the selection.
+ */
+const getSelectedBlockAncestors = createSelector(
+	( state ) => {
+		const ancestors = new Set();
+
+		for ( const clientId of getSelectedBlockClientIds( state ) ) {
+			let current = clientId;
+			while ( ( current = state.blocks.parents.get( current ) ) ) {
+				// An earlier block already walked the rest of this chain.
+				if ( ancestors.has( current ) ) {
+					break;
+				}
+
+				ancestors.add( current );
+			}
+		}
+
+		return ancestors;
+	},
+	( state ) => getSelectedBlockClientIds.getDependants( state )
+);
 
 /**
  * Returns true if one of the block's inner blocks is selected.
@@ -1285,11 +1364,9 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	}
 
 	if ( deep ) {
-		return selectedBlockClientIds.some( ( id ) =>
-			// Pass true because we don't care about order and it's more
-			// performant.
-			getBlockParents( state, id, true ).includes( clientId )
-		);
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
+		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
 	return selectedBlockClientIds.some(

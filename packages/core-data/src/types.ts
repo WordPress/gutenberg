@@ -160,13 +160,22 @@ export type SelectionInOneBlock = {
 	selectionDirection?: SelectionDirection;
 };
 
+/**
+ * One end of a multi-block selection. Uses SelectionCursor when the endpoint
+ * lands inside a RichText field (character-level anchor) or SelectionWholeBlock
+ * when the entire block is selected (block-slot anchor). The type discriminant
+ * tells the receiver how to resolve this endpoint.
+ */
+export type SelectionEndpoint = SelectionCursor | SelectionWholeBlock;
+
 export type SelectionInMultipleBlocks = {
-	// The user has highlighted text over multiple blocks.
-	// The blocks are derived on the receiver side by navigating up from the
-	// resolved cursor positions via Y.AbstractType.parent.
+	// The user's selection spans more than one block. Each endpoint is resolved
+	// independently: text blocks carry a character-level CursorEndpoint while
+	// blocks without a RichText field (or selected as whole blocks) carry a
+	// WholeBlockEndpoint. Mixed combinations (e.g. paragraph → image) are valid.
 	type: SelectionType.SelectionInMultipleBlocks;
-	cursorStartPosition: CursorPosition;
-	cursorEndPosition: CursorPosition;
+	startEndpoint: SelectionEndpoint;
+	endEndpoint: SelectionEndpoint;
 	// The direction of the selection, indicating where the caret sits.
 	selectionDirection?: SelectionDirection;
 };

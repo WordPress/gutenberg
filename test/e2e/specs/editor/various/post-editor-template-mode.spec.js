@@ -67,7 +67,7 @@ test.describe( 'Post Editor Template mode', () => {
 		);
 
 		// Save changes.
-		await page.click( 'role=button[name="Back"i]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save', exact: true } )
@@ -264,7 +264,9 @@ class PostEditorTemplateMode {
 	}
 
 	async saveTemplateWithoutPublishing() {
-		await this.page.click( 'role=button[name="Back"i]' );
+		await this.page
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await this.page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save', exact: true } )

@@ -1,15 +1,13 @@
 /**
  * WordPress dependencies
  */
-import {
-	SelectControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
+import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 
 /**
  * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
@@ -29,6 +27,9 @@ import { useSettings } from '../use-settings';
  * @property {SelectControlProps[]}         [options]          Aspect ratio options.
  * @property {string}                       [defaultValue]     Default aspect ratio value.
  * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
+ * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
+ * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
+ * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
  */
 
 export default function AspectRatioTool( {
@@ -39,6 +40,9 @@ export default function AspectRatioTool( {
 	defaultValue = 'auto',
 	hasValue,
 	isShownByDefault = true,
+	className,
+	isInherited,
+	hasLocalOverride,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
@@ -78,7 +82,10 @@ export default function AspectRatioTool( {
 	];
 
 	return (
-		<ToolsPanelItem
+		<InheritanceToolsPanelItem
+			className={ className }
+			isInherited={ isInherited }
+			hasLocalOverride={ hasLocalOverride }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
@@ -93,6 +100,6 @@ export default function AspectRatioTool( {
 				options={ options ?? aspectRatioOptions }
 				onChange={ onChange }
 			/>
-		</ToolsPanelItem>
+		</InheritanceToolsPanelItem>
 	);
 }

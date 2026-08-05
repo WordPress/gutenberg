@@ -55,9 +55,22 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { plainText, html } = getPasteEventData( event );
+		const pasteData = getPasteEventData( event );
+
+		// Some browsers don't support `clipboardData` and paste plain text on
+		// their own, so the event has to be left alone for them.
+		if ( ! pasteData ) {
+			return;
+		}
 
 		event.preventDefault();
+
+		const { plainText, html, files } = pasteData;
+
+		// Rich text can only paste text; files are placed by the writing flow.
+		if ( files.length ) {
+			return;
+		}
 
 		// Allows us to ask for this information when we get a report.
 		// `pasteHandler` also logs this, but we're not using `pasteHandler` in

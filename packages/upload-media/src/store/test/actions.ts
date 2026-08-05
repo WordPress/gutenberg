@@ -55,7 +55,6 @@ import { cancelGifToVideoOperations } from '../utils/video-conversion';
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	// @ts-ignore
 	[ uploadStore ].forEach( registry.register );
 	return registry;
 }
@@ -1778,7 +1777,7 @@ describe( 'actions', () => {
 
 		afterEach( () => {
 			// Clean up global mock.
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		} );
 

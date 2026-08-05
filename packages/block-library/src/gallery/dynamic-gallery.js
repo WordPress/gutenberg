@@ -75,13 +75,43 @@ function OrderControl( { orderby, order, onChange } ) {
 }
 
 /**
+ * Confirmation for leaving dynamic mode, shown from both the block toolbar and
+ * the Source panel so the two entry points explain the change identically.
+ *
+ * Detaching keeps the images the gallery currently shows but breaks the link to
+ * its source, so it's worth confirming — mirroring the dialog `GallerySourcePanel`
+ * shows for the opposite direction.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onConfirm Called when the user confirms detaching.
+ * @param {Function} props.onCancel  Called when the user dismisses the dialog.
+ */
+function DetachGalleryDialog( { onConfirm, onCancel } ) {
+	return (
+		<ConfirmDialog
+			isOpen
+			title={ __( 'Detach Gallery' ) }
+			__experimentalHideHeader={ false }
+			confirmButtonText={ __( 'Detach' ) }
+			onConfirm={ onConfirm }
+			onCancel={ onCancel }
+			size="medium"
+		>
+			{ __(
+				'The gallery displays the images attached to the post. Detaching will enable you to add, delete, or reorder images. However, new attachments will no longer be added automatically.'
+			) }
+		</ConfirmDialog>
+	);
+}
+
+/**
  * The Gallery block's "Source" inspector panel.
  *
- * In dynamic mode it shows the resolved source, a control to convert back to
- * individual images, and the source ordering. In static mode it offers the
- * entry point into dynamic mode — and, since switching discards any hand-added
- * images, owns the confirmation dialog for that one-way change. Rendered inside
- * the block's `InspectorControls`, alongside the Settings panel.
+ * In dynamic mode it shows the resolved source, a control to detach the gallery
+ * from it, and the source ordering. In static mode it offers the entry point
+ * into dynamic mode. Either direction is a one-way change, so both are behind a
+ * confirmation dialog this panel owns. Rendered inside the block's
+ * `InspectorControls`, alongside the Settings panel.
  *
  * @param {Object}  props
  * @param {Object}  props.dynamic           The `useDynamicGallery` result.
@@ -110,6 +140,7 @@ export function GallerySourcePanel( {
 	const isDynamic = !! dynamicContent;
 
 	const [ isConfirming, setIsConfirming ] = useState( false );
+	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
 	// Entering dynamic mode discards any hand-added images, so confirm first
 	// when there are images to lose; otherwise switch straight away.
@@ -123,63 +154,76 @@ export function GallerySourcePanel( {
 
 	if ( isDynamic ) {
 		return (
-			<ToolsPanel
-				label={ __( 'Source' ) }
-				resetAll={ resetSource }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				<div className="wp-block-gallery__source-settings">
-					<p className="wp-block-gallery__source-description">
-						{ sourceDescriptor?.description ??
-							__( 'Dynamic images.' ) }
-					</p>
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={ convertToStatic }
-						// Guard the race where the media is still resolving:
-						// converting now would map over an incomplete (or empty)
-						// list and produce a gallery missing images.
-						disabled={ isResolvingDynamic }
-						accessibleWhenDisabled
-					>
-						{ __( 'Convert to individual images' ) }
-					</Button>
-				</div>
-				{ hasMoreImagesThanCap && (
-					<Notice
-						className="wp-block-gallery__source-notice"
-						status="warning"
-						isDismissible={ false }
-					>
-						{ sprintf(
-							/* translators: 1: number of images shown. 2: total number of matching images. */
-							__(
-								'Only the first %1$d of %2$d images will be displayed.'
-							),
-							MAX_IMAGES,
-							dynamicMediaTotal
-						) }
-					</Notice>
-				) }
-				<ToolsPanelItem
-					isShownByDefault
-					label={ __( 'Order by' ) }
-					hasValue={ () =>
-						sourceOrderby !== DEFAULT_ORDERBY ||
-						sourceOrder !== DEFAULT_ORDER
-					}
-					onDeselect={ () => setSourceOrder( undefined, undefined ) }
+			<>
+				<ToolsPanel
+					label={ __( 'Source' ) }
+					resetAll={ resetSource }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<OrderControl
-						orderby={ sourceOrderby }
-						order={ sourceOrder }
-						onChange={ ( { orderby, order } ) =>
-							setSourceOrder( orderby, order )
+					<div className="wp-block-gallery__source-settings">
+						<p className="wp-block-gallery__source-description">
+							{ sourceDescriptor?.description ??
+								__( 'Dynamic images.' ) }
+						</p>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => setIsConfirmingDetach( true ) }
+							// Guard the race where the media is still resolving:
+							// detaching now would map over an incomplete (or
+							// empty) list and produce a gallery missing images.
+							disabled={ isResolvingDynamic }
+							accessibleWhenDisabled
+						>
+							{ __( 'Detach Gallery' ) }
+						</Button>
+					</div>
+					{ hasMoreImagesThanCap && (
+						<Notice
+							className="wp-block-gallery__source-notice"
+							status="warning"
+							isDismissible={ false }
+						>
+							{ sprintf(
+								/* translators: 1: number of images shown. 2: total number of matching images. */
+								__(
+									'Only the first %1$d of %2$d images will be displayed.'
+								),
+								MAX_IMAGES,
+								dynamicMediaTotal
+							) }
+						</Notice>
+					) }
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Order by' ) }
+						hasValue={ () =>
+							sourceOrderby !== DEFAULT_ORDERBY ||
+							sourceOrder !== DEFAULT_ORDER
 						}
+						onDeselect={ () =>
+							setSourceOrder( undefined, undefined )
+						}
+					>
+						<OrderControl
+							orderby={ sourceOrderby }
+							order={ sourceOrder }
+							onChange={ ( { orderby, order } ) =>
+								setSourceOrder( orderby, order )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+				{ isConfirmingDetach && (
+					<DetachGalleryDialog
+						onConfirm={ () => {
+							convertToStatic();
+							setIsConfirmingDetach( false );
+						} }
+						onCancel={ () => setIsConfirmingDetach( false ) }
 					/>
-				</ToolsPanelItem>
-			</ToolsPanel>
+				) }
+			</>
 		);
 	}
 
@@ -266,7 +310,8 @@ function GalleryImagesPreview( { imageBlocks } ) {
 /**
  * Renders a dynamic-mode gallery on the canvas:
  *
- * - a block-toolbar control to convert back to individual images;
+ * - a block-toolbar control to detach the gallery from its source, confirmed in
+ *   a dialog;
  * - the gallery `<figure>` wrapper holding a non-editable preview of the
  *   resolved media (or a placeholder while resolving / when nothing is found),
  *   with the gallery's provided context so the previewed images inherit
@@ -306,12 +351,14 @@ export function GalleryDynamicView( {
 		convertToStatic,
 	} = dynamic;
 
-	// Converting to a static gallery materializes editable inner blocks, which
-	// is a structural change. Only offer it when the block is fully editable:
+	// Detaching the gallery materializes editable inner blocks, which is a
+	// structural change. Only offer it when the block is fully editable:
 	// under a content lock (e.g. inside a `contentOnly` group) the editing mode
 	// is `'contentOnly'`/`'disabled'`, where structural toolbar controls are
 	// hidden and the conversion shouldn't be possible.
 	const blockEditingMode = useBlockEditingMode();
+
+	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
 	// Empty-state copy for the preview. Framed as forward-looking ("… will appear
 	// here") rather than as an error, since the same empty result covers both a
@@ -326,18 +373,30 @@ export function GalleryDynamicView( {
 	return (
 		<>
 			{ blockEditingMode === 'default' && (
-				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ convertToStatic }
-						// Same guard as the inspector's "Convert to individual
-						// images": both call `convertToStatic`, which would map over
-						// a still-resolving (or empty) media list. (`ToolbarButton`
-						// stays focusable when disabled by default.)
-						disabled={ isResolvingDynamic }
-					>
-						{ __( 'Convert to images' ) }
-					</ToolbarButton>
-				</BlockControls>
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							onClick={ () => setIsConfirmingDetach( true ) }
+							// Same guard as the inspector's "Detach Gallery": both end in
+							// `convertToStatic`, which would map over a
+							// still-resolving (or empty) media list.
+							// (`ToolbarButton` stays focusable when disabled by
+							// default.)
+							disabled={ isResolvingDynamic }
+						>
+							{ __( 'Detach' ) }
+						</ToolbarButton>
+					</BlockControls>
+					{ isConfirmingDetach && (
+						<DetachGalleryDialog
+							onConfirm={ () => {
+								convertToStatic();
+								setIsConfirmingDetach( false );
+							} }
+							onCancel={ () => setIsConfirmingDetach( false ) }
+						/>
+					) }
+				</>
 			) }
 			<figure { ...blockProps }>
 				{ dynamicImageBlocks.length ? (

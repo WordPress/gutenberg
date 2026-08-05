@@ -149,6 +149,7 @@ test.describe( 'Details', () => {
 			)
 			.toBe( true );
 	} );
+
 	test( 'should select the parent when clicking its summary from an inner paragraph', async ( {
 		editor,
 		page,

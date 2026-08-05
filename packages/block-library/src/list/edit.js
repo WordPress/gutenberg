@@ -32,7 +32,6 @@ import TagName from './tag-name';
 const DEFAULT_BLOCK = {
 	name: 'core/list-item',
 };
-const TEMPLATE = [ [ 'core/list-item' ] ];
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -44,7 +43,7 @@ const TEMPLATE = [ [ 'core/list-item' ] ];
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -62,9 +61,19 @@ function useMigrateOnLoad( attributes, clientId ) {
 			alternative: 'inner blocks',
 		} );
 
+		// The selection can be inside an inner block created from the block
+		// type template at insertion, which the migration replaces; restore
+		// the selection to the migrated block in that case.
+		const shouldReselectBlock = registry
+			.select( blockEditorStore )
+			.hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.values ] );
 }
@@ -128,9 +137,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
-		template: TEMPLATE,
 		templateLock: false,
-		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );

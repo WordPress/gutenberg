@@ -24,7 +24,7 @@ function invalidateFontFamilyCache( registry: DataRegistry ) {
 
 	// Invalidate all font family queries
 	// Ideally there should be a dedicated action to do this
-	// "invalide all cacches for this entity type"
+	// "invalid all caches for this entity type"
 	receiveEntityRecords(
 		'postType',
 		'wp_font_family',
