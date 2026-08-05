@@ -322,9 +322,21 @@ inside intent payloads, not the transport.
   incl. end-to-end convergence through the in-memory server twin, 5
   manager over a capturing fake transport).
 
-  Remaining: 2d — browser-verify the end-to-end editor flow (build +
-  wp-env + two browsers), escalation surfacing UI, presence wiring,
-  and the full two-browser swap test.
+  **2d-i (live two-browser editing) LANDED.** `wp_sync_engine` is a
+  registered setting (writing group, show_in_rest) so the swap is
+  scriptable; `collaboration-intent-log-engine.spec.ts` flips the site
+  to intent-log over REST, runs two-user editing through the full stack
+  in real browsers (text sync both directions; concurrent different-
+  block edits converging on both editors — both passed first run), and
+  restores the default, after which the yjs multibyte suite still
+  passes. Build note: hand-written .d.ts files need explicit `declare`
+  on consts (esbuild parses declaration files as source).
+
+  Remaining in 2d: escalation surfacing UI (notice, not console),
+  presence/awareness wiring for the intent-log manager, a same-block
+  conflict e2e (escalation visible in the editor), the stale-tab
+  mid-session engine-flip e2e (409 → lock fallback), and save-flow
+  verification (materialize vs client save).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what
