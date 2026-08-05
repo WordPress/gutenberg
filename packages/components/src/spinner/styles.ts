@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css, keyframes } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 
 const spinAnimation = keyframes`

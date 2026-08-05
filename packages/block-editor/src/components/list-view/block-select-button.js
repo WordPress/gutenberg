@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -19,10 +12,6 @@ import {
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { Stack, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';

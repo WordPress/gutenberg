@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	getColorClassName,
 	getColorObjectByColorValue,

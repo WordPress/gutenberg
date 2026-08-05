@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockSettingsDropdown from './block-settings-dropdown';
 import NoteIconToolbarSlotFill from '../../components/collab/note-icon-toolbar-slot';
 

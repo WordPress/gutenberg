@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -26,10 +23,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,

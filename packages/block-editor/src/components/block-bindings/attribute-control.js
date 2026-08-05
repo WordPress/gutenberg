@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockBindingsSource,
@@ -21,10 +14,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockContext from '../block-context';
 import BlockBindingsSourceFieldsList from './source-fields-list';
 import useBlockBindingsUtils from './use-block-bindings-utils';

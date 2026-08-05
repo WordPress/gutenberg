@@ -1,9 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
-
-/**
- * External dependencies
- */
 import {
 	h as createElement,
 	options,
@@ -14,10 +10,6 @@ import {
 	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-
-/**
- * Internal dependencies
- */
 import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';

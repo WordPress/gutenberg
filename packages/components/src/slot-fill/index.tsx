@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Fill from './fill';
 import BaseSlot from './slot';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';

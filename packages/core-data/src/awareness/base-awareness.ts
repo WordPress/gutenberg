@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { resolveSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { AwarenessState } from './awareness-state';
 import { STORE_NAME as coreStore } from '../name';
 import { generateCollaboratorInfo, areCollaboratorInfosEqual } from './utils';
-
 import type { BaseState } from './types';
 
 export abstract class BaseAwarenessState<

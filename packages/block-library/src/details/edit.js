@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
@@ -18,10 +15,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { dirname, join } = require( 'path' );
 const makeDir = require( 'make-dir' );
 const { render } = require( 'mustache' );

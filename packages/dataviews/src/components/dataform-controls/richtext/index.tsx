@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RichTextControl from './control';
 import type { DataFormControlProps } from '../../../types';
 import getCustomValidity from '../utils/get-custom-validity';

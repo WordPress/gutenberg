@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { observableMap } from '../../../utils/observable-map';
 import useObservableValue from '..';
 

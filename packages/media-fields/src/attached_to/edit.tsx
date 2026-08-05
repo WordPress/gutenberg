@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	store as coreStore,
@@ -11,10 +8,6 @@ import { useState } from '@wordpress/element';
 import { useDebounce, useEvent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 import { getRenderedContent } from '../utils/get-rendered-content';
 

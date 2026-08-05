@@ -102,7 +102,7 @@ _Related_
 
 ### BlockBindingsAttributeControl
 
-Internal dependencies
+Undocumented declaration.
 
 ### BlockBindingsSourceFieldsList
 

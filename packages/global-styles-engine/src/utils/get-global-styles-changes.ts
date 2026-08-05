@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { getBlockTypes } from '@wordpress/blocks';
 

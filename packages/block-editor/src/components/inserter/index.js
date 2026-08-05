@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
@@ -17,10 +10,6 @@ import {
 } from '@wordpress/blocks';
 import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';

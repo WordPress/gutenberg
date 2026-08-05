@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const engine = require( '../lib/engine' );
 const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
 

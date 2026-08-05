@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useEffect, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';

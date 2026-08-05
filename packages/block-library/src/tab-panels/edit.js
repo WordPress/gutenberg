@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
 
 export default function Edit( { clientId } ) {

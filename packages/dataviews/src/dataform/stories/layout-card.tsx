@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 import { unlock } from '../../lock-unlock';

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import type { Form } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { createLabelField } from '../../utils/fields';
 import {
 	createLabelsActionsField,

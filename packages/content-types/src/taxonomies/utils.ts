@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { pickStoredLabels, serializeLabels } from '../utils/form-data';
 import type { StoredLabels, TaxonomyFormData, TaxonomyRecord } from './types';
 

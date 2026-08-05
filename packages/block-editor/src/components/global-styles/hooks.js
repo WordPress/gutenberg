@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 /**

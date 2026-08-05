@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
 
 jest.mock( '@wordpress/api-fetch' );
@@ -13,10 +6,6 @@ jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	getEntityRecord,
 	getEntityRecords,

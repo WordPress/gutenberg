@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
@@ -10,10 +7,6 @@ import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { TaxonomyFormData } from '../types';
 import type { CoreDataError } from '../../types';
 import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -18,10 +15,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
-
-/**
- * Internal dependencies
- */
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';

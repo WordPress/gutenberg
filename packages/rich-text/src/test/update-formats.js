@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { updateFormats } from '../update-formats';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';

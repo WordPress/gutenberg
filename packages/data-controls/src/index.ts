@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { controls as dataControls } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
 import {
@@ -33,10 +26,6 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );

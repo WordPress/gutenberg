@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '36px';

@@ -1,7 +1,4 @@
 'use strict';
-/**
- * External dependencies
- */
 const util = require( 'util' );
 const { v2: dockerCompose } = require( 'docker-compose' );
 
@@ -9,10 +6,6 @@ const { v2: dockerCompose } = require( 'docker-compose' );
  * Promisified dependencies
  */
 const copyDir = util.promisify( require( 'copy-dir' ) );
-
-/**
- * Internal dependencies
- */
 const { readWordPressVersion } = require( '../../wordpress' );
 
 /**
