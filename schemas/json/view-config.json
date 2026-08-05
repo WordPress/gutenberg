@@ -391,7 +391,7 @@
 						"type": "string"
 					},
 					"view": {
-						"description": "Partial view configuration applied on top of `default_view` when the view is selected — typically locked `filters`, but any view property works. Optional.",
+						"description": "Partial view configuration applied on top of [`default_view`](#default_view) when the view is selected — typically locked `filters`, but any view property works. Optional.",
 						"type": "object",
 						"properties": {
 							"type": {

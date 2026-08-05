@@ -1234,7 +1234,7 @@ return array(
 						'type' => 'string',
 					),
 					'view' => array(
-						'description' => __( 'Partial view configuration applied on top of `default_view` when the view is selected — typically locked `filters`, but any view property works. Optional.', 'gutenberg' ),
+						'description' => __( 'Partial view configuration applied on top of [`default_view`](#default_view) when the view is selected — typically locked `filters`, but any view property works. Optional.', 'gutenberg' ),
 						'type' => 'object',
 						'properties' => array(
 							'type' => array(
