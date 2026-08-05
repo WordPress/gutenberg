@@ -25,6 +25,13 @@ export type IconType =
 	| ( ( props: { size?: number } ) => React.JSX.Element )
 	| React.JSX.Element;
 
+/* The sizing props forwarded to an icon element that is not an `SVG` or a `Dashicon`. */
+type SizeProps = {
+	size?: number;
+	width?: number | string;
+	height?: number | string;
+};
+
 type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U
 	: T extends DashiconIconKey
@@ -103,9 +110,8 @@ function Icon( {
 		return <SVG { ...appliedProps } />;
 	}
 
-	if ( isValidElement( icon ) ) {
+	if ( isValidElement< SizeProps >( icon ) ) {
 		return cloneElement( icon, {
-			// @ts-ignore Just forwarding the size prop along
 			size,
 			width: size,
 			height: size,

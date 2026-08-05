@@ -15,8 +15,11 @@ import variations from './variations';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/term-template' ] ];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 	example: {},

@@ -406,6 +406,8 @@ _Parameters_
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
 -   _props.value_ `string`: The current dimension value.
+-   _props.placeholder_ `?string`: Placeholder text for the custom-value input.
+-   _props.className_ `?string`: Additional CSS class on the wrapping fieldset.
 -   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
 
 _Returns_
@@ -896,6 +898,7 @@ _Properties_
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _blockStatesEditingEnabled_ `boolean`: Whether or not block style states editing is enabled
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
 -   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
@@ -950,9 +953,15 @@ Ensures that the text selection keeps the same vertical distance from the viewpo
 
 ### URLInput
 
+Text field for entering a URL, with an autocomplete list of matching posts, pages and other link suggestions.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
 
 ### URLInputButton
 

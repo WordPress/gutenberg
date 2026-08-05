@@ -328,7 +328,14 @@ export function useColorGradientSettings( settings ) {
 	);
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const encodeGradientValue = ( gradientValue ) => {
+	// When a slug is provided it is used directly: two presets can share the
+	// same gradient string, and matching by string alone would collapse them
+	// onto whichever entry appears first. Without a slug, fall back to
+	// matching the gradient string against the presets.
+	const encodeGradientValue = ( gradientValue, slug ) => {
+		if ( slug ) {
+			return 'var:preset|gradient|' + slug;
+		}
 		const allGradients = gradients.flatMap(
 			( { gradients: originGradients } ) => originGradients
 		);

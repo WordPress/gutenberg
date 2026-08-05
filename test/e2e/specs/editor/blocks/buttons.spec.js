@@ -281,7 +281,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Cyan bluish gray"i]' );
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
 		await editorSettings
 			.locator( '.components-tools-panel' )
 			.filter( {
@@ -289,7 +289,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Vivid red"i]' );
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -317,8 +317,15 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=button[name="Custom color picker"i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+		// Match by substring: when the control has a value (e.g. an inherited
+		// color), the button's accessible name gains a "The currently selected
+		// color is…" suffix, so an exact-name match no longer works.
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
 
 		await editorSettings
 			.locator( '.components-tools-panel' )
@@ -327,8 +334,12 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=button[name="Custom color picker"i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -353,7 +364,9 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Gradient', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
+		await page
+			.getByRole( 'option', { name: 'Gradient: Purple to yellow' } )
+			.click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -378,15 +391,23 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Gradient', exact: true } )
 			.click();
-		await page.click(
-			'role=button[name=/^Gradient control point at position 0% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 0% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
 		await page.keyboard.press( 'Escape' );
-		await page.click(
-			'role=button[name=/^Gradient control point at position 100% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 100% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -514,8 +535,12 @@ test.describe( 'Buttons', () => {
 				.getByLabel( 'Set custom value' )
 				.click();
 
-			// Change the unit from px to % using the combobox
+			// Change the unit from px to % using the combobox. Scope the
+			// lookup to the Width control's group: the block inspector now
+			// renders other unit selectors (e.g. Typography font size) above
+			// it, so a panel-wide `.first()` would match the wrong control.
 			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
 				.getByRole( 'combobox', { name: 'Select unit' } )
 				.first()
 				.selectOption( '%' );

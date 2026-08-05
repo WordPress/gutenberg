@@ -916,9 +916,145 @@ describe( 'filters', () => {
 		expect( result ).toHaveLength( 1 );
 		expect( result ).toStrictEqual( [ testData[ 1 ] ] );
 	} );
+
+	describe( 'time fields', () => {
+		const timeData = [
+			{ title: 'Early', opensAt: '08:00' },
+			{ title: 'Mid', opensAt: '13:00' },
+			{ title: 'Late', opensAt: '19:00' },
+		];
+		const timeFields = [ { id: 'opensAt', type: 'time', label: 'Opens' } ];
+
+		const filterBy = ( operator, value, items = timeData ) =>
+			filterSortAndPaginate(
+				items,
+				{ filters: [ { field: 'opensAt', operator, value } ] },
+				timeFields
+			).data.map( ( item ) => item.title );
+
+		it( 'should filter using BEFORE and AFTER operators', () => {
+			expect( filterBy( 'before', '13:00' ) ).toStrictEqual( [
+				'Early',
+			] );
+			expect( filterBy( 'after', '13:00' ) ).toStrictEqual( [ 'Late' ] );
+		} );
+
+		it( 'should filter using inclusive BEFORE and AFTER operators', () => {
+			expect( filterBy( 'beforeInc', '13:00' ) ).toStrictEqual( [
+				'Early',
+				'Mid',
+			] );
+			expect( filterBy( 'afterInc', '13:00' ) ).toStrictEqual( [
+				'Mid',
+				'Late',
+			] );
+		} );
+
+		it( 'should filter using ON and NOT_ON operators', () => {
+			expect( filterBy( 'on', '13:00' ) ).toStrictEqual( [ 'Mid' ] );
+			expect( filterBy( 'notOn', '13:00' ) ).toStrictEqual( [
+				'Early',
+				'Late',
+			] );
+		} );
+
+		it( 'should filter using BETWEEN operator', () => {
+			expect( filterBy( 'between', [ '09:00', '17:00' ] ) ).toStrictEqual(
+				[ 'Mid' ]
+			);
+		} );
+
+		it( 'should exclude values that are not times when the BETWEEN bounds are times', () => {
+			// Fractional seconds are not a valid time. Without parsing, the
+			// value would match the bounds as a string and `between` would be
+			// the only operator to include it.
+			const withDirty = [
+				...timeData,
+				{ title: 'Dirty', opensAt: '13:00:15.500' },
+			];
+			expect(
+				filterBy( 'between', [ '09:00', '17:00' ], withDirty )
+			).toStrictEqual( [ 'Mid' ] );
+		} );
+
+		it( 'should not apply a BETWEEN filter until both bounds are filled', () => {
+			const all = [ 'Early', 'Mid', 'Late' ];
+			expect(
+				filterBy( 'between', [ '13:00', undefined ] )
+			).toStrictEqual( all );
+			expect( filterBy( 'between', [ '', '13:00' ] ) ).toStrictEqual(
+				all
+			);
+			// An `undefined` bound becomes `null` when a persisted view
+			// round-trips through JSON.
+			expect( filterBy( 'between', [ '13:00', null ] ) ).toStrictEqual(
+				all
+			);
+		} );
+
+		it( 'should treat a missing value the way `is`/`isNot` do', () => {
+			const withMissing = [ ...timeData, { title: 'Unset' } ];
+
+			// Ordering operators never match a missing value.
+			expect( filterBy( 'before', '13:00', withMissing ) ).toStrictEqual(
+				[ 'Early' ]
+			);
+			expect( filterBy( 'on', '13:00', withMissing ) ).toStrictEqual( [
+				'Mid',
+			] );
+
+			// `notOn` keeps it, the same way `isNot` keeps items whose value
+			// is not the filtered one.
+			expect( filterBy( 'notOn', '13:00', withMissing ) ).toStrictEqual( [
+				'Early',
+				'Late',
+				'Unset',
+			] );
+		} );
+
+		it( 'should match regardless of seconds precision', () => {
+			const mixed = [
+				{ title: 'Stored with seconds', opensAt: '13:00:00' },
+				{ title: 'Stored without', opensAt: '15:00' },
+			];
+			expect( filterBy( 'on', '13:00', mixed ) ).toStrictEqual( [
+				'Stored with seconds',
+			] );
+			expect( filterBy( 'before', '13:00:30', mixed ) ).toStrictEqual( [
+				'Stored with seconds',
+			] );
+		} );
+	} );
 } );
 
 describe( 'sorting', () => {
+	it( 'should sort time fields chronologically', () => {
+		const timeData = [
+			{ title: 'Late', opensAt: '19:00' },
+			{ title: 'Early', opensAt: '09:00:30' },
+			{ title: 'Earliest', opensAt: '09:00' },
+		];
+		const timeFields = [ { id: 'opensAt', type: 'time', label: 'Opens' } ];
+
+		const sortBy = ( direction ) =>
+			filterSortAndPaginate(
+				timeData,
+				{ sort: { field: 'opensAt', direction } },
+				timeFields
+			).data.map( ( item ) => item.title );
+
+		expect( sortBy( 'asc' ) ).toStrictEqual( [
+			'Earliest',
+			'Early',
+			'Late',
+		] );
+		expect( sortBy( 'desc' ) ).toStrictEqual( [
+			'Late',
+			'Early',
+			'Earliest',
+		] );
+	} );
+
 	it( 'should sort by groupBy.field first, then by sort.field', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,

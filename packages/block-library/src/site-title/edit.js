@@ -73,8 +73,13 @@ export default function SiteTitleEdit( props ) {
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
 			/>
 		</TagName>
