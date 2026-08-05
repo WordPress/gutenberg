@@ -370,6 +370,9 @@ export function syncClient( server, client ) {
  * @param {number} [options.agentChance] Chance per step of a server-agent
  *                                       write (bot/CLI path, authored at
  *                                       head).
+ * @param {Array}  [options.recorder]    Ingest transcript recorder; every
+ *                                       serverIngestBatch call is pushed
+ *                                       onto it (vector generation).
  * @return {Object} { server, clients, authored, finalDoc, violations }.
  */
 export function runSimulation( {
@@ -377,11 +380,15 @@ export function runSimulation( {
 	steps = 200,
 	clientCount = 3,
 	agentChance = 0.02,
+	recorder = null,
 } ) {
 	const rng = mulberry32( seed );
 	const revision = { postId: 10, revisionId: 100 };
 	const initialDoc = makeGenesisDoc( revision );
 	const server = createServer( initialDoc );
+	if ( recorder ) {
+		server.recorder = recorder;
+	}
 	const clients = Array.from( { length: clientCount }, ( _, i ) =>
 		makeClient( `actor-${ i }`, initialDoc )
 	);

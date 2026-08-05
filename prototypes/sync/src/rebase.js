@@ -977,6 +977,12 @@ export function planBatch( units, log, docAt ) {
  * @return {Object[]} Dispositions, one per intent.
  */
 export function serverIngestBatch( server, intents ) {
+	// Optional transcript recorder (see tools/generate-planner-vectors.js):
+	// captures every ingest batch so a twin implementation can replay the
+	// exact call sequence against frozen expectations.
+	if ( server.recorder ) {
+		server.recorder.push( intents );
+	}
 	const units = groupUnits( intents )
 		.map( ( unit ) =>
 			unit.filter(
