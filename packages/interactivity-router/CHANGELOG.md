@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `data-wp-router-persist` attribute and a `persistedHeadElements` `core/router` config option (set via `wp_interactivity_config()`) so `<style>`/`<link rel="stylesheet">` elements can opt out of the router's head merge on client-side navigation. This covers both markup you control directly and third-party CSS injected at runtime by scripts like consent managers (OneTrust, Complianz) or chat widgets (HubSpot), which won't add a WordPress-specific attribute themselves. Prototype for [#76031](https://github.com/WordPress/gutenberg/issues/76031).
+
 ## 2.51.0 (2026-07-14)
 
 ## 2.50.0 (2026-07-01)

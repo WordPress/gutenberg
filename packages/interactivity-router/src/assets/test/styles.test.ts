@@ -6,6 +6,8 @@ import {
 	updateStylesWithSCS,
 	preloadStyles,
 	applyStyles,
+	isPersistedElement,
+	PERSIST_ATTRIBUTE,
 	type StyleElement,
 } from '../styles';
 
@@ -768,6 +770,147 @@ describe( 'Router styles management', () => {
 			expect( styles[ 0 ].isEqualNode( styles[ 1 ] ) ).toBe( true );
 			expect( styles[ 0 ].isEqualNode( styles[ 2 ] ) ).toBe( true );
 			expect( styles[ 0 ].isEqualNode( styles[ 3 ] ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isPersistedElement', () => {
+		it( 'should return true for elements with the persist attribute', () => {
+			const style = createStyleElement( 'onetrust-style' );
+			style.setAttribute( PERSIST_ATTRIBUTE, '' );
+
+			expect( isPersistedElement( style ) ).toBe( true );
+		} );
+
+		it( 'should return false for regular elements when no selectors are registered', () => {
+			const style = createStyleElement( 'regular-style' );
+
+			expect( isPersistedElement( style ) ).toBe( false );
+		} );
+
+		it( 'should return true for elements matching a registered selector', () => {
+			const style = createStyleElement( 'onetrust-consent-sdk-style' );
+			style.id = 'onetrust-consent-sdk-style';
+
+			expect(
+				isPersistedElement( style, [
+					'#onetrust-consent-sdk-style',
+					'style[data-hubspot]',
+				] )
+			).toBe( true );
+		} );
+
+		it( 'should return false for elements that match neither the attribute nor a registered selector', () => {
+			const style = createStyleElement( 'unrelated-style' );
+
+			expect(
+				isPersistedElement( style, [ 'style[data-hubspot]' ] )
+			).toBe( false );
+		} );
+
+		it( 'should ignore invalid selectors instead of throwing', () => {
+			const style = createStyleElement( 'some-style' );
+
+			expect( () =>
+				isPersistedElement( style, [ ':::not-a-selector' ] )
+			).not.toThrow();
+			expect( isPersistedElement( style, [ ':::not-a-selector' ] ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'preloadStyles with persisted elements', () => {
+		it( 'should not include a live persisted element in the returned promises', async () => {
+			const persisted = createStyleElement( 'onetrust-style' );
+			persisted.setAttribute( PERSIST_ATTRIBUTE, '' );
+			parent.append( persisted );
+
+			const doc = document.implementation.createHTMLDocument();
+
+			const promises = preloadStyles( doc );
+
+			expect( promises.length ).toBe( 0 );
+			// The persisted element should still be in the document, untouched.
+			expect( parent.contains( persisted ) ).toBe( true );
+		} );
+
+		it( 'should not duplicate an element matching a registered selector from the fetched page', async () => {
+			const persisted = createStyleElement( 'hubspot-style' );
+			persisted.setAttribute( 'data-hubspot', '' );
+			parent.append( persisted );
+
+			const doc = document.implementation.createHTMLDocument();
+			const fetchedTwin = doc.createElement( 'style' );
+			fetchedTwin.setAttribute( 'data-hubspot', '' );
+			doc.head.appendChild( fetchedTwin );
+
+			const promises = preloadStyles( doc, [ 'style[data-hubspot]' ] );
+
+			expect( promises.length ).toBe( 0 );
+			expect(
+				parent.querySelectorAll( 'style[data-hubspot]' ).length
+			).toBe( 1 );
+		} );
+
+		it( 'should still reconcile non-persisted elements normally', () => {
+			const persisted = createStyleElement( 'onetrust-style' );
+			persisted.setAttribute( PERSIST_ATTRIBUTE, '' );
+			const regular = createStyleElement( 'regular-style' );
+			parent.append( persisted, regular );
+
+			const doc = document.implementation.createHTMLDocument();
+			const newStyle = doc.createElement( 'style' );
+			newStyle.id = 'new-style';
+			doc.head.appendChild( newStyle );
+
+			const promises = preloadStyles( doc );
+
+			// Only the new, non-persisted style should generate a promise.
+			expect( promises.length ).toBe( 1 );
+			expect( parent.contains( persisted ) ).toBe( true );
+			expect( parent.contains( regular ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'applyStyles with persisted elements', () => {
+		it( 'should never disable an element with the persist attribute', () => {
+			const persisted = createStyleElement( 'onetrust-style' );
+			persisted.setAttribute( PERSIST_ATTRIBUTE, '' );
+			document.head.appendChild( persisted );
+
+			mockSheet( persisted, { disabled: false, mediaText: 'all' } );
+
+			// Not included in `styles`, which would normally disable it.
+			applyStyles( [] );
+
+			expect( persisted.sheet!.disabled ).toBe( false );
+		} );
+
+		it( 'should never disable an element matching a registered selector', () => {
+			const vendor = createStyleElement( 'onetrust-consent-sdk' );
+			vendor.id = 'onetrust-consent-sdk';
+			document.head.appendChild( vendor );
+
+			mockSheet( vendor, { disabled: false, mediaText: 'all' } );
+
+			applyStyles( [], [ '#onetrust-consent-sdk' ] );
+
+			expect( vendor.sheet!.disabled ).toBe( false );
+		} );
+
+		it( 'should still disable regular elements not present in styles', () => {
+			const persisted = createStyleElement( 'onetrust-style' );
+			persisted.setAttribute( PERSIST_ATTRIBUTE, '' );
+			const regular = createStyleElement( 'regular-style' );
+			document.head.append( persisted, regular );
+
+			mockSheet( persisted, { disabled: false, mediaText: 'all' } );
+			mockSheet( regular, { disabled: false, mediaText: 'all' } );
+
+			applyStyles( [] );
+
+			expect( persisted.sheet!.disabled ).toBe( false );
+			expect( regular.sheet!.disabled ).toBe( true );
 		} );
 	} );
 } );

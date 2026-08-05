@@ -106,6 +106,49 @@ Example with `attachTo`:
 </div>
 ```
 
+### Persisting head styles across navigation
+
+<div class="callout callout-info">
+This is an early, minimal prototype meant to make the discussion in <a href="https://github.com/WordPress/gutenberg/issues/76031">#76031</a> concrete for the WordPress 7.1 planning cycle. The API described here may still change.
+</div>
+
+When the router navigates to a new page, it merges the `<style>` and `<link rel="stylesheet">` elements of the fetched page into the current document, and disables any stylesheet that isn't part of that new page. This is normally what you want, but it breaks stylesheets that a script added to `<head>` at runtime and that aren't part of any server-rendered page, such as the CSS a consent-management banner (OneTrust, Complianz) or a chat widget (HubSpot) injects after the page loads. The router has no way of knowing those styles matter, so on the first client-side navigation it silently disables them, and the widget ends up unstyled.
+
+There are two ways to tell the router to leave a style or link element alone, no matter what the fetched page looks like:
+
+#### `data-wp-router-persist` attribute
+
+Add `data-wp-router-persist` to any `<style>` or `<link rel="stylesheet">` element that your own code controls. This works for stylesheets your theme or plugin enqueues and then mutates on the client (e.g. toggling a `media` attribute to implement a client-side theme switcher):
+
+```html
+<link
+	rel="stylesheet"
+	id="my-plugin-theme-light-css"
+	href="theme-light.css"
+	data-wp-router-persist
+/>
+```
+
+The router will never disable, remove, or reorder an element carrying this attribute, whether or not a matching element exists in the fetched page's HTML.
+
+#### `persistedHeadElements` config
+
+The attribute above only helps for markup you control. A vendor like OneTrust or HubSpot will never add a WordPress-specific attribute to their own snippet. For those cases, the site owner (who knows exactly which third-party tools are running on their site, even though the vendor has no idea WordPress or its router exists) can register a list of CSS selectors through the existing `core/router` config, using the same `wp_interactivity_config()` call other parts of the Interactivity API already use:
+
+```php
+wp_interactivity_config(
+	'core/router',
+	array(
+		'persistedHeadElements' => array(
+			'#onetrust-consent-sdk style',
+			'style[data-hubspot]',
+		),
+	)
+);
+```
+
+Any `<style>` or `<link rel="stylesheet">` element matching one of these selectors is treated exactly like an element carrying `data-wp-router-persist`: the router leaves it alone during the head merge, regardless of whether anything matching it is present in the fetched page.
+
 ### Actions
 
 #### `navigate`

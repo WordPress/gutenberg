@@ -35,6 +35,19 @@ const regionAttr = `data-wp-router-region`;
 const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
+/**
+ * Returns the list of CSS selectors that a site owner registered, via
+ * `wp_interactivity_config( 'core/router', [ 'persistedHeadElements' => [...] ] )`,
+ * for head elements the router's style merge should never touch (e.g. a
+ * `<style>` tag injected at runtime by a consent-management script). See
+ * `isPersistedElement()` in `./assets/styles`.
+ *
+ * @return List of registered selectors, or an empty array if none were
+ *         registered.
+ */
+const getPersistedHeadElements = (): string[] =>
+	getConfig( 'core/router' )?.persistedHeadElements ?? [];
+
 export interface NavigateOptions {
 	force?: boolean;
 	html?: string;
@@ -222,7 +235,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 	// Wait for styles and modules to be ready.
 	const [ styles, scriptModules ] = await Promise.all( [
-		Promise.all( preloadStyles( dom ) ),
+		Promise.all( preloadStyles( dom, getPersistedHeadElements() ) ),
 		Promise.all( preloadScriptModules( dom ) ),
 	] );
 
@@ -244,7 +257,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
  * @param page The {@link Page} object to render.
  */
 const renderPage = ( page: Page ) => {
-	applyStyles( page.styles );
+	applyStyles( page.styles, getPersistedHeadElements() );
 
 	// Clone regionsToAttach.
 	const regionsToAttach = { ...page.regionsToAttach };
