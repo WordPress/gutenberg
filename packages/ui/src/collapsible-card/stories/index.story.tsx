@@ -25,6 +25,11 @@ function Text( { children }: { children: React.ReactNode } ) {
 	);
 }
 
+const headerDescriptionTextStyle = {
+	fontSize: 'var(--wpds-typography-font-size-sm)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
+};
+
 const meta: Meta< typeof CollapsibleCard.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/CollapsibleCard',
@@ -226,50 +231,64 @@ export const WithHeaderDescription: Story = {
 		defaultOpen: true,
 	},
 	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
-		<CollapsibleCard.Root
-			open={ open }
-			defaultOpen={ defaultOpen }
-			onOpenChange={ onOpenChange }
-			disabled={ disabled }
-			{ ...restArgs }
-		>
-			<CollapsibleCard.Header>
-				<Stack justify="space-between">
-					<Card.Title>Settings</Card.Title>
-					<Stack direction="row" gap="sm">
+		<Stack direction="column" gap="lg">
+			<CollapsibleCard.Root
+				open={ open }
+				defaultOpen={ defaultOpen }
+				onOpenChange={ onOpenChange }
+				disabled={ disabled }
+				{ ...restArgs }
+			>
+				<CollapsibleCard.Header>
+					<Stack justify="space-between">
+						<Card.Title>Settings</Card.Title>
 						<CollapsibleCard.HeaderDescription>
-							<span
-								style={ {
-									fontSize:
-										'var(--wpds-typography-font-size-sm)',
-									color: 'var(--wpds-color-foreground-content-neutral-weak)',
-								} }
-							>
+							<span style={ headerDescriptionTextStyle }>
 								3 items configured
 							</span>
 						</CollapsibleCard.HeaderDescription>
+					</Stack>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						This header uses one description. Assistive technologies
+						announce it after the button label.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root
+				open={ open }
+				defaultOpen={ defaultOpen }
+				onOpenChange={ onOpenChange }
+				disabled={ disabled }
+				{ ...restArgs }
+			>
+				<CollapsibleCard.Header>
+					<Stack direction="column" gap="sm">
+						<Stack justify="space-between">
+							<Card.Title>Settings</Card.Title>
+							<CollapsibleCard.HeaderDescription>
+								<span style={ headerDescriptionTextStyle }>
+									3 items configured
+								</span>
+							</CollapsibleCard.HeaderDescription>
+						</Stack>
 						<CollapsibleCard.HeaderDescription>
-							<span
-								style={ {
-									fontSize:
-										'var(--wpds-typography-font-size-sm)',
-									color: 'var(--wpds-color-foreground-content-neutral-weak)',
-								} }
-							>
+							<span style={ headerDescriptionTextStyle }>
 								Needs review
 							</span>
 						</CollapsibleCard.HeaderDescription>
 					</Stack>
-				</Stack>
-			</CollapsibleCard.Header>
-			<CollapsibleCard.Content>
-				<Text>
-					The header descriptions provide supplementary context to the
-					trigger button. Assistive technologies will announce both
-					descriptions after the button label.
-				</Text>
-			</CollapsibleCard.Content>
-		</CollapsibleCard.Root>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						This header uses two descriptions in different rows.
+						Assistive technologies announce both descriptions after
+						the button label.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+		</Stack>
 	),
 };
 
