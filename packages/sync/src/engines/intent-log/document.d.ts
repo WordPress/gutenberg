@@ -5,7 +5,7 @@
 
 import type { EngineBlock, EngineDocument } from './engine-types';
 
-export const DEFAULT_FIELD: string;
+export declare const DEFAULT_FIELD: string;
 
 export function makeBlock( spec: Record< string, unknown > ): EngineBlock;
 

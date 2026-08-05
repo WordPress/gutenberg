@@ -114,6 +114,31 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
+if ( ! function_exists( 'gutenberg_register_sync_engine_setting' ) ) {
+	/**
+	 * Registers the sync engine selection setting.
+	 *
+	 * Swapping engines is a configuration change (see WP_Sync_Engine_Registry):
+	 * REST exposure makes the swap scriptable (`wp option update`, the
+	 * settings endpoint, e2e fixtures). Unknown slugs are harmless — the
+	 * registry falls back to the default engine.
+	 */
+	function gutenberg_register_sync_engine_setting() {
+		register_setting(
+			'writing',
+			'wp_sync_engine',
+			array(
+				'type'              => 'string',
+				'description'       => __( 'Collaborative editing sync engine', 'gutenberg' ),
+				'sanitize_callback' => 'sanitize_key',
+				'default'           => WP_Sync_Engine_Registry::DEFAULT_ENGINE,
+				'show_in_rest'      => true,
+			)
+		);
+	}
+	add_action( 'init', 'gutenberg_register_sync_engine_setting' );
+}
+
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
 	 * Registers the real-time collaboration setting.

@@ -5,9 +5,9 @@
 
 import type { IntentEnvelope } from './engine-types';
 
-export const IntentTypes: Record< string, string >;
+export declare const IntentTypes: Record< string, string >;
 
-export const TEXT_INTENT_TYPES: Set< string >;
+export declare const TEXT_INTENT_TYPES: Set< string >;
 
 export function createIntent(
 	type: string,

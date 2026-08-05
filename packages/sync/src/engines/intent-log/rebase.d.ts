@@ -9,7 +9,7 @@ import type {
 	IntentEnvelope,
 } from './engine-types';
 
-export const ESCALATION_REASONS: Set< string >;
+export declare const ESCALATION_REASONS: Set< string >;
 
 export interface IntentLogServer {
 	initialDoc: EngineDocument;
