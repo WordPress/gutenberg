@@ -17,7 +17,6 @@ export { metadata, name };
 export const settings = {
 	icon: pages,
 	example: {},
-	appender: 'none',
 	edit,
 };
 

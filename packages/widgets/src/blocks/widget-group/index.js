@@ -23,7 +23,6 @@ export const settings = {
 	),
 	icon,
 	__experimentalLabel: ( { name: label } ) => label,
-	appender: 'none',
 	edit,
 	save,
 	transforms: {

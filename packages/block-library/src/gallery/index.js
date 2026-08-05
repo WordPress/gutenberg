@@ -41,7 +41,6 @@ export const settings = {
 	},
 	transforms,
 	variations,
-	appender: 'none',
 	edit,
 	save,
 	deprecated,

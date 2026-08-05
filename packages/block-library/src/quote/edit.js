@@ -15,7 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { verse } from '@wordpress/icons';
@@ -82,6 +82,16 @@ export default function QuoteEdit( {
 } ) {
 	const { textAlign, allowedBlocks } = attributes;
 
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlockCount } = select( blockEditorStore );
+			return {
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
+			};
+		},
+		[ clientId ]
+	);
+
 	useMigrateOnLoad( attributes, clientId );
 
 	const blockProps = useBlockProps( {
@@ -91,6 +101,7 @@ export default function QuoteEdit( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
+		renderAppender: hasInnerBlocks ? false : undefined,
 		allowedBlocks,
 	} );
 

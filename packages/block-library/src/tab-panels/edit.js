@@ -18,6 +18,7 @@ export default function Edit( { clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: false,
+		renderAppender: false, // Appender handled by individual tab blocks
 	} );
 
 	// Get the parent tabs block clientId

@@ -59,7 +59,6 @@ export const settings = {
 	},
 	// Initial tab/panel creation is delegated to the tab-panels template, applied when its inner blocks are empty.
 	template: TEMPLATE,
-	appender: 'none',
 	edit,
 	save,
 };

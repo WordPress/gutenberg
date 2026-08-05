@@ -452,6 +452,7 @@ const PlaylistEdit = ( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
+		renderAppender: false,
 	} );
 
 	if ( tracks.length === 0 ) {

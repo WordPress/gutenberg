@@ -29,7 +29,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	template: TAB_PANELS_TEMPLATE,
-	appender: 'none',
 	edit,
 	save,
 };

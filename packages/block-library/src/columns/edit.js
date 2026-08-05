@@ -221,6 +221,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		orientation: 'horizontal',
+		renderAppender: false,
 		templateLock,
 	} );
 

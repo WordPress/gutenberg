@@ -80,7 +80,6 @@ export const settings = {
 		],
 	},
 	deprecated,
-	appender: 'none',
 	edit,
 	save,
 	transforms,

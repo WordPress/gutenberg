@@ -42,7 +42,7 @@ function PlaceholderContent( { clientId } ) {
 			>
 				<ButtonBlockAppender rootClientId={ clientId } />
 			</Placeholder>
-			<InnerBlocks />
+			<InnerBlocks renderAppender={ false } />
 		</>
 	);
 }

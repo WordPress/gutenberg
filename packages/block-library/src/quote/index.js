@@ -38,7 +38,6 @@ export const settings = {
 	transforms,
 	template: TEMPLATE,
 	templateInsertUpdatesSelection: true,
-	appender: 'default',
 	edit,
 	save,
 	deprecated,

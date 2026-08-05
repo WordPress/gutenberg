@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -88,6 +89,11 @@ function EditableContentLoaded( {
 		value: blocks,
 		onInput,
 		onChange,
+		// Show a writing prompt for empty content, even when the block
+		// is not selected, so the content area remains discoverable.
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.DefaultBlockAppender,
 	} );
 	return <TagName { ...props } />;
 }

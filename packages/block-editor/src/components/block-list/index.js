@@ -19,15 +19,13 @@ import {
 	useMemo,
 	useCallback,
 } from '@wordpress/element';
-import { getDefaultBlockName, store as blocksStore } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import InnerBlocksDefaultBlockAppender from '../inner-blocks/default-block-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -184,19 +182,8 @@ function Items( {
 } ) {
 	// Avoid passing CustomAppender to useSelect because it could be a new
 	// function on every render.
-	const hasAppenderProp = CustomAppender !== undefined;
 	const hasAppender = CustomAppender !== false;
 	const hasCustomAppender = !! CustomAppender;
-
-	if ( rootClientId && CustomAppender === InnerBlocksDefaultBlockAppender ) {
-		deprecated(
-			'wp.blockEditor.InnerBlocks renderAppender={ InnerBlocks.DefaultBlockAppender }',
-			{
-				since: '7.1',
-				alternative: "the block type's `appender` setting",
-			}
-		);
-	}
 	const {
 		order,
 		isZoomOut,
@@ -227,22 +214,6 @@ function Items( {
 					selectedBlocks: EMPTY_ARRAY,
 					visibleBlocks: EMPTY_SET,
 				};
-			}
-
-			// Without a renderAppender option, the appender is resolved
-			// from the block type: no appender, or the default appender
-			// while the block is selected or empty.
-			let _hasAppender = hasAppender;
-			let _showWhileEmpty = false;
-			if ( ! hasAppenderProp && rootClientId ) {
-				const appender = select( blocksStore ).getBlockType(
-					getBlockName( rootClientId )
-				)?.appender;
-				if ( appender === 'none' ) {
-					_hasAppender = false;
-				} else if ( appender === 'default' ) {
-					_showWhileEmpty = ! _order.length;
-				}
 			}
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -276,15 +247,14 @@ function Items( {
 						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					( ! templateLock || templateLock === 'contentOnly' ) &&
-					_hasAppender &&
+					hasAppender &&
 					! _isZoomOut() &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
-						showRootAppender ||
-						_showWhileEmpty ),
+						showRootAppender ),
 			};
 		},
-		[ rootClientId, hasAppenderProp, hasAppender, hasCustomAppender ]
+		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
 
 	return (

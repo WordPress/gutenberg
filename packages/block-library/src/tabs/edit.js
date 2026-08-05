@@ -29,6 +29,7 @@ function Edit( { clientId } ) {
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		templateLock: 'all',
+		renderAppender: false,
 	} );
 
 	return (

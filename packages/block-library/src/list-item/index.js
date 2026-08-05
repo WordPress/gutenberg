@@ -24,7 +24,6 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	appender: 'none',
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {
