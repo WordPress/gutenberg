@@ -14,7 +14,7 @@ import {
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -111,7 +111,6 @@ function VisualEditor( {
 		styles,
 		hasCanvasWidth,
 		canvasWidth,
-		canvasHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -121,7 +120,6 @@ function VisualEditor( {
 			getRenderingMode,
 			getDeviceType,
 			getCanvasWidth,
-			getCanvasHeight,
 		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
@@ -166,7 +164,6 @@ function VisualEditor( {
 			styles: editorSettings.styles,
 			hasCanvasWidth: _canvasWidth !== undefined,
 			canvasWidth: _canvasWidth,
-			canvasHeight: getCanvasHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -191,8 +188,6 @@ function VisualEditor( {
 	}, [] );
 
 	const localRef = useRef();
-	const [ isResizingCanvas, setIsResizingCanvas ] = useState( false );
-	const [ resizingCanvasHeight, setResizingCanvasHeight ] = useState();
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -348,9 +343,6 @@ function VisualEditor( {
 	);
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
-	const effectiveCanvasHeight = isResizingCanvas
-		? resizingCanvasHeight
-		: canvasHeight;
 	const iframeBodyMinHeightCSS =
 		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
 
@@ -431,16 +423,7 @@ function VisualEditor( {
 				width={
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
 				}
-				height={
-					enableResizing && effectiveCanvasHeight
-						? effectiveCanvasHeight + 'px'
-						: '100%'
-				}
-				onResizeStart={ () => {
-					setResizingCanvasHeight( canvasHeight );
-					setIsResizingCanvas( true );
-				} }
-				onResizeStop={ () => setIsResizingCanvas( false ) }
+				height="100%"
 			>
 				<BlockCanvas
 					shouldIframe

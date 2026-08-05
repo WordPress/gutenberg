@@ -74,11 +74,11 @@ function ResizableEditor( {
 	);
 
 	const updateCanvasWidth = useCallback(
-		( element ) => {
+		( element, isResizeEnd ) => {
 			const currentWidth = element.offsetWidth;
 			const containerWidth = element.parentElement?.offsetWidth ?? 0;
 			setCanvasWidth(
-				isAtMaxWidth( currentWidth, containerWidth, 80 )
+				isResizeEnd && isAtMaxWidth( currentWidth, containerWidth, 80 )
 					? undefined
 					: currentWidth
 			);
@@ -107,7 +107,7 @@ function ResizableEditor( {
 				updateCanvasWidth( element );
 			} }
 			onResizeStop={ ( event, direction, element ) => {
-				updateCanvasWidth( element );
+				updateCanvasWidth( element, true );
 				setIsResizing( false );
 				onResizeStop?.();
 			} }
