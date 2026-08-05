@@ -11,6 +11,7 @@
 
 ### Performance
 
+-   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).
 -   `ListView`: Collapse the placeholder rows that stand in for blocks outside of the render window into a single spacer row per run, instead of rendering a `<tr>`/`<td>` pair for every block. On a post with 1000 top-level blocks this removes ~1900 elements (about 60% of the List View's DOM and nearly half of the document's elements), which cuts the style recalculation and layout work done when the List View opens ([#80953](https://github.com/WordPress/gutenberg/pull/80953)).
 
 ### Internal
@@ -28,6 +29,7 @@
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
 -   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
+-   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 
 ## 16.0.0 (2026-07-14)
 

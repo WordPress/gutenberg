@@ -6,6 +6,10 @@
 
 -   Update the Ectoplasm admin color scheme's primary color to be brighter ([#81127](https://github.com/WordPress/gutenberg/pull/81127)).
 
+### Bug Fixes
+
+-   `Breadcrumbs`: reset the list item margin that wp-admin's `common.css` applies, which left the trail misaligned with the rest of the page header ([#81134](https://github.com/WordPress/gutenberg/pull/81134)).
+
 ## 2.6.0 (2026-07-14)
 
 ### Enhancements

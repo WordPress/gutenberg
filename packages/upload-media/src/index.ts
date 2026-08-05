@@ -9,6 +9,10 @@ export { default as MediaUploadProvider } from './components/provider';
 export { ErrorCode, UploadError } from './upload-error';
 export { getErrorMessage } from './error-messages';
 export {
+	getHeicConversionAdvice,
+	getHeicUnsupportedMessage,
+} from './heic-support';
+export {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
 	isHeicCanvasSupported,

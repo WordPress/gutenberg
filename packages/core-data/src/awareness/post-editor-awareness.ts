@@ -3,7 +3,7 @@
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -200,7 +200,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			undoIgnore: true,
 		};
 
-		// @ts-ignore Types are not provided when using store name instead of store instance.
+		// @ts-expect-error Types are not provided when using the store name instead of the store instance.
 		dispatch( coreStore ).editEntityRecord(
 			this.kind,
 			this.name,
@@ -288,7 +288,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			};
 		}
 
+		// SelectionInMultipleBlocks is decomposed by the caller into per-endpoint
+		// Cursor / WholeBlock calls and should never arrive here directly.
+		if ( selection.type === SelectionType.SelectionInMultipleBlocks ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
+
 		// Text-based selections: resolve cursor position and navigate up.
+		// SelectionCursor → cursorPosition; SelectionInOneBlock → cursorStartPosition.
 		const cursorPos =
 			'cursorPosition' in selection
 				? selection.cursorPosition

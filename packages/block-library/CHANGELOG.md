@@ -8,6 +8,7 @@
 -   Playlist: Expose the parent "Add track" toolbar control to selected Playlist Track child blocks via block toolbar sharing ([#80368](https://github.com/WordPress/gutenberg/pull/80368)).
 -   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
+-   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab" ([#81009](https://github.com/WordPress/gutenberg/pull/81009)).
 
 ### Bug Fixes
 

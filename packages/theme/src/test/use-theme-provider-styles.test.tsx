@@ -2,8 +2,11 @@
 // tests focus on what the hook uniquely owns:
 //
 // - `resolvedSettings`: how each setting is resolved (local prop > inherited from
-//   a parent provider > built-in default), which is the value propagated through
-//   context to descendant providers.
+//   a parent provider > built-in default when generating), which is the value
+//   propagated through context to descendant providers. Color stays unset when
+//   neither local nor inherited seeds are present.
+// - when color custom properties are emitted (any resolved color) vs omitted
+//   (total default only)
 // - the legacy `wp-admin` / `wp-components` bridge in `themeProviderStyles`, which
 //   the `ThemeProvider` tests intentionally do not cover.
 //
@@ -18,13 +21,10 @@ import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 describe( 'useThemeProviderStyles', () => {
 	describe( 'resolvedSettings', () => {
-		it( 'falls back to the default seed colors and no cursor', () => {
+		it( 'leaves color unset by default, expecting that CSS or build fallbacks apply', () => {
 			const { result } = renderHook( () => useThemeProviderStyles() );
 
-			expect( result.current.resolvedSettings.color ).toEqual( {
-				primary: DEFAULT_SEED_COLORS.primary,
-				background: DEFAULT_SEED_COLORS.background,
-			} );
+			expect( result.current.resolvedSettings.color ).toEqual( {} );
 			expect( result.current.resolvedSettings.cursor ).toBeUndefined();
 			// `cornerRadius` falls back to the prebuilt default.
 			expect( result.current.resolvedSettings.cornerRadius ).toBe(
@@ -107,6 +107,62 @@ describe( 'useThemeProviderStyles', () => {
 		} );
 	} );
 
+	describe( 'color styles', () => {
+		it( 'omits color custom properties by default', () => {
+			const { result } = renderHook( () => useThemeProviderStyles() );
+
+			expect( result.current.themeProviderStyles ).not.toHaveProperty(
+				'--wp-admin-theme-color'
+			);
+			expect( result.current.themeProviderStyles ).not.toHaveProperty(
+				'--wpds-color-background-interactive-brand-strong'
+			);
+		} );
+
+		it( 'emits color properties when at least one setting is provided', () => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
+			);
+
+			expect( result.current.resolvedSettings.color ).toEqual( {
+				primary: '#1e90ff',
+				background: DEFAULT_SEED_COLORS.background,
+			} );
+			expect(
+				result.current.themeProviderStyles[
+					'--wpds-color-background-interactive-brand-strong'
+				]
+			).toBe( '#1e90ff' );
+		} );
+
+		it( 're-emits inherited color tokens so portaled subtrees can re-apply them', () => {
+			const wrapper = ( { children }: { children: ReactNode } ) => (
+				<ThemeProvider
+					color={ { primary: '#abcdef', background: '#222222' } }
+				>
+					{ children }
+				</ThemeProvider>
+			);
+
+			const { result } = renderHook( () => useThemeProviderStyles(), {
+				wrapper,
+			} );
+
+			expect( result.current.resolvedSettings.color ).toEqual( {
+				primary: '#abcdef',
+				background: '#222222',
+			} );
+			expect( result.current.themeProviderStyles ).toHaveProperty(
+				'--wp-admin-theme-color',
+				'#abcdef'
+			);
+			expect( result.current.themeProviderStyles ).toHaveProperty(
+				'--wpds-color-background-interactive-brand-strong',
+				'#abcdef'
+			);
+		} );
+	} );
+
 	describe( 'legacy wp-admin / wp-components bridge', () => {
 		it( 'derives the wp-admin theme color from the primary seed', () => {
 			const { result } = renderHook( () =>
@@ -121,7 +177,9 @@ describe( 'useThemeProviderStyles', () => {
 		} );
 
 		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
-			const { result } = renderHook( () => useThemeProviderStyles() );
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
+			);
 			const styles = result.current.themeProviderStyles;
 
 			expect( styles[ '--wp-components-color-accent' ] ).toBe(
