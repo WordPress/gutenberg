@@ -80,7 +80,6 @@ export default function ListItemEdit( {
 	const { placeholder, content } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( clientId );

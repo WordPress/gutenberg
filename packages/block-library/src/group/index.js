@@ -79,6 +79,7 @@ export const settings = {
 		viewportWidth: 600,
 	},
 	transforms,
+	appender: 'button',
 	edit,
 	save,
 	deprecated,

@@ -20,6 +20,7 @@ export { metadata, name };
 
 export const settings = {
 	deprecated,
+	appender: 'button',
 	edit,
 	icon,
 	__experimentalLabel: ( { ref } ) => {

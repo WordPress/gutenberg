@@ -305,7 +305,6 @@ export default function PageListEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
 		__unstableDisableDropZone: true,
 		templateLock: isChildOfNavigation ? false : 'all',
 		onInput: NOOP,

@@ -52,6 +52,7 @@ export const settings = {
 		};
 	},
 
+	appender: 'none',
 	edit,
 
 	save,

@@ -343,7 +343,6 @@ export default function NavigationLinkEdit( {
 		{
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
-			renderAppender: false,
 		}
 	);
 

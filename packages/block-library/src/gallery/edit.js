@@ -650,7 +650,6 @@ export default function GalleryEdit( props ) {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		orientation: 'horizontal',
-		renderAppender: false,
 		// In dynamic mode nothing may be inserted: the images are resolved from
 		// the source, not authored as inner blocks. `allowedBlocks: []` enforces
 		// this in every context — unlike `templateLock: 'all'`, it isn't relaxed

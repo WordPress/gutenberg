@@ -31,6 +31,7 @@ const TEMPLATE = [
 export const settings = {
 	icon,
 	template: TEMPLATE,
+	appender: 'button',
 	edit,
 	save,
 	variations,

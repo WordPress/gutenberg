@@ -3,11 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	InnerBlocks,
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
@@ -15,14 +13,13 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const Edit = ( { attributes, setAttributes, clientId } ) => {
+const Edit = ( { attributes, setAttributes } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const resetAllSettings = () => {
@@ -37,22 +34,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { action, method, email, submissionMethod } = attributes;
 	const blockProps = useBlockProps();
 
-	const { hasInnerBlocks } = useSelect(
-		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const block = getBlock( clientId );
-			return {
-				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: hasInnerBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	return (
 		<>
