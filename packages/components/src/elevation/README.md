@@ -1,8 +1,6 @@
 # Elevation
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `Elevation` is a core component that renders shadow, using the component system's shadow system.
 
