@@ -35,6 +35,8 @@ import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { useGridColumns } from '../grid/preview-size-picker';
 import {
 	useIntersectionObserver,
@@ -43,9 +45,9 @@ import {
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
-	multiselect?: boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
+	selectionProps: SelectionProps;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	titleField?: NormalizedField< Item >;
@@ -62,9 +64,9 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	view,
-	multiselect,
 	selection,
 	onChangeSelection,
+	selectionProps,
 	getItemId,
 	item,
 	mediaField,
@@ -115,19 +117,7 @@ function GridItem< Item >( {
 				'is-selected': isSelected,
 			} ) }
 			aria-selected={ isSelected }
-			onClick={ () => {
-				// Toggle in/out of selection array
-				if ( isSelected ) {
-					onChangeSelection(
-						selection.filter( ( itemId ) => id !== itemId )
-					);
-				} else {
-					const newSelection = multiselect
-						? [ ...selection, id ]
-						: [ id ];
-					onChangeSelection( newSelection );
-				}
-			} }
+			{ ...selectionProps }
 		>
 			{ showMedia && renderedMediaField && (
 				<div className="dataviews-view-picker-grid__media">
@@ -333,6 +323,19 @@ function ViewPickerGrid< Item >( {
 	const isInfiniteScroll =
 		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
+	} );
+
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
@@ -409,13 +412,13 @@ function ViewPickerGrid< Item >( {
 												<GridItem
 													key={ getItemId( item ) }
 													view={ view }
-													multiselect={
-														isMultiselect
-													}
 													selection={ selection }
 													onChangeSelection={
 														onChangeSelection
 													}
+													selectionProps={ getSelectionProps(
+														getItemId( item )
+													) }
 													getItemId={ getItemId }
 													item={ item }
 													mediaField={ mediaField }
@@ -501,9 +504,11 @@ function ViewPickerGrid< Item >( {
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
-									multiselect={ isMultiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
+									selectionProps={ getSelectionProps(
+										getItemId( item )
+									) }
 									getItemId={ getItemId }
 									item={ item }
 									mediaField={ mediaField }

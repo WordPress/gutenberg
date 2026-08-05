@@ -9,7 +9,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-// @ts-ignore
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -20,13 +19,12 @@ export default function RevisionsView() {
 				getCurrentPostLastRevisionId,
 				getCurrentPostRevisionsCount,
 				getEditorSettings,
-				// @ts-ignore
 			} = select( editorStore );
 			return {
 				lastRevisionId: getCurrentPostLastRevisionId(),
 				revisionsCount: getCurrentPostRevisionsCount(),
 				disableVisualRevisions:
-					// @ts-ignore
+					// @ts-expect-error Editor settings are typed as a bare `Object`.
 					!! getEditorSettings().disableVisualRevisions,
 			};
 		}, [] );

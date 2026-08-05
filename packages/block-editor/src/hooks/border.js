@@ -29,6 +29,7 @@ import {
 	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
@@ -149,17 +150,30 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor } = useSelect(
+	const { style, borderColor, className } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { style: _style, borderColor: _borderColor } =
-				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { style: _style, borderColor: _borderColor };
+			const {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			};
 		},
 		[ clientId, isEnabled ]
+	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
 	);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
@@ -204,6 +218,7 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			inheritedValue={ inheritedValue }
 		/>
 	);
 }

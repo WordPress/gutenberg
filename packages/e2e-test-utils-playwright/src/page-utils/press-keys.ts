@@ -43,7 +43,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	const output = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const canvasDoc =
-				// @ts-ignore
+				// @ts-expect-error `activeElement` is typed as `Element`, which does not declare `contentDocument`.
 				document.activeElement?.contentDocument ?? document;
 			const event = new ClipboardEvent( _type, {
 				bubbles: true,

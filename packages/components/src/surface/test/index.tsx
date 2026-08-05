@@ -8,6 +8,18 @@ import { render, screen } from '@testing-library/react';
  */
 import { Surface } from '../index';
 
+// Checking for deprecation warnings before other tests because the `deprecated`
+// utility only fires a console.warn the first time a component is rendered.
+describe( 'Shows a deprecation warning', () => {
+	test( 'Surface', () => {
+		render( <Surface>Surface</Surface> );
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__experimentalSurface is deprecated since version 7.2 and will be removed in version 7.4.'
+		);
+	} );
+} );
+
 describe( 'props', () => {
 	test( 'should render children in a Surface wrapper', () => {
 		render( <Surface>Surface</Surface> );

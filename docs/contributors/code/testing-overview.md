@@ -323,8 +323,8 @@ When a snapshot test fails, it just means that a component's rendering has chang
 However, if the change was intentional, follow these steps to update the snapshot. Run the following to update the snapshots:
 
 ```sh
-# --testPathPattern is optional but will be much faster by only running matching tests
-npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
+# --testPathPatterns is optional but will be much faster by only running matching tests
+npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -403,10 +403,10 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
 ```
 
-`--testPathPattern` is not required, but specifying a path will speed things up by running a subset of tests.
+`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
 
 It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
 

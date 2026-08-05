@@ -14,6 +14,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
@@ -59,16 +60,25 @@ export function ElementsEdit( {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
-	const style = useSelect(
+	const { style, className } = useSelect(
 		( select ) => {
 			if ( ! isEnabled ) {
-				return undefined;
+				return {};
 			}
 			const attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId );
-			return attributes?.style;
+			return {
+				style: attributes?.style,
+				className: attributes?.className,
+			};
 		},
 		[ clientId, isEnabled ]
+	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
 	);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
@@ -134,6 +144,7 @@ export function ElementsEdit( {
 			defaultControls={ defaultControls }
 			label={ label }
 			contrastWarning={ contrastWarning }
+			inheritedValue={ inheritedValue }
 		/>
 	);
 }

@@ -9,7 +9,7 @@ import {
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
@@ -28,9 +28,10 @@ import noteMentionCompleter from './note-mention-completer';
 const { RichTextControl } = unlock( dataviewsPrivateApis );
 
 /*
- * `core/link` also carries `@` mentions: the completer inserts a mention as a
- * link to the user's author page with a `wp-note-mention user-N` class, which
- * rich text preserves as an unregistered attribute of the link format.
+ * `@` mentions are not on this list: the completer inserts a mention as a
+ * `<span class="wp-note-mention user-N">` chip, which rich text preserves as
+ * unregistered markup, so no format is involved and the Link UI never picks a
+ * mention up as an editable link.
  */
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',
@@ -60,28 +61,25 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 		}
 		setIsSubmitting( true );
 		const submitted = inputComment;
-		try {
+
+		/*
+		 * The note actions resolve with the saved record on success and
+		 * `undefined` on failure (they surface their own error notice),
+		 * so only discard the draft once the save actually succeeded.
+		 */
+		const result = await onSubmit( submitted );
+		if ( result ) {
 			/*
-			 * The note actions resolve with the saved record on success and
-			 * `undefined` on failure (they surface their own error notice),
-			 * so only discard the draft once the save actually succeeded.
+			 * The field stays editable while the request is in flight, so
+			 * keep anything typed since; clearing unconditionally would
+			 * discard it.
 			 */
-			const result = await onSubmit( submitted );
-			if ( result !== undefined ) {
-				/*
-				 * The field stays editable while the request is in flight, so
-				 * keep anything typed since; clearing unconditionally would
-				 * discard it.
-				 */
-				setInputComment( ( current ) =>
-					current === submitted ? '' : current
-				);
-			}
-		} catch {
-			// Keep the draft so the user can retry.
-		} finally {
-			setIsSubmitting( false );
+			setInputComment( ( current ) =>
+				current === submitted ? '' : current
+			);
 		}
+
+		setIsSubmitting( false );
 	}
 
 	return (
@@ -125,7 +123,12 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				gap="sm"
 				wrap="wrap"
 			>
-				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ onCancel }
+					shortcut="Escape"
+				>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button
@@ -134,6 +137,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					variant="primary"
 					type="submit"
 					disabled={ isDisabled }
+					shortcut={ displayShortcut.primary( 'Enter' ) }
 				>
 					<Truncate>{ labels?.submit ?? __( 'Add note' ) }</Truncate>
 				</Button>

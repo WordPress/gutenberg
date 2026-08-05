@@ -1,9 +1,7 @@
 # ToolsPanel
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early
-implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early
+implementation subject to drastic and breaking changes.</p>
 <br />
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.

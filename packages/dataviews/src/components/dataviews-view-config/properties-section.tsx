@@ -80,7 +80,7 @@ export function PropertiesSection( {
 		},
 	].filter( ( { field } ) => isDefined( field ) ) as Array< {
 		field: NormalizedField< any >;
-		isVisibleFlag: string;
+		isVisibleFlag: 'showTitle' | 'showMedia' | 'showDescription';
 	} >;
 	const visibleFieldIds = view.fields ?? [];
 	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
@@ -88,9 +88,7 @@ export function PropertiesSection( {
 	).length;
 
 	const visibleLockedFields = lockedFields.filter(
-		( { isVisibleFlag } ) =>
-			// @ts-expect-error
-			view[ isVisibleFlag ] ?? true
+		( { isVisibleFlag } ) => view[ isVisibleFlag ] ?? true
 	);
 
 	// If only one field (locked or regular) is visible, prevent it from being hidden
@@ -112,7 +110,6 @@ export function PropertiesSection( {
 			>
 				<ItemGroup isBordered isSeparated size="medium">
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
-						// @ts-expect-error
 						const isVisible = view[ isVisibleFlag ] ?? true;
 						const fieldToRender =
 							isSingleVisibleLockedField && isVisible
