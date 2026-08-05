@@ -158,8 +158,11 @@ function FontCollection( { slug }: { slug: string } ) {
 		setPage( 1 );
 	};
 
-	// @ts-expect-error
-	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+	const debouncedUpdateSearchInput = debounce(
+		// @ts-expect-error `debounce` expects a `(...args: unknown[]) => unknown` callback.
+		handleUpdateSearchInput,
+		300
+	);
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );

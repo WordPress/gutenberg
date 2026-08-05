@@ -3,26 +3,15 @@
  */
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
-import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import rawJestDomPlugin from 'eslint-plugin-jest-dom';
-import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
+import jestDomPlugin from 'eslint-plugin-jest-dom';
+import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-
-// Wrap plugins that don't yet support ESLint v10's rule context API.
-const jestDomPlugin = {
-	...rawJestDomPlugin,
-	rules: fixupPluginRules( rawJestDomPlugin ).rules,
-};
-const testingLibraryPlugin = {
-	...rawTestingLibraryPlugin,
-	rules: fixupPluginRules( rawTestingLibraryPlugin ).rules,
-};
 
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
@@ -292,6 +281,20 @@ export default dedupePlugins( [
 			'import/resolver': require.resolve( './import-resolver.cjs' ),
 		},
 		rules: {
+			/*
+			 * `@ts-ignore` keeps silently passing even after the error it was
+			 * added for is gone. Require `@ts-expect-error` instead, along with
+			 * a description explaining why the suppression is needed.
+			 */
+			'@typescript-eslint/ban-ts-comment': [
+				'error',
+				{
+					'ts-expect-error': 'allow-with-description',
+					'ts-ignore': true,
+					'ts-nocheck': true,
+					'ts-check': false,
+				},
+			],
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -459,8 +462,7 @@ export default dedupePlugins( [
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
 	{
-		...rawJestDomPlugin.configs[ 'flat/recommended' ],
-		plugins: { 'jest-dom': jestDomPlugin },
+		...jestDomPlugin.configs[ 'flat/recommended' ],
 		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'test/e2e/**/*.[tj]s?(x)',
@@ -470,7 +472,6 @@ export default dedupePlugins( [
 	},
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
-		plugins: { 'testing-library': testingLibraryPlugin },
 		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
 		ignores: [
 			'test/e2e/**/*.[tj]s?(x)',
@@ -653,10 +654,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [
-			'packages/components/src/utils/colors-values.js',
-			'packages/components/src/theme/**',
-		],
+		ignores: [ 'packages/components/src/utils/colors-values.js' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',

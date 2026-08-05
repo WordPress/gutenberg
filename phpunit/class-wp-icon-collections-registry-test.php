@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_Icon_Collections_Registry functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 

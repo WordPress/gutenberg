@@ -24,7 +24,7 @@ function Navigation() {
 		useSidebarParent();
 	const menuItems = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);

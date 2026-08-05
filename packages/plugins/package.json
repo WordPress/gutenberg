@@ -49,7 +49,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^2.1.0",
+		"memize": "^2.1.1",
 		"react-is": "^18.3.0"
 	},
 	"devDependencies": {

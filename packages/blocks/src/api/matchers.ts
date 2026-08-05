@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// @ts-ignore
 export { attr, prop, text, query } from 'hpq';
 
 /**

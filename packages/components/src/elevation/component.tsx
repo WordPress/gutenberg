@@ -30,16 +30,15 @@ function UnconnectedElevation(
  * ```jsx
  * import {
  *	__experimentalElevation as Elevation,
- *	__experimentalSurface as Surface,
  *	__experimentalText as Text,
  * } from '@wordpress/components';
  *
  * function Example() {
  *   return (
- *     <Surface>
+ *     <div>
  *       <Text>Code is Poetry</Text>
  *       <Elevation value={ 5 } />
- *     </Surface>
+ *     </div>
  *   );
  * }
  * ```

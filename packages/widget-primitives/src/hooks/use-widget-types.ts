@@ -1,13 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import {
+	createElement,
+	isValidElement,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { resolveFields } from '../field-types';
-import type { WidgetModuleRecord, WidgetName, WidgetType } from '../types';
+import { resolveIcon } from '../icon-resolver';
+import type {
+	WidgetIcon,
+	WidgetModuleRecord,
+	WidgetName,
+	WidgetType,
+} from '../types';
+
+/*
+ * Transparent stand-in for an icon reference that has not resolved yet:
+ * it holds the icon slot so titles do not shift when the icon lands.
+ */
+const pendingIcon: WidgetIcon = createElement( 'svg', {
+	viewBox: '0 0 24 24',
+} );
 
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
@@ -19,7 +38,10 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * For each record it dynamically imports `widget_module` and merges the
  * module's default export with the runtime fields (`name`, `renderModule`).
  * Attribute schemas pass through `resolveFields`, so attributes referencing
- * registered field types reach hosts as plain DataViews fields.
+ * registered field types reach hosts as plain DataViews fields. Icon
+ * references resolve through the registered icon resolver, off the loading
+ * flag: widget types emit as soon as their modules land, and each resolved
+ * icon patches in afterwards.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -63,6 +85,17 @@ export function useWidgetTypes(
 
 					const metadata = module.default as Partial< WidgetType >;
 
+					/*
+					 * Only a renderable element may enter; a pending
+					 * reference holds the slot with the stand-in until
+					 * it resolves after the gate.
+					 */
+					const moduleIcon = isValidElement( metadata.icon )
+						? metadata.icon
+						: undefined;
+					const icon =
+						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
+
 					return {
 						...metadata,
 						...( metadata.attributes
@@ -74,6 +107,7 @@ export function useWidgetTypes(
 							: {} ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
+						icon,
 						/*
 						 * `title` is required:
 						 * - Server-side title wins
@@ -111,6 +145,39 @@ export function useWidgetTypes(
 				results.filter( ( t ): t is WidgetType => t !== null )
 			);
 			setIsResolvingWidgetTypes( false );
+
+			/*
+			 * Icons resolve off the loading gate. The resolved reference
+			 * wins; when it does not resolve, the module's element
+			 * stands and the stand-in clears.
+			 */
+			for ( const record of records ) {
+				if ( ! record.icon ) {
+					continue;
+				}
+
+				void resolveIcon( record.icon ).then( ( resolved ) => {
+					if ( cancelled ) {
+						return;
+					}
+
+					setWidgetTypes( ( prev ) =>
+						prev.map( ( widgetType ) => {
+							if ( widgetType.name !== record.name ) {
+								return widgetType;
+							}
+
+							if ( resolved ) {
+								return { ...widgetType, icon: resolved };
+							}
+
+							return widgetType.icon === pendingIcon
+								? { ...widgetType, icon: undefined }
+								: widgetType;
+						} )
+					);
+				} );
+			}
 		} );
 
 		return () => {
