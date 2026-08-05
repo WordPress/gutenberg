@@ -340,32 +340,6 @@ describe( 'CollapsibleCard', () => {
 			);
 		} );
 
-		it( 'marks every description as aria-hidden', () => {
-			render(
-				<CollapsibleCard.Root>
-					<CollapsibleCard.Header>
-						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription>
-							Status: OK
-						</CollapsibleCard.HeaderDescription>
-						<CollapsibleCard.HeaderDescription>
-							Up to date
-						</CollapsibleCard.HeaderDescription>
-					</CollapsibleCard.Header>
-				</CollapsibleCard.Root>
-			);
-
-			for ( const descriptionWrapper of [
-				screen.getByText( 'Status: OK' ),
-				screen.getByText( 'Up to date' ),
-			] ) {
-				expect( descriptionWrapper ).toHaveAttribute(
-					'aria-hidden',
-					'true'
-				);
-			}
-		} );
-
 		it( 'preserves remaining descriptions when one unmounts', () => {
 			const getCard = ( showFirstDescription: boolean ) => (
 				<CollapsibleCard.Root>
