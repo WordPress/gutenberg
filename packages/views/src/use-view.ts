@@ -9,7 +9,6 @@ import { dequal } from 'dequal';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { View } from '@wordpress/dataviews';
-// @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**

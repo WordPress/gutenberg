@@ -281,6 +281,20 @@ export default dedupePlugins( [
 			'import/resolver': require.resolve( './import-resolver.cjs' ),
 		},
 		rules: {
+			/*
+			 * `@ts-ignore` keeps silently passing even after the error it was
+			 * added for is gone. Require `@ts-expect-error` instead, along with
+			 * a description explaining why the suppression is needed.
+			 */
+			'@typescript-eslint/ban-ts-comment': [
+				'error',
+				{
+					'ts-expect-error': 'allow-with-description',
+					'ts-ignore': true,
+					'ts-nocheck': true,
+					'ts-check': false,
+				},
+			],
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',

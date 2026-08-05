@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-// @ts-ignore
+// @ts-expect-error `hpq` does not ship type declarations.
 import { parse as hpqParse } from 'hpq';
 import memoize from 'memize';
 

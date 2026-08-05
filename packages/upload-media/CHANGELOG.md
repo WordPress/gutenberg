@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   The error shown when a HEIC file cannot be converted now explains the failure in terms of the browser and operating system in use, and points at the browsers that do decode HEIC there, since HEIC decoding depends on OS-provided codecs. Exposed as the new `getHeicUnsupportedMessage` and `getHeicConversionAdvice` exports ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
 -   Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
 -   Animated GIF to video conversion is now abandoned after a timeout (default 30 seconds) and skipped entirely for GIFs whose total decoded pixels (width × height × frame count) exceed a budget. In both cases the original GIF upload is kept and no error is surfaced; a `SCRIPT_DEBUG` diagnostic explains the skip. Both knobs are configurable via the `TranscodeGif` operation args ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
 

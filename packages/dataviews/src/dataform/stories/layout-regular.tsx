@@ -326,7 +326,7 @@ const getLayoutFromStoryArgs = ( {
 			type: 'card',
 		};
 		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
+			// @ts-expect-error `cardLayout` is narrowed to the member whose `withHeader` can only be `true`.
 			cardLayout.withHeader = withHeader;
 		}
 		layout = cardLayout;

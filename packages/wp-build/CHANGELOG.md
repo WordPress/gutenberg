@@ -15,6 +15,7 @@
 -   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
 -   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
 -   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+-   Wrap script bundles in an IIFE to avoid `use strict` affecting external code in concatenated JavaScript files ([#79792](https://github.com/WordPress/gutenberg/pull/79792).
 
 ## 0.19.0 (2026-07-14)
 
