@@ -1362,9 +1362,8 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	}
 
 	if ( deep ) {
-		// Callers ask this once per rendered block, so walking the parents of
-		// every selected block on each call is quadratic. The set is built
-		// once per selection instead.
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
 		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
