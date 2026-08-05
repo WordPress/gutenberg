@@ -9,7 +9,7 @@ Safe defaults for code that can lose someone's work or leave them stuck. Apply t
 
 ## Errors the user sees
 
--   Say the cause, not just the symptom. Where the failure carries a usable message, put it (and its `code` where that helps) in what the user reads, and keep copy of your own for when it does not. A `catch` that receives an error and shows a fixed string is a defect.
+-   Say the cause, not just the symptom. Where the failure carries a usable message, put it (and its `code` where that helps) in what the user reads, and fall back to your own copy when it does not. A `catch` that receives an error and shows a fixed string is a defect.
 -   Mind the rejection shape `apiFetch` uses — see the pitfall in the root `AGENTS.md`. It decides how you read a cause out of a failed request.
 -   REST validation failures carry per-field reasons in `error.data.params`. The top-level message only names the field.
 -   An error message containing HTML is still useful: strip the tags with `__unstableStripHTML` from `@wordpress/dom` rather than discarding the message.
