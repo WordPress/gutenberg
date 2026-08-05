@@ -9,7 +9,7 @@ Safe defaults for code that can lose someone's work or leave them stuck. Apply t
 
 ## Errors the user sees
 
--   Say the cause, not just the symptom. If an error object is in scope, put its `message` (and `code` where it helps) in what the user reads. A `catch` that receives an error and shows a fixed string is a defect.
+-   Say the cause, not just the symptom. Where the failure carries a usable message, put it (and its `code` where that helps) in what the user reads, and keep copy of your own for when it does not. A `catch` that receives an error and shows a fixed string is a defect.
 -   Mind the rejection shape `apiFetch` uses — see the pitfall in the root `AGENTS.md`. It decides how you read a cause out of a failed request.
 -   REST validation failures carry per-field reasons in `error.data.params`. The top-level message only names the field.
 -   An error message containing HTML is still useful: strip the tags with `__unstableStripHTML` from `@wordpress/dom` rather than discarding the message.
@@ -27,7 +27,8 @@ Safe defaults for code that can lose someone's work or leave them stuck. Apply t
 
 ## Data you did not create
 
-Guard where untrusted data enters — a REST response, post meta, `theme.json`, an editor setting passed through a filter, a storage read — rather than at every read downstream. Block attribute scalar types are already validated on parse (`packages/blocks/src/api/parser/get-block-attributes.ts`), so re-checking those adds noise without adding safety.
+Guard where untrusted data enters — a REST response, post meta, `theme.json`, an editor setting passed through a filter, a storage read — rather than at every read downstream. Block attributes are only partly covered: `packages/blocks/src/api/parser/get-block-attributes.ts` substitutes the declared default when a parsed value fails its type, but the `blocks.getBlockAttributes` filter runs after that check and `updateBlockAttributes` merges without any check, so a wrongly typed value can still reach a save function or PHP.
 
--   `JSON.parse` at a boundary goes in a `try`/`catch`, and the result is shape-checked (`Array.isArray`, `is_array`) before it is mapped or iterated: valid JSON of the wrong shape is the common case, not malformed JSON. The same applies to PHP array offsets and `foreach`, where an unguarded `TypeError` during rendering is a white screen for every visitor rather than an admin-only error.
+-   `JSON.parse` at a boundary goes in a `try`/`catch`, and the result is shape-checked (`Array.isArray`, `is_array`) before it is mapped or iterated: valid JSON of the wrong shape is the common case, not malformed JSON.
+-   In PHP, know which failure you are risking. `foreach` over a non-iterable emits a warning and carries on, so it degrades quietly. Using a non-scalar as an array offset throws a `TypeError`, and during rendering that is a white screen for every visitor rather than an admin-only error, so guard the offsets first.
 -   Check where a throw lands. React error boundaries only catch render-phase errors — a throw inside a `registry.subscribe` callback, an async click handler, or a promise chain escapes them entirely and can silently drop the user's edit.
