@@ -60,8 +60,7 @@ export function useDragCursor(
 		if ( isDragging ) {
 			document.documentElement.style.cursor = dragCursor;
 		} else {
-			// @ts-expect-error `cursor` is typed as `string`, but `null` clears it.
-			document.documentElement.style.cursor = null;
+			document.documentElement.style.removeProperty( 'cursor' );
 		}
 	}, [ isDragging, dragCursor ] );
 
