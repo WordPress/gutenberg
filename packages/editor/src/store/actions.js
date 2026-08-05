@@ -35,7 +35,7 @@ import {
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
-import { getDevicePreviewWidthByDeviceType } from '../utils/device-type';
+import { getCanvasWidthByDeviceType } from '../utils/device-type';
 
 const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 
@@ -817,7 +817,7 @@ export function setDeviceType( deviceType ) {
 		const viewportSettings = unlock(
 			registry.select( blockEditorStore )
 		).getSettings().__experimentalFeatures?.viewport;
-		const width = getDevicePreviewWidthByDeviceType(
+		const width = getCanvasWidthByDeviceType(
 			deviceType,
 			viewportSettings
 		);

@@ -34,7 +34,7 @@ import {
 } from '../dataviews/store/private-selectors';
 import {
 	getDeviceTypeByCanvasWidth,
-	getDevicePreviewWidthByDeviceType,
+	getCanvasWidthByDeviceType,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
 
@@ -370,7 +370,7 @@ export const getCanvasHeight = createRegistrySelector(
 		// within a band frees the canvas to fill the editor.
 		if (
 			canvasWidth !==
-			getDevicePreviewWidthByDeviceType( deviceType, viewportSettings )
+			getCanvasWidthByDeviceType( deviceType, viewportSettings )
 		) {
 			return undefined;
 		}

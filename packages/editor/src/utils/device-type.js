@@ -44,46 +44,24 @@ export const VIEWPORT_STATE_BY_DEVICE_TYPE = {
  */
 export function getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings ) {
 	const width = getViewportBreakpointValueInPixels( canvasWidth );
+	const breakpoints = getViewportBreakpoints( viewportSettings );
 
 	// Mobile
 	if (
 		width &&
-		width <=
-			getViewportBreakpointValueInPixels(
-				getCanvasWidthByDeviceType( 'Mobile', viewportSettings )
-			)
+		width <= getViewportBreakpointValueInPixels( breakpoints.mobile )
 	) {
 		return MOBILE_DEVICE_TYPE;
 	}
 	// Tablet
 	if (
 		width &&
-		width <=
-			getViewportBreakpointValueInPixels(
-				getCanvasWidthByDeviceType( 'Tablet', viewportSettings )
-			)
+		width <= getViewportBreakpointValueInPixels( breakpoints.tablet )
 	) {
 		return TABLET_DEVICE_TYPE;
 	}
 	// Desktop
 	return DESKTOP_DEVICE_TYPE;
-}
-
-/**
- * Get the canvas width by device type.
- *
- * @param {string} deviceType       The device type.
- * @param {Object} viewportSettings Optional viewport breakpoint settings.
- * @return {number|undefined} The canvas width in pixels.
- */
-export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
-	const viewportKey = VIEWPORT_KEY_BY_DEVICE_TYPE[ deviceType ];
-
-	if ( viewportKey ) {
-		return getViewportBreakpointValueInPixels(
-			getViewportBreakpoints( viewportSettings )[ viewportKey ]
-		);
-	}
 }
 
 /**
@@ -95,11 +73,17 @@ export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
  * @param {Object} viewportSettings Optional viewport breakpoint settings.
  * @return {number|undefined} The device preview width in pixels.
  */
-export function getDevicePreviewWidthByDeviceType(
-	deviceType,
-	viewportSettings
-) {
-	const width = getCanvasWidthByDeviceType( deviceType, viewportSettings );
+export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
+	const viewportKey = VIEWPORT_KEY_BY_DEVICE_TYPE[ deviceType ];
+
+	if ( ! viewportKey ) {
+		return undefined;
+	}
+
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+	const width = getViewportBreakpointValueInPixels(
+		breakpoints[ viewportKey ]
+	);
 
 	if ( width === undefined ) {
 		return undefined;
@@ -108,10 +92,7 @@ export function getDevicePreviewWidthByDeviceType(
 	let lowerBreakpoint = 0;
 	if ( deviceType === TABLET_DEVICE_TYPE ) {
 		lowerBreakpoint =
-			getCanvasWidthByDeviceType(
-				MOBILE_DEVICE_TYPE,
-				viewportSettings
-			) ?? 0;
+			getViewportBreakpointValueInPixels( breakpoints.mobile ) ?? 0;
 	}
 	const offset = Math.min(
 		DEVICE_PREVIEW_WIDTH_OFFSET,
