@@ -104,7 +104,8 @@ export const PanelColorGradientSettingsInner = ( {
 				/>
 				{ !! children && (
 					<>
-						<Spacer marginY={ 4 } /> { children }
+						<Spacer marginTop={ 4 } marginBottom={ 0 } />
+						{ children }
 					</>
 				) }
 			</div>
