@@ -204,6 +204,91 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		}
 	} );
 
+	test( 'a passive reader on an EMPTY post receives typed content', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// Field scenario: user A types into a brand-new empty post while
+		// user B just watches. B authors nothing (no rows, no awareness
+		// churn) — pure receive path over an empty genesis.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Passive Reader Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		const pageErrors: string[] = [];
+		page2.on( 'pageerror', ( error ) =>
+			pageErrors.push( String( error ) )
+		);
+		page2.on( 'console', ( message ) => {
+			if ( 'error' === message.type() ) {
+				pageErrors.push( message.text() );
+			}
+		} );
+
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page1.keyboard.type( 'paragraph added by admin' );
+
+		await expect(
+			editor2.canvas.locator( '[data-type="core/paragraph"]' ).first()
+		).toContainText( 'paragraph added by admin', { timeout: 15000 } );
+
+		expect( pageErrors ).toEqual( [] );
+	} );
+
+	test( 'reader-first ordering: the post creator sees content typed by a later joiner', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// Field scenario inverted roles: the READER opens the empty post
+		// first (as its creator would from post-new.php) and idles; the
+		// WRITER joins second and types. The first client's initial poll
+		// initializes the room (stores the empty snapshot); its editor must
+		// still render content that arrives later.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Reader First Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		const pageErrors: string[] = [];
+		page1.on( 'pageerror', ( error ) =>
+			pageErrors.push( String( error ) )
+		);
+		page1.on( 'console', ( message ) => {
+			if ( 'error' === message.type() ) {
+				pageErrors.push( message.text() );
+			}
+		} );
+
+		// Editor1 (opened first) idles; editor2 (joined second) types.
+		await editor2.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page2.keyboard.type( 'typed by the second user' );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' ).first()
+		).toContainText( 'typed by the second user', { timeout: 15000 } );
+
+		expect( pageErrors ).toEqual( [] );
+	} );
+
 	test( 'concurrent edits to different blocks both survive', async ( {
 		collaborationUtils,
 		requestUtils,
