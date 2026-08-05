@@ -308,8 +308,23 @@ inside intent payloads, not the transport.
   in-memory JS server (the vector-pinned PHP twin). NOT yet registered
   as an adapter — the mismatch fallback stays until 2c.
 
-  Remaining: 2c capture layer + entity bridge + adapter registration,
-  2d escalation surfacing + the full two-browser swap test.
+  **2c (capture bridge + manager + adapter) LANDED.**
+  `intent-log-bridge.ts`: block trees ↔ engine documents; identity-keyed
+  diff derivation (moves stay moves), verify-or-degrade against the
+  bridge's projection, loud failure on unverifiable batches (duplicate
+  syncIds). `intent-log-manager.ts`: the SyncManager surface over one
+  session per entity — capture on update(), editRecord on remote
+  changes, echo suppression both directions (canonical comparison + a
+  capture guard for the session's synchronous change events). Registered
+  as a default adapter: `wp_sync_engine=intent-log` now resolves a
+  working client. v1 scope: blocks only, core default undo, console-
+  warned escalations, no client persistence. 16 new tests (11 bridge
+  incl. end-to-end convergence through the in-memory server twin, 5
+  manager over a capturing fake transport).
+
+  Remaining: 2d — browser-verify the end-to-end editor flow (build +
+  wp-env + two browsers), escalation surfacing UI, presence wiring,
+  and the full two-browser swap test.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what
