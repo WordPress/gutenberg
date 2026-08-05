@@ -281,6 +281,35 @@ inside intent payloads, not the transport.
   `yjs-relay` and `intent-log` via the filter, both ways, mid-content-
   lifetime — mismatched tabs must land in the lock fallback, never
   corrupt.** This is where constraints 1–3 get their proof.
+
+  **Status (2026-08-05): 2a (server engine) LANDED.**
+  `WP_Intent_Log_Engine` registered alongside the relay; wire kinds
+  `snapshot` / `intent` / `proposal` / `voided` over the existing poll
+  route; genesis from parse_blocks (metadata.syncId or deterministic
+  ids); planner-backed ingest with per-intent dispositions as the ack;
+  transformed intents relayed to all clients (author included); voided
+  markers make redelivery exactly-once; materialize() round-trips block
+  markup with syncIds; server-stamped `u{user}c{client}` actor ids
+  (resolves the multi-tab open item). Eight route-level tests including
+  the engine-flip 409. Server-side mismatch demo is live NOW: setting
+  `wp_sync_engine=intent-log` makes clients (no intent-log adapter yet)
+  warn and fall back to post locking.
+
+  **2b (client session codec) LANDED.** `createIntentLogSession()`
+  (`packages/sync/src/engines/intent-log-session.ts`) implements
+  EngineSessionCodec: snapshot → replica bootstrap, intent rows appended
+  to the log copy with pending work replanned (shared planner),
+  proposals recorded, optimistic authoring with wire emission. New
+  optional `receiveDispositions` codec member; the transport delivers
+  the ack AFTER the same response's rows (rows settle what they
+  supersede; the document never regresses mid-response) — ordering
+  pinned by manager tests. Engine core typed via hand-written lockstep
+  .d.ts files. Seven session tests run two sessions against the
+  in-memory JS server (the vector-pinned PHP twin). NOT yet registered
+  as an adapter — the mismatch fallback stays until 2c.
+
+  Remaining: 2c capture layer + entity bridge + adapter registration,
+  2d escalation surfacing + the full two-browser swap test.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what
