@@ -20,7 +20,7 @@ import {
 	isClientIdSelected,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -82,18 +82,23 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const parentBlockInformation = useBlockDisplayInformation( parentId );
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
-
-	const canParentExpand = useSelect(
+	const { canParentExpand, isParentSynced } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return true;
+				return { canParentExpand: true, isParentSynced: false };
 			}
-			return select( blockEditorStore ).canEditBlock( parentId );
+			const { canEditBlock, isSyncedBlock } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				canParentExpand: canEditBlock( parentId ),
+				isParentSynced: isSyncedBlock( parentId ),
+			};
 		},
 		[ parentId ]
 	);
+
+	const syncedBranch = isSyncedBranch || isParentSynced;
 
 	const {
 		blockDropPosition,

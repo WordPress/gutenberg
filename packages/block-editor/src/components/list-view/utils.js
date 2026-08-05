@@ -17,13 +17,13 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 		level
 	);
 
-export const getBlockPropertiesDescription = ( blockInformation, isLocked ) =>
+export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
 	[
-		blockInformation?.positionLabel
+		positionLabel
 			? `${ sprintf(
 					// translators: %s: Position of selected block, e.g. "Sticky" or "Fixed".
 					__( 'Position: %s' ),
-					blockInformation.positionLabel
+					positionLabel
 			  ) }.`
 			: undefined,
 		isLocked ? __( 'This block is locked.' ) : undefined,
