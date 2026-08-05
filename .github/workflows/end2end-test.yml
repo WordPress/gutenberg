@@ -192,14 +192,14 @@ jobs:
                   path: playwright-report
                   if-no-files-found: ignore
 
-    report-to-issues:
+    report-flaky-tests:
         name: Report to GitHub
         needs: [merge-artifacts]
-        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
+        # Flaky tests are only reported as a comment on the pull request.
+        if: ${{ github.event_name == 'pull_request' && needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-            issues: write
             pull-requests: write
         timeout-minutes: 10
         steps:
@@ -228,5 +228,4 @@ jobs:
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  label: '[Type] Flaky Test'
                   artifact-path: flaky-tests

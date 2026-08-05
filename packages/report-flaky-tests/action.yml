@@ -1,13 +1,9 @@
 name: 'Report flaky tests'
-description: 'Report flaky tests to GitHub issues'
+description: 'Report flaky tests as a comment on the pull request'
 inputs:
     repo-token:
         description: 'GitHub token'
         required: true
-    label:
-        description: 'The flaky-test label name'
-        required: true
-        default: 'flaky-test'
     artifact-path:
         description: 'The path of the downloaded artifact'
         required: true

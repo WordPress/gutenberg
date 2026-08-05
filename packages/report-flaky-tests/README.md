@@ -1,6 +1,6 @@
 # Report Flaky Tests
 
-A GitHub action to report flaky E2E tests to GitHub issues.
+A GitHub action to report flaky E2E tests as a comment on the pull request.
 
 **This package is still experimental and breaking changes could be introduced in future minor versions (`v0.x`). Use it at your own risks.**
 
