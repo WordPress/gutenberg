@@ -60,6 +60,42 @@ describe( 'Playlist transforms', () => {
 		] );
 	} );
 
+	it( 'converts multiple selected Audio blocks into one Playlist', () => {
+		const audioBlocks = [
+			createBlock( 'core/audio', {
+				blob: 'blob:https://example.com/first-track',
+				id: 123,
+				src: 'https://example.com/first-track.mp3',
+			} ),
+			createBlock( 'core/audio', {
+				blob: 'blob:https://example.com/second-track',
+				src: 'https://example.com/second-track.mp3',
+			} ),
+		];
+
+		const [ playlist ] = switchToBlockType( audioBlocks, 'core/playlist' );
+
+		expect( playlist.innerBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					blob: 'blob:https://example.com/first-track',
+					id: 123,
+					src: 'https://example.com/first-track.mp3',
+					title: 'first-track.mp3',
+				} ),
+			} ),
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					blob: 'blob:https://example.com/second-track',
+					src: 'https://example.com/second-track.mp3',
+					title: 'second-track.mp3',
+				} ),
+			} ),
+		] );
+	} );
+
 	it( 'preserves shared layout attributes when converting Audio to Playlist', () => {
 		const audio = createBlock( 'core/audio', {
 			align: 'wide',
@@ -96,5 +132,54 @@ describe( 'Playlist transforms', () => {
 		expect( playlist.innerBlocks[ 0 ].attributes ).not.toHaveProperty(
 			'id'
 		);
+	} );
+
+	it( 'converts a one-track Playlist into Audio', () => {
+		const playlist = createBlock(
+			'core/playlist',
+			{
+				align: 'wide',
+				anchor: 'my-playlist',
+				caption: 'A playlist caption',
+				style: { spacing: { margin: { top: '1rem' } } },
+			},
+			[
+				createBlock( 'core/playlist-track', {
+					blob: 'blob:https://example.com/track',
+					id: 123,
+					src: 'https://example.com/track.mp3',
+				} ),
+			]
+		);
+
+		const [ audio ] = switchToBlockType( playlist, 'core/audio' );
+
+		expect( audio ).toMatchObject( {
+			name: 'core/audio',
+			attributes: {
+				align: 'wide',
+				anchor: 'my-playlist',
+				blob: 'blob:https://example.com/track',
+				id: 123,
+				src: 'https://example.com/track.mp3',
+				style: { spacing: { margin: { top: '1rem' } } },
+			},
+		} );
+		expect( audio.attributes.caption.toString() ).toBe(
+			'A playlist caption'
+		);
+	} );
+
+	it( 'does not convert a Playlist with multiple tracks into Audio', () => {
+		const playlist = createBlock( 'core/playlist', {}, [
+			createBlock( 'core/playlist-track', {
+				src: 'https://example.com/first-track.mp3',
+			} ),
+			createBlock( 'core/playlist-track', {
+				src: 'https://example.com/second-track.mp3',
+			} ),
+		] );
+
+		expect( switchToBlockType( playlist, 'core/audio' ) ).toBeNull();
 	} );
 } );
