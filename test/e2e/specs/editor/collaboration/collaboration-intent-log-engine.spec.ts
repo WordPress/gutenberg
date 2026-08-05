@@ -146,6 +146,64 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		).toHaveCount( 1 );
 	} );
 
+	test( 'both users typing on an EMPTY post converge without deleting each other', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// Regression: on a fresh post (empty genesis) each client seeds its
+		// own paragraph; the peer's paragraph lands in the shared document
+		// before the local editor renders it, and a stale capture used to
+		// interpret its absence as a deletion — the clients silently deleted
+		// each other's content forever.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Empty Post Test',
+			status: 'draft',
+			content: '',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		// Both users type into the empty canvas at once.
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page1.keyboard.type( 'First author paragraph' );
+		await editor2.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page2.keyboard.type( 'Second author paragraph' );
+
+		// Both editors converge on BOTH paragraphs (order may vary by
+		// arrival; neither may vanish).
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				const contents = blocks.map(
+					( block ) => block.attributes.content
+				);
+				expect( contents ).toEqual(
+					expect.arrayContaining( [
+						'First author paragraph',
+						'Second author paragraph',
+					] )
+				);
+			} ).toPass( { timeout: 15000 } );
+		}
+
+		// And they STAY converged (no delete/reinsert war): after a settle
+		// window, both canvases still show both paragraphs.
+		await page1.waitForTimeout( 3000 );
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect(
+				currentEditor.canvas.locator( '[data-type="core/paragraph"]' )
+			).toHaveCount( 2 );
+		}
+	} );
+
 	test( 'concurrent edits to different blocks both survive', async ( {
 		collaborationUtils,
 		requestUtils,

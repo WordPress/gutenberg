@@ -50,7 +50,8 @@ export interface BridgeBlock {
 
 /**
  * A derived batch: the intents to author, in order, plus how many blocks
- * required the coarse fallback (0 = clean capture).
+ * required the coarse fallback (0 = clean capture) and which document
+ * blocks were retained despite being absent from the editor tree.
  */
 export interface DerivedIntents {
 	intents: Array< {
@@ -58,6 +59,29 @@ export interface DerivedIntents {
 		payload: Record< string, unknown >;
 	} >;
 	coarseBlockCount: number;
+	retainedIds: Set< string >;
+}
+
+/**
+ * Options scoping what a capture diff may conclude.
+ */
+export interface DeriveOptions {
+	/**
+	 * Ids the editor tree is allowed to DELETE: blocks the editor has
+	 * actually displayed. A document block absent from the tree but not in
+	 * this set was never seen by the user — its absence is staleness, not a
+	 * deletion, and it is retained (reported via retainedIds). Omit to allow
+	 * all removals (trusted-tree callers).
+	 */
+	removableIds?: Set< string >;
+
+	/**
+	 * Ids the editor tree may still show but which were removed from the
+	 * document remotely. Tree blocks with these ids are dropped from the
+	 * capture (not re-inserted): a stale tree must not resurrect another
+	 * user's deletion.
+	 */
+	excludeIds?: Set< string >;
 }
 
 /**
@@ -371,40 +395,84 @@ function collectSpecIds(
  * NOTE: mutates nothing — the caller authors the returned intents through
  * its session (which applies them optimistically).
  *
- * @param doc    The session's current engine document.
- * @param blocks The editor's new block tree (bridge shape). Id-less blocks
- *               adopt the positionally corresponding document identity when
- *               one exists (see adoptExistingIds); otherwise they are
- *               treated as newly created with a minted id. Callers MUST
- *               write the resulting ids back to the editor via the returned
- *               specs, or the next capture cycle re-mints.
+ * @param doc     The session's current engine document.
+ * @param blocks  The editor's new block tree (bridge shape). Id-less blocks
+ *                adopt the positionally corresponding document identity when
+ *                one exists (see adoptExistingIds); otherwise they are
+ *                treated as newly created with a minted id. Callers MUST
+ *                write the resulting ids back to the editor via the returned
+ *                specs, or the next capture cycle re-mints.
+ * @param options Removability/exclusion scoping (see DeriveOptions).
  * @return Derived intents + the specs (with adopted/minted ids), or null.
  */
 export function deriveIntents(
 	doc: EngineDocument,
-	blocks: BridgeBlock[]
+	blocks: BridgeBlock[],
+	options: DeriveOptions = {}
 ): ( DerivedIntents & { specs: Array< Record< string, unknown > > } ) | null {
 	const minted = new Set< string >();
-	const specs = blocks.map( ( block ) => blockToEngineSpec( block, minted ) );
+	let specs = blocks.map( ( block ) => blockToEngineSpec( block, minted ) );
 	const claimed = collectSpecIds( specs, new Set() );
 	for ( const id of minted ) {
 		claimed.delete( id );
 	}
 	adoptExistingIds( specs, doc.root, claimed, minted );
+	if ( options.excludeIds && options.excludeIds.size > 0 ) {
+		specs = filterExcludedSpecs( specs, options.excludeIds );
+	}
 	const target = specsToDocument( specs );
+	const targetIds = collectSpecIds( specs, new Set() );
 	const targetJson = bridgeCanonical( target );
-	if ( targetJson === bridgeCanonical( doc ) ) {
-		return null;
+	if ( targetJson === bridgeCanonical( doc, targetIds ) ) {
+		/*
+		 * Equal up to blocks absent from the tree. Absent-but-REMOVABLE
+		 * blocks are deletions and need full derivation; when every absent
+		 * block is non-removable (never displayed), there is nothing to
+		 * author — only retention to report.
+		 */
+		const docIds = new Set< string >();
+		const collectDocIds = ( docBlocks: EngineBlock[] ) => {
+			for ( const block of docBlocks ) {
+				docIds.add( block.syncId );
+				collectDocIds( block.children );
+			}
+		};
+		collectDocIds( doc.root );
+		const missing = [ ...docIds ].filter( ( id ) => ! targetIds.has( id ) );
+		const hasRemovableMissing = missing.some(
+			( id ) => ! options.removableIds || options.removableIds.has( id )
+		);
+		if ( ! hasRemovableMissing ) {
+			if ( 0 === missing.length ) {
+				return null;
+			}
+			return {
+				intents: [],
+				coarseBlockCount: 0,
+				retainedIds: new Set( missing ),
+				specs,
+			};
+		}
 	}
 
 	const oldFlat = flattenDocument( doc );
 	const newFlat = flattenSpecs( specs, null, new Map() );
 	const intents: DerivedIntents[ 'intents' ] = [];
+	const retainedIds = new Set< string >();
 
 	// Removals first (they cannot invalidate later anchors: anchors are
 	// computed against the new tree).
 	for ( const [ syncId ] of oldFlat ) {
 		if ( ! newFlat.has( syncId ) ) {
+			if (
+				options.removableIds &&
+				! options.removableIds.has( syncId )
+			) {
+				// The editor never displayed this block: its absence is
+				// staleness, not a user deletion — retain it.
+				retainedIds.add( syncId );
+				continue;
+			}
 			intents.push( {
 				type: 'remove_block',
 				payload: { syncId },
@@ -501,9 +569,10 @@ export function deriveIntents(
 		}
 	}
 
-	// Verify: the derived intents must reproduce the target tree.
-	if ( verifiesTo( doc, intents, targetJson ) ) {
-		return { intents, coarseBlockCount: 0, specs };
+	// Verify: the derived intents must reproduce the target tree (retained
+	// blocks excluded from the comparison — they are staleness, not target).
+	if ( verifiesTo( doc, intents, targetJson, targetIds ) ) {
+		return { intents, coarseBlockCount: 0, retainedIds, specs };
 	}
 
 	/*
@@ -537,13 +606,39 @@ export function deriveIntents(
 			} );
 		}
 	}
-	if ( ! verifiesTo( doc, coarse, targetJson ) ) {
+	if ( ! verifiesTo( doc, coarse, targetJson, targetIds ) ) {
 		throw new Error(
 			'Intent capture failed verification even after degrading to coarse replacement.'
 		);
 	}
 
-	return { intents: coarse, coarseBlockCount, specs };
+	return { intents: coarse, coarseBlockCount, retainedIds, specs };
+}
+
+/**
+ * Drops specs (recursively) whose ids were removed from the document by
+ * another actor: a stale tree must not resurrect them.
+ *
+ * @param specs      Engine block specs.
+ * @param excludeIds Ids to drop.
+ * @return Filtered specs.
+ */
+function filterExcludedSpecs(
+	specs: Array< Record< string, unknown > >,
+	excludeIds: Set< string >
+): Array< Record< string, unknown > > {
+	const kept: Array< Record< string, unknown > > = [];
+	for ( const spec of specs ) {
+		if ( excludeIds.has( spec.syncId as string ) ) {
+			continue;
+		}
+		spec.children = filterExcludedSpecs(
+			( spec.children as Array< Record< string, unknown > > ) ?? [],
+			excludeIds
+		);
+		kept.push( spec );
+	}
+	return kept;
 }
 
 /**
@@ -566,10 +661,18 @@ function specsToDocument(
  * trees built from editor blocks never carry it and it must not fail
  * verification.
  *
- * @param doc Engine document.
+ * When `restrictTo` is given, blocks outside the set are omitted from the
+ * projection (with their subtrees) — used to compare a document that
+ * retains never-displayed blocks against a target tree that lacks them.
+ *
+ * @param doc        Engine document.
+ * @param restrictTo Optional id allowlist.
  * @return Canonical JSON of the projection.
  */
-function bridgeCanonical( doc: EngineDocument ): string {
+function bridgeCanonical(
+	doc: EngineDocument,
+	restrictTo?: Set< string >
+): string {
 	const project = ( block: EngineBlock ): Record< string, unknown > => ( {
 		syncId: block.syncId,
 		blockType: block.blockType,
@@ -581,9 +684,15 @@ function bridgeCanonical( doc: EngineDocument ): string {
 				.sort( ( [ a ], [ b ] ) => ( a < b ? -1 : 1 ) )
 		),
 		text: block.fields.content?.text ?? '',
-		children: block.children.map( project ),
+		children: projectList( block.children ),
 	} );
-	return JSON.stringify( doc.root.map( project ) );
+	const projectList = ( blocks: EngineBlock[] ): unknown[] =>
+		blocks
+			.filter(
+				( block ) => ! restrictTo || restrictTo.has( block.syncId )
+			)
+			.map( project );
+	return JSON.stringify( projectList( doc.root ) );
 }
 
 /**
@@ -593,12 +702,14 @@ function bridgeCanonical( doc: EngineDocument ): string {
  * @param doc        Starting document.
  * @param intents    Derived intents.
  * @param targetJson Canonical target.
+ * @param restrictTo Optional id allowlist for the comparison.
  * @return Whether the application reproduces the target.
  */
 function verifiesTo(
 	doc: EngineDocument,
 	intents: DerivedIntents[ 'intents' ],
-	targetJson: string
+	targetJson: string,
+	restrictTo?: Set< string >
 ): boolean {
 	let current = doc;
 	for ( const intent of intents ) {
@@ -612,5 +723,5 @@ function verifiesTo(
 		} as IntentEnvelope );
 		current = result.doc;
 	}
-	return bridgeCanonical( current ) === targetJson;
+	return bridgeCanonical( current, restrictTo ) === targetJson;
 }

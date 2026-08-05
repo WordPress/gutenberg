@@ -60,6 +60,42 @@ interface EntityState {
 	 * those are the editor's own state and must not bounce back.
 	 */
 	capturing: boolean;
+	/**
+	 * Ids the editor has actually displayed (last agreed view). Only these
+	 * may be DELETED by a capture diff: a document block missing from the
+	 * editor tree but never displayed is staleness, not a deletion.
+	 */
+	editorIds: Set< string > | null;
+	/** Document ids as of the previous session change (tombstone diffing). */
+	prevDocIds: Set< string >;
+	/**
+	 * Ids removed from the document by remote intents. A stale editor tree
+	 * still showing them must not resurrect them.
+	 */
+	docTombstones: Set< string >;
+}
+
+/**
+ * Collects all syncIds in a bridge block tree (metadata.syncId).
+ *
+ * @param blocks Bridge blocks.
+ * @param into   Accumulator.
+ * @return The accumulator.
+ */
+function collectBlockIds(
+	blocks: BridgeBlock[],
+	into: Set< string > = new Set()
+): Set< string > {
+	for ( const block of blocks ) {
+		const metadata = block.attributes?.metadata as
+			| { syncId?: string }
+			| undefined;
+		if ( metadata?.syncId ) {
+			into.add( metadata.syncId );
+		}
+		collectBlockIds( block.innerBlocks, into );
+	}
+	return into;
 }
 
 /**
@@ -123,18 +159,39 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			unloaded: false,
 			lastPushedState: null,
 			capturing: false,
+			editorIds: null,
+			prevDocIds: new Set(),
+			docTombstones: new Set(),
 		};
 		entityStates.set( key, state );
 
 		session.onChange( () => {
-			if (
-				state.unloaded ||
-				state.capturing ||
-				! session.isInitialized()
-			) {
+			if ( state.unloaded || ! session.isInitialized() ) {
 				return;
 			}
 			const blocks = engineDocumentToBlocks( session.getDocument()! );
+			const docIds = collectBlockIds( blocks );
+			/*
+			 * Tombstone maintenance: ids that left the document through
+			 * REMOTE intents (own authorship is under the capturing guard)
+			 * must not be resurrected by a stale editor tree. Reappearing
+			 * ids clear their tombstone.
+			 */
+			if ( ! state.capturing ) {
+				for ( const id of state.prevDocIds ) {
+					if ( ! docIds.has( id ) ) {
+						state.docTombstones.add( id );
+					}
+				}
+			}
+			for ( const id of docIds ) {
+				state.docTombstones.delete( id );
+			}
+			state.prevDocIds = docIds;
+
+			if ( state.capturing ) {
+				return;
+			}
 			/*
 			 * Never push an EMPTY shared document over a live editor as the
 			 * first push (fresh post: the genesis is empty while the user
@@ -149,6 +206,12 @@ export function createIntentLogManager( debug = false ): SyncManager {
 				return; // Echo of our own capture; nothing new for the editor.
 			}
 			state.lastPushedState = canonical;
+			/*
+			 * Deliberately NOT marking the pushed ids as editor-displayed:
+			 * a push only proves we dispatched, not that the editor
+			 * rendered it. Ids become removable when the editor itself
+			 * hands us a tree containing them (its echo of this push).
+			 */
 			handlers.editRecord( { blocks }, { undoIgnore: true } );
 		} );
 
@@ -204,13 +267,44 @@ export function createIntentLogManager( debug = false ): SyncManager {
 				return; // v1: only block content syncs.
 			}
 
+			/*
+			 * The incoming tree is the editor's own testimony about what it
+			 * displays: every id it carries becomes removable from now on.
+			 * (A push becomes removable when its echo arrives here.)
+			 */
+			const treeIds = collectBlockIds( blocks );
+			if ( null === state.editorIds ) {
+				state.editorIds = new Set();
+			}
+			for ( const id of treeIds ) {
+				state.editorIds.add( id );
+			}
+
 			const derived = deriveIntents(
 				state.session.getDocument()!,
-				blocks
+				blocks,
+				{
+					// Only blocks the editor has displayed may be deleted
+					// by its tree's absence; never-seen blocks are retained.
+					removableIds: state.editorIds,
+					// Remotely removed blocks in a stale tree are not
+					// resurrected.
+					excludeIds: state.docTombstones,
+				}
 			);
 			if ( ! derived ) {
 				return;
 			}
+			// Id-less blocks in the tree confirm their adopted/minted ids.
+			const confirmIds = ( specs: typeof derived.specs ) => {
+				for ( const spec of specs ) {
+					state.editorIds!.add( spec.syncId as string );
+					confirmIds(
+						( spec.children as typeof derived.specs ) ?? []
+					);
+				}
+			};
+			confirmIds( derived.specs );
 			if ( derived.coarseBlockCount > 0 ) {
 				log( 'coarse capture', {
 					origin,
@@ -230,14 +324,15 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			const captured = engineDocumentToBlocks(
 				state.session.getDocument()!
 			);
-			state.lastPushedState = canonicalBlocksJson( captured );
+			const capturedJson = canonicalBlocksJson( captured );
+			state.prevDocIds = collectBlockIds( captured );
 
 			/*
-			 * Write identities back: when the editor's tree lacked syncIds
-			 * (freshly parsed content, newly created blocks), the bridge
-			 * adopted or minted them — the editor must carry them so the
-			 * NEXT capture cycle sees stable identities instead of
-			 * re-minting (the insert/remove churn bug).
+			 * Push the editor forward when its tree was behind the shared
+			 * document: missing identities (freshly parsed or new blocks
+			 * needing their adopted/minted ids — the churn bug), retained
+			 * never-displayed remote blocks, or blocks dropped because a
+			 * remote deletion outranked the stale tree.
 			 */
 			const editorHadAllIds = blocks.every( function hasId(
 				block: BridgeBlock
@@ -247,12 +342,20 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					| undefined;
 				return !! metadata?.syncId && block.innerBlocks.every( hasId );
 			} );
-			if ( ! editorHadAllIds ) {
+			const treeHasTombstoned = [ ...treeIds ].some( ( id ) =>
+				state.docTombstones.has( id )
+			);
+			const editorIsBehind =
+				! editorHadAllIds ||
+				derived.retainedIds.size > 0 ||
+				treeHasTombstoned;
+			if ( editorIsBehind && capturedJson !== state.lastPushedState ) {
 				state.handlers.editRecord(
 					{ blocks: captured },
 					{ undoIgnore: true }
 				);
 			}
+			state.lastPushedState = capturedJson;
 		},
 
 		getAwareness: ( objectType, objectId ) => {

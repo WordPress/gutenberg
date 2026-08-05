@@ -337,6 +337,217 @@ describe( 'intent-log manager', () => {
 		);
 	} );
 
+	it( 'REGRESSION: a stale editor tree does not delete an unseen remote block', async () => {
+		// Two clients seed an empty post concurrently. The remote client's
+		// paragraph lands in the shared document while the local editor tree
+		// (mid-typing) does not contain it yet. Capture must NOT interpret
+		// that absence as a user deletion — it must retain the block and
+		// push the merged view to the editor.
+		const { manager, handlers, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate( snapshotRow( [] ) );
+
+		// The local user types a paragraph of their own (id-less tree).
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'mine' },
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+		const ownInsert = JSON.parse( transport.captured.sent[ 0 ].data );
+		expect( ownInsert.type ).toBe( 'insert_block' );
+
+		// A remote client's paragraph arrives.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intentId: 'remote-1',
+				actorId: 'u9c9',
+				baseSeq: 0,
+				txnId: null,
+				type: 'insert_block',
+				payload: {
+					block: {
+						syncId: 'remote-block',
+						blockType: 'core/paragraph',
+						text: 'theirs',
+					},
+					parentId: null,
+					afterSiblingId: null,
+				},
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.INTENT,
+		} );
+
+		// The local editor, still on its stale tree, types more BEFORE
+		// rendering the push (the tree lacks the remote block).
+		transport.captured.sent.length = 0;
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'mine!',
+							metadata: {
+								syncId: ownInsert.payload.block.syncId,
+							},
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		const sentTypes = transport.captured.sent.map(
+			( update ) => JSON.parse( update.data ).type
+		);
+		expect( sentTypes ).not.toContain( 'remove_block' );
+		// The merged view (both blocks) reached the editor.
+		const lastPush = handlers.edits.at( -1 ) as {
+			blocks: Array< { attributes: { metadata?: { syncId?: string } } } >;
+		};
+		const pushedIds = lastPush.blocks.map(
+			( block ) => block.attributes.metadata?.syncId
+		);
+		expect( pushedIds ).toContain( 'remote-block' );
+		expect( pushedIds ).toContain( ownInsert.payload.block.syncId );
+	} );
+
+	it( 'REGRESSION: a remotely removed block is not resurrected by a stale editor tree', async () => {
+		const { manager, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{ syncId: 'a1', blockType: 'core/paragraph', text: 'Alpha' },
+				{ syncId: 'b1', blockType: 'core/paragraph', text: 'Beta' },
+			] )
+		);
+
+		// A remote client removes Beta.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intentId: 'remote-rm',
+				actorId: 'u9c9',
+				baseSeq: 0,
+				txnId: null,
+				type: 'remove_block',
+				payload: { syncId: 'b1' },
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.INTENT,
+		} );
+
+		// The local editor, on a stale tree that still shows Beta, edits
+		// Alpha. Beta must not be re-inserted.
+		transport.captured.sent.length = 0;
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Alpha!',
+							metadata: { syncId: 'a1' },
+						},
+						innerBlocks: [],
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Beta',
+							metadata: { syncId: 'b1' },
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		const sent = transport.captured.sent.map( ( update ) =>
+			JSON.parse( update.data )
+		);
+		expect( sent.map( ( intent ) => intent.type ) ).toEqual( [
+			'insert_text',
+		] );
+		expect( sent[ 0 ].payload.syncId ).toBe( 'a1' );
+	} );
+
+	it( 'a block the editor KNEW and dropped is still removed', async () => {
+		const { manager, transport } = await loadManagedEntity();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{ syncId: 'a1', blockType: 'core/paragraph', text: 'Alpha' },
+				{ syncId: 'b1', blockType: 'core/paragraph', text: 'Beta' },
+			] )
+		);
+
+		// The editor renders the snapshot push and echoes the full tree —
+		// its testimony that it displays both blocks.
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Alpha',
+							metadata: { syncId: 'a1' },
+						},
+						innerBlocks: [],
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Beta',
+							metadata: { syncId: 'b1' },
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		// The user deletes Beta.
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Alpha',
+							metadata: { syncId: 'a1' },
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		const sent = transport.captured.sent.map( ( update ) =>
+			JSON.parse( update.data )
+		);
+		expect( sent.map( ( intent ) => intent.type ) ).toEqual( [
+			'remove_block',
+		] );
+		expect( sent[ 0 ].payload.syncId ).toBe( 'b1' );
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );
