@@ -1945,6 +1945,17 @@ describe( 'selectors', () => {
 
 			expect( isBlockSelected( state, '23' ) ).toBe( false );
 		} );
+
+		it( 'should return false if there is no client ID', () => {
+			const state = {
+				selection: {
+					selectionStart: {},
+					selectionEnd: {},
+				},
+			};
+
+			expect( isBlockSelected( state, undefined ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'hasSelectedInnerBlock', () => {
