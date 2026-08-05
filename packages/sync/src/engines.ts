@@ -11,6 +11,7 @@ import {
 	createYjsSessionCodec,
 	type YjsSessionOptions,
 } from './engines/yjs-relay';
+import { createIntentLogManager } from './engines/intent-log-manager';
 import { createSyncManager } from './manager';
 import type { SyncManager } from './types';
 
@@ -75,6 +76,18 @@ export interface AnnouncedSync {
 export const YJS_RELAY_ENGINE_SLUG = 'yjs-relay';
 
 /**
+ * Slug of the built-in intent-log engine. Must match
+ * WP_Intent_Log_Engine::SLUG on the PHP side.
+ */
+export const INTENT_LOG_ENGINE_SLUG = 'intent-log';
+
+/**
+ * Protocol version of the built-in intent-log engine. Must match
+ * WP_Intent_Log_Engine::PROTOCOL_VERSION on the PHP side.
+ */
+export const INTENT_LOG_ENGINE_PROTOCOL = 1;
+
+/**
  * Protocol version of the built-in Yjs relay engine. Must match
  * WP_Yjs_Relay_Engine::PROTOCOL_VERSION on the PHP side.
  */
@@ -100,6 +113,11 @@ function getDefaultEngineAdapters(): SyncEngineAdapter[] {
 			createManager: createSyncManager,
 			createSessionCodec: ( options?: unknown ) =>
 				createYjsSessionCodec( options as YjsSessionOptions ),
+		},
+		{
+			slug: INTENT_LOG_ENGINE_SLUG,
+			protocolVersion: INTENT_LOG_ENGINE_PROTOCOL,
+			createManager: createIntentLogManager,
 		},
 	];
 }

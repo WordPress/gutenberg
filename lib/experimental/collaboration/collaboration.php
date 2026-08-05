@@ -326,7 +326,10 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		'wp-core-data',
 		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
 		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';' .
-		'window._wpCollaborationSync = ' . wp_json_encode( $sync ) . ';',
+		'window._wpCollaborationSync = ' . wp_json_encode( $sync ) . ';' .
+		// Informational half of the intent-log actor id; the server stamps
+		// the authoritative value from the authenticated request.
+		'window._wpCollaborationUserId = ' . wp_json_encode( get_current_user_id() ) . ';',
 		'after'
 	);
 }

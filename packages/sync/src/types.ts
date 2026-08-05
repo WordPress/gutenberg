@@ -27,6 +27,7 @@ export type {
 declare global {
 	interface Window {
 		_wpCollaborationEnabled?: string;
+		_wpCollaborationUserId?: number;
 		_wpCollaborationSync?: {
 			engine?: string;
 			engineProtocol?: number;

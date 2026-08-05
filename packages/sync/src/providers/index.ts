@@ -80,3 +80,10 @@ export function getProviderCreators(): ProviderCreator[] {
 
 	return providerCreators;
 }
+
+/**
+ * Resets the provider creator cache. Test use only.
+ */
+export function resetProviderCreatorsForTesting(): void {
+	providerCreators = null;
+}
