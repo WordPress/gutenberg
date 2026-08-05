@@ -13,18 +13,10 @@ import { useSelect } from '@wordpress/data';
  */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
 
-/**
- * Initial template applied only when the block is first inserted (i.e. when
- * inner blocks are empty). templateLock is false, so this is never applied to
- * existing blocks that already have tab panels saved.
- */
-const TAB_PANELS_TEMPLATE = [ [ 'core/tab-panel' ], [ 'core/tab-panel' ] ];
-
 export default function Edit( { clientId } ) {
 	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TAB_PANELS_TEMPLATE,
 		templateLock: false,
 		renderAppender: false, // Appender handled by individual tab blocks
 	} );

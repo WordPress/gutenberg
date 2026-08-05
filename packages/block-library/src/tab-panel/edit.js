@@ -14,8 +14,6 @@ import { useEffect } from '@wordpress/element';
  */
 import Controls from './controls';
 
-const TEMPLATE = [ [ 'core/paragraph' ] ];
-
 export default function Edit( { clientId, isSelected } ) {
 	const {
 		activeTabIndex,
@@ -102,9 +100,7 @@ export default function Edit( { clientId, isSelected } ) {
 		tabIndex: isSelectedTab ? 0 : -1,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 
 	return (
 		<section { ...innerBlocksProps }>
