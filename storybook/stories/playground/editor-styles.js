@@ -1,3 +1,21 @@
+// Base styles for the content rendered within the BlockCanvas iframe.
+// Reason: Styles are contained in the BlockCanvas iframe.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import componentsStyles from '@wordpress/components/build-style/style.css?raw';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import blockEditorContentStyles from '@wordpress/block-editor/build-style/content.css?raw';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import blockLibraryEditorStyles from '@wordpress/block-library/build-style/editor.css?raw';
+
+export const blockLibraryContentStyles = [
+	{ css: componentsStyles },
+	{ css: blockEditorContentStyles },
+	{ css: blockLibraryStyles },
+	{ css: blockLibraryEditorStyles },
+];
+
 export const editorStyles = [
 	{
 		css: `
