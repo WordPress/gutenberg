@@ -7,9 +7,8 @@
  *
  * The generated file returns the schema as a PHP array with all local `$ref`
  * pointers dereferenced, the `definitions` map dropped, and `description`
- * annotations stripped: descriptions in the JSON Schema are documentation
- * prose (consumed by gen-view-config-reference.mjs), while the REST endpoint
- * attaches its own translatable descriptions in PHP.
+ * annotations wrapped in `__()` calls so they are picked up by the plugin's
+ * translation pipeline.
  *
  * Usage:
  *   node tools/docs/gen-view-config-schema-php.mjs          # (re)generate
@@ -83,33 +82,12 @@ function resolveRefs( node, root ) {
 }
 
 /**
- * Recursively removes `description` annotations from a schema.
- *
- * Only string values are removed: a schema *property* named `description`
- * (e.g. a form field description) maps to an object, so it is preserved.
- *
- * @param {*} node Schema node to strip.
- * @return {*} The stripped node.
- */
-function stripDescriptions( node ) {
-	if ( Array.isArray( node ) ) {
-		return node.map( stripDescriptions );
-	}
-	if ( ! node || typeof node !== 'object' ) {
-		return node;
-	}
-	return Object.fromEntries(
-		Object.entries( node )
-			.filter(
-				( [ key, value ] ) =>
-					key !== 'description' || typeof value !== 'string'
-			)
-			.map( ( [ key, value ] ) => [ key, stripDescriptions( value ) ] )
-	);
-}
-
-/**
  * Serializes a value as a PHP literal.
+ *
+ * `description` annotations are emitted as translatable strings, i.e.
+ * `__( '…', 'gutenberg' )`. Only string values qualify: a schema *property*
+ * named `description` (e.g. a form field description) maps to an object, so
+ * it is serialized as a regular array.
  *
  * @param {*}      value  Value to serialize.
  * @param {string} indent Current indentation.
@@ -142,10 +120,13 @@ function toPhp( value, indent = '' ) {
 		return 'array()';
 	}
 	const items = entries
-		.map(
-			( [ key, item ] ) =>
-				`${ inner }${ toPhp( key ) } => ${ toPhp( item, inner ) },\n`
-		)
+		.map( ( [ key, item ] ) => {
+			const serialized =
+				key === 'description' && typeof item === 'string'
+					? `__( ${ toPhp( item ) }, 'gutenberg' )`
+					: toPhp( item, inner );
+			return `${ inner }${ toPhp( key ) } => ${ serialized },\n`;
+		} )
 		.join( '' );
 	return `array(\n${ items }${ indent })`;
 }
@@ -161,7 +142,6 @@ export function generate() {
 	);
 	const dereferenced = resolveRefs( schema, schema );
 	delete dereferenced.definitions;
-	const stripped = stripDescriptions( dereferenced );
 
 	return `<?php
 /**
@@ -177,7 +157,7 @@ export function generate() {
 
 // phpcs:ignoreFile
 
-return ${ toPhp( stripped ) };
+return ${ toPhp( dereferenced ) };
 `;
 }
 

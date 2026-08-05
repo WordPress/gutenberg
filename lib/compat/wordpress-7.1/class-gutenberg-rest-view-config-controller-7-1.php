@@ -227,13 +227,11 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	/**
 	 * Retrieves the item's schema, conforming to JSON Schema.
 	 *
-	 * The structure of the schema is loaded from `view-config-schema.php`,
-	 * which is generated from the canonical JSON Schema at
-	 * `schemas/json/view-config.json` (see
-	 * `tools/docs/gen-view-config-schema-php.mjs`). The generated structure
-	 * carries no `description` annotations: the JSON Schema descriptions are
-	 * documentation prose, while the endpoint descriptions are attached here
-	 * so they go through the plugin's translation pipeline.
+	 * The schema is loaded from `view-config-schema.php`, which is generated
+	 * from the canonical JSON Schema at `schemas/json/view-config.json` (see
+	 * `tools/docs/gen-view-config-schema-php.mjs`). The generated file wraps
+	 * the JSON Schema descriptions in `__()` calls so they go through the
+	 * plugin's translation pipeline.
 	 *
 	 * @return array Item schema data.
 	 */
@@ -242,22 +240,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
-		$schema = require __DIR__ . '/view-config-schema.php';
-
-		$descriptions = array(
-			'kind'            => __( 'Entity kind.', 'gutenberg' ),
-			'name'            => __( 'Entity name.', 'gutenberg' ),
-			'version'         => __( 'The schema version of the configuration.', 'gutenberg' ),
-			'default_view'    => __( 'Default view configuration.', 'gutenberg' ),
-			'default_layouts' => __( 'Default layout configurations.', 'gutenberg' ),
-			'view_list'       => __( 'List of default views.', 'gutenberg' ),
-			'form'            => __( 'Default form configuration.', 'gutenberg' ),
-		);
-		foreach ( $descriptions as $property => $description ) {
-			$schema['properties'][ $property ]['description'] = $description;
-		}
-
-		$this->schema = $schema;
+		$this->schema = require __DIR__ . '/view-config-schema.php';
 
 		return $this->add_additional_fields_schema( $this->schema );
 	}
