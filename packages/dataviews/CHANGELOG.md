@@ -8,6 +8,7 @@
 
 ### Bug Fix
 
+-   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 - DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
 - Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
