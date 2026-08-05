@@ -10,13 +10,13 @@ import type { PullRequestEvent } from '@octokit/webhooks-types';
 /**
  * Internal dependencies
  */
-import { GitHubAPI } from './github-api';
+import { GitHubAPI } from './github-api.ts';
 import {
 	formatTestErrorMessage,
 	renderReportComment,
 	isReportComment,
-} from './markdown';
-import type { FlakyTestResult, ReportedFlakyTest } from './types';
+} from './markdown.ts';
+import type { FlakyTestResult, ReportedFlakyTest } from './types.ts';
 
 async function run() {
 	// Flaky tests are only reported on pull requests. The workflow already

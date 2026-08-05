@@ -532,7 +532,7 @@ Every core block is required to have at least one set of fixture files for its m
 
 ### Flaky tests
 
-A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect them and report them automatically via the [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action, which comments the detected tests and their errors on the pull request. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported, and that flaky tests are only reported on pull requests.
+A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect them, and report them, together with their errors, as a single comment on the pull request via the [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported, and that flaky tests are only reported on pull requests.
 
 ## PHP testing
 

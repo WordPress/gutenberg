@@ -7,8 +7,8 @@ import { formatResultsErrors } from 'jest-message-util';
 /**
  * Internal dependencies
  */
-import { stripAnsi } from './strip-ansi';
-import type { FlakyTestResult, ReportedFlakyTest } from './types';
+import { stripAnsi } from './strip-ansi.ts';
+import type { FlakyTestResult, ReportedFlakyTest } from './types.ts';
 
 function formatTestErrorMessage( flakyTestResult: FlakyTestResult ) {
 	switch ( flakyTestResult.runner ) {
