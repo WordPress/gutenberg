@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import {
+	memo,
+	RawHTML,
+	useContext,
+	useDeferredValue,
+	useMemo,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -111,6 +117,9 @@ function BlockListBlock( {
 		...context
 	} = useContext( PrivateBlockContext );
 
+	// Let the selection paint before the inspector and toolbar fills mount.
+	const deferredMayDisplayControls = useDeferredValue( mayDisplayControls );
+
 	const parentLayout = useLayout() || {};
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
@@ -134,7 +143,7 @@ function BlockListBlock( {
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
-			mayDisplayControls={ mayDisplayControls }
+			mayDisplayControls={ deferredMayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
 			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
