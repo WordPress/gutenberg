@@ -83,8 +83,8 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
-		"colorjs.io": "^0.7.0",
-		"memize": "^2.1.0"
+		"colorjs.io": "^0.7.1",
+		"memize": "^2.1.1"
 	},
 	"devDependencies": {
 		"@storybook/react-vite": "^10.4.3",
@@ -95,7 +95,7 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
-		"@types/jest": "^29.5.14",
+		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",

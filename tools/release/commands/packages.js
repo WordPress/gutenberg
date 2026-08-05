@@ -695,11 +695,16 @@ async function runNpmPublishPreflight(
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
-	log( '>> Checking npm package access.' );
-	await commandFn( 'npm access list packages @wordpress --json', {
+	/*
+	 * `npm whoami` fails for every credential problem that happens in practice:
+	 * a missing, expired, or revoked auth token, or an unreachable registry.
+	 */
+	log( '>> Checking npm authentication.' );
+	const { stdout: whoamiOutput } = await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'pipe',
 	} );
+	log( `>> Authenticated as "${ whoamiOutput.trim() }".` );
 
 	log( '>> Verifying target package versions and dist-tags.' );
 	const publishedPackageNames = [];

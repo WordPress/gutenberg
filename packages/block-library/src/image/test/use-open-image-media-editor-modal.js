@@ -80,6 +80,7 @@ async function runModalUpdate( {
 	attributes,
 	registryOptions = {},
 	updatePayload = { id: attributes.id, url: 'updated.jpg' },
+	hookOptions = {},
 } ) {
 	const registry = createRegistry( registryOptions );
 	useRegistry.mockReturnValue( registry );
@@ -87,7 +88,11 @@ async function runModalUpdate( {
 	const openMediaEditorModal = jest.fn();
 	mockMediaEditorModalSetting( openMediaEditorModal );
 	const { result } = renderHook( () =>
-		useOpenImageMediaEditorModal( { attributes, setAttributes } )
+		useOpenImageMediaEditorModal( {
+			attributes,
+			setAttributes,
+			...hookOptions,
+		} )
 	);
 	await act( async () => {
 		await result.current();
@@ -103,6 +108,37 @@ async function runModalUpdate( {
 describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+	} );
+
+	it( 'notifies onUrlChange when the update switches to a new attachment URL', async () => {
+		const onUrlChange = jest.fn();
+		await runModalUpdate( {
+			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
+			updatePayload: { id: 2, url: 'updated.jpg' },
+			hookOptions: { onUrlChange },
+		} );
+		expect( onUrlChange ).toHaveBeenCalledTimes( 1 );
+		expect( onUrlChange ).toHaveBeenCalledWith( 'updated.jpg' );
+	} );
+
+	it( 'does not notify onUrlChange for a same-attachment update', async () => {
+		const onUrlChange = jest.fn();
+		await runModalUpdate( {
+			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
+			updatePayload: { id: 1, url: 'original.jpg' },
+			hookOptions: { onUrlChange },
+		} );
+		expect( onUrlChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not notify onUrlChange when the update carries no URL', async () => {
+		const onUrlChange = jest.fn();
+		await runModalUpdate( {
+			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
+			updatePayload: { id: 2 },
+			hookOptions: { onUrlChange },
+		} );
+		expect( onUrlChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'returns no opener when the media editor modal setting is unavailable', () => {

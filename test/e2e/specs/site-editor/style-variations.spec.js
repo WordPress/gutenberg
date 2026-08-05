@@ -77,9 +77,9 @@ test.describe( 'Global styles variations', () => {
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
-		await page.click( 'role=button[name="pink"i]' );
-		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Background styles"i]' );
+		await page.getByRole( 'button', { name: 'pink' } ).click();
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 
 		await expect(
 			page.locator(
@@ -87,9 +87,9 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
-		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Typography"i]' );
-		await page.click( 'role=button[name="Text"i]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Typography' } ).click();
+		await page.getByRole( 'button', { name: 'Text', exact: true } ).click();
 
 		await expect(
 			page.locator(
@@ -113,9 +113,9 @@ test.describe( 'Global styles variations', () => {
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
-		await page.click( 'role=button[name="yellow"i]' );
-		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Background styles"i]' );
+		await page.getByRole( 'button', { name: 'yellow' } ).click();
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 
 		await expect(
 			page.locator(
@@ -123,9 +123,9 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
-		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Typography"i]' );
-		await page.click( 'role=button[name="Text"i]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Typography' } ).click();
+		await page.getByRole( 'button', { name: 'Text', exact: true } ).click();
 
 		await expect(
 			page.locator(
@@ -149,10 +149,10 @@ test.describe( 'Global styles variations', () => {
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
-		await page.click( 'role=button[name="pink"i]' );
-		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors"i]' );
-		await page.click( 'role=button[name="Edit palette"i]' );
+		await page.getByRole( 'button', { name: 'pink' } ).click();
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Colors' } ).click();
+		await page.getByRole( 'button', { name: 'Edit palette' } ).click();
 
 		await expect(
 			page.locator( 'role=option[name="Foreground"i]' )
@@ -179,7 +179,7 @@ test.describe( 'Global styles variations', () => {
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
-		await page.click( 'role=button[name="yellow"i]' );
+		await page.getByRole( 'button', { name: 'yellow' } ).click();
 
 		const paragraph = editor.canvas.locator(
 			'text="My awesome paragraph"'
@@ -200,7 +200,9 @@ class SiteEditorStyleVariations {
 	}
 
 	async browseStyles() {
-		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Browse styles"i]' );
+		await this.page.getByRole( 'button', { name: 'Styles' } ).click();
+		await this.page
+			.getByRole( 'button', { name: 'Browse styles' } )
+			.click();
 	}
 }

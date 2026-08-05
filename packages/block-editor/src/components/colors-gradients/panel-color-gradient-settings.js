@@ -65,6 +65,7 @@ export const PanelColorGradientSettingsInner = ( {
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
+			hasInnerWrapper
 			label={ showTitle ? title : undefined }
 			resetAll={ () => {
 				batch( () => {
@@ -88,23 +89,26 @@ export const PanelColorGradientSettingsInner = ( {
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 		>
-			<ColorGradientSettingsDropdown
-				settings={ settings }
-				panelId={ panelId }
-				{ ...{
-					colors,
-					gradients,
-					disableCustomColors,
-					disableCustomGradients,
-					__experimentalIsRenderedInSidebar,
-					enableAlpha,
-				} }
-			/>
-			{ !! children && (
-				<>
-					<Spacer marginY={ 4 } /> { children }
-				</>
-			) }
+			<div className="block-editor-panel-color-gradient-settings__inner-wrapper">
+				<ColorGradientSettingsDropdown
+					settings={ settings }
+					panelId={ panelId }
+					{ ...{
+						colors,
+						gradients,
+						disableCustomColors,
+						disableCustomGradients,
+						__experimentalIsRenderedInSidebar,
+						enableAlpha,
+					} }
+				/>
+				{ !! children && (
+					<>
+						<Spacer marginTop={ 4 } marginBottom={ 0 } />
+						{ children }
+					</>
+				) }
+			</div>
 		</ToolsPanel>
 	);
 };

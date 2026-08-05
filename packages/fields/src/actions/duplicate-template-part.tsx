@@ -5,7 +5,6 @@ import { useDispatch } from '@wordpress/data';
 import { _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
-// @ts-ignore
 import { parse } from '@wordpress/blocks';
 import type { Action } from '@wordpress/dataviews';
 

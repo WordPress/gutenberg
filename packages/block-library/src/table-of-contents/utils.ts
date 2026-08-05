@@ -1,3 +1,10 @@
+/**
+ * WordPress dependencies
+ */
+import { createBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
+import { escapeAttribute, escapeEditableHTML } from '@wordpress/escape-html';
+
 export interface HeadingData {
 	/** The plain text content of the heading. */
 	content: string;
@@ -68,4 +75,43 @@ export function linearToNestedHeadingList(
 	} );
 
 	return nestedHeadingList;
+}
+
+/**
+ * Converts a nested heading list into `core/list-item` blocks, with
+ * sub-headings nested in a `core/list` block inside their parent item.
+ *
+ * @param nestedHeadingList The nested list of headings.
+ * @param ordered           Whether nested lists are ordered.
+ *
+ * @return The list item blocks.
+ */
+export function createListItemBlocks(
+	nestedHeadingList: NestedHeadingData[],
+	ordered: boolean
+): Block[] {
+	return nestedHeadingList.map(
+		( { heading: { content, link }, children } ) =>
+			createBlock(
+				'core/list-item',
+				{
+					// Headings are plain text, and links can carry query args on
+					// paginated posts, so both need escaping to become markup.
+					content: link
+						? `<a href="${ escapeAttribute(
+								link
+						  ) }">${ escapeEditableHTML( content ) }</a>`
+						: escapeEditableHTML( content ),
+				},
+				children?.length
+					? [
+							createBlock(
+								'core/list',
+								{ ordered },
+								createListItemBlocks( children, ordered )
+							),
+					  ]
+					: []
+			)
+	);
 }

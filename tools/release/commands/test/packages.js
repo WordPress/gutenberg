@@ -344,10 +344,13 @@ describe( 'verifyRemotePackageTags', () => {
 } );
 
 describe( 'runNpmPublishPreflight', () => {
-	it( 'uses the npm access command supported by current npm versions', async () => {
+	// npm whoami output, intentionally padded to verify it is trimmed.
+	const WHOAMI = { stdout: 'wp-user\n' };
+
+	it( 'verifies npm authentication before checking registry state', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockRejectedValueOnce( {
 				stderr: 'npm ERR! code E404',
 			} );
@@ -366,11 +369,10 @@ describe( 'runNpmPublishPreflight', () => {
 			)
 		).resolves.toEqual( [] );
 
-		expect( commandFn ).toHaveBeenNthCalledWith(
-			1,
-			'npm access list packages @wordpress --json',
-			{ cwd: '/repo', stdio: 'pipe' }
-		);
+		expect( commandFn ).toHaveBeenNthCalledWith( 1, 'npm whoami', {
+			cwd: '/repo',
+			stdio: 'pipe',
+		} );
 		expect( commandFn ).toHaveBeenNthCalledWith(
 			2,
 			'npm view @wordpress/a11y@4.50.0 version gitHead dist-tags --json',
@@ -379,10 +381,34 @@ describe( 'runNpmPublishPreflight', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'fails without checking registry state when npm authentication fails', async () => {
+		const commandFn = jest.fn().mockRejectedValueOnce(
+			Object.assign( new Error( 'Command failed: npm whoami' ), {
+				stderr: 'npm ERR! code ENEEDAUTH',
+			} )
+		);
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow( 'Command failed: npm whoami' );
+		expect( commandFn ).toHaveBeenCalledTimes( 1 );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'accepts a published version from the prepared commit with the expected dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -407,7 +433,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when a published version came from another commit', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -433,7 +459,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails with an actionable error when a published version has no gitHead', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -459,7 +485,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when a published version has the wrong dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );
@@ -485,7 +511,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when the registry returns a different version', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );

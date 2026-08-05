@@ -29,7 +29,7 @@ export async function selectBlocks(
 	if ( endClientId ) {
 		await this.page.evaluate(
 			( [ startId, endId ] ) => {
-				// @ts-ignore
+				// @ts-expect-error `wp` is a browser global that only exists inside `page.evaluate`.
 				wp.data
 					.dispatch( 'core/block-editor' )
 					.multiSelect( startId, endId );
@@ -39,7 +39,7 @@ export async function selectBlocks(
 	} else {
 		await this.page.evaluate(
 			( [ clientId ] ) => {
-				// @ts-ignore
+				// @ts-expect-error `wp` is a browser global that only exists inside `page.evaluate`.
 				wp.data.dispatch( 'core/block-editor' ).selectBlock( clientId );
 			},
 			[ startClientId ]
