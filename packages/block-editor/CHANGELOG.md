@@ -11,6 +11,8 @@
 
 ### Performance
 
+-   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on every call. The old form was quadratic in the number of selected blocks, since `BlockListBlock` calls it once per rendered block.
+
 -   `BlockListBlock`: Skip the `hasSelectedInnerBlock` deep check behind `isSelectionWithinCurrentSection` when the block is not within a section block. The check was passed an `undefined` client ID, which can never match, but still walked the parents of every selected block. On a post with 1000 top-level blocks, selecting all of them with Cmd+A spent about 6.6 seconds in this call alone.
 
 -   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).
