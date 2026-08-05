@@ -311,6 +311,7 @@ const scriptConfig = {
 				proxy: [
 					{
 						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},

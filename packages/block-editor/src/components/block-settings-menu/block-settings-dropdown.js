@@ -70,7 +70,7 @@ function CopyMenuItem( {
 }
 
 export function BlockSettingsDropdown( {
-	block,
+	clientId,
 	clientIds,
 	children,
 	__experimentalSelectBlock,

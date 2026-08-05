@@ -1396,6 +1396,150 @@ describe( 'useFormValidity', () => {
 		} );
 	} );
 
+	describe( 'isValid.min (time)', () => {
+		const MIN_MESSAGE = {
+			min: {
+				type: 'invalid',
+				message: 'Value is below the minimum.',
+			},
+		};
+
+		it( 'time is valid when value is at min', () => {
+			const item = { id: 1, opensAt: '09:00' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: '09:00',
+					},
+				},
+			];
+			const form = { fields: [ 'opensAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'time is invalid when value is before min', () => {
+			const item = { id: 1, opensAt: '08:59' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: '09:00',
+					},
+				},
+			];
+			const form = { fields: [ 'opensAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.opensAt ).toEqual( MIN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'time is compared regardless of seconds precision', () => {
+			const item = { id: 1, opensAt: '09:00:00' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: '09:00',
+					},
+				},
+			];
+			const form = { fields: [ 'opensAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'time is valid when value is empty and min is defined', () => {
+			const item = { id: 1, opensAt: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: '09:00',
+					},
+				},
+			];
+			const form = { fields: [ 'opensAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'isValid.max (time)', () => {
+		const MAX_MESSAGE = {
+			max: {
+				type: 'invalid',
+				message: 'Value is above the maximum.',
+			},
+		};
+
+		it( 'time is valid when value is at max', () => {
+			const item = { id: 1, closesAt: '17:00' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'closesAt',
+					type: 'time',
+					isValid: {
+						max: '17:00',
+					},
+				},
+			];
+			const form = { fields: [ 'closesAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'time is invalid when value is after max', () => {
+			const item = { id: 1, closesAt: '17:01' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'closesAt',
+					type: 'time',
+					isValid: {
+						max: '17:00',
+					},
+				},
+			];
+			const form = { fields: [ 'closesAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.closesAt ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
 	describe( 'isValid combined min and max (date)', () => {
 		it( 'date is valid when value is within range', () => {
 			const item = { id: 1, eventDate: '2026-04-10' };

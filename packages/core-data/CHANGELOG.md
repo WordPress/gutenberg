@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+
 ### Bug Fixes
 
 -   Ensure revision resolvers finish after fetched revisions are stored.
