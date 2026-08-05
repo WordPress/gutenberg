@@ -352,7 +352,11 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Block: Paragraph/i,
 			} );
 
-			const samples = 10;
+			// Fewer samples than the other metrics take. The comparison runs
+			// this spec against builds that predate the selection fix, where a
+			// single iteration costs seconds, and ten of them exceed the test
+			// timeout.
+			const samples = 3;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
