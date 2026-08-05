@@ -35,8 +35,8 @@
 </div>
 
 <!-- The spacer pushes the islands below. The default viewport is 720px high and
-     the observer rootMargin is 100%, so an island needs to be more than
-     ~1440px down to stay unobserved on load. -->
+	the observer rootMargin is 100%, so an island needs to be more than
+	~1440px down to stay unobserved on load. -->
 <div style="height: 2500px" aria-hidden="true"></div>
 
 <div data-wp-interactive="router-lazy-hydration" data-testid="below-island">
