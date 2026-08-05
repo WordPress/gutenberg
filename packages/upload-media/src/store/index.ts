@@ -41,7 +41,5 @@ export const store = createReduxStore( STORE_NAME, {
 if ( ! select( store ) ) {
 	register( store );
 }
-// @ts-ignore
 unlock( store ).registerPrivateActions( privateActions );
-// @ts-ignore
 unlock( store ).registerPrivateSelectors( privateSelectors );

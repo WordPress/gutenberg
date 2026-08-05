@@ -89,7 +89,7 @@ export function PropertiesSection( {
 
 	const visibleLockedFields = lockedFields.filter(
 		( { isVisibleFlag } ) =>
-			// @ts-expect-error
+			// @ts-expect-error A string key cannot index `View`.
 			view[ isVisibleFlag ] ?? true
 	);
 
@@ -112,7 +112,7 @@ export function PropertiesSection( {
 			>
 				<ItemGroup isBordered isSeparated size="medium">
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
-						// @ts-expect-error
+						// @ts-expect-error A string key cannot index `View`.
 						const isVisible = view[ isVisibleFlag ] ?? true;
 						const fieldToRender =
 							isSingleVisibleLockedField && isVisible

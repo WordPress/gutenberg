@@ -105,7 +105,7 @@ function Icon( {
 
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
-			// @ts-ignore Just forwarding the size prop along
+			// @ts-expect-error `size` is forwarded but is not in the icon component overloads.
 			size,
 			width: size,
 			height: size,
