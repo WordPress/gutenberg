@@ -89,8 +89,7 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout,
-		renderAppender === undefined
+		layout
 	);
 
 	useInnerBlockTemplateSync(

@@ -26,7 +26,6 @@ import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockAddChild from './block-add-child';
 import { BlockLockToolbar } from '../block-lock';
 import { ViewportVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
@@ -311,11 +310,6 @@ export function PrivateBlockToolbar( {
 								</>
 							) }
 						</>
-					) }
-				{ ! isMultiToolbar &&
-					! areSelectedBlocksHiddenOnViewport &&
-					shouldShowVisualToolbar && (
-						<BlockAddChild clientId={ blockClientId } />
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
