@@ -3,6 +3,7 @@
  */
 import {
 	createBlock,
+	getPossibleBlockTransformations,
 	registerBlockType,
 	switchToBlockType,
 	unregisterBlockType,
@@ -152,6 +153,12 @@ describe( 'Playlist transforms', () => {
 			]
 		);
 
+		expect( getPossibleBlockTransformations( [ playlist ] ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { name: 'core/audio' } ),
+			] )
+		);
+
 		const [ audio ] = switchToBlockType( playlist, 'core/audio' );
 
 		expect( audio ).toMatchObject( {
@@ -170,7 +177,7 @@ describe( 'Playlist transforms', () => {
 		);
 	} );
 
-	it( 'does not convert a Playlist with multiple tracks into Audio', () => {
+	it( 'does not offer Playlist to Audio for multiple tracks', () => {
 		const playlist = createBlock( 'core/playlist', {}, [
 			createBlock( 'core/playlist-track', {
 				src: 'https://example.com/first-track.mp3',
@@ -180,6 +187,10 @@ describe( 'Playlist transforms', () => {
 			} ),
 		] );
 
-		expect( switchToBlockType( playlist, 'core/audio' ) ).toBeNull();
+		expect( getPossibleBlockTransformations( [ playlist ] ) ).not.toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { name: 'core/audio' } ),
+			] )
+		);
 	} );
 } );
