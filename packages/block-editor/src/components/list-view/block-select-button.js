@@ -6,11 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -22,8 +18,7 @@ import {
 	unseen,
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
-
-import { Tooltip } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -34,8 +29,6 @@ import ListViewExpander from './expander';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -148,20 +141,20 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon icon={ icon } showColors context="list-view" />
-			<HStack
-				alignment="center"
+			<Stack
+				align="center"
 				className="block-editor-list-view-block-select-button__label-wrapper"
 				justify="flex-start"
-				spacing={ 1 }
+				gap="xs"
 			>
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
 				{ !! anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<WCBadge className="block-editor-list-view-block-select-button__anchor">
+						<span className="block-editor-list-view-block-select-button__anchor">
 							{ anchor }
-						</WCBadge>
+						</span>
 					</span>
 				) }
 				{ isSticky && (
@@ -212,7 +205,7 @@ function ListViewBlockSelectButton(
 						<Icon icon={ lock } />
 					</span>
 				) }
-			</HStack>
+			</Stack>
 		</a>
 	);
 }
