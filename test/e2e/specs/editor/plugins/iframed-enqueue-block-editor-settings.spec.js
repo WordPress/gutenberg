@@ -21,8 +21,8 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
-			name: 'Add default block',
+		const defaultBlock = editor.canvas.getByRole( 'document', {
+			name: /Empty block/i,
 		} );
 
 		// Expect a red border (added in PHP).
@@ -55,8 +55,8 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
-			name: 'Add default block',
+		const defaultBlock = editor.canvas.getByRole( 'document', {
+			name: /Empty block/i,
 		} );
 
 		await page.evaluate( () => {

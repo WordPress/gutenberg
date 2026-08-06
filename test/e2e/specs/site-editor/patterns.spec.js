@@ -69,7 +69,7 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( 'My pattern' );
 

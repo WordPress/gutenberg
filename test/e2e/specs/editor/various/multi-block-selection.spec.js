@@ -82,7 +82,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+Enter' );
@@ -109,7 +109,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
@@ -132,7 +132,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+ArrowUp' );
@@ -244,7 +244,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -290,7 +290,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -588,7 +588,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -655,7 +655,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( '123' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -772,8 +772,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', {
-				name: 'Add default block',
+			.getByRole( 'document', {
+				name: /Empty block/i,
 			} )
 			.click();
 		await page.keyboard.type( '1' );
@@ -864,7 +864,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1' );
 
@@ -1266,7 +1266,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
@@ -1295,7 +1295,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );

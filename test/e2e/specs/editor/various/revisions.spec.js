@@ -21,7 +21,7 @@ test.describe( 'Post revisions', () => {
 			.fill( 'Revisions Test' );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( 'Original content' );
 
@@ -407,7 +407,7 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Revisions with meta box' );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 		await page.keyboard.type( 'Original content' );
 		await editor.saveDraft();

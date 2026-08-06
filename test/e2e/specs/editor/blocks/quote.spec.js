@@ -68,8 +68,8 @@ test.describe( 'Quote', () => {
 		// arrowing up from the citation onto the appender inserts a fresh
 		// paragraph inside the quote.
 		await expect(
-			editor.canvas.getByRole( 'button', {
-				name: 'Add default block',
+			editor.canvas.getByRole( 'document', {
+				name: /Empty block/i,
 			} )
 		).toBeVisible();
 		await page.keyboard.press( 'ArrowUp' );
@@ -97,7 +97,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		// Create a block with some text that will trigger a paragraph creation.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( '> A quote' );
 		// Create a second paragraph.
@@ -122,7 +122,7 @@ test.describe( 'Quote', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 'test'.length } );
@@ -139,7 +139,7 @@ test.describe( 'Quote', () => {
 	test( 'can be created by typing "/quote"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( '/quote' );
 		await expect(
@@ -161,7 +161,7 @@ test.describe( 'Quote', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
@@ -179,7 +179,7 @@ test.describe( 'Quote', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );

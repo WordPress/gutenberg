@@ -38,7 +38,7 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name*="Empty block"i]' )
 			.click();
 		await page.keyboard.type( '/group' );
 		await expect(
