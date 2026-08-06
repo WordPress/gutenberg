@@ -811,17 +811,22 @@ export function rebaseIntent( intent, priors, docAtBase, startSeq = null ) {
  * Creates a server: the single ordering and trust authority.
  *
  * @param {Object} initialDoc Genesis document (server-owned).
+ * @param {number} [firstSeq] Engine seq of the initial document (> 0 when
+ *                            reconstructed from a compaction checkpoint).
  * @return {Object} Server state.
  */
-export function createServer( initialDoc ) {
+export function createServer( initialDoc, firstSeq = 0 ) {
 	return {
 		initialDoc,
+		// Engine seq of log[0]; > 0 when initialized from a compaction
+		// checkpoint rather than genesis.
+		firstSeq,
 		log: [],
 		proposals: [],
 		dispositions: new Map(),
 		// seq → document snapshot. Append-only log makes entries permanently
 		// valid; callers must treat returned documents as read-only.
-		docCache: new Map( [ [ 0, initialDoc ] ] ),
+		docCache: new Map( [ [ firstSeq, initialDoc ] ] ),
 	};
 }
 
@@ -839,7 +844,11 @@ export function serverDocAt( server, seq ) {
 	if ( cached ) {
 		return cached;
 	}
-	let nearest = 0;
+	// The log array holds entries [firstSeq ..); replicas initialized from a
+	// checkpoint (server compaction) have firstSeq > 0. Absolute seqs are
+	// the public coordinate; array indices are translated here only.
+	const firstSeq = server.firstSeq ?? 0;
+	let nearest = firstSeq;
 	for ( const key of server.docCache.keys() ) {
 		if ( key <= seq && key > nearest ) {
 			nearest = key;
@@ -847,7 +856,7 @@ export function serverDocAt( server, seq ) {
 	}
 	const doc = replay(
 		server.docCache.get( nearest ),
-		server.log.slice( nearest, seq )
+		server.log.slice( nearest - firstSeq, seq - firstSeq )
 	);
 	server.docCache.set( seq, doc );
 	return doc;
@@ -894,27 +903,32 @@ export function groupUnits( intents ) {
  * (lowest-trigger) escalation; surviving intents apply in order to the head
  * document.
  *
- * @param {Object[][]} units Batch grouped into units (groupUnits), in
- *                           authoring order.
- * @param {Object[]}   log   Accepted log (the batch's intents NOT included).
- * @param {Function}   docAt ( seq ) → document at that log position
- *                           (read-only).
+ * @param {Object[][]} units      Batch grouped into units (groupUnits), in
+ *                                authoring order.
+ * @param {Object[]}   log        Accepted log (the batch's intents NOT
+ *                                included).
+ * @param {Function}   docAt      ( seq ) → document at that log position
+ *                                (read-only).
+ * @param {number}     [firstSeq] Engine seq of log[0]; callers guarantee
+ *                                every intent's baseSeq >= firstSeq.
  * @return {Object} { rows, headDoc }. Each row:
  *                  { intent, disposition, accepted, proposal } — `accepted`
  *                  is the transformed intent to append (null if not
  *                  accepted), `proposal` the proposal-lane record (null if
  *                  not escalated).
  */
-export function planBatch( units, log, docAt ) {
+export function planBatch( units, log, docAt, firstSeq = 0 ) {
 	// Frame state spans the whole batch: one client's sequential authoring.
 	const frame = createFrameState();
 	const rows = [];
-	let headDoc = docAt( log.length );
+	let headDoc = docAt( firstSeq + log.length );
 	for ( const unit of units ) {
 		const rebased = [];
 		for ( let j = 0; j < unit.length; j++ ) {
 			const intent = unit[ j ];
-			const slice = log.slice( intent.baseSeq );
+			// Callers guarantee baseSeq >= firstSeq (the server rejects or
+			// stale-voids intents older than its retention horizon).
+			const slice = log.slice( intent.baseSeq - firstSeq );
 			const firstRemoteSeq = ( key ) => {
 				const index = slice.findIndex(
 					( entry ) =>
@@ -1047,8 +1061,11 @@ export function serverIngestBatch( server, intents ) {
 			} )
 		)
 		.filter( ( unit ) => unit.length > 0 );
-	const { rows, headDoc } = planBatch( units, server.log, ( seq ) =>
-		serverDocAt( server, seq )
+	const { rows, headDoc } = planBatch(
+		units,
+		server.log,
+		( seq ) => serverDocAt( server, seq ),
+		server.firstSeq ?? 0
 	);
 	for ( const row of rows ) {
 		server.dispositions.set( row.intent.intentId, row.disposition );
@@ -1059,7 +1076,10 @@ export function serverIngestBatch( server, intents ) {
 			server.log.push( row.accepted );
 		}
 	}
-	server.docCache.set( server.log.length, headDoc );
+	server.docCache.set(
+		( server.firstSeq ?? 0 ) + server.log.length,
+		headDoc
+	);
 	return intents.map( ( intent ) =>
 		server.dispositions.get( intent.intentId )
 	);

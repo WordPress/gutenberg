@@ -161,6 +161,15 @@ export interface IntentLogSession extends EngineSessionCodec {
 
 	/** Subscribes to arriving proposals (escalations, any author). */
 	onProposal: ( listener: ( proposal: IntentLogProposal ) => void ) => void;
+
+	/**
+	 * Subscribes to horizon resets: the server compacted history this
+	 * replica never observed and re-bootstrapped it from a checkpoint.
+	 * Pending unacked intents are dropped (their offsets reference trimmed
+	 * history); the bridge re-derives them from the editor tree on the next
+	 * capture.
+	 */
+	onReset: ( listener: () => void ) => void;
 }
 
 /**
@@ -188,6 +197,7 @@ export function createIntentLogSession(
 	const proposalListeners = new Set<
 		( proposal: IntentLogProposal ) => void
 	>();
+	const resetListeners = new Set< () => void >();
 
 	const notifyChange = () => {
 		changeListeners.forEach( ( listener ) => listener() );
@@ -229,15 +239,38 @@ export function createIntentLogSession(
 			const decoded = JSON.parse( update.data );
 			switch ( update.type ) {
 				case INTENT_LOG_UPDATE_TYPES.SNAPSHOT: {
-					// First snapshot wins; concurrent-initializer
-					// duplicates are ignored (mirrors the server).
+					const snapshotSeq = ( decoded.seq as number ) ?? 0;
 					if ( ! replica ) {
+						// First snapshot wins; genesis carries seq 0 and a
+						// compaction checkpoint carries its engine seq.
 						replica = createClient(
 							actorId,
-							decoded.doc as EngineDocument
+							decoded.doc as EngineDocument,
+							snapshotSeq
 						);
 						notifyChange();
+						return;
 					}
+					if ( snapshotSeq > replica.cursor ) {
+						/*
+						 * Horizon reset: the server trimmed history between
+						 * our cursor and this checkpoint — one-sided
+						 * transforms over the gap are impossible, so the
+						 * replica re-bootstraps. Pending intents are
+						 * dropped; the manager re-captures the editor tree
+						 * against the reset document, re-deriving any
+						 * unacked local work.
+						 */
+						replica = createClient(
+							actorId,
+							decoded.doc as EngineDocument,
+							snapshotSeq
+						);
+						resetListeners.forEach( ( listener ) => listener() );
+						notifyChange();
+					}
+					// Stale/duplicate snapshots (seq <= cursor) are ignored
+					// (mirrors the server's first-snapshot-wins genesis).
 					return;
 				}
 				case INTENT_LOG_UPDATE_TYPES.INTENT: {
@@ -342,6 +375,7 @@ export function createIntentLogSession(
 			changeListeners.clear();
 			dispositionListeners.clear();
 			proposalListeners.clear();
+			resetListeners.clear();
 		},
 
 		// ---- Bridge/dev surface ----
@@ -387,6 +421,9 @@ export function createIntentLogSession(
 		},
 		onProposal: ( listener ) => {
 			proposalListeners.add( listener );
+		},
+		onReset: ( listener ) => {
+			resetListeners.add( listener );
 		},
 	};
 }

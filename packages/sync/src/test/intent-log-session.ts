@@ -163,6 +163,56 @@ describe( 'intent-log session codec', () => {
 		expect( canonicalJson( session.getDocument()! ) ).toBe( before );
 	} );
 
+	it( 'a checkpoint snapshot past the cursor RESETS the replica (horizon reset), dropping pending intents', () => {
+		const session = makeSession( 1, 11 );
+		session.receiveUpdate( {
+			data: JSON.stringify( { doc: createDocument( GENESIS_BLOCKS ) } ),
+			type: INTENT_LOG_UPDATE_TYPES.SNAPSHOT,
+		} );
+		let resets = 0;
+		session.onReset( () => resets++ );
+
+		// Pending local work exists when the reset arrives.
+		session.author( 'insert_text', {
+			syncId: 'p1',
+			offset: 0,
+			text: 'pending',
+		} );
+		expect( session.getPendingCount() ).toBe( 1 );
+
+		const checkpointDoc = createDocument( [
+			{
+				syncId: 'p9',
+				blockType: 'core/paragraph',
+				text: 'After compaction',
+			},
+		] );
+		session.receiveUpdate( {
+			data: JSON.stringify( { doc: checkpointDoc, seq: 40 } ),
+			type: INTENT_LOG_UPDATE_TYPES.SNAPSHOT,
+		} );
+
+		expect( resets ).toBe( 1 );
+		expect( session.getSeq() ).toBe( 40 );
+		expect( session.getPendingCount() ).toBe( 0 );
+		expect( canonicalJson( session.getDocument()! ) ).toBe(
+			canonicalJson( checkpointDoc )
+		);
+
+		// A STALE snapshot (seq at/below cursor) never resets.
+		session.receiveUpdate( {
+			data: JSON.stringify( {
+				doc: createDocument( GENESIS_BLOCKS ),
+				seq: 40,
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.SNAPSHOT,
+		} );
+		expect( resets ).toBe( 1 );
+		expect( canonicalJson( session.getDocument()! ) ).toBe(
+			canonicalJson( checkpointDoc )
+		);
+	} );
+
 	it( 'authors optimistically and emits wire updates with byte sizes', () => {
 		const wire = makeWireServer();
 		const session = makeSession( 1, 11 );

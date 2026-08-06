@@ -12,8 +12,11 @@ import type {
 
 export function createClient(
 	actorId: string,
-	initialDoc: EngineDocument
+	initialDoc: EngineDocument,
+	firstSeq?: number
 ): ClientReplica;
+
+export function trimClientLog( client: ClientReplica ): void;
 
 export function authorIntent(
 	client: ClientReplica,

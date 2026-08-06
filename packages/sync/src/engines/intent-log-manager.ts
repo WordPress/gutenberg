@@ -384,6 +384,22 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			);
 		} );
 
+		session.onReset( () => {
+			/*
+			 * Horizon reset: the replica re-bootstrapped from a server
+			 * checkpoint and pending intents were dropped. Clear the echo
+			 * suppression state so the reset document pushes to the editor,
+			 * and clear staleness bookkeeping derived from the old replica.
+			 * The editor tree still holds any un-acked local work; the next
+			 * capture diffs it against the reset document and re-authors.
+			 */
+			state.lastPushedState = null;
+			state.lastPushedProps = {};
+			state.docTombstones.clear();
+			state.prevDocIds = new Set();
+			log( 'session reset from server checkpoint', { key } );
+		} );
+
 		session.onProposal( ( proposal ) => {
 			if ( handlers.onEscalation ) {
 				handlers.onEscalation( {

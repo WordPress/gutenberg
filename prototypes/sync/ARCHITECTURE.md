@@ -446,16 +446,47 @@ inside intent payloads, not the transport.
     collaboration` and were invisible to group-filtered runs — the
     group now runs 210 tests, up from 176.
 
+  **2d-xv (compaction & growth bounds — review 1.6) DONE.** The
+  engine's history is bounded on both sides:
+  - The server appends a compaction CHECKPOINT snapshot row
+    ({doc, seq, checkpoint: true}) once the retained window crosses
+    the interval (filter `wp_sync_intent_log_checkpoint_interval`,
+    default 100 intent rows), records it in per-room storage meta,
+    and TRIMS all rows behind the PREVIOUS checkpoint — after
+    re-appending any proposal rows that would fall behind the floor
+    (escalated work parked for review survives compaction, the
+    substrate half of finding 1.3b). Retention invariant: one full
+    interval of history is always kept.
+  - load_room reconstructs from the latest checkpoint (bounded work);
+    pure read polls no longer reconstruct engine state at all (the
+    O(session-length)-per-poll cost is gone). Late joiners bootstrap
+    from the checkpoint; a cursor below the trim floor is served the
+    retained checkpoint as a RESET snapshot.
+  - The shared planner core gained an explicit `firstSeq` (log arrays
+    may start at a checkpoint; absolute seqs remain the public
+    coordinate; both twins, vectors byte-stable at firstSeq 0).
+    Intents authored below the retention horizon settle as voided
+    `stale-base` — a one-sided transform over trimmed history is
+    impossible — and the client re-derives that work from its editor
+    tree after its reset.
+  - The client session accepts reset snapshots (seq > cursor):
+    replica re-bootstraps, pending intents drop, the manager clears
+    its echo-suppression state and the next capture re-authors from
+    the editor tree. The client replica also trims its own observed
+    log below the replan floor (min pending baseSeq / cursor) —
+    sweeps hold prediction parity through every trim.
+  Verified live: two-tab observer converged across a mid-session
+  checkpoint on the dev env with zero console errors.
+
   Remaining in 2d, all design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport) and
   the escalation REVIEW UI (inspect/apply/discard a parked proposal)
   beyond the notice. Review findings NOT yet addressed (next tier):
-  compaction/growth bounds (1.6), the capture layer's HTML-string
-  diffing vs the spec'd rich-text coordinates (1.4), proposal-lane
-  recoverability substrate (1.3b), frame/txn state across request
-  boundaries (1.3c), independent effect-model oracles (3.1), and the
-  invasiveness cleanups (identity triplication, lockstep .d.ts,
-  delayed re-push).
+  the capture layer's HTML-string diffing vs the spec'd rich-text
+  coordinates (1.4), the proposal READ API half of 1.3b, frame/txn
+  state across request boundaries (1.3c), independent effect-model
+  oracles (3.1), and the invasiveness cleanups (identity
+  triplication, lockstep .d.ts, delayed re-push).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

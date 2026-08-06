@@ -56,7 +56,10 @@ export interface ClientReplica {
 	online: boolean;
 	outbox: IntentEnvelope[];
 	nextIntent: number;
+	/** Engine seq of log[0] (> 0 after a checkpoint bootstrap or trim). */
+	firstSeq: number;
 	log: IntentEnvelope[];
+	docCache: Map< number, EngineDocument >;
 	baseDoc: EngineDocument;
 	doc: EngineDocument;
 	predictions: Map< string, IntentDisposition >;

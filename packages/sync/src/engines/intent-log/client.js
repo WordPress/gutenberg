@@ -37,19 +37,24 @@ import {
  *
  * @param {string} actorId    Actor id.
  * @param {Object} initialDoc Genesis document.
+ * @param {number} [firstSeq] Engine seq of the initial document (> 0 when
+ *                            bootstrapping from a server checkpoint).
  * @return {Object} Client state.
  */
-export function createClient( actorId, initialDoc ) {
+export function createClient( actorId, initialDoc, firstSeq = 0 ) {
 	return {
 		actorId,
-		cursor: 0,
+		cursor: firstSeq,
 		online: true,
 		outbox: [],
 		nextIntent: 0,
-		// Verbatim copy of the observed log prefix, plus the same seq →
-		// document cache shape the server uses (serverDocAt works on both).
+		// Verbatim copy of the observed log entries [firstSeq ..), plus the
+		// same seq → document cache shape the server uses (serverDocAt works
+		// on both). firstSeq > 0 when initialized from a server compaction
+		// checkpoint, or after trimClientLog().
+		firstSeq,
 		log: [],
-		docCache: new Map( [ [ 0, cloneDocument( initialDoc ) ] ] ),
+		docCache: new Map( [ [ firstSeq, cloneDocument( initialDoc ) ] ] ),
 		baseDoc: cloneDocument( initialDoc ),
 		doc: cloneDocument( initialDoc ),
 		// intentId → predicted disposition, from the latest replan.
@@ -66,12 +71,41 @@ function replan( client ) {
 	const { rows, headDoc } = planBatch(
 		groupUnits( client.outbox ),
 		client.log,
-		( seq ) => serverDocAt( client, seq )
+		( seq ) => serverDocAt( client, seq ),
+		client.firstSeq
 	);
 	client.predictions = new Map(
 		rows.map( ( row ) => [ row.intent.intentId, row.disposition ] )
 	);
 	client.doc = headDoc;
+}
+
+/**
+ * Drops log entries (and cached documents) the replica can never need
+ * again: nothing below the oldest pending intent's baseSeq (or the cursor,
+ * when the outbox is empty) is ever sliced by a replan. Without this the
+ * client's log copy grows for the lifetime of the session.
+ *
+ * Planner-neutral by construction: planBatch only ever slices the log from
+ * a pending intent's baseSeq, and rebases against docAt(baseSeq) — both
+ * remain reachable after the trim.
+ *
+ * @param {Object} client Client.
+ */
+export function trimClientLog( client ) {
+	const floor = client.outbox.length
+		? Math.min( ...client.outbox.map( ( intent ) => intent.baseSeq ) )
+		: client.cursor;
+	if ( floor <= client.firstSeq ) {
+		return;
+	}
+	const floorDoc = serverDocAt( client, floor );
+	client.log = client.log.slice( floor - client.firstSeq );
+	client.firstSeq = floor;
+	client.docCache = new Map( [
+		[ floor, floorDoc ],
+		[ client.cursor, client.baseDoc ],
+	] );
 }
 
 /**
@@ -118,9 +152,10 @@ export function clientReceive( client, entries, startSeq ) {
 		);
 	}
 	client.log.push( ...entries );
-	client.cursor = client.log.length;
+	client.cursor = client.firstSeq + client.log.length;
 	client.baseDoc = serverDocAt( client, client.cursor );
 	replan( client );
+	trimClientLog( client );
 }
 
 /**
@@ -132,7 +167,11 @@ export function clientReceive( client, entries, startSeq ) {
  * @param {Object} client Client.
  */
 export function catchUp( server, client ) {
-	clientReceive( client, server.log.slice( client.cursor ), client.cursor );
+	clientReceive(
+		client,
+		server.log.slice( client.cursor - ( server.firstSeq ?? 0 ) ),
+		client.cursor
+	);
 }
 
 /**

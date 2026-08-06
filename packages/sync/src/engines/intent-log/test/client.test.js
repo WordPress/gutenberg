@@ -6,6 +6,7 @@ import { createServer, serverDocAt, serverIngestBatch } from '../rebase.js';
 import {
 	authorIntent,
 	catchUp,
+	clientReceive,
 	createClient,
 	flushClient,
 	predictedDisposition,
@@ -436,4 +437,81 @@ test( 'redelivering a flushed batch is idempotent, including proposals', () => {
 		redelivered,
 		report.map( ( row ) => row.actual )
 	);
+} );
+
+test( 'trimClientLog bounds the replica: history below the replan floor drops, predictions stay exact', () => {
+	const server = createServer( baseDoc() );
+	const alice = makeActorClient( 'alice' );
+	const bob = makeActorClient( 'bob' );
+
+	// Bob accumulates a long observed log with an empty outbox: everything
+	// below the cursor is trimmable.
+	for ( let i = 0; i < 20; i++ ) {
+		alice.author( IntentTypes.INSERT_TEXT, {
+			syncId: 'p1',
+			offset: 0,
+			text: 'a',
+		} );
+		flushClient( server, alice.client );
+		catchUp( server, bob.client );
+	}
+	assert.equal( bob.client.log.length, 0 );
+	assert.equal( bob.client.firstSeq, bob.client.cursor );
+
+	// Pending work pins the floor at its baseSeq: entries the replan still
+	// needs survive the trim, and prediction parity holds through it.
+	bob.author( IntentTypes.INSERT_TEXT, {
+		syncId: 'p3',
+		offset: 0,
+		text: 'z',
+	} );
+	alice.author( IntentTypes.INSERT_TEXT, {
+		syncId: 'p1',
+		offset: 0,
+		text: 'b',
+	} );
+	flushClient( server, alice.client );
+	catchUp( server, bob.client );
+	assert.ok( bob.client.firstSeq <= bob.client.outbox[ 0 ].baseSeq );
+	const report = flushClient( server, bob.client );
+	for ( const row of report ) {
+		assert.deepEqual( row.predicted, row.actual );
+	}
+} );
+
+test( 'a replica bootstrapped from a checkpoint (firstSeq > 0) plans identically to a genesis replica', () => {
+	// Build history on a genesis server.
+	const server = createServer( baseDoc() );
+	const alice = makeActorClient( 'alice' );
+	for ( let i = 0; i < 5; i++ ) {
+		alice.author( IntentTypes.INSERT_TEXT, {
+			syncId: 'p1',
+			offset: 0,
+			text: 'a',
+		} );
+	}
+	flushClient( server, alice.client );
+
+	// A late replica bootstraps from the head as a checkpoint.
+	const checkpointDoc = serverDocAt( server, server.log.length );
+	const late = createClient( 'late', checkpointDoc, server.log.length );
+	assert.equal( late.cursor, 5 );
+
+	// It authors against the checkpoint and rebases over later entries.
+	const pending = createIntent(
+		IntentTypes.INSERT_TEXT,
+		{ syncId: 'p1', offset: 0, text: 'L' },
+		{ actorId: 'late', baseSeq: late.cursor, intentId: 'late#0' }
+	);
+	authorIntent( late, pending );
+	alice.author( IntentTypes.INSERT_TEXT, {
+		syncId: 'p1',
+		offset: 1,
+		text: 'c',
+	} );
+	flushClient( server, alice.client );
+	clientReceive( late, server.log.slice( 5 ), 5 );
+	const predicted = predictedDisposition( late, 'late#0' );
+	const [ actual ] = serverIngestBatch( server, [ pending ] );
+	assert.deepEqual( predicted, actual );
 } );

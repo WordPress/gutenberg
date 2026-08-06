@@ -425,6 +425,156 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_sync_invalid_intent', $extraneous, 400 );
 	}
 
+	/**
+	 * Sends N applied single-character inserts from one client.
+	 *
+	 * @param int $count     How many intents.
+	 * @param int $base_seq  Engine seq the first intent observes.
+	 * @param int $client_id Sending client.
+	 */
+	private function type_intents( int $count, int $base_seq, int $client_id = 101 ): void {
+		for ( $i = 0; $i < $count; $i++ ) {
+			$response = $this->poll(
+				array(
+					self::intent_update(
+						array(
+							'intentId' => "type-{$client_id}-" . ( $base_seq + $i ),
+							'baseSeq'  => $base_seq + $i,
+							'type'     => 'insert_text',
+							'payload'  => array(
+								'syncId' => self::paragraph_id(),
+								'field'  => 'content',
+								'offset' => 0,
+								'text'   => 'x',
+							),
+						)
+					),
+				),
+				array( 'client_id' => $client_id )
+			);
+			$this->assertSame( 'applied', $response['dispositions'][0]['status'], "intent at seq {$base_seq}+{$i}" );
+		}
+	}
+
+	public function test_checkpoints_bound_history_preserve_proposals_and_reset_stale_clients() {
+		$interval = static function () {
+			return 3;
+		};
+		add_filter( 'wp_sync_intent_log_checkpoint_interval', $interval );
+
+		try {
+			// An early escalation parks a proposal (pre-floor content that
+			// must survive compaction).
+			$this->poll(); // Genesis.
+			$target = self::paragraph_id();
+			$this->poll(
+				array(
+					self::intent_update(
+						array(
+							'intentId' => 'early-a',
+							'baseSeq'  => 0,
+							'type'     => 'set_attr',
+							'payload'  => array(
+								'syncId'          => $target,
+								'key'             => 'align',
+								'value'           => 'wide',
+								'observedVersion' => 0,
+							),
+						)
+					),
+				)
+			);
+			$escalated = $this->poll(
+				array(
+					self::intent_update(
+						array(
+							'intentId' => 'early-b',
+							'baseSeq'  => 0,
+							'type'     => 'set_attr',
+							'payload'  => array(
+								'syncId'          => $target,
+								'key'             => 'align',
+								'value'           => 'full',
+								'observedVersion' => 0,
+							),
+						)
+					),
+				),
+				array( 'client_id' => 202 )
+			);
+			$this->assertSame( 'escalated', $escalated['dispositions'][0]['status'] );
+
+			// Cross the interval twice: two checkpoints, one trim.
+			$this->type_intents( 4, 1 );
+			$this->type_intents( 4, 5 );
+
+			// A fresh joiner bootstraps from a CHECKPOINT, not genesis.
+			$join  = $this->poll( array(), array( 'client_id' => 303 ) );
+			$types = array_column( $join['updates'], 'type' );
+			$first = json_decode( $join['updates'][0]['data'], true );
+			$this->assertSame( WP_Intent_Log_Engine::UPDATE_TYPE_SNAPSHOT, $join['updates'][0]['type'] );
+			$this->assertNotEmpty( $first['checkpoint'] );
+			$this->assertGreaterThan( 0, $first['seq'] );
+
+			// The parked proposal SURVIVED the trim.
+			$proposals = array();
+			foreach ( $join['updates'] as $update ) {
+				if ( WP_Intent_Log_Engine::UPDATE_TYPE_PROPOSAL === $update['type'] ) {
+					$proposals[] = json_decode( $update['data'], true );
+				}
+			}
+			$this->assertCount( 1, $proposals );
+			$this->assertSame( 'early-b', $proposals[0]['intent']['intentId'] );
+
+			// History is bounded: far fewer rows than the 11+ ever written.
+			$this->assertLessThan( 11, count( $join['updates'] ) );
+
+			// A STALE cursor (below the trim floor) receives the retained
+			// checkpoint as its first row — the reset bootstrap.
+			$stale = $this->poll(
+				array(),
+				array(
+					'client_id' => 404,
+					'after'     => 1,
+				)
+			);
+			$this->assertSame( WP_Intent_Log_Engine::UPDATE_TYPE_SNAPSHOT, $stale['updates'][0]['type'] );
+			$reset = json_decode( $stale['updates'][0]['data'], true );
+			$this->assertNotEmpty( $reset['checkpoint'] );
+
+			// An intent authored below the retention horizon settles as a
+			// stale void instead of failing the request or mis-rebasing.
+			$stale_write = $this->poll(
+				array(
+					self::intent_update(
+						array(
+							'intentId' => 'stale-1',
+							'baseSeq'  => 0,
+							'type'     => 'insert_text',
+							'payload'  => array(
+								'syncId' => $target,
+								'field'  => 'content',
+								'offset' => 0,
+								'text'   => 'late',
+							),
+						)
+					),
+				),
+				array( 'client_id' => 404 )
+			);
+			$this->assertSame(
+				array(
+					'intentId' => 'stale-1',
+					'status'   => 'voided',
+					'reason'   => 'stale-base',
+				),
+				$stale_write['dispositions'][0]
+			);
+		} finally {
+			remove_filter( 'wp_sync_intent_log_checkpoint_interval', $interval );
+		}
+	}
+
 	public function test_genesis_stamps_engine_lineage_on_a_read_poll() {
 		// A pure READ initializes the room (genesis snapshot row). That
 		// server-initiated first write must stamp the engine lineage, or a

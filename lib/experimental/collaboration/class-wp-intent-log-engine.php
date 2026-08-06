@@ -297,6 +297,8 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			}
 
 			$actor_id = self::actor_id( $client_id );
+			$base_seq = (int) ( $state['base_seq'] ?? 0 );
+			$head_seq = $base_seq + count( $state['log'] );
 			$intents  = array();
 			foreach ( $updates as $update ) {
 				if ( self::UPDATE_TYPE_INTENT !== $update['type'] ) {
@@ -311,7 +313,7 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					! is_array( $intent ) ||
 					! is_string( $intent['intentId'] ?? null ) || '' === $intent['intentId'] ||
 					! is_int( $intent['baseSeq'] ?? null ) || $intent['baseSeq'] < 0 ||
-					$intent['baseSeq'] > count( $state['log'] ) ||
+					$intent['baseSeq'] > $head_seq ||
 					! is_string( $intent['type'] ?? null ) ||
 					! is_array( $intent['payload'] ?? null ) ||
 					! ( null === ( $intent['txnId'] ?? null ) || is_string( $intent['txnId'] ) )
@@ -342,19 +344,31 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			// a redelivered prefix cannot fuse two distinct units (mirrors the
 			// JS engine's serverIngestBatch). The in-batch set extends the
 			// idempotency to duplicates WITHIN one request: the settled map
-			// is only populated after planning.
+			// is only populated after planning. Intents authored BELOW the
+			// retention horizon (baseSeq < base_seq — the priors they need
+			// were compacted away, so a one-sided transform is impossible)
+			// settle immediately as stale voids without planning; the client
+			// re-derives the work from its editor tree after its reset.
 			$seen_in_batch = array();
+			$stale         = array();
 			$units         = array();
 			foreach ( WP_Intent_Log_Planner::group_units( $intents ) as $unit ) {
 				$fresh = array_values(
 					array_filter(
 						$unit,
-						function ( $intent ) use ( $state, &$seen_in_batch ) {
+						function ( $intent ) use ( $state, $base_seq, &$seen_in_batch, &$stale ) {
 							$intent_id = $intent['intentId'];
 							if ( isset( $state['settled'][ $intent_id ] ) || isset( $seen_in_batch[ $intent_id ] ) ) {
 								return false;
 							}
 							$seen_in_batch[ $intent_id ] = true;
+							if ( $intent['baseSeq'] < $base_seq ) {
+								$stale[ $intent_id ] = array(
+									'status' => 'voided',
+									'reason' => 'stale-base',
+								);
+								return false;
+							}
 							return true;
 						}
 					)
@@ -365,12 +379,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			}
 
 			$log       = $state['log'];
-			$doc_cache = array( 0 => $state['genesis'] );
-			$doc_at    = function ( int $seq ) use ( $log, &$doc_cache ): array {
+			$doc_cache = array( $base_seq => $state['genesis'] );
+			$doc_at    = function ( int $seq ) use ( $log, $base_seq, &$doc_cache ): array {
 				if ( isset( $doc_cache[ $seq ] ) ) {
 					return $doc_cache[ $seq ];
 				}
-				$nearest = 0;
+				$nearest = $base_seq;
 				foreach ( array_keys( $doc_cache ) as $key ) {
 					if ( $key <= $seq && $key > $nearest ) {
 						$nearest = $key;
@@ -378,13 +392,13 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				}
 				$doc               = WP_Intent_Log_Document::replay(
 					$doc_cache[ $nearest ],
-					array_slice( $log, $nearest, $seq - $nearest )
+					array_slice( $log, $nearest - $base_seq, $seq - $nearest )
 				);
 				$doc_cache[ $seq ] = $doc;
 				return $doc;
 			};
 
-			$plan = WP_Intent_Log_Planner::plan_batch( $units, $state['log'], $doc_at );
+			$plan = WP_Intent_Log_Planner::plan_batch( $units, $state['log'], $doc_at, $base_seq );
 
 			// Commit the plan to storage.
 			foreach ( $plan['rows'] as $row ) {
@@ -418,17 +432,151 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				}
 				$state['settled'][ $intent_id ] = $row['disposition'];
 			}
+
+			// Growth bound: append a compaction checkpoint (and trim behind
+			// the previous one) once the retained window is large enough.
+			$accepted_count = 0;
+			foreach ( $plan['rows'] as $row ) {
+				if ( null !== $row['accepted'] ) {
+					++$accepted_count;
+				}
+			}
+			$this->maybe_checkpoint(
+				$room,
+				$client_id,
+				count( $state['log'] ) + $accepted_count,
+				$head_seq + $accepted_count,
+				$plan['headDoc']
+			);
+
 			$this->room_state[ $room ] = null; // Invalidate: rows changed.
 
 			$dispositions = array();
 			foreach ( $intents as $intent ) {
 				$dispositions[] = array_merge(
 					array( 'intentId' => $intent['intentId'] ),
-					$state['settled'][ $intent['intentId'] ] ?? array( 'status' => 'unknown' )
+					$state['settled'][ $intent['intentId'] ]
+						?? $stale[ $intent['intentId'] ]
+						?? array( 'status' => 'unknown' )
 				);
 			}
 
 			return array( 'dispositions' => $dispositions );
+		}
+
+		/**
+		 * Appends a compaction checkpoint and trims history behind the
+		 * PREVIOUS checkpoint once the retained window reaches the interval.
+		 *
+		 * Retention invariant: rows from the previous checkpoint onward are
+		 * always kept, so any client within one full checkpoint interval of
+		 * the head resumes normally. Older clients hit the floor and receive
+		 * the retained checkpoint as a reset snapshot. Proposal rows that
+		 * would fall behind the floor are re-appended first — escalated work
+		 * parked for review must survive compaction.
+		 *
+		 * Requires the storage to expose per-room metadata (the post-meta
+		 * storage does); silently skips checkpointing otherwise.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $room               Room identifier.
+		 * @param int    $client_id          Requesting client id (row attribution).
+		 * @param int    $window_intent_rows Intent rows since the reconstructed
+		 *                                   genesis, after this commit.
+		 * @param int    $head_seq           Engine seq at the new head.
+		 * @param array  $head_doc           Document at the new head.
+		 */
+		private function maybe_checkpoint( string $room, int $client_id, int $window_intent_rows, int $head_seq, array $head_doc ): void {
+			if ( ! method_exists( $this->storage, 'get_room_meta' ) || ! method_exists( $this->storage, 'set_room_meta' ) ) {
+				return;
+			}
+
+			/**
+			 * Filters the intent-log checkpoint interval: a compaction
+			 * checkpoint is appended once this many intent rows accumulate
+			 * since the previous one.
+			 *
+			 * @since 7.2.0
+			 *
+			 * @param int    $interval Interval in intent rows.
+			 * @param string $room     Room identifier.
+			 */
+			$interval = (int) apply_filters( 'wp_sync_intent_log_checkpoint_interval', 100, $room );
+			if ( $interval < 1 || $window_intent_rows < $interval ) {
+				return;
+			}
+
+			$previous = $this->storage->get_room_meta( $room, 'intent_log_checkpoint' );
+
+			// Escalated work parked below the future floor survives by
+			// re-appending it above the new checkpoint's predecessor.
+			if ( is_array( $previous ) && isset( $previous['cursor'] ) ) {
+				$rows           = $this->storage->get_updates_after_cursor( $room, 0 );
+				$below          = array();
+				$found_previous = false;
+				foreach ( $rows as $row ) {
+					$decoded = json_decode( $row['data'], true );
+					if ( ! is_array( $decoded ) ) {
+						continue;
+					}
+					if (
+						self::UPDATE_TYPE_SNAPSHOT === $row['type'] &&
+						! empty( $decoded['checkpoint'] ) &&
+						(int) ( $decoded['seq'] ?? -1 ) === (int) ( $previous['seq'] ?? -2 )
+					) {
+						$found_previous = true;
+						break;
+					}
+					if ( self::UPDATE_TYPE_PROPOSAL === $row['type'] ) {
+						$below[] = $decoded;
+					}
+				}
+				if ( $found_previous ) {
+					foreach ( $below as $proposal ) {
+						$this->add_row( $room, 0, self::UPDATE_TYPE_PROPOSAL, $proposal );
+					}
+				}
+			}
+
+			$stored = $this->add_row(
+				$room,
+				$client_id,
+				self::UPDATE_TYPE_SNAPSHOT,
+				array(
+					'doc'        => $head_doc,
+					'seq'        => $head_seq,
+					'checkpoint' => true,
+				)
+			);
+			if ( ! $stored ) {
+				return; // Non-fatal: the next commit retries.
+			}
+			// The checkpoint row's own transport cursor: the storage writes
+			// postmeta directly, so the connection's last insert id IS the
+			// row's meta_id (the storage's cached get_cursor() is stale
+			// until the next read).
+			global $wpdb;
+			$cursor = (int) $wpdb->insert_id;
+			if ( $cursor <= 0 ) {
+				return;
+			}
+			$this->storage->set_room_meta(
+				$room,
+				'intent_log_checkpoint',
+				array(
+					'seq'    => $head_seq,
+					'cursor' => $cursor,
+				)
+			);
+
+			if ( is_array( $previous ) && isset( $previous['cursor'] ) ) {
+				// Trim everything BELOW the previous checkpoint row (it
+				// stays: it is the reset bootstrap for stale cursors) and
+				// record the floor for the read path.
+				$this->storage->remove_updates_before_cursor( $room, (int) $previous['cursor'] );
+				$this->storage->set_room_meta( $room, 'intent_log_floor', (int) $previous['cursor'] );
+			}
 		}
 
 		/**
@@ -447,8 +595,29 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 * @return array Room response data.
 		 */
 		public function get_updates_since( string $room, int $client_id, int $cursor, array $context ): array {
-			// Ensure genesis exists so first pollers receive the snapshot.
-			$this->load_room( $room );
+			/*
+			 * Ensure genesis exists so first pollers receive the snapshot —
+			 * WITHOUT reconstructing full engine state: a pure read only
+			 * needs the stored rows. Reconstruction (load_room) is an
+			 * ingest-path concern; running it here made every poll
+			 * O(session length).
+			 */
+			if ( 0 === $this->storage->get_cursor( $room ) ) {
+				$this->load_room( $room );
+			}
+
+			/*
+			 * Compaction floor: a cursor below the trimmed history cannot be
+			 * caught up row-by-row (its missing rows are gone). Serve from
+			 * the retained checkpoint row instead — the client receives it
+			 * as a reset snapshot and re-bootstraps.
+			 */
+			if ( $cursor > 0 && method_exists( $this->storage, 'get_room_meta' ) ) {
+				$floor = $this->storage->get_room_meta( $room, 'intent_log_floor' );
+				if ( is_numeric( $floor ) && $cursor < (int) $floor ) {
+					$cursor = (int) $floor - 1;
+				}
+			}
 
 			$rows          = $this->storage->get_updates_after_cursor( $room, $cursor );
 			$typed_updates = array();
@@ -504,10 +673,11 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				return $this->room_state[ $room ];
 			}
 
-			$rows    = $this->storage->get_updates_after_cursor( $room, 0 );
-			$genesis = null;
-			$log     = array();
-			$settled = array();
+			$rows     = $this->storage->get_updates_after_cursor( $room, 0 );
+			$genesis  = null;
+			$log      = array();
+			$settled  = array();
+			$base_seq = 0;
 
 			foreach ( $rows as $row ) {
 				$decoded = json_decode( $row['data'], true );
@@ -516,9 +686,19 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				}
 				switch ( $row['type'] ) {
 					case self::UPDATE_TYPE_SNAPSHOT:
-						// First snapshot wins (a concurrent-initialization
-						// duplicate is ignored deterministically).
-						if ( null === $genesis ) {
+						if ( ! empty( $decoded['checkpoint'] ) ) {
+							// A compaction checkpoint supersedes everything
+							// before it: reconstruct from here. Settled
+							// state for the retained window rebuilds from
+							// the rows that follow.
+							$genesis  = $decoded['doc'];
+							$base_seq = (int) ( $decoded['seq'] ?? 0 );
+							$log      = array();
+							$settled  = array();
+						} elseif ( null === $genesis ) {
+							// Genesis: first snapshot wins (a concurrent-
+							// initialization duplicate is ignored
+							// deterministically).
 							$genesis = $decoded['doc'];
 						}
 						break;
@@ -551,9 +731,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			}
 
 			$state                     = array(
-				'genesis' => $genesis,
-				'log'     => $log,
-				'settled' => $settled,
+				'genesis'  => $genesis,
+				'log'      => $log,
+				'settled'  => $settled,
+				// Engine seq of the reconstructed genesis (0, or the
+				// checkpoint's seq): log[i] is engine seq base_seq + i.
+				'base_seq' => $base_seq,
 			);
 			$this->room_state[ $room ] = $state;
 

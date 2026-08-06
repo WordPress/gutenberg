@@ -917,19 +917,21 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 		 * @return array array( 'rows' => row[], 'headDoc' => array ). Each row:
 		 *               array( 'intent', 'disposition', 'accepted' => ?array, 'proposal' => ?array ).
 		 */
-		public static function plan_batch( array $units, array $log, callable $doc_at ): array {
+		public static function plan_batch( array $units, array $log, callable $doc_at, int $first_seq = 0 ): array {
 			$frame    = array(
 				'ownWrites' => array(),
 				'broken'    => array(),
 			);
 			$rows     = array();
-			$head_doc = $doc_at( count( $log ) );
+			$head_doc = $doc_at( $first_seq + count( $log ) );
 
 			foreach ( $units as $unit ) {
 				$unit    = array_values( $unit );
 				$rebased = array();
 				foreach ( $unit as $j => $intent ) {
-					$slice            = array_slice( $log, $intent['baseSeq'] );
+					// Callers guarantee baseSeq >= $first_seq (older intents
+					// are stale-voided before planning).
+					$slice            = array_slice( $log, $intent['baseSeq'] - $first_seq );
 					$actor_id         = $intent['actorId'];
 					$base_seq         = $intent['baseSeq'];
 					$first_remote_seq = static function ( string $key ) use ( $slice, $actor_id, $base_seq ): ?int {
