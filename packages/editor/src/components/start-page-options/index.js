@@ -24,6 +24,14 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 
+/**
+ * Name the welcome guides register themselves under in the interface store.
+ * Registration happens in each editor, so this only ever reflects a guide that
+ * is actually rendered — unlike the underlying preferences, which are shared
+ * between editors and would leak across them.
+ */
+const WELCOME_GUIDE_MODAL_NAME = 'editor/welcome-guide';
+
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
 	// and it has no postTypes declared and the current post type is page or if
@@ -147,23 +155,33 @@ export default function StartPageOptions() {
 	const { isEditedPostEmpty } = useSelect( editorStore );
 	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
 	const { isModalActive } = useSelect( interfaceStore );
-	const { enabled, postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		const choosePatternModalEnabled = select( preferencesStore ).get(
-			'core',
-			'enableChoosePatternModal'
-		);
-		const currentPostType = getCurrentPostType();
-		return {
-			postType: currentPostType,
-			postId: getCurrentPostId(),
-			enabled:
-				choosePatternModalEnabled &&
-				ATTACHMENT_POST_TYPE !== currentPostType &&
-				TEMPLATE_POST_TYPE !== currentPostType &&
-				TEMPLATE_PART_POST_TYPE !== currentPostType,
-		};
-	}, [] );
+	const { enabled, postType, postId, isWelcomeGuideActive } = useSelect(
+		( select ) => {
+			const { getCurrentPostId, getCurrentPostType } =
+				select( editorStore );
+			const { get: getPreference } = select( preferencesStore );
+			const choosePatternModalEnabled = getPreference(
+				'core',
+				'enableChoosePatternModal'
+			);
+			const currentPostType = getCurrentPostType();
+			return {
+				postType: currentPostType,
+				postId: getCurrentPostId(),
+				// Read reactively so that dismissing the guide re-runs the
+				// effect below and opens this modal in its place.
+				isWelcomeGuideActive: select( interfaceStore ).isModalActive(
+					WELCOME_GUIDE_MODAL_NAME
+				),
+				enabled:
+					choosePatternModalEnabled &&
+					ATTACHMENT_POST_TYPE !== currentPostType &&
+					TEMPLATE_POST_TYPE !== currentPostType &&
+					TEMPLATE_PART_POST_TYPE !== currentPostType,
+			};
+		},
+		[]
+	);
 
 	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
 	// Examples: changing pages in the List View, creating a new page via Command Palette.
@@ -198,7 +216,12 @@ export default function StartPageOptions() {
 		isModalActive,
 	] );
 
-	if ( ! isOpen ) {
+	// Checked at render rather than in the effect above. The welcome guide is
+	// rendered as part of `children`, so it registers itself in the same commit
+	// that runs this component's effect, which would still see no active guide
+	// and open on top of it. Holding the modal back here is order-independent:
+	// it stays queued while a guide is on screen and appears once it closes.
+	if ( ! isOpen || isWelcomeGuideActive ) {
 		return null;
 	}
 

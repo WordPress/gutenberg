@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import WelcomeGuideImage from './image';
+import useRegisterWelcomeGuide from './use-register-welcome-guide';
 
 export default function WelcomeGuideEditor() {
 	const { toggle } = useDispatch( preferencesStore );
@@ -26,6 +27,8 @@ export default function WelcomeGuideEditor() {
 				select( coreStore ).getCurrentTheme()?.is_block_theme,
 		};
 	}, [] );
+
+	useRegisterWelcomeGuide( isActive && isBlockBasedTheme );
 
 	if ( ! isActive || ! isBlockBasedTheme ) {
 		return null;
