@@ -1971,15 +1971,44 @@
 				}
 			]
 		},
+		"stylesBlocksResponsiveStatePropertiesComplete": {
+			"description": "The styles a block can set inside a single responsive breakpoint state: the same style properties as the default block state, plus per-element styles.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"elements": {
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							}
+						]
+					}
+				}
+			]
+		},
 		"stylesBlocksResponsiveSelectorsProperties": {
-			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state.",
+			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state, plus per-element styles.",
 			"type": "object",
 			"properties": {
 				"@mobile": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"$ref": "#/definitions/stylesBlocksResponsiveStatePropertiesComplete"
 				},
 				"@tablet": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"$ref": "#/definitions/stylesBlocksResponsiveStatePropertiesComplete"
 				}
 			}
 		},
