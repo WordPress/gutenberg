@@ -2764,15 +2764,14 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param    {Object}         state            Editor state.
- * @param    {?string}        rootClientId     Optional root client ID of block list.
+ * @param    {Object}  state        Editor state.
+ * @param    {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined} The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
- * @property {string}         name             The type of block.
- * @property {?Object}        attributes       Attributes to pass to the newly created block.
- * @property {?Array<string>} attributesToCopy Attributes to be copied from adjacent blocks when inserted.
+ * @property {string}  name         The type of block.
+ * @property {?Object} attributes   Attributes to pass to the newly created block.
  */
 export function getDirectInsertBlock( state, rootClientId = null ) {
 	if ( ! rootClientId ) {
