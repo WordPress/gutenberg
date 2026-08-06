@@ -49,7 +49,7 @@
 
 ### Internal
 
--   `ToggleGroupControl`, validated form controls: Use `--focus-color` for invalid focus rings and remove the `$components-color-focus` override ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `ToggleGroupControl`, `ValidatedToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
