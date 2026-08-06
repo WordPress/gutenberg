@@ -24,6 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
 /**
  * Path to the canonical view-config JSON Schema.
@@ -167,8 +168,11 @@ const isMain =
 	fileURLToPath( import.meta.url ) === path.resolve( process.argv[ 1 ] );
 
 if ( isMain ) {
+	const {
+		values: { check },
+	} = parseArgs( { options: { check: { type: 'boolean' } } } );
 	const content = generate();
-	if ( process.argv.includes( '--check' ) ) {
+	if ( check ) {
 		const current = fs.existsSync( PHP_SCHEMA_PATH )
 			? fs.readFileSync( PHP_SCHEMA_PATH, 'utf8' )
 			: null;
