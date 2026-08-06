@@ -67,6 +67,10 @@
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
 -   `ColorPicker`: Keep the visual picker in native HSVA so gradient/controlled HSLA echoes no longer jitter the saturation pointer, and preserve the black-edge saturation coordinate without leaving white at a chromatic position ([#80205](https://github.com/WordPress/gutenberg/pull/80205)).
 
+### Internal
+
+-   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package; the private API re-exports it unchanged ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
+
 ### TypeScript
 
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).

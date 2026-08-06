@@ -1,8 +1,8 @@
-import { kebabCase } from '../kebab-case';
+/**
+ * Internal dependencies
+ */
+import { kebabCase } from '..';
 
-// Mirrors the test suite of the private `kebabCase` utility of
-// `@wordpress/components` (packages/components/src/utils/test/strings.js),
-// which this function is a verbatim copy of.
 describe( 'kebabCase', () => {
 	it( 'separates lowercase letters, followed by uppercase letters', () => {
 		expect( kebabCase( 'fooBar' ) ).toEqual( 'foo-bar' );
