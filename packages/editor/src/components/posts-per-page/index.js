@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
@@ -21,22 +21,48 @@ import PostPanelRow from '../post-panel-row';
 
 export default function PostsPerPage() {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { postsPerPage, isTemplate, postSlug } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getCurrentPostType } =
+	const {
+		isTemplate,
+		postSlug,
+		templateId,
+		postsPerPage,
+		globalPostsPerPage,
+	} = useSelect( ( select ) => {
+		const { getEditedPostAttribute, getCurrentPostId, getCurrentPostType } =
 			select( editorStore );
-		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const {
+			getEntityRecord,
+			getEntityRecordEdits,
+			getEditedEntityRecord,
+			canUser,
+		} = select( coreStore );
 		const siteSettings = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
 		} )
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;
+		const slug = getEditedPostAttribute( 'slug' );
+
+		const id = getCurrentPostId();
+		const perPage = getEntityRecord( 'postType', TEMPLATE_POST_TYPE, id, {
+			combinedTemplates: false,
+		} )?.posts_per_page;
+		const editedPerPage = getEntityRecordEdits(
+			'postType',
+			TEMPLATE_POST_TYPE,
+			id
+		)?.posts_per_page;
+
 		return {
 			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
-			postSlug: getEditedPostAttribute( 'slug' ),
-			postsPerPage: siteSettings?.posts_per_page || 1,
+			postSlug: slug,
+			templateId: id,
+			postsPerPage: editedPerPage || perPage,
+			globalPostsPerPage: siteSettings?.posts_per_page || 1,
 		};
 	}, [] );
+
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -53,12 +79,31 @@ export default function PostsPerPage() {
 		[ popoverAnchor ]
 	);
 
-	if ( ! isTemplate || ! [ 'home', 'index' ].includes( postSlug ) ) {
+	if (
+		! isTemplate ||
+		! [
+			'home',
+			'index',
+			'author',
+			'category',
+			'tag',
+			'taxonomy',
+			'date',
+			'search',
+			'archive',
+		].some(
+			( slug ) => postSlug === slug || postSlug?.startsWith( slug + '-' )
+		)
+	) {
 		return null;
 	}
-	const setPostsPerPage = ( newValue ) => {
-		editEntityRecord( 'root', 'site', undefined, {
-			posts_per_page: newValue,
+
+	const handleSetPostsPerPage = ( newPostsPerPage ) => {
+		if ( newPostsPerPage ) {
+			newPostsPerPage = Number( newPostsPerPage );
+		}
+		editEntityRecord( 'postType', TEMPLATE_POST_TYPE, templateId, {
+			posts_per_page: newPostsPerPage,
 		} );
 	};
 	return (
@@ -75,7 +120,7 @@ export default function PostsPerPage() {
 						aria-label={ __( 'Change posts per page' ) }
 						onClick={ onToggle }
 					>
-						{ postsPerPage }
+						{ postsPerPage || `Default ${ globalPostsPerPage }` }
 					</Button>
 				) }
 				renderContent={ ( { onClose } ) => (
@@ -85,15 +130,15 @@ export default function PostsPerPage() {
 							onClose={ onClose }
 						/>
 						<NumberControl
-							placeholder={ 0 }
+							placeholder={ `Default ${ globalPostsPerPage }` }
 							value={ postsPerPage }
 							spinControls="custom"
 							step="1"
-							min="1"
-							onChange={ setPostsPerPage }
+							min="0"
+							onChange={ handleSetPostsPerPage }
 							label={ __( 'Posts per page' ) }
 							help={ __(
-								'Set the default number of posts to display on blog pages, including categories and tags. Some templates may override this setting.'
+								'Set the number of posts to display per page. Leave empty to use the site default.'
 							) }
 							hideLabelFromVision
 						/>
