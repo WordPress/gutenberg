@@ -26,13 +26,7 @@ The fulfillment is named by the key that carries it, not by a separate discrimin
 }
 ```
 
-`href`: absolute URL, admin `.php` entry point, root-relative path, or a file
-next to the widget (resolved to a plugin URL on the server). `data:` and
-`javascript:` hrefs are rejected at registration. Use `downloadBlob` for client-generated
-files. Query strings on local filenames (e.g. `report.csv?v=2`) are not
-resolved as widget files.
-
-A file next to the widget resolves only where that directory ships. The Gutenberg plugin zip carries `build/`, not `widgets/`, so a relative `href` in a bundled widget resolves from a checkout and is dropped once installed. Use an absolute URL for anything that has to work in both.
+`href`: an absolute URL, an admin `.php` entry point, a root-relative path, or a file next to the widget, resolved to a plugin URL on the server. `data:` and `javascript:` hrefs are rejected at registration.
 
 Two more keys belong to the link, not to the envelope, so they only mean something alongside an `href`:
 
@@ -43,8 +37,8 @@ Two more keys belong to the link, not to the envelope, so they only mean somethi
 {
 	id: 'export',
 	label: __( 'Export CSV' ),
-	href: 'report.csv', // widgets/{name}/report.csv
-	download: 'report.csv',
+	href: 'https://example.com/reports/monthly.csv',
+	download: 'monthly-report.csv',
 }
 ```
 
