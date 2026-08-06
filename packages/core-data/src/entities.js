@@ -7,7 +7,11 @@ import { capitalCase, pascalCase } from 'change-case';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
+import {
+	__unstableSerializeAndClean,
+	getBlockType,
+	parse,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -481,6 +485,28 @@ async function loadPostTypeEntities() {
 					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
 					window._wpCollaborationDisabledPostTypes.includes( name )
 				),
+
+			/**
+			 * Names a block type's rich-text attributes so engines with
+			 * rich-text-coordinate capture know which attributes become
+			 * text fields.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @return {string[]} Rich-text attribute names.
+			 */
+			richTextFields: ( blockName ) => {
+				const blockType = getBlockType( blockName );
+				if ( ! blockType ) {
+					return [ 'content' ];
+				}
+				return Object.entries( blockType.attributes ?? {} )
+					.filter(
+						( [ , schema ] ) =>
+							'html' === schema?.source ||
+							'rich-text' === schema?.source
+					)
+					.map( ( [ key ] ) => key );
+			},
 		};
 
 		return entity;

@@ -4,9 +4,11 @@
 import { makeBlock } from './intent-log/document.js';
 import { applyIntent } from './intent-log/reducer.js';
 import { mintSyncId } from './intent-log/sync-id.js';
+import { fieldToHtml, htmlToField } from './intent-log/rich-text.js';
 import type {
 	EngineBlock,
 	EngineDocument,
+	EngineField,
 	IntentEnvelope,
 } from './intent-log/engine-types';
 
@@ -19,23 +21,22 @@ import type {
  * identity (metadata.syncId) — never by position, so a moved block derives a
  * move_block instead of degenerating into remove+insert.
  *
- * Every derivation is VERIFIED: the derived intents are applied to the
- * current document and the result must equal the target tree canonically.
- * When verification fails, the bridge degrades per divergent block to a
- * coarse replace_attr_content (the vocabulary's designed fallback) and
- * re-verifies — capture bugs surface as measurable coarse-capture cost,
- * never as silent divergence. This is the verify-or-degrade design from
- * INTEGRATION.md, inherited from mergeRichTextUpdate's delta verification.
+ * TEXT COORDINATES ARE RICH-TEXT COORDINATES: every rich-text attribute the
+ * block registry declares becomes an engine FIELD via the rich-text codec
+ * (plain text + format spans, UTF-16 code units — see rich-text.js). Text
+ * intents therefore carry offsets over plain text, never over serialized
+ * markup: concurrent merges interleave in text space and can never land
+ * inside a tag. Format changes derive as format_text intents; a paragraph
+ * split derives split_block and a paragraph merge derives merge_blocks, so
+ * the engine's split/merge/format concurrency semantics are reachable from
+ * real typing.
  *
- * v1 simplifications (documented in INTEGRATION.md):
- * - The `content` attribute maps to the engine's `content` field as an
- *   opaque HTML string (matching the server's genesis mapping); text edits
- *   diff by common prefix/suffix without a cursor hint. Rich-text-coordinate
- *   capture and multi-field schemas arrive with the editor-side bridge,
- *   where block schemas are available.
- * - split_block / merge_blocks are not derived from tree diffs (a split
- *   looks like edit+insert without selection context); identity lineage for
- *   splits arrives with action-level capture.
+ * Every derivation is VERIFIED: the derived intents are applied to the
+ * current document and the result must equal the target tree canonically
+ * (fields INCLUDED — text and formats). When verification fails, the bridge
+ * degrades per divergent field to a coarse replace_attr_content plus format
+ * restoration and re-verifies — capture bugs surface as measurable
+ * coarse-capture cost, never as silent divergence.
  */
 
 /**
@@ -49,7 +50,16 @@ export interface BridgeBlock {
 }
 
 /**
- * A derived batch: the intents to author, in order, plus how many blocks
+ * Names a block type's rich-text attributes (the ones that become engine
+ * fields). The editor side supplies a resolver backed by the block
+ * registry; the default captures the conventional `content` attribute.
+ */
+export type RichTextFieldsResolver = ( blockName: string ) => string[];
+
+const defaultRichTextFields: RichTextFieldsResolver = () => [ 'content' ];
+
+/**
+ * A derived batch: the intents to author, in order, plus how many fields
  * required the coarse fallback (0 = clean capture) and which document
  * blocks were retained despite being absent from the editor tree.
  */
@@ -82,6 +92,9 @@ export interface DeriveOptions {
 	 * user's deletion.
 	 */
 	excludeIds?: Set< string >;
+
+	/** Rich-text attribute names per block type (default: content only). */
+	richTextFields?: RichTextFieldsResolver;
 }
 
 /**
@@ -113,17 +126,20 @@ function serializeAttribute( value: unknown ): unknown {
 
 /**
  * Maps one Gutenberg-shaped block (and its subtree) onto an engine block
- * spec, minting creation syncIds for blocks that lack one.
+ * spec, minting creation syncIds for blocks that lack one. Rich-text
+ * attributes become codec fields (plain text + format spans).
  *
- * @param block   Bridge block.
- * @param minted  Optional set collecting the ids minted here (so the caller
- *                can distinguish minted ids from editor-authored ones).
- * @param seenIds Optional set of ids already used in this tree; later
- *                duplicates re-mint (the first occurrence keeps identity).
+ * @param block    Bridge block.
+ * @param resolver Rich-text attribute names per block type.
+ * @param minted   Optional set collecting the ids minted here (so the caller
+ *                 can distinguish minted ids from editor-authored ones).
+ * @param seenIds  Optional set of ids already used in this tree; later
+ *                 duplicates re-mint (the first occurrence keeps identity).
  * @return Engine block spec (makeBlock input shape).
  */
 export function blockToEngineSpec(
 	block: BridgeBlock,
+	resolver: RichTextFieldsResolver = defaultRichTextFields,
 	minted?: Set< string >,
 	seenIds?: Set< string >
 ): Record< string, unknown > {
@@ -154,8 +170,12 @@ export function blockToEngineSpec(
 		delete attributes.metadata;
 	}
 
-	const text = serializeAttribute( attributes.content );
-	delete attributes.content;
+	const fields: Record< string, EngineField > = {};
+	for ( const name of resolver( block.name ) ) {
+		const raw = serializeAttribute( attributes[ name ] );
+		delete attributes[ name ];
+		fields[ name ] = htmlToField( 'string' === typeof raw ? raw : '' );
+	}
 
 	const attrs: Record< string, unknown > = {};
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
@@ -166,22 +186,28 @@ export function blockToEngineSpec(
 		syncId,
 		blockType: block.name,
 		attrs,
-		text: 'string' === typeof text ? text : '',
+		fields,
 		children: block.innerBlocks.map( ( child ) =>
-			blockToEngineSpec( child, minted, seenIds )
+			blockToEngineSpec( child, resolver, minted, seenIds )
 		),
 	};
 }
 
 /**
  * Maps an engine block back to the serializable Gutenberg shape, with the
- * syncId riding in metadata and the content field as the `content`
- * attribute.
+ * syncId riding in metadata and each RESOLVER-NAMED field serialized back
+ * to its attribute through the codec. Fields the resolver does not name
+ * (e.g. a server genesis content field for an attribute-less block) stay
+ * engine-side.
  *
- * @param block Engine block.
+ * @param block    Engine block.
+ * @param resolver Rich-text attribute names per block type.
  * @return Bridge block.
  */
-export function engineBlockToBlock( block: EngineBlock ): BridgeBlock {
+export function engineBlockToBlock(
+	block: EngineBlock,
+	resolver: RichTextFieldsResolver = defaultRichTextFields
+): BridgeBlock {
 	const attributes: Record< string, unknown > = {};
 	for ( const [ key, value ] of Object.entries( block.attrs ) ) {
 		// Engine-internal attrs (e.g. the server's _wrapper markup capture)
@@ -195,26 +221,37 @@ export function engineBlockToBlock( block: EngineBlock ): BridgeBlock {
 		syncId: block.syncId,
 	};
 	attributes.metadata = metadata;
-	const text = block.fields.content?.text ?? '';
-	if ( '' !== text ) {
-		attributes.content = text;
+	for ( const name of resolver( block.blockType ) ) {
+		const field = block.fields[ name ];
+		if (
+			field &&
+			( '' !== field.text || ( field.formats?.length ?? 0 ) > 0 )
+		) {
+			attributes[ name ] = fieldToHtml( field );
+		}
 	}
 
 	return {
 		name: block.blockType,
 		attributes,
-		innerBlocks: block.children.map( engineBlockToBlock ),
+		innerBlocks: block.children.map( ( child ) =>
+			engineBlockToBlock( child, resolver )
+		),
 	};
 }
 
 /**
  * Maps an engine document to bridge blocks.
  *
- * @param doc Engine document.
+ * @param doc      Engine document.
+ * @param resolver Rich-text attribute names per block type.
  * @return Bridge blocks.
  */
-export function engineDocumentToBlocks( doc: EngineDocument ): BridgeBlock[] {
-	return doc.root.map( engineBlockToBlock );
+export function engineDocumentToBlocks(
+	doc: EngineDocument,
+	resolver: RichTextFieldsResolver = defaultRichTextFields
+): BridgeBlock[] {
+	return doc.root.map( ( block ) => engineBlockToBlock( block, resolver ) );
 }
 
 interface FlatEntry {
@@ -277,19 +314,35 @@ function flattenDocument( doc: EngineDocument ) {
 	return map;
 }
 
+const specField = (
+	spec: Record< string, unknown >,
+	name: string
+): EngineField =>
+	( ( spec.fields as Record< string, EngineField > | undefined )?.[
+		name
+	] as EngineField ) ?? { text: '', formats: [] };
+
+const specText = ( spec: Record< string, unknown > ): string =>
+	specField( spec, 'content' ).text;
+
+const blockField = ( block: EngineBlock, name: string ): EngineField =>
+	block.fields[ name ] ?? { text: '', formats: [] };
+
 /**
- * Diffs two strings by common prefix/suffix into at most one text intent
+ * Diffs two plain texts by common prefix/suffix into at most one text intent
  * payload.
  *
  * @param before Old text.
  * @param after  New text.
  * @param syncId Target block id.
+ * @param field  Field name.
  * @return An intent { type, payload }, or null when equal.
  */
 function diffText(
 	before: string,
 	after: string,
-	syncId: string
+	syncId: string,
+	field: string
 ): { type: string; payload: Record< string, unknown > } | null {
 	if ( before === after ) {
 		return null;
@@ -309,7 +362,7 @@ function diffText(
 	}
 	const removed = before.slice( prefix, before.length - suffix );
 	const inserted = after.slice( prefix, after.length - suffix );
-	const base = { syncId, field: 'content' };
+	const base = { syncId, field };
 	if ( '' === removed ) {
 		return {
 			type: 'insert_text',
@@ -340,24 +393,85 @@ function diffText(
 }
 
 /**
- * Aligns id-less specs with the document's existing identities.
+ * Derives format_text intents transforming one field's spans into
+ * another's, for fields whose TEXT already matches. Membership is computed
+ * per format id per character; contiguous runs of difference become one
+ * intent each.
  *
- * The editor parses post content without metadata.syncId, so every incoming
- * tree may lack ids for blocks the document already knows. Minting a fresh
- * id in that situation is the churn bug: each capture cycle would derive
- * remove_block + insert_block for the same block, making it flicker out of
- * existence on peers. Instead, an id-less spec ADOPTS the id of the
- * positionally corresponding document block of the same type (recursively),
- * provided no id-bearing spec in the tree already claims it. Only blocks
- * with no such counterpart keep their minted (creation) id.
- *
- * Mutates the spec objects in place (they are bridge-created).
- *
- * @param specs     Engine block specs at one level.
- * @param docBlocks Document blocks at the same level.
- * @param claimed   Ids claimed by id-bearing specs anywhere in the tree.
- * @param eligible  Ids unknown to the document (adoption candidates).
+ * @param before Field with current spans.
+ * @param after  Field with target spans.
+ * @param syncId Target block id.
+ * @param field  Field name.
+ * @return format_text intents.
  */
+function diffFormats(
+	before: EngineField,
+	after: EngineField,
+	syncId: string,
+	field: string
+): Array< { type: string; payload: Record< string, unknown > } > {
+	if ( before.text !== after.text ) {
+		return [];
+	}
+	const length = after.text.length;
+	const membership = ( spans: EngineField[ 'formats' ], format: string ) => {
+		const chars = new Array( length ).fill( false );
+		for ( const span of spans ) {
+			if ( span.format !== format ) {
+				continue;
+			}
+			for (
+				let i = Math.max( 0, span.start );
+				i < Math.min( length, span.end );
+				i++
+			) {
+				chars[ i ] = true;
+			}
+		}
+		return chars;
+	};
+	const formatIds = new Set< string >();
+	for ( const span of before.formats ?? [] ) {
+		formatIds.add( span.format );
+	}
+	for ( const span of after.formats ?? [] ) {
+		formatIds.add( span.format );
+	}
+	const intents: Array< {
+		type: string;
+		payload: Record< string, unknown >;
+	} > = [];
+	for ( const format of [ ...formatIds ].sort() ) {
+		const beforeChars = membership( before.formats ?? [], format );
+		const afterChars = membership( after.formats ?? [], format );
+		let run: { on: boolean; start: number } | null = null;
+		for ( let i = 0; i <= length; i++ ) {
+			const state =
+				i < length && beforeChars[ i ] !== afterChars[ i ]
+					? afterChars[ i ]
+					: null;
+			if ( run && ( null === state || state !== run.on ) ) {
+				intents.push( {
+					type: 'format_text',
+					payload: {
+						syncId,
+						field,
+						start: run.start,
+						end: i,
+						format,
+						on: run.on,
+					},
+				} );
+				run = null;
+			}
+			if ( null !== state && ! run ) {
+				run = { on: state, start: i };
+			}
+		}
+	}
+	return intents;
+}
+
 /**
  * Whether two content strings are similar enough that positional adoption
  * is safe: their common prefix plus common suffix covers the shorter one.
@@ -418,7 +532,7 @@ function adoptExistingIds(
 		if ( ! eligible.has( spec.syncId as string ) ) {
 			continue;
 		}
-		const text = ( spec.text as string ) ?? '';
+		const text = specText( spec );
 		let match = unclaimedAt( index );
 		if (
 			! match ||
@@ -450,10 +564,7 @@ function adoptExistingIds(
 		if (
 			docBlock &&
 			docBlock.blockType === spec.blockType &&
-			textsAreSimilar(
-				( spec.text as string ) ?? '',
-				docText( docBlock )
-			)
+			textsAreSimilar( specText( spec ), docText( docBlock ) )
 		) {
 			spec.syncId = docBlock.syncId;
 			claimed.add( docBlock.syncId );
@@ -491,11 +602,138 @@ function collectSpecIds(
 }
 
 /**
+ * Derives split_block / merge_blocks for the content field from
+ * identity + concatenation signals, per sibling level:
+ *
+ * - SPLIT: a document block's text partitions exactly into its spec text
+ *   followed by a NEW (document-unknown) same-type sibling's text — the
+ *   shape Enter-in-a-paragraph produces. The new spec's id becomes the
+ *   split's newSyncId, so identity is agreed before the server ever sees
+ *   the block.
+ * - MERGE: two adjacent document siblings' texts concatenate exactly into
+ *   one surviving spec's text while the absorbed block left the tree (and
+ *   the editor testified it displayed it) — the Backspace-join shape.
+ *
+ * Guards are exact (strict concatenation, same type, childless absorbed
+ * block); anything murkier falls through to the general differ.
+ *
+ * @param doc     Engine document.
+ * @param specs   Adopted engine specs (root level).
+ * @param options Derive options (removableIds gate merges).
+ * @return Structural text intents, in application order.
+ */
+function deriveSplitsAndMerges(
+	doc: EngineDocument,
+	specs: Array< Record< string, unknown > >,
+	options: DeriveOptions
+): Array< { type: string; payload: Record< string, unknown > } > {
+	const intents: Array< {
+		type: string;
+		payload: Record< string, unknown >;
+	} > = [];
+	const docIds = new Set< string >();
+	const collect = ( blocks: EngineBlock[] ) => {
+		for ( const block of blocks ) {
+			docIds.add( block.syncId );
+			collect( block.children );
+		}
+	};
+	collect( doc.root );
+	const specIds = collectSpecIds( specs, new Set() );
+
+	const walkLevel = (
+		levelSpecs: Array< Record< string, unknown > >,
+		docBlocks: EngineBlock[]
+	) => {
+		const docById = new Map(
+			docBlocks.map( ( block ) => [ block.syncId, block ] )
+		);
+		for ( let i = 0; i < levelSpecs.length; i++ ) {
+			const spec = levelSpecs[ i ];
+			const docBlock = docById.get( spec.syncId as string );
+			const next = levelSpecs[ i + 1 ];
+
+			// SPLIT: doc text === head spec text + NEW next spec text.
+			if (
+				docBlock &&
+				next &&
+				! docIds.has( next.syncId as string ) &&
+				next.blockType === spec.blockType &&
+				0 ===
+					( ( next.children as unknown[] | undefined )?.length ?? 0 )
+			) {
+				const docContent = blockField( docBlock, 'content' ).text;
+				const headText = specText( spec );
+				const tailText = specText( next );
+				if (
+					docContent === headText + tailText &&
+					'' !== tailText &&
+					docContent !== headText
+				) {
+					intents.push( {
+						type: 'split_block',
+						payload: {
+							syncId: spec.syncId as string,
+							field: 'content',
+							offset: headText.length,
+							newSyncId: next.syncId as string,
+						},
+					} );
+					docIds.add( next.syncId as string );
+				}
+			}
+
+			// MERGE: spec text === doc text + NEXT doc sibling's text, the
+			// sibling gone from the tree and removable.
+			if ( docBlock ) {
+				const docIndex = docBlocks.indexOf( docBlock );
+				const absorbed = docBlocks[ docIndex + 1 ];
+				if (
+					absorbed &&
+					! specIds.has( absorbed.syncId ) &&
+					0 === absorbed.children.length &&
+					( ! options.removableIds ||
+						options.removableIds.has( absorbed.syncId ) )
+				) {
+					const survivorText = blockField( docBlock, 'content' ).text;
+					const absorbedText = blockField( absorbed, 'content' ).text;
+					if (
+						'' !== absorbedText &&
+						specText( spec ) === survivorText + absorbedText
+					) {
+						intents.push( {
+							type: 'merge_blocks',
+							payload: {
+								survivorId: docBlock.syncId,
+								absorbedId: absorbed.syncId,
+								field: 'content',
+								joinOffset: survivorText.length,
+							},
+						} );
+					}
+				}
+			}
+
+			// Recurse into matching children.
+			if ( docBlock ) {
+				walkLevel(
+					( spec.children as Array< Record< string, unknown > > ) ??
+						[],
+					docBlock.children
+				);
+			}
+		}
+	};
+	walkLevel( specs, doc.root );
+	return intents;
+}
+
+/**
  * Derives intents that transform `doc` into the tree described by `blocks`.
  *
- * The result is verified by application; on divergence the affected blocks
- * degrade to coarse replacement and the batch re-verifies. Returns null in
- * the no-op case (trees already equal).
+ * The result is verified by application; on divergence the affected fields
+ * degrade to coarse replacement (with format restoration) and the batch
+ * re-verifies. Returns null in the no-op case (trees already equal).
  *
  * NOTE: mutates nothing — the caller authors the returned intents through
  * its session (which applies them optimistically).
@@ -507,7 +745,7 @@ function collectSpecIds(
  *                treated as newly created with a minted id. Callers MUST
  *                write the resulting ids back to the editor via the returned
  *                specs, or the next capture cycle re-mints.
- * @param options Removability/exclusion scoping (see DeriveOptions).
+ * @param options Removability/exclusion/field scoping (see DeriveOptions).
  * @return Derived intents + the specs (with adopted/minted ids), or null.
  */
 export function deriveIntents(
@@ -515,10 +753,11 @@ export function deriveIntents(
 	blocks: BridgeBlock[],
 	options: DeriveOptions = {}
 ): ( DerivedIntents & { specs: Array< Record< string, unknown > > } ) | null {
+	const resolver = options.richTextFields ?? defaultRichTextFields;
 	const minted = new Set< string >();
 	const seenIds = new Set< string >();
 	let specs = blocks.map( ( block ) =>
-		blockToEngineSpec( block, minted, seenIds )
+		blockToEngineSpec( block, resolver, minted, seenIds )
 	);
 	/*
 	 * Adoption eligibility: a spec may take over a document identity when
@@ -550,8 +789,8 @@ export function deriveIntents(
 	}
 	const target = specsToDocument( specs );
 	const targetIds = collectSpecIds( specs, new Set() );
-	const targetJson = bridgeCanonical( target );
-	if ( targetJson === bridgeCanonical( doc, targetIds ) ) {
+	const targetJson = bridgeCanonical( target, resolver );
+	if ( targetJson === bridgeCanonical( doc, resolver, targetIds ) ) {
 		/*
 		 * Equal up to blocks absent from the tree. Absent-but-REMOVABLE
 		 * blocks are deletions and need full derivation; when every absent
@@ -575,9 +814,21 @@ export function deriveIntents(
 		}
 	}
 
-	const oldFlat = flattenDocument( doc );
+	/*
+	 * Structural text ops first: splits and merges derived from identity +
+	 * concatenation signals apply to a scratch document, and the general
+	 * differ then works against that — the split's tail already exists,
+	 * the merge's absorbed block is already gone.
+	 */
+	const structural = deriveSplitsAndMerges( doc, specs, options );
+	let workingDoc = doc;
+	for ( const intent of structural ) {
+		workingDoc = applyScratch( workingDoc, intent );
+	}
+
+	const oldFlat = flattenDocument( workingDoc );
 	const newFlat = flattenSpecs( specs, null, new Map() );
-	const intents: DerivedIntents[ 'intents' ] = [];
+	const intents: DerivedIntents[ 'intents' ] = [ ...structural ];
 	const retainedIds = new Set< string >();
 
 	// Removals first (they cannot invalidate later anchors: anchors are
@@ -601,7 +852,7 @@ export function deriveIntents(
 	}
 
 	// Walk the new tree in order: insert added blocks, move relocated ones,
-	// then diff type/attrs/text for survivors.
+	// then diff type/attrs/fields for survivors.
 	for ( const [ syncId, entry ] of newFlat ) {
 		const old = oldFlat.get( syncId );
 		if ( ! old ) {
@@ -679,60 +930,142 @@ export function deriveIntents(
 			}
 		}
 
-		const textIntent = diffText(
-			oldBlock.fields.content?.text ?? '',
-			( entry.spec.text as string ) ?? '',
-			syncId
-		);
-		if ( textIntent ) {
-			intents.push( textIntent );
+		for ( const field of resolver( newType ) ) {
+			const textIntent = diffText(
+				blockField( oldBlock, field ).text,
+				specField( entry.spec, field ).text,
+				syncId,
+				field
+			);
+			if ( textIntent ) {
+				intents.push( textIntent );
+			}
+		}
+	}
+
+	/*
+	 * Format derivation: apply everything so far to a scratch document (the
+	 * reducer shifts existing spans through the text edits), then diff each
+	 * surviving field's spans against the target and emit format_text runs.
+	 */
+	let scratch = doc;
+	for ( const intent of intents ) {
+		scratch = applyScratch( scratch, intent );
+	}
+	const scratchFlat = flattenDocument( scratch );
+	for ( const [ syncId, entry ] of newFlat ) {
+		const scratchEntry = scratchFlat.get( syncId );
+		if ( ! scratchEntry ) {
+			continue;
+		}
+		for ( const field of resolver( entry.spec.blockType as string ) ) {
+			intents.push(
+				...diffFormats(
+					blockField( scratchEntry.block, field ),
+					specField( entry.spec, field ),
+					syncId,
+					field
+				)
+			);
 		}
 	}
 
 	// Verify: the derived intents must reproduce the target tree (retained
 	// blocks excluded from the comparison — they are staleness, not target).
-	if ( verifiesTo( doc, intents, targetJson, targetIds ) ) {
+	if ( verifiesTo( doc, intents, targetJson, resolver, targetIds ) ) {
 		return { intents, coarseBlockCount: 0, retainedIds, specs };
 	}
 
 	/*
-	 * Degrade: replace each survivor's content wholesale and retry. If even
-	 * the coarse batch cannot verify (structural derivation bug), fail
-	 * loudly — silent divergence is the one unacceptable outcome.
+	 * Degrade: replace each divergent field wholesale (text via the coarse
+	 * op, spans restored via format_text — replace_attr_content clears
+	 * formats) and retry. If even the coarse batch cannot verify
+	 * (structural derivation bug), fail loudly — silent divergence is the
+	 * one unacceptable outcome.
 	 */
 	const coarse: DerivedIntents[ 'intents' ] = intents.filter(
 		( intent ) =>
 			'insert_text' !== intent.type &&
 			'delete_text' !== intent.type &&
-			'replace_text' !== intent.type
+			'replace_text' !== intent.type &&
+			'format_text' !== intent.type &&
+			'split_block' !== intent.type &&
+			'merge_blocks' !== intent.type
 	);
 	let coarseBlockCount = 0;
+	const coarseOldFlat = flattenDocument( doc );
 	for ( const [ syncId, entry ] of newFlat ) {
-		const old = oldFlat.get( syncId );
+		const old = coarseOldFlat.get( syncId );
 		if ( ! old ) {
 			continue;
 		}
-		const newText = ( entry.spec.text as string ) ?? '';
-		if ( ( old.block.fields.content?.text ?? '' ) !== newText ) {
+		for ( const field of resolver( entry.spec.blockType as string ) ) {
+			const targetField = specField( entry.spec, field );
+			const docField = blockField( old.block, field );
+			if (
+				docField.text === targetField.text &&
+				JSON.stringify( docField.formats ) ===
+					JSON.stringify( targetField.formats )
+			) {
+				continue;
+			}
 			coarseBlockCount++;
 			coarse.push( {
 				type: 'replace_attr_content',
 				payload: {
 					syncId,
-					field: 'content',
-					newText,
+					field,
+					newText: targetField.text,
 					observedVersion: 0,
 				},
 			} );
+			for ( const span of targetField.formats ?? [] ) {
+				if ( span.end > span.start ) {
+					coarse.push( {
+						type: 'format_text',
+						payload: {
+							syncId,
+							field,
+							start: span.start,
+							end: span.end,
+							format: span.format,
+							on: true,
+						},
+					} );
+				}
+			}
 		}
 	}
-	if ( ! verifiesTo( doc, coarse, targetJson, targetIds ) ) {
+	if ( ! verifiesTo( doc, coarse, targetJson, resolver, targetIds ) ) {
 		throw new Error(
 			'Intent capture failed verification even after degrading to coarse replacement.'
 		);
 	}
 
 	return { intents: coarse, coarseBlockCount, retainedIds, specs };
+}
+
+/**
+ * Applies one derived intent to a scratch document (synthetic envelope).
+ *
+ * @param doc            Document.
+ * @param intent         Derived intent.
+ * @param intent.type    Intent type.
+ * @param intent.payload Intent payload.
+ * @return Next document.
+ */
+function applyScratch(
+	doc: EngineDocument,
+	intent: { type: string; payload: Record< string, unknown > }
+): EngineDocument {
+	return applyIntent( doc, {
+		intentId: 'scratch',
+		actorId: 'scratch',
+		baseSeq: 0,
+		txnId: null,
+		type: intent.type,
+		payload: intent.payload,
+	} as IntentEnvelope ).doc;
 }
 
 /**
@@ -762,7 +1095,7 @@ function filterExcludedSpecs(
 }
 
 /**
- * Builds an engine document from specs (formats-free bridge trees).
+ * Builds an engine document from specs.
  *
  * @param specs Engine block specs.
  * @return Engine document.
@@ -775,24 +1108,35 @@ function specsToDocument(
 
 /**
  * Canonicalizes a document to the BRIDGE'S projection: block identity,
- * type, sorted attrs, content text, and structure. Engine-internal state
- * the bridge does not capture — attrVersions, format spans, syncParent
- * lineage, non-content fields — is deliberately excluded, since target
- * trees built from editor blocks never carry it and it must not fail
- * verification.
+ * type, sorted attrs, RESOLVER-NAMED fields (text AND format spans), and
+ * structure. Engine-internal state the bridge does not capture —
+ * attrVersions, syncParent lineage, fields outside the resolver's schema —
+ * is deliberately excluded, since target trees built from editor blocks
+ * never carry it and it must not fail verification.
  *
  * When `restrictTo` is given, blocks outside the set are omitted from the
  * projection (with their subtrees) — used to compare a document that
  * retains never-displayed blocks against a target tree that lacks them.
  *
  * @param doc        Engine document.
+ * @param resolver   Rich-text attribute names per block type.
  * @param restrictTo Optional id allowlist.
  * @return Canonical JSON of the projection.
  */
 function bridgeCanonical(
 	doc: EngineDocument,
+	resolver: RichTextFieldsResolver,
 	restrictTo?: Set< string >
 ): string {
+	const canonicalField = ( field: EngineField ) => ( {
+		text: field.text,
+		formats: [ ...( field.formats ?? [] ) ].sort(
+			( a, b ) =>
+				a.start - b.start ||
+				a.end - b.end ||
+				( a.format < b.format ? -1 : 1 )
+		),
+	} );
 	const project = ( block: EngineBlock ): Record< string, unknown > => ( {
 		syncId: block.syncId,
 		blockType: block.blockType,
@@ -803,7 +1147,15 @@ function bridgeCanonical(
 				.filter( ( [ key ] ) => ! key.startsWith( '_' ) )
 				.sort( ( [ a ], [ b ] ) => ( a < b ? -1 : 1 ) )
 		),
-		text: block.fields.content?.text ?? '',
+		fields: Object.fromEntries(
+			resolver( block.blockType )
+				.slice()
+				.sort()
+				.map( ( name ) => [
+					name,
+					canonicalField( blockField( block, name ) ),
+				] )
+		),
 		children: projectList( block.children ),
 	} );
 	const projectList = ( blocks: EngineBlock[] ): unknown[] =>
@@ -822,6 +1174,7 @@ function bridgeCanonical(
  * @param doc        Starting document.
  * @param intents    Derived intents.
  * @param targetJson Canonical target.
+ * @param resolver   Rich-text attribute names per block type.
  * @param restrictTo Optional id allowlist for the comparison.
  * @return Whether the application reproduces the target.
  */
@@ -829,19 +1182,12 @@ function verifiesTo(
 	doc: EngineDocument,
 	intents: DerivedIntents[ 'intents' ],
 	targetJson: string,
+	resolver: RichTextFieldsResolver,
 	restrictTo?: Set< string >
 ): boolean {
 	let current = doc;
 	for ( const intent of intents ) {
-		const result = applyIntent( current, {
-			intentId: 'verify',
-			actorId: 'verify',
-			baseSeq: 0,
-			txnId: null,
-			type: intent.type,
-			payload: intent.payload,
-		} as IntentEnvelope );
-		current = result.doc;
+		current = applyScratch( current, intent );
 	}
-	return bridgeCanonical( current, restrictTo ) === targetJson;
+	return bridgeCanonical( current, resolver, restrictTo ) === targetJson;
 }

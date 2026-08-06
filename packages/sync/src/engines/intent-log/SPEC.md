@@ -316,3 +316,19 @@ escalation rates need the divergence fixtures from the benchmark plan.
   cannot pass. Remaining edge: an offset landing INSIDE a surrogate pair
   (astral characters) is not yet pinned cross-language; vector content
   deliberately stays within the BMP.
+
+## Rich-text codec
+
+Field text is PLAIN text: `rich-text.js` (JS) and `WP_Intent_Log_Rich_Text`
+(PHP twin) convert a block's inline HTML into `{ text, formats }` and back,
+frozen by `test-vectors/rich-text.json`. Formatting elements (em, strong,
+a, code, …) become spans whose format id encodes the tag and its sorted
+attributes (`tag` or `tag|{"attr":"value"}`); `<br>` is a newline; any
+other element (or a comment) collapses to ONE object replacement character
+(U+FFFC) whose span carries the raw source verbatim; unsupported or
+malformed input degrades to a whole-field object — round-trip exact,
+opaque to merging, never wrong. Consequences: text intents never carry
+markup characters, concurrent merges cannot corrupt HTML, and the capture
+bridge derives `split_block`/`merge_blocks` from identity + concatenation
+signals and `format_text` from span diffs — the engine's split/merge and
+format semantics are reachable from real typing.

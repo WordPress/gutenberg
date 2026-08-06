@@ -20,6 +20,7 @@ import {
 	createDocument,
 	canonicalJson,
 } from '../engines/intent-log/document.js';
+import { htmlToField } from '../engines/intent-log/rich-text.js';
 import {
 	createServer,
 	serverDocAt,
@@ -47,16 +48,20 @@ describe( 'intent-log bridge', () => {
 	describe( 'block mapping', () => {
 		it( 'round-trips blocks with syncId in metadata and content as a field', () => {
 			const blocks = [
-				paragraph( 'p1', '<p>Hello</p>', { align: 'wide' } ),
+				paragraph( 'p1', 'Hello <em>there</em>', { align: 'wide' } ),
 				{
 					name: 'core/group',
 					attributes: { metadata: { syncId: 'g1', name: 'Kept' } },
-					innerBlocks: [ paragraph( 'p2', '<p>Nested</p>' ) ],
+					innerBlocks: [ paragraph( 'p2', 'Nested' ) ],
 				},
 			];
 			const doc = docFromBlocks( blocks );
 			expect( doc.root[ 0 ].syncId ).toBe( 'p1' );
-			expect( doc.root[ 0 ].fields.content.text ).toBe( '<p>Hello</p>' );
+			// Plain-text coordinates: no tag characters in field text.
+			expect( doc.root[ 0 ].fields.content ).toEqual( {
+				text: 'Hello there',
+				formats: [ { start: 6, end: 11, format: 'em' } ],
+			} );
 			expect( doc.root[ 0 ].attrs.align ).toBe( 'wide' );
 			expect( doc.root[ 0 ].attrs.metadata ).toBeUndefined();
 			expect( doc.root[ 1 ].attrs.metadata ).toEqual( { name: 'Kept' } );
@@ -65,7 +70,9 @@ describe( 'intent-log bridge', () => {
 			expect( back[ 0 ].attributes.metadata ).toEqual( {
 				syncId: 'p1',
 			} );
-			expect( back[ 0 ].attributes.content ).toBe( '<p>Hello</p>' );
+			expect( back[ 0 ].attributes.content ).toBe(
+				'Hello <em>there</em>'
+			);
 			expect( back[ 1 ].attributes.metadata ).toEqual( {
 				syncId: 'g1',
 				name: 'Kept',
@@ -75,15 +82,20 @@ describe( 'intent-log bridge', () => {
 			} );
 		} );
 
-		it( 'serializes rich-text values and mints ids for new blocks', () => {
+		it( 'converts rich-text values through the codec and mints ids for new blocks', () => {
 			const spec = blockToEngineSpec( {
 				name: 'core/paragraph',
 				attributes: {
-					content: { toHTMLString: () => '<p>Rich</p>' },
+					content: { toHTMLString: () => 'so <em>Rich</em>' },
 				},
 				innerBlocks: [],
 			} );
-			expect( spec.text ).toBe( '<p>Rich</p>' );
+			expect( spec.fields ).toEqual( {
+				content: {
+					text: 'so Rich',
+					formats: [ { start: 3, end: 7, format: 'em' } ],
+				},
+			} );
 			expect( typeof spec.syncId ).toBe( 'string' );
 			expect( ( spec.syncId as string ).length ).toBeGreaterThan( 8 );
 		} );
@@ -487,7 +499,8 @@ describe( 'adoption edge cases', () => {
 		const echo = derived.specs.map( ( spec ) => ( {
 			name: 'core/paragraph',
 			attributes: {
-				content: spec.text as string,
+				content: ( spec.fields as Record< string, { text: string } > )
+					.content.text,
 				metadata: { syncId: spec.syncId as string },
 			},
 			innerBlocks: [],
@@ -507,5 +520,162 @@ describe( 'adoption edge cases', () => {
 		);
 		const applied = serverDocAt( server, server.log.length );
 		expect( deriveIntents( applied, echo ) ).toBeNull();
+	} );
+} );
+
+describe( 'rich-text coordinate capture', () => {
+	const idless = ( content: string ): BridgeBlock => ( {
+		name: 'core/paragraph',
+		attributes: { content },
+		innerBlocks: [],
+	} );
+
+	it( 'derives split_block from the Enter-in-a-paragraph tree shape', () => {
+		const doc = docFromBlocks( [ paragraph( 'p1', 'HelloWorld' ) ] );
+		const derived = deriveIntents( doc, [
+			paragraph( 'p1', 'Hello' ),
+			idless( 'World' ),
+		] )!;
+
+		const types = derived.intents.map( ( intent ) => intent.type );
+		expect( types ).toContain( 'split_block' );
+		expect( types ).not.toContain( 'insert_block' );
+		expect( types ).not.toContain( 'remove_block' );
+		const split = derived.intents.find(
+			( intent ) => 'split_block' === intent.type
+		)!;
+		expect( split.payload ).toMatchObject( {
+			syncId: 'p1',
+			field: 'content',
+			offset: 5,
+		} );
+		// The tail's identity is the split's newSyncId — agreed before the
+		// server ever sees the block.
+		expect( split.payload.newSyncId ).toBe( derived.specs[ 1 ].syncId );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'derives merge_blocks from the Backspace-join tree shape', () => {
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'Hello' ),
+			paragraph( 'p2', 'World' ),
+		] );
+		const derived = deriveIntents(
+			doc,
+			[ paragraph( 'p1', 'HelloWorld' ) ],
+			{ removableIds: new Set( [ 'p1', 'p2' ] ) }
+		)!;
+
+		const types = derived.intents.map( ( intent ) => intent.type );
+		expect( types ).toContain( 'merge_blocks' );
+		expect( types ).not.toContain( 'remove_block' );
+		expect( types ).not.toContain( 'insert_text' );
+		const merge = derived.intents.find(
+			( intent ) => 'merge_blocks' === intent.type
+		)!;
+		expect( merge.payload ).toEqual( {
+			survivorId: 'p1',
+			absorbedId: 'p2',
+			field: 'content',
+			joinOffset: 5,
+		} );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'derives format_text for a newly bolded range, no text intents', () => {
+		const doc = docFromBlocks( [ paragraph( 'p1', 'Hello World' ) ] );
+		const derived = deriveIntents( doc, [
+			paragraph( 'p1', 'Hello <strong>World</strong>' ),
+		] )!;
+
+		expect( derived.intents ).toEqual( [
+			{
+				type: 'format_text',
+				payload: {
+					syncId: 'p1',
+					field: 'content',
+					start: 6,
+					end: 11,
+					format: 'strong',
+					on: true,
+				},
+			},
+		] );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'existing spans shift through a text edit without redundant format intents', () => {
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'Hello <strong>World</strong>' ),
+		] );
+		const derived = deriveIntents( doc, [
+			paragraph( 'p1', 'Hey <strong>World</strong>' ),
+		] )!;
+
+		const types = derived.intents.map( ( intent ) => intent.type );
+		expect( types ).toContain( 'replace_text' );
+		// The reducer shifts the strong span through the replacement; the
+		// target agrees, so no format churn.
+		expect( types ).not.toContain( 'format_text' );
+		expect( derived.coarseBlockCount ).toBe( 0 );
+	} );
+
+	it( 'unformatting derives format_text off', () => {
+		const doc = docFromBlocks( [
+			paragraph( 'p1', 'Hello <em>World</em>' ),
+		] );
+		const derived = deriveIntents( doc, [
+			paragraph( 'p1', 'Hello World' ),
+		] )!;
+		expect( derived.intents ).toEqual( [
+			{
+				type: 'format_text',
+				payload: {
+					syncId: 'p1',
+					field: 'content',
+					start: 6,
+					end: 11,
+					format: 'em',
+					on: false,
+				},
+			},
+		] );
+	} );
+
+	it( 'a resolver-less field stays engine-side in both directions', () => {
+		// A block whose resolver names NO rich-text attributes (e.g. an
+		// image): its genesis content field must be neither captured over
+		// nor serialized into an editor attribute.
+		const resolver = ( blockName: string ) =>
+			'core/image' === blockName ? [] : [ 'content' ];
+		const doc = createDocument( [
+			{
+				syncId: 'img1',
+				blockType: 'core/image',
+				attrs: { url: 'a.png' },
+				fields: {
+					content: htmlToField( '<img src="a.png">' ),
+				},
+			},
+		] );
+		const back = engineDocumentToBlocks( doc, resolver );
+		expect( back[ 0 ].attributes.content ).toBeUndefined();
+
+		const derived = deriveIntents(
+			doc,
+			[
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'b.png',
+						metadata: { syncId: 'img1' },
+					},
+					innerBlocks: [],
+				},
+			],
+			{ richTextFields: resolver }
+		)!;
+		const types = derived.intents.map( ( intent ) => intent.type );
+		expect( types ).toEqual( [ 'set_attr' ] );
 	} );
 } );

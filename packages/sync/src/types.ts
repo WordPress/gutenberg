@@ -186,6 +186,13 @@ export interface SyncConfig {
 		objectId: ObjectID | null
 	) => boolean;
 	supportsPersistence?: boolean;
+	/**
+	 * Names a block type's rich-text attributes (backed by the block
+	 * registry). Engines with rich-text-coordinate capture (the intent log)
+	 * use it to decide which attributes become text fields; omitted, only
+	 * the conventional `content` attribute is captured.
+	 */
+	richTextFields?: ( blockName: string ) => string[];
 }
 
 export interface SyncManager {

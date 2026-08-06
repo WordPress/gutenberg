@@ -13,6 +13,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/class-wp-yjs-relay-engine.php';
 	require_once __DIR__ . '/class-wp-intent-log-document.php';
 	require_once __DIR__ . '/class-wp-intent-log-planner.php';
+	require_once __DIR__ . '/class-wp-intent-log-rich-text.php';
 	require_once __DIR__ . '/class-wp-intent-log-engine.php';
 	require_once __DIR__ . '/class-wp-sync-engine-registry.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';

@@ -780,6 +780,123 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		expect( saved.content.raw ).toContain( expected );
 	} );
 
+	test( 'formatted content survives genesis, sync, and save (rich-text coordinates)', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Formatting Round Trip',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Hello <em>styled</em> world</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+
+		// The peer sees the formatting from genesis.
+		await expect( async () => {
+			const blocks = await editor2.getBlocks();
+			expect( blocks[ 0 ].attributes.content ).toContain(
+				'<em>styled</em>'
+			);
+		} ).toPass( { timeout: 10000 } );
+
+		// The peer appends text; the em span survives untouched on both.
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.type( ' indeed' );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.content ).toBe(
+				'Hello <em>styled</em> world indeed'
+			);
+		} ).toPass( { timeout: 10000 } );
+
+		await editor2.saveDraft();
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain(
+			'Hello <em>styled</em> world indeed'
+		);
+	} );
+
+	test( 'one user bolds a word while the other types in the SAME paragraph: both changes survive', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// The marquee capability of rich-text coordinates: a format span and
+		// concurrent typing merge in plain-text space — under HTML-string
+		// diffing this was an escalation (or worse, markup corruption).
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Concurrent Format Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Make World bold now</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		// User 1 selects the word "World" and bolds it; user 2 types at the
+		// end of the same paragraph at the same time.
+		const paragraph1 = editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first();
+		await paragraph1.dblclick( { position: { x: 60, y: 10 } } );
+		// Anchor selection on the exact word regardless of layout: select
+		// "World" via the store for precision.
+		await page1.evaluate( () => {
+			const selectAll = window.getSelection();
+			const block = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
+			const textNode = block?.firstChild;
+			if ( ! textNode || ! selectAll ) {
+				return;
+			}
+			const text = textNode.textContent ?? '';
+			const start = text.indexOf( 'World' );
+			const range = document.createRange();
+			range.setStart( textNode, start );
+			range.setEnd( textNode, start + 'World'.length );
+			selectAll.removeAllRanges();
+			selectAll.addRange( range );
+		} );
+
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page2.keyboard.press( 'End' );
+
+		await Promise.all( [
+			page1.keyboard.press( 'ControlOrMeta+b' ),
+			page2.keyboard.type( ' please', { delay: 50 } ),
+		] );
+
+		// Both changes survive on both editors.
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				const content = blocks[ 0 ].attributes.content as string;
+				expect( content ).toContain( '<strong>World</strong>' );
+				expect( content ).toContain( 'now please' );
+			} ).toPass( { timeout: 15000 } );
+		}
+	} );
+
 	test( 'title edits sync between users in both directions', async ( {
 		collaborationUtils,
 		requestUtils,

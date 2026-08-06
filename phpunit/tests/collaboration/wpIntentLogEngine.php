@@ -634,7 +634,22 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 							'block'          => array(
 								'syncId'    => 'fresh-block',
 								'blockType' => 'core/paragraph',
-								'text'      => '<p>Appended</p>',
+								// Codec model: plain text + spans; the
+								// wrapper element rides the internal attr.
+								'text'      => 'Appended boldly',
+								'formats'   => array(
+									array(
+										'start'  => 9,
+										'end'    => 15,
+										'format' => 'strong',
+									),
+								),
+								'attrs'     => array(
+									'_wrapper' => array(
+										'open'  => '<p>',
+										'close' => '</p>',
+									),
+								),
 							),
 							'parentId'       => null,
 							'afterSiblingId' => self::paragraph_id(),
@@ -646,7 +661,8 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 
 		$content = $engine->materialize( $this->room() );
 		$this->assertStringContainsString( '<p>Hello world</p>', $content );
-		$this->assertStringContainsString( '<p>Appended</p>', $content );
+		// Formats serialize back to markup through the codec.
+		$this->assertStringContainsString( '<p>Appended <strong>boldly</strong></p>', $content );
 		$this->assertStringContainsString( self::paragraph_id(), $content );
 		$this->assertStringContainsString( 'fresh-block', $content );
 		$this->assertStringContainsString( 'wp:paragraph', $content );

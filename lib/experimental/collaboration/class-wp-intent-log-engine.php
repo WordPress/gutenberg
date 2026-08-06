@@ -834,11 +834,13 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				/*
 				 * The editor's `content` attribute is the INNER HTML of a
 				 * block's single wrapper element ('<p>Hi</p>' → 'Hi'), and
-				 * the client bridge captures in that form. Genesis must
-				 * store the same form or every text offset disagrees between
-				 * client and server. The stripped wrapper is kept in an
-				 * internal `_wrapper` attr (excluded from client capture)
-				 * so materialize() can rebuild the full markup.
+				 * the client bridge captures in that form — then through the
+				 * rich-text codec into plain text + format spans (THE text
+				 * coordinate space). Genesis must store the same form or
+				 * every text offset disagrees between client and server.
+				 * The stripped wrapper is kept in an internal `_wrapper`
+				 * attr (excluded from client capture) so materialize() can
+				 * rebuild the full markup.
 				 */
 				$text    = trim( $block['innerHTML'] );
 				$wrapper = null;
@@ -857,7 +859,9 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					'syncId'    => $sync_id,
 					'blockType' => $block['blockName'],
 					'attrs'     => $attrs,
-					'text'      => $text,
+					'fields'    => array(
+						'content' => WP_Intent_Log_Rich_Text::html_to_field( $text ),
+					),
 					'children'  => self::blocks_to_specs( $block['innerBlocks'], $post_id, $block_path ),
 				);
 				++$index;
@@ -882,7 +886,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			$attrs['metadata']['syncId'] = $block['syncId'];
 
 			$inner_blocks = array_map( array( __CLASS__, 'to_serializable_block' ), $block['children'] );
-			$text         = $block['fields']['content']['text'] ?? '';
+			$text         = WP_Intent_Log_Rich_Text::field_to_html(
+				$block['fields']['content'] ?? array(
+					'text'    => '',
+					'formats' => array(),
+				)
+			);
 			if ( is_array( $wrapper ) ) {
 				$text = ( $wrapper['open'] ?? '' ) . $text . ( $wrapper['close'] ?? '' );
 			}

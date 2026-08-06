@@ -478,15 +478,42 @@ inside intent payloads, not the transport.
   Verified live: two-tab observer converged across a mid-session
   checkpoint on the dev env with zero console errors.
 
+  **2d-xvi (CAPTURE REWRITE onto rich-text coordinates — review 1.4,
+  the big one) DONE.** The engine that was validated is now the engine
+  that runs:
+  - A vector-frozen rich-text codec (`rich-text.js` +
+    `WP_Intent_Log_Rich_Text`, `test-vectors/rich-text.json`, 28
+    cases) converts inline HTML ↔ { plain text, format spans } in both
+    languages — the PHP twin reproduced every vector first-run. Format
+    ids encode tag+attributes; `<br>` = newline; unknown elements
+    collapse to one object char preserving raw source; unsupported
+    input degrades to a whole-field object (safe, never wrong).
+  - The bridge diffs PLAIN TEXT (offsets never count markup, so
+    concurrent merges cannot produce invalid HTML), captures every
+    registry-declared rich-text attribute as its own field
+    (SyncConfig.richTextFields, backed by getBlockType source
+    html/rich-text), derives `split_block`/`merge_blocks` from
+    identity+concatenation signals, and derives `format_text` by
+    scratch-applying the batch and diffing spans — the reducer's own
+    span shifting means an edit under a format produces no format
+    churn. Verification now covers formats; the coarse fallback
+    restores spans after replace_attr_content (which clears them).
+  - Server genesis and materialize run the codec twin, so client and
+    server agree on the coordinate space from the first snapshot, and
+    materialized content carries formatting markup back.
+  - E2e: formatted genesis→sync→save round trip, and the marquee —
+    one user bolds a word while the other types in the SAME paragraph,
+    both changes surviving on both editors (first-run pass). 18 specs,
+    1317 jest, 214 PHPUnit, observer clean.
+
   Remaining in 2d, all design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport) and
   the escalation REVIEW UI (inspect/apply/discard a parked proposal)
   beyond the notice. Review findings NOT yet addressed (next tier):
-  the capture layer's HTML-string diffing vs the spec'd rich-text
-  coordinates (1.4), the proposal READ API half of 1.3b, frame/txn
-  state across request boundaries (1.3c), independent effect-model
-  oracles (3.1), and the invasiveness cleanups (identity
-  triplication, lockstep .d.ts, delayed re-push).
+  the proposal READ API half of 1.3b, frame/txn state across request
+  boundaries (1.3c), independent effect-model oracles (3.1), and the
+  invasiveness cleanups (identity triplication, lockstep .d.ts,
+  delayed re-push).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

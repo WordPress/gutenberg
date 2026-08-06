@@ -1,0 +1,495 @@
+{
+	"description": "Frozen rich-text codec vectors: html→field (htmlToField), field→html (fieldToHtml), and reparse normalization. The PHP twin must reproduce every entry byte-for-byte. Regenerate with tools/generate-rich-text-vectors.js only alongside a deliberate codec change, in both languages together.",
+	"cases": {
+		"html": [
+			{
+				"html": "",
+				"field": {
+					"text": "",
+					"formats": []
+				},
+				"serialized": ""
+			},
+			{
+				"html": "Hello world",
+				"field": {
+					"text": "Hello world",
+					"formats": []
+				},
+				"serialized": "Hello world"
+			},
+			{
+				"html": "a &amp; b &lt;c&gt; &quot;d&quot; &apos;e&apos;",
+				"field": {
+					"text": "a & b <c> \"d\" 'e'",
+					"formats": []
+				},
+				"serialized": "a &amp; b &lt;c&gt; \"d\" 'e'"
+			},
+			{
+				"html": "num &#233; hex &#xE9; astral &#x1F600;",
+				"field": {
+					"text": "num é hex é astral 😀",
+					"formats": []
+				},
+				"serialized": "num é hex é astral 😀"
+			},
+			{
+				"html": "nb&nbsp;sp",
+				"field": {
+					"text": "nb sp",
+					"formats": []
+				},
+				"serialized": "nb&nbsp;sp"
+			},
+			{
+				"html": "a <em>b</em> c",
+				"field": {
+					"text": "a b c",
+					"formats": [
+						{
+							"start": 2,
+							"end": 3,
+							"format": "em"
+						}
+					]
+				},
+				"serialized": "a <em>b</em> c"
+			},
+			{
+				"html": "<strong><em>nested</em></strong> tail",
+				"field": {
+					"text": "nested tail",
+					"formats": [
+						{
+							"start": 0,
+							"end": 6,
+							"format": "em"
+						},
+						{
+							"start": 0,
+							"end": 6,
+							"format": "strong"
+						}
+					]
+				},
+				"serialized": "<em><strong>nested</strong></em> tail"
+			},
+			{
+				"html": "<em>touching</em><strong>spans</strong>",
+				"field": {
+					"text": "touchingspans",
+					"formats": [
+						{
+							"start": 0,
+							"end": 8,
+							"format": "em"
+						},
+						{
+							"start": 8,
+							"end": 13,
+							"format": "strong"
+						}
+					]
+				},
+				"serialized": "<em>touching</em><strong>spans</strong>"
+			},
+			{
+				"html": "<a href=\"https://example.test/?a=1&amp;b=2\" rel=\"nofollow\">link</a>",
+				"field": {
+					"text": "link",
+					"formats": [
+						{
+							"start": 0,
+							"end": 4,
+							"format": "a|{\"href\":\"https://example.test/?a=1&b=2\",\"rel\":\"nofollow\"}"
+						}
+					]
+				},
+				"serialized": "<a href=\"https://example.test/?a=1&amp;b=2\" rel=\"nofollow\">link</a>"
+			},
+			{
+				"html": "<code>if (a &lt; b) {}</code>",
+				"field": {
+					"text": "if (a < b) {}",
+					"formats": [
+						{
+							"start": 0,
+							"end": 13,
+							"format": "code"
+						}
+					]
+				},
+				"serialized": "<code>if (a &lt; b) {}</code>"
+			},
+			{
+				"html": "line one<br>line two<br/>line three",
+				"field": {
+					"text": "line one\nline two\nline three",
+					"formats": []
+				},
+				"serialized": "line one<br>line two<br>line three"
+			},
+			{
+				"html": "ca<em>fé 你好</em> niño",
+				"field": {
+					"text": "café 你好 niño",
+					"formats": [
+						{
+							"start": 2,
+							"end": 7,
+							"format": "em"
+						}
+					]
+				},
+				"serialized": "ca<em>fé 你好</em> niño"
+			},
+			{
+				"html": "<em>你好<strong>世界</strong></em>",
+				"field": {
+					"text": "你好世界",
+					"formats": [
+						{
+							"start": 0,
+							"end": 4,
+							"format": "em"
+						},
+						{
+							"start": 2,
+							"end": 4,
+							"format": "strong"
+						}
+					]
+				},
+				"serialized": "<em>你好<strong>世界</strong></em>"
+			},
+			{
+				"html": "x <img src=\"i.png\" alt=\"&amp;\"> y",
+				"field": {
+					"text": "x ￼ y",
+					"formats": [
+						{
+							"start": 2,
+							"end": 3,
+							"format": "obj|{\"html\":\"<img src=\\\"i.png\\\" alt=\\\"&amp;\\\">\"}"
+						}
+					]
+				},
+				"serialized": "x <img src=\"i.png\" alt=\"&amp;\"> y"
+			},
+			{
+				"html": "<figure><img src=\"i.png\"><figcaption>cap</figcaption></figure>",
+				"field": {
+					"text": "￼",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"<figure><img src=\\\"i.png\\\"><figcaption>cap</figcaption></figure>\"}"
+						}
+					]
+				},
+				"serialized": "<figure><img src=\"i.png\"><figcaption>cap</figcaption></figure>"
+			},
+			{
+				"html": "a<!-- comment -->b",
+				"field": {
+					"text": "a￼b",
+					"formats": [
+						{
+							"start": 1,
+							"end": 2,
+							"format": "obj|{\"html\":\"<!-- comment -->\"}"
+						}
+					]
+				},
+				"serialized": "a<!-- comment -->b"
+			},
+			{
+				"html": "<s>strike</s> <sub>sub</sub> <sup>sup</sup> <kbd>K</kbd> <mark>hi</mark>",
+				"field": {
+					"text": "strike sub sup K hi",
+					"formats": [
+						{
+							"start": 0,
+							"end": 6,
+							"format": "s"
+						},
+						{
+							"start": 7,
+							"end": 10,
+							"format": "sub"
+						},
+						{
+							"start": 11,
+							"end": 14,
+							"format": "sup"
+						},
+						{
+							"start": 15,
+							"end": 16,
+							"format": "kbd"
+						},
+						{
+							"start": 17,
+							"end": 19,
+							"format": "mark"
+						}
+					]
+				},
+				"serialized": "<s>strike</s> <sub>sub</sub> <sup>sup</sup> <kbd>K</kbd> <mark>hi</mark>"
+			},
+			{
+				"html": "<span class=\"x\" data-v=\"1\">styled</span>",
+				"field": {
+					"text": "styled",
+					"formats": [
+						{
+							"start": 0,
+							"end": 6,
+							"format": "span|{\"class\":\"x\",\"data-v\":\"1\"}"
+						}
+					]
+				},
+				"serialized": "<span class=\"x\" data-v=\"1\">styled</span>"
+			},
+			{
+				"html": "<em>unclosed",
+				"field": {
+					"text": "￼",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"<em>unclosed\"}"
+						}
+					]
+				},
+				"serialized": "<em>unclosed"
+			},
+			{
+				"html": "mismatched </strong>",
+				"field": {
+					"text": "￼",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"mismatched </strong>\"}"
+						}
+					]
+				},
+				"serialized": "mismatched </strong>"
+			},
+			{
+				"html": "entity &hellip; unknown",
+				"field": {
+					"text": "￼",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"entity &hellip; unknown\"}"
+						}
+					]
+				},
+				"serialized": "entity &hellip; unknown"
+			},
+			{
+				"html": "stray < bracket",
+				"field": {
+					"text": "￼",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"stray < bracket\"}"
+						}
+					]
+				},
+				"serialized": "stray < bracket"
+			},
+			{
+				"html": "<div>block-level content</div> tail",
+				"field": {
+					"text": "￼ tail",
+					"formats": [
+						{
+							"start": 0,
+							"end": 1,
+							"format": "obj|{\"html\":\"<div>block-level content</div>\"}"
+						}
+					]
+				},
+				"serialized": "<div>block-level content</div> tail"
+			}
+		],
+		"field": [
+			{
+				"field": {
+					"text": "abcd",
+					"formats": [
+						{
+							"start": 0,
+							"end": 3,
+							"format": "em"
+						},
+						{
+							"start": 2,
+							"end": 4,
+							"format": "strong"
+						}
+					]
+				},
+				"serialized": "<em>ab<strong>c</strong></em><strong>d</strong>",
+				"reparsed": {
+					"text": "abcd",
+					"formats": [
+						{
+							"start": 0,
+							"end": 3,
+							"format": "em"
+						},
+						{
+							"start": 2,
+							"end": 3,
+							"format": "strong"
+						},
+						{
+							"start": 3,
+							"end": 4,
+							"format": "strong"
+						}
+					]
+				}
+			},
+			{
+				"field": {
+					"text": "overlap three",
+					"formats": [
+						{
+							"start": 0,
+							"end": 9,
+							"format": "em"
+						},
+						{
+							"start": 4,
+							"end": 13,
+							"format": "strong"
+						},
+						{
+							"start": 6,
+							"end": 8,
+							"format": "s"
+						}
+					]
+				},
+				"serialized": "<em>over<strong>la<s>p </s>t</strong></em><strong>hree</strong>",
+				"reparsed": {
+					"text": "overlap three",
+					"formats": [
+						{
+							"start": 0,
+							"end": 9,
+							"format": "em"
+						},
+						{
+							"start": 4,
+							"end": 9,
+							"format": "strong"
+						},
+						{
+							"start": 6,
+							"end": 8,
+							"format": "s"
+						},
+						{
+							"start": 9,
+							"end": 13,
+							"format": "strong"
+						}
+					]
+				}
+			},
+			{
+				"field": {
+					"text": "same range ties",
+					"formats": [
+						{
+							"start": 0,
+							"end": 4,
+							"format": "strong"
+						},
+						{
+							"start": 0,
+							"end": 4,
+							"format": "em"
+						}
+					]
+				},
+				"serialized": "<em><strong>same</strong></em> range ties",
+				"reparsed": {
+					"text": "same range ties",
+					"formats": [
+						{
+							"start": 0,
+							"end": 4,
+							"format": "em"
+						},
+						{
+							"start": 0,
+							"end": 4,
+							"format": "strong"
+						}
+					]
+				}
+			},
+			{
+				"field": {
+					"text": "a & < > \" née",
+					"formats": [
+						{
+							"start": 2,
+							"end": 7,
+							"format": "code"
+						}
+					]
+				},
+				"serialized": "a <code>&amp; &lt; &gt;</code> \" née",
+				"reparsed": {
+					"text": "a & < > \" née",
+					"formats": [
+						{
+							"start": 2,
+							"end": 7,
+							"format": "code"
+						}
+					]
+				}
+			},
+			{
+				"field": {
+					"text": "x\ny",
+					"formats": [
+						{
+							"start": 0,
+							"end": 3,
+							"format": "em"
+						}
+					]
+				},
+				"serialized": "<em>x<br>y</em>",
+				"reparsed": {
+					"text": "x\ny",
+					"formats": [
+						{
+							"start": 0,
+							"end": 3,
+							"format": "em"
+						}
+					]
+				}
+			}
+		]
+	}
+}

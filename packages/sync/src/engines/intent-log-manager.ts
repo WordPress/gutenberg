@@ -13,6 +13,7 @@ import { createAwarenessDoc } from './awareness-sync';
 import {
 	deriveIntents,
 	engineDocumentToBlocks,
+	type RichTextFieldsResolver,
 	type BridgeBlock,
 } from './intent-log-bridge';
 import {
@@ -101,6 +102,12 @@ interface EntityState {
 	 * genesis snapshot's properties are not re-pushed as edits.
 	 */
 	lastPushedProps: Record< string, string >;
+	/**
+	 * Rich-text attribute names per block type (from the entity syncConfig,
+	 * backed by the block registry). Names both the fields the bridge
+	 * captures and the fields it serializes back into attributes.
+	 */
+	fieldsResolver: RichTextFieldsResolver;
 }
 
 /**
@@ -300,6 +307,8 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			clientIds: new Map(),
 			pushSeq: 0,
 			lastPushedProps: initialProps,
+			fieldsResolver:
+				syncConfig.richTextFields ?? ( () => [ 'content' ] ),
 		};
 		entityStates.set( key, state );
 
@@ -332,7 +341,10 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			if ( state.unloaded || ! session.isInitialized() ) {
 				return;
 			}
-			const blocks = engineDocumentToBlocks( session.getDocument()! );
+			const blocks = engineDocumentToBlocks(
+				session.getDocument()!,
+				state.fieldsResolver
+			);
 			const docIds = collectBlockIds( blocks );
 			/*
 			 * Tombstone maintenance: ids that left the document through
@@ -512,6 +524,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					// Remotely removed blocks in a stale tree are not
 					// resurrected.
 					excludeIds: state.docTombstones,
+					richTextFields: state.fieldsResolver,
 				}
 			);
 			if ( ! derived ) {
@@ -544,7 +557,8 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			// Record the state we just captured so later change events do
 			// not bounce it back into the editor.
 			const captured = engineDocumentToBlocks(
-				state.session.getDocument()!
+				state.session.getDocument()!,
+				state.fieldsResolver
 			);
 			const capturedJson = canonicalBlocksJson( captured );
 			state.prevDocIds = collectBlockIds( captured );
