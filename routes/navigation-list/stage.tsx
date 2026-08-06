@@ -13,10 +13,6 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
-
-/**
- * Style dependencies
- */
 import './style.scss';
 
 // Unlock WordPress private APIs

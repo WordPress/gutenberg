@@ -22,6 +22,16 @@ import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
+/**
+ * Renders a control for viewing and editing a block attribute binding.
+ *
+ * @param {Object} root0           Component props.
+ * @param {string} root0.attribute The block attribute name.
+ * @param {Object} [root0.binding] The current block binding.
+ * @param {string} root0.blockName The block type name.
+ *
+ * @return {Element} The block attribute binding control.
+ */
 export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,

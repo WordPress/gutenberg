@@ -3,10 +3,6 @@ const fs = require( 'fs' ).promises;
 const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Promisified dependencies
- */
 const { rimraf } = require( 'rimraf' );
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
