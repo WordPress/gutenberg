@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Include viewport and pseudo style states in global styles save confirmation labels, grouping each block/element once with its state labels (e.g. Default, Mobile, Tablet), and export `getGlobalStylesChangeGroups` and `getGlobalStylesChangeGroupSummary` so UIs can render structured change summaries ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

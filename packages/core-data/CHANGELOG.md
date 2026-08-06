@@ -16,6 +16,10 @@
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 -   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
 
+### Enhancements
+
+-   List each Global Styles change on its own line in the save confirmation panel, followed by badges for the style states it applies to (e.g. Default, Mobile, Tablet) ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ## 7.51.0 (2026-07-14)
 
 ### Enhancements

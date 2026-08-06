@@ -11,14 +11,32 @@ import { getBlockTypes } from '@wordpress/blocks';
 
 type TranslationMap = Record< string, string >;
 type BlockNamesMap = Record< string, string >;
-type ChangeEntry = [ string, string ];
+
+export interface GlobalStylesChangeItem {
+	label: string;
+	states: string[];
+}
+
+export interface GlobalStylesChangeGroup {
+	group: string;
+	items: GlobalStylesChangeItem[];
+}
 
 interface GetGlobalStylesChangesOptions {
 	maxResults?: number;
 }
 
+type ChangeEntry = {
+	group: string;
+	label: string;
+	stateKeys: string[];
+	// Whether the same block or element also changed in the default state.
+	hasDefaultState: boolean;
+};
+
 const globalStylesChangesCache = new Map< string, ChangeEntry[] >();
-const EMPTY_ARRAY: string[] = [];
+const EMPTY_STRING_ARRAY: string[] = [];
+const EMPTY_GROUP_ARRAY: GlobalStylesChangeGroup[] = [];
 const translationMap: TranslationMap = {
 	caption: __( 'Caption' ),
 	link: __( 'Link' ),
@@ -39,6 +57,80 @@ const translationMap: TranslationMap = {
 	'styles.background': __( 'Background' ),
 	'styles.typography': __( 'Typography' ),
 };
+const styleStateLabelMap: TranslationMap = {
+	'@tablet': __( 'Tablet' ),
+	'@mobile': __( 'Mobile' ),
+	':link': __( 'Link' ),
+	':any-link': __( 'Any Link' ),
+	':visited': __( 'Visited' ),
+	':hover': __( 'Hover' ),
+	':focus': __( 'Focus' ),
+	':focus-visible': __( 'Focus-visible' ),
+	':active': __( 'Active' ),
+};
+const styleStateOrder = Object.keys( styleStateLabelMap );
+const defaultStateLabel = __( 'Default' );
+
+/**
+ * Whether a theme.json key represents a style state (viewport or pseudo).
+ *
+ * @param key Object key from a styles path.
+ */
+function isStyleStateKey( key: string ): boolean {
+	return key.startsWith( '@' ) || key.startsWith( ':' );
+}
+
+/**
+ * Summarize a deep change path for change listing.
+ * Keeps the group + name (two segments), plus any consecutive style-state keys
+ * so viewport/pseudo edits are distinguishable from default-state edits.
+ *
+ * @param parentPath Dot-separated path to the changed value.
+ */
+function getChangeKeyPath( parentPath: string ): string {
+	const keyArray = parentPath.split( '.' );
+	const changeKeyParts = keyArray.slice( 0, 2 );
+
+	for ( let i = 2; i < keyArray.length; i++ ) {
+		const key = keyArray[ i ];
+		if ( ! key || ! isStyleStateKey( key ) ) {
+			break;
+		}
+		changeKeyParts.push( key );
+	}
+
+	return changeKeyParts.join( '.' );
+}
+
+/**
+ * Sort style-state keys into a stable viewport-then-pseudo order.
+ *
+ * @param stateKeys Viewport and/or pseudo keys.
+ */
+function sortStyleStateKeys( stateKeys: string[] ): string[] {
+	return [ ...new Set( stateKeys ) ].sort( ( a, b ) => {
+		const aIndex = styleStateOrder.indexOf( a );
+		const bIndex = styleStateOrder.indexOf( b );
+		const normalizedA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+		const normalizedB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+		if ( normalizedA !== normalizedB ) {
+			return normalizedA - normalizedB;
+		}
+		return a.localeCompare( b );
+	} );
+}
+
+/**
+ * Translate style-state keys to labels.
+ *
+ * @param stateKeys Viewport and/or pseudo keys.
+ */
+function getStyleStateLabels( stateKeys: string[] ): string[] {
+	return sortStyleStateKeys( stateKeys ).map(
+		( key ) => styleStateLabelMap[ key ] || key.replace( /^[@:]/, '' )
+	);
+}
+
 const getBlockNames = memoize(
 	(): BlockNamesMap =>
 		getBlockTypes().reduce< BlockNamesMap >(
@@ -62,20 +154,25 @@ const isObject = ( obj: any ): obj is Record< string, any > =>
 	obj !== null && typeof obj === 'object';
 
 /**
- * Get the translation for a given global styles key.
+ * Get the base (state-free) translation for a given global styles key.
+ *
  * @param key A key representing a path to a global style property or setting.
- * @return A translated key or undefined if no translation exists.
+ * @return A translated label or undefined if no translation exists.
  */
-function getTranslation( key: string ): string | undefined {
+function getBaseLabel( key: string ): string | undefined {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
 
 	const keyArray = key.split( '.' );
+	const twoPartKey = keyArray.slice( 0, 2 ).join( '.' );
+
+	if ( translationMap[ twoPartKey ] ) {
+		return translationMap[ twoPartKey ];
+	}
 
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
-		const blockName = getBlockNames()?.[ keyArray[ 1 ] ];
-		return blockName || keyArray[ 1 ];
+		return getBlockNames()?.[ keyArray[ 1 ] ] || keyArray[ 1 ];
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
@@ -101,10 +198,11 @@ function deepCompare(
 	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
 		/*
 		 * Only return a path if the value has changed.
-		 * And then only the path name up to 2 levels deep.
+		 * Keep the group + name (two levels), plus any style-state keys
+		 * (viewport/pseudo) so the save panel can label Mobile/Tablet/etc.
 		 */
 		return changedObject !== originalObject
-			? parentPath.split( '.' ).slice( 0, 2 ).join( '.' )
+			? getChangeKeyPath( parentPath )
 			: undefined;
 	}
 
@@ -133,12 +231,13 @@ function deepCompare(
 }
 
 /**
- * Returns an array of translated summarized global styles changes.
+ * Returns summarized global styles changes with style-state keys.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
+ * Same block/element appears once; state keys from all its changes are merged.
  *
  * @param next     The changed object to compare.
  * @param previous The original object to compare against.
- * @return A 2-dimensional array of tuples: [ "group", "translated change" ].
+ * @return Change entries grouped by label with merged state keys.
  */
 export function getGlobalStylesChangelist(
 	next: any,
@@ -192,28 +291,185 @@ export function getGlobalStylesChangelist(
 		? changedValueTree
 		: [ changedValueTree ];
 
-	// Remove duplicate results.
-	const result = [ ...new Set( changedValueArray ) ]
-		/*
-		 * Translate the keys.
-		 * Remove empty translations.
-		 */
-		.reduce< ChangeEntry[] >( ( acc, curr ) => {
-			const translation = getTranslation( curr );
-			if ( translation ) {
-				acc.push( [ curr.split( '.' )[ 0 ], translation ] );
-			}
-			return acc;
-		}, [] );
+	const itemsByKey = new Map< string, ChangeEntry >();
 
+	for ( const path of new Set( changedValueArray ) ) {
+		const label = getBaseLabel( path );
+		if ( ! label ) {
+			continue;
+		}
+
+		const pathParts = path.split( '.' );
+		const group = pathParts[ 0 ]!;
+		const itemKey = `${ group }\0${ label }`;
+		const stateKeys = pathParts.slice( 2 ).filter( isStyleStateKey );
+		const isDefaultState = ! stateKeys.length;
+		const existing = itemsByKey.get( itemKey );
+
+		if ( existing ) {
+			existing.stateKeys = sortStyleStateKeys( [
+				...existing.stateKeys,
+				...stateKeys,
+			] );
+			existing.hasDefaultState =
+				existing.hasDefaultState || isDefaultState;
+			continue;
+		}
+
+		itemsByKey.set( itemKey, {
+			group,
+			label,
+			stateKeys: sortStyleStateKeys( stateKeys ),
+			hasDefaultState: isDefaultState,
+		} );
+	}
+
+	const result = [ ...itemsByKey.values() ];
 	globalStylesChangesCache.set( cacheKey, result );
 
 	return result;
 }
 
 /**
+ * Returns global styles changes as grouped items with state labels.
+ * Useful for UIs that render viewport/pseudo badges beside a single name.
+ *
+ * @param next     The changed object to compare.
+ * @param previous The original object to compare against.
+ * @param options  Options. maxResults: results to return before truncating.
+ * @return Grouped change items.
+ */
+export function getGlobalStylesChangeGroups(
+	next: any,
+	previous: any,
+	options: GetGlobalStylesChangesOptions = {}
+): GlobalStylesChangeGroup[] {
+	let changeList = getGlobalStylesChangelist( next, previous );
+	const { maxResults } = options;
+
+	if ( ! changeList.length ) {
+		return EMPTY_GROUP_ARRAY;
+	}
+
+	if ( !! maxResults && changeList.length > maxResults ) {
+		changeList = changeList.slice( 0, maxResults );
+	}
+
+	const groups: GlobalStylesChangeGroup[] = [];
+	const groupIndexByName = new Map< string, number >();
+
+	for ( const entry of changeList ) {
+		const states = getStyleStateLabels( entry.stateKeys );
+
+		/*
+		 * A block or element edited in both the default state and a viewport or
+		 * pseudo state needs the default state spelled out, otherwise its
+		 * default-state changes would read as viewport-only changes.
+		 */
+		if ( states.length && entry.hasDefaultState ) {
+			states.unshift( defaultStateLabel );
+		}
+
+		const item: GlobalStylesChangeItem = {
+			label: entry.label,
+			states,
+		};
+		const existingIndex = groupIndexByName.get( entry.group );
+
+		if ( existingIndex === undefined ) {
+			groupIndexByName.set( entry.group, groups.length );
+			groups.push( {
+				group: entry.group,
+				items: [ item ],
+			} );
+			continue;
+		}
+
+		groups[ existingIndex ]!.items.push( item );
+	}
+
+	return groups;
+}
+
+/**
+ * Format a change item label, optionally including states for plain-text UIs.
+ *
+ * @param item Change item with label and state labels.
+ */
+function formatChangeItemLabel( item: GlobalStylesChangeItem ): string {
+	if ( ! item.states.length ) {
+		return item.label;
+	}
+
+	return sprintf(
+		/* translators: 1: block or element name. 2: comma-separated style states such as Mobile, Tablet. */
+		__( '%1$s (%2$s)' ),
+		item.label,
+		item.states.join(
+			/* translators: Used between list items, there is a space after the comma. */
+			__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+		)
+	);
+}
+
+/**
+ * Returns the translated summary sentence for a group of changes.
+ * UIs that render the change names themselves, for example as elements with
+ * state badges, can pass a placeholder as `names` and interpolate it.
+ *
+ * @param group Change group: 'blocks', 'elements', 'settings' or 'styles'.
+ * @param names The group's change names, already joined into a single string.
+ * @param count Number of change names, used to pluralize the sentence.
+ * @return The translated sentence for the group.
+ */
+export function getGlobalStylesChangeGroupSummary(
+	group: string,
+	names: string,
+	count: number
+): string {
+	switch ( group ) {
+		case 'blocks': {
+			return sprintf(
+				// translators: %s: a list of block names separated by a comma.
+				_n( '%s block.', '%s blocks.', count ),
+				names
+			);
+		}
+		case 'elements': {
+			return sprintf(
+				// translators: %s: a list of element names separated by a comma.
+				_n( '%s element.', '%s elements.', count ),
+				names
+			);
+		}
+		case 'settings': {
+			return sprintf(
+				// translators: %s: a list of theme.json setting labels separated by a comma.
+				__( '%s settings.' ),
+				names
+			);
+		}
+		case 'styles': {
+			return sprintf(
+				// translators: %s: a list of theme.json top-level styles labels separated by a comma.
+				__( '%s styles.' ),
+				names
+			);
+		}
+		default: {
+			return sprintf(
+				// translators: %s: a list of global styles changes separated by a comma.
+				__( '%s.' ),
+				names
+			);
+		}
+	}
+}
+
+/**
  * From a getGlobalStylesChangelist() result, returns an array of translated global styles changes, grouped by type.
  * The types are 'blocks', 'elements', 'settings', and 'styles'.
+ * Each block/element is listed once; non-default states are appended in parentheses for plain text.
  *
  * @param next     The changed object to compare.
  * @param previous The original object to compare against.
@@ -225,68 +481,22 @@ export default function getGlobalStylesChanges(
 	previous: any,
 	options: GetGlobalStylesChangesOptions = {}
 ): string[] {
-	let changeList = getGlobalStylesChangelist( next, previous );
-	const changesLength = changeList.length;
-	const { maxResults } = options;
+	const groups = getGlobalStylesChangeGroups( next, previous, options );
 
-	if ( changesLength ) {
-		// Truncate to `n` results if necessary.
-		if ( !! maxResults && changesLength > maxResults ) {
-			changeList = changeList.slice( 0, maxResults );
-		}
-		return Object.entries(
-			changeList.reduce< Record< string, string[] > >( ( acc, curr ) => {
-				const group = acc[ curr[ 0 ] ] || [];
-				if ( ! group.includes( curr[ 1 ] ) ) {
-					acc[ curr[ 0 ] ] = [ ...group, curr[ 1 ] ];
-				}
-				return acc;
-			}, {} )
-		).map( ( [ key, changeValues ] ) => {
-			const changeValuesLength = changeValues.length;
-			const joinedChangesValue = changeValues.join(
-				/* translators: Used between list items, there is a space after the comma. */
-				__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
-			);
-			switch ( key ) {
-				case 'blocks': {
-					return sprintf(
-						// translators: %s: a list of block names separated by a comma.
-						_n( '%s block.', '%s blocks.', changeValuesLength ),
-						joinedChangesValue
-					);
-				}
-				case 'elements': {
-					return sprintf(
-						// translators: %s: a list of element names separated by a comma.
-						_n( '%s element.', '%s elements.', changeValuesLength ),
-						joinedChangesValue
-					);
-				}
-				case 'settings': {
-					return sprintf(
-						// translators: %s: a list of theme.json setting labels separated by a comma.
-						__( '%s settings.' ),
-						joinedChangesValue
-					);
-				}
-				case 'styles': {
-					return sprintf(
-						// translators: %s: a list of theme.json top-level styles labels separated by a comma.
-						__( '%s styles.' ),
-						joinedChangesValue
-					);
-				}
-				default: {
-					return sprintf(
-						// translators: %s: a list of global styles changes separated by a comma.
-						__( '%s.' ),
-						joinedChangesValue
-					);
-				}
-			}
-		} );
+	if ( ! groups.length ) {
+		return EMPTY_STRING_ARRAY;
 	}
 
-	return EMPTY_ARRAY;
+	return groups.map( ( { group, items } ) => {
+		const changeValues = items.map( formatChangeItemLabel );
+
+		return getGlobalStylesChangeGroupSummary(
+			group,
+			changeValues.join(
+				/* translators: Used between list items, there is a space after the comma. */
+				__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			),
+			changeValues.length
+		);
+	} );
 }
