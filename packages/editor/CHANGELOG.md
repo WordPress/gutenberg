@@ -11,6 +11,7 @@
 ### New Features
 
 -   Add a "Collaboration conflicts" panel to the document settings sidebar listing edits set aside after a sync conflict, with per-conflict Restore/Discard actions and a bulk "Discard all".
+-   Conflicts are now resolvable in context: blocks with edits set aside for review get an in-canvas marker badge that opens the conflict (attribution, lost content, Restore/Discard) anchored to the block, and the sidebar panel's entries link to the conflicted block. The panel remains the only surface for conflicts whose block no longer exists.
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
 -   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu and the viewport state control in Global Styles when set to `false` ([#80814](https://github.com/WordPress/gutenberg/pull/80814)).
 -   Add a `blockStatesEditingEnabled` editor setting, defaulting to `true`, which hides state controls for blocks in the block inspector and Global Styles when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).

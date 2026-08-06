@@ -153,6 +153,12 @@ export interface SyncReviewItem {
 	summary?: string;
 	/** Target-field excerpt captured at escalation time. */
 	excerpt?: string;
+	/**
+	 * The target block's engine identity (syncId), when the intent
+	 * addresses one — lets UI anchor the conflict to a block in the
+	 * editor. Absent for document-level intents (e.g. entity properties).
+	 */
+	targetId?: string;
 }
 
 export interface SyncManagerUpdateOptions {

@@ -575,6 +575,30 @@ inside intent payloads, not the transport.
   concurrent-typing e2e now resolves the burst through the panel's
   Discard all and re-asserts durability across reload.
 
+  **2d-xx (in-canvas conflict markers; panel demoted to index) DONE.**
+  Direct response to "a sidebar list strips the context": review items
+  now carry `targetId` (the escalated intent's target syncId), the
+  editor resolves it to a block clientId by scanning block
+  `metadata.syncId` attributes, and every conflicted block gets a
+  marker badge anchored via the block-editor's private BlockPopover
+  (mounted in VisualEditor OUTSIDE the iframe so editor styles apply
+  — chrome-side popovers avoid the canvas-stylesheet problem
+  entirely). The badge opens the shared conflict card (attribution,
+  reason, lost content, Restore/Discard) in place; the sidebar panel
+  reuses the same card/group/data modules
+  (`collaboration-review-panel/review-{data,group}.js`) and becomes
+  an index — entries link to the block (selectBlock scrolls the
+  canvas, flashBlock points) — plus the bulk Discard all and the
+  fallback surface for conflicts whose block no longer exists
+  (targetless entity-property conflicts land there too). Design
+  direction (from the arch-decision DE prototype comparison): adopt
+  its in-canvas review-affordance PATTERN, not its void-block
+  machinery — live concurrency conflicts stay in the sync log;
+  materializing unresolved proposals into pending-review blocks at
+  save time is earmarked for the offline phase, and kses/capability
+  conflicts (`requires-approval` lane, ingest enforcement — a known
+  gap) would join this same surface with capability-gated actions.
+
   Remaining in 2d, design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport).
   Review findings NOT yet addressed (next tier):

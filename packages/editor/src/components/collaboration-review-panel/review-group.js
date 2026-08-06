@@ -1,0 +1,80 @@
+/**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { REASON_LABELS } from './review-data';
+
+/**
+ * One conflict group (a unit of edits set aside together): attribution,
+ * reason, the lost content, and Restore/Discard actions. When `onNavigate`
+ * is given, the attribution becomes a link to the conflicted block.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.items        The group's review items.
+ * @param {Function} props.onResolve    ( items, resolution ) => void.
+ * @param {Function} [props.onNavigate] Jump to the conflicted block.
+ */
+export default function ReviewGroup( { items, onResolve, onNavigate } ) {
+	const [ first ] = items;
+	const attribution = first.isLocal
+		? __( 'One of your edits was set aside.' )
+		: __( 'A collaborator’s edit was set aside.' );
+	const reason = REASON_LABELS[ first.reason ];
+	const summaries = items
+		.map( ( item ) => item.summary ?? item.excerpt )
+		.filter( Boolean );
+
+	return (
+		<div className="editor-collaboration-review-panel__item">
+			<p className="editor-collaboration-review-panel__attribution">
+				{ onNavigate ? (
+					<Button
+						__next40pxDefaultSize
+						variant="link"
+						onClick={ onNavigate }
+						label={ __( 'Go to the conflicted block' ) }
+						showTooltip
+					>
+						{ attribution }
+					</Button>
+				) : (
+					attribution
+				) }{ ' ' }
+				{ reason }
+			</p>
+			{ summaries.length > 0 && (
+				<p className="editor-collaboration-review-panel__summary">
+					{ sprintf(
+						/* translators: %s: the content of the edit that was set aside. */
+						__( 'Lost content: “%s”' ),
+						summaries.join( ' ' )
+					) }
+				</p>
+			) }
+			<div className="editor-collaboration-review-panel__actions">
+				<Button
+					__next40pxDefaultSize
+					size="compact"
+					variant="secondary"
+					onClick={ () => onResolve( items, 'restored' ) }
+				>
+					{ __( 'Restore' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					size="compact"
+					variant="tertiary"
+					isDestructive
+					onClick={ () => onResolve( items, 'dismissed' ) }
+				>
+					{ __( 'Discard' ) }
+				</Button>
+			</div>
+		</div>
+	);
+}

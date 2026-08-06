@@ -1,141 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Button, PanelBody } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const REASON_LABELS = {
-	'frame-conflict': __( 'It conflicted with a collaborator’s change.' ),
-	'dependent-on-escalated': __(
-		'It depended on another edit that was set aside.'
-	),
-};
-
-/**
- * Groups review items by their unit (a batch of edits made together), so a
- * burst of typing reads as one conflict with one set of actions.
- *
- * @param {Array} items Review items.
- *
- * @return {Array} Groups of items sharing a unitId.
- */
-function groupByUnit( items ) {
-	const groups = new Map();
-	for ( const item of items ) {
-		if ( ! groups.has( item.unitId ) ) {
-			groups.set( item.unitId, [] );
-		}
-		groups.get( item.unitId ).push( item );
-	}
-	return Array.from( groups.values() );
-}
-
-function ReviewGroup( { items, onResolve } ) {
-	const [ first ] = items;
-	const attribution = first.isLocal
-		? __( 'One of your edits was set aside.' )
-		: __( 'A collaborator’s edit was set aside.' );
-	const reason = REASON_LABELS[ first.reason ];
-	const summaries = items
-		.map( ( item ) => item.summary ?? item.excerpt )
-		.filter( Boolean );
-
-	return (
-		<div className="editor-collaboration-review-panel__item">
-			<p className="editor-collaboration-review-panel__attribution">
-				{ attribution } { reason }
-			</p>
-			{ summaries.length > 0 && (
-				<p className="editor-collaboration-review-panel__summary">
-					{ sprintf(
-						/* translators: %s: the content of the edit that was set aside. */
-						__( 'Lost content: “%s”' ),
-						summaries.join( ' ' )
-					) }
-				</p>
-			) }
-			<div className="editor-collaboration-review-panel__actions">
-				<Button
-					__next40pxDefaultSize
-					size="compact"
-					variant="secondary"
-					onClick={ () => onResolve( items, 'restored' ) }
-				>
-					{ __( 'Restore' ) }
-				</Button>
-				<Button
-					__next40pxDefaultSize
-					size="compact"
-					variant="tertiary"
-					isDestructive
-					onClick={ () => onResolve( items, 'dismissed' ) }
-				>
-					{ __( 'Discard' ) }
-				</Button>
-			</div>
-		</div>
-	);
-}
+import ReviewGroup from './review-group';
+import {
+	groupByUnit,
+	useReviewData,
+	useResolveReviewItems,
+} from './review-data';
 
 /**
  * Lists edits that were set aside for review after a sync conflict (open
  * proposals), with actions to restore the lost content as a new edit or
  * discard it. Resolving either way closes the proposal for every
  * collaborator.
+ *
+ * The panel is an index: conflicts anchored to a live block link to it (the
+ * in-canvas marker is the primary resolution surface); conflicts whose
+ * block no longer exists are only resolvable here.
  */
 export default function CollaborationReviewPanel() {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-		};
-	}, [] );
-	const items = useSelect(
-		( select ) =>
-			unlock( select( coreStore ) ).getSyncReviewItems(
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
-	const { resolveSyncProposal, restoreSyncProposal } = unlock(
-		useDispatch( coreStore )
-	);
-
-	const onResolve = useCallback(
-		( groupItems, resolution ) => {
-			for ( const item of groupItems ) {
-				if ( 'restored' === resolution ) {
-					restoreSyncProposal(
-						'postType',
-						postType,
-						postId,
-						item.id
-					);
-				} else {
-					resolveSyncProposal(
-						'postType',
-						postType,
-						postId,
-						item.id,
-						'dismissed'
-					);
-				}
-			}
-		},
-		[ postType, postId, resolveSyncProposal, restoreSyncProposal ]
-	);
+	const { postType, postId, items, clientIdByTarget } = useReviewData();
+	const onResolve = useResolveReviewItems( postType, postId );
+	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 
 	if ( ! items.length ) {
 		return null;
@@ -160,13 +54,26 @@ export default function CollaborationReviewPanel() {
 					items.length
 				) }
 			</p>
-			{ groups.map( ( groupItems ) => (
-				<ReviewGroup
-					key={ groupItems[ 0 ].unitId }
-					items={ groupItems }
-					onResolve={ onResolve }
-				/>
-			) ) }
+			{ groups.map( ( groupItems ) => {
+				const clientId = clientIdByTarget[ groupItems[ 0 ].targetId ];
+				return (
+					<ReviewGroup
+						key={ groupItems[ 0 ].unitId }
+						items={ groupItems }
+						onResolve={ onResolve }
+						onNavigate={
+							clientId
+								? () => {
+										// Selection scrolls the canvas to
+										// the block; the flash points at it.
+										selectBlock( clientId );
+										flashBlock( clientId, 500 );
+								  }
+								: undefined
+						}
+					/>
+				);
+			} ) }
 			{ groups.length > 1 && (
 				<Button
 					__next40pxDefaultSize

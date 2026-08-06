@@ -33,3 +33,43 @@
 .editor-collaboration-review-panel__discard-all {
 	margin-top: $grid-unit-15;
 }
+
+.editor-collaboration-conflict-marker {
+	// The chip must not swallow clicks meant for the block below it.
+	.components-popover__content {
+		background: none;
+		border: none;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.editor-collaboration-conflict-marker__chip {
+		background: $white;
+		border: $border-width solid $alert-yellow;
+		border-radius: $radius-small;
+		box-shadow: $elevation-x-small;
+		color: $gray-900;
+
+		svg {
+			fill: $alert-yellow;
+		}
+	}
+
+	.editor-collaboration-conflict-marker__card {
+		background: $white;
+		border: $border-width solid $gray-300;
+		border-radius: $radius-medium;
+		box-shadow: $elevation-medium;
+		margin-top: $grid-unit-05;
+		max-height: 60vh;
+		max-width: 320px;
+		min-width: 280px;
+		overflow-y: auto;
+		padding: $grid-unit-15;
+
+		.editor-collaboration-review-panel__item:first-child {
+			border-top: none;
+			padding-top: 0;
+		}
+	}
+}

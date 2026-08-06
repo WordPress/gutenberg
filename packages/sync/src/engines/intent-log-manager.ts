@@ -455,6 +455,10 @@ export function createIntentLogManager( debug = false ): SyncManager {
 				intentType: proposal.intent.type,
 				summary: summarizeProposal( proposal ),
 				excerpt: proposal.context?.excerpt,
+				targetId:
+					typeof proposal.intent.payload.syncId === 'string'
+						? proposal.intent.payload.syncId
+						: undefined,
 			} ) );
 		session.onProposalsChange( () => {
 			if ( proposalsNotifyScheduled ) {

@@ -732,6 +732,58 @@ describe( 'intent-log manager', () => {
 		);
 	} );
 
+	it( 'review items carry the target block identity when the intent addresses one', async () => {
+		const { handlers, transport } = await loadManagedEntity();
+		const onProposalsChange = jest.fn();
+		handlers.onProposalsChange = onProposalsChange;
+		handlers.onEscalation = jest.fn();
+
+		transport.captured.session!.receiveUpdate( snapshotRow( [] ) );
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'p-anchored',
+					txnId: null,
+					type: 'insert_text',
+					payload: { syncId: 'block-a', text: 'lost' },
+				},
+				actorId: 'u9c9',
+				reason: 'frame-conflict',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+		expect( onProposalsChange ).toHaveBeenLastCalledWith( [
+			expect.objectContaining( {
+				id: 'p-anchored',
+				targetId: 'block-a',
+			} ),
+		] );
+
+		// Document-level intents (entity properties) have no block target.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'p-property',
+					txnId: null,
+					type: 'set_property',
+					payload: { name: 'title', value: 'Lost title' },
+				},
+				actorId: 'u9c9',
+				reason: 'property-conflict',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+		expect( onProposalsChange ).toHaveBeenLastCalledWith( [
+			expect.objectContaining( { id: 'p-anchored' } ),
+			expect.objectContaining( {
+				id: 'p-property',
+				targetId: undefined,
+			} ),
+		] );
+	} );
+
 	it( 'a proposal resolved within the same delivery batch never notifies, and resolution round-trips', async () => {
 		const { manager, handlers, transport } = await loadManagedEntity();
 		const onEscalation = jest.fn();

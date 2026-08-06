@@ -682,6 +682,31 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		} ).toPass( { timeout: 15000 } );
 
 		/*
+		 * The conflicts anchor IN CONTEXT: the contested paragraph gets a
+		 * marker badge (rendered in the editor chrome, anchored to the
+		 * block), which opens the conflict card with Restore/Discard.
+		 */
+		const markerChip = noticePage.locator(
+			'.editor-collaboration-conflict-marker__chip'
+		);
+		await expect( markerChip.first() ).toBeVisible( { timeout: 15000 } );
+		await markerChip.first().click();
+		const markerCard = noticePage.locator(
+			'.editor-collaboration-conflict-marker__card'
+		);
+		await expect( markerCard ).toBeVisible();
+		await expect(
+			markerCard
+				.getByRole( 'button', { name: 'Discard', exact: true } )
+				.first()
+		).toBeVisible();
+		// Resolve one conflict group in place; the rest go through the panel.
+		await markerCard
+			.getByRole( 'button', { name: 'Discard', exact: true } )
+			.first()
+			.click();
+
+		/*
 		 * The review panel in the document sidebar lists every parked edit
 		 * regardless of how many notices were shown. Discarding closes each
 		 * proposal for every collaborator, durably — after a reload the
@@ -726,6 +751,8 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			// poll/flush cycle counts — otherwise discard again.
 			await noticePage.waitForTimeout( 3000 );
 			expect( await panel.count() ).toBe( 0 );
+			// The in-canvas markers unmount with the list.
+			expect( await markerChip.count() ).toBe( 0 );
 			// Resolving through the panel also clears the notices
 			// (per-item and aggregate alike).
 			expect(
@@ -761,6 +788,9 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			.click();
 		await expect(
 			noticePage.locator( '.editor-collaboration-review-panel' )
+		).toHaveCount( 0 );
+		await expect(
+			noticePage.locator( '.editor-collaboration-conflict-marker__chip' )
 		).toHaveCount( 0 );
 	} );
 
