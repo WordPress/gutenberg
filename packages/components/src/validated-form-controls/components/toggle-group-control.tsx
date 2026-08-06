@@ -1,14 +1,24 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useId, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { ToggleGroupControl } from '../../toggle-group-control';
+
+/**
+ * The option currently holding the roving tabindex. Focus on the hidden
+ * delegate is redirected here.
+ */
+const ACTIVE_ITEM_SELECTOR = '[data-active-item="true"]';
+
+/**
+ * The group container. A group-level description is what a screen reader
+ * announces on entering the group, so the validity message goes here rather
+ * than on an individual option — and unlike the active item, this element is
+ * always present.
+ *
+ * `ToggleGroupControl` renders a `radiogroup` by default and a `group` in its
+ * deselectable mode.
+ */
+const GROUP_SELECTOR = '[role="radiogroup"],[role="group"]';
 
 const UnforwardedValidatedToggleGroupControl = (
 	{
@@ -24,6 +34,11 @@ const UnforwardedValidatedToggleGroupControl = (
 
 	const nameAttr = useId();
 
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector(
+			GROUP_SELECTOR
+		);
+
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
@@ -31,6 +46,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<ToggleGroupControl ref={ forwardedRef } { ...restProps } />
 			</ControlWithError>
@@ -47,7 +63,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling
 						?.querySelector< HTMLButtonElement | HTMLInputElement >(
-							'[data-active-item="true"]'
+							ACTIVE_ITEM_SELECTOR
 						)
 						?.focus();
 				} }
