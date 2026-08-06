@@ -489,3 +489,55 @@ test.describe( 'Footnotes', () => {
 		} );
 	} );
 } );
+
+test.describe( 'Footnotes meta written by something else', () => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	// A plugin, an import, or a direct database edit can leave the meta
+	// malformed or holding something other than an array. Parsing it unguarded
+	// threw inside a store subscriber, where no error boundary catches it, so
+	// the edit never reached core-data: the keystroke showed on screen, the
+	// post never became dirty, and the work was lost with no notice at all.
+	test( 'does not stop the post from saving', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Malformed footnotes meta',
+				status: 'draft',
+				meta: { footnotes: 'null' },
+			},
+		} );
+
+		// Guard the fixture itself: without unfiltered_html the value is
+		// sanitized away, and the test would pass for the wrong reason.
+		expect( post.meta.footnotes ).toBe( 'null' );
+
+		await admin.editPost( post.id );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'a paragraph' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save draft' } )
+		).toBeEnabled();
+
+		await editor.saveDraft();
+
+		const saved = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain( 'a paragraph' );
+	} );
+} );
