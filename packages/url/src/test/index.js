@@ -670,6 +670,25 @@ describe( 'addQueryArgs', () => {
 			}
 		);
 	} );
+
+	it( 'should not truncate an existing value containing equals signs', () => {
+		const url =
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ==';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ%3D%3D&sun=true'
+		);
+	} );
+
+	it( 'should not truncate a nested URL passed as an existing value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?redirect=%2Fwatch%3Fv%3Dabc&sun=true'
+		);
+	} );
 } );
 
 describe( 'getQueryArgs', () => {
