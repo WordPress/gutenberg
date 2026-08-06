@@ -485,6 +485,61 @@ test.describe( 'Buttons', () => {
 		] );
 	} );
 
+	test( 'copies attributes when adding a sibling with Enter', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'Content',
+						backgroundColor: 'vivid-red',
+						textColor: 'cyan-bluish-gray',
+						anchor: 'first-button',
+					},
+				},
+			],
+		} );
+
+		// Place the caret at the end of the button text and press Enter.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		// The new button inherits everything but the content, like a
+		// duplicated block would.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+							anchor: 'first-button',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Second',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
 	test.describe( 'Width support', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'emptytheme' );
