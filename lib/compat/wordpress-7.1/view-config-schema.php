@@ -47,6 +47,7 @@ return array(
 						'activity',
 						'pickerGrid',
 						'pickerTable',
+						'pickerActivity',
 					),
 				),
 				'layout' => array(
@@ -562,7 +563,7 @@ return array(
 							'type' => 'boolean',
 						),
 						'layout' => array(
-							'description' => __( 'Options specific to list-type layouts (`list`, `activity`).', 'gutenberg' ),
+							'description' => __( 'Options specific to list-type layouts (`list`, `activity`, `pickerActivity`).', 'gutenberg' ),
 							'type' => 'object',
 							'properties' => array(
 								'density' => array(
@@ -859,7 +860,7 @@ return array(
 							'type' => 'boolean',
 						),
 						'layout' => array(
-							'description' => __( 'Options specific to list-type layouts (`list`, `activity`).', 'gutenberg' ),
+							'description' => __( 'Options specific to list-type layouts (`list`, `activity`, `pickerActivity`).', 'gutenberg' ),
 							'type' => 'object',
 							'properties' => array(
 								'density' => array(
@@ -1216,6 +1217,149 @@ return array(
 						),
 					),
 				),
+				'pickerActivity' => array(
+					'description' => __( 'View overrides applied when the activity layout of a picker (DataViewsPicker) is selected.', 'gutenberg' ),
+					'type' => 'object',
+					'properties' => array(
+						'filters' => array(
+							'description' => __( 'Filters applied to the dataset. A filter with `isLocked` set cannot be changed or removed by the user.', 'gutenberg' ),
+							'type' => 'array',
+							'items' => array(
+								'type' => 'object',
+								'properties' => array(
+									'field' => array(
+										'description' => __( 'The field to filter by.', 'gutenberg' ),
+										'type' => 'string',
+									),
+									'operator' => array(
+										'description' => __( 'The operator to use, one of `is`, `isNot`, `isAny`, `isNone`, `isAll`, `isNotAll`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, or `after`.', 'gutenberg' ),
+										'type' => 'string',
+										'enum' => array(
+											'is',
+											'isNot',
+											'isAny',
+											'isNone',
+											'isAll',
+											'isNotAll',
+											'lessThan',
+											'greaterThan',
+											'lessThanOrEqual',
+											'greaterThanOrEqual',
+											'before',
+											'after',
+										),
+									),
+									'value' => array(
+										'description' => __( 'The value to filter by.', 'gutenberg' ),
+									),
+									'isLocked' => array(
+										'description' => __( 'Whether the filter is locked. A locked filter cannot be changed or removed by the user.', 'gutenberg' ),
+										'type' => 'boolean',
+									),
+								),
+							),
+						),
+						'sort' => array(
+							'description' => __( 'The default sort: the field id and the direction (`asc` or `desc`).', 'gutenberg' ),
+							'type' => 'object',
+							'properties' => array(
+								'field' => array(
+									'description' => __( 'The field to sort by.', 'gutenberg' ),
+									'type' => 'string',
+								),
+								'direction' => array(
+									'description' => __( 'The direction to sort by, `asc` or `desc`.', 'gutenberg' ),
+									'type' => 'string',
+									'enum' => array(
+										'asc',
+										'desc',
+									),
+								),
+							),
+						),
+						'perPage' => array(
+							'description' => __( 'Number of records per page. Also used as the batch size when infinite scroll is enabled.', 'gutenberg' ),
+							'type' => 'integer',
+						),
+						'fields' => array(
+							'description' => __( 'Ids of the fields that are visible, in display order.', 'gutenberg' ),
+							'type' => 'array',
+							'items' => array(
+								'type' => 'string',
+							),
+						),
+						'titleField' => array(
+							'description' => __( 'Id of the field used as the record title.', 'gutenberg' ),
+							'type' => 'string',
+						),
+						'mediaField' => array(
+							'description' => __( 'Id of the field used as the record media (e.g. featured image or preview).', 'gutenberg' ),
+							'type' => 'string',
+						),
+						'descriptionField' => array(
+							'description' => __( 'Id of the field used as the record description.', 'gutenberg' ),
+							'type' => 'string',
+						),
+						'showTitle' => array(
+							'description' => __( 'Whether the title is shown. Defaults to `true`.', 'gutenberg' ),
+							'type' => 'boolean',
+						),
+						'showMedia' => array(
+							'description' => __( 'Whether the media is shown. Defaults to `true`.', 'gutenberg' ),
+							'type' => 'boolean',
+						),
+						'showDescription' => array(
+							'description' => __( 'Whether the description is shown. Defaults to `true`.', 'gutenberg' ),
+							'type' => 'boolean',
+						),
+						'showLevels' => array(
+							'description' => __( 'Whether to display hierarchical levels for the records (e.g. child pages indented under their parent). Defaults to `false`.', 'gutenberg' ),
+							'type' => 'boolean',
+						),
+						'groupBy' => array(
+							'description' => __( 'The grouping configuration: the field to group by, the direction (`asc` or `desc`), and whether to show the field label in each group header (`showLabel`, defaults to `true`).', 'gutenberg' ),
+							'type' => 'object',
+							'properties' => array(
+								'field' => array(
+									'description' => __( 'The field to group by.', 'gutenberg' ),
+									'type' => 'string',
+								),
+								'direction' => array(
+									'description' => __( 'The direction to sort the groups by, `asc` or `desc`.', 'gutenberg' ),
+									'type' => 'string',
+									'enum' => array(
+										'asc',
+										'desc',
+									),
+								),
+								'showLabel' => array(
+									'description' => __( 'Whether to show the field label in the group header.', 'gutenberg' ),
+									'type' => 'boolean',
+									'default' => true,
+								),
+							),
+						),
+						'infiniteScrollEnabled' => array(
+							'description' => __( 'Whether infinite scroll is enabled instead of pagination.', 'gutenberg' ),
+							'type' => 'boolean',
+						),
+						'layout' => array(
+							'description' => __( 'Options specific to list-type layouts (`list`, `activity`, `pickerActivity`).', 'gutenberg' ),
+							'type' => 'object',
+							'properties' => array(
+								'density' => array(
+									'description' => __( 'The density of the layout: `compact`, `balanced`, or `comfortable`.', 'gutenberg' ),
+									'type' => 'string',
+									'enum' => array(
+										'compact',
+										'balanced',
+										'comfortable',
+									),
+								),
+							),
+						),
+					),
+				),
 			),
 		),
 		'view_list' => array(
@@ -1238,7 +1382,7 @@ return array(
 						'type' => 'object',
 						'properties' => array(
 							'type' => array(
-								'description' => __( 'The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.', 'gutenberg' ),
+								'description' => __( 'The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, `pickerTable`, or `pickerActivity`.', 'gutenberg' ),
 								'type' => 'string',
 							),
 							'layout' => array(

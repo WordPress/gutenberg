@@ -32,7 +32,8 @@
 						"list",
 						"activity",
 						"pickerGrid",
-						"pickerTable"
+						"pickerTable",
+						"pickerActivity"
 					]
 				},
 
@@ -372,6 +373,54 @@
 							"$ref": "#/definitions/tableLayout"
 						}
 					}
+				},
+				"pickerActivity": {
+					"description": "View overrides applied when the activity layout of a picker (DataViewsPicker) is selected.",
+					"type": "object",
+					"properties": {
+						"filters": {
+							"$ref": "#/definitions/filters"
+						},
+						"sort": {
+							"$ref": "#/definitions/sort"
+						},
+						"perPage": {
+							"$ref": "#/definitions/perPage"
+						},
+						"fields": {
+							"$ref": "#/definitions/fields"
+						},
+						"titleField": {
+							"$ref": "#/definitions/titleField"
+						},
+						"mediaField": {
+							"$ref": "#/definitions/mediaField"
+						},
+						"descriptionField": {
+							"$ref": "#/definitions/descriptionField"
+						},
+						"showTitle": {
+							"$ref": "#/definitions/showTitle"
+						},
+						"showMedia": {
+							"$ref": "#/definitions/showMedia"
+						},
+						"showDescription": {
+							"$ref": "#/definitions/showDescription"
+						},
+						"showLevels": {
+							"$ref": "#/definitions/showLevels"
+						},
+						"groupBy": {
+							"$ref": "#/definitions/groupBy"
+						},
+						"infiniteScrollEnabled": {
+							"$ref": "#/definitions/infiniteScrollEnabled"
+						},
+						"layout": {
+							"$ref": "#/definitions/listLayout"
+						}
+					}
 				}
 			}
 		},
@@ -395,7 +444,7 @@
 						"type": "object",
 						"properties": {
 							"type": {
-								"description": "The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, or `pickerTable`.",
+								"description": "The layout type, one of `table`, `grid`, `list`, `activity`, `pickerGrid`, `pickerTable`, or `pickerActivity`.",
 								"type": "string"
 							},
 							"layout": {
@@ -626,7 +675,7 @@
 			}
 		},
 		"listLayout": {
-			"description": "Options specific to list-type layouts (`list`, `activity`).",
+			"description": "Options specific to list-type layouts (`list`, `activity`, `pickerActivity`).",
 			"type": "object",
 			"properties": {
 				"density": {
