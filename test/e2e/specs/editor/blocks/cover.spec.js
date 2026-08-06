@@ -200,16 +200,15 @@ test.describe( 'Cover', () => {
 			} )
 			.click();
 
-		// Activate the paragraph block inside the Cover block.
-		// The name of the block differs depending on whether text has been entered or not.
-		const coverBlockParagraph = coverBlock.getByRole( 'document', {
-			name: /Block: Paragraph|Empty block; start writing or type forward slash to choose a block/,
+		// Activate the heading block inside the Cover block.
+		const coverBlockHeading = coverBlock.getByRole( 'document', {
+			name: 'Block: Heading',
 		} );
-		await expect( coverBlockParagraph ).toBeEditable();
+		await expect( coverBlockHeading ).toBeEditable();
 
-		await coverBlockParagraph.fill( titleText );
+		await coverBlockHeading.fill( titleText );
 
-		await expect( coverBlockParagraph ).toContainText( titleText );
+		await expect( coverBlockHeading ).toContainText( titleText );
 	} );
 
 	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
