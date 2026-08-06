@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -16,6 +17,7 @@ import {
 } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -139,6 +141,9 @@ export default function SavePanel() {
 		setIsSaveViewOpened( false );
 	}, [ canvas, setIsSaveViewOpened ] );
 
+	const instanceId = useInstanceId( SavePanel );
+	const saveButtonDescriptionId = `edit-site-save-panel__save-button-description-${ instanceId }`;
+
 	if ( canvas === 'view' ) {
 		return isSaveViewOpen ? (
 			<Modal
@@ -153,6 +158,9 @@ export default function SavePanel() {
 	}
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
+	const disabledReason = isSaving
+		? __( 'Saving changes.' )
+		: __( 'No changes to save.' );
 	return (
 		<NavigableRegion
 			className={ clsx( 'edit-site-layout__actions', {
@@ -171,11 +179,19 @@ export default function SavePanel() {
 					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup="dialog"
+					aria-describedby={
+						disabled ? saveButtonDescriptionId : undefined
+					}
 					disabled={ disabled }
 					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>
+				{ disabled && (
+					<VisuallyHidden id={ saveButtonDescriptionId }>
+						{ disabledReason }
+					</VisuallyHidden>
+				) }
 			</div>
 			{ isSaveViewOpen && (
 				<_EntitiesSavedStates onClose={ onClose } renderDialog />
