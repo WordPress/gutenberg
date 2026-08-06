@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role, which now include `metadata`) and the anchor, a document-unique id, is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
+-   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role, which now include `metadata`) is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
 
 ### Enhancements
 

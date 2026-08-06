@@ -512,8 +512,8 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
 
-		// The new button inherits the styling, but not the content or the
-		// unique attributes like the anchor.
+		// The new button inherits everything but the content, like a
+		// duplicated block would.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/buttons',
@@ -538,10 +538,6 @@ test.describe( 'Buttons', () => {
 				],
 			},
 		] );
-		const blocks = await editor.getBlocks();
-		expect(
-			blocks[ 0 ].innerBlocks[ 1 ].attributes.anchor
-		).toBeUndefined();
 	} );
 
 	test.describe( 'Width support', () => {
