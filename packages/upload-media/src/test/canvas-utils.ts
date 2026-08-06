@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 
 describe( 'canvasConvertToJpeg', () => {
 	const originalCreateImageBitmap = global.createImageBitmap;
@@ -14,13 +15,13 @@ describe( 'canvasConvertToJpeg', () => {
 		if ( originalCreateImageBitmap ) {
 			global.createImageBitmap = originalCreateImageBitmap;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		}
 		if ( originalOffscreenCanvas ) {
 			global.OffscreenCanvas = originalOffscreenCanvas;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.OffscreenCanvas;
 		}
 		if ( originalImageDecoder ) {
@@ -143,7 +144,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				getHeicUnsupportedMessage()
 			);
 			expect( mockBitmap.close ).toHaveBeenCalled();
 		} );
@@ -164,7 +165,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				getHeicUnsupportedMessage()
 			);
 		} );
 
@@ -187,7 +188,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				'cannot decode HEIC'
+				getHeicUnsupportedMessage()
 			);
 
 			expect(

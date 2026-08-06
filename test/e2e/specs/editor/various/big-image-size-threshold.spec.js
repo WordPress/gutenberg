@@ -15,6 +15,16 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @typedef {import('@playwright/test').Page} Page
  */
 
+/**
+ * Returns the file name of an upload-relative path such as `2026/08/image.jpeg`.
+ *
+ * @param {string} file Upload-relative file path.
+ * @return {string} File name.
+ */
+function wpBasename( file ) {
+	return file.split( '/' ).pop();
+}
+
 test.use( {
 	imageBlockUtils: async ( { page }, use ) => {
 		await use( new ImageBlockUtils( { page } ) );
@@ -67,7 +77,7 @@ test.describe( 'Big image size threshold', () => {
 		await expect( imageBlock ).toBeVisible();
 
 		// Upload a large image (3200x2400) that exceeds the default threshold (2560).
-		await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' ),
 			'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 		);
@@ -100,49 +110,46 @@ test.describe( 'Big image size threshold', () => {
 					?.attributes?.id
 		);
 
-		if ( imageId ) {
-			// Fetch the attachment details from the REST API.
-			const media = await requestUtils.rest( {
-				method: 'GET',
-				path: `/wp/v2/media/${ imageId }`,
-			} );
+		expect( imageId ).toBeDefined();
 
-			// The image should be scaled down (either client-side or server-side).
-			expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
-			expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
+		// Fetch the attachment details from the REST API.
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
 
-			if ( media.source_url.includes( '-scaled' ) ) {
-				// When client-side scaling adds the -scaled suffix,
-				// original_image may or may not be set depending on whether
-				// the server also processes the image. Only check if present.
-				if ( media.media_details.original_image ) {
-					expect( media.media_details.original_image ).toBeDefined();
-				}
+		// The image should be scaled down to the threshold.
+		expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
+		expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
 
-				// Verify thumbnails were generated.
-				const sizes = media.media_details.sizes;
-				expect( sizes ).toBeDefined();
+		/*
+		 * Only the scaled-down copy carries the `-scaled` suffix, and the
+		 * untouched upload is kept alongside it as `original_image`. If the
+		 * server also scales the upload while the client owns the derivatives,
+		 * the client's scaled file collides with the server's and is stored as
+		 * `-scaled-1`, the sub-sizes inherit the numbered name, and the
+		 * server's full-size file is orphaned on disk.
+		 * See https://core.trac.wordpress.org/ticket/65708.
+		 */
+		expect( wpBasename( media.media_details.file ) ).toBe(
+			`${ fileName }-scaled.jpeg`
+		);
+		expect( media.media_details.original_image ).toBe(
+			`${ fileName }.jpeg`
+		);
 
-				// Check that at least some standard sizes were created.
-				// The exact sizes depend on theme/site configuration.
-				const hasStandardSizes =
-					sizes.thumbnail || sizes.medium || sizes.large;
-				expect( hasStandardSizes ).toBeTruthy();
+		// Sub-sizes are named after the original, with no collision suffix.
+		// The `full` entry is the attached file itself, so it is skipped.
+		const sizes = Object.entries( media.media_details.sizes ).filter(
+			( [ name ] ) => name !== 'full'
+		);
+		expect( sizes.length ).toBeGreaterThan( 0 );
 
-				// If thumbnail exists, verify it has reasonable dimensions.
-				// Default thumbnail size is 150x150.
-				if ( sizes.thumbnail ) {
-					expect( sizes.thumbnail.width ).toBeLessThanOrEqual( 150 );
-					expect( sizes.thumbnail.height ).toBeLessThanOrEqual( 150 );
-				}
-
-				// If medium exists, verify dimensions.
-				// Default medium size is 300x300.
-				if ( sizes.medium ) {
-					expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
-					expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
-				}
-			}
+		for ( const [ name, size ] of sizes ) {
+			expect(
+				size.file,
+				`the "${ name }" sub-size should be named after the original`
+			).toBe( `${ fileName }-${ size.width }x${ size.height }.jpeg` );
 		}
 	} );
 
@@ -203,19 +210,20 @@ test.describe( 'Big image size threshold', () => {
 					?.attributes?.id
 		);
 
-		if ( imageId ) {
-			// Fetch the attachment details from the REST API.
-			const media = await requestUtils.rest( {
-				method: 'GET',
-				path: `/wp/v2/media/${ imageId }`,
-			} );
+		expect( imageId ).toBeDefined();
 
-			// The image should NOT be scaled since it's below the threshold.
-			expect( media.source_url ).not.toContain( '-scaled' );
-			// Original dimensions should be preserved.
-			expect( media.media_details.width ).toBe( 1024 );
-			expect( media.media_details.height ).toBe( 768 );
-		}
+		// Fetch the attachment details from the REST API.
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+
+		// The image should NOT be scaled since it's below the threshold.
+		expect( media.source_url ).not.toContain( '-scaled' );
+		expect( media.media_details.original_image ).toBeUndefined();
+		// Original dimensions should be preserved.
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
 	} );
 } );
 

@@ -28,7 +28,6 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
-const TEMPLATE = [ [ 'core/post-template' ] ];
 export default function QueryContent( {
 	attributes,
 	setAttributes,
@@ -51,9 +50,7 @@ export default function QueryContent( {
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, getEntityRecordEdits, canUser } =

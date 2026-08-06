@@ -3,7 +3,6 @@
 // - lodash.clonedeep is replaced with JSON parse / stringify
 // - lodash.isequal is replaced with fast-deep-equal.
 
-// @ts-ignore
 /**
  * External dependencies
  */

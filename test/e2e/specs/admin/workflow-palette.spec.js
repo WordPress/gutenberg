@@ -63,6 +63,6 @@ test.describe( 'Workflow palette', () => {
 		const requestCountAfterFirstOpen = abilityRequests.length;
 		await page.keyboard.press( 'ControlOrMeta+j' );
 		await expect( palette ).toBeVisible();
-		expect( abilityRequests.length ).toBe( requestCountAfterFirstOpen );
+		expect( abilityRequests ).toHaveLength( requestCountAfterFirstOpen );
 	} );
 } );

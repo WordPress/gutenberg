@@ -24,6 +24,7 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getSiblingBlockAttributes } from '../../utils/sibling-block-attributes';
 import { getAppenderLabel } from './get-appender-label';
 
 const UnforwardedInserterToggle = (
@@ -196,11 +197,7 @@ const UnforwardedInserter = (
 	function insertOnlyAllowedBlock() {
 		const blockName = blockToInsert?.name ?? allowedBlockType.name;
 
-		function getAdjacentBlockAttributes( attributesToCopy ) {
-			if ( ! attributesToCopy?.length ) {
-				return {};
-			}
-
+		function getAdjacentBlockAttributes() {
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
 			// an existing block, otherwise the last child of the root.
@@ -221,15 +218,7 @@ const UnforwardedInserter = (
 				}
 			}
 
-			if ( ! adjacentAttributes ) {
-				return {};
-			}
-
-			return Object.fromEntries(
-				attributesToCopy
-					.filter( ( attr ) => attr in adjacentAttributes )
-					.map( ( attr ) => [ attr, adjacentAttributes[ attr ] ] )
-			);
+			return getSiblingBlockAttributes( blockName, adjacentAttributes );
 		}
 
 		function getInsertionIndex() {
@@ -255,9 +244,7 @@ const UnforwardedInserter = (
 		// Attempt to augment the inserted block with attributes from an adjacent block.
 		// This ensures styling from nearby blocks is preserved in the newly inserted block.
 		// See: https://github.com/WordPress/gutenberg/issues/37904
-		const newAttributes = getAdjacentBlockAttributes(
-			blockToInsert?.attributesToCopy
-		);
+		const newAttributes = getAdjacentBlockAttributes();
 
 		const newBlock = createBlock( blockName, {
 			...blockToInsert?.attributes,
