@@ -260,16 +260,6 @@
 			"count": 3
 		}
 	},
-	"packages/block-editor/src/components/list-view/block-select-button.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/list-view/drop-indicator.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/multi-selection-inspector/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
