@@ -7,6 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import useRegisterWelcomeGuide from './use-register-welcome-guide';
+
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
@@ -20,6 +25,8 @@ export default function WelcomeGuideTemplate() {
 		};
 	}, [] );
 	const isVisible = isActive && hasPreviousEntity;
+
+	useRegisterWelcomeGuide( isVisible );
 
 	if ( ! isVisible ) {
 		return null;

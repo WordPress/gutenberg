@@ -6,6 +6,10 @@
 
 -   Wrap the post editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81112](https://github.com/WordPress/gutenberg/pull/81112)).
 
+### Internal
+
+-   Welcome guide: Register the guide as the active modal in the interface store while it is on screen, so other editor UI can wait for it to be dismissed ([#65104](https://github.com/WordPress/gutenberg/issues/65104)).
+
 ## 8.51.0 (2026-07-14)
 
 ### Enhancements

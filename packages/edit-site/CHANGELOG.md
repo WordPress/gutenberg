@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Welcome guides: Register the visible guide as the active modal in the interface store, so other editor UI can wait for it to be dismissed ([#65104](https://github.com/WordPress/gutenberg/issues/65104)).
+
 ## 7.0.0 (2026-07-14)
 
 ### Breaking Changes

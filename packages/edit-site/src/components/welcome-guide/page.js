@@ -6,6 +6,11 @@ import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
+import useRegisterWelcomeGuide from './use-register-welcome-guide';
+
 export default function WelcomeGuidePage() {
 	const { toggle } = useDispatch( preferencesStore );
 
@@ -20,6 +25,8 @@ export default function WelcomeGuidePage() {
 		);
 		return isPageActive && ! isEditorActive;
 	}, [] );
+
+	useRegisterWelcomeGuide( isVisible );
 
 	if ( ! isVisible ) {
 		return null;
