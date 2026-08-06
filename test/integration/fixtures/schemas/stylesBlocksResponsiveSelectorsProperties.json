@@ -4,7 +4,13 @@
 	"styles": {
 		"blocks": {
 			"core/paragraph": {
-				"invalidAdditionalProperty": true
+				"@mobile": {
+					":hover": {
+						"color": {
+							"text": "red"
+						}
+					}
+				}
 			}
 		}
 	}
