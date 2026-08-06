@@ -6,7 +6,7 @@
 
 -   `WidgetAction` gains envelope fields: `icon`, a registered icon name
     resolved by `useWidgetTypes` into a renderable element, and `relevance`
-    (`'high' | 'low'`).
+    (`'high' | 'low'`) ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
     user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).

@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Widgets: carry an action's `icon` and `relevance` from `widget.json`
-    into the generated PHP registry.
+    into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into
     the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
