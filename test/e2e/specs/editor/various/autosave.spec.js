@@ -423,4 +423,78 @@ test.describe( 'Autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 0 );
 	} );
+
+	test( 'should be able to undo local autosave restore', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const pageTitleField = editor.canvas.getByRole( 'textbox', {
+			name: 'Add title',
+		} );
+		await pageTitleField.focus();
+		await pageTitleField.fill( 'before save title' );
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save content' );
+
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+
+		await pageTitleField.focus();
+		await pageTitleField.fill( 'before save title after save title' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' after save content' );
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		// Reload without saving on the server.
+		await page.reload();
+		await page.waitForFunction( () => window?.wp?.data );
+
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'The backup of this post in your browser is different from the version below.'
+		);
+
+		await page
+			.getByRole( 'button', { name: 'Restore the backup' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before save content after save content',
+				},
+			},
+		] );
+		await expect( pageTitleField ).toHaveText(
+			'before save title after save title'
+		);
+
+		await page
+			.locator( '.components-snackbar' )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save content' },
+			},
+		] );
+		await expect( pageTitleField ).toHaveText( 'before save title' );
+	} );
 } );
