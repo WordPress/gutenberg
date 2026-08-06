@@ -366,11 +366,19 @@ inside intent payloads, not the transport.
   sustained concurrent typing into the same paragraph reliably provokes
   a frame-conflict escalation and the notice appears in the editor.
 
-  Remaining in 2d: save-flow verification (materialize vs client save),
-  dev-bundle e2e variant (SCRIPT_DEBUG=true), selection/caret sharing
-  for intent-log, and title/entity-property sync (deliberate v1
-  exclusion). Escalation REVIEW UI (inspect/apply/discard a parked
-  proposal) is future work beyond the notice.
+  **2d-xi (save flow + dev-bundle smoke) DONE.** E2e: two users edit
+  concurrently, converge, one saves — persisted content carries both
+  users' settled work, leaks no engine-internal state (_wrapper,
+  attrVersions), and the peer's editor is unaffected. The two-tab
+  observer's four scenarios all converge cleanly against the
+  SCRIPT_DEBUG=true dev environment (the bundle-divergence class).
+
+  Remaining in 2d, all design-scoped: selection/caret sharing for
+  intent-log (presence works; carets need engine-side transport),
+  title/entity-property sync (deliberate v1 exclusion; the one gap
+  users notice), deterministic genesis client-side, and the escalation
+  REVIEW UI (inspect/apply/discard a parked proposal) beyond the
+  notice.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what
