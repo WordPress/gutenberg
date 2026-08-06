@@ -15,6 +15,12 @@
     link and navigates client-side; `download` and `openInNewTab` keep the
     plain anchor.
 
+### Documentation
+
+-   Add a `HostLinks` story: a demo host whose `links` capability turns an
+    in-app action target into a client-side route link, beside a plain
+    anchor and a download.
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))

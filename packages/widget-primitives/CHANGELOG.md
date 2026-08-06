@@ -18,6 +18,11 @@
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
+### Documentation
+
+-   Add a Widget host doc page: the capability seam and the `links`
+    contract, with the consumption rules link actions follow.
+
 ## 0.5.0 (2026-08-12)
 
 ### New Features
