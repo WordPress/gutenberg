@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
@@ -11,18 +8,8 @@ import {
 	useAnchor,
 } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Popover, ValidatedTextControl } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const { ValidatedTextControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );

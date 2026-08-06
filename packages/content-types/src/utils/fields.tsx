@@ -1,7 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	ValidatedInputControl,
+	ValidatedToggleControl,
+} from '@wordpress/components';
+import type { ValidatedControlProps } from '@wordpress/components';
 import type {
 	DataFormControlProps,
 	Field,
@@ -9,26 +10,21 @@ import type {
 	NormalizedRules,
 } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
 import { Badge } from '@wordpress/ui';
 import { cleanForSlug } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
 import type { ContentType } from '../types';
-
-const { ValidatedInputControl, ValidatedToggleControl } = unlock(
-	componentsPrivateApis
-);
 
 // Surface field-level validity messages in priority order: structural rules
 // (required, pattern, maxLength) first, async/custom last. `required` only
 // overrides the native browser message when our rule supplies one of its own.
-export function getCustomValidity( validity?: FieldValidity ) {
-	if ( validity?.required?.message ) {
-		return validity.required;
+export function getCustomValidity(
+	validity?: FieldValidity
+): ValidatedControlProps[ 'customValidity' ] {
+	// `FieldValidity.required.message` is optional, unlike every other rule, so
+	// it has to be narrowed rather than passed straight through.
+	const required = validity?.required;
+	if ( required?.message ) {
+		return { ...required, message: required.message };
 	}
 	if ( validity?.pattern ) {
 		return validity.pattern;
@@ -235,8 +231,11 @@ export function SlugEdit< T extends ContentType >( {
 	const { label, description, getValue, setValue } = field;
 	const isValid = field.isValid as SlugFieldRules< T >;
 	const value = ( getValue( { item: data } ) as string | undefined ) ?? '';
-	const handleChange = ( newValue: string ) =>
-		onChange( setValue( { item: data, value: newValue } ) );
+	// `InputControl` reports `undefined` when the field is cleared. The control
+	// renders `value ?? ''`, so normalise here to keep what is stored in step
+	// with what is displayed.
+	const handleChange = ( newValue: string | undefined ) =>
+		onChange( setValue( { item: data, value: newValue ?? '' } ) );
 	const onFocus = () => {
 		if ( data.id !== undefined || data.slug ) {
 			return;

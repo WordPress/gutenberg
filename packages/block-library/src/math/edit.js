@@ -1,24 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Popover, ValidatedTextareaControl } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const { ValidatedTextareaControl } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;

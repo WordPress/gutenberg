@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -16,19 +9,12 @@ import {
 	__experimentalInputControl as InputControl,
 	Spinner,
 	Popover,
-	privateApis as componentsPrivateApis,
+	ValidatedInputControl,
 } from '@wordpress/components';
 import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const noop = () => {};
 
