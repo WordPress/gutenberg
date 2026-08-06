@@ -22,6 +22,16 @@
 	min-height: var(--wpds-dimension-size-md);
 }
 
+/*
+ * The leading group (sidebar toggle, visual, title, breadcrumbs, badges) is a
+ * flex item whose default `min-width: auto` would let a nowrap title's or
+ * crumb's min-content widen the whole page into horizontal scrolling before
+ * their truncation styles can engage.
+ */
+.header-leading {
+	min-width: 0;
+}
+
 .header-actions {
 	flex-shrink: 0;
 }
