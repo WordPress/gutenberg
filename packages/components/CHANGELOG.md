@@ -8,20 +8,24 @@
     -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
     -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
     -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
+    -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
 -   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
 
 ### Deprecations
 
+-   `Animate`: Deprecate the component, planned for removal in WordPress 7.4 ([#80931](https://github.com/WordPress/gutenberg/pull/80931)).
 -   `Surface`: Deprecate the component, planned for removal in WordPress 7.4 ([#80943](https://github.com/WordPress/gutenberg/pull/80943)).
 
 ### Enhancements
 
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
 -   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
+-   `SandBox`: Add `allowForms` prop to opt into `allow-forms` in the iframe's sandbox attribute ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).
 -   Validated form controls: Only move focus to the invalid control for trusted `invalid` events (form submission, `reportValidity()`). Consumers can now dispatch a synthetic `invalid` event to reveal a control's error message without disturbing the user's place in the form ([#80685](https://github.com/WordPress/gutenberg/pull/80685)).
 
 ### Bug Fixes
 
+-   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 -   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `Autocomplete`: Omit `aria-activedescendant` while no suggestion is highlighted, instead of returning `null` for it ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
@@ -60,6 +64,7 @@
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
 -   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
+-   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 37.0.0 (2026-07-14)

@@ -71,6 +71,7 @@ jobs:
             - name: Install Playwright browsers
               uses: ./.github/setup-playwright
               with:
+                  workspace: '@wordpress/storybook'
                   browsers: chromium
 
             - name: Serve Storybook and run tests

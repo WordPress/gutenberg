@@ -682,9 +682,17 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const sectionBlockClientId = _isSectionBlock( clientId )
+			const isSectionBlock = _isSectionBlock( clientId );
+			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			// Without a section block there is nothing for the deep check to
+			// match, and it walks the parents of every selected block to find
+			// that out.
+			const isSelectionWithinCurrentSection =
+				isBlockSelected( sectionBlockClientId ) ||
+				( !! sectionBlockClientId &&
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -702,11 +710,9 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				isSectionBlock,
 				isWithinSectionBlock: !! sectionBlockClientId,
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				isSelectionWithinCurrentSection,
 				blockType,
 				canRemove,
 				canMove,

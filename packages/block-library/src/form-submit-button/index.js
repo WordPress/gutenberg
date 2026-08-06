@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
@@ -10,7 +15,25 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [
+	[
+		'core/buttons',
+		{},
+		[
+			[
+				'core/button',
+				{
+					text: __( 'Submit' ),
+					tagName: 'button',
+					type: 'submit',
+				},
+			],
+		],
+	],
+];
+
 export const settings = {
+	template: TEMPLATE,
 	edit,
 	save,
 	example: {},

@@ -166,7 +166,7 @@ export function CustomGradientPicker( {
 			color: getStopCssColor( colorStop ),
 			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
 			// TypeScript doesn't know that `colorStop.length` is not undefined here.
-			// @ts-expect-error
+			// @ts-expect-error `colorStop.length` is possibly `undefined`.
 			position: parseInt( colorStop.length.value ),
 		};
 	} );

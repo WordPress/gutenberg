@@ -1921,9 +1921,12 @@ export const getBlockSelectors = (
 		const hasLayoutSupport =
 			!! blockType?.supports?.layout ||
 			!! blockType?.supports?.__experimentalLayout;
+		const blockGapSupport = blockType?.supports?.spacing?.blockGap;
 		const fallbackGapValue =
-			// @ts-expect-error
-			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+			typeof blockGapSupport === 'object' &&
+			! Array.isArray( blockGapSupport )
+				? blockGapSupport.__experimentalDefault
+				: undefined;
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors: Record< string, string > = {};

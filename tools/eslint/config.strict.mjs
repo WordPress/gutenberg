@@ -9,6 +9,7 @@ export default [
 	...baseConfig,
 	{
 		rules: {
+			'@wordpress/dependency-group': [ 'error', 'never' ],
 			// Enforce import ordering on modified files
 			'import/order': [
 				'error',
@@ -19,8 +20,18 @@ export default [
 						'internal', // Aliased modules
 						[ 'parent', 'sibling', 'index' ], // Relative imports
 					],
+					'newlines-between': 'never',
+					warnOnUnassignedImports: true,
 				},
 			],
+		},
+	},
+	{
+		// This config conditionally loads plugins, so its CommonJS imports
+		// cannot form one static import block.
+		files: [ 'tools/eslint/config.mjs' ],
+		rules: {
+			'import/order': 'off',
 		},
 	},
 ];

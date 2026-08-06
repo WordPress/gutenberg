@@ -4,6 +4,10 @@
 
 ### Enhancements
 
+-   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
+
+### Enhancements
+
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
 -   Inherited Global Styles now resolve per-level heading element styles for the heading-family blocks (`core/heading`, `core/site-title`, `core/post-title`, `core/query-title`, `core/comments-title`, `core/term-name`, `core/site-tagline`, `core/accordion-heading`), so inspector controls reflect values set on a specific heading level (`styles.elements.h1`–`h6`) in addition to the shared `heading` element. A block rendered at level 0 (a paragraph) folds no heading element styles; `core/accordion-heading` has no level-0 state and takes its level from the parent Accordion's block context ([#80495](https://github.com/WordPress/gutenberg/pull/80495)).
 -   Inherited Global Styles now resolve the `link` element (`styles.elements.link`) for whole-block link blocks — those that render as a link — so their inspector controls reflect inherited link styles, mirroring the `button` element treatment for `core/button`. Covers `core/read-more`, `core/loginout`, `core/post-navigation-link`, `core/query-pagination-next`, `core/query-pagination-previous`, `core/query-pagination-numbers`, `core/comments-pagination-next`, `core/comments-pagination-previous`, `core/comments-pagination-numbers`, `core/comment-edit-link`, `core/comment-reply-link`, and `core/post-comments-link` [#80607](https://github.com/WordPress/gutenberg/pull/80607)).
@@ -11,6 +15,9 @@
 
 ### Performance
 
+-   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on each call. `BlockListBlock` asks once per rendered block, so the old cost was the block count multiplied by the selection size ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `BlockListBlock`: Skip that deep check behind `isSelectionWithinCurrentSection` when the block is not within a section block, where it was passed an `undefined` client ID that never matches. Together the two changes take selecting all blocks on a 1000 paragraph post from 16.8s to 0.4s ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).
 -   `ListView`: Collapse the placeholder rows that stand in for blocks outside of the render window into a single spacer row per run, instead of rendering a `<tr>`/`<td>` pair for every block. On a post with 1000 top-level blocks this removes ~1900 elements (about 60% of the List View's DOM and nearly half of the document's elements), which cuts the style recalculation and layout work done when the List View opens ([#80953](https://github.com/WordPress/gutenberg/pull/80953)).
 
 ### Internal
@@ -21,6 +28,7 @@
 
 ### Bug Fixes
 
+-   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
@@ -28,6 +36,8 @@
 -   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
 -   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
+-   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
+-   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
 
 ## 16.0.0 (2026-07-14)
 

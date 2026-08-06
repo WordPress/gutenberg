@@ -5,10 +5,10 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { Button, ComboboxControl } from '@wordpress/components';
+import { ComboboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, createInterpolateElement } from '@wordpress/element';
-import { debounce } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+import { useDebounce, useEvent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
@@ -76,7 +76,6 @@ export default function MediaAttachedToEdit( {
 			_embedded: { ...data?._embedded, 'wp:attached-to': undefined },
 		} );
 		setValue( null );
-		setOptions( [] );
 	};
 
 	const onValueChange = async ( filterValue: string ) => {
@@ -103,6 +102,12 @@ export default function MediaAttachedToEdit( {
 		setOptions( suggestions.concat( includeCurrent ? defaultPost : [] ) );
 		setIsLoading( false );
 	};
+
+	// `onValueChange` closes over state, so it's wrapped in `useEvent` to give
+	// `useDebounce` a stable function. Debouncing an inline function instead
+	// rebuilds the timer on every render, so nothing is debounced and each
+	// keystroke fires its own request.
+	const debouncedValueChange = useDebounce( useEvent( onValueChange ), 300 );
 
 	/**
 	 * Handle selection.
@@ -150,38 +155,22 @@ export default function MediaAttachedToEdit( {
 		}
 	};
 
-	const help = createInterpolateElement(
-		__(
-			'Search for a post or page to attach this media to or <button>detach current</button>.'
-		),
-		{
-			button: (
-				<Button
-					__next40pxDefaultSize
-					onClick={ handleDetach }
-					variant="link"
-					accessibleWhenDisabled
-					disabled={ ! value }
-				/>
-			),
-		}
-	);
-
 	return (
 		<ComboboxControl
 			className="dataviews-media-field__attached-to"
 			isLoading={ isLoading }
 			label={ __( 'Attached to' ) }
-			help={ help }
+			help={ __( 'Attach this file to a single post or page.' ) }
 			value={ value }
 			options={ options }
-			onFilterValueChange={ debounce(
-				( filterValue: unknown ) =>
-					onValueChange( filterValue as string ),
-				300
-			) }
+			onFilterValueChange={ ( filterValue: unknown ) =>
+				debouncedValueChange( filterValue as string )
+			}
 			onChange={ handleSelectOption }
 			hideLabelFromVision
+			// Opening the panel shouldn't imply the user has decided to change
+			// the attachment, so wait for them to search before showing the list.
+			expandOnFocus={ false }
 		/>
 	);
 }

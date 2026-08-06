@@ -21,12 +21,10 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 
-const TEMPLATE = [ [ 'core/term-name' ] ];
-
 function TermTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: clsx( 'wp-block-term', classList ) },
-		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
+		{ __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
 }
