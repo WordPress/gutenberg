@@ -6,6 +6,9 @@
  * @package Gutenberg
  */
 
+/**
+ * @group collaboration
+ */
 class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 	/**
 	 * Editor user ID.
@@ -321,6 +324,119 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 			)
 		);
 		$this->assertErrorResponse( 'rest_sync_invalid_intent', $future, 400 );
+	}
+
+	public function test_payload_schema_violations_are_rejected_with_400_not_500() {
+		// Unknown vocabulary type.
+		$unknown = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'v-1',
+						'baseSeq'  => 0,
+						'type'     => 'teleport_block',
+						'payload'  => array( 'syncId' => self::paragraph_id() ),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $unknown, 400 );
+
+		// Known type, wrong-typed field (offset must be a non-negative int).
+		// Pre-validation this fataled inside typed planner code.
+		$wrong_type = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'v-2',
+						'baseSeq'  => 0,
+						'type'     => 'insert_text',
+						'payload'  => array(
+							'syncId' => self::paragraph_id(),
+							'field'  => 'content',
+							'offset' => 'NaN',
+							'text'   => 'x',
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $wrong_type, 400 );
+
+		// Missing required field.
+		$missing = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'v-3',
+						'baseSeq'  => 0,
+						'type'     => 'delete_text',
+						'payload'  => array(
+							'syncId' => self::paragraph_id(),
+							'field'  => 'content',
+							'start'  => 0,
+							'end'    => 2,
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $missing, 400 );
+
+		// A syncId containing `::` would silently break the frame-key
+		// algebra (frame keys are `syncId::field`).
+		$frame_breaker = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'v-4',
+						'baseSeq'  => 0,
+						'type'     => 'insert_block',
+						'payload'  => array(
+							'block'          => array(
+								'syncId'    => 'evil::content',
+								'blockType' => 'core/paragraph',
+							),
+							'parentId'       => null,
+							'afterSiblingId' => null,
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $frame_breaker, 400 );
+
+		// Extraneous payload fields are rejected (closed vocabulary).
+		$extraneous = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'v-5',
+						'baseSeq'  => 0,
+						'type'     => 'remove_block',
+						'payload'  => array(
+							'syncId' => self::paragraph_id(),
+							'sneaky' => true,
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $extraneous, 400 );
+	}
+
+	public function test_genesis_stamps_engine_lineage_on_a_read_poll() {
+		// A pure READ initializes the room (genesis snapshot row). That
+		// server-initiated first write must stamp the engine lineage, or a
+		// site-level engine flip would let another engine append rows into
+		// this room (the lineage check passes on null).
+		$this->poll();
+
+		$storage = new WP_Sync_Post_Meta_Storage();
+		$this->assertSame(
+			WP_Intent_Log_Engine::SLUG,
+			$storage->get_room_engine( $this->room() )
+		);
 	}
 
 	public function test_room_lineage_fences_an_engine_flip_with_409() {

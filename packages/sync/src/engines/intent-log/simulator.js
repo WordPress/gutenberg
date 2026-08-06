@@ -54,7 +54,22 @@ export function mulberry32( seed ) {
 	/* eslint-enable no-bitwise */
 }
 
-const WORDS = [ 'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'wapuu', 'block' ];
+/*
+ * Includes multibyte BMP content (é is 2 UTF-8 bytes / 1 UTF-16 code unit;
+ * CJK is 3 bytes / 1 unit) so the frozen vectors pin the UTF-16 code-unit
+ * coordinate space cross-language — a byte-offset PHP twin fails these.
+ * Astral characters (surrogate pairs) are deliberately excluded: splitting
+ * inside a pair is a documented open edge (SPEC.md), not yet pinned.
+ */
+const WORDS = [
+	'lorem',
+	'ipsum',
+	'dolor',
+	'café',
+	'niño',
+	'你好世界',
+	'blöck',
+];
 const FORMATS = [ 'bold', 'em', 'code' ];
 const ATTR_KEYS = [ 'align', 'dropCap', 'fontSize' ];
 

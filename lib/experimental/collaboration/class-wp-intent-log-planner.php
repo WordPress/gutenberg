@@ -207,6 +207,159 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 		}
 
 		/**
+		 * Validates an intent payload against the vocabulary schema — the
+		 * PHP mirror of createIntent()'s PAYLOAD_SCHEMAS plus its range
+		 * checks. Payloads reach typed planner/document code, so the route
+		 * must reject malformed ones with a 400 instead of fataling
+		 * mid-plan. SyncIds additionally must not contain `::`, which would
+		 * silently break the frame-key algebra (frame keys are
+		 * `syncId::field`).
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $type    Intent type.
+		 * @param array  $payload Intent payload.
+		 * @return bool Whether the payload is valid for the type.
+		 */
+		public static function is_valid_payload( string $type, array $payload ): bool {
+			$is_sync_id         = static function ( $value ): bool {
+				return is_string( $value ) && '' !== $value && false === strpos( $value, '::' );
+			};
+			$is_sync_id_or_null = static function ( $value ) use ( $is_sync_id ): bool {
+				return null === $value || $is_sync_id( $value );
+			};
+			$is_nonempty_string = static function ( $value ): bool {
+				return is_string( $value ) && '' !== $value;
+			};
+			$is_nn_int          = static function ( $value ): bool {
+				return is_int( $value ) && $value >= 0;
+			};
+			$is_text            = 'is_string';
+			$is_any             = static function (): bool {
+				return true;
+			};
+			$is_block           = null;
+			$is_block           = static function ( $value ) use ( &$is_block, $is_sync_id, $is_nonempty_string ): bool {
+				if ( ! is_array( $value ) || ! $is_sync_id( $value['syncId'] ?? null ) || ! $is_nonempty_string( $value['blockType'] ?? null ) ) {
+					return false;
+				}
+				foreach ( $value['children'] ?? array() as $child ) {
+					if ( ! $is_block( $child ) ) {
+						return false;
+					}
+				}
+				return true;
+			};
+
+			$schemas = array(
+				'set_attr'             => array(
+					'syncId'          => $is_sync_id,
+					'key'             => $is_nonempty_string,
+					'value'           => $is_any,
+					'observedVersion' => $is_nn_int,
+				),
+				'remove_attr'          => array(
+					'syncId'          => $is_sync_id,
+					'key'             => $is_nonempty_string,
+					'observedVersion' => $is_nn_int,
+				),
+				'set_property'         => array(
+					'name'            => $is_nonempty_string,
+					'value'           => $is_any,
+					'observedVersion' => $is_nn_int,
+				),
+				'insert_block'         => array(
+					'block'          => $is_block,
+					'parentId'       => $is_sync_id_or_null,
+					'afterSiblingId' => $is_sync_id_or_null,
+				),
+				'remove_block'         => array(
+					'syncId' => $is_sync_id,
+				),
+				'move_block'           => array(
+					'syncId'         => $is_sync_id,
+					'newParentId'    => $is_sync_id_or_null,
+					'afterSiblingId' => $is_sync_id_or_null,
+				),
+				'split_block'          => array(
+					'syncId'    => $is_sync_id,
+					'field'     => $is_nonempty_string,
+					'offset'    => $is_nn_int,
+					'newSyncId' => $is_sync_id,
+				),
+				'merge_blocks'         => array(
+					'survivorId' => $is_sync_id,
+					'absorbedId' => $is_sync_id,
+					'field'      => $is_nonempty_string,
+					'joinOffset' => $is_nn_int,
+				),
+				'transform_block'      => array(
+					'syncId'       => $is_sync_id,
+					'newBlockType' => $is_nonempty_string,
+				),
+				'insert_text'          => array(
+					'syncId' => $is_sync_id,
+					'field'  => $is_nonempty_string,
+					'offset' => $is_nn_int,
+					'text'   => $is_nonempty_string,
+				),
+				'delete_text'          => array(
+					'syncId'      => $is_sync_id,
+					'field'       => $is_nonempty_string,
+					'start'       => $is_nn_int,
+					'end'         => $is_nn_int,
+					'removedText' => $is_text,
+				),
+				'format_text'          => array(
+					'syncId' => $is_sync_id,
+					'field'  => $is_nonempty_string,
+					'start'  => $is_nn_int,
+					'end'    => $is_nn_int,
+					'format' => $is_nonempty_string,
+					'on'     => 'is_bool',
+				),
+				'replace_text'         => array(
+					'syncId'      => $is_sync_id,
+					'field'       => $is_nonempty_string,
+					'start'       => $is_nn_int,
+					'end'         => $is_nn_int,
+					'removedText' => $is_text,
+					'text'        => $is_nonempty_string,
+				),
+				'replace_attr_content' => array(
+					'syncId'          => $is_sync_id,
+					'field'           => $is_nonempty_string,
+					'newText'         => $is_text,
+					'observedVersion' => $is_nn_int,
+				),
+			);
+
+			if ( ! isset( $schemas[ $type ] ) ) {
+				return false;
+			}
+			$schema = $schemas[ $type ];
+			foreach ( $schema as $field => $predicate ) {
+				if ( ! array_key_exists( $field, $payload ) || ! $predicate( $payload[ $field ] ) ) {
+					return false;
+				}
+			}
+			foreach ( array_keys( $payload ) as $field ) {
+				if ( ! isset( $schema[ $field ] ) ) {
+					return false; // Extraneous field.
+				}
+			}
+			// Range sanity, mirroring createIntent().
+			$ranged = array( 'delete_text', 'format_text', 'replace_text' );
+			if ( in_array( $type, $ranged, true ) && $payload['end'] < $payload['start'] ) {
+				return false;
+			}
+			if ( in_array( $type, array( 'delete_text', 'format_text' ), true ) && $payload['end'] === $payload['start'] ) {
+				return false;
+			}
+			return true;
+		}
+
+		/**
 		 * Block ids that must survive for the intent to remain applicable.
 		 *
 		 * @since 7.2.0
@@ -524,6 +677,29 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 
 				case 'merge_blocks':
 					if ( ! self::targets_any_text_of( $intent, $prior_payload['absorbedId'] ) ) {
+						/*
+						 * The merge consumes the absorbed block (and its
+						 * subtree): identity-addressed intents on it escalate
+						 * rather than silently voiding at apply time,
+						 * mirroring the remove_block prior (rule 1). The one
+						 * idempotent case: a concurrent merge of the SAME
+						 * pair already achieved this intent's effect — void.
+						 */
+						if (
+							'merge_blocks' === $intent['type'] &&
+							$payload['absorbedId'] === $prior_payload['absorbedId'] &&
+							$payload['survivorId'] === $prior_payload['survivorId']
+						) {
+							return $void_out( $intent, 'already-merged' );
+						}
+						$absorbed_block = WP_Intent_Log_Document::get_block( $doc, $prior_payload['absorbedId'] );
+						if ( null !== $absorbed_block ) {
+							foreach ( self::required_targets( $intent ) as $id ) {
+								if ( WP_Intent_Log_Document::subtree_contains( $absorbed_block, $id ) ) {
+									return $escalate( $intent, 'target-deleted' );
+								}
+							}
+						}
 						return $clean( $intent );
 					}
 					if (
@@ -537,7 +713,7 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 					if ( null === $survivor || null === $absorbed ) {
 						return $clean( $intent );
 					}
-					$join_offset = strlen( $survivor['fields'][ $prior_payload['field'] ]['text'] ?? '' );
+					$join_offset = WP_Intent_Log_Document::text_length( $survivor['fields'][ $prior_payload['field'] ]['text'] ?? '' );
 					$point       = self::point_of( $intent );
 					if ( null !== $point ) {
 						return $clean(
@@ -569,7 +745,7 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 						return $clean( $intent );
 					}
 					$at     = $prior_payload['offset'];
-					$length = strlen( $prior_payload['text'] );
+					$length = WP_Intent_Log_Document::text_length( $prior_payload['text'] );
 					$point  = self::point_of( $intent );
 					if ( null !== $point ) {
 						if ( $at <= $point ) {
@@ -604,7 +780,7 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 					$ds           = $prior_payload['start'];
 					$de           = $prior_payload['end'];
 					$removed_len  = $de - $ds;
-					$inserted     = 'replace_text' === $prior['type'] ? strlen( $prior_payload['text'] ) : 0;
+					$inserted     = 'replace_text' === $prior['type'] ? WP_Intent_Log_Document::text_length( $prior_payload['text'] ) : 0;
 					$is_replace   = 'replace_text' === $prior['type'];
 					$map_position = static function ( int $position ) use ( $ds, $de, $removed_len, $inserted ): ?int {
 						if ( $position <= $ds ) {
@@ -921,13 +1097,21 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 		 * @return array Dispositions, one per input intent.
 		 */
 		public static function server_ingest_batch( array &$server, array $intents ): array {
-			$units = array();
+			// Idempotency covers duplicates WITHIN one batch too (the settled
+			// map is only populated after planning) — mirrors the JS twin.
+			$seen_in_batch = array();
+			$units         = array();
 			foreach ( self::group_units( $intents ) as $unit ) {
 				$fresh = array_values(
 					array_filter(
 						$unit,
-						static function ( $intent ) use ( $server ) {
-							return ! isset( $server['dispositions'][ $intent['intentId'] ] );
+						static function ( $intent ) use ( $server, &$seen_in_batch ) {
+							$intent_id = $intent['intentId'];
+							if ( isset( $server['dispositions'][ $intent_id ] ) || isset( $seen_in_batch[ $intent_id ] ) ) {
+								return false;
+							}
+							$seen_in_batch[ $intent_id ] = true;
+							return true;
 						}
 					)
 				);

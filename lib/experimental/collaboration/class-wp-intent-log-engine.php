@@ -176,6 +176,74 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		}
 
 		/**
+		 * Acquires the per-room ingest lock (MySQL GET_LOCK, held by this
+		 * request's database connection).
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return true|WP_Error True when held, retryable error otherwise.
+		 */
+		private function acquire_room_lock( string $room ) {
+			global $wpdb;
+
+			$acquired = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT GET_LOCK(%s, %d)',
+					$this->room_lock_name( $room ),
+					5 // Seconds; a plan is milliseconds, so contention clears fast.
+				)
+			);
+			if ( '1' === (string) $acquired ) {
+				return true;
+			}
+
+			// Timeout or connection error: the client retries on its normal
+			// poll cadence.
+			return new WP_Error(
+				'rest_sync_room_busy',
+				__( 'The room is busy processing another request. Retry shortly.', 'gutenberg' ),
+				array( 'status' => 503 )
+			);
+		}
+
+		/**
+		 * Releases the per-room ingest lock.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 */
+		private function release_room_lock( string $room ): void {
+			global $wpdb;
+
+			$wpdb->query(
+				$wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $this->room_lock_name( $room ) )
+			);
+		}
+
+		/**
+		 * The MySQL user-lock name for a room, prefixed for multisite/table
+		 * isolation and hashed to stay under the 64-character lock-name cap.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return string Lock name.
+		 */
+		private function room_lock_name( string $room ): string {
+			global $wpdb;
+
+			return $wpdb->prefix . 'sync_ingest_' . md5( $room );
+		}
+
+		/**
 		 * Ingests a batch of intent updates from one client.
 		 *
 		 * @since 7.2.0
@@ -193,6 +261,36 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				return array( 'dispositions' => null );
 			}
 
+			/*
+			 * Serialize ingest per room: the whole design rests on a single
+			 * server-assigned total order, and load→plan→commit is not
+			 * atomic. Two concurrent pollers planning against the same log
+			 * length would commit transformed payloads with conflicting
+			 * bases and diverge every replica. The lock is per-room, so
+			 * rooms never contend with each other.
+			 */
+			$lock = $this->acquire_room_lock( $room );
+			if ( is_wp_error( $lock ) ) {
+				return $lock;
+			}
+			try {
+				return $this->handle_updates_locked( $room, $client_id, $updates );
+			} finally {
+				$this->release_room_lock( $room );
+			}
+		}
+
+		/**
+		 * The body of handle_updates(), run under the per-room ingest lock.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $room      Room identifier.
+		 * @param int    $client_id Client identifier.
+		 * @param array  $updates   Typed updates.
+		 * @return array|WP_Error array( 'dispositions' => array ) or error.
+		 */
+		private function handle_updates_locked( string $room, int $client_id, array $updates ) {
 			$state = $this->load_room( $room );
 			if ( is_wp_error( $state ) ) {
 				return $state;
@@ -224,6 +322,16 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 						array( 'status' => 400 )
 					);
 				}
+				// Payloads reach typed planner/document code: validate the
+				// full vocabulary schema up front so a malformed intent is a
+				// clean 400 instead of a fatal mid-plan.
+				if ( ! WP_Intent_Log_Planner::is_valid_payload( $intent['type'], $intent['payload'] ) ) {
+					return new WP_Error(
+						'rest_sync_invalid_intent',
+						__( 'Unknown intent type or malformed payload.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
 				// Attribution is a server-side fact: stamp, never trust.
 				$intent['actorId'] = $actor_id;
 				$intent['txnId']   = $intent['txnId'] ?? null;
@@ -232,14 +340,22 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 
 			// Group first, then drop already-settled intents within units, so
 			// a redelivered prefix cannot fuse two distinct units (mirrors the
-			// JS engine's serverIngestBatch).
-			$units = array();
+			// JS engine's serverIngestBatch). The in-batch set extends the
+			// idempotency to duplicates WITHIN one request: the settled map
+			// is only populated after planning.
+			$seen_in_batch = array();
+			$units         = array();
 			foreach ( WP_Intent_Log_Planner::group_units( $intents ) as $unit ) {
 				$fresh = array_values(
 					array_filter(
 						$unit,
-						function ( $intent ) use ( $state ) {
-							return ! isset( $state['settled'][ $intent['intentId'] ] );
+						function ( $intent ) use ( $state, &$seen_in_batch ) {
+							$intent_id = $intent['intentId'];
+							if ( isset( $state['settled'][ $intent_id ] ) || isset( $seen_in_batch[ $intent_id ] ) ) {
+								return false;
+							}
+							$seen_in_batch[ $intent_id ] = true;
+							return true;
 						}
 					)
 				);
@@ -488,6 +604,16 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					array( 'status' => 500 )
 				);
 			}
+
+			/*
+			 * The genesis snapshot is the room's FIRST stored row, so it must
+			 * stamp the engine lineage: the transport only stamps lineage on
+			 * client-supplied updates, and a room whose first write is this
+			 * server-initiated genesis would otherwise pass the lineage check
+			 * (null) after a site-level engine flip — letting another engine
+			 * append rows into a room already containing intent-log rows.
+			 */
+			$this->storage->set_room_engine( $room, $this->get_slug() );
 
 			return $genesis;
 		}

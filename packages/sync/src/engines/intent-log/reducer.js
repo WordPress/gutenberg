@@ -125,8 +125,22 @@ export function applyIntent( doc, intent ) {
 		}
 
 		case IntentTypes.INSERT_BLOCK: {
-			if ( getBlock( next, payload.block.syncId ) ) {
-				return voided( next, 'duplicate-id' );
+			// EVERY id the payload subtree brings in must be new, and unique
+			// within the payload itself: a nested duplicate would silently
+			// retarget all later intents addressing that id.
+			const incomingIds = [];
+			( function collectIds( blockPayload ) {
+				incomingIds.push( blockPayload.syncId );
+				for ( const child of blockPayload.children ?? [] ) {
+					collectIds( child );
+				}
+			} )( payload.block );
+			const seenIds = new Set();
+			for ( const id of incomingIds ) {
+				if ( getBlock( next, id ) || seenIds.has( id ) ) {
+					return voided( next, 'duplicate-id' );
+				}
+				seenIds.add( id );
 			}
 			let siblings = next.root;
 			if ( payload.parentId !== null ) {

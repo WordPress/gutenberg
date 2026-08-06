@@ -544,6 +544,35 @@ function transformOne( intent, prior, doc ) {
 
 		case IntentTypes.MERGE_BLOCKS: {
 			if ( ! targetsAnyTextOf( intent, priorPayload.absorbedId ) ) {
+				/*
+				 * The merge consumes the absorbed block (and its subtree):
+				 * identity-addressed intents on it — attr writes, moves,
+				 * transforms, inserts anchored under it — reference
+				 * structure the log dropped. Mirroring the remove_block
+				 * prior (rule 1), they escalate rather than silently void
+				 * at apply time: the drop must never swallow another
+				 * actor's work. The one idempotent case: a concurrent merge
+				 * of the SAME pair already achieved this intent's effect —
+				 * nothing was lost, so it voids.
+				 */
+				if (
+					type === IntentTypes.MERGE_BLOCKS &&
+					payload.absorbedId === priorPayload.absorbedId &&
+					payload.survivorId === priorPayload.survivorId
+				) {
+					return voidOut( intent, 'already-merged' );
+				}
+				const absorbedLocation = locateBlock(
+					doc,
+					priorPayload.absorbedId
+				);
+				if ( absorbedLocation ) {
+					for ( const id of requiredTargets( intent ) ) {
+						if ( subtreeContains( absorbedLocation.block, id ) ) {
+							return escalate( intent, 'target-deleted' );
+						}
+					}
+				}
 				return clean( intent );
 			}
 			// Intents on the absorbed block's OTHER fields (or a wholesale
@@ -999,11 +1028,23 @@ export function serverIngestBatch( server, intents ) {
 	if ( server.recorder ) {
 		server.recorder.push( intents );
 	}
+	// Idempotency covers duplicates WITHIN one batch too, not only
+	// redeliveries of settled intents: without the in-batch set, a batch
+	// containing the same intentId twice would double-apply (the settled
+	// map is only populated after planning).
+	const seenInBatch = new Set();
 	const units = groupUnits( intents )
 		.map( ( unit ) =>
-			unit.filter(
-				( intent ) => ! server.dispositions.has( intent.intentId )
-			)
+			unit.filter( ( intent ) => {
+				if (
+					server.dispositions.has( intent.intentId ) ||
+					seenInBatch.has( intent.intentId )
+				) {
+					return false;
+				}
+				seenInBatch.add( intent.intentId );
+				return true;
+			} )
 		)
 		.filter( ( unit ) => unit.length > 0 );
 	const { rows, headDoc } = planBatch( units, server.log, ( seq ) =>

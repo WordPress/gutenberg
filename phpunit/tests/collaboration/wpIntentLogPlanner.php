@@ -6,6 +6,9 @@
  * @package Gutenberg
  */
 
+/**
+ * @group collaboration
+ */
 class Tests_Collaboration_WpIntentLogPlanner extends WP_UnitTestCase {
 	/**
 	 * Loads a frozen vector file from the sync prototype.

@@ -20,9 +20,10 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 	 * Twin discipline: this class must match the JS implementation exactly —
 	 * the frozen transcripts in `prototypes/sync/test-vectors/planner.json`
 	 * are the contract, and any behavior change must land in both languages
-	 * with regenerated vectors. Text offsets are byte offsets here and UTF-16
-	 * code units in JS; the vectors are ASCII-only, and pinning a shared
-	 * code-unit convention is a known open item (SPEC.md).
+	 * with regenerated vectors. Text offsets are UTF-16 CODE UNITS in both
+	 * languages (see text_length/text_slice): JS strings are UTF-16
+	 * natively, and the vectors include multibyte and astral content
+	 * pinning the convention cross-language.
 	 *
 	 * @since 7.2.0
 	 * @access private
@@ -86,6 +87,50 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 				'syncParent'   => $spec['syncParent'] ?? null,
 				'children'     => $children,
 			);
+		}
+
+		/**
+		 * Length of field text in UTF-16 CODE UNITS — the engine's pinned
+		 * text coordinate space. JavaScript strings are UTF-16 natively;
+		 * every offset in every text intent counts code units, so the PHP
+		 * twin must too (PHP's byte-based strlen/substr desynchronize on the
+		 * first multibyte character). Astral characters count as 2, matching
+		 * JS surrogate pairs.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $text UTF-8 text.
+		 * @return int Length in UTF-16 code units.
+		 */
+		public static function text_length( string $text ): int {
+			if ( '' === $text ) {
+				return 0;
+			}
+			return (int) ( strlen( mb_convert_encoding( $text, 'UTF-16LE', 'UTF-8' ) ) / 2 );
+		}
+
+		/**
+		 * Slice of field text by UTF-16 code-unit offsets (see text_length).
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string   $text  UTF-8 text.
+		 * @param int      $start Start offset (code units).
+		 * @param int|null $end   End offset (code units), or null for the end.
+		 * @return string UTF-8 slice.
+		 */
+		public static function text_slice( string $text, int $start, ?int $end = null ): string {
+			if ( '' === $text ) {
+				return '';
+			}
+			$utf16  = mb_convert_encoding( $text, 'UTF-16LE', 'UTF-8' );
+			$length = (int) ( strlen( $utf16 ) / 2 );
+			$end    = null === $end ? $length : $end;
+			$sliced = substr( $utf16, $start * 2, max( 0, ( $end - $start ) * 2 ) );
+			if ( false === $sliced || '' === $sliced ) {
+				return '';
+			}
+			return mb_convert_encoding( $sliced, 'UTF-8', 'UTF-16LE' );
 		}
 
 		/**
@@ -390,7 +435,7 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 		 * @param int   $end   End offset.
 		 */
 		private static function apply_text_delete( array &$field, int $start, int $end ): void {
-			$field['text']    = substr( $field['text'], 0, $start ) . substr( $field['text'], $end );
+			$field['text']    = self::text_slice( $field['text'], 0, $start ) . self::text_slice( $field['text'], $end );
 			$field['formats'] = self::shift_formats_for_delete( $field['formats'], $start, $end );
 		}
 
@@ -404,8 +449,8 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 		 * @param string $text   Text to insert.
 		 */
 		private static function apply_text_insert( array &$field, int $offset, string $text ): void {
-			$field['text'] = substr( $field['text'], 0, $offset ) . $text . substr( $field['text'], $offset );
-			self::shift_formats_for_insert( $field['formats'], $offset, strlen( $text ) );
+			$field['text'] = self::text_slice( $field['text'], 0, $offset ) . $text . self::text_slice( $field['text'], $offset );
+			self::shift_formats_for_insert( $field['formats'], $offset, self::text_length( $text ) );
 		}
 
 		/**
@@ -474,8 +519,24 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					return $applied( $next );
 
 				case 'insert_block':
-					if ( null !== self::get_block( $next, $payload['block']['syncId'] ) ) {
-						return $voided( $next, 'duplicate-id' );
+					// EVERY id the payload subtree brings in must be new,
+					// and unique within the payload itself: a nested
+					// duplicate would silently retarget all later intents
+					// addressing that id.
+					$incoming_ids = array();
+					$collect_ids  = static function ( $block_payload ) use ( &$collect_ids, &$incoming_ids ) {
+						$incoming_ids[] = $block_payload['syncId'];
+						foreach ( $block_payload['children'] ?? array() as $child ) {
+							$collect_ids( $child );
+						}
+					};
+					$collect_ids( $payload['block'] );
+					$seen_ids = array();
+					foreach ( $incoming_ids as $incoming_id ) {
+						if ( null !== self::get_block( $next, $incoming_id ) || isset( $seen_ids[ $incoming_id ] ) ) {
+							return $voided( $next, 'duplicate-id' );
+						}
+						$seen_ids[ $incoming_id ] = true;
 					}
 					$new_block = self::make_block( $payload['block'] );
 					if ( null === $payload['parentId'] ) {
@@ -536,14 +597,14 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					}
 					$block  =& self::block_at( $next, $path );
 					$field  =& self::ensure_field( $block, $payload['field'] );
-					$offset = min( $payload['offset'], strlen( $field['text'] ) );
+					$offset = min( $payload['offset'], self::text_length( $field['text'] ) );
 					$tail   = self::make_block(
 						array(
 							'syncId'     => $payload['newSyncId'],
 							'blockType'  => $block['blockType'],
 							'attrs'      => $block['attrs'],
 							'fields'     => array(
-								$payload['field'] => array( 'text' => substr( $field['text'], $offset ) ),
+								$payload['field'] => array( 'text' => self::text_slice( $field['text'], $offset ) ),
 							),
 							'syncParent' => $block['syncId'],
 						)
@@ -557,7 +618,7 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 							);
 						}
 					}
-					$field['text'] = substr( $field['text'], 0, $offset );
+					$field['text'] = self::text_slice( $field['text'], 0, $offset );
 					$head_formats  = array();
 					foreach ( $field['formats'] as $span ) {
 						$span['end'] = min( $span['end'], $offset );
@@ -587,7 +648,7 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					$absorbed_field = $absorbed['fields'][ $payload['field'] ] ?? self::make_field();
 					$survivor       =& self::block_at( $next, $survivor_path );
 					$field          =& self::ensure_field( $survivor, $payload['field'] );
-					$join_offset    = strlen( $field['text'] );
+					$join_offset    = self::text_length( $field['text'] );
 					$field['text'] .= $absorbed_field['text'];
 					foreach ( $absorbed_field['formats'] as $span ) {
 						$field['formats'][] = array(
@@ -622,7 +683,7 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					}
 					$block  =& self::block_at( $next, $path );
 					$field  =& self::ensure_field( $block, $payload['field'] );
-					$offset = min( $payload['offset'], strlen( $field['text'] ) );
+					$offset = min( $payload['offset'], self::text_length( $field['text'] ) );
 					self::apply_text_insert( $field, $offset, $payload['text'] );
 					return $applied( $next );
 
@@ -633,8 +694,8 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					}
 					$block =& self::block_at( $next, $path );
 					$field =& self::ensure_field( $block, $payload['field'] );
-					$start = min( $payload['start'], strlen( $field['text'] ) );
-					$end   = min( $payload['end'], strlen( $field['text'] ) );
+					$start = min( $payload['start'], self::text_length( $field['text'] ) );
+					$end   = min( $payload['end'], self::text_length( $field['text'] ) );
 					if ( $end <= $start ) {
 						return $voided( $next, 'empty-after-clamp' );
 					}
@@ -648,8 +709,8 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					}
 					$block =& self::block_at( $next, $path );
 					$field =& self::ensure_field( $block, $payload['field'] );
-					$start = min( $payload['start'], strlen( $field['text'] ) );
-					$end   = min( $payload['end'], strlen( $field['text'] ) );
+					$start = min( $payload['start'], self::text_length( $field['text'] ) );
+					$end   = min( $payload['end'], self::text_length( $field['text'] ) );
 					if ( $end <= $start ) {
 						return $voided( $next, 'empty-after-clamp' );
 					}
@@ -688,8 +749,8 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					}
 					$block =& self::block_at( $next, $path );
 					$field =& self::ensure_field( $block, $payload['field'] );
-					$start = min( $payload['start'], strlen( $field['text'] ) );
-					$end   = min( $payload['end'], strlen( $field['text'] ) );
+					$start = min( $payload['start'], self::text_length( $field['text'] ) );
+					$end   = min( $payload['end'], self::text_length( $field['text'] ) );
 					if ( $end > $start ) {
 						self::apply_text_delete( $field, $start, $end );
 					}

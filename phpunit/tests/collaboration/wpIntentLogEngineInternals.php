@@ -7,6 +7,9 @@
  * @package Gutenberg
  */
 
+/**
+ * @group collaboration
+ */
 class Tests_Collaboration_WpIntentLogEngineInternals extends WP_UnitTestCase {
 	/**
 	 * Editor user ID.

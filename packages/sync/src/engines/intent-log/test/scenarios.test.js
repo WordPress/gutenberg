@@ -169,7 +169,7 @@ test( 'merge × merge of the same pair: the second voids instead of double-appen
 	] );
 	assert.deepEqual( disposition, {
 		status: 'voided',
-		reason: 'missing-target',
+		reason: 'already-merged',
 	} );
 	assert.equal(
 		getBlock( headDoc( server ), 'p1' ).fields.content.text,

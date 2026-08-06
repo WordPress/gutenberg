@@ -410,10 +410,52 @@ inside intent payloads, not the transport.
   in both tabs equal the imported engine function's output exactly and
   persist verbatim through an edit + save.
 
+  **2d-xiv (hardening: the adversarial review's top findings) DONE.**
+  See REVIEW-2026-08-05.md for the full findings list. Landed:
+  - Transport recovery is codec-driven (optional
+    `createRecoveryUpdate`; Yjs = full state, intent-log = restore
+    exact updates, created before the queue is cleared). Previously
+    one transient network error while typing lost queued intents and
+    permanently killed polling (finding 1.2).
+  - Bootstrap engine mismatch flips `collaborationSupported` false so
+    WordPress post locking re-engages, with a notice — previously
+    no-sync-AND-no-lock silent overwrites (finding 1.1).
+  - Server ingest is serialized per room (MySQL GET_LOCK around
+    load→plan→commit; 503 `rest_sync_room_busy` on contention), and
+    intent payloads are schema-validated at the route (400, incl. the
+    `::`-in-syncId frame-key guard). The engine's genesis write stamps
+    room lineage, closing the read-poll → engine-flip hole (findings
+    1.5, 1.8).
+  - Planner policy: identity-addressed intents on merge-absorbed
+    blocks escalate (`target-deleted`) instead of silently voiding;
+    same-pair merge×merge voids `already-merged` (idempotent
+    convergence); ingest is idempotent for duplicates WITHIN a batch;
+    nested duplicate ids in inserted subtrees void (findings 1.3a,
+    1.9a, 3.2).
+  - Text coordinates are PINNED to UTF-16 code units cross-language:
+    the PHP twin slices via UTF-16LE conversion, the vocabulary words
+    are multibyte, and a hand-authored vector case exercises every
+    rule-2 range reason, four void reasons, merge absorption, and
+    intra-batch idempotency at exact boundaries over multibyte text.
+    A new JS-side replay test pins planner.json against the JS engine
+    too — regeneration can no longer silently rewrite the contract
+    (findings 1.9e, 3.4). Surrogate-pair-interior offsets remain a
+    documented open edge (BMP only in vectors).
+  - PHPUnit group fix: four collaboration test files (engine route,
+    planner vectors, internals, registry) lacked `@group
+    collaboration` and were invisible to group-filtered runs — the
+    group now runs 210 tests, up from 176.
+
   Remaining in 2d, all design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport) and
   the escalation REVIEW UI (inspect/apply/discard a parked proposal)
-  beyond the notice.
+  beyond the notice. Review findings NOT yet addressed (next tier):
+  compaction/growth bounds (1.6), the capture layer's HTML-string
+  diffing vs the spec'd rich-text coordinates (1.4), proposal-lane
+  recoverability substrate (1.3b), frame/txn state across request
+  boundaries (1.3c), independent effect-model oracles (3.1), and the
+  invasiveness cleanups (identity triplication, lockstep .d.ts,
+  delayed re-push).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

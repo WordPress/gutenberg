@@ -229,11 +229,18 @@ An intent escalates to the proposal lane iff:
    block only a phantom intent created. Scoped by `baseSeq`: intents
    authored after the author observed the settling entry are clean.
 
-Everything else auto-merges. Formats never escalate (a format range crossing
-a concurrent split clips to the first half; format frames may drift —
-cosmetic, recoverable). Moves never conflict with content edits (identity
-addressing). Deleting the same content twice is clean (voided), not a
-conflict.
+Everything else auto-merges. Formats avoid POSITIONAL escalation (a format
+range crossing a concurrent split clips to the first half; format frames may
+drift — cosmetic, recoverable), but a format over content a concurrent
+replace-class prior rewrote still escalates with that prior's reason — the
+content under the range is gone, not merely shifted. Moves never conflict
+with content edits (identity addressing). Idempotent convergence voids
+rather than escalating: deleting the same content twice (`already-deleted`),
+removing an already-removed block (`already-removed`), and merging an
+already-merged pair (`already-merged`) are clean voids, not conflicts. A
+concurrent merge into a DIFFERENT survivor, or any other identity-addressed
+intent on a merge-absorbed block, escalates (`target-deleted`): the
+absorption must never silently swallow another actor's work.
 
 `ESCALATION_REASONS` in `src/rebase.js` is the closed set of reasons; the
 escalation-soundness oracle rejects anything else.
@@ -302,5 +309,10 @@ escalation rates need the divergence fixtures from the benchmark plan.
 - The client replans its full outbox against its log copy on every catch-up
   (O(pending × slice)); production needs incremental planning or bounded
   outboxes, without changing planner semantics.
-- Code-unit convention: JS string indices (UTF-16). The cross-language spec
-  must pin this before the PHP twin (open item).
+- Code-unit convention: PINNED as UTF-16 code units in both languages. JS
+  strings are UTF-16 natively; the PHP twin slices via UTF-16LE conversion
+  (`WP_Intent_Log_Document::text_length`/`text_slice`), and the frozen
+  vectors carry multibyte BMP content so a byte-offset implementation
+  cannot pass. Remaining edge: an offset landing INSIDE a surrogate pair
+  (astral characters) is not yet pinned cross-language; vector content
+  deliberately stays within the BMP.

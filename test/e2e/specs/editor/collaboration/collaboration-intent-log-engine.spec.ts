@@ -740,6 +740,46 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		}
 	} );
 
+	test( 'multibyte text syncs and persists intact (UTF-16 code-unit coordinates)', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Multibyte Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Départ 你好</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+
+		// User 2 appends multibyte text to the multibyte paragraph.
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.type( ' — café niño 世界' );
+
+		const expected = 'Départ 你好 — café niño 世界';
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.content ).toBe( expected );
+		} ).toPass( { timeout: 10000 } );
+
+		// The author saves; the multibyte content survives the server round
+		// trip byte-intact.
+		await editor2.saveDraft();
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain( expected );
+	} );
+
 	test( 'title edits sync between users in both directions', async ( {
 		collaborationUtils,
 		requestUtils,

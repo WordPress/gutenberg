@@ -6,6 +6,9 @@
  * @package Gutenberg
  */
 
+/**
+ * @group collaboration
+ */
 class Tests_Collaboration_WpSyncEngineRegistry extends WP_Test_REST_TestCase {
 	/**
 	 * Editor user ID.
