@@ -1,0 +1,32 @@
+.wp-block-quote {
+	border-left: 0.25em solid currentColor;
+	margin: 0 0 1.75em 0;
+	padding-left: 1em;
+	cite,
+	footer {
+		color: currentColor;
+		font-size: 0.8125em;
+		position: relative;
+		font-style: normal;
+	}
+
+	&:where(.has-text-align-right) {
+		border-left: none;
+		border-right: 0.25em solid currentColor;
+		padding-left: 0;
+		padding-right: 1em;
+	}
+
+	&:where(.has-text-align-center) {
+		border: none;
+		padding-left: 0;
+	}
+	// .is-style-large and .is-large are kept for backwards compatibility.
+	// They are not wrapped in `:where()` to keep specificity as it was before
+	// they were deprecated.
+	&:where(.is-style-plain),
+	&.is-style-large,
+	&.is-large {
+		border: none;
+	}
+}

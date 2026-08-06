@@ -1,0 +1,84 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-interactive`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+?>
+
+<div>
+	<div data-wp-show-mock="state.falseValue">
+		<span data-testid="not inside an island">
+			This should be shown because it is inside an island.
+		</span>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="inside an island with json object">
+				This should not be shown because it is inside an island.
+			</span>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="inside an island with string">
+				This should not be shown because it is inside an island.
+			</span>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-ignore>
+			<div data-wp-show-mock="state.falseValue">
+				<span data-testid="inside an element with data-wp-ignore">
+					This should not be shown because data-wp-ignore no
+					longer prevents hydration.
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="tovdom-islands">
+			<div
+				data-wp-show-mock="state.falseValue"
+				data-testid="island inside another island"
+			>
+				<span>
+					This should not have two template wrappers because
+					that means we hydrated twice.
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div>
+			<div
+				data-wp-interactive="tovdom-islands"
+			>
+				<div data-wp-show-mock="state.falseValue">
+					<span
+						data-testid="island inside an inner element of another island"
+					>
+						This should not be shown because it is inside a
+						new island nested in an inner element of another
+						island.
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="something-new"></div>
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="directive after different namespace">
+				The directive above should keep the `tovdom-island` namespace,
+				so this message should not be visible.
+			</span>
+		</div>
+	</div>
+</div>

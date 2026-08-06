@@ -1,0 +1,104 @@
+import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
+import {
+	useContext,
+	useMemo,
+	forwardRef,
+	useCallback,
+} from '@wordpress/element';
+import type { WordPressComponentProps } from '../context';
+import type { PopoverProps } from './types';
+import styles from './style.module.scss';
+import { Context } from './context';
+
+export const Popover = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< PopoverProps, 'div', false >
+>( function UnforwardedPopover(
+	{ gutter, shift, modal = true, ...otherProps },
+	ref
+) {
+	const menuContext = useContext( Context );
+
+	// Extract the side from the applied placement — useful for animations.
+	// Using `currentPlacement` instead of `placement` to make sure that we
+	// use the final computed placement (including "flips" etc).
+	const appliedPlacementSide = Ariakit.useStoreState(
+		menuContext?.store,
+		'currentPlacement'
+	)?.split( '-' )[ 0 ];
+
+	const hideOnEscape = useCallback(
+		( event: React.KeyboardEvent< Element > ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs, close parent modals...).
+			event.preventDefault();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
+		[]
+	);
+
+	const computedDirection = Ariakit.useStoreState( menuContext?.store, 'rtl' )
+		? 'rtl'
+		: 'ltr';
+
+	const wrapperProps = useMemo(
+		() => ( {
+			dir: computedDirection,
+			style: {
+				direction:
+					computedDirection as React.CSSProperties[ 'direction' ],
+			},
+		} ),
+		[ computedDirection ]
+	);
+
+	if ( ! menuContext?.store ) {
+		throw new Error(
+			'Menu.Popover can only be rendered inside a Menu component'
+		);
+	}
+
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<div className={ styles[ 'menu-motion-root' ] }>
+				<div
+					{ ...htmlProps }
+					className={ clsx(
+						styles[ 'menu-surface' ],
+						htmlProps.className,
+						{
+							[ styles[ 'is-toolbar' ] ]:
+								menuContext.variant === 'toolbar',
+						}
+					) }
+				/>
+			</div>
+		),
+		[ menuContext.variant ]
+	);
+
+	return (
+		<Ariakit.Menu
+			{ ...otherProps }
+			className={ clsx( styles.menu, otherProps.className ) }
+			ref={ ref }
+			modal={ modal }
+			store={ menuContext.store }
+			// Root menu has an 8px distance from its trigger,
+			// otherwise 0 (which causes the submenu to slightly overlap)
+			gutter={ gutter ?? ( menuContext.store.parent ? 0 : 8 ) }
+			// Align nested menu by the same (but opposite) amount
+			// as the menu container's padding.
+			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
+			hideOnHoverOutside={ false }
+			data-side={ appliedPlacementSide }
+			data-submenu={ !! menuContext.store.parent || undefined }
+			wrapperProps={ wrapperProps }
+			hideOnEscape={ hideOnEscape }
+			unmountOnHide
+			render={ renderMenu }
+		/>
+	);
+} );

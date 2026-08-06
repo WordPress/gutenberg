@@ -1,0 +1,235 @@
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.use( {
+	ToolbarRovingTabindexUtils: async ( { editor, page, pageUtils }, use ) => {
+		await use(
+			new ToolbarRovingTabindexUtils( { editor, page, pageUtils } )
+		);
+	},
+} );
+
+test.describe( 'Toolbar roving tabindex', () => {
+	test.beforeEach( async ( { admin, editor, page } ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'First block' );
+
+		// Ensure the fixed toolbar option is off.
+		// See: https://github.com/WordPress/gutenberg/pull/54785.
+		await editor.setIsFixedToolbar( false );
+	} );
+
+	test( 'ensures base block toolbars use roving tabindex', async ( {
+		editor,
+		page,
+		pageUtils,
+		ToolbarRovingTabindexUtils,
+	} ) => {
+		// ensures paragraph block toolbar uses roving tabindex
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Paragraph' );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Block: Paragraph',
+			'Paragraph'
+		);
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
+			'Paragraph'
+		);
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: Paragraph',
+			'Paragraph'
+		);
+
+		// test: ensures heading block toolbar uses roving tabindex
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Block: Heading 2',
+			'Heading 2'
+		);
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
+			'Heading 2'
+		);
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: Heading 2',
+			'Heading 2'
+		);
+
+		// ensures list block toolbar uses roving tabindex
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'List' );
+		await ToolbarRovingTabindexUtils.focusBlockToolbar();
+		await page
+			.getByRole( 'button', { name: 'Select parent block: List' } )
+			.click();
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: List',
+			'List',
+			{ hasInnerBlocks: true }
+		);
+
+		// ensures table block toolbar uses roving tabindex
+		await editor.insertBlock( { name: 'core/table' } );
+		await page.keyboard.press( 'ArrowLeft' );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Block: Table',
+			'Table'
+		);
+
+		// Move focus to the first toolbar item.
+		await page.keyboard.press( 'Home' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
+		await editor.canvas
+			.locator( `role=button[name="Create Table"i]` )
+			.click();
+		await pageUtils.pressKeys( 'Tab' );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Body cell text',
+			'Table'
+		);
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Table' );
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: Table',
+			'Table'
+		);
+
+		// ensures image block toolbar uses roving tabindex
+		// This also tests if shift + tab works as expected to move focus to the toolbar when the preceding block has a form element.
+		await editor.insertBlock( { name: 'core/image' } );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Block: Image',
+			'Image'
+		);
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Image' );
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: Image',
+			'Image'
+		);
+	} );
+
+	test( 'ensures block toolbar remembers the last focused item', async ( {
+		editor,
+		page,
+		pageUtils,
+		ToolbarRovingTabindexUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Paragraph' );
+		await ToolbarRovingTabindexUtils.focusBlockToolbar();
+		await page.keyboard.press( 'ArrowRight' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
+	} );
+
+	test( 'can reach toolbar items with arrow keys after pressing alt+F10', async ( {
+		page,
+		pageUtils,
+		ToolbarRovingTabindexUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Align text' );
+	} );
+} );
+
+class ToolbarRovingTabindexUtils {
+	constructor( { editor, page, pageUtils } ) {
+		this.editor = editor;
+		this.page = page;
+		this.pageUtils = pageUtils;
+	}
+
+	async focusBlockToolbar() {
+		await this.pageUtils.pressKeys( 'alt+F10' );
+	}
+
+	async testBlockToolbarKeyboardNavigation(
+		currentBlockLabel,
+		currentBlockTitle
+	) {
+		await this.focusBlockToolbar();
+		await this.expectLabelToHaveFocus( currentBlockTitle );
+		await this.page.keyboard.press( 'ArrowRight' );
+		await this.expectLabelToHaveFocus( 'Move up' );
+		await this.pageUtils.pressKeys( 'Tab' );
+		await this.expectLabelToHaveFocus( currentBlockLabel );
+		await this.pageUtils.pressKeys( 'shift+Tab' );
+		await this.expectLabelToHaveFocus( 'Move up' );
+	}
+
+	async expectLabelToHaveFocus( label ) {
+		if ( label.startsWith( 'Block: ' ) ) {
+			await this.expectBlockToOwnFocus( label );
+			return;
+		}
+		let ariaLabel = await this.editor.getFocusOwnerLabel();
+		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
+		if ( ariaLabel !== label ) {
+			await this.page.keyboard.press( 'ArrowUp' );
+			ariaLabel = await this.editor.getFocusOwnerLabel();
+		}
+		expect( ariaLabel ).toBe( label );
+	}
+
+	// The selected block is the labelled one, and it owns focus: it is
+	// focused itself, or the focused editing host contains it and the
+	// selection.
+	async expectBlockToOwnFocus( label ) {
+		const block = this.editor.canvas.locator(
+			`[data-block="${ await this.getSelectedBlockClientId() }"]`
+		);
+		await expect( block ).toHaveAttribute( 'aria-label', label );
+		if ( ! ( await this.editor.ownsSelection( block ) ) ) {
+			// Focus may be within a block without text (e.g. on an image
+			// placeholder button): ArrowUp moves it to the block wrapper.
+			await this.page.keyboard.press( 'ArrowUp' );
+		}
+		await expect
+			.poll( () => this.editor.ownsSelection( block ) )
+			.toBe( true );
+	}
+
+	async getSelectedBlockClientId() {
+		return this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId()
+		);
+	}
+
+	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
+		await this.page
+			.getByRole( 'button', { name: currentBlockTitle, exact: true } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Group', exact: true } )
+			.click();
+	}
+
+	async testGroupKeyboardNavigation(
+		currentBlockLabel,
+		currentBlockTitle,
+		{ hasInnerBlocks = false } = {}
+	) {
+		await this.expectLabelToHaveFocus( 'Block: Group' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		if ( hasInnerBlocks ) {
+			// ArrowRight enters a nested inner block (e.g. list-item
+			// inside list). Use primary+a to escalate selection back
+			// to the expected parent block.
+			await this.pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		}
+		await this.expectLabelToHaveFocus( currentBlockLabel );
+		await this.pageUtils.pressKeys( 'shift+Tab' );
+		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		// The parent selector segment also hosts the inserter.
+		await this.expectLabelToHaveFocus( 'Add block' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		await this.expectLabelToHaveFocus( currentBlockTitle );
+	}
+}

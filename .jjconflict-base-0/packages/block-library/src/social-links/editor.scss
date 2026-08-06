@@ -1,0 +1,57 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// Editor specific styles for Social Links.
+.wp-block-social-links div.block-editor-url-input {
+	display: inline-block;
+	margin-left: $grid-unit-10;
+}
+
+
+// Prevent toolbar from jumping when selecting / hovering a link.
+.wp-social-link:hover {
+	transform: none;
+}
+
+// Specificity for the following styles are fixed at 0-1-0 to match and be
+// overridable by global styles.
+:root :where(.wp-block-social-links) {
+	padding: 0;
+}
+
+// Center flex items. This has an equivalent in style.scss.
+.wp-block[data-align="center"] > .wp-block-social-links,
+.wp-block.wp-block-social-links.aligncenter {
+	justify-content: center;
+}
+
+// Improve the preview, ensure buttons are fully opaque despite being disabled.
+// @todo Look at improving the preview component to make this unnecessary.
+.block-editor-block-preview__content .components-button:disabled {
+	opacity: 1;
+}
+
+// Unconfigured placeholder links are semitransparent.
+.wp-social-link.wp-social-link__is-incomplete {
+	opacity: 0.5;
+}
+
+.wp-block-social-links .is-selected .wp-social-link__is-incomplete,
+.wp-social-link.wp-social-link__is-incomplete:hover,
+.wp-social-link.wp-social-link__is-incomplete:focus {
+	opacity: 1;
+}
+
+.wp-block-social-links .block-list-appender {
+	position: static; // display inline.
+
+	.block-editor-inserter {
+		font-size: inherit;
+	}
+
+	.block-editor-button-block-appender {
+		height: 1.5em;
+		width: 1.5em;
+		font-size: inherit;
+		padding: 0;
+	}
+}

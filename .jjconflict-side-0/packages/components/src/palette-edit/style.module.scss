@@ -1,0 +1,67 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "../utils/theme-variables" as *;
+
+.indicator.indicator {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+}
+
+.name-input {
+	:global(.components-input-control__container) {
+		background: $gray-100;
+		border-radius: $radius-x-small;
+
+		// Preserve the specificity of the previous Emotion component selectors.
+		:global(
+			.components-input-control__input.components-input-control__input.components-input-control__input.components-input-control__input
+		) {
+			height: 32px;
+		}
+
+		:global(
+			.components-input-control__backdrop.components-input-control__backdrop.components-input-control__backdrop
+		) {
+			border-color: transparent;
+			box-shadow: none;
+		}
+	}
+}
+
+.name {
+	line-height: 32px;
+	margin-inline: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.heading {
+	text-transform: uppercase;
+	font-weight: 600;
+}
+
+.heading.heading.heading {
+	font-size: 11px;
+	line-height: 24px;
+	margin-bottom: 0;
+}
+
+.contents {
+	margin-top: 8px;
+}
+
+.palette.palette.palette {
+	:global(.components-button.has-icon) {
+		min-width: 0;
+		padding: 0;
+	}
+}
+
+.done.done {
+	color: $components-color-accent;
+}
+
+.remove.remove {
+	margin-top: 4px;
+}

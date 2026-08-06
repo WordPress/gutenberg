@@ -1,0 +1,301 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as core from '@actions/core';
+import hasWordPressProfile from '../../../has-wordpress-profile.js';
+import firstTimeContributorAccountLink from '../index.js';
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	setOutput: vi.fn(),
+} ) );
+
+vi.mock( import( '../../../has-wordpress-profile.js' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const setOutput = vi.mocked( core.setOutput );
+const mockedHasWordPressProfile = vi.mocked( hasWordPressProfile );
+const botUser = {
+	data: {
+		name: 'Ghost',
+		email: 'ghost@example.invalid',
+		username: 'ghost',
+		type: 'Bot',
+	},
+};
+const humanUser = {
+	data: {
+		name: 'Ghost',
+		email: 'ghost@example.invalid',
+		username: 'ghost',
+		type: 'User',
+	},
+};
+
+describe( 'firstTimeContributorAccountLink', () => {
+	beforeEach( () => {
+		setOutput.mockReset();
+		mockedHasWordPressProfile.mockReset();
+	} );
+
+	const payload = {
+		ref: 'refs/heads/trunk',
+		commits: [
+			{
+				id: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+				message: 'Add a feature from pull request (#123)',
+				author: {
+					name: 'Ghost',
+					email: 'ghost@example.invalid',
+					username: 'ghost',
+				},
+			},
+		],
+		repository: {
+			owner: {
+				login: 'WordPress',
+			},
+			name: 'gutenberg',
+		},
+	};
+
+	it( 'does nothing if not a commit to trunk', async () => {
+		const payloadForBranchPush = {
+			...payload,
+			ref: 'refs/heads/update/chicken-branch',
+		};
+
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn(),
+				},
+				users: {
+					getByUsername: vi.fn( () => humanUser ),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
+
+		expect( octokit.rest.users.getByUsername ).not.toHaveBeenCalled();
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if commit pull request undeterminable', async () => {
+		const payloadDirectToTrunk = {
+			...payload,
+			commits: [
+				{
+					message: 'Add a feature direct to trunk',
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+						username: 'ghost',
+					},
+				},
+			],
+		};
+
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn(),
+				},
+				users: {
+					getByUsername: vi.fn( () => humanUser ),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payloadDirectToTrunk, octokit );
+
+		expect( octokit.rest.users.getByUsername ).not.toHaveBeenCalled();
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the commit author has no GitHub username', async () => {
+		const payloadWithoutUsername = {
+			...payload,
+			commits: [
+				{
+					...payload.commits[ 0 ],
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+					},
+				},
+			],
+		};
+		const getByUsername = vi.fn();
+		await firstTimeContributorAccountLink( payloadWithoutUsername, {
+			rest: {
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payloadWithoutOwner = {
+			...payload,
+			repository: {
+				name: payload.repository.name,
+			},
+		};
+		const getByUsername = vi.fn( () => humanUser );
+		const listCommits = vi.fn();
+
+		await firstTimeContributorAccountLink( payloadWithoutOwner, {
+			rest: {
+				repos: {
+					listCommits,
+				},
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+		expect( listCommits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing for commits by bots', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn(),
+				},
+				users: {
+					// Return a bot when `getByUsername` is called.
+					getByUsername: vi.fn( () => botUser ),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payload, octokit );
+
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the user has multiple commits', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+								{
+									sha: '59b07cc57adff90630fc9d5cf2317269a0f4f158',
+								},
+							],
+						} )
+					),
+				},
+				users: {
+					getByUsername: vi.fn( () => humanUser ),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payload, octokit );
+
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
+		} );
+		expect( setOutput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+							],
+						} )
+					),
+				},
+				users: {
+					getByUsername: vi.fn( () => humanUser ),
+				},
+			},
+		};
+
+		mockedHasWordPressProfile.mockImplementation( () => {
+			return Promise.reject( new Error( 'Whoops!' ) );
+		} );
+
+		await firstTimeContributorAccountLink( payload, octokit );
+
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
+		} );
+		expect( setOutput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+							],
+						} )
+					),
+				},
+				users: {
+					getByUsername: vi.fn( () => humanUser ),
+				},
+			},
+		};
+
+		mockedHasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
+
+		await firstTimeContributorAccountLink( payload, octokit );
+
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
+		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-prompt',
+			expect.stringMatching( /^Congratulations/ )
+		);
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-pr-number',
+			123
+		);
+	} );
+} );

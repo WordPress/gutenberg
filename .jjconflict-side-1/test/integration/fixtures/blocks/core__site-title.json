@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/site-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
+			"isLink": true,
+			"linkTarget": "_self"
+		},
+		"innerBlocks": []
+	}
+]

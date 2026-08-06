@@ -1,0 +1,82 @@
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
+import rule from '../no-base-control-with-label-without-id';
+
+const RuleTester = configureRuleTester( { describe, it } );
+
+const ruleTester = new RuleTester( {
+	languageOptions: {
+		ecmaVersion: 6,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
+		},
+	},
+} );
+
+ruleTester.run( 'no-base-control-with-label-without-id', rule, {
+	valid: [
+		{
+			code: `
+			<BaseControl
+				label="ok"
+				id="my-id"
+			/>`,
+		},
+		{
+			code: `<BaseControl />`,
+		},
+		{
+			code: `
+			<BaseControl
+				label="ok"
+				id="my-id"
+			>
+				<input id="my-id" />
+			</BaseControl>`,
+		},
+		{
+			code: `
+			<BaseControl>
+				<input id="my-id" />
+			</BaseControl>`,
+		},
+		{
+			code: `
+			<BaseControl
+				id="my-id"
+			>
+				<input id="my-id" />
+			</BaseControl>`,
+		},
+	],
+	invalid: [
+		{
+			code: `
+			<BaseControl
+				label="ok"
+			>
+				<input id="my-id" />
+			</BaseControl>`,
+			errors: [
+				{
+					message:
+						'When using BaseControl component if a label property is passed an id property should also be passed.',
+				},
+			],
+		},
+		{
+			code: `
+			<BaseControl
+				label="ok"
+			/>`,
+			errors: [
+				{
+					message:
+						'When using BaseControl component if a label property is passed an id property should also be passed.',
+				},
+			],
+		},
+	],
+} );

@@ -1,0 +1,106 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Patterns/Destructive Actions" />
+
+# Destructive Actions
+
+Destructive actions are operations that remove, delete, or permanently alter content or data. The appropriate pattern to use depends on the reversibility and immediacy of the action's result.
+
+## Decision Tree
+
+When implementing a destructive action, follow this decision tree:
+
+1. **Does the action have an immediate visible result on the frontend?**
+   - If **no** → [No confirmation needed](#no-confirmation-needed)
+   - If **yes** → Continue to question 2
+
+2. **Can the action be easily undone?**
+   - If **yes** → [Use confirmDialog](#use-confirmdialog)
+   - If **no** → [Use Modal with destructive button](#use-modal-with-destructive-button)
+
+## No Confirmation Needed
+
+Destructive actions that have no immediate visible result on the frontend (e.g., deleting a block) do not require any destructive styling or confirmation.
+
+### When to Use
+
+- The action doesn't produce an immediate visible change on the frontend
+- The action can be reversed through standard undo functionality
+- The user expects the action to be reversible
+
+### Implementation
+
+- Use standard trigger styling, avoiding destructive (red) styling
+- No confirmation dialog required
+- Ensure undo functionality is available
+
+**Example**: Deleting a block in the editor. The block is removed but the change can be immediately undone using the undo command.
+
+## Use ConfirmDialog
+
+Destructive actions that have an immediate visible result but can be easily undone (e.g., moving to trash) require a confirmation using the `ConfirmDialog` component. A snackbar with undo affordance should be displayed after the action completes.
+
+### When to Use
+
+- The action produces an immediate visible change
+- The action can be reversed through a clear, accessible mechanism (e.g., trash/restore)
+- The user should be aware of the change before it happens
+
+### Implementation
+
+- Use `__experimentalConfirmDialog` from `@wordpress/components`
+- The dialog can be dismissed (ESC key, click outside, cancel button)
+- Standard button styling for the trigger (no destructive styling)
+- The confirmation button uses primary variant (not destructive)
+- After the action completes, display a Snackbar with an undo action
+
+### Component Details
+
+`ConfirmDialog` is built on top of `Modal` and provides:
+- Automatic focus management
+- Keyboard navigation (Enter to confirm, ESC to cancel)
+- Accessible dialog structure
+- Standard button layout (Cancel + Confirm)
+
+**Example**: Moving a post to trash. The post status changes immediately, but it can be restored from the trash.
+
+## Use Modal with Destructive Button
+
+Destructive actions that cannot be undone require a confirmation, but the primary action button should be `destructive`. Use `Modal` without a close button. A snackbar should confirm the action completes.
+
+### When to Use
+
+- The action produces an immediate, permanent change
+- The action cannot be reversed or undone
+- The consequences are significant and irreversible
+
+### Implementation
+
+- Use `Modal` component (not `ConfirmDialog`)
+- Set `isDismissible={ false }` to prevent closing via the header button
+- Set `shouldCloseOnEsc={ false }` to prevent closing via ESC key
+- Set `shouldCloseOnClickOutside={ false }` to prevent closing via overlay click
+- Primary action button must have `isDestructive={ true }` prop
+- Cancel button should use `variant="tertiary"`
+- User must explicitly choose Cancel or Delete (no accidental dismissal)
+- After the action completes, display a Snackbar to confirm the action
+
+### Component Details
+
+The `Modal` configuration ensures:
+- User cannot accidentally dismiss the dialog
+- Destructive styling on the primary button clearly indicates danger
+- User must make a deliberate choice to proceed or cancel
+- Accessibility is maintained through proper ARIA attributes and focus management
+
+### Accessibility Considerations
+
+- The modal title should clearly describe the action
+- Use descriptive button labels (e.g., "Delete permanently" not just "Delete")
+- Ensure focus is properly managed when the modal opens
+
+**Example**: Permanently deleting a post. The post is removed completely and cannot be restored.
+
+## Additional Confirmation Patterns
+
+For highly destructive or complex actions, an additional confirmation step may be warranted. Include an initially unchecked checkbox that the user must check before the destructive button becomes enabled. The checkbox label should explicitly state what the user is acknowledging (e.g., "I understand this action cannot be undone").

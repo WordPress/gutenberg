@@ -1,0 +1,77 @@
+# Documentation
+/docs                                           @juanmaguitar @fabiankaegy
+/packages/interactivity/docs                    @juanmaguitar
+
+# Data
+/packages/api-fetch
+/packages/core-data                             @Mamaduka
+/packages/data                                  @Mamaduka
+
+# Blocks
+/packages/block-library                         @fabiankaegy
+
+# Editor
+/packages/block-editor                          @ellatrix
+/packages/block-editor/src/hooks                @tellthemachines
+/packages/block-editor/src/layouts              @tellthemachines
+/packages/block-serialization-spec-parser       @dmsnell
+/packages/block-serialization-default-parser    @dmsnell
+/packages/block-editor/src/components/link-control  @getdave
+
+# Widgets
+/packages/widget-primitives                     @retrofox
+
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
+# Tooling
+/.npmrc                                         @manzoorwanijk
+# Emptied out by #83033; the entry stays so anything reappearing there gets reviewed.
+/bin                                            @manzoorwanijk
+/tools                                          @manzoorwanijk
+/test/php/gutenberg-coding-standards            @anton-vlasenko
+
+# UI Components
+/packages/components                            @WordPress/gutenberg-components
+/packages/design-system-mcp                     @WordPress/gutenberg-components
+/packages/nux                                   @peterwilsoncc
+/packages/dataviews                             @oandregal @gigitux @ntsekouras
+/packages/theme                                 @WordPress/gutenberg-components
+/packages/ui                                    @WordPress/gutenberg-components
+/packages/widget-dashboard                      @retrofox
+/packages/grid                                  @retrofox
+
+# Utilities
+/packages/dom                                   @ellatrix
+/packages/i18n                                  @swissspidy
+
+# Extensibility
+/packages/hooks                                 @adamsilverstein
+
+# Rich Text
+/packages/format-library                        @ellatrix
+/packages/rich-text                             @ellatrix
+/packages/block-editor/src/components/rich-text @ellatrix
+
+# Project Management
+/.github                                        @desrosj
+
+# wp-env
+/packages/env                                   @t-hamano
+
+# Widget Dashboard
+/routes/dashboard                               @retrofox
+/lib/experimental/dashboard-widgets             @retrofox
+
+# PHP
+/lib                                            @spacedmonkey
+/lib/block-supports/layout.php                  @tellthemachines
+/lib/class-wp-theme-json-gutenberg.php          @tellthemachines
+/lib/compat/*/html-api                          @dmsnell
+
+# Exclusions
+# An entry without an owner cancels the rules above it, and last match wins,
+# so these stay at the end. Removing them brings back the review requests.
+/tools/eslint/suppressions.json
+/tools/stylelint/stylelint-suppressions.json
+/tools/validation/check-private-apis.config.json

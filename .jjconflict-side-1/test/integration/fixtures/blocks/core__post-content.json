@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/post-content",
+		"isValid": true,
+		"attributes": {
+			"tagName": "div"
+		},
+		"innerBlocks": []
+	}
+]

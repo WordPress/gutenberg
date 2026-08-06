@@ -1,0 +1,37 @@
+[
+	{
+		"blockName": "core/buttons",
+		"attrs": {
+			"align": "wide",
+			"contentJustification": "center"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/button",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>\n\t"
+				]
+			},
+			{
+				"blockName": "core/button",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t",
+			null,
+			"\n\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

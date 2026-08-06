@@ -1,0 +1,462 @@
+import { createSelector, createRegistrySelector } from '@wordpress/data';
+import type { ConnectionStatus } from '@wordpress/sync';
+import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
+import { STORE_NAME } from './name';
+import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
+
+type EntityRecordKey = string | number;
+
+const EMPTY_OBJECT = {};
+
+/**
+ * Returns the undo manager holding the entity records edits history.
+ *
+ * @param state State tree.
+ *
+ * @return The undo manager.
+ */
+export function getUndoManager( state: State ) {
+	return state.undoManager;
+}
+
+/**
+ * Retrieve the fallback Navigation.
+ *
+ * @param state Data state.
+ * @return The ID for the fallback Navigation post.
+ */
+export function getNavigationFallbackId(
+	state: State
+): EntityRecordKey | undefined {
+	return state.navigationFallbackId;
+}
+
+export const getBlockPatternsForPostType = createRegistrySelector(
+	( select: any ) =>
+		createSelector(
+			( state, postType ) =>
+				select( STORE_NAME )
+					.getBlockPatterns()
+					.filter(
+						( { postTypes } ) =>
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+					),
+			() => [ select( STORE_NAME ).getBlockPatterns() ]
+		)
+);
+
+/**
+ * Returns the entity records permissions for the given entity record ids.
+ */
+export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
+	createSelector(
+		(
+			state: State,
+			kind: string,
+			name: string,
+			ids: string | string[]
+		) => {
+			const normalizedIds = Array.isArray( ids ) ? ids : [ ids ];
+			return normalizedIds.map( ( id ) => ( {
+				delete: select( STORE_NAME ).canUser( 'delete', {
+					kind,
+					name,
+					id,
+				} ),
+				update: select( STORE_NAME ).canUser( 'update', {
+					kind,
+					name,
+					id,
+				} ),
+			} ) );
+		},
+		( state ) => [ state.userPermissions ]
+	)
+);
+
+/**
+ * Returns the entity record permissions for the given entity record id.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param id    Entity record id.
+ *
+ * @return The entity record permissions.
+ */
+export function getEntityRecordPermissions(
+	state: State,
+	kind: string,
+	name: string,
+	id: string
+) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
+	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
+}
+
+/**
+ * Returns the registered post meta fields for a given post type.
+ *
+ * @param state    Data state.
+ * @param postType Post type.
+ *
+ * @return Registered post meta fields.
+ */
+export function getRegisteredPostMeta( state: State, postType: string ) {
+	return state.registeredPostMeta?.[ postType ] ?? {};
+}
+
+function normalizePageId( value: number | string | undefined ): string | null {
+	if ( ! value || ! [ 'number', 'string' ].includes( typeof value ) ) {
+		return null;
+	}
+
+	// We also need to check if it's not zero (`'0'`).
+	if ( Number( value ) === 0 ) {
+		return null;
+	}
+
+	return value.toString();
+}
+
+interface SiteData {
+	show_on_front?: string;
+	page_on_front?: string | number;
+	page_for_posts?: string | number;
+}
+
+export const getHomePage = createRegistrySelector( ( select ) =>
+	createSelector(
+		() => {
+			const siteData = select( STORE_NAME ).getEntityRecord(
+				'root',
+				'__unstableBase'
+			) as SiteData | undefined;
+			// Still resolving getEntityRecord.
+			if ( ! siteData ) {
+				return null;
+			}
+			const homepageId =
+				siteData?.show_on_front === 'page'
+					? normalizePageId( siteData.page_on_front )
+					: null;
+			if ( homepageId ) {
+				return { postType: 'page', postId: homepageId };
+			}
+			const frontPageTemplateId = select(
+				STORE_NAME
+			).getDefaultTemplateId( {
+				slug: 'front-page',
+			} );
+			if ( frontPageTemplateId ) {
+				return {
+					postType: 'wp_template',
+					postId: frontPageTemplateId,
+				};
+			}
+			// Resolution is finished and no front-page template exists.
+			if ( frontPageTemplateId === '' ) {
+				return EMPTY_OBJECT;
+			}
+			// Still resolving getDefaultTemplateId.
+			return null;
+		},
+		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
+			getEntityRecord( state, 'root', '__unstableBase' ),
+			getDefaultTemplateId( state, {
+				slug: 'front-page',
+			} ),
+		]
+	)
+);
+
+export const getPostsPageId = createRegistrySelector( ( select ) => () => {
+	const siteData = select( STORE_NAME ).getEntityRecord(
+		'root',
+		'__unstableBase'
+	) as SiteData | undefined;
+	return siteData?.show_on_front === 'page'
+		? normalizePageId( siteData.page_for_posts )
+		: null;
+} );
+
+export const getTemplateId = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
+
+		if ( ! homepage ) {
+			return;
+		}
+
+		// For the front page, we always use the front page template if existing.
+		if (
+			postType === 'page' &&
+			postType === homepage?.postType &&
+			postId.toString() === homepage?.postId
+		) {
+			// The /lookup endpoint cannot currently handle a lookup
+			// when a page is set as the front page, so specifically in
+			// that case, we want to check if there is a front page
+			// template, and instead of falling back to the home
+			// template, we want to fall back to the page template.
+			const templates = select( STORE_NAME ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{
+					per_page: -1,
+				}
+			);
+			if ( ! templates ) {
+				return;
+			}
+			const id = templates.find(
+				( { slug } ) => slug === 'front-page'
+			)?.id;
+			if ( id ) {
+				return id;
+			}
+			// If no front page template is found, continue with the
+			// logic below (fetching the page template).
+		}
+
+		const editedEntity = select( STORE_NAME ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( ! editedEntity ) {
+			return;
+		}
+		const postsPageId = unlock( select( STORE_NAME ) ).getPostsPageId();
+		// Check if the current page is the posts page.
+		if ( postType === 'page' && postsPageId === postId.toString() ) {
+			return select( STORE_NAME ).getDefaultTemplateId( {
+				slug: 'home',
+			} );
+		}
+		// First see if the post/page has an assigned template and fetch it.
+		const currentTemplateSlug = editedEntity.template;
+		if ( currentTemplateSlug ) {
+			const currentTemplate = select( STORE_NAME )
+				.getEntityRecords( 'postType', 'wp_template', {
+					per_page: -1,
+				} )
+				?.find( ( { slug } ) => slug === currentTemplateSlug );
+			if ( currentTemplate ) {
+				return currentTemplate.id;
+			}
+		}
+		// If no template is assigned, use the default template.
+		let slugToCheck;
+		// In `draft` status we might not have a slug available, so we use the `single`
+		// post type templates slug(ex page, single-post, single-product etc..).
+		// Pages do not need the `single` prefix in the slug to be prioritized
+		// through template hierarchy.
+		if ( editedEntity.slug ) {
+			slugToCheck =
+				postType === 'page'
+					? `${ postType }-${ editedEntity.slug }`
+					: `single-${ postType }-${ editedEntity.slug }`;
+		} else {
+			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
+		}
+		return select( STORE_NAME ).getDefaultTemplateId( {
+			slug: slugToCheck,
+		} );
+	}
+);
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}
+
+/**
+ * Returns whether collaboration is supported.
+ *
+ * @param state Data state.
+ * @return Whether collaboration is supported.
+ */
+export function isCollaborationSupported( state: State ): boolean {
+	return state.collaborationSupported;
+}
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
+ * it is consumed by the `getViewConfig` resolver to request a subset of the
+ * config via the REST API `_fields` parameter and does not affect what is read
+ * here. Partial responses are merged in the reducer, so the returned object may
+ * accumulate properties across requests for the same entity.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string
+): Record< string, any > | undefined {
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+			form: undefined,
+		}
+	);
+}
+
+/**
+ * The fields registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-fields` route.
+ */
+export interface FieldsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each field, in registration order.
+	 */
+	fields: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the fields, in
+	 * registration order, with the ids of the fields each provides.
+	 */
+	script_modules: Array< { id: string; fields: string[] } >;
+}
+
+/**
+ * Returns the fields registered on the server for the given entity, as the
+ * `/wp/v2/entity-fields` REST API route returns them.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The fields config, or undefined if not loaded.
+ */
+export function getFieldsConfig(
+	state: State,
+	kind: string,
+	name: string
+): FieldsConfig | undefined {
+	return state.fieldsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
+ * The actions registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-actions` route.
+ */
+export interface EntityActionsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each action, in registration order.
+	 */
+	actions: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the actions, in
+	 * registration order, with the ids of the actions each provides.
+	 */
+	script_modules: Array< { id: string; actions: string[] } >;
+}
+
+/**
+ * Returns the actions registered on the server for the given entity, as the
+ * `/wp/v2/entity-actions` REST API route returns them: the serializable part of each
+ * action, and the script modules providing their JavaScript parts.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The actions config, or undefined if not loaded.
+ */
+export function getEntityActionsConfig(
+	state: State,
+	kind: string,
+	name: string
+): EntityActionsConfig | undefined {
+	return state.entityActionsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
+}
+
+/**
+ * Returns the sync connection status for a single entity, or undefined if
+ * the entity is not being synced or no provider has reported a status yet.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
+ *
+ * @return The sync connection status for the entity.
+ */
+export function getEntitySyncConnectionStatus(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
+): ConnectionStatus | undefined {
+	return state.syncConnectionStatuses?.[
+		`${ kind }/${ name }:${ recordId }`
+	];
+}

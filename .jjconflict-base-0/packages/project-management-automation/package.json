@@ -1,0 +1,54 @@
+{
+	"name": "@wordpress/project-management-automation",
+	"version": "3.2.0",
+	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"github",
+		"action"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/project-management-automation"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=24.18.0"
+	},
+	"files": [
+		"action.yml",
+		"build-types",
+		"lib",
+		"*.md",
+		"!**/test/**"
+	],
+	"type": "module",
+	"main": "lib/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./lib/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types/index.d.ts",
+	"dependencies": {
+		"@actions/core": "^3.0.1",
+		"@actions/github": "^9.1.1",
+		"@octokit/openapi-webhooks-types": "^12.1.0"
+	},
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
