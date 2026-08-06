@@ -317,7 +317,7 @@ A good error message also includes some context that orients the user. “Your a
 
 #### FIVE: Remember that a message can disappear before it’s been read.
 
-A snackbar dismisses itself about six seconds after it appears, whether or not anyone has finished reading. That’s the budget for the whole message, and it doesn’t stretch to fit a longer one.
+By default a snackbar clears itself about six seconds after it appears, whether or not anyone has finished reading. That’s the budget for the whole message, and it doesn’t stretch to fit a longer one.
 
 So keep a snackbar short enough to take in at a glance—one line is a good target. Counting characters isn’t much help here, because translations often run longer than the English original: a message that sits on one line for you can wrap to three somewhere else.
 
@@ -327,4 +327,4 @@ vs.
 
 > That file couldn’t be read. Try converting it to JPEG or PNG.
 
-And when someone really does need to read a message and act on it, a snackbar is the wrong home for it. Give them a notice that stays put until they dismiss it.
+And when someone really does need to read a message and act on it, don’t leave it on that six second timer. Either keep the snackbar up until it’s dismissed, or use a notice that stays put by design.
