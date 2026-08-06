@@ -38,7 +38,6 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			anchor: {
 				type: 'string',
-				role: 'content',
 			},
 		};
 	}
