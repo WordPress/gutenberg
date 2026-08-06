@@ -17,6 +17,7 @@ import {
 } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -24,6 +25,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BlockControls from '../block-controls';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import RegisterGridMovementShortcuts from './register-grid-shortcuts';
 
 export function GridItemMovers( {
 	layout,
@@ -49,103 +51,130 @@ export function GridItemMovers( {
 		columnCount
 	);
 
+	// Helper functions for grid item movement.
+	const moveLeft = () => {
+		if ( columnStart <= 1 ) {
+			return;
+		}
+		onChange( { columnStart: columnStart - 1 } );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ blockClientId ],
+			gridClientId,
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart - 1, rowStart )
+		);
+	};
+
+	const moveRight = () => {
+		if ( columnCount && columnEnd >= columnCount ) {
+			return;
+		}
+		onChange( { columnStart: columnStart + 1 } );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ blockClientId ],
+			gridClientId,
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart + 1, rowStart )
+		);
+	};
+
+	const moveUp = () => {
+		if ( rowStart <= 1 ) {
+			return;
+		}
+		onChange( { rowStart: rowStart - 1 } );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ blockClientId ],
+			gridClientId,
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart, rowStart - 1 )
+		);
+	};
+
+	const moveDown = () => {
+		if ( rowCount && rowEnd >= rowCount ) {
+			return;
+		}
+		onChange( { rowStart: rowStart + 1 } );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ blockClientId ],
+			gridClientId,
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart, rowStart + 1 )
+		);
+	};
+
+	// Register keyboard shortcuts for grid item movement.
+	useShortcut( 'core/block-editor/move-grid-item-left', ( event ) => {
+		event.preventDefault();
+		moveLeft();
+	} );
+
+	useShortcut( 'core/block-editor/move-grid-item-right', ( event ) => {
+		event.preventDefault();
+		moveRight();
+	} );
+
+	useShortcut( 'core/block-editor/move-grid-item-up', ( event ) => {
+		event.preventDefault();
+		moveUp();
+	} );
+
+	useShortcut( 'core/block-editor/move-grid-item-down', ( event ) => {
+		event.preventDefault();
+		moveDown();
+	} );
+
 	return (
-		<BlockControls group="parent">
-			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
-				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
-					<GridItemMover
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						label={ __( 'Move left' ) }
-						description={ __( 'Move left' ) }
-						isDisabled={ columnStart <= 1 }
-						onClick={ () => {
-							onChange( {
-								columnStart: columnStart - 1,
-							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart - 1,
-									rowStart
-								)
-							);
-						} }
-					/>
-				</div>
-				<div className="block-editor-grid-item-mover__move-vertical-button-container">
-					<GridItemMover
-						className="is-up-button"
-						icon={ chevronUp }
-						label={ __( 'Move up' ) }
-						description={ __( 'Move up' ) }
-						isDisabled={ rowStart <= 1 }
-						onClick={ () => {
-							onChange( {
-								rowStart: rowStart - 1,
-							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart,
-									rowStart - 1
-								)
-							);
-						} }
-					/>
-					<GridItemMover
-						className="is-down-button"
-						icon={ chevronDown }
-						label={ __( 'Move down' ) }
-						description={ __( 'Move down' ) }
-						isDisabled={ rowCount && rowEnd >= rowCount }
-						onClick={ () => {
-							onChange( {
-								rowStart: rowStart + 1,
-							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart,
-									rowStart + 1
-								)
-							);
-						} }
-					/>
-				</div>
-				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-right">
-					<GridItemMover
-						icon={ isRTL() ? chevronLeft : chevronRight }
-						label={ __( 'Move right' ) }
-						description={ __( 'Move right' ) }
-						isDisabled={ columnCount && columnEnd >= columnCount }
-						onClick={ () => {
-							onChange( {
-								columnStart: columnStart + 1,
-							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart + 1,
-									rowStart
-								)
-							);
-						} }
-					/>
-				</div>
-			</ToolbarGroup>
-		</BlockControls>
+		<>
+			<RegisterGridMovementShortcuts />
+			<BlockControls group="parent">
+				<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
+					<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
+						<GridItemMover
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							label={ __( 'Move left' ) }
+							description={ __( 'Move left' ) }
+							isDisabled={ columnStart <= 1 }
+							onClick={ moveLeft }
+						/>
+					</div>
+					<div className="block-editor-grid-item-mover__move-vertical-button-container">
+						<GridItemMover
+							className="is-up-button"
+							icon={ chevronUp }
+							label={ __( 'Move up' ) }
+							description={ __( 'Move up' ) }
+							isDisabled={ rowStart <= 1 }
+							onClick={ moveUp }
+						/>
+						<GridItemMover
+							className="is-down-button"
+							icon={ chevronDown }
+							label={ __( 'Move down' ) }
+							description={ __( 'Move down' ) }
+							isDisabled={ rowCount && rowEnd >= rowCount }
+							onClick={ moveDown }
+						/>
+					</div>
+					<div className="block-editor-grid-item-mover__move-horizontal-button-container is-right">
+						<GridItemMover
+							icon={ isRTL() ? chevronLeft : chevronRight }
+							label={ __( 'Move right' ) }
+							description={ __( 'Move right' ) }
+							isDisabled={
+								columnCount && columnEnd >= columnCount
+							}
+							onClick={ moveRight }
+						/>
+					</div>
+				</ToolbarGroup>
+			</BlockControls>
+		</>
 	);
 }
 
