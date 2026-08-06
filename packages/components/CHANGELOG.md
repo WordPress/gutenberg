@@ -25,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Validated form controls: Attach validation messages to the interactive element rather than the hidden validation delegate, so screen reader users hear the error on the control they focus. Affects `ValidatedFormTokenField`, `ValidatedToggleGroupControl`, and `ValidatedCustomSelectControl` ([#76741](https://github.com/WordPress/gutenberg/issues/76741)).
 -   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 -   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
