@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix a `TypeError` when opening the image editor for an image in an existing gallery, by removing the redundant `edit-image` handler in the gallery details frame.
+
 ### Internal
 
 -   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).

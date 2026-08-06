@@ -174,32 +174,12 @@ const getGalleryDetailsMediaFrame = () => {
 		},
 
 		/**
-		 * Handle the edit state requirements of selected media item.
-		 *
-		 * @return {void}
-		 */
-		editState() {
-			const selection = this.state( 'gallery' ).get( 'selection' );
-			const view = new wp.media.view.EditImage( {
-				model: selection.single(),
-				controller: this,
-			} ).render();
-
-			// Set the view to the EditImage frame using the selected image.
-			this.content.set( view );
-
-			// After bringing in the frame, load the actual editor via an ajax call.
-			view.loadEditor();
-		},
-
-		/**
 		 * Create the default states.
 		 *
 		 * @return {void}
 		 */
 		createStates: function createStates() {
 			this.on( 'toolbar:create:main-gallery', this.galleryToolbar, this );
-			this.on( 'content:render:edit-image', this.editState, this );
 
 			this.states.add( [
 				new wp.media.controller.Library( {
