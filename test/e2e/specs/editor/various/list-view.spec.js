@@ -186,7 +186,7 @@ test.describe( 'List View', () => {
 		// The child heading block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Heading',
+				name: 'Heading 2',
 				exact: true,
 				selected: true,
 			} )
@@ -221,7 +221,7 @@ test.describe( 'List View', () => {
 		// The child heading block in List View should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Heading',
+				name: 'Heading 2',
 				exact: true,
 				selected: true,
 			} )
@@ -232,7 +232,7 @@ test.describe( 'List View', () => {
 		await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
 
 		await listView
-			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading 2', exact: true } )
 			.click();
 
 		// Move down to the Group block.
