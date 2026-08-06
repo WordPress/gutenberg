@@ -515,6 +515,72 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		} ).toPass( { timeout: 15000 } );
 	} );
 
+	test( 'a save captures both users’ settled edits and persists clean content', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Save Flow Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Shared start</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+
+		// User 2 extends the existing paragraph; user 1 adds a new one.
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page2.keyboard.press( 'End' );
+		await page2.keyboard.type( ' plus user two' );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Added by admin' },
+		} );
+
+		// Both editors converge before the save.
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				expect( blocks ).toMatchObject( [
+					{
+						attributes: {
+							content: 'Shared start plus user two',
+						},
+					},
+					{ attributes: { content: 'Added by admin' } },
+				] );
+			} ).toPass( { timeout: 15000 } );
+		}
+
+		await editor.saveDraft();
+
+		// The persisted content carries BOTH users' settled work…
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain( 'Shared start plus user two' );
+		expect( saved.content.raw ).toContain( 'Added by admin' );
+
+		// …and no engine-internal state leaks into it.
+		expect( saved.content.raw ).not.toContain( '_wrapper' );
+		expect( saved.content.raw ).not.toContain( 'attrVersions' );
+
+		// The non-saving peer's editor is unaffected by the save.
+		const peerBlocks = await editor2.getBlocks();
+		expect( peerBlocks ).toMatchObject( [
+			{ attributes: { content: 'Shared start plus user two' } },
+			{ attributes: { content: 'Added by admin' } },
+		] );
+	} );
+
 	test( 'concurrent edits to different blocks both survive', async ( {
 		collaborationUtils,
 		requestUtils,
