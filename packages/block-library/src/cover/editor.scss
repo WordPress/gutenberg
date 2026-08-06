@@ -63,8 +63,6 @@
 
 	// The .wp-block-cover class is used just to increase selector specificity.
 	.wp-block-cover__inner-container {
-		// Avoid text align inherit from cover image align.
-		text-align: left;
 		margin-left: 0;
 		margin-right: 0;
 	}
