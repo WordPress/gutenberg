@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
 import {
 	useEntityRecord,
+	useEntityRecords,
 	store as coreStore,
 	useEntityBlockEditor,
 } from '@wordpress/core-data';
@@ -32,7 +33,7 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -157,14 +158,44 @@ function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: ref,
+			} ),
+		[ ref ]
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+
+	const entityRecord = useEntityRecord( 'postType', 'wp_block', ref );
+	const entityBlocks = useEntityBlockEditor( 'postType', 'wp_block', {
 		id: ref,
 	} );
+	const records = useEntityRecords( 'postType', 'wp_block', {
+		include: [ ref ],
+		context: 'view',
+	} );
+
+	const record = canUserEdit ? entityRecord?.record : records?.records?.[ 0 ];
+	const hasResolved = canUserEdit
+		? entityRecord?.hasResolved
+		: records?.hasResolved;
+
+	const blocks = useMemo( () => {
+		if ( canUserEdit ) {
+			return entityBlocks[ 0 ];
+		}
+		if ( record ) {
+			return parse(
+				'string' === typeof record.content?.raw
+					? record.content?.raw
+					: ''
+			);
+		}
+		return [];
+	}, [ canUserEdit, entityBlocks, record ] );
+
 	const isMissing = hasResolved && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
