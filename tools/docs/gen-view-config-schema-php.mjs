@@ -22,6 +22,7 @@
  * External dependencies
  */
 import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
@@ -163,7 +164,7 @@ return ${ toPhp( dereferenced ) };
 
 const isMain =
 	process.argv[ 1 ] &&
-	import.meta.url === new URL( `file://${ process.argv[ 1 ] }` ).href;
+	fileURLToPath( import.meta.url ) === path.resolve( process.argv[ 1 ] );
 
 if ( isMain ) {
 	const content = generate();
