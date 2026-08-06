@@ -62,22 +62,19 @@ import { unlock } from '../../lock-unlock';
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
-function getInnerBlocksTemplate( attributes ) {
-	return [
-		[
-			'core/paragraph',
-			{
-				style: {
-					typography: {
-						textAlign: 'center',
-					},
+const INNER_BLOCKS_TEMPLATE = [
+	[
+		'core/heading',
+		{
+			style: {
+				typography: {
+					textAlign: 'center',
 				},
-				placeholder: __( 'Write title…' ),
-				...attributes,
 			},
-		],
-	];
-}
+			placeholder: __( 'Write title…' ),
+		},
+	],
+];
 
 /**
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
@@ -227,7 +224,7 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
-	// Create the initial inner paragraph when the block gains a background
+	// Create the initial inner heading when the block gains a background
 	// and has no content yet.
 	const scaffoldInnerBlocks = () => {
 		const {
@@ -238,19 +235,9 @@ function CoverEdit( {
 		if ( getBlocks( clientId ).length > 0 ) {
 			return;
 		}
-		// Check for fontSize support before we pass a fontSize attribute to
-		// the innerBlocks.
-		const [ fontSizes ] = unlock(
-			registry.select( blockEditorStore )
-		).getBlockSettings( clientId, 'typography.fontSizes' );
-		const hasFontSizes = fontSizes?.length > 0;
 		replaceInnerBlocks(
 			clientId,
-			createBlocksFromInnerBlocksTemplate(
-				getInnerBlocksTemplate( {
-					fontSize: hasFontSizes ? 'large' : undefined,
-				} )
-			),
+			createBlocksFromInnerBlocksTemplate( INNER_BLOCKS_TEMPLATE ),
 			isBlockSelected( clientId ),
 			getSelectedBlocksInitialCaretPosition()
 		);
