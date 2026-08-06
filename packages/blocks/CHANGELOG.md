@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Block types support a `defaultBlock` setting describing the default child block, as `{ name, attributes, attributesToCopy }`. It replaces the `defaultBlock` option of `InnerBlocks`/`useInnerBlocksProps`.
+-   Block types support a `defaultBlock` setting describing the default child block, as `{ name, attributes }`. It replaces the `defaultBlock` option of `InnerBlocks`/`useInnerBlocksProps`.
 
 ### Internal
 
