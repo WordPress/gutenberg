@@ -944,6 +944,73 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		}
 	} );
 
+	test( 'the wpSync console inspector records decoded wire traffic when enabled', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Inspector Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Inspect me</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const page1 = editor.page;
+
+		type WpSyncWindow = Window & {
+			wpSync: {
+				enable: () => string;
+				untail: () => string;
+				log: () => Array< {
+					room: string;
+					rows: Array< { summary: string } >;
+				} >;
+				doc: () => { root?: unknown[] } | undefined;
+			};
+		};
+		await page1.evaluate( () => {
+			const wpSync = ( window as unknown as WpSyncWindow ).wpSync;
+			wpSync.enable();
+			wpSync.untail(); // Keep the console quiet for the harness.
+		} );
+
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page1.keyboard.press( 'End' );
+		await page1.keyboard.type( ' closely' );
+
+		await expect( async () => {
+			const captured = await page1.evaluate( () => {
+				const wpSync = ( window as unknown as WpSyncWindow ).wpSync;
+				return {
+					records: wpSync.log(),
+					docBlocks: wpSync.doc()?.root?.length ?? 0,
+				};
+			} );
+			expect( captured.records.length ).toBeGreaterThan( 0 );
+			const summaries = captured.records.flatMap( ( record ) =>
+				record.rows.map( ( row ) => row.summary )
+			);
+			expect(
+				summaries.some( ( summary ) =>
+					summary.includes( 'insert_text' )
+				)
+			).toBe( true );
+			// Session state accessors work too.
+			expect( captured.docBlocks ).toBeGreaterThan( 0 );
+		} ).toPass( { timeout: 10000 } );
+
+		// Cleanup: the flag persists per browser profile.
+		await page1.evaluate( () =>
+			window.localStorage.removeItem( 'wp_sync_debug' )
+		);
+	} );
+
 	test( 'title edits sync between users in both directions', async ( {
 		collaborationUtils,
 		requestUtils,

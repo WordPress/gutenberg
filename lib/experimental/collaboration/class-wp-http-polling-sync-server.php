@@ -194,6 +194,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'required' => false,
 					'type'     => 'string',
 				),
+				// Debug envelope opt-in (see the sync inspector).
+				'debug'           => array(
+					'required' => false,
+					'type'     => 'boolean',
+				),
 				'engine_protocol' => array(
 					'minimum'  => 1,
 					'required' => false,
@@ -347,6 +352,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				$mismatch = $this->check_engine_mismatch( $engine, $room, $room_request, $updates );
 				if ( is_wp_error( $mismatch ) ) {
+					do_action( 'qm/debug', "wp-sync: engine mismatch for {$room} (client speaks another engine)" );
 					return $mismatch;
 				}
 
@@ -355,6 +361,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				$context = array(
 					'awareness' => $merged_awareness,
+					/*
+					 * Debug envelope opt-in: the client's inspector sets
+					 * `debug` per room; honored only when the site allows
+					 * it (room permission was already enforced by the
+					 * route). Engines that support it attach `_debug` to
+					 * their room response.
+					 */
+					'debug'     => ! empty( $room_request['debug'] ) && self::is_debug_allowed(),
 				);
 
 				// Engine ingests this client's updates.
@@ -378,6 +392,28 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			}
 
 			return new WP_REST_Response( $response, 200 );
+		}
+
+		/**
+		 * Whether debug envelopes may be attached to room responses.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return bool Allowed state.
+		 */
+		private static function is_debug_allowed(): bool {
+			$default = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+
+			/**
+			 * Filters whether sync debug envelopes are allowed. The room
+			 * permission check has already run; this gates only the extra
+			 * diagnostic detail.
+			 *
+			 * @since 7.2.0
+			 *
+			 * @param bool $allowed Defaults to SCRIPT_DEBUG.
+			 */
+			return (bool) apply_filters( 'wp_sync_debug_enabled', $default );
 		}
 
 		/**

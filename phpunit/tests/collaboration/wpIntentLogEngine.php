@@ -739,6 +739,57 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		}
 	}
 
+	public function test_debug_envelope_is_opt_in_and_gated() {
+		$intent = static function ( string $id ) {
+			return self::intent_update(
+				array(
+					'intentId' => $id,
+					'baseSeq'  => 0,
+					'type'     => 'insert_text',
+					'payload'  => array(
+						'syncId' => self::paragraph_id(),
+						'field'  => 'content',
+						'offset' => 0,
+						'text'   => 'x',
+					),
+				)
+			);
+		};
+
+		// Opt-in without the site gate: no envelope.
+		$deny = static function () {
+			return false;
+		};
+		add_filter( 'wp_sync_debug_enabled', $deny );
+		$response = $this->poll( array( $intent( 'dbg-1' ) ), array( 'debug' => true ) );
+		$this->assertArrayNotHasKey( '_debug', $response );
+		remove_filter( 'wp_sync_debug_enabled', $deny );
+
+		// Gate open + opt-in: engine facts attached.
+		$allow = static function () {
+			return true;
+		};
+		add_filter( 'wp_sync_debug_enabled', $allow );
+		try {
+			$response = $this->poll( array( $intent( 'dbg-2' ) ), array( 'debug' => true ) );
+			$this->assertArrayHasKey( '_debug', $response );
+			$debug = $response['_debug'];
+			$this->assertSame( 1, $debug['plan']['applied'] );
+			$this->assertSame( 0, $debug['plan']['escalated'] );
+			$this->assertFalse( $debug['checkpoint'] );
+			$this->assertArrayHasKey( 'lock_wait_ms', $debug );
+			$this->assertArrayHasKey( 'head_seq', $debug );
+			$this->assertArrayHasKey( 'rows_returned', $debug );
+			$this->assertArrayHasKey( 'total_rows', $debug );
+
+			// Gate open but no opt-in: still no envelope.
+			$response = $this->poll( array(), array( 'client_id' => 202 ) );
+			$this->assertArrayNotHasKey( '_debug', $response );
+		} finally {
+			remove_filter( 'wp_sync_debug_enabled', $allow );
+		}
+	}
+
 	public function test_genesis_stamps_engine_lineage_on_a_read_poll() {
 		// A pure READ initializes the room (genesis snapshot row). That
 		// server-initiated first write must stamp the engine lineage, or a

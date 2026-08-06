@@ -22,6 +22,13 @@ import {
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { EngineSessionCodec } from '../../engines/session';
+import {
+	installSyncDebug,
+	isSyncDebugEnabled,
+	recordPoll,
+	registerDebugSession,
+	unregisterDebugSession,
+} from '../../debug/inspector';
 import type { ConnectionStatus } from '../../types';
 import type {
 	AwarenessState,
@@ -268,6 +275,9 @@ function handleEngineMismatchError(
 
 const roomStates: Map< string, RoomState > = new Map();
 
+// Console stub for the sync inspector (wpSync.enable() and friends).
+installSyncDebug();
+
 /**
  * Check whether the awareness state exceeds the configured connection limit.
  *
@@ -463,6 +473,8 @@ function createPayloadRoom(
 					engine_protocol: state.session.engineProtocol,
 			  }
 			: {} ),
+		// The inspector's server-envelope opt-in (see debug/inspector.ts).
+		...( isSyncDebugEnabled() ? { debug: true } : {} ),
 		room: state.room,
 		updates,
 	};
@@ -576,6 +588,7 @@ function poll(): void {
 			state.onStatusChange( { status: 'connecting' } );
 		} );
 
+		const pollStarted = Date.now();
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
@@ -603,6 +616,30 @@ function poll(): void {
 				}
 
 				const roomState = roomStates.get( room.room )!;
+
+				// The inspector's wire tap: decoded traffic, both ways.
+				if ( isSyncDebugEnabled() ) {
+					const requested = payload.rooms.find(
+						( sent ) => sent.room === room.room
+					);
+					recordPoll( {
+						room: room.room,
+						sent: requested?.updates ?? [],
+						received: room.updates,
+						dispositions: room.dispositions as
+							| Array< Record< string, unknown > >
+							| undefined,
+						cursorBefore: requested?.after,
+						cursorAfter: room.end_cursor,
+						durationMs: Date.now() - pollStarted,
+						serverDebug: (
+							room as {
+								_debug?: Record< string, unknown >;
+							}
+						 )._debug,
+					} );
+				}
+
 				roomState.endCursor = room.end_cursor;
 
 				// If a limit is exceeded, disconnect immediately without processing updates.
@@ -712,6 +749,17 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
+			if ( isSyncDebugEnabled() ) {
+				for ( const requested of payload.rooms ) {
+					recordPoll( {
+						room: requested.room,
+						sent: requested.updates,
+						received: [],
+						durationMs: Date.now() - pollStarted,
+						error: String( error ),
+					} );
+				}
+			}
 			// A 403 response means the user does not have permission to
 			// sync a specific entity. Silently unregister the affected
 			// room(s) and let polling continue for the rest.
@@ -898,6 +946,10 @@ function registerRoom( {
 		return;
 	}
 
+	// State accessors for the console inspector (duck-typed; inert unless
+	// the inspector is enabled).
+	registerDebugSession( room, session );
+
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( session.getInitialUpdates() );
 
@@ -1018,6 +1070,7 @@ function unregisterRoom(
 		state.unregister();
 		roomStates.delete( room );
 	}
+	unregisterDebugSession( room );
 
 	if ( 0 === roomStates.size && areListenersRegistered ) {
 		window.removeEventListener( 'beforeunload', handleBeforeUnload );

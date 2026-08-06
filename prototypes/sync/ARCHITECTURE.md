@@ -533,6 +533,25 @@ inside intent payloads, not the transport.
     tests cover context enrichment, idempotency, and the retention
     rule. 18 e2e, 1319 jest, 216 PHPUnit.
 
+  **2d-xviii (dev tooling: the sync wire inspector) DONE.** Opt-in
+  console tooling replacing Network-tab archaeology: the polling
+  manager taps every poll into `packages/sync/src/debug/inspector.ts`
+  — `wpSync.enable()` + `wpSync.tail()` live-print decoded non-empty
+  polls (one-line intent summaries), with a ring buffer, filters,
+  per-syncId history (`wpSync.intents('p1')`), session state
+  accessors, and `wpSync.export()` for bug reports. Enabled requests
+  set `debug: true` per room; the engine answers with a `_debug`
+  envelope (lock wait, window size, head seq, plan counts, checkpoint
+  flag, row counts) gated by SCRIPT_DEBUG / `wp_sync_debug_enabled`.
+  `qm/debug` breadcrumbs fire at engine hot spots (checkpoints,
+  trims, escalations, stale-base voids, lock timeouts, engine
+  mismatches) — no-ops without Query Monitor. Deliberately NOT built:
+  a debug UI, and a QM panel (QM is page-request-scoped; polls are
+  background fetches — console-first is the right tool; a QM
+  collector for editor-load room state can come later if the console
+  tool shows we keep reaching for it). Verified live on the dev env:
+  decoded summaries + full server envelope through real typing.
+
   Remaining in 2d, design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport) and
   the full review PANEL (list UI; the actionable notices cover the

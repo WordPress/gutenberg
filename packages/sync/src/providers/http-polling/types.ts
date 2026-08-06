@@ -43,11 +43,15 @@ interface SyncEnvelopeFromClient {
 	 */
 	engine?: string;
 	engine_protocol?: number;
+	/** Sync-inspector opt-in: ask the engine for a `_debug` envelope. */
+	debug?: boolean;
 	room: string;
 	updates: SyncUpdate[];
 }
 
 interface SyncEnvelopeFromServer {
+	/** Engine diagnostics, present only when the request opted in. */
+	_debug?: Record< string, unknown >;
 	awareness: AwarenessState;
 	compaction_request?: SyncUpdate[]; // deprecated
 	dispositions?: EngineDisposition[];

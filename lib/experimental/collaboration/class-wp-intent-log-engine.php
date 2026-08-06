@@ -123,6 +123,16 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		private array $room_state = array();
 
 		/**
+		 * Per-request debug info stash, keyed by room (ingest fills it,
+		 * get_updates_since attaches it as the `_debug` envelope when the
+		 * request opted in).
+		 *
+		 * @since 7.2.0
+		 * @var array<string, array>
+		 */
+		private array $debug_stash = array();
+
+		/**
 		 * Constructor.
 		 *
 		 * @since 7.2.0
@@ -280,12 +290,15 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			 * bases and diverge every replica. The lock is per-room, so
 			 * rooms never contend with each other.
 			 */
-			$lock = $this->acquire_room_lock( $room );
+			$lock_started = microtime( true );
+			$lock         = $this->acquire_room_lock( $room );
+			$lock_wait_ms = round( ( microtime( true ) - $lock_started ) * 1000, 1 );
 			if ( is_wp_error( $lock ) ) {
+				do_action( 'qm/debug', "wp-sync: ingest lock timeout for {$room} after {$lock_wait_ms}ms" );
 				return $lock;
 			}
 			try {
-				return $this->handle_updates_locked( $room, $client_id, $updates );
+				return $this->handle_updates_locked( $room, $client_id, $updates, $context, $lock_wait_ms );
 			} finally {
 				$this->release_room_lock( $room );
 			}
@@ -296,12 +309,14 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 *
 		 * @since 7.2.0
 		 *
-		 * @param string $room      Room identifier.
-		 * @param int    $client_id Client identifier.
-		 * @param array  $updates   Typed updates.
+		 * @param string $room         Room identifier.
+		 * @param int    $client_id    Client identifier.
+		 * @param array  $updates      Typed updates.
+		 * @param array  $context      Transport context (debug opt-in).
+		 * @param float  $lock_wait_ms Time spent acquiring the ingest lock.
 		 * @return array|WP_Error array( 'dispositions' => array ) or error.
 		 */
-		private function handle_updates_locked( string $room, int $client_id, array $updates ) {
+		private function handle_updates_locked( string $room, int $client_id, array $updates, array $context = array(), float $lock_wait_ms = 0 ) {
 			$state = $this->load_room( $room );
 			if ( is_wp_error( $state ) ) {
 				return $state;
@@ -483,13 +498,43 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					++$accepted_count;
 				}
 			}
-			$this->maybe_checkpoint(
+			$checkpointed = $this->maybe_checkpoint(
 				$room,
 				$client_id,
 				count( $state['log'] ) + $accepted_count,
 				$head_seq + $accepted_count,
 				$plan['headDoc']
 			);
+
+			// Breadcrumbs + the debug envelope stash (attached by the read
+			// half of this same request when the client opted in).
+			$plan_counts = array(
+				'applied'   => 0,
+				'escalated' => 0,
+				'voided'    => 0,
+			);
+			foreach ( $plan['rows'] as $row ) {
+				$status = $row['disposition']['status'];
+				if ( isset( $plan_counts[ $status ] ) ) {
+					++$plan_counts[ $status ];
+				}
+			}
+			$plan_counts['stale'] = count( $stale );
+			if ( $plan_counts['escalated'] > 0 ) {
+				do_action( 'qm/debug', "wp-sync: {$plan_counts['escalated']} intent(s) escalated for review in {$room}" );
+			}
+			if ( $plan_counts['stale'] > 0 ) {
+				do_action( 'qm/debug', "wp-sync: {$plan_counts['stale']} stale-base intent(s) voided in {$room} (client below retention horizon)" );
+			}
+			if ( ! empty( $context['debug'] ) ) {
+				$this->debug_stash[ $room ] = array(
+					'lock_wait_ms' => $lock_wait_ms,
+					'window_rows'  => count( $state['log'] ),
+					'head_seq'     => $head_seq + $accepted_count,
+					'plan'         => $plan_counts,
+					'checkpoint'   => $checkpointed,
+				);
+			}
 
 			/*
 			 * Resolutions, after intents: close open proposals. Idempotent by
@@ -590,10 +635,11 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 *                                   genesis, after this commit.
 		 * @param int    $head_seq           Engine seq at the new head.
 		 * @param array  $head_doc           Document at the new head.
+		 * @return bool Whether a checkpoint was appended.
 		 */
-		private function maybe_checkpoint( string $room, int $client_id, int $window_intent_rows, int $head_seq, array $head_doc ): void {
+		private function maybe_checkpoint( string $room, int $client_id, int $window_intent_rows, int $head_seq, array $head_doc ): bool {
 			if ( ! method_exists( $this->storage, 'get_room_meta' ) || ! method_exists( $this->storage, 'set_room_meta' ) ) {
-				return;
+				return false;
 			}
 
 			/**
@@ -608,7 +654,7 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			 */
 			$interval = (int) apply_filters( 'wp_sync_intent_log_checkpoint_interval', 100, $room );
 			if ( $interval < 1 || $window_intent_rows < $interval ) {
-				return;
+				return false;
 			}
 
 			$previous = $this->storage->get_room_meta( $room, 'intent_log_checkpoint' );
@@ -666,7 +712,7 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				)
 			);
 			if ( ! $stored ) {
-				return; // Non-fatal: the next commit retries.
+				return false; // Non-fatal: the next commit retries.
 			}
 			// The checkpoint row's own transport cursor: the storage writes
 			// postmeta directly, so the connection's last insert id IS the
@@ -675,8 +721,9 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			global $wpdb;
 			$cursor = (int) $wpdb->insert_id;
 			if ( $cursor <= 0 ) {
-				return;
+				return true;
 			}
+			do_action( 'qm/debug', "wp-sync: checkpoint at seq {$head_seq} for {$room}" );
 			$this->storage->set_room_meta(
 				$room,
 				'intent_log_checkpoint',
@@ -692,7 +739,9 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				// record the floor for the read path.
 				$this->storage->remove_updates_before_cursor( $room, (int) $previous['cursor'] );
 				$this->storage->set_room_meta( $room, 'intent_log_floor', (int) $previous['cursor'] );
+				do_action( 'qm/debug', "wp-sync: trimmed history below cursor {$previous['cursor']} for {$room}" );
 			}
+			return true;
 		}
 
 		/**
@@ -744,13 +793,29 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				);
 			}
 
-			return array(
+			$response = array(
 				'end_cursor'     => $this->storage->get_cursor( $room ),
 				'room'           => $room,
 				'should_compact' => false,
 				'total_updates'  => $this->storage->get_update_count( $room ),
 				'updates'        => $typed_updates,
 			);
+
+			// The debug envelope: engine facts from this request's ingest
+			// half (the stash) plus read-side counts. Attached only when
+			// the request opted in AND the site allows it (transport gate).
+			if ( ! empty( $context['debug'] ) ) {
+				$response['_debug'] = array_merge(
+					$this->debug_stash[ $room ] ?? array(),
+					array(
+						'rows_returned' => count( $typed_updates ),
+						'total_rows'    => $response['total_updates'],
+					)
+				);
+				unset( $this->debug_stash[ $room ] );
+			}
+
+			return $response;
 		}
 
 		/**

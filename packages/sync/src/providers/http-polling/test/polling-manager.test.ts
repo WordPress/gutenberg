@@ -164,6 +164,7 @@ describe( 'polling-manager', () => {
 		typeof import('../utils').postSyncUpdateNonBlocking
 	>;
 	let mockApplyFilters: jest.Mock;
+	let inspector: typeof import('../../../debug/inspector').syncDebugApi;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -176,6 +177,9 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdateNonBlocking =
 				require( '../utils' ).postSyncUpdateNonBlocking;
 			mockApplyFilters = require( '@wordpress/hooks' ).applyFilters;
+			// Same isolated registry as the polling manager: the inspector
+			// buffer must be the instance the tap writes to.
+			inspector = require( '../../../debug/inspector' ).syncDebugApi;
 		} );
 	} );
 
@@ -2318,6 +2322,81 @@ describe( 'polling-manager', () => {
 			);
 			expect( beaconsSent.every( ( n ) => n <= 10 ) ).toBe( true );
 			expect( beaconsSent.reduce( ( a, b ) => a + b, 0 ) ).toBe( 21 );
+		} );
+	} );
+	describe( 'sync inspector tap', () => {
+		it( 'records decoded polls and requests the server envelope when enabled', async () => {
+			window.localStorage.setItem( 'wp_sync_debug', '1' );
+			inspector.clear();
+			inspector.untail();
+			try {
+				mockPostSyncUpdate.mockResolvedValueOnce( {
+					rooms: [
+						{
+							room: 'test-room',
+							end_cursor: 2,
+							awareness: {},
+							updates: [
+								{
+									data: JSON.stringify( {
+										intentId: 'r-1',
+										actorId: 'u9c9',
+										baseSeq: 0,
+										txnId: null,
+										type: 'remove_block',
+										payload: { syncId: 'p1' },
+									} ),
+									type: 'intent',
+								},
+							],
+							_debug: { head_seq: 1 },
+						},
+					],
+				} );
+				pollingManager.registerRoom( {
+					room: 'test-room',
+					session: createMockSession( 1 ),
+					log: jest.fn(),
+					onStatusChange: jest.fn(),
+				} );
+				await jest.advanceTimersByTimeAsync( 0 );
+
+				// The payload asked the server for the debug envelope…
+				const payload = mockPostSyncUpdate.mock
+					.calls[ 0 ][ 0 ] as unknown as {
+					rooms: Array< { debug?: boolean } >;
+				};
+				expect( payload.rooms[ 0 ].debug ).toBe( true );
+
+				// …and the inspector captured the decoded traffic.
+				const records = inspector.log( { room: 'test-room' } );
+				expect( records ).toHaveLength( 1 );
+				expect( records[ 0 ].rows[ 0 ].summary ).toContain(
+					'remove_block -p1'
+				);
+				expect( records[ 0 ].serverDebug ).toEqual( { head_seq: 1 } );
+			} finally {
+				window.localStorage.removeItem( 'wp_sync_debug' );
+				inspector.clear();
+			}
+		} );
+
+		it( 'stays inert when disabled', async () => {
+			inspector.clear();
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				session: createMockSession( 1 ),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+			await jest.advanceTimersByTimeAsync( 0 );
+			const payload = mockPostSyncUpdate.mock
+				.calls[ 0 ][ 0 ] as unknown as {
+				rooms: Array< { debug?: boolean } >;
+			};
+			expect( payload.rooms[ 0 ].debug ).toBeUndefined();
+			expect( inspector.log() ).toHaveLength( 0 );
 		} );
 	} );
 } );
