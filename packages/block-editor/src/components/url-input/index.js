@@ -87,6 +87,7 @@ export default function URLInput( props ) {
 	const [ isSuggestionsListOpen, setIsSuggestionsListOpen ] =
 		useState( false );
 	const [ isLoading, setIsLoading ] = useState( false );
+	const [ isComposing, setIsComposing ] = useState( false );
 
 	const fallbackInputRef = useRef();
 	const suggestionNodesRef = useRef( [] );
@@ -199,15 +200,19 @@ export default function URLInput( props ) {
 
 	// Keep the suggestions in sync with the value being searched for. An empty
 	// value requests the initial suggestions, when those are enabled.
+	// Composition state is a dependency, so the composed value is picked up
+	// whether the browser reports it before or after `compositionend`.
 	useEffect( () => {
 		if (
 			! disableSuggestions &&
+			! isComposing &&
 			( value.length || showInitialSuggestions )
 		) {
 			debouncedUpdateSuggestions( value );
 		}
 	}, [
 		value,
+		isComposing,
 		disableSuggestions,
 		showInitialSuggestions,
 		debouncedUpdateSuggestions,
@@ -254,6 +259,17 @@ export default function URLInput( props ) {
 		// `InputControl` passes an `{ event }` object as its second argument,
 		// which callers would mistake for a selected suggestion.
 		onChange( newValue );
+	}
+
+	function handleCompositionStart() {
+		setIsComposing( true );
+		// Cancel any debounced suggestions update scheduled before the
+		// composition started so no request fires while composing.
+		debouncedUpdateSuggestions.cancel();
+	}
+
+	function handleCompositionEnd() {
+		setIsComposing( false );
 	}
 
 	function handleFocus() {
@@ -358,6 +374,8 @@ export default function URLInput( props ) {
 		name: inputId,
 		autoComplete: 'off',
 		onChange: disabled ? noop : handleChange,
+		onCompositionStart: disabled ? noop : handleCompositionStart,
+		onCompositionEnd: disabled ? noop : handleCompositionEnd,
 		onFocus: disabled ? noop : handleFocus,
 		onKeyDown: disabled ? noop : handleKeyDown,
 		placeholder,

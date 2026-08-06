@@ -44,7 +44,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -485,7 +484,7 @@ function MediaTextEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE, allowedBlocks }
+		{ allowedBlocks }
 	);
 
 	const blockEditingMode = useBlockEditingMode();

@@ -45,9 +45,8 @@ import {
 } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
-import useBlockDisplayInformation from '../use-block-display-information';
-import { useBlockLock } from '../block-lock';
-import { useBlockRename, BlockRenameModal } from '../block-rename';
+import { getPositionTypeLabel } from '../use-block-display-information';
+import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
@@ -78,7 +77,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -119,7 +117,6 @@ function ListViewBlock( {
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const pasteStyles = usePasteStyles();
 
 	const {
@@ -130,6 +127,9 @@ function ListViewBlock( {
 		editedSection,
 		viewportSettings,
 		blockVisibilitySetting,
+		positionLabel,
+		isSynced,
+		isLocked,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -138,13 +138,15 @@ function ListViewBlock( {
 				getBlockEditingMode: getBlockEditingModeForClientId,
 				getSettings,
 				getEditedContentOnlySection,
+				isSyncedBlock,
+				isLockedBlock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
+			const attributes = getBlockAttributes( clientId );
 
 			return {
 				blockName: getBlockName( clientId ),
-				blockVisibility:
-					getBlockAttributes( clientId )?.metadata?.blockVisibility,
+				blockVisibility: attributes?.metadata?.blockVisibility,
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
@@ -152,13 +154,17 @@ function ListViewBlock( {
 				blockVisibilitySetting:
 					settings.__experimentalFeatures?.blockVisibility
 						?.allowEditing,
+				positionLabel: getPositionTypeLabel( attributes ),
+				isSynced: isSyncedBlock( clientId ),
+				isLocked: isLockedBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
 	const isDisabled = blockEditingMode === 'disabled';
-	const { canRename } = useBlockRename( blockName );
+	const canRename =
+		!! blockName && hasBlockSupport( blockName, 'renaming', true );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -171,7 +177,6 @@ function ListViewBlock( {
 	const {
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expansionState,
 		updateExpansion,
 		setInsertedBlockClientId,
 		treeGridElementRef,
@@ -371,8 +376,7 @@ function ListViewBlock( {
 			const { firstBlockClientId } = getBlocksToUpdate();
 			const blockParents = getBlockParents( firstBlockClientId, false );
 			// Collapse all blocks and expand the block's parents.
-			updateExpansion( { type: 'clear' } );
-			updateExpansion( { type: 'expand', clientIds: blockParents } );
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
@@ -469,7 +473,7 @@ function ListViewBlock( {
 			}
 			updateExpansion( {
 				type: isExpanded ? 'collapse' : 'expand',
-				clientIds: clientId,
+				clientIds: [ clientId ],
 			} );
 		},
 		[ clientId, updateExpansion, isExpanded ]
@@ -553,7 +557,7 @@ function ListViewBlock( {
 	);
 
 	const blockPropertiesDescription = getBlockPropertiesDescription(
-		blockInformation,
+		positionLabel,
 		isLocked
 	);
 
@@ -591,7 +595,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation?.isSynced,
+		'is-synced': isSynced,
 		'is-draggable': canMoveBlock && ! isDisabled,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
@@ -658,10 +662,6 @@ function ListViewBlock( {
 							onToggleExpanded={
 								isDisabled ? undefined : toggleExpanded
 							}
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
@@ -739,7 +739,6 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expansionState={ expansionState }
 							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
 								setInsertedBlockClientId

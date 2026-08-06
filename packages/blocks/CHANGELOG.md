@@ -5,6 +5,7 @@
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+-   Update `hpq` to 1.4.0 for its bundled TypeScript types ([#81199](https://github.com/WordPress/gutenberg/pull/81199)).
 
 ## 15.24.0 (2026-07-14)
 

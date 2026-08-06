@@ -268,6 +268,7 @@ function IsolatedSandBox( {
 	onFocus,
 	tabIndex,
 	allowPopups = false,
+	allowForms = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
@@ -275,6 +276,7 @@ function IsolatedSandBox( {
 
 	const sandbox = clsx( 'allow-scripts', 'allow-presentation', {
 		'allow-popups': allowPopups,
+		'allow-forms': allowForms,
 	} );
 
 	const srcDoc = useMemo(
@@ -393,6 +395,7 @@ function SameOriginSandBox( {
 	onFocus,
 	tabIndex,
 	allowPopups = false,
+	allowForms = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
@@ -404,6 +407,7 @@ function SameOriginSandBox( {
 		'allow-presentation',
 		{
 			'allow-popups': allowPopups,
+			'allow-forms': allowForms,
 		}
 	);
 

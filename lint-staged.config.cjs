@@ -1,6 +1,6 @@
 module.exports = {
-	'*.{js,json,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
-	'**/*.{js,ts,tsx,jsx}': [
+	'*.{cjs,js,json,jsx,mjs,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
+	'**/*.{cjs,js,jsx,mjs,ts,tsx}': [
 		() => 'npm run prelint:js',
 		'node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs',
 	],
