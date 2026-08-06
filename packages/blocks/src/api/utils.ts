@@ -428,6 +428,11 @@ export function getBlockAttributesNamesByRole(
 	}
 
 	return attributesNames.filter( ( attributeName ) => {
+		// The metadata attribute has no declared definition, but carries the
+		// block's bindings and custom name, which belong to its content.
+		if ( role === 'content' && attributeName === 'metadata' ) {
+			return true;
+		}
 		const attribute = attributes[ attributeName ];
 		if ( attribute?.role === role ) {
 			return true;

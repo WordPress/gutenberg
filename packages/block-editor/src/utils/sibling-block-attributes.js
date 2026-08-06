@@ -4,15 +4,10 @@
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
 
 /**
- * Attributes that must stay unique to a block and are never inherited by a
- * new sibling. `metadata` also carries the block's bindings and custom name.
- */
-const UNIQUE_ATTRIBUTES = [ 'anchor', 'metadata' ];
-
-/**
  * Returns the attributes a newly created block inherits from an adjacent
  * block of the same type: everything except the adjacent block's content
- * (attributes with the `content` role) and attributes that must stay unique.
+ * (attributes with the `content` role, which include the anchor and the
+ * block's metadata).
  * A styled sibling thus yields an equally styled, empty new block.
  *
  * @param {string}  blockName  The block name.
@@ -25,10 +20,9 @@ export function getSiblingBlockAttributes( blockName, attributes ) {
 		return {};
 	}
 
-	const excluded = new Set( [
-		...getBlockAttributesNamesByRole( blockName, 'content' ),
-		...UNIQUE_ATTRIBUTES,
-	] );
+	const excluded = new Set(
+		getBlockAttributesNamesByRole( blockName, 'content' )
+	);
 	return Object.fromEntries(
 		Object.entries( attributes ).filter(
 			( [ key ] ) => ! excluded.has( key )
