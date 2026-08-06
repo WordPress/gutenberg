@@ -49,6 +49,7 @@ function UnforwardedModal(
 			describedby: undefined,
 		},
 		onRequestClose,
+		onValidateClose = () => true,
 		icon,
 		closeButtonLabel,
 		children,
@@ -321,11 +322,13 @@ function UnforwardedModal(
 											size="compact"
 											onClick={ (
 												event: React.MouseEvent< HTMLButtonElement >
-											) =>
-												closeModal().then( () =>
-													onRequestClose( event )
-												)
-											}
+											) => {
+												if ( onValidateClose() ) {
+													closeModal().then( () =>
+														onRequestClose( event )
+													);
+												}
+											} }
 											icon={ close }
 											label={
 												closeButtonLabel ||

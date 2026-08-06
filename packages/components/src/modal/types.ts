@@ -107,6 +107,7 @@ export type ModalProps = {
 	onRequestClose: (
 		event?: React.KeyboardEvent< HTMLDivElement > | React.SyntheticEvent
 	) => void;
+	onValidateClose?: () => boolean | void;
 	/**
 	 * If this property is added, it will an additional class name to the modal
 	 * overlay `div`.

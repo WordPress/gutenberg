@@ -6,7 +6,7 @@ import type { StoryFn, Meta } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
 
 /**
@@ -131,4 +131,38 @@ WithHeaderActions.args = {
 };
 WithHeaderActions.parameters = {
 	...Default.parameters,
+};
+
+export const PreventCloseRequest = {
+	render: function Render() {
+		const [ isOpen, setOpen ] = useState( false );
+		const closableCbxRef = useRef< HTMLInputElement >( null );
+		const openModal = () => setOpen( true );
+		const closeModal = () => setOpen( false );
+
+		return (
+			<>
+				<Button variant="secondary" onClick={ openModal }>
+					Open Modal
+				</Button>
+				{ isOpen && (
+					<Modal
+						title="This is my modal"
+						onRequestClose={ closeModal }
+						onValidateClose={ () =>
+							closableCbxRef.current?.checked
+						}
+					>
+						<input
+							type="checkbox"
+							// eslint-disable-next-line no-restricted-syntax
+							id="allow-close"
+							ref={ closableCbxRef }
+						/>{ ' ' }
+						<label htmlFor="allow-close">Allow close</label>
+					</Modal>
+				) }
+			</>
+		);
+	},
 };
