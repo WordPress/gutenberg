@@ -98,6 +98,16 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		const UPDATE_TYPE_VOIDED = 'voided';
 
 		/**
+		 * Update type: a proposal's terminal state (client-sendable).
+		 * `{ proposalId, resolution: restored|dismissed }`, server-stamped
+		 * with `resolvedBy` and `time`. Idempotent by proposalId.
+		 *
+		 * @since 7.2.0
+		 * @var string
+		 */
+		const UPDATE_TYPE_RESOLVED = 'resolved';
+
+		/**
 		 * Storage backend.
 		 *
 		 * @since 7.2.0
@@ -160,6 +170,7 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				self::UPDATE_TYPE_SNAPSHOT,
 				self::UPDATE_TYPE_PROPOSAL,
 				self::UPDATE_TYPE_VOIDED,
+				self::UPDATE_TYPE_RESOLVED,
 			);
 		}
 
@@ -296,15 +307,32 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				return $state;
 			}
 
-			$actor_id = self::actor_id( $client_id );
-			$base_seq = (int) ( $state['base_seq'] ?? 0 );
-			$head_seq = $base_seq + count( $state['log'] );
-			$intents  = array();
+			$actor_id    = self::actor_id( $client_id );
+			$base_seq    = (int) ( $state['base_seq'] ?? 0 );
+			$head_seq    = $base_seq + count( $state['log'] );
+			$intents     = array();
+			$resolutions = array();
 			foreach ( $updates as $update ) {
+				if ( self::UPDATE_TYPE_RESOLVED === $update['type'] ) {
+					$resolution = json_decode( $update['data'], true );
+					if (
+						! is_array( $resolution ) ||
+						! is_string( $resolution['proposalId'] ?? null ) || '' === $resolution['proposalId'] ||
+						! in_array( $resolution['resolution'] ?? null, array( 'restored', 'dismissed' ), true )
+					) {
+						return new WP_Error(
+							'rest_sync_invalid_intent',
+							__( 'Malformed proposal resolution.', 'gutenberg' ),
+							array( 'status' => 400 )
+						);
+					}
+					$resolutions[] = $resolution;
+					continue;
+				}
 				if ( self::UPDATE_TYPE_INTENT !== $update['type'] ) {
 					return new WP_Error(
 						'rest_invalid_update_type',
-						__( 'Clients may only send intent updates to an intent-log room.', 'gutenberg' ),
+						__( 'Clients may only send intent or resolution updates to an intent-log room.', 'gutenberg' ),
 						array( 'status' => 400 )
 					);
 				}
@@ -406,7 +434,21 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				if ( null !== $row['accepted'] ) {
 					$stored = $this->add_row( $room, $client_id, self::UPDATE_TYPE_INTENT, $row['accepted'] );
 				} elseif ( null !== $row['proposal'] ) {
-					$stored = $this->add_row( $room, $client_id, self::UPDATE_TYPE_PROPOSAL, $row['proposal'] );
+					/*
+					 * Review context, captured while the document is at hand:
+					 * offsets go stale the moment the log moves on, so the
+					 * row carries a content excerpt of the target field for
+					 * content-centric rendering (see PROPOSAL-REVIEW.md).
+					 */
+					$proposal            = $row['proposal'];
+					$proposal['at']      = $head_seq;
+					$proposal['time']    = time();
+					$proposal['context'] = array(
+						'excerpt' => self::proposal_excerpt( $doc_at( $head_seq ), $row['intent'] ),
+					);
+					$stored              = $this->add_row( $room, $client_id, self::UPDATE_TYPE_PROPOSAL, $proposal );
+					// Same-request resolutions can target it.
+					$state['proposals_open'][ $intent_id ] = true;
 				} else {
 					$stored = true;
 				}
@@ -449,6 +491,37 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				$plan['headDoc']
 			);
 
+			/*
+			 * Resolutions, after intents: close open proposals. Idempotent by
+			 * proposalId — a redelivered, concurrent, or trimmed-and-resolved
+			 * (unknown) id acks as resolved without a new row; only a
+			 * currently-open proposal appends one.
+			 */
+			foreach ( $resolutions as $resolution ) {
+				$proposal_id = $resolution['proposalId'];
+				if ( isset( $state['proposals_open'][ $proposal_id ] ) && ! isset( $state['resolved'][ $proposal_id ] ) ) {
+					$stored = $this->add_row(
+						$room,
+						$client_id,
+						self::UPDATE_TYPE_RESOLVED,
+						array(
+							'proposalId' => $proposal_id,
+							'resolution' => $resolution['resolution'],
+							'resolvedBy' => $actor_id,
+							'time'       => time(),
+						)
+					);
+					if ( ! $stored ) {
+						return new WP_Error(
+							'rest_sync_storage_error',
+							__( 'Failed to store sync update.', 'gutenberg' ),
+							array( 'status' => 500 )
+						);
+					}
+					$state['resolved'][ $proposal_id ] = true;
+				}
+			}
+
 			$this->room_state[ $room ] = null; // Invalidate: rows changed.
 
 			$dispositions = array();
@@ -460,8 +533,39 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 						?? array( 'status' => 'unknown' )
 				);
 			}
+			foreach ( $resolutions as $resolution ) {
+				$dispositions[] = array(
+					'intentId' => $resolution['proposalId'],
+					'status'   => 'resolved',
+				);
+			}
 
 			return array( 'dispositions' => $dispositions );
+		}
+
+		/**
+		 * A short plain-text excerpt of an escalated intent's target field,
+		 * for content-centric review rendering.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $doc    Document at settlement.
+		 * @param array $intent The escalated intent (transformed form).
+		 * @return string Excerpt (possibly empty).
+		 */
+		private static function proposal_excerpt( array $doc, array $intent ): string {
+			$payload = $intent['payload'];
+			$sync_id = $payload['syncId'] ?? $payload['survivorId'] ?? null;
+			if ( ! is_string( $sync_id ) ) {
+				return '';
+			}
+			$block = WP_Intent_Log_Document::get_block( $doc, $sync_id );
+			if ( null === $block ) {
+				return '';
+			}
+			$field = $payload['field'] ?? 'content';
+			$text  = $block['fields'][ $field ]['text'] ?? '';
+			return WP_Intent_Log_Document::text_slice( $text, 0, 80 );
 		}
 
 		/**
@@ -509,12 +613,21 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 
 			$previous = $this->storage->get_room_meta( $room, 'intent_log_checkpoint' );
 
-			// Escalated work parked below the future floor survives by
-			// re-appending it above the new checkpoint's predecessor.
+			// UNRESOLVED escalated work parked below the future floor
+			// survives by re-appending it above the new checkpoint's
+			// predecessor; resolved pairs age out with the trim (the
+			// retention rule — see PROPOSAL-REVIEW.md).
 			if ( is_array( $previous ) && isset( $previous['cursor'] ) ) {
 				$rows           = $this->storage->get_updates_after_cursor( $room, 0 );
 				$below          = array();
+				$resolved_ids   = array();
 				$found_previous = false;
+				foreach ( $rows as $row ) {
+					$decoded = json_decode( $row['data'], true );
+					if ( is_array( $decoded ) && self::UPDATE_TYPE_RESOLVED === $row['type'] && isset( $decoded['proposalId'] ) ) {
+						$resolved_ids[ $decoded['proposalId'] ] = true;
+					}
+				}
 				foreach ( $rows as $row ) {
 					$decoded = json_decode( $row['data'], true );
 					if ( ! is_array( $decoded ) ) {
@@ -528,7 +641,10 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 						$found_previous = true;
 						break;
 					}
-					if ( self::UPDATE_TYPE_PROPOSAL === $row['type'] ) {
+					if (
+						self::UPDATE_TYPE_PROPOSAL === $row['type'] &&
+						! isset( $resolved_ids[ $decoded['intent']['intentId'] ?? '' ] )
+					) {
 						$below[] = $decoded;
 					}
 				}
@@ -673,11 +789,13 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				return $this->room_state[ $room ];
 			}
 
-			$rows     = $this->storage->get_updates_after_cursor( $room, 0 );
-			$genesis  = null;
-			$log      = array();
-			$settled  = array();
-			$base_seq = 0;
+			$rows           = $this->storage->get_updates_after_cursor( $room, 0 );
+			$genesis        = null;
+			$log            = array();
+			$settled        = array();
+			$proposals_open = array();
+			$resolved       = array();
+			$base_seq       = 0;
 
 			foreach ( $rows as $row ) {
 				$decoded = json_decode( $row['data'], true );
@@ -707,10 +825,15 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 						$settled[ $decoded['intentId'] ] = array( 'status' => 'applied' );
 						break;
 					case self::UPDATE_TYPE_PROPOSAL:
-						$settled[ $decoded['intent']['intentId'] ] = array(
+						$settled[ $decoded['intent']['intentId'] ]        = array(
 							'status' => 'escalated',
 							'reason' => $decoded['reason'],
 						);
+						$proposals_open[ $decoded['intent']['intentId'] ] = true;
+						break;
+					case self::UPDATE_TYPE_RESOLVED:
+						unset( $proposals_open[ $decoded['proposalId'] ] );
+						$resolved[ $decoded['proposalId'] ] = true;
 						break;
 					case self::UPDATE_TYPE_VOIDED:
 						// Overrides an intent row's 'applied': apply-time
@@ -731,12 +854,16 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			}
 
 			$state                     = array(
-				'genesis'  => $genesis,
-				'log'      => $log,
-				'settled'  => $settled,
+				'genesis'        => $genesis,
+				'log'            => $log,
+				'settled'        => $settled,
+				// Review lifecycle: open proposals (escalations minus
+				// resolutions) and resolved ids, for resolution validation.
+				'proposals_open' => $proposals_open,
+				'resolved'       => $resolved,
 				// Engine seq of the reconstructed genesis (0, or the
 				// checkpoint's seq): log[i] is engine seq base_seq + i.
-				'base_seq' => $base_seq,
+				'base_seq'       => $base_seq,
 			);
 			$this->room_state[ $room ] = $state;
 

@@ -67,17 +67,31 @@ export const INTENT_LOG_ENGINE_PROTOCOL = 1;
 export const INTENT_LOG_UPDATE_TYPES = {
 	INTENT: 'intent',
 	PROPOSAL: 'proposal',
+	RESOLVED: 'resolved',
 	SNAPSHOT: 'snapshot',
 	VOIDED: 'voided',
 } as const;
 
 /**
- * An escalated intent parked in the proposal lane, as received.
+ * An escalated intent parked in the proposal lane, as received. The engine
+ * enriches rows with the settlement seq, a server timestamp, and a short
+ * excerpt of the target field at escalation time (context for review).
  */
 export interface IntentLogProposal {
 	intent: IntentEnvelope;
 	actorId: string;
 	reason: string;
+	at?: number;
+	time?: number;
+	context?: { excerpt?: string };
+}
+
+/** A proposal's terminal state, as received. */
+export interface IntentLogResolution {
+	proposalId: string;
+	resolution: 'restored' | 'dismissed';
+	resolvedBy?: string;
+	time?: number;
 }
 
 /**
@@ -136,6 +150,25 @@ export interface IntentLogSession extends EngineSessionCodec {
 	/** Escalated intents received for this room, in arrival order. */
 	getProposals: () => IntentLogProposal[];
 
+	/**
+	 * Escalated intents not yet resolved (arrival order): the review list.
+	 * Reconstructs entirely from retained rows — no client persistence.
+	 */
+	getOpenProposals: () => IntentLogProposal[];
+
+	/**
+	 * Sends a resolution for a parked proposal. `restored` callers author
+	 * the recovered content as ordinary intents FIRST — restoration is a
+	 * normal edit; this only closes the proposal. Idempotent server-side.
+	 */
+	resolveProposal: (
+		proposalId: string,
+		resolution: 'restored' | 'dismissed'
+	) => void;
+
+	/** Subscribes to review-list changes (proposal arrived or resolved). */
+	onProposalsChange: ( listener: () => void ) => void;
+
 	/** Number of authored intents not yet settled by the server. */
 	getPendingCount: () => number;
 
@@ -190,6 +223,11 @@ export function createIntentLogSession(
 	let localAwareness: LocalAwarenessState = {};
 	let peers: AwarenessState = {};
 	const proposals: IntentLogProposal[] = [];
+	const resolvedIds = new Set< string >();
+	const proposalsChangeListeners = new Set< () => void >();
+	const notifyProposalsChange = () => {
+		proposalsChangeListeners.forEach( ( listener ) => listener() );
+	};
 	const changeListeners = new Set< () => void >();
 	const dispositionListeners = new Set<
 		( settled: SettledDisposition ) => void
@@ -298,7 +336,16 @@ export function createIntentLogSession(
 					proposalListeners.forEach( ( listener ) =>
 						listener( proposal )
 					);
+					notifyProposalsChange();
 					notifyChange();
+					return;
+				}
+				case INTENT_LOG_UPDATE_TYPES.RESOLVED: {
+					const resolution = decoded as IntentLogResolution;
+					if ( ! resolvedIds.has( resolution.proposalId ) ) {
+						resolvedIds.add( resolution.proposalId );
+						notifyProposalsChange();
+					}
 					return;
 				}
 				case INTENT_LOG_UPDATE_TYPES.VOIDED: {
@@ -376,6 +423,7 @@ export function createIntentLogSession(
 			dispositionListeners.clear();
 			proposalListeners.clear();
 			resetListeners.clear();
+			proposalsChangeListeners.clear();
 		},
 
 		// ---- Bridge/dev surface ----
@@ -406,6 +454,28 @@ export function createIntentLogSession(
 		getDocument: () => replica?.doc ?? null,
 		getBaseDocument: () => replica?.baseDoc ?? null,
 		getProposals: () => [ ...proposals ],
+		getOpenProposals: () =>
+			proposals.filter(
+				( proposal ) => ! resolvedIds.has( proposal.intent.intentId )
+			),
+		resolveProposal: ( proposalId, resolution ) => {
+			const data = JSON.stringify( { proposalId, resolution } );
+			if ( localUpdateListener ) {
+				localUpdateListener(
+					{ data, type: INTENT_LOG_UPDATE_TYPES.RESOLVED },
+					new TextEncoder().encode( data ).length
+				);
+			}
+			// Optimistic: the list shrinks immediately; the relayed row (or
+			// the idempotent ack) confirms.
+			if ( ! resolvedIds.has( proposalId ) ) {
+				resolvedIds.add( proposalId );
+				notifyProposalsChange();
+			}
+		},
+		onProposalsChange: ( listener ) => {
+			proposalsChangeListeners.add( listener );
+		},
 		getPendingCount: () => replica?.outbox.length ?? 0,
 		getSeq: () => replica?.cursor ?? 0,
 		isInitialized: () => null !== replica,

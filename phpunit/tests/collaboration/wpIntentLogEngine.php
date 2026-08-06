@@ -575,6 +575,170 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		}
 	}
 
+	/**
+	 * Escalates one attr conflict and returns the losing intent id.
+	 *
+	 * @param string $suffix Unique id suffix.
+	 * @return string The escalated proposal id.
+	 */
+	private function escalate_attr_conflict( string $suffix ): string {
+		$target = self::paragraph_id();
+		$this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => "win-$suffix",
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => $target,
+							'key'             => "k$suffix",
+							'value'           => 'a',
+							'observedVersion' => 0,
+						),
+					)
+				),
+			)
+		);
+		$response = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => "lose-$suffix",
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => $target,
+							'key'             => "k$suffix",
+							'value'           => 'b',
+							'observedVersion' => 0,
+						),
+					)
+				),
+			),
+			array( 'client_id' => 202 )
+		);
+		$this->assertSame( 'escalated', $response['dispositions'][0]['status'] );
+		return "lose-$suffix";
+	}
+
+	/**
+	 * Builds one resolution update row.
+	 *
+	 * @param string $proposal_id Proposal id.
+	 * @param string $resolution  restored|dismissed.
+	 * @return array Typed update.
+	 */
+	private static function resolution_update( string $proposal_id, string $resolution ): array {
+		return array(
+			'type' => WP_Intent_Log_Engine::UPDATE_TYPE_RESOLVED,
+			'data' => wp_json_encode(
+				array(
+					'proposalId' => $proposal_id,
+					'resolution' => $resolution,
+				)
+			),
+		);
+	}
+
+	public function test_proposals_carry_review_context_and_resolve_idempotently() {
+		$proposal_id = $this->escalate_attr_conflict( '1' );
+
+		// The proposal row carries review context: settlement seq, server
+		// time, and a content excerpt of the target block.
+		$catchup   = $this->poll( array(), array( 'client_id' => 303 ) );
+		$proposals = array_values(
+			array_filter(
+				$catchup['updates'],
+				static function ( $update ) {
+					return WP_Intent_Log_Engine::UPDATE_TYPE_PROPOSAL === $update['type'];
+				}
+			)
+		);
+		$this->assertCount( 1, $proposals );
+		$proposal = json_decode( $proposals[0]['data'], true );
+		$this->assertSame( $proposal_id, $proposal['intent']['intentId'] );
+		$this->assertArrayHasKey( 'at', $proposal );
+		$this->assertArrayHasKey( 'time', $proposal );
+		$this->assertSame( 'Hello world', $proposal['context']['excerpt'] );
+
+		// Resolving appends ONE row, stamped server-side, acked as resolved.
+		$resolve = $this->poll(
+			array( self::resolution_update( $proposal_id, 'dismissed' ) ),
+			array( 'client_id' => 303 )
+		);
+		$this->assertSame(
+			array(
+				'intentId' => $proposal_id,
+				'status'   => 'resolved',
+			),
+			$resolve['dispositions'][0]
+		);
+		$after       = $this->poll( array(), array( 'client_id' => 404 ) );
+		$resolutions = array_values(
+			array_filter(
+				$after['updates'],
+				static function ( $update ) {
+					return WP_Intent_Log_Engine::UPDATE_TYPE_RESOLVED === $update['type'];
+				}
+			)
+		);
+		$this->assertCount( 1, $resolutions );
+		$resolution = json_decode( $resolutions[0]['data'], true );
+		$this->assertSame( 'dismissed', $resolution['resolution'] );
+		$this->assertSame( 'u' . self::$editor_id . 'c303', $resolution['resolvedBy'] );
+
+		// Idempotent: re-resolving (or resolving an unknown id) acks
+		// without growing the row count.
+		$total    = $after['total_updates'];
+		$again    = $this->poll(
+			array(
+				self::resolution_update( $proposal_id, 'restored' ),
+				self::resolution_update( 'never-existed', 'dismissed' ),
+			),
+			array( 'client_id' => 303 )
+		);
+		$statuses = array_column( $again['dispositions'], 'status' );
+		$this->assertSame( array( 'resolved', 'resolved' ), $statuses );
+		$this->assertSame( $total, $again['total_updates'] );
+	}
+
+	public function test_compaction_drops_resolved_proposals_and_keeps_open_ones() {
+		$interval = static function () {
+			return 3;
+		};
+		add_filter( 'wp_sync_intent_log_checkpoint_interval', $interval );
+
+		try {
+			$this->poll(); // Genesis.
+			$kept_id     = $this->escalate_attr_conflict( 'kept' );
+			$resolved_id = $this->escalate_attr_conflict( 'done' );
+			$this->poll(
+				array( self::resolution_update( $resolved_id, 'dismissed' ) ),
+				array( 'client_id' => 505 )
+			);
+
+			// Cross the interval twice: checkpoint + trim.
+			$this->type_intents( 4, 2 );
+			$this->type_intents( 4, 6 );
+
+			$join         = $this->poll( array(), array( 'client_id' => 606 ) );
+			$proposal_ids = array();
+			foreach ( $join['updates'] as $update ) {
+				if ( WP_Intent_Log_Engine::UPDATE_TYPE_PROPOSAL === $update['type'] ) {
+					$decoded        = json_decode( $update['data'], true );
+					$proposal_ids[] = $decoded['intent']['intentId'];
+				}
+			}
+			// The open proposal survives compaction; the resolved pair aged
+			// out with the trim.
+			$this->assertContains( $kept_id, $proposal_ids );
+			$this->assertNotContains( $resolved_id, $proposal_ids );
+		} finally {
+			remove_filter( 'wp_sync_intent_log_checkpoint_interval', $interval );
+		}
+	}
+
 	public function test_genesis_stamps_engine_lineage_on_a_read_poll() {
 		// A pure READ initializes the room (genesis snapshot row). That
 		// server-initiated first write must stamp the engine lineage, or a

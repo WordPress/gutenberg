@@ -174,6 +174,43 @@ export function receiveEditorAssets( assets ) {
  *
  * @return {Object} Action object.
  */
+/**
+ * Closes a parked sync proposal (an escalated edit set aside for review).
+ *
+ * @param {string}        kind       Entity kind.
+ * @param {string}        name       Entity name.
+ * @param {string|number} recordId   Record ID.
+ * @param {string}        proposalId Proposal id.
+ * @param {string}        resolution 'restored' or 'dismissed'.
+ */
+export const resolveSyncProposal =
+	( kind, name, recordId, proposalId, resolution ) => () => {
+		getSyncManager()?.resolveProposal?.(
+			`${ kind }/${ name }`,
+			recordId,
+			proposalId,
+			resolution
+		);
+	};
+
+/**
+ * Best-effort restore of a parked sync proposal's content as ordinary
+ * edits, then closes it as restored.
+ *
+ * @param {string}        kind       Entity kind.
+ * @param {string}        name       Entity name.
+ * @param {string|number} recordId   Record ID.
+ * @param {string}        proposalId Proposal id.
+ */
+export const restoreSyncProposal =
+	( kind, name, recordId, proposalId ) => () => {
+		getSyncManager()?.restoreProposal?.(
+			`${ kind }/${ name }`,
+			recordId,
+			proposalId
+		);
+	};
+
 export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {

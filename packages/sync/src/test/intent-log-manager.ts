@@ -691,9 +691,15 @@ describe( 'intent-log manager', () => {
 
 		const proposalRow = ( actorId: string, reason: string ) => ( {
 			data: JSON.stringify( {
-				intent: { intentId: `i-${ reason }` },
+				intent: {
+					intentId: `i-${ reason }`,
+					txnId: null,
+					type: 'insert_text',
+					payload: { text: 'lost words' },
+				},
 				actorId,
 				reason,
+				context: { excerpt: 'Around here' },
 			} ),
 			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
 		} );
@@ -701,9 +707,14 @@ describe( 'intent-log manager', () => {
 		transport.captured.session!.receiveUpdate(
 			proposalRow( 'u999c999', 'frame-conflict' )
 		);
+		// Notices derive from the settled open list, one microtask later.
+		await Promise.resolve();
 		expect( onEscalation ).toHaveBeenCalledWith( {
 			reason: 'frame-conflict',
 			isLocal: false,
+			proposalId: 'i-frame-conflict',
+			summary: 'lost words',
+			excerpt: 'Around here',
 		} );
 
 		const ownActorId = ( transport.captured.session as IntentLogSession )
@@ -711,10 +722,147 @@ describe( 'intent-log manager', () => {
 		transport.captured.session!.receiveUpdate(
 			proposalRow( ownActorId, 'merge-dropped-field' )
 		);
-		expect( onEscalation ).toHaveBeenLastCalledWith( {
-			reason: 'merge-dropped-field',
-			isLocal: true,
+		await Promise.resolve();
+		expect( onEscalation ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				reason: 'merge-dropped-field',
+				isLocal: true,
+				proposalId: 'i-merge-dropped-field',
+			} )
+		);
+	} );
+
+	it( 'a proposal resolved within the same delivery batch never notifies, and resolution round-trips', async () => {
+		const { manager, handlers, transport } = await loadManagedEntity();
+		const onEscalation = jest.fn();
+		const onProposalsChange = jest.fn();
+		handlers.onEscalation = onEscalation;
+		handlers.onProposalsChange = onProposalsChange;
+
+		transport.captured.session!.receiveUpdate( snapshotRow( [] ) );
+
+		// Bootstrap replay shape: proposal row immediately followed by its
+		// resolution row (a long-resolved conflict).
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'old-1',
+					txnId: null,
+					type: 'insert_text',
+					payload: { text: 'ancient' },
+				},
+				actorId: 'u9c9',
+				reason: 'frame-conflict',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
 		} );
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				proposalId: 'old-1',
+				resolution: 'dismissed',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.RESOLVED,
+		} );
+		await Promise.resolve();
+		expect( onEscalation ).not.toHaveBeenCalled();
+		expect( onProposalsChange ).toHaveBeenLastCalledWith( [] );
+
+		// A live open proposal notifies; resolving it emits the wire row
+		// and empties the review list.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'live-1',
+					txnId: null,
+					type: 'insert_text',
+					payload: { text: 'fresh' },
+				},
+				actorId: 'u9c9',
+				reason: 'frame-conflict',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+		expect( onEscalation ).toHaveBeenCalledTimes( 1 );
+
+		manager.resolveProposal!( 'postType/post', '1', 'live-1', 'dismissed' );
+		const resolvedRows = transport.captured.sent.filter(
+			( update ) => INTENT_LOG_UPDATE_TYPES.RESOLVED === update.type
+		);
+		expect( resolvedRows ).toHaveLength( 1 );
+		expect( JSON.parse( resolvedRows[ 0 ].data ) ).toEqual( {
+			proposalId: 'live-1',
+			resolution: 'dismissed',
+		} );
+		await Promise.resolve();
+		expect( onProposalsChange ).toHaveBeenLastCalledWith( [] );
+	} );
+
+	it( 'restoreProposal re-authors lost text at the current head, then resolves', async () => {
+		const { manager, handlers, transport } = await loadManagedEntity();
+		handlers.onEscalation = jest.fn();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'p1',
+					blockType: 'core/paragraph',
+					text: 'Existing text',
+				},
+			] )
+		);
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'lost-1',
+					txnId: null,
+					type: 'insert_text',
+					payload: {
+						syncId: 'p1',
+						field: 'content',
+						offset: 4,
+						text: ' recovered',
+					},
+				},
+				actorId: 'u9c9',
+				reason: 'frame-conflict',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+
+		manager.restoreProposal!( 'postType/post', '1', 'lost-1' );
+
+		// The recovered text was authored as an ORDINARY intent at the end
+		// of the target field, and the proposal closed as restored.
+		const sentTypes = transport.captured.sent.map( ( update ) => ( {
+			type: update.type,
+			decoded: JSON.parse( update.data ),
+		} ) );
+		const authored = sentTypes.find(
+			( row ) =>
+				INTENT_LOG_UPDATE_TYPES.INTENT === row.type &&
+				'insert_text' === row.decoded.type
+		);
+		expect( authored!.decoded.payload ).toMatchObject( {
+			syncId: 'p1',
+			field: 'content',
+			offset: 'Existing text'.length,
+			text: ' recovered',
+		} );
+		const resolved = sentTypes.find(
+			( row ) => INTENT_LOG_UPDATE_TYPES.RESOLVED === row.type
+		);
+		expect( resolved!.decoded ).toEqual( {
+			proposalId: 'lost-1',
+			resolution: 'restored',
+		} );
+		// The restored content reached the editor push path.
+		const lastBlocks = handlers.edits.at( -1 ) as {
+			blocks: Array< { attributes: { content: string } } >;
+		};
+		expect( lastBlocks.blocks[ 0 ].attributes.content ).toBe(
+			'Existing text recovered'
+		);
 	} );
 
 	it( 'unload destroys providers and the session', async () => {

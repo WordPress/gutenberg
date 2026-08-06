@@ -9,7 +9,7 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -262,26 +262,65 @@ export const getEntityRecord =
 								key
 							),
 						// Surface engine escalations (edits set aside for
-						// review instead of merged) as a notice. A stable
-						// per-entity id keeps repeat escalations from
-						// stacking.
-						onEscalation: ( { isLocal } ) => {
+						// review instead of merged) as an ACTIONABLE notice:
+						// the lost content can be restored as an ordinary
+						// edit or discarded, either way closing the parked
+						// proposal for every collaborator (see
+						// prototypes/sync/PROPOSAL-REVIEW.md).
+						onEscalation: ( { isLocal, proposalId, summary } ) => {
+							const base = isLocal
+								? __(
+										"One of your recent edits conflicted with a collaborator's change and was set aside."
+								  )
+								: __(
+										"A collaborator's edit conflicted with recent changes and was set aside."
+								  );
+							const content = summary
+								? sprintf(
+										/* translators: 1: conflict description. 2: the lost content. */
+										__( '%1$s Lost content: “%2$s”' ),
+										base,
+										summary
+								  )
+								: base;
+							const noticeId = `core-data-sync-escalation-${ kind }-${ name }-${ key }-${ proposalId }`;
+							const close = ( resolution ) => {
+								if ( 'restored' === resolution ) {
+									dispatch.restoreSyncProposal(
+										kind,
+										name,
+										key,
+										proposalId
+									);
+								} else {
+									dispatch.resolveSyncProposal(
+										kind,
+										name,
+										key,
+										proposalId,
+										'dismissed'
+									);
+								}
+								registry
+									.dispatch( noticesStore )
+									.removeNotice( noticeId );
+							};
 							registry
 								.dispatch( noticesStore )
-								.createNotice(
-									'warning',
-									isLocal
-										? __(
-												"One of your recent edits conflicted with a collaborator's change and was set aside for review."
-										  )
-										: __(
-												"A collaborator's edit conflicted with recent changes and was set aside for review."
-										  ),
-									{
-										id: `core-data-sync-escalation-${ kind }-${ name }-${ key }`,
-										isDismissible: true,
-									}
-								);
+								.createNotice( 'warning', content, {
+									id: noticeId,
+									isDismissible: true,
+									actions: [
+										{
+											label: __( 'Restore' ),
+											onClick: () => close( 'restored' ),
+										},
+										{
+											label: __( 'Discard' ),
+											onClick: () => close( 'dismissed' ),
+										},
+									],
+								} );
 						},
 						// Handle sync connection status changes.
 						onStatusChange: ( status ) => {

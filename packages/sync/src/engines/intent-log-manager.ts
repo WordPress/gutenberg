@@ -20,6 +20,7 @@ import {
 	createIntentLogSession,
 	type IntentLogSession,
 } from './intent-log-session';
+import { mintSyncId } from './intent-log/sync-id.js';
 import { getProviderCreators } from '../providers';
 import type {
 	ObjectData,
@@ -412,20 +413,84 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			log( 'session reset from server checkpoint', { key } );
 		} );
 
-		session.onProposal( ( proposal ) => {
-			if ( handlers.onEscalation ) {
-				handlers.onEscalation( {
-					reason: proposal.reason,
-					isLocal: proposal.actorId === session.actorId,
-				} );
+		/*
+		 * Escalation notices derive from the SETTLED open-proposal list, on
+		 * a microtask after the delivery batch: a bootstrap replay delivers
+		 * proposal rows before their resolution rows, and notifying on raw
+		 * arrival would re-surface long-resolved conflicts on every reload.
+		 */
+		const notifiedProposalIds = new Set< string >();
+		let proposalsNotifyScheduled = false;
+		const summarizeProposal = ( proposal: {
+			intent: { type: string; payload: Record< string, unknown > };
+		} ): string | undefined => {
+			const { type, payload } = proposal.intent;
+			switch ( type ) {
+				case 'insert_text':
+				case 'replace_text':
+					return payload.text as string;
+				case 'replace_attr_content':
+					return payload.newText as string;
+				case 'delete_text':
+					return undefined; // A lost deletion has no content to show.
+				case 'set_attr':
+					return `${ payload.key as string }: ${ JSON.stringify(
+						payload.value
+					) }`;
+				case 'set_property':
+					return `${ payload.name as string }: ${ JSON.stringify(
+						payload.value
+					) }`;
+				default:
+					return undefined;
+			}
+		};
+		const mapReviewItems = () =>
+			session.getOpenProposals().map( ( proposal ) => ( {
+				id: proposal.intent.intentId,
+				unitId: proposal.intent.txnId ?? proposal.intent.intentId,
+				isLocal: proposal.actorId === session.actorId,
+				actorId: proposal.actorId,
+				reason: proposal.reason,
+				intentType: proposal.intent.type,
+				summary: summarizeProposal( proposal ),
+				excerpt: proposal.context?.excerpt,
+			} ) );
+		session.onProposalsChange( () => {
+			if ( proposalsNotifyScheduled ) {
 				return;
 			}
-			// eslint-disable-next-line no-console
-			console.warn(
-				'[IntentLog] An edit was escalated for review (%s): %o',
-				proposal.reason,
-				proposal.intent
-			);
+			proposalsNotifyScheduled = true;
+			void Promise.resolve().then( () => {
+				proposalsNotifyScheduled = false;
+				if ( state.unloaded ) {
+					return;
+				}
+				const items = mapReviewItems();
+				handlers.onProposalsChange?.( items );
+				for ( const item of items ) {
+					if ( notifiedProposalIds.has( item.id ) ) {
+						continue;
+					}
+					notifiedProposalIds.add( item.id );
+					if ( handlers.onEscalation ) {
+						handlers.onEscalation( {
+							reason: item.reason,
+							isLocal: item.isLocal,
+							proposalId: item.id,
+							summary: item.summary,
+							excerpt: item.excerpt,
+						} );
+					} else {
+						// eslint-disable-next-line no-console
+						console.warn(
+							'[IntentLog] An edit was escalated for review (%s): %s',
+							item.reason,
+							item.id
+						);
+					}
+				}
+			} );
 		} );
 
 		log( 'connecting', { key } );
@@ -650,6 +715,106 @@ export function createIntentLogManager( debug = false ): SyncManager {
 		) => {
 			return entityStates.get( entityKey( objectType, objectId ) )
 				?.awareness as State | undefined;
+		},
+
+		resolveProposal( objectType, objectId, proposalId, resolution ) {
+			const state = entityStates.get( entityKey( objectType, objectId ) );
+			if ( ! state || state.unloaded ) {
+				return;
+			}
+			state.session.resolveProposal( proposalId, resolution );
+		},
+
+		restoreProposal( objectType, objectId, proposalId ) {
+			const state = entityStates.get( entityKey( objectType, objectId ) );
+			if ( ! state || state.unloaded ) {
+				return;
+			}
+			const session = state.session;
+			const proposal = session
+				.getOpenProposals()
+				.find( ( open ) => open.intent.intentId === proposalId );
+			if ( ! proposal ) {
+				return;
+			}
+			/*
+			 * Best-effort re-author at the current head — restoration is an
+			 * ORDINARY edit through the normal planning rules, never a
+			 * privileged replay. Text appends to the target field (or a
+			 * fresh paragraph when the block is gone); register writes
+			 * re-apply at current observed versions. Types with no sensible
+			 * auto-restore just resolve; the notice showed the content for
+			 * manual recovery.
+			 */
+			const { type, payload } = proposal.intent;
+			const doc = session.getDocument();
+			const findBlock = (
+				blocks: import('./intent-log/engine-types').EngineBlock[],
+				id: string
+			): import('./intent-log/engine-types').EngineBlock | null => {
+				for ( const block of blocks ) {
+					if ( block.syncId === id ) {
+						return block;
+					}
+					const inChildren = findBlock( block.children, id );
+					if ( inChildren ) {
+						return inChildren;
+					}
+				}
+				return null;
+			};
+			const restoreText = ( text: string ) => {
+				const targetId = payload.syncId as string;
+				const field = ( payload.field as string ) ?? 'content';
+				const block = doc ? findBlock( doc.root, targetId ) : null;
+				if ( block ) {
+					const current = block.fields[ field ]?.text ?? '';
+					session.author( 'insert_text', {
+						syncId: targetId,
+						field,
+						offset: current.length,
+						text,
+					} );
+				} else {
+					session.author( 'insert_block', {
+						block: {
+							syncId: mintSyncId(),
+							blockType: 'core/paragraph',
+							text,
+						},
+						parentId: null,
+						afterSiblingId: doc?.root.at( -1 )?.syncId ?? null,
+					} );
+				}
+			};
+			let restoredText: string | null = null;
+			if ( 'insert_text' === type || 'replace_text' === type ) {
+				restoredText = payload.text as string;
+			} else if ( 'replace_attr_content' === type ) {
+				restoredText = payload.newText as string;
+			}
+			if ( restoredText ) {
+				restoreText( restoredText );
+			} else if ( 'set_attr' === type && doc ) {
+				const block = findBlock( doc.root, payload.syncId as string );
+				if ( block ) {
+					session.author( 'set_attr', {
+						syncId: payload.syncId as string,
+						key: payload.key as string,
+						value: payload.value,
+						observedVersion:
+							block.attrVersions[ payload.key as string ] ?? 0,
+					} );
+				}
+			} else if ( 'set_property' === type && doc ) {
+				session.author( 'set_property', {
+					name: payload.name as string,
+					value: payload.value,
+					observedVersion:
+						doc.propVersions?.[ payload.name as string ] ?? 0,
+				} );
+			}
+			session.resolveProposal( proposalId, 'restored' );
 		},
 
 		// The server materializes; there is no client-side persisted doc.

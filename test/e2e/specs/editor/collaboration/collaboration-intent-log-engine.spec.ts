@@ -668,13 +668,60 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		] );
 
 		// At least one side shows the escalation notice.
+		let noticePage = page1;
 		await expect( async () => {
 			const counts = await Promise.all( [
-				page1.getByText( /set aside for review/ ).count(),
-				page2.getByText( /set aside for review/ ).count(),
+				page1.getByText( /was set aside/ ).count(),
+				page2.getByText( /was set aside/ ).count(),
 			] );
 			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
+			noticePage = counts[ 0 ] > 0 ? page1 : page2;
 		} ).toPass( { timeout: 15000 } );
+
+		/*
+		 * The notices are ACTIONABLE, one per parked edit: discarding
+		 * closes each proposal for every collaborator, durably — after a
+		 * reload the resolved conflicts must NOT resurface (the resolution
+		 * rows settle the bootstrap replay). A sustained typing race parks
+		 * many edits; discard them all.
+		 */
+		await expect( async () => {
+			// Late-settling intents can park more edits mid-loop; keep
+			// discarding until the list stays empty.
+			for ( let i = 0; i < 60; i++ ) {
+				const discard = noticePage
+					.getByRole( 'button', { name: 'Discard' } )
+					.first();
+				if ( 0 === ( await discard.count() ) ) {
+					break;
+				}
+				await discard.click();
+			}
+			expect(
+				await noticePage
+					.locator( '.components-notice' )
+					.filter( { hasText: 'was set aside' } )
+					.count()
+			).toBe( 0 );
+		} ).toPass( { timeout: 30000 } );
+
+		// Let the resolution rows flush to the server (the list shrinks
+		// optimistically; durability needs the wire round trip) before
+		// testing persistence across a reload.
+		await noticePage.waitForTimeout( 4000 );
+
+		await noticePage.reload();
+		await expect(
+			noticePage.locator( 'iframe[name="editor-canvas"]' )
+		).toBeVisible( { timeout: 30000 } );
+		// Allow the bootstrap replay to settle; a resolved proposal must
+		// not re-notify.
+		await noticePage.waitForTimeout( 4000 );
+		await expect(
+			noticePage
+				.locator( '.components-notice' )
+				.filter( { hasText: 'was set aside' } )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'legacy blocks get DETERMINISTIC genesis ids: both tabs and the server mint identical identities with no adoption round-trip', async ( {
@@ -968,8 +1015,8 @@ test.describe( 'Collaboration - intent-log engine', () => {
 
 		await expect( async () => {
 			const counts = await Promise.all( [
-				page1.getByText( /set aside for review/ ).count(),
-				page2.getByText( /set aside for review/ ).count(),
+				page1.getByText( /was set aside/ ).count(),
+				page2.getByText( /was set aside/ ).count(),
 			] );
 			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
 		} ).toPass( { timeout: 15000 } );

@@ -506,14 +506,40 @@ inside intent payloads, not the transport.
     both changes surviving on both editors (first-run pass). 18 specs,
     1317 jest, 214 PHPUnit, observer clean.
 
-  Remaining in 2d, all design-scoped: selection/caret sharing for
+  **2d-xvii (proposal read API + resolution — review 1.3b complete)
+  DONE.** Design in PROPOSAL-REVIEW.md; the read API is the stream:
+  - New `resolved` wire row (client-sendable): closes a proposal
+    idempotently by id, server-stamped resolvedBy/time, acked through
+    dispositions; unknown/duplicate resolutions settle without rows.
+  - Proposal rows enriched at the engine layer (settlement seq,
+    timestamp, target-field excerpt) for content-centric review.
+  - Retention rule: compaction re-appends only UNRESOLVED proposals;
+    resolved pairs age out with the trim. Open parked work persists
+    indefinitely; bounded by construction.
+  - Session: getOpenProposals/onProposalsChange/resolveProposal.
+    Manager: mapped review items via RecordHandlers.onProposalsChange;
+    resolveProposal/restoreProposal (restore = best-effort re-author
+    of the lost content as ORDINARY intents, then resolve — no
+    privileged replay). Escalation notices derive from the SETTLED
+    open list on a microtask, so bootstrap replays never re-surface
+    long-resolved conflicts.
+  - core-data: escalation notices show the lost content and offer
+    Restore/Discard (per-proposal notice ids); private actions wrap
+    the manager methods.
+  - E2e: the concurrent-typing conflict spec now discards every
+    parked edit through the notice actions and proves resolution is
+    DURABLE across a reload. Manager tests cover the resolved-in-
+    same-batch no-notify case and restore-re-author round trip; route
+    tests cover context enrichment, idempotency, and the retention
+    rule. 18 e2e, 1319 jest, 216 PHPUnit.
+
+  Remaining in 2d, design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport) and
-  the escalation REVIEW UI (inspect/apply/discard a parked proposal)
-  beyond the notice. Review findings NOT yet addressed (next tier):
-  the proposal READ API half of 1.3b, frame/txn state across request
-  boundaries (1.3c), independent effect-model oracles (3.1), and the
-  invasiveness cleanups (identity triplication, lockstep .d.ts,
-  delayed re-push).
+  the full review PANEL (list UI; the actionable notices cover the
+  common flow). Review findings NOT yet addressed (next tier):
+  frame/txn state across request boundaries (1.3c), independent
+  effect-model oracles (3.1), and the invasiveness cleanups (identity
+  triplication, lockstep .d.ts, delayed re-push).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what
