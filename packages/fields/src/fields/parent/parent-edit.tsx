@@ -14,7 +14,6 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-// @ts-ignore
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { debounce } from '@wordpress/compose';

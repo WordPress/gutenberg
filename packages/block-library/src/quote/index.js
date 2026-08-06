@@ -18,6 +18,8 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/paragraph', {} ] ];
+
 export const settings = {
 	icon,
 	example: {
@@ -34,6 +36,8 @@ export const settings = {
 		],
 	},
 	transforms,
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 	deprecated,

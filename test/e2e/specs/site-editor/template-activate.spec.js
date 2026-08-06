@@ -77,7 +77,12 @@ test.describe( 'Template Activate', () => {
 			.first()
 			.click();
 
-		await expect( editor.canvas.getByText( 'gutenberg' ) ).toBeVisible();
+		// The site title, rendered by the header template part. Exact, so a
+		// site tagline containing the word does not make the locator
+		// ambiguous.
+		await expect(
+			editor.canvas.getByText( 'gutenberg', { exact: true } )
+		).toBeVisible();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',

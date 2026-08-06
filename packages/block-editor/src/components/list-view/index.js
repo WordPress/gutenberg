@@ -11,6 +11,7 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
@@ -29,7 +30,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ListViewBranch from './branch';
-import { ListViewContext } from './context';
+import {
+	ListViewContext,
+	ListViewInsertedBlockContext,
+	ListViewTreeStateContext,
+} from './context';
 import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
@@ -42,23 +47,35 @@ import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dro
 import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
-const expanded = ( state, action ) => {
-	if ( action.type === 'clear' ) {
-		return {};
+const expansion = ( state, action ) => {
+	const { type, clientIds } = action;
+
+	// Overwrite the state: only the listed blocks stay expanded, every other
+	// block falls back to the list view's default.
+	if ( type === 'replace' ) {
+		const next = Object.fromEntries(
+			clientIds.map( ( id ) => [ id, true ] )
+		);
+		return isShallowEqual( state, next ) ? state : next;
 	}
-	if ( Array.isArray( action.clientIds ) ) {
-		return {
-			...state,
-			...action.clientIds.reduce(
-				( newState, id ) => ( {
-					...newState,
-					[ id ]: action.type === 'expand',
-				} ),
-				{}
-			),
-		};
+
+	if ( type !== 'expand' && type !== 'collapse' ) {
+		return state;
 	}
-	return state;
+
+	const isExpand = type === 'expand';
+	// An unrecorded block is not the same as an explicitly collapsed one,
+	// because the fallback depends on the `isExpanded` prop.
+	const changed = clientIds.filter( ( id ) => state[ id ] !== isExpand );
+
+	if ( ! changed.length ) {
+		return state;
+	}
+
+	return {
+		...state,
+		...Object.fromEntries( changed.map( ( id ) => [ id, isExpand ] ) ),
+	};
 };
 
 /** @typedef {React.ComponentType} ComponentType */
@@ -132,13 +149,14 @@ function ListViewComponent(
 
 	const { updateBlockSelection } = useBlockSelection();
 
-	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
 
-	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
-		setExpandedState,
+		updateExpansion,
 	} );
 	const selectEditorBlock = useCallback(
 		/**
@@ -158,8 +176,7 @@ function ListViewComponent(
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
 		dropZoneElement,
-		expandedState,
-		setExpandedState,
+		updateExpansion,
 	} );
 	const elementRef = useRef();
 
@@ -188,42 +205,18 @@ function ListViewComponent(
 		ref,
 	] );
 
-	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			const clientIds = Array.isArray( clientId )
-				? clientId
-				: [ clientId ];
-			setExpandedState( { type: 'expand', clientIds } );
-		},
-		[ setExpandedState ]
-	);
-	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
-		},
-		[ setExpandedState ]
-	);
-	const collapseAll = useCallback( () => {
-		setExpandedState( { type: 'clear' } );
-	}, [ setExpandedState ] );
-	const expandRow = useCallback(
-		( row ) => {
-			expand( row?.dataset?.block );
-		},
-		[ expand ]
-	);
-	const collapseRow = useCallback(
-		( row ) => {
-			collapse( row?.dataset?.block );
-		},
-		[ collapse ]
-	);
+	const expandRow = useCallback( ( row ) => {
+		const clientId = row?.dataset?.block;
+		if ( clientId ) {
+			updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
+		}
+	}, [] );
+	const collapseRow = useCallback( ( row ) => {
+		const clientId = row?.dataset?.block;
+		if ( clientId ) {
+			updateExpansion( { type: 'collapse', clientIds: [ clientId ] } );
+		}
+	}, [] );
 	const focusRow = useCallback(
 		( event, startRow, endRow ) => {
 			if ( event.shiftKey ) {
@@ -237,10 +230,7 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
-	useListViewCollapseItems( {
-		collapseAll,
-		expand,
-	} );
+	useListViewCollapseItems( { updateExpansion } );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
@@ -282,41 +272,44 @@ function ListViewComponent(
 			};
 		}, [ blockDropTarget, blockIndexes, firstDraggedBlockClientId ] );
 
+	// Values that stay stable for the lifetime of the List View.
 	const contextValue = useMemo(
+		() => ( {
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			listViewInstanceId: instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			treeGridElementRef: elementRef,
+			updateExpansion,
+		} ),
+		[
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			updateExpansion,
+		]
+	);
+
+	// Values that change while expanding, collapsing, or dragging.
+	const treeStateContextValue = useMemo(
 		() => ( {
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
-			BlockSettingsMenu,
-			listViewInstanceId: instanceId,
-			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
-			treeGridElementRef: elementRef,
-			rootClientId,
 		} ),
 		[
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
-			BlockSettingsMenu,
-			instanceId,
-			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
-			rootClientId,
 		]
 	);
 
@@ -330,7 +323,7 @@ function ListViewComponent(
 			// switch the list view to a tall list view with a scrollbar, and vice versa.
 			// When this happens, the windowing logic needs to be recalculated to ensure that
 			// the correct number of blocks are rendered, by rechecking for a scroll container.
-			expandedState,
+			expandedState: expansionState,
 			useWindowing: true,
 			windowOverscan: 40,
 		}
@@ -381,16 +374,24 @@ function ListViewComponent(
 				} }
 			>
 				<ListViewContext.Provider value={ contextValue }>
-					<ListViewBranch
-						blocks={ clientIdsTree }
-						parentId={ rootClientId }
-						selectBlock={ selectEditorBlock }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						isExpanded={ isExpanded }
-						showAppender={ showAppender }
-					/>
+					<ListViewInsertedBlockContext.Provider
+						value={ insertedBlockClientId }
+					>
+						<ListViewTreeStateContext.Provider
+							value={ treeStateContextValue }
+						>
+							<ListViewBranch
+								blocks={ clientIdsTree }
+								parentId={ rootClientId }
+								selectBlock={ selectEditorBlock }
+								showBlockMovers={ showBlockMovers }
+								fixedListWindow={ fixedListWindow }
+								selectedClientIds={ selectedClientIds }
+								isExpanded={ isExpanded }
+								showAppender={ showAppender }
+							/>
+						</ListViewTreeStateContext.Provider>
+					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>

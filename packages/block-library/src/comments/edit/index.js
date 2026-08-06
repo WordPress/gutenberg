@@ -8,16 +8,13 @@ import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
  */
 import CommentsInspectorControls from './comments-inspector-controls';
 import CommentsLegacy from './comments-legacy';
-import TEMPLATE from './template';
 
 export default function CommentsEdit( props ) {
 	const { attributes, setAttributes, clientId } = props;
 	const { tagName: TagName, legacy } = attributes;
 
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	if ( legacy ) {
 		return <CommentsLegacy { ...props } />;

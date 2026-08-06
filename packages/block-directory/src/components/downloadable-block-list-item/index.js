@@ -30,24 +30,36 @@ function getDownloadableBlockLabel(
 	const stars = Math.round( rating / 0.5 ) * 0.5;
 
 	if ( ! isInstalled && hasNotice ) {
-		/* translators: %s: block title */
-		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Retry installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalled ) {
-		/* translators: %s: block title */
-		return sprintf( 'Add %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Add %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalling ) {
-		/* translators: %s: block title */
-		return sprintf( 'Installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	// No ratings yet, just use the title.
 	if ( ratingCount < 1 ) {
-		/* translators: %s: block title */
-		return sprintf( 'Install %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Install %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	return sprintf(

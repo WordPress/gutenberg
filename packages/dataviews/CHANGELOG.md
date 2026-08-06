@@ -2,13 +2,22 @@
 
 ## Unreleased
 
+### New Features
+
+-   DataViews: Add a `time` field type and matching `time` control for times of day with no date attached. Values are wall-clock `HH:mm`/`HH:mm:ss` strings that render identically regardless of the visitor's timezone, and `format.time` controls both the rendered format and whether the control offers a seconds field. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
+
 ### Enhancements
 
+-   DataViews: Generalize the ordering filter operators (`on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `between`) from dates to temporal values, so they also compare times of day. Comparisons for `date` and `datetime` are unchanged. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
+-   DataViews: Add an `aspectRatio` layout option to the `grid` and `table` layouts so consumers can configure the aspect ratio of item media previews from a set of preset ratios, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
 
 ### Bug Fix
 
+-   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
+-   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)
+-   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataForms: Stop the `card` and `details` layouts from hijacking focus when they reveal validation errors. Errors for every field in the container are now shown once focus leaves it, instead of on each internal blur, and revealing them no longer moves focus, so the natural tab sequence is preserved. [#80685](https://github.com/WordPress/gutenberg/pull/80685)
 -   DataForms: Complete the `richtext` control's autocomplete semantics by associating the textbox with its suggestions list for assistive technology. [#80403](https://github.com/WordPress/gutenberg/pull/80403)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
@@ -18,6 +27,7 @@
 
 ### Internal
 
+-   DataViews: Inline a verbatim copy of the `kebabCase` utility instead of unlocking the private one from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `change-case` dependency; no behavior change. ([#81284](https://github.com/WordPress/gutenberg/pull/81284))
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Update `@ariakit/react` to 0.4.35 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).

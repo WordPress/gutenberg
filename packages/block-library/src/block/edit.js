@@ -191,7 +191,7 @@ function ReusableBlockEdit( {
 	const canOverrideBlocks = useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
 		const hasOverridableBlocks = ( _blocks ) =>
-			_blocks.some( ( block ) => {
+			_blocks?.some( ( block ) => {
 				if (
 					supportedBlockTypes.includes( block.name ) &&
 					isOverridableBlock( block )

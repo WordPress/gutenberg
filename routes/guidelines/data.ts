@@ -68,7 +68,6 @@ export function blockSlug( blockName: string ): string {
 export function useContentBlocks(): ContentBlock[] {
 	return useSelect(
 		( s ) =>
-			// @ts-ignore - getBlockTypes is untyped in this context.
 			s( blocksStore )
 				.getBlockTypes()
 				.filter( ( block: ContentBlock ) =>

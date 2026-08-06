@@ -21,6 +21,7 @@
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
+		{ "path": "../escape-html" },
 		{ "path": "../fields" },
 		{ "path": "../global-styles-engine" },
 		{ "path": "../global-styles-ui" },

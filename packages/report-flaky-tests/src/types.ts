@@ -24,15 +24,9 @@ export type FlakyTestResult =
 	| JestCircusFlakyTestResult
 	| PlaywrightTestFlakyTestResult;
 
-export type MetaData = {
-	failedTimes?: number;
-	totalCommits?: number;
-	baseCommit?: string;
-};
-
-export type ReportedIssue = {
+export type ReportedFlakyTest = {
 	testTitle: string;
 	testPath: string;
-	issueNumber: number;
-	issueUrl: string;
+	failedTimes: number;
+	errorMessage?: string;
 };
