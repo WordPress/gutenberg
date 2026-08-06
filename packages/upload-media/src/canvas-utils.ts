@@ -78,11 +78,12 @@ export async function canvasConvertToJpeg(
 				type: file.type,
 				data: file.stream(),
 			} );
+			let timeoutId: ReturnType< typeof setTimeout > | undefined;
 			try {
 				const { image: videoFrame } = await Promise.race( [
 					decoder.decode(),
 					new Promise< never >( ( _resolve, reject ) => {
-						setTimeout( () => {
+						timeoutId = setTimeout( () => {
 							decoder.close();
 							reject(
 								new Error( 'ImageDecoder decode timed out' )
@@ -118,6 +119,7 @@ export async function canvasConvertToJpeg(
 				// decode() rejected, timed out, or the platform doesn't
 				// actually support the codec. Fall through to strategy 3.
 			} finally {
+				clearTimeout( timeoutId );
 				try {
 					decoder.close();
 				} catch {
