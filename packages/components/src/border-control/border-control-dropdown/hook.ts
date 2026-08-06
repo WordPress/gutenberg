@@ -57,14 +57,16 @@ export function useBorderControlDropdown(
 		enableAlpha,
 		enableStyle,
 		indicatorWrapperClassName: styles[ 'color-indicator-wrapper' ],
-		// Applied inline as custom properties. Style `none` previews as `solid`;
-		// a style without a color falls back to gray-300.
+		// Applied inline so CSS-wide values (e.g. `inherit`) and the `||` color
+		// fallback pass straight through to `border-style`/`border-color`. Style
+		// `none` previews as `solid`; a style without a color falls back to
+		// gray-300.
 		indicatorWrapperStyle: indicatorStyle
 			? {
-					'--wp-components-border-control-indicator-style':
+					borderStyle:
 						indicatorStyle === 'none' ? 'solid' : indicatorStyle,
-					'--wp-components-border-control-indicator-color':
-						indicatorColor ??
+					borderColor:
+						indicatorColor ||
 						( indicatorStyle !== 'none'
 							? COLORS.gray[ 300 ]
 							: undefined ),

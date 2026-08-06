@@ -68,9 +68,7 @@
 .color-indicator-wrapper {
 	border-radius: $radius-round;
 	border: 2px solid transparent;
-	/* Style/color are set inline as custom properties; fallbacks match the default. */
-	border-style: var(--wp-components-border-control-indicator-style, solid);
-	border-color: var(--wp-components-border-control-indicator-color, transparent);
+	/* border-style / border-color are applied inline by the dropdown hook. */
 	width: 24px;
 	height: 24px;
 	padding: 2px;

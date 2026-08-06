@@ -1,12 +1,15 @@
 import {
 	fireEvent,
 	render,
+	renderHook,
 	screen,
 	waitFor,
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
+import { useBorderControlDropdown } from '../border-control-dropdown/hook';
+import { COLORS } from '../../utils';
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -124,6 +127,52 @@ describe( 'BorderControl', () => {
 
 			const widthInput = getWidthInput();
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
+		} );
+
+		describe( 'color indicator inline styles', () => {
+			const getIndicatorWrapperStyle = ( border ) =>
+				renderHook( () =>
+					useBorderControlDropdown( {
+						border,
+						onChange: jest.fn(),
+					} )
+				).result.current.indicatorWrapperStyle;
+
+			it( 'should fall back to gray-300 when a style is set without a color', () => {
+				expect(
+					getIndicatorWrapperStyle( { style: 'solid', color: '' } )
+				).toEqual( {
+					borderStyle: 'solid',
+					borderColor: COLORS.gray[ 300 ],
+				} );
+			} );
+
+			it( 'should pass CSS-wide values through to border-style and border-color', () => {
+				expect(
+					getIndicatorWrapperStyle( {
+						style: 'inherit',
+						color: 'inherit',
+					} )
+				).toEqual( {
+					borderStyle: 'inherit',
+					borderColor: 'inherit',
+				} );
+			} );
+
+			it( 'should preview a `none` style as solid without applying a color', () => {
+				expect( getIndicatorWrapperStyle( { style: 'none' } ) ).toEqual(
+					{
+						borderStyle: 'solid',
+						borderColor: undefined,
+					}
+				);
+			} );
+
+			it( 'should not apply inline styles when no style is set', () => {
+				expect(
+					getIndicatorWrapperStyle( { color: '#72aee6' } )
+				).toBeUndefined();
+			} );
 		} );
 
 		it( 'should render color and style popover', async () => {

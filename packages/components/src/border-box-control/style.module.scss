@@ -1,4 +1,4 @@
-/* Overrides BorderControl's margin, winning via equal single-class specificity. */
+/* Restores the gutter; a single class outranks BorderControl's :where() zero-specificity margin reset. */
 .linked-border-control {
 	flex: 1;
 	margin-inline-end: 24px;
