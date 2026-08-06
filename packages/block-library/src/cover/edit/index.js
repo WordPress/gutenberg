@@ -66,11 +66,6 @@ const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/heading',
 		{
-			style: {
-				typography: {
-					textAlign: 'center',
-				},
-			},
 			placeholder: __( 'Write title…' ),
 		},
 	],
@@ -225,16 +220,28 @@ function CoverEdit( {
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
 	// Create the initial inner heading when the block gains a background
-	// and has no content yet.
+	// and has no content yet. The text alignment is set on the cover itself
+	// so every inner block inherits it.
 	const scaffoldInnerBlocks = () => {
 		const {
 			getBlocks,
+			getBlockAttributes,
 			isBlockSelected,
 			getSelectedBlocksInitialCaretPosition,
 		} = registry.select( blockEditorStore );
 		if ( getBlocks( clientId ).length > 0 ) {
 			return;
 		}
+		const { style } = getBlockAttributes( clientId ) ?? {};
+		setAttributes( {
+			style: {
+				...style,
+				typography: {
+					...style?.typography,
+					textAlign: 'center',
+				},
+			},
+		} );
 		replaceInnerBlocks(
 			clientId,
 			createBlocksFromInnerBlocksTemplate( INNER_BLOCKS_TEMPLATE ),
