@@ -36,6 +36,13 @@ interface SyncEnvelopeFromClient {
 	after: number;
 	awareness: LocalAwarenessState;
 	client_id: number;
+	/**
+	 * Engine identity stamp (see EngineSessionCodec.engineSlug): lets the
+	 * server fence a stale tab speaking the wrong engine with a 409 before
+	 * storing any of its updates.
+	 */
+	engine?: string;
+	engine_protocol?: number;
 	room: string;
 	updates: SyncUpdate[];
 }

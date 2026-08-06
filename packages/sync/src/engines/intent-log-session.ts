@@ -49,6 +49,19 @@ import type {
  */
 
 /**
+ * Slug of the intent-log engine. Must match WP_Intent_Log_Engine::SLUG on the
+ * PHP side. Defined here (rather than in engines.ts, which re-exports it) so
+ * the codec can stamp its own identity without an import cycle.
+ */
+export const INTENT_LOG_ENGINE_SLUG = 'intent-log';
+
+/**
+ * Protocol version of the intent-log engine. Must match
+ * WP_Intent_Log_Engine::PROTOCOL_VERSION on the PHP side.
+ */
+export const INTENT_LOG_ENGINE_PROTOCOL = 1;
+
+/**
  * Wire kinds, matching WP_Intent_Log_Engine::UPDATE_TYPE_*.
  */
 export const INTENT_LOG_UPDATE_TYPES = {
@@ -202,6 +215,8 @@ export function createIntentLogSession(
 	return {
 		actorId,
 		clientId,
+		engineSlug: INTENT_LOG_ENGINE_SLUG,
+		engineProtocol: INTENT_LOG_ENGINE_PROTOCOL,
 
 		// ---- EngineSessionCodec (transport-facing) ----
 

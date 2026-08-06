@@ -151,6 +151,19 @@ function processDocUpdate(
 }
 
 /**
+ * Slug of the Yjs relay engine. Must match WP_Yjs_Relay_Engine::SLUG on the
+ * PHP side. Defined here (rather than in engines.ts, which re-exports it) so
+ * the codec can stamp its own identity without an import cycle.
+ */
+export const YJS_RELAY_ENGINE_SLUG = 'yjs-relay';
+
+/**
+ * Protocol version of the Yjs relay engine. Must match
+ * WP_Yjs_Relay_Engine::PROTOCOL_VERSION on the PHP side.
+ */
+export const YJS_RELAY_ENGINE_PROTOCOL = 1;
+
+/**
  * Creates the Yjs relay engine's session codec for one entity/room. The codec
  * closes over the Y.Doc and Awareness so that transports never see them: they
  * receive only wire-shaped typed updates and awareness state objects.
@@ -187,6 +200,8 @@ export function createYjsSessionCodec(
 				YJS_RELAY_SESSION_ORIGIN
 			),
 		clientId: doc.clientID,
+		engineSlug: YJS_RELAY_ENGINE_SLUG,
+		engineProtocol: YJS_RELAY_ENGINE_PROTOCOL,
 		createCompactionUpdate: () =>
 			createSyncUpdate(
 				Y.encodeStateAsUpdateV2( doc ),

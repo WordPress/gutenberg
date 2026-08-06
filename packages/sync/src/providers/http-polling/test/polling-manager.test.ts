@@ -1738,6 +1738,255 @@ describe( 'polling-manager', () => {
 		} );
 	} );
 
+	describe( 'engine mismatch handling', () => {
+		const engineMismatchError = ( room?: string ) => ( {
+			code: 'rest_sync_engine_mismatch',
+			message: `Sync engine mismatch for room ${ room }: the room requires engine yjs-relay v1.`,
+			data: {
+				status: 409,
+				...( room ? { room } : {} ),
+				engine: 'yjs-relay',
+				engine_protocol: 1,
+			},
+		} );
+
+		it( 'drops only the mismatched room into the lock posture on a 409', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'healthy-room',
+						end_cursor: 1,
+						// Collaborators present, so queued updates are sent
+						// (a solo room holds them back).
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+					{
+						room: 'stale-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			const onStaleStatusChange = jest.fn();
+			const onHealthyStatusChange = jest.fn();
+			const healthySession = createMockSession( 1 );
+			// The surviving room is registered first so it is the primary
+			// room — non-primary queues pause until collaborators appear,
+			// which would hide the update-restoration behavior under test.
+			pollingManager.registerRoom( {
+				room: 'healthy-room',
+				session: healthySession,
+				log: jest.fn(),
+				onStatusChange: onHealthyStatusChange,
+			} );
+			pollingManager.registerRoom( {
+				room: 'stale-room',
+				session: createMockSession( 2 ),
+				log: jest.fn(),
+				onStatusChange: onStaleStatusChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Queue an update on the surviving room so restoration is
+			// observable.
+			const onLocalUpdate = getOnLocalUpdate( healthySession );
+			onLocalUpdate( createMockUpdate( 3 ), 3 );
+
+			// Second poll (1000ms cadence with collaborators): the server
+			// rejects the request on stale-room.
+			mockPostSyncUpdate.mockRejectedValueOnce(
+				engineMismatchError( 'stale-room' )
+			);
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// The mismatched room enters the lock posture...
+			expect( onStaleStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'engine-mismatch',
+				} ),
+			} );
+			// ...and is not signaled as a retryable disconnect.
+			expect( onStaleStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( { canManuallyRetry: true } )
+			);
+
+			// The healthy room is untouched.
+			expect( onHealthyStatusChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( { error: expect.anything() } )
+			);
+
+			// Polling continues for the surviving room, with its pending
+			// update restored from the failed request.
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'healthy-room',
+						end_cursor: 2,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
+				rooms: Array< { room: string; updates: unknown[] } >;
+			};
+			expect( retryPayload.rooms.map( ( room ) => room.room ) ).toEqual( [
+				'healthy-room',
+			] );
+			expect( retryPayload.rooms[ 0 ].updates.length ).toBeGreaterThan(
+				0
+			);
+		} );
+
+		it( 'does not retry the mismatched room or send it a disconnect signal', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				session: createMockSession( 1 ),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			mockPostSyncUpdate.mockRejectedValueOnce(
+				engineMismatchError( 'test-room' )
+			);
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// A mismatch is terminal for the room: no retry polls hammering
+			// the server with further 409s...
+			await jest.advanceTimersByTimeAsync( 60000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// ...and no disconnect beacon (the server would 409 that too).
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
+		} );
+
+		it( 'stamps the session engine identity on room payloads, omitting it for unstamped sessions', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'stamped-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'unstamped-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			pollingManager.registerRoom( {
+				room: 'stamped-room',
+				session: {
+					...createMockSession( 1 ),
+					engineSlug: 'intent-log',
+					engineProtocol: 1,
+				},
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'unstamped-room',
+				session: createMockSession( 2 ),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// The first poll fires synchronously with only the first room;
+			// the second poll carries both.
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const payload = mockPostSyncUpdate.mock
+				.calls[ 1 ][ 0 ] as unknown as {
+				rooms: Array< Record< string, unknown > >;
+			};
+			const stamped = payload.rooms.find(
+				( room ) => room.room === 'stamped-room'
+			);
+			const unstamped = payload.rooms.find(
+				( room ) => room.room === 'unstamped-room'
+			);
+			expect( stamped ).toMatchObject( {
+				engine: 'intent-log',
+				engine_protocol: 1,
+			} );
+			expect( unstamped ).not.toHaveProperty( 'engine' );
+			expect( unstamped ).not.toHaveProperty( 'engine_protocol' );
+		} );
+
+		it( 'treats a 409 without room details as affecting all requested rooms, and a later registerRoom restarts polling', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			const onStatusChange = jest.fn();
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				session: createMockSession( 1 ),
+				log: jest.fn(),
+				onStatusChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( engineMismatchError() );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			expect( onStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'engine-mismatch',
+				} ),
+			} );
+
+			// The poll loop stopped with the last room; registering a new
+			// room must start a fresh cycle.
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'new-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			pollingManager.registerRoom( {
+				room: 'new-room',
+				session: createMockSession( 2 ),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
+
 	describe( 'room overflow rotation', () => {
 		// The outer mock sets MAX_ROOMS_PER_REQUEST to 10. Tests in this
 		// block register a primary room plus additional "overflow" rooms

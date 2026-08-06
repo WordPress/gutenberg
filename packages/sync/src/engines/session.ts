@@ -80,6 +80,16 @@ export interface EngineSessionCodec {
 	clientId: number;
 
 	/**
+	 * Engine identity stamped on every sync request (the `engine` and
+	 * `engine_protocol` wire fields) so the server can fence a stale tab
+	 * speaking the wrong engine BEFORE storing any of its updates. Optional:
+	 * sessions without a stamp rely on the server's room-lineage check alone,
+	 * which only fences rooms that already have stored updates.
+	 */
+	engineSlug?: string;
+	engineProtocol?: number;
+
+	/**
 	 * Creates a single update representing the full local state, replacing
 	 * all prior updates (compaction-on-request and idempotent error
 	 * recovery).

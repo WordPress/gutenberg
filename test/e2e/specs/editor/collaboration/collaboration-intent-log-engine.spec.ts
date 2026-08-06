@@ -22,6 +22,19 @@ async function setSyncEngine(
 	requestUtils: RequestUtils,
 	engine: string | null
 ) {
+	if ( null === engine ) {
+		// Nulling an already-absent option 500s (rest_invalid_stored_value:
+		// the settings controller validates the stored value first, and an
+		// absent row reads as `false`). Restore only when our flip is still
+		// in effect — e.g. the engine-flip spec already deleted the option
+		// mid-test.
+		const settings = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+		if ( 'intent-log' !== settings.wp_sync_engine ) {
+			return;
+		}
+	}
 	await requestUtils.rest( {
 		method: 'POST',
 		path: '/wp/v2/settings',
@@ -545,6 +558,37 @@ test.describe( 'Collaboration - intent-log engine', () => {
 					'Second from two'
 				);
 			} ).toPass( { timeout: 10000 } );
+		}
+	} );
+
+	test( 'a mid-session engine change drops open tabs into the lock modal instead of retry-hammering', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Engine Flip Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before the flip</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		// The site's engine changes back to the default (yjs-relay) while
+		// both tabs are mid-session. Their polls still stamp intent-log, so
+		// the server fences them with 409 rest_sync_engine_mismatch and the
+		// clients must fall into the unrecoverable-mismatch modal — not an
+		// endless 409 retry loop.
+		await setSyncEngine( requestUtils, null );
+
+		for ( const page of [ page1, page2 ] ) {
+			await expect(
+				page.getByText( 'Collaboration settings changed' )
+			).toBeVisible( { timeout: 15000 } );
 		}
 	} );
 } );

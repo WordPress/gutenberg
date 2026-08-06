@@ -9,9 +9,15 @@ import { applyFilters } from '@wordpress/hooks';
 import type { EngineSessionCodec } from './engines/session';
 import {
 	createYjsSessionCodec,
+	YJS_RELAY_ENGINE_SLUG,
+	YJS_RELAY_ENGINE_PROTOCOL,
 	type YjsSessionOptions,
 } from './engines/yjs-relay';
 import { createIntentLogManager } from './engines/intent-log-manager';
+import {
+	INTENT_LOG_ENGINE_SLUG,
+	INTENT_LOG_ENGINE_PROTOCOL,
+} from './engines/intent-log-session';
 import { createSyncManager } from './manager';
 import type { SyncManager } from './types';
 
@@ -69,29 +75,17 @@ export interface AnnouncedSync {
 	transportProtocol: number;
 }
 
-/**
- * Slug of the built-in Yjs relay engine. Must match
- * WP_Yjs_Relay_Engine::SLUG on the PHP side.
+/*
+ * Engine identity constants (slug + protocol version, matching the PHP
+ * engine classes) are defined in each engine's session module so codecs can
+ * stamp their own identity, and re-exported here as the public surface.
  */
-export const YJS_RELAY_ENGINE_SLUG = 'yjs-relay';
-
-/**
- * Slug of the built-in intent-log engine. Must match
- * WP_Intent_Log_Engine::SLUG on the PHP side.
- */
-export const INTENT_LOG_ENGINE_SLUG = 'intent-log';
-
-/**
- * Protocol version of the built-in intent-log engine. Must match
- * WP_Intent_Log_Engine::PROTOCOL_VERSION on the PHP side.
- */
-export const INTENT_LOG_ENGINE_PROTOCOL = 1;
-
-/**
- * Protocol version of the built-in Yjs relay engine. Must match
- * WP_Yjs_Relay_Engine::PROTOCOL_VERSION on the PHP side.
- */
-export const YJS_RELAY_ENGINE_PROTOCOL = 1;
+export {
+	YJS_RELAY_ENGINE_SLUG,
+	YJS_RELAY_ENGINE_PROTOCOL,
+	INTENT_LOG_ENGINE_SLUG,
+	INTENT_LOG_ENGINE_PROTOCOL,
+};
 
 /**
  * Transport slug of the built-in HTTP short-polling provider.

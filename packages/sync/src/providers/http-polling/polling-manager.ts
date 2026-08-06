@@ -79,7 +79,7 @@ interface RoomState {
 interface WPRestError {
 	code?: string;
 	message?: string;
-	data: { status: number; rooms?: string[] };
+	data: { status: number; rooms?: string[]; room?: string };
 }
 
 /**
@@ -118,6 +118,22 @@ function isProtocolMismatchError( error: unknown ): error is WPRestError {
 	return (
 		( error as WPRestError | undefined )?.code ===
 		'rest_sync_protocol_mismatch'
+	);
+}
+
+/**
+ * Check if an error is the sync server's engine mismatch signal (409). The
+ * room is bound to a different sync engine than this client speaks — either
+ * the site configuration changed mid-session (stale tab) or the room's
+ * storage lineage predates an engine swap. Retrying cannot succeed; the
+ * affected room must fall back to the lock posture.
+ *
+ * @param error The caught error to inspect.
+ */
+function isEngineMismatchError( error: unknown ): error is WPRestError {
+	return (
+		( error as WPRestError | undefined )?.code ===
+		'rest_sync_engine_mismatch'
 	);
 }
 
@@ -185,6 +201,67 @@ function handleForbiddenError(
 				);
 				unregisterRoom( room, { sendDisconnectSignal: false } );
 			}
+		}
+	}
+}
+
+/**
+ * Handle a 409 engine mismatch from the sync endpoint. The server rejects the
+ * whole request on the first mismatched room, naming it in the error data.
+ * That room is terminally incompatible — its status is set to disconnected
+ * with an ENGINE_MISMATCH error (the lock posture) and it is unregistered
+ * without a disconnect signal (the server would 409 that request too).
+ * Pending updates for the other rooms in the request are restored so they
+ * retry on the next poll cycle.
+ *
+ * Without a room in the error data (defensively), all requested rooms are
+ * treated as mismatched.
+ *
+ * @param error          The mismatch error, narrowed via isEngineMismatchError.
+ * @param requestedRooms The rooms that were in the failing request.
+ */
+function handleEngineMismatchError(
+	error: WPRestError,
+	requestedRooms: SyncPayload[ 'rooms' ]
+): void {
+	const mismatchedRooms =
+		'string' === typeof error.data.room
+			? [ error.data.room ]
+			: requestedRooms.map( ( room ) => room.room );
+
+	for ( const room of mismatchedRooms ) {
+		const state = roomStates.get( room );
+		if ( ! state ) {
+			continue;
+		}
+		state.log(
+			'Sync engine mismatch, unregistering room',
+			{ error },
+			'error',
+			true // force
+		);
+		state.onStatusChange( {
+			status: 'disconnected',
+			error: new ConnectionError(
+				ConnectionErrorCode.ENGINE_MISMATCH,
+				'Sync engine mismatch between client and server'
+			),
+		} );
+		unregisterRoom( room, { sendDisconnectSignal: false } );
+	}
+
+	// Restore updates for remaining rooms so they can be retried on the
+	// next poll cycle.
+	for ( const room of requestedRooms ) {
+		if ( mismatchedRooms.includes( room.room ) ) {
+			continue;
+		}
+		if ( ! roomStates.has( room.room ) ) {
+			continue;
+		}
+		const remainingState = roomStates.get( room.room )!;
+		if ( room.updates.length > 0 ) {
+			remainingState.updateQueue.restore( room.updates );
 		}
 	}
 }
@@ -380,6 +457,12 @@ function createPayloadRoom(
 		after: state.endCursor ?? 0,
 		awareness: state.session.getLocalAwareness(),
 		client_id: state.session.clientId,
+		...( state.session.engineSlug
+			? {
+					engine: state.session.engineSlug,
+					engine_protocol: state.session.engineProtocol,
+			  }
+			: {} ),
 		room: state.room,
 		updates,
 	};
@@ -638,6 +721,16 @@ function poll(): void {
 				// If every room was unregistered, stop the poll loop
 				// instead of scheduling another tick. Reset isPolling
 				// so a future registerRoom() call can restart it.
+				if ( roomStates.size === 0 ) {
+					isPolling = false;
+					return;
+				}
+			} else if ( isEngineMismatchError( error ) ) {
+				// A 409 means the room is bound to a different sync engine.
+				// Retrying can never succeed — drop the affected room into
+				// the lock posture and keep polling for the rest.
+				handleEngineMismatchError( error, payload.rooms );
+
 				if ( roomStates.size === 0 ) {
 					isPolling = false;
 					return;

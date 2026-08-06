@@ -3,6 +3,7 @@ export enum ConnectionErrorCode {
 	CONNECTION_EXPIRED = 'connection-expired',
 	CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded',
 	DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded',
+	ENGINE_MISMATCH = 'engine-mismatch',
 	PROTOCOL_MISMATCH = 'protocol-mismatch',
 	UNKNOWN_ERROR = 'unknown-error',
 }
