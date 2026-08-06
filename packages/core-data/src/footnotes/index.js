@@ -29,18 +29,19 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	// something other than an array. Parsing it unguarded throws inside a store
 	// subscriber, where no error boundary catches it and the edit is dropped
 	// before it reaches editEntityRecord, so the post silently stops saving.
+	let parsed;
+	try {
+		parsed = JSON.parse( meta.footnotes || '[]' );
+	} catch {
+		// Left undefined, which the check below reports along with a value of
+		// the wrong shape.
+	}
+
 	let footnotes = [];
-	if ( meta.footnotes ) {
-		try {
-			const parsed = JSON.parse( meta.footnotes );
-			if ( Array.isArray( parsed ) ) {
-				footnotes = parsed;
-			} else {
-				warning( 'Footnotes post meta is not an array; ignoring it.' );
-			}
-		} catch {
-			warning( 'Footnotes post meta is not valid JSON; ignoring it.' );
-		}
+	if ( Array.isArray( parsed ) ) {
+		footnotes = parsed;
+	} else {
+		warning( 'Footnotes post meta is not a JSON array; ignoring it.' );
 	}
 
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
