@@ -1,14 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import CustomSelectControl from '../../custom-select-control';
+
+/**
+ * The element the user actually interacts with. `ValidatedCustomSelectControl`
+ * validates through a hidden delegate `<select>`, so this has to be resolved
+ * from the DOM — both to delegate focus and to attach the validity message.
+ */
+const INTERACTIVE_TARGET_SELECTOR = '[role="combobox"]';
 
 const UnforwardedValidatedCustomSelectControl = (
 	{
@@ -22,6 +22,11 @@ const UnforwardedValidatedCustomSelectControl = (
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
 
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector(
+			INTERACTIVE_TARGET_SELECTOR
+		);
+
 	return (
 		<div
 			className="components-validated-control__wrapper-with-error-delegate"
@@ -32,6 +37,7 @@ const UnforwardedValidatedCustomSelectControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<CustomSelectControl
 					// TODO: Upstream limitation - Required isn't passed down correctly,
@@ -49,7 +55,7 @@ const UnforwardedValidatedCustomSelectControl = (
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling
 						?.querySelector< HTMLButtonElement >(
-							'[role="combobox"]'
+							INTERACTIVE_TARGET_SELECTOR
 						)
 						?.focus();
 				} }

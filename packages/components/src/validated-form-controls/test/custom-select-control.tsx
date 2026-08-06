@@ -57,4 +57,32 @@ describe( 'ValidatedCustomSelectControl', () => {
 			);
 		} );
 	} );
+
+	it( 'should connect the validation error to the interactive combobox', async () => {
+		const user = userEvent.setup();
+		render(
+			<form onSubmit={ ( e ) => e.preventDefault() }>
+				<ValidatedCustomSelectControl
+					label="Font Size"
+					options={ options }
+					value={ undefined }
+					onChange={ () => {} }
+					required
+				/>
+				<button type="submit">Submit</button>
+			</form>
+		);
+
+		const combobox = await screen.findByRole( 'combobox', {
+			name: /^Font Size/,
+		} );
+
+		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
+
+		await waitFor( () => {
+			expect( combobox ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Constraints not satisfied' )
+			);
+		} );
+	} );
 } );
