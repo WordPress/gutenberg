@@ -1,22 +1,5 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
-
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
-	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
-} ) );
-
-/**
- * Internal dependencies
- */
 import {
 	getEntityRecord,
 	getEntityRecords,
@@ -26,6 +9,12 @@ import {
 	getCurrentUser,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
+
+jest.mock( '@wordpress/api-fetch' );
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+} ) );
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -61,6 +50,44 @@ describe( 'getEntityRecord', () => {
 		};
 		getSyncManager.mockImplementation( () => syncManager );
 	} );
+
+	const loadSyncedPost = async ( postRecord, currentEdits = {} ) => {
+		const postResponse = {
+			json: () => Promise.resolve( postRecord ),
+		};
+		const entitiesWithSync = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+		const select = {
+			getEntityRecordEdits: jest.fn( () => currentEdits ),
+			getRawEntityRecord: jest.fn( () => postRecord ),
+		};
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => entitiesWithSync ),
+			getEditedEntityRecord: jest.fn(),
+		};
+
+		triggerFetch.mockImplementation( () => postResponse );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		return syncManager.load.mock.calls[ 0 ][ 4 ];
+	};
 
 	it( 'yields with requested post type', async () => {
 		// Provide response
@@ -181,6 +208,52 @@ describe( 'getEntityRecord', () => {
 				restoreUndoMeta: expect.any( Function ),
 			}
 		);
+	} );
+
+	it( 'does not mark an entity as edited when a synced update matches the persisted record', async () => {
+		const POST_RECORD = {
+			id: 1,
+			meta: { nested: [ 'value' ] },
+			title: 'Test Post',
+		};
+		const handlers = await loadSyncedPost( POST_RECORD );
+		handlers.editRecord( { meta: { nested: [ 'value' ] } } );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'applies a synced update when it differs from the persisted record', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const handlers = await loadSyncedPost( POST_RECORD );
+		handlers.editRecord( { title: 'Synced title' } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: { title: 'Synced title' },
+			meta: { undo: undefined },
+			options: {},
+		} );
+	} );
+
+	it( 'clears a local edit when a synced update restores the persisted value', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const handlers = await loadSyncedPost( POST_RECORD, {
+			title: 'Local title',
+		} );
+		handlers.editRecord( { title: 'Test Post' } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: { title: undefined },
+			meta: { undo: undefined },
+			options: {},
+		} );
 	} );
 
 	it( 'does not load entity with sync manager when collaboration is unsupported', async () => {
