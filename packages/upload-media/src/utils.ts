@@ -84,6 +84,24 @@ export function getFileExtension( file: string ): string | null {
 }
 
 /**
+ * Checks whether a file name has one of the given extensions.
+ *
+ * Case-insensitive, since filesystems and cameras don't agree on casing
+ * (e.g. "IMG_1234.HEIC").
+ *
+ * @param name       File name.
+ * @param extensions Extensions to match against, without the leading dot.
+ * @return Whether the file name ends in one of the given extensions.
+ */
+export function hasFileExtension(
+	name: string,
+	extensions: readonly string[]
+): boolean {
+	const extension = getFileExtension( name )?.toLowerCase();
+	return !! extension && extensions.includes( extension );
+}
+
+/**
  * Returns file basename without extension.
  *
  * For example, turns "my-awesome-file.jpeg" into "my-awesome-file".
