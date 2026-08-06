@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, privateApis } from '@wordpress/components';
+import type { ValidatedControlProps } from '@wordpress/components';
+import { Button, ValidatedTextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {
@@ -17,20 +11,18 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import DateControl from '../../components/dataform-controls/date';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedTextControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
 	validity: FieldValidity | undefined
 ) {
-	let customValidity;
+	let customValidity: ValidatedControlProps[ 'customValidity' ];
 	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
-		customValidity = validity?.required?.message
-			? validity.required
+		const { message } = validity.required;
+		customValidity = message
+			? { ...validity.required, message }
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;

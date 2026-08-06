@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner, ValidatedComboboxControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
-import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedComboboxControl } = unlock( privateApis );
 
 export default function Combobox< Item >( {
 	data,
@@ -26,7 +16,9 @@ export default function Combobox< Item >( {
 	const value = getValue( { item: data } ) ?? '';
 
 	const onChangeControl = useCallback(
-		( newValue: string | null ) =>
+		// `ComboboxControl` reports `null` on reset and `undefined` when the
+		// selection is cleared; both mean "no value" here.
+		( newValue: string | null | undefined ) =>
 			onChange( setValue( { item: data, value: newValue ?? '' } ) ),
 		[ data, onChange, setValue ]
 	);

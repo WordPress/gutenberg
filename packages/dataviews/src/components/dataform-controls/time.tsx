@@ -1,24 +1,11 @@
-/**
- * WordPress dependencies
- */
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { BaseControl, ValidatedInputControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps, FormatTime } from '../../types';
 import { OPERATOR_BETWEEN } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import parseTime from '../../field-types/utils/parse-time';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 type TimeBetween = [ string, string ];
 

@@ -1,23 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedSelectControl } from '../select-control';
+import type { ValidatedSelectControlSingleSelectionProps } from '../select-control';
 import { formDecorator } from './story-utils';
 
-const meta: Meta< typeof ValidatedSelectControl > = {
+// Pinned to the single-selection half of the props union: Storybook's `args`
+// spread cannot round-trip a discriminated union.
+const meta: Meta< ValidatedSelectControlSingleSelectionProps > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedSelectControl',
 	id: 'components-validatedselectcontrol',
-	component: ValidatedSelectControl,
+	component:
+		ValidatedSelectControl as React.ComponentType< ValidatedSelectControlSingleSelectionProps >,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
@@ -27,7 +20,7 @@ const meta: Meta< typeof ValidatedSelectControl > = {
 };
 export default meta;
 
-export const Default: StoryObj< typeof ValidatedSelectControl > = {
+export const Default: StoryObj< ValidatedSelectControlSingleSelectionProps > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState< string | undefined >( '' );
 

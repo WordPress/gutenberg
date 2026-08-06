@@ -1,15 +1,50 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import SelectControl from '../../select-control';
+import type { WordPressComponentProps } from '../../context';
+import type {
+	SelectControlSingleSelectionProps,
+	SelectControlMultipleSelectionProps,
+} from '../../select-control/types';
 import type { ValidatedControlProps } from './types';
+
+/**
+ * `onChange` is redeclared as required — a validated control is always
+ * controlled — and without `SelectControl`'s optional `extra` argument, which
+ * consumers of this wrapper have no use for.
+ */
+export type ValidatedSelectControlSingleSelectionProps = Omit<
+	WordPressComponentProps<
+		SelectControlSingleSelectionProps< string >,
+		'select',
+		false
+	>,
+	'onChange'
+> &
+	ValidatedControlProps & {
+		onChange: ( value: string ) => void;
+	};
+
+export type ValidatedSelectControlMultipleSelectionProps = Omit<
+	WordPressComponentProps<
+		SelectControlMultipleSelectionProps< string >,
+		'select',
+		false
+	>,
+	'onChange'
+> &
+	ValidatedControlProps & {
+		onChange: ( value: string[] ) => void;
+	};
+
+/**
+ * Mirrors `SelectControl`'s own single/multiple discriminated union, so that
+ * `multiple` selects are typed with an array `value` and an array `onChange`.
+ */
+export type ValidatedSelectControlProps =
+	| ValidatedSelectControlSingleSelectionProps
+	| ValidatedSelectControlMultipleSelectionProps;
 
 const UnforwardedValidatedSelectControl = (
 	{
@@ -17,13 +52,7 @@ const UnforwardedValidatedSelectControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof SelectControl >,
-		'multiple' | 'onChange' | 'value'
-	> & {
-		value?: string;
-		onChange: ( value: string ) => void;
-	} & ValidatedControlProps,
+	}: ValidatedSelectControlProps,
 	forwardedRef: React.ForwardedRef< HTMLSelectElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );

@@ -1,24 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	BaseControl,
+	ValidatedNumberControl,
 	__experimentalNumberControl as NumberControl,
-	privateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
-import { unlock } from '../../../lock-unlock';
 import getCustomValidity from './get-custom-validity';
-
-const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
@@ -157,8 +147,11 @@ export default function ValidatedNumber< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid.min ? isValid.min.constraint : undefined }
-			max={ isValid.max ? isValid.max.constraint : undefined }
+			// `min`/`max` constraints are typed `number | string` because the
+			// same rules describe dates and times. On a number field they are
+			// always numeric.
+			min={ isValid.min ? Number( isValid.min.constraint ) : undefined }
+			max={ isValid.max ? Number( isValid.max.constraint ) : undefined }
 			disabled={ disabled }
 		/>
 	);

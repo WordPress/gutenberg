@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner, ValidatedSelectControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
-import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedSelectControl } = unlock( privateApis );
 
 export default function Select< Item >( {
 	data,
