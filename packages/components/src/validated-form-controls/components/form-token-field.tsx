@@ -1,14 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { FormTokenField } from '../../form-token-field';
+
+/**
+ * The element the user actually interacts with. `ValidatedFormTokenField`
+ * validates through a hidden delegate input, so this has to be resolved from
+ * the DOM — both to delegate focus and to attach the validity message.
+ *
+ * This input also carries `role="combobox"`.
+ */
+const INTERACTIVE_TARGET_SELECTOR = 'input[type="text"]';
 
 const UnforwardedValidatedFormTokenField = (
 	{
@@ -21,6 +23,11 @@ const UnforwardedValidatedFormTokenField = (
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector(
+			INTERACTIVE_TARGET_SELECTOR
+		);
+
 	return (
 		<div
 			className="components-validated-control__wrapper-with-error-delegate"
@@ -31,6 +38,7 @@ const UnforwardedValidatedFormTokenField = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<FormTokenField { ...restProps } />
 			</ControlWithError>
@@ -49,7 +57,7 @@ const UnforwardedValidatedFormTokenField = (
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling
 						?.querySelector< HTMLInputElement >(
-							'input[type="text"]'
+							INTERACTIVE_TARGET_SELECTOR
 						)
 						?.focus();
 				} }
