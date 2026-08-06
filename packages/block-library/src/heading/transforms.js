@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -125,6 +126,25 @@ const transforms = {
 						} ),
 					} );
 				} ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/site-title' ],
+			transform: ( attributes ) => {
+				const { content } = attributes;
+
+				if ( content ) {
+					apiFetch( {
+						path: '/wp/v2/settings',
+						method: 'POST',
+						data: { title: content },
+					} );
+				}
+
+				return createBlock( 'core/site-title' );
+			},
+			__experimentalLabel:
+				'Replace with Site Title (updates site settings)',
 		},
 	],
 };
