@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 0.4.0 (2026-07-29)
+
 ### New Features
 
 -   Surface a widget's declared `actions` in the tile chrome as a "More"

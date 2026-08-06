@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 1.19.0 (2026-07-29)
+
 ### Bug Fixes
 
 -   Font Library: Give the "Install fonts" search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes ([#80315](https://github.com/WordPress/gutenberg/pull/80315)).

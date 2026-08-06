@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 8.4.0 (2026-07-29)
+
 ### Bug Fixes
 
 -   `createInterpolateElement`: Warn and stop interpolating instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).

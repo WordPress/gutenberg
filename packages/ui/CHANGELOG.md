@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 0.19.0 (2026-07-29)
+
 ### Enhancements
 
 -   `Input`: Hide native browser spin controls for `type="number"` inputs by default ([#80646](https://github.com/WordPress/gutenberg/pull/80646)).

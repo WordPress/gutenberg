@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 0.4.0 (2026-07-29)
+
 ### New Features
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of

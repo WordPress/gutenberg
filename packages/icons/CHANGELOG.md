@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 15.3.0 (2026-07-29)
+
 ### Enhancements
 
 -   Normalize `keyboard-close`, `offline`, and `wordpress` to use the standard `viewBox="0 0 24 24"`. ([#80273](https://github.com/WordPress/gutenberg/pull/80273))
