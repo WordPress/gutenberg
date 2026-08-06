@@ -1,9 +1,4 @@
 {
-	"packages/annotations/src/store/index.ts": {
-		"import/order": {
-			"count": 1
-		}
-	},
 	"packages/babel-preset-default/bin/index.js": {
 		"import/order": {
 			"count": 1
@@ -402,11 +397,6 @@
 	"packages/block-library/src/html/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		}
-	},
-	"packages/block-library/src/image/edit.js": {
-		"import/order": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/image/image.js": {
@@ -1604,11 +1594,6 @@
 			"count": 1
 		}
 	},
-	"packages/env/lib/runtime/playground/index.js": {
-		"import/order": {
-			"count": 1
-		}
-	},
 	"packages/eslint-plugin/rules/no-unknown-ds-tokens.js": {
 		"import/order": {
 			"count": 1
@@ -2247,9 +2232,6 @@
 	},
 	"routes/navigation-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
-		"import/order": {
 			"count": 1
 		}
 	},
