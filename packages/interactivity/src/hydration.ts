@@ -172,5 +172,5 @@ export const hydrateRegions = async () => {
 	 * `window.requestIdleCallback` when native support is missing, and is a
 	 * no-op on browsers that have it.
 	 */
-	window.requestIdleCallback( hydrateAllRemaining, { timeout: 2000 } );
+	requestIdleCallback( hydrateAllRemaining, { timeout: 2000 } );
 };
