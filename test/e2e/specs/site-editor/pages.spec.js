@@ -47,7 +47,7 @@ async function addPageContent( editor, page ) {
 			name: 'Block: Content',
 		} )
 		.getByRole( 'document', {
-			name: /Empty block/i,
+			name: 'Add default block',
 		} )
 		.click();
 
@@ -287,7 +287,7 @@ test.describe( 'Pages', () => {
 		// A single click on the prompt inserts a paragraph and moves the
 		// caret into it; no click to select the Content block is needed.
 		await contentBlock
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Typed after one click' );
 

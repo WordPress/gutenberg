@@ -11,7 +11,7 @@ test.describe( 'Format Library - Math', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( 'equation: ' );
@@ -92,7 +92,7 @@ test.describe( 'Format Library - Math', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		// Type the LaTeX as plain text, then select it.

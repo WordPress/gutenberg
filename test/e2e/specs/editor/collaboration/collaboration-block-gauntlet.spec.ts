@@ -63,7 +63,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 
 		// Paragraph: click the default block appender and type.
 		await editor.canvas
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Gauntlet paragraph' );
 

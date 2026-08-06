@@ -23,6 +23,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { _x } from '@wordpress/i18n';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 import BlockEdit from '../block-edit';
@@ -893,6 +894,13 @@ function BlockListBlockProvider( props ) {
 
 	const privateContext = {
 		isPreviewMode,
+		ariaLabel:
+			ghostBlock && ghostBlock.clientId === clientId
+				? _x(
+						'Add default block',
+						'accessible name of the default block ghost'
+				  )
+				: undefined,
 		clientId,
 		className,
 		index,

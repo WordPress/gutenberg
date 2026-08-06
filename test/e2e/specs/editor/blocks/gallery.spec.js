@@ -42,7 +42,7 @@ test.describe( 'Gallery', () => {
 		} );
 
 		await editor.canvas
-			.locator( 'role=document[name*="Empty block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+v' );
 

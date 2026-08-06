@@ -114,7 +114,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=document[name*="Empty block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await expect(
