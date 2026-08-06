@@ -334,6 +334,11 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 							'properties' => array(
 								'id'           => array( 'type' => 'string' ),
 								'label'        => array( 'type' => 'string' ),
+								'icon'         => array( 'type' => 'string' ),
+								'relevance'    => array(
+									'type' => 'string',
+									'enum' => array( 'high', 'low' ),
+								),
 								'href'         => array( 'type' => 'string' ),
 								'download'     => array( 'type' => array( 'string', 'boolean' ) ),
 								'openInNewTab' => array( 'type' => 'boolean' ),

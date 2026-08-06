@@ -4,6 +4,9 @@
 
 ### New Features
 
+-   The actions "More" menu renders each action's resolved icon as the menu
+    item prefix.
+
 -   Surface a widget's declared `actions` in the tile chrome as a "More"
     menu of links ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
 
