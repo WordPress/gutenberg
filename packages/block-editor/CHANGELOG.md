@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add editor content styles that draw markers for non-printing characters. Characters that occupy space are marked with a background so that turning the preference on never reflows the text ([#72232](https://github.com/WordPress/gutenberg/issues/72232)).
+
 ### Enhancements
 
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).

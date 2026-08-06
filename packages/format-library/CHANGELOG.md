@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `core/non-printing-characters` format that marks spaces, non-breaking spaces, tabs, line breaks and zero width characters in the editor while the "Show non-printing characters" preference is on. The format exists only in the editable tree and is never saved, so the content is untouched ([#72232](https://github.com/WordPress/gutenberg/issues/72232)).
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements

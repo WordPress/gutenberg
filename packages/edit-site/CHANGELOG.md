@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Register the `showNonPrintingCharacters` preference, defaulting to off ([#72232](https://github.com/WordPress/gutenberg/issues/72232)).
+
 ## 7.0.0 (2026-07-14)
 
 ### Breaking Changes
