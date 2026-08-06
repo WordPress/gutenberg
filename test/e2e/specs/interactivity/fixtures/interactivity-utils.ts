@@ -90,6 +90,34 @@ export default class InteractivityUtils {
 		return this.getLink( alias );
 	}
 
+	/**
+	 * Creates a post with several TOP-LEVEL blocks (e.g. a router block plus
+	 * an island that throws during hydration), as `addPostWithBlock` only
+	 * supports a single block.
+	 *
+	 * @param blocks      The top-level blocks, in document order.
+	 * @param options     Options object.
+	 * @param options.alias The alias used to retrieve the post's link.
+	 * @return The post's link, with the directives SSR disabled.
+	 */
+	async addPostWithBlocks(
+		blocks: Block[],
+		{ alias }: { alias: string }
+	) {
+		const content = blocks.map( generateBlockMarkup ).join( '' );
+
+		const payload = {
+			content,
+			status: 'publish' as 'publish',
+			date_gmt: '2023-01-01T00:00:00',
+			title: alias,
+		};
+
+		const { link } = await this.requestUtils.createPost( payload );
+		this.links.set( alias, link );
+		return this.getLink( alias );
+	}
+
 	async deleteAllPosts() {
 		await this.requestUtils.deleteAllPosts();
 		this.links.clear();
