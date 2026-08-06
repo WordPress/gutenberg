@@ -200,6 +200,20 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
+export {
+	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
+	ValidatedFormTokenField,
+	ValidatedInputControl,
+	ValidatedNumberControl,
+	ValidatedRadioControl,
+	ValidatedSelectControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+} from './validated-form-controls/components';
+export type { ValidatedControlProps } from './validated-form-controls/components/types';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
