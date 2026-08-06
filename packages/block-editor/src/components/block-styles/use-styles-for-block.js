@@ -9,6 +9,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -65,16 +66,36 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 
 		return {
 			block: ! blockType?.example ? block : null,
+			blockName: block.name,
 			blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',
 		};
 	};
-	const { styles, block, blockType, className } = useSelect( selector, [
-		clientId,
-	] );
+	const { styles, block, blockName, blockType, className } = useSelect(
+		selector,
+		[ clientId ]
+	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const stylesToRender = getRenderedStyles( styles );
+
+	/**
+	 * Filters the available styles for a block to render in the UI.
+	 *
+	 * @param {Array}  styles    The array of styles available for the block.
+	 * @param {string} blockName The name of the block (e.g., 'core/button').
+	 * @param {string} clientId  The client ID of the block.
+	 */
+	const filteredStyles = useMemo(
+		() =>
+			applyFilters(
+				'blockEditor.useStylesForBlock',
+				styles,
+				blockName,
+				clientId
+			),
+		[ styles, blockName, clientId ]
+	);
+	const stylesToRender = getRenderedStyles( filteredStyles );
 	const activeStyle = getActiveStyle( stylesToRender, className );
 	const genericPreviewBlock = useGenericPreviewBlock( block, blockType );
 
