@@ -4,6 +4,10 @@
 
 ### New Features
 
+-   `WidgetHostProvider` / `useWidgetHost`: the seam through which a host
+    provides capabilities to the widgets it renders, merged over the
+    inherited value. First capability: `links`, in-app route recognition
+    (`match`) plus the host router's link primitive.
 -   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
     for persistent but compact visibility
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).

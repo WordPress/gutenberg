@@ -1,0 +1,43 @@
+import { useMemo } from '@wordpress/element';
+import { Link } from '@wordpress/route';
+import { WidgetHostProvider } from '@wordpress/widget-primitives';
+import type { WidgetHost } from '@wordpress/widget-primitives';
+import type { ComponentProps, ReactNode } from 'react';
+import { matchDashboardHref } from './match-dashboard-href';
+
+function DashboardRouteLink( {
+	to,
+	...props
+}: { to: string } & ComponentProps< 'a' > ): React.ReactNode {
+	return <Link to={ to } { ...props } />;
+}
+
+type DashboardWidgetHostProviderProps = {
+	/**
+	 * Subtree the dashboard capabilities apply to.
+	 */
+	children: ReactNode;
+};
+
+/**
+ * Provides this route's host capabilities to the widgets it renders:
+ * `links` recognizes hrefs that target this SPA's own routes and mounts
+ * the router link for them.
+ *
+ * @param {DashboardWidgetHostProviderProps} props Component props.
+ */
+export function DashboardWidgetHostProvider( {
+	children,
+}: DashboardWidgetHostProviderProps ): React.ReactNode {
+	const host = useMemo< WidgetHost >(
+		() => ( {
+			links: {
+				match: matchDashboardHref,
+				Link: DashboardRouteLink,
+			},
+		} ),
+		[]
+	);
+
+	return <WidgetHostProvider value={ host }>{ children }</WidgetHostProvider>;
+}

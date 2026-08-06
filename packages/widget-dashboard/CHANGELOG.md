@@ -10,6 +10,10 @@
     declared icon); the "More" menu keeps the rest, and full-bleed widgets
     keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   A link action whose target the host recognizes as one of its own routes
+    (the `links` capability from `useWidgetHost`) mounts the host router's
+    link and navigates client-side; `download` and `openInNewTab` keep the
+    plain anchor.
 
 ### Internal
 
