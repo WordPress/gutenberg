@@ -12,20 +12,12 @@
 	&:focus,
 	&[aria-current="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
-
-		.edit-site-sidebar-navigation-item__drilldown-indicator {
-			fill: var(--wpds-color-foreground-interactive-neutral-weak-active);
-		}
 	}
 
 	&[aria-current="true"] {
 		background: var(--wpds-color-background-interactive-neutral-weak-active);
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-	}
-
-	.edit-site-sidebar-navigation-item__drilldown-indicator {
-		fill: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&.with-suffix {
