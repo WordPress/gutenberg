@@ -9,7 +9,7 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -229,6 +229,24 @@ export const getEntityRecord =
 					}
 				}
 
+				/*
+				 * Escalation notice bookkeeping shared between the
+				 * onProposalsChange and onEscalation handlers below. A burst
+				 * of conflicts (e.g. two collaborators typing in the same
+				 * paragraph) would stack one notice per parked edit; past
+				 * AGGREGATE_NOTICE_THRESHOLD open items the per-item notices
+				 * are swept and replaced by a single counter notice pointing
+				 * at the review panel. onProposalsChange always fires before
+				 * the same batch's onEscalation calls, so the flag reliably
+				 * suppresses per-item notices while aggregated.
+				 */
+				const AGGREGATE_NOTICE_THRESHOLD = 3;
+				const escalationNoticeId = ( proposalId ) =>
+					`core-data-sync-escalation-${ kind }-${ name }-${ key }-${ proposalId }`;
+				const aggregateNoticeId = `core-data-sync-review-aggregate-${ kind }-${ name }-${ key }`;
+				let aggregateNoticeActive = false;
+				let knownProposalIds = [];
+
 				// Load the entity record for syncing. Do not await promise.
 				void syncManager?.load(
 					entityConfig.syncConfig,
@@ -267,7 +285,78 @@ export const getEntityRecord =
 						// edit or discarded, either way closing the parked
 						// proposal for every collaborator (see
 						// prototypes/sync/PROPOSAL-REVIEW.md).
+						// Mirror the settled open-proposal list into the store
+						// (it feeds the editor's review panel) and reconcile
+						// notices: sweep per-item notices for proposals that
+						// closed elsewhere, and collapse bursts into a single
+						// aggregate notice.
+						onProposalsChange: ( items ) => {
+							dispatch.setSyncReviewItems(
+								kind,
+								name,
+								key,
+								items
+							);
+
+							const notices = registry.dispatch( noticesStore );
+							const openIds = new Set(
+								items.map( ( item ) => item.id )
+							);
+							const useAggregate =
+								items.length > AGGREGATE_NOTICE_THRESHOLD;
+
+							if ( useAggregate && ! aggregateNoticeActive ) {
+								// Entering aggregate mode: sweep per-item
+								// notices so they don't stack under the
+								// counter notice.
+								for ( const id of knownProposalIds ) {
+									notices.removeNotice(
+										escalationNoticeId( id )
+									);
+								}
+							}
+							aggregateNoticeActive = useAggregate;
+
+							if ( useAggregate ) {
+								notices.createNotice(
+									'warning',
+									sprintf(
+										/* translators: %d: number of edits set aside for review. */
+										_n(
+											'%d edit was set aside because of conflicting changes. Review it in the Collaboration panel of the document settings.',
+											'%d edits were set aside because of conflicting changes. Review them in the Collaboration panel of the document settings.',
+											items.length
+										),
+										items.length
+									),
+									{
+										id: aggregateNoticeId,
+										isDismissible: true,
+									}
+								);
+							} else {
+								notices.removeNotice( aggregateNoticeId );
+								// Remove notices for proposals resolved
+								// elsewhere (another collaborator, the review
+								// panel, or another tab).
+								for ( const id of knownProposalIds ) {
+									if ( ! openIds.has( id ) ) {
+										notices.removeNotice(
+											escalationNoticeId( id )
+										);
+									}
+								}
+							}
+
+							knownProposalIds = items.map( ( item ) => item.id );
+						},
 						onEscalation: ( { isLocal, proposalId, summary } ) => {
+							// While aggregated, the counter notice and the
+							// review panel carry the information; skip the
+							// per-item notice.
+							if ( aggregateNoticeActive ) {
+								return;
+							}
 							const base = isLocal
 								? __(
 										"One of your recent edits conflicted with a collaborator's change and was set aside."
@@ -283,7 +372,7 @@ export const getEntityRecord =
 										summary
 								  )
 								: base;
-							const noticeId = `core-data-sync-escalation-${ kind }-${ name }-${ key }-${ proposalId }`;
+							const noticeId = escalationNoticeId( proposalId );
 							const close = ( resolution ) => {
 								if ( 'restored' === resolution ) {
 									dispatch.restoreSyncProposal(

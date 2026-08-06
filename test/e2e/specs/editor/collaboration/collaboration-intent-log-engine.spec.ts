@@ -667,43 +667,74 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			page2.keyboard.type( 'two two two two two ', { delay: 100 } ),
 		] );
 
-		// At least one side shows the escalation notice.
+		// At least one side surfaces the escalation: per-item notices below
+		// the aggregation threshold, one counter notice above it.
 		let noticePage = page1;
+		let noticeEditor = editor;
 		await expect( async () => {
 			const counts = await Promise.all( [
-				page1.getByText( /was set aside/ ).count(),
-				page2.getByText( /was set aside/ ).count(),
+				page1.getByText( /set aside/ ).count(),
+				page2.getByText( /set aside/ ).count(),
 			] );
 			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
 			noticePage = counts[ 0 ] > 0 ? page1 : page2;
+			noticeEditor = counts[ 0 ] > 0 ? editor : editor2;
 		} ).toPass( { timeout: 15000 } );
 
 		/*
-		 * The notices are ACTIONABLE, one per parked edit: discarding
-		 * closes each proposal for every collaborator, durably — after a
-		 * reload the resolved conflicts must NOT resurface (the resolution
-		 * rows settle the bootstrap replay). A sustained typing race parks
-		 * many edits; discard them all.
+		 * The review panel in the document sidebar lists every parked edit
+		 * regardless of how many notices were shown. Discarding closes each
+		 * proposal for every collaborator, durably — after a reload the
+		 * resolved conflicts must NOT resurface (the resolution rows settle
+		 * the bootstrap replay). A sustained typing race parks many edits;
+		 * discard them all through the panel.
 		 */
+		await noticeEditor.openDocumentSettingsSidebar();
+		// The sidebar auto-switches to the Block tab while a block is
+		// selected; the review panel lives in the document (Post) tab.
+		await noticePage
+			.getByRole( 'tab', { name: 'Post', exact: true } )
+			.click();
+		const panel = noticePage.locator(
+			'.editor-collaboration-review-panel'
+		);
+		await expect( panel ).toBeVisible( { timeout: 15000 } );
 		await expect( async () => {
-			// Late-settling intents can park more edits mid-loop; keep
-			// discarding until the list stays empty.
-			for ( let i = 0; i < 60; i++ ) {
-				const discard = noticePage
-					.getByRole( 'button', { name: 'Discard' } )
-					.first();
-				if ( 0 === ( await discard.count() ) ) {
-					break;
+			// Discard everything currently parked. "Discard all" appears
+			// with 2+ conflict groups; otherwise use the single group's
+			// Discard.
+			for ( let i = 0; i < 40; i++ ) {
+				const discardAll = panel.getByRole( 'button', {
+					name: 'Discard all',
+				} );
+				if ( ( await discardAll.count() ) > 0 ) {
+					await discardAll.click();
+					continue;
 				}
-				await discard.click();
+				const discard = panel
+					.getByRole( 'button', { name: 'Discard', exact: true } )
+					.first();
+				if ( ( await discard.count() ) > 0 ) {
+					await discard.click();
+					continue;
+				}
+				break;
 			}
+			// Quiescence, not just momentary emptiness: in-flight pushes
+			// from the typing race can escalate MORE edits after the list
+			// first empties. Only settled-and-still-empty after a full
+			// poll/flush cycle counts — otherwise discard again.
+			await noticePage.waitForTimeout( 3000 );
+			expect( await panel.count() ).toBe( 0 );
+			// Resolving through the panel also clears the notices
+			// (per-item and aggregate alike).
 			expect(
 				await noticePage
 					.locator( '.components-notice' )
-					.filter( { hasText: 'was set aside' } )
+					.filter( { hasText: 'set aside' } )
 					.count()
 			).toBe( 0 );
-		} ).toPass( { timeout: 30000 } );
+		} ).toPass( { timeout: 60000 } );
 
 		// Let the resolution rows flush to the server (the list shrinks
 		// optimistically; durability needs the wire round trip) before
@@ -715,12 +746,21 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			noticePage.locator( 'iframe[name="editor-canvas"]' )
 		).toBeVisible( { timeout: 30000 } );
 		// Allow the bootstrap replay to settle; a resolved proposal must
-		// not re-notify.
+		// not re-notify or repopulate the review panel.
 		await noticePage.waitForTimeout( 4000 );
 		await expect(
 			noticePage
 				.locator( '.components-notice' )
-				.filter( { hasText: 'was set aside' } )
+				.filter( { hasText: 'set aside' } )
+		).toHaveCount( 0 );
+		await noticeEditor.openDocumentSettingsSidebar();
+		// The sidebar remembers the Block tab across reloads; the panel
+		// (were it wrongly present) would live in the Post tab.
+		await noticePage
+			.getByRole( 'tab', { name: 'Post', exact: true } )
+			.click();
+		await expect(
+			noticePage.locator( '.editor-collaboration-review-panel' )
 		).toHaveCount( 0 );
 	} );
 

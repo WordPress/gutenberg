@@ -58,6 +58,7 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	syncReviewItems?: Record< string, Array< Record< string, unknown > > >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
 }

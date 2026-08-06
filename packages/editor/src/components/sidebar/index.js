@@ -15,6 +15,7 @@ import { Tabs } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import CollaborationReviewPanel from '../collaboration-review-panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
@@ -89,6 +90,7 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				) : (
 					<PostSummary onActionPerformed={ onActionPerformed } />
 				) }
+				<CollaborationReviewPanel />
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }

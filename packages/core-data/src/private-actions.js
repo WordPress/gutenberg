@@ -175,6 +175,26 @@ export function receiveEditorAssets( assets ) {
  * @return {Object} Action object.
  */
 /**
+ * Stores an entity's sync review list (open escalated proposals).
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {string|number} recordId Record ID.
+ * @param {Array}         items    Review items from the sync manager.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncReviewItems( kind, name, recordId, items ) {
+	return {
+		type: 'SET_SYNC_REVIEW_ITEMS',
+		kind,
+		name,
+		recordId,
+		items,
+	};
+}
+
+/**
  * Closes a parked sync proposal (an escalated edit set aside for review).
  *
  * @param {string}        kind       Entity kind.

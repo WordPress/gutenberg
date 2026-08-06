@@ -552,10 +552,32 @@ inside intent payloads, not the transport.
   tool shows we keep reaching for it). Verified live on the dev env:
   decoded summaries + full server envelope through real typing.
 
+  **2d-xix (review panel UI) DONE.** The consolidated review surface
+  the actionable notices couldn't be: a "Collaboration conflicts (N)"
+  panel in the editor's document settings sidebar
+  (`packages/editor/src/components/collaboration-review-panel/`),
+  fed by a new `syncReviewItems` core-data reducer (keyed
+  `kind/name:recordId`, mirrored from the manager's
+  `onProposalsChange` settled list via the private
+  `setSyncReviewItems` action / `getSyncReviewItems` selector).
+  Items group by unitId (a typing batch reads as one conflict) with
+  attribution ("your edit" vs "a collaborator's"), humanized reason
+  (frame-conflict / dependent-on-escalated), the lost content, and
+  per-group Restore/Discard plus a bulk "Discard all" — all routed
+  through the existing resolve/restore private actions, so
+  resolution stays durable and cross-collaborator. Notice policy:
+  below 4 open items, per-item actionable notices as before; past
+  that threshold the resolvers sweep them and show ONE counter
+  notice pointing at the panel (onProposalsChange fires before the
+  same batch's onEscalation calls, so the aggregate flag reliably
+  suppresses the flood), and notices for proposals resolved
+  elsewhere (peer, panel, other tab) are reconciled away. The
+  concurrent-typing e2e now resolves the burst through the panel's
+  Discard all and re-asserts durability across reload.
+
   Remaining in 2d, design-scoped: selection/caret sharing for
-  intent-log (presence works; carets need engine-side transport) and
-  the full review PANEL (list UI; the actionable notices cover the
-  common flow). Review findings NOT yet addressed (next tier):
+  intent-log (presence works; carets need engine-side transport).
+  Review findings NOT yet addressed (next tier):
   frame/txn state across request boundaries (1.3c), independent
   effect-model oracles (3.1), and the invasiveness cleanups (identity
   triplication, lockstep .d.ts, delayed re-push).

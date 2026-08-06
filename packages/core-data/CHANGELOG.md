@@ -6,6 +6,7 @@
 
 -   Surface sync engine escalations (edits set aside for review instead of merged) as a dismissible warning notice in the editor.
 -   Escalation notices are now actionable: they show the lost content and offer Restore (re-authors it as an ordinary edit) and Discard, either way durably closing the parked proposal for every collaborator.
+-   Track the open sync review list (escalated edits parked for review) in the store, exposed via the private `getSyncReviewItems` selector; bursts of conflicts now collapse the per-item notices into a single counter notice pointing at the editor's review panel.
 -   When the server announces a sync engine this client cannot provide, collaboration is now marked unsupported so WordPress's regular post locking re-engages (previously the degraded state was silently no-sync-and-no-lock), with a warning notice explaining why.
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
 
