@@ -54,3 +54,69 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 .rich-text [contenteditable="false"]::selection {
 	background-color: transparent;
 }
+
+// Markers for non-printing characters, shown when the "Show non-printing
+// characters" preference is on. The format that adds these wrappers exists only
+// in the editable tree and is never saved, so nothing here reaches the content.
+//
+// Markers for characters that occupy space are painted as backgrounds rather
+// than pseudo elements, so that turning the preference on never reflows the
+// text the author is reading. Only characters with no width of their own get a
+// pseudo element, since there is no box to paint on otherwise.
+[data-rich-text-non-printing-character] {
+	// Blocks and themes set their own colors, so derive the marker from the
+	// surrounding text instead of naming a color.
+	--wp-non-printing-character-color: color-mix(in srgb, currentColor 45%, transparent);
+
+	background-repeat: no-repeat;
+
+	&::before {
+		// Keep markers out of the way of writing and selecting.
+		pointer-events: none;
+		user-select: none;
+		-webkit-user-select: none;
+		color: var(--wp-non-printing-character-color);
+		// Reset the text shadow from the global styles.
+		text-shadow: none;
+	}
+}
+
+// A dot in the middle of the space, as word processors draw it.
+[data-rich-text-non-printing-character="space"] {
+	background-image: radial-gradient(circle at 50% 50%, var(--wp-non-printing-character-color) 0 0.06em, transparent 0.07em);
+}
+
+// The same dot, on a tinted box: a non-breaking space looks identical to a
+// regular one, so the marker has to say more than "there is a space here".
+[data-rich-text-non-printing-character="non-breaking-space"] {
+	background-color: color-mix(in srgb, currentColor 12%, transparent);
+	background-image: radial-gradient(circle at 50% 50%, var(--wp-non-printing-character-color) 0 0.06em, transparent 0.07em);
+	border-radius: $radius-small;
+}
+
+// A rule running the width of the tab, which varies with where the tab lands.
+[data-rich-text-non-printing-character="tab"] {
+	background-image: linear-gradient(to right, var(--wp-non-printing-character-color) 0 100%);
+	background-size: 100% 1px;
+	background-position: 0 65%;
+}
+
+// A return arrow sitting at the end of the line, before the break itself.
+[data-rich-text-non-printing-character="line-break"]::before {
+	content: "\21b5";
+	font-size: 0.9em;
+	line-height: 1;
+}
+
+// Zero width characters have no box to paint on, so give them a small tick.
+// This does shift the text by a fraction, which is the point: an invisible
+// character that takes up no room can only be revealed by making room for it.
+[data-rich-text-non-printing-character="zero-width"]::before {
+	content: "";
+	display: inline-block;
+	width: 0.2em;
+	height: 0.85em;
+	vertical-align: text-bottom;
+	border-radius: 1px;
+	background-color: var(--wp-non-printing-character-color);
+}

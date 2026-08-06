@@ -16,6 +16,7 @@ import { unknown } from './unknown';
 import { language } from './language';
 import { math } from './math';
 import { nonBreakingSpace } from './non-breaking-space';
+import { nonPrintingCharacters } from './non-printing-characters';
 
 export default [
 	bold,
@@ -33,4 +34,5 @@ export default [
 	language,
 	math,
 	nonBreakingSpace,
+	nonPrintingCharacters,
 ];
