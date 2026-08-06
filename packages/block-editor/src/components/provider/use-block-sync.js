@@ -10,6 +10,7 @@ import { cloneBlock } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -158,8 +159,14 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
+	const { setControllerExternalClientIds } = unlock(
+		registry.dispatch( blockEditorStore )
+	);
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
+	const { getExternalClientId } = unlock(
+		registry.select( blockEditorStore )
+	);
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
@@ -202,6 +209,27 @@ export default function useBlockSync( {
 			: !! getBlockName( startClientId );
 
 		if ( isOurs ) {
+			// The check above cannot tell duplicate controllers apart: two
+			// controllers synced from the same entity (e.g. two Navigation
+			// blocks using the same menu) map the same external IDs, so both
+			// consider the selection theirs and the last one to sync would
+			// steal it. To break the tie, check whether the selection is
+			// already in place: every controller registers in the store
+			// which external block each of its clones was made from, so if
+			// the currently selected block is a copy of the same external
+			// block this selection targets — whichever controller made the
+			// copy — there is nothing left to restore. The root controller
+			// never skips: it doesn't clone, so its blocks have no
+			// registered external IDs to compare.
+			if ( clientId ) {
+				const currentClientId = getSelectionStart()?.clientId;
+				if (
+					currentClientId &&
+					getExternalClientId( currentClientId ) === startClientId
+				) {
+					return;
+				}
+			}
 			appliedSelectionRef.current = selection;
 			// Inner block controllers need to convert external→internal
 			// IDs via the clone mapping; the root controller uses
@@ -265,6 +293,15 @@ export default function useBlockSync( {
 				} );
 				replaceInnerBlocks( clientId, storeBlocks );
 
+				// Publish a snapshot of the clone mapping so that other
+				// controllers can recognise this controller's clones when
+				// deciding whether to restore a selection (see
+				// restoreSelection).
+				setControllerExternalClientIds(
+					clientId,
+					new Map( idMappingRef.current.internalToExternal )
+				);
+
 				// Invalidate the applied-selection ref so that
 				// restoreSelection() at the end of the
 				// controlledBlocks effect re-applies with the
@@ -294,6 +331,7 @@ export default function useBlockSync( {
 				history: 'ignore',
 			} );
 			replaceInnerBlocks( clientId, [] );
+			setControllerExternalClientIds( clientId, null );
 		} else {
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
