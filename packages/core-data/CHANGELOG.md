@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Surface sync engine escalations (edits set aside for review instead of merged) as a dismissible warning notice in the editor.
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
 
 ### Bug Fixes

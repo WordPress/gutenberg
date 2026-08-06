@@ -345,11 +345,32 @@ inside intent payloads, not the transport.
   on the shared presence-gated `openCollaborativeSession` fixture, so
   every spec doubles as a presence assertion; 9/9 green.
 
-  Remaining in 2d: escalation surfacing UI (notice, not console), a
-  same-block conflict e2e (escalation visible in the editor), the
-  stale-tab mid-session engine-flip e2e (409 → lock fallback), save-flow
-  verification (materialize vs client save), selection/caret sharing for
-  intent-log, and title/entity-property sync (deliberate v1 exclusion).
+  **2d-ix (client 409 handling) DONE.** Session codecs stamp their
+  engine identity (`engine`/`engine_protocol`, already accepted by the
+  server) on every poll, fencing stale tabs BEFORE their first stored
+  update — the lineage check alone cannot cover fresh rooms. The polling
+  manager maps 409 `rest_sync_engine_mismatch` to the lock posture:
+  disconnected with the new `ENGINE_MISMATCH` error code, room
+  unregistered without a disconnect beacon, surviving rooms keep polling
+  with restored updates. The editor modal gains dedicated copy
+  ('Collaboration settings changed' → refresh) on the no-delay
+  unrecoverable path. E2e: mid-session engine flip drops both tabs into
+  the modal (one 409 each, no retry loop). Harness find: nulling
+  `wp_sync_engine` via REST 500s when the row is already absent — the
+  settings controller validates the stored value first.
+
+  **2d-x (escalation notice) DONE.** `RecordHandlers.onEscalation`
+  (optional; reason + local/remote attribution) replaces the manager's
+  console.warn; core-data's resolver dispatches a dismissible warning
+  notice with a stable per-entity id (repeats replace, not stack). E2e:
+  sustained concurrent typing into the same paragraph reliably provokes
+  a frame-conflict escalation and the notice appears in the editor.
+
+  Remaining in 2d: save-flow verification (materialize vs client save),
+  dev-bundle e2e variant (SCRIPT_DEBUG=true), selection/caret sharing
+  for intent-log, and title/entity-property sync (deliberate v1
+  exclusion). Escalation REVIEW UI (inspect/apply/discard a parked
+  proposal) is future work beyond the notice.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

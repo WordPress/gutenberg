@@ -13,7 +13,10 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
  */
 import { Awareness } from 'y-protocols/awareness';
 import { createIntentLogManager } from '../engines/intent-log-manager';
-import { INTENT_LOG_UPDATE_TYPES } from '../engines/intent-log-session';
+import {
+	INTENT_LOG_UPDATE_TYPES,
+	type IntentLogSession,
+} from '../engines/intent-log-session';
 import {
 	getEngineAdapters,
 	resetEngineAdaptersForTesting,
@@ -590,6 +593,43 @@ describe( 'intent-log manager', () => {
 		expect( secondPush.blocks[ 0 ].clientId ).toBe(
 			firstPush.blocks[ 0 ].clientId
 		);
+	} );
+
+	it( 'surfaces proposals through onEscalation with local/remote attribution', async () => {
+		const { handlers, transport } = await loadManagedEntity();
+		const onEscalation = jest.fn();
+		// The manager reads the handler at proposal time, so assigning to
+		// the same handlers object after load is sufficient.
+		handlers.onEscalation = onEscalation;
+
+		transport.captured.session!.receiveUpdate( snapshotRow( [] ) );
+
+		const proposalRow = ( actorId: string, reason: string ) => ( {
+			data: JSON.stringify( {
+				intent: { intentId: `i-${ reason }` },
+				actorId,
+				reason,
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+
+		transport.captured.session!.receiveUpdate(
+			proposalRow( 'u999c999', 'frame-conflict' )
+		);
+		expect( onEscalation ).toHaveBeenCalledWith( {
+			reason: 'frame-conflict',
+			isLocal: false,
+		} );
+
+		const ownActorId = ( transport.captured.session as IntentLogSession )
+			.actorId;
+		transport.captured.session!.receiveUpdate(
+			proposalRow( ownActorId, 'merge-dropped-field' )
+		);
+		expect( onEscalation ).toHaveBeenLastCalledWith( {
+			reason: 'merge-dropped-field',
+			isLocal: true,
+		} );
 	} );
 
 	it( 'unload destroys providers and the session', async () => {

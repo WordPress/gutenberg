@@ -299,8 +299,13 @@ export function createIntentLogManager( debug = false ): SyncManager {
 		} );
 
 		session.onProposal( ( proposal ) => {
-			// Phase 2d surfaces these in UI; for now they must at least be
-			// visible and countable.
+			if ( handlers.onEscalation ) {
+				handlers.onEscalation( {
+					reason: proposal.reason,
+					isLocal: proposal.actorId === session.actorId,
+				} );
+				return;
+			}
 			// eslint-disable-next-line no-console
 			console.warn(
 				'[IntentLog] An edit was escalated for review (%s): %o',

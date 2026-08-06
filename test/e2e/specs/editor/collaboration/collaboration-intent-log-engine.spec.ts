@@ -561,6 +561,53 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		}
 	} );
 
+	test( 'concurrent same-paragraph edits surface an escalation notice instead of silently merging', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Escalation Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Contested paragraph</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		// Both users type into the SAME paragraph simultaneously. Sustained
+		// overlapping writes to one text frame guarantee that at least one
+		// client authors against a stale sequence, which the engine sets
+		// aside for review (frame-conflict) rather than silently merging.
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page1.keyboard.press( 'End' );
+		await editor2.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page2.keyboard.press( 'Home' );
+
+		await Promise.all( [
+			page1.keyboard.type( ' one one one one one', { delay: 100 } ),
+			page2.keyboard.type( 'two two two two two ', { delay: 100 } ),
+		] );
+
+		// At least one side shows the escalation notice.
+		await expect( async () => {
+			const counts = await Promise.all( [
+				page1.getByText( /set aside for review/ ).count(),
+				page2.getByText( /set aside for review/ ).count(),
+			] );
+			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
+		} ).toPass( { timeout: 15000 } );
+	} );
+
 	test( 'a mid-session engine change drops open tabs into the lock modal instead of retry-hammering', async ( {
 		collaborationUtils,
 		requestUtils,

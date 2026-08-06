@@ -9,6 +9,8 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -231,6 +233,28 @@ export const getEntityRecord =
 								name,
 								key
 							),
+						// Surface engine escalations (edits set aside for
+						// review instead of merged) as a notice. A stable
+						// per-entity id keeps repeat escalations from
+						// stacking.
+						onEscalation: ( { isLocal } ) => {
+							registry
+								.dispatch( noticesStore )
+								.createNotice(
+									'warning',
+									isLocal
+										? __(
+												"One of your recent edits conflicted with a collaborator's change and was set aside for review."
+										  )
+										: __(
+												"A collaborator's edit conflicted with recent changes and was set aside for review."
+										  ),
+									{
+										id: `core-data-sync-escalation-${ kind }-${ name }-${ key }`,
+										isDismissible: true,
+									}
+								);
+						},
 						// Handle sync connection status changes.
 						onStatusChange: ( status ) => {
 							dispatch.setSyncConnectionStatus(

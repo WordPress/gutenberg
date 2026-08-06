@@ -153,6 +153,13 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	/**
+	 * Called when the sync engine sets an edit aside for review instead of
+	 * merging it (an escalation). `isLocal` distinguishes the current
+	 * client's own edit from a collaborator's. Optional: managers fall back
+	 * to console output when absent.
+	 */
+	onEscalation?: ( escalation: { reason: string; isLocal: boolean } ) => void;
 	onStatusChange: OnStatusChangeCallback;
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
