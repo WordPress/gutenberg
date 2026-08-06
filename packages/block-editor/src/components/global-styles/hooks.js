@@ -2,15 +2,20 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { useMediaQuery } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import {
+	getValueFromVariable,
+	normalizeColorSchemePresets,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { extractPresetSlug } from '../../utils/color-values';
 
 /**
  * React hook that overrides a global settings object with block and element specific settings.
@@ -217,16 +222,29 @@ export function useColorsPerOrigin( settings ) {
 	const themeColors = settings?.color?.palette?.theme;
 	const defaultColors = settings?.color?.palette?.default;
 	const shouldDisplayDefaultColors = settings?.color?.defaultPalette;
+	const prefersLight = useMediaQuery( '(prefers-color-scheme: light)' );
+	const prefersDark = useMediaQuery( '(prefers-color-scheme: dark)' );
+	const lightColors = settings?.color?.light?.palette;
+	const darkColors = settings?.color?.dark?.palette;
+	const currentThemeColors = useMemo( () => {
+		if ( prefersDark && darkColors !== undefined ) {
+			return normalizeColorSchemePresets( themeColors, darkColors );
+		}
+		if ( prefersLight && lightColors !== undefined ) {
+			return normalizeColorSchemePresets( themeColors, lightColors );
+		}
+		return themeColors;
+	}, [ darkColors, lightColors, prefersDark, prefersLight, themeColors ] );
 
 	return useMemo( () => {
 		const result = [];
-		if ( themeColors && themeColors.length ) {
+		if ( currentThemeColors && currentThemeColors.length ) {
 			result.push( {
 				name: _x(
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
-				colors: themeColors,
+				colors: currentThemeColors,
 			} );
 		}
 		if (
@@ -254,7 +272,7 @@ export function useColorsPerOrigin( settings ) {
 		return result;
 	}, [
 		customColors,
-		themeColors,
+		currentThemeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
 	] );
@@ -265,16 +283,38 @@ export function useGradientsPerOrigin( settings ) {
 	const themeGradients = settings?.color?.gradients?.theme;
 	const defaultGradients = settings?.color?.gradients?.default;
 	const shouldDisplayDefaultGradients = settings?.color?.defaultGradients;
+	const prefersLight = useMediaQuery( '(prefers-color-scheme: light)' );
+	const prefersDark = useMediaQuery( '(prefers-color-scheme: dark)' );
+	const lightGradients = settings?.color?.light?.gradients;
+	const darkGradients = settings?.color?.dark?.gradients;
+	const currentThemeGradients = useMemo( () => {
+		if ( prefersDark && darkGradients !== undefined ) {
+			return normalizeColorSchemePresets( themeGradients, darkGradients );
+		}
+		if ( prefersLight && lightGradients !== undefined ) {
+			return normalizeColorSchemePresets(
+				themeGradients,
+				lightGradients
+			);
+		}
+		return themeGradients;
+	}, [
+		darkGradients,
+		lightGradients,
+		prefersDark,
+		prefersLight,
+		themeGradients,
+	] );
 
 	return useMemo( () => {
 		const result = [];
-		if ( themeGradients && themeGradients.length ) {
+		if ( currentThemeGradients && currentThemeGradients.length ) {
 			result.push( {
 				name: _x(
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
-				gradients: themeGradients,
+				gradients: currentThemeGradients,
 			} );
 		}
 		if (
@@ -302,7 +342,7 @@ export function useGradientsPerOrigin( settings ) {
 		return result;
 	}, [
 		customGradients,
-		themeGradients,
+		currentThemeGradients,
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
@@ -326,8 +366,34 @@ export function useColorGradientSettings( settings ) {
 		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
 		[ colors ]
 	);
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const allGradients = useMemo(
+		() =>
+			gradients.flatMap(
+				( { gradients: originGradients } ) => originGradients
+			),
+		[ gradients ]
+	);
+	const decodeValue = ( rawValue ) => {
+		const colorSlug = extractPresetSlug( rawValue, 'color' );
+		if ( colorSlug ) {
+			const colorObject = allColors.find(
+				( { slug } ) => slug === colorSlug
+			);
+			if ( colorObject ) {
+				return colorObject.color;
+			}
+		}
+		const gradientSlug = extractPresetSlug( rawValue, 'gradient' );
+		if ( gradientSlug ) {
+			const gradientObject = allGradients.find(
+				( { slug } ) => slug === gradientSlug
+			);
+			if ( gradientObject ) {
+				return gradientObject.gradient;
+			}
+		}
+		return getValueFromVariable( { settings }, '', rawValue );
+	};
 	// When a slug is provided it is used directly: two presets can share the
 	// same gradient string, and matching by string alone would collapse them
 	// onto whichever entry appears first. Without a slug, fall back to
@@ -336,9 +402,6 @@ export function useColorGradientSettings( settings ) {
 		if ( slug ) {
 			return 'var:preset|gradient|' + slug;
 		}
-		const allGradients = gradients.flatMap(
-			( { gradients: originGradients } ) => originGradients
-		);
 		const gradientObject = allGradients.find(
 			( { gradient } ) => gradient === gradientValue
 		);

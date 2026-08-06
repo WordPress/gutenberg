@@ -4,6 +4,8 @@
 import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
+	getNamedPresetStyleValue,
+	getPresetCSSVar,
 } from '../color-values';
 
 describe( 'extractPresetSlug', () => {
@@ -117,5 +119,33 @@ describe( 'encodeColorValueWithPalette', () => {
 		expect( encodeColorValueWithPalette( palette, '#abcabc' ) ).toBe(
 			'#abcabc'
 		);
+	} );
+} );
+
+describe( 'getPresetCSSVar', () => {
+	it( 'returns a color preset CSS custom property reference', () => {
+		expect( getPresetCSSVar( 'color', 'accent' ) ).toBe(
+			'var(--wp--preset--color--accent)'
+		);
+	} );
+
+	it( 'returns a gradient preset CSS custom property reference', () => {
+		expect( getPresetCSSVar( 'gradient', 'signal' ) ).toBe(
+			'var(--wp--preset--gradient--signal)'
+		);
+	} );
+} );
+
+describe( 'getNamedPresetStyleValue', () => {
+	it( 'preserves the CSS custom property for color scheme presets', () => {
+		expect(
+			getNamedPresetStyleValue( 'color', 'accent', '#f00', true )
+		).toBe( 'var(--wp--preset--color--accent)' );
+	} );
+
+	it( 'keeps the resolved value when color schemes are absent', () => {
+		expect(
+			getNamedPresetStyleValue( 'color', 'accent', '#f00', false )
+		).toBe( '#f00' );
 	} );
 } );

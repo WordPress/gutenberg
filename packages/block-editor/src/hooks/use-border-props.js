@@ -4,6 +4,7 @@
 import { getInlineStyles } from './style';
 import { getBorderClasses, getMultiOriginColor } from './border';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
+import { getNamedPresetStyleValue } from '../utils/color-values';
 
 // This utility is intended to assist where the serialization of the border
 // block support is being skipped for a block but the border related CSS classes
@@ -38,7 +39,7 @@ export function getBorderClassesAndStyles( attributes ) {
  * @return {Object} ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const { colors } = useMultipleOriginColorsAndGradients();
+	const { colors, hasColorSchemes } = useMultipleOriginColorsAndGradients();
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const { borderColor } = attributes;
 
@@ -50,7 +51,12 @@ export function useBorderProps( attributes ) {
 			namedColor: borderColor,
 		} );
 
-		borderProps.style.borderColor = borderColorObject.color;
+		borderProps.style.borderColor = getNamedPresetStyleValue(
+			'color',
+			borderColor,
+			borderColorObject.color,
+			hasColorSchemes
+		);
 	}
 
 	return borderProps;

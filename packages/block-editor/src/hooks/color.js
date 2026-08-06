@@ -21,6 +21,8 @@ import { __experimentalGetGradientClass } from '../components/gradients';
 import { transformStyles, shouldSkipSerialization } from './utils';
 import { getBackgroundImageClasses } from './background';
 import { useSettings } from '../components/use-settings';
+import useColorSchemePresets from '../components/colors-gradients/use-color-scheme-presets';
+import { getNamedPresetStyleValue } from '../utils/color-values';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -185,14 +187,16 @@ function useBlockProps( {
 		'color.palette.theme',
 		'color.palette.default'
 	);
+	const { presets: currentThemePalette, hasColorSchemes } =
+		useColorSchemePresets( 'palette', themePalette );
 
 	const colors = useMemo(
 		() => [
 			...( userPalette || [] ),
-			...( themePalette || [] ),
+			...( currentThemePalette || [] ),
 			...( defaultPalette || [] ),
 		],
-		[ userPalette, themePalette, defaultPalette ]
+		[ userPalette, currentThemePalette, defaultPalette ]
 	);
 	if (
 		! hasColorSupport( name ) ||
@@ -206,19 +210,23 @@ function useBlockProps( {
 		textColor &&
 		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
 	) {
-		extraStyles.color = getColorObjectByAttributeValues(
-			colors,
-			textColor
-		)?.color;
+		extraStyles.color = getNamedPresetStyleValue(
+			'color',
+			textColor,
+			getColorObjectByAttributeValues( colors, textColor )?.color,
+			hasColorSchemes
+		);
 	}
 	if (
 		backgroundColor &&
 		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
 	) {
-		extraStyles.backgroundColor = getColorObjectByAttributeValues(
-			colors,
-			backgroundColor
-		)?.color;
+		extraStyles.backgroundColor = getNamedPresetStyleValue(
+			'color',
+			backgroundColor,
+			getColorObjectByAttributeValues( colors, backgroundColor )?.color,
+			hasColorSchemes
+		);
 	}
 
 	const saveProps = addSaveProps( { style: extraStyles }, name, {

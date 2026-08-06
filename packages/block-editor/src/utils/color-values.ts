@@ -61,3 +61,36 @@ export function encodeColorValueWithPalette(
 	const colorObject = allColors.find( ( { color } ) => color === colorValue );
 	return colorObject ? 'var:preset|color|' + colorObject.slug : colorValue;
 }
+
+/**
+ * Returns the CSS custom property reference for a named preset.
+ *
+ * @param type Preset type.
+ * @param slug Preset slug.
+ * @return CSS custom property reference.
+ */
+export function getPresetCSSVar( type: 'color' | 'gradient', slug: string ) {
+	return `var(--wp--preset--${ type }--${ slug })`;
+}
+
+/**
+ * Returns the value used to render a named preset in the editor.
+ *
+ * Color scheme presets must retain their CSS custom property reference so the
+ * browser can apply the current scheme. Existing themes keep the resolved
+ * value used by the editor today.
+ *
+ * @param type            Preset type.
+ * @param slug            Preset slug.
+ * @param resolvedValue   Resolved base or active preset value.
+ * @param hasColorSchemes Whether the preset type has color scheme alternatives.
+ * @return Editor style value.
+ */
+export function getNamedPresetStyleValue(
+	type: 'color' | 'gradient',
+	slug: string,
+	resolvedValue: string | undefined,
+	hasColorSchemes: boolean
+) {
+	return hasColorSchemes ? getPresetCSSVar( type, slug ) : resolvedValue;
+}

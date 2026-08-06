@@ -29,6 +29,11 @@ export {
 	getResolvedValue,
 	splitSelectorList,
 } from './utils/common';
+export {
+	flattenColorSchemePresets,
+	normalizeColorSchemePresets,
+} from './utils/color-schemes';
+export type { ColorSchemePresetCollection } from './utils/color-schemes';
 export { privateApis } from './private-apis';
 
 // Types

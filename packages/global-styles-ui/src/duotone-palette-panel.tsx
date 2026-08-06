@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import type {
-	ColorSchemePreset,
+	ColorSchemeSettings,
 	Duotone,
 } from '@wordpress/global-styles-engine';
 import { DuotonePicker } from '@wordpress/components';
@@ -15,8 +15,7 @@ import { Stack } from '@wordpress/ui';
 import { useSetting } from './hooks';
 import { Subtitle } from './subtitle';
 import {
-	addBasePresetNames,
-	flattenSchemePresets,
+	normalizeColorSchemePresets,
 	SchemePaletteIcon,
 	type ColorScheme,
 	type SchemePresetCollection,
@@ -86,23 +85,35 @@ export default function DuotonePalettePanel( {
 		...( defaultDuotones && defaultDuotoneEnabled ? defaultDuotones : [] ),
 	];
 
-	const [ lightDuotones ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Duotone > >
-	>( 'color.light.duotone', name );
-	const [ darkDuotones ] = useSetting<
-		SchemePresetCollection< ColorSchemePreset< Duotone > >
-	>( 'color.dark.duotone', name );
+	const [ lightScheme ] = useSetting< ColorSchemeSettings >(
+		'color.light',
+		name
+	);
+	const [ lightDuotones ] = useSetting< SchemePresetCollection< Duotone > >(
+		'color.light.duotone',
+		name
+	);
+	const [ darkScheme ] = useSetting< ColorSchemeSettings >(
+		'color.dark',
+		name
+	);
+	const [ darkDuotones ] = useSetting< SchemePresetCollection< Duotone > >(
+		'color.dark.duotone',
+		name
+	);
 
-	const namedLightDuotones = addBasePresetNames(
-		flattenSchemePresets( lightDuotones ),
-		themeDuotones
+	const normalizedLightDuotones = normalizeColorSchemePresets(
+		themeDuotones,
+		lightDuotones
 	);
-	const namedDarkDuotones = addBasePresetNames(
-		flattenSchemePresets( darkDuotones ),
-		themeDuotones
+	const normalizedDarkDuotones = normalizeColorSchemePresets(
+		themeDuotones,
+		darkDuotones
 	);
-	const hasLightDuotones = namedLightDuotones.length > 0;
-	const hasDarkDuotones = namedDarkDuotones.length > 0;
+	const hasLightDuotones =
+		lightScheme !== undefined && normalizedLightDuotones.length > 0;
+	const hasDarkDuotones =
+		darkScheme !== undefined && normalizedDarkDuotones.length > 0;
 
 	return (
 		<Stack
@@ -118,14 +129,14 @@ export default function DuotonePalettePanel( {
 			) }
 			{ hasLightDuotones && (
 				<DuotonePalette
-					duotones={ namedLightDuotones }
+					duotones={ normalizedLightDuotones }
 					label={ __( 'Light duotone' ) }
 					scheme="light"
 				/>
 			) }
 			{ hasDarkDuotones && (
 				<DuotonePalette
-					duotones={ namedDarkDuotones }
+					duotones={ normalizedDarkDuotones }
 					label={ __( 'Dark duotone' ) }
 					scheme="dark"
 				/>

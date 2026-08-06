@@ -24,5 +24,5 @@
 		{ "path": "../ui" }
 	],
 	"include": [ "src/**/*" ],
-	"exclude": [ "src/font-library/lib/**/*" ]
+	"exclude": [ "src/font-library/lib/**/*", "src/**/test/**/*" ]
 }

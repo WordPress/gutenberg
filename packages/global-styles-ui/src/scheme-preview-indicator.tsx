@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, moon, sun } from '@wordpress/icons';
+import type { BasePreset } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import {
 type SchemeSettings = Partial<
 	Record<
 		'palette' | 'gradients' | 'duotone',
-		SchemePresetCollection< unknown >
+		SchemePresetCollection< BasePreset >
 	>
 >;
 
