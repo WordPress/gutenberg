@@ -210,16 +210,10 @@ const archiveMimeTypes = [
 	'application/x-gzip',
 ];
 
-function getAttachmentTitle(
-	attachment: Pick< Attachment< 'view' >, 'title' >
-): string {
-	return decodeEntities( attachment.title.rendered );
-}
-
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ getAttachmentTitle( attachment ) }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -363,8 +357,10 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											getAttachmentTitle(
-												attachment as Attachment< 'view' >
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
 											)
 									  )
 									: __( 'Replace' )
