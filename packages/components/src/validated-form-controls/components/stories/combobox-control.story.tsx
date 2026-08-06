@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedComboboxControl } from '../combobox-control';
 import { formDecorator } from './story-utils';
 
@@ -18,7 +7,6 @@ const meta: Meta< typeof ValidatedComboboxControl > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedComboboxControl',
 	id: 'components-validatedcomboboxcontrol',
 	component: ValidatedComboboxControl,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: {

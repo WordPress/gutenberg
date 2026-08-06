@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { formDecorator } from './story-utils';
 import { ValidatedToggleControl } from '../toggle-control';
 
@@ -18,7 +7,6 @@ const meta: Meta< typeof ValidatedToggleControl > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleControl',
 	id: 'components-validatedtogglecontrol',
 	component: ValidatedToggleControl,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: {

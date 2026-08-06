@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedFormTokenField } from '../form-token-field';
 import { formDecorator } from './story-utils';
 import type { TokenItem } from '../../../form-token-field/types';
@@ -19,7 +8,6 @@ const meta: Meta< typeof ValidatedFormTokenField > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedFormTokenField',
 	id: 'components-validatedformtokenfield',
 	component: ValidatedFormTokenField,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: {

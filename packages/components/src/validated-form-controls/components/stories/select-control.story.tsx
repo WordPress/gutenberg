@@ -11,7 +11,6 @@ const meta: Meta< ValidatedSelectControlSingleSelectionProps > = {
 	id: 'components-validatedselectcontrol',
 	component:
 		ValidatedSelectControl as React.ComponentType< ValidatedSelectControlSingleSelectionProps >,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: {

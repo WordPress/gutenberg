@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedCheckboxControl } from '../checkbox-control';
 import { formDecorator } from './story-utils';
 
@@ -18,7 +7,6 @@ const meta: Meta< typeof ValidatedCheckboxControl > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCheckboxControl',
 	id: 'components-validatedcheckboxcontrol',
 	component: ValidatedCheckboxControl,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: {

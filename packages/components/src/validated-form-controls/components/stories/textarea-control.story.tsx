@@ -1,15 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-/**
- * Internal dependencies
- */
 import { formDecorator } from './story-utils';
 import { ValidatedTextareaControl } from '../textarea-control';
 
@@ -17,7 +7,6 @@ const meta: Meta< typeof ValidatedTextareaControl > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedTextareaControl',
 	id: 'components-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
-	tags: [ 'status-private' ],
 	decorators: formDecorator,
 	args: { onChange: () => {} },
 	argTypes: { value: { control: false } },
