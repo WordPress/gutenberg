@@ -563,7 +563,7 @@ BlockListBlock = compose(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
-	const { clientId, rootClientId } = props;
+	const { clientId, rootClientId, ghostBlock } = props;
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -599,7 +599,16 @@ function BlockListBlockProvider( props ) {
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
-				getBlockWithoutAttributes( clientId );
+				getBlockWithoutAttributes( clientId ) ??
+				// An appender ghost renders from its block object until it
+				// is inserted on entry; it is never selected before that.
+				( ghostBlock && clientId === ghostBlock.clientId
+					? {
+							clientId,
+							name: ghostBlock.name,
+							isValid: true,
+					  }
+					: undefined );
 
 			// This is a temporary fix.
 			// This function should never be called when a block is not
@@ -613,7 +622,8 @@ function BlockListBlockProvider( props ) {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
-			const attributes = getBlockAttributes( clientId );
+			const attributes =
+				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
 			const settings = getSettings();
@@ -675,9 +685,13 @@ function BlockListBlockProvider( props ) {
 			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			// Without a section block there is nothing for the deep check to
+			// match, and it walks the parents of every selected block to find
+			// that out.
 			const isSelectionWithinCurrentSection =
 				isBlockSelected( sectionBlockClientId ) ||
-				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
+				( !! sectionBlockClientId &&
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -748,7 +762,7 @@ function BlockListBlockProvider( props ) {
 				viewportSettings,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, rootClientId, ghostBlock ]
 	);
 
 	const defaultViewRef = useRefEffect( ( element ) => {

@@ -11,11 +11,17 @@ import {
 	useEffect,
 	useMemo,
 	useCallback,
+	useRef,
 } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
+import { useBlockElement } from './use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
@@ -162,6 +168,52 @@ export default function BlockList( settings ) {
 const EMPTY_ARRAY = [];
 const EMPTY_SET = new Set();
 
+/**
+ * Renders the ghost of a block list's default block while the list is
+ * empty: a real block object rendered before it exists in the store, and
+ * inserted, unchanged, when the user enters it.
+ *
+ * @param {Object} props              Component props.
+ * @param {string} props.rootClientId The block list's root client ID.
+ * @param {Object} props.block        The ghost block object.
+ */
+function GhostBlock( { rootClientId, block } ) {
+	const { insertBlocks } = useDispatch( blockEditorStore );
+	const element = useBlockElement( block.clientId );
+	const materializedRef = useRef( false );
+
+	useEffect( () => {
+		materializedRef.current = false;
+	}, [ block ] );
+
+	useEffect( () => {
+		if ( ! element ) {
+			return;
+		}
+		function materialize() {
+			if ( materializedRef.current ) {
+				return;
+			}
+			materializedRef.current = true;
+			insertBlocks( [ block ], undefined, rootClientId, false );
+		}
+		element.addEventListener( 'pointerdown', materialize, true );
+		element.addEventListener( 'focusin', materialize, true );
+		return () => {
+			element.removeEventListener( 'pointerdown', materialize, true );
+			element.removeEventListener( 'focusin', materialize, true );
+		};
+	}, [ element, block, rootClientId, insertBlocks ] );
+
+	return (
+		<BlockListBlock
+			rootClientId={ rootClientId }
+			clientId={ block.clientId }
+			ghostBlock={ block }
+		/>
+	);
+}
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -178,6 +230,8 @@ function Items( {
 		isZoomOut,
 		selectedBlocks,
 		visibleBlocks,
+		ghostBlockName,
+		ghostBlockAttributes,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -191,6 +245,7 @@ function Items( {
 				isSectionBlock,
 				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
+				getBlockListSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -203,6 +258,28 @@ function Items( {
 					selectedBlocks: EMPTY_ARRAY,
 					visibleBlocks: EMPTY_SET,
 				};
+			}
+
+			// A block list without a custom appender renders a ghost of
+			// the container's default block while empty: a real block
+			// object rendered before it exists in the store, inserted on
+			// entry.
+			let _ghostBlockName;
+			let _ghostBlockAttributes;
+			if ( hasAppender && ! hasCustomAppender && ! _order.length ) {
+				const defaultBlock = ( rootClientId
+					? getBlockListSettings( rootClientId )?.defaultBlock ??
+					  select( blocksStore ).getBlockType(
+							getBlockName( rootClientId )
+					  )?.defaultBlock
+					: undefined ) ?? { name: getDefaultBlockName() };
+				if (
+					defaultBlock.name &&
+					canInsertBlockType( defaultBlock.name, rootClientId )
+				) {
+					_ghostBlockName = defaultBlock.name;
+					_ghostBlockAttributes = defaultBlock.attributes;
+				}
 			}
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -228,6 +305,8 @@ function Items( {
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
+				ghostBlockName: _ghostBlockName,
+				ghostBlockAttributes: _ghostBlockAttributes,
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(
@@ -245,6 +324,18 @@ function Items( {
 		},
 		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
+
+	// One ghost per empty period: regenerated when the list empties again
+	// or the default block changes, stable in between so the client ID,
+	// and with it the DOM, survives materialization.
+	const ghostBlock = useMemo(
+		() =>
+			ghostBlockName
+				? createBlock( ghostBlockName, ghostBlockAttributes )
+				: null,
+		[ ghostBlockName, ghostBlockAttributes ]
+	);
+	const showGhost = !! ghostBlock && shouldRenderAppender;
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -278,8 +369,16 @@ function Items( {
 					) }
 				</AsyncModeProvider>
 			) ) }
+			{ showGhost && (
+				<AsyncModeProvider key={ ghostBlock.clientId } value={ false }>
+					<GhostBlock
+						rootClientId={ rootClientId }
+						block={ ghostBlock }
+					/>
+				</AsyncModeProvider>
+			) }
 			{ order.length < 1 && placeholder }
-			{ shouldRenderAppender && (
+			{ shouldRenderAppender && ! showGhost && (
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }
