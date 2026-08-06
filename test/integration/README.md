@@ -63,7 +63,7 @@ npm run fixtures:regenerate
 | Location | Expectation |
 |---|---|
 | any `theme.json` under `lib/`, `phpunit/`, `test/`, or `packages/*/src/` | must validate, and must set `$schema` |
-| any file in `fixtures/schemas/` | must fail validation |
+| any `.json` file directly in `fixtures/schemas/` | must fail validation |
 
 Name an invalid fixture after the schema definition that rejects it, adding a `_suffix` when one definition needs several cases, as in `stylesPropertiesAndElementsComplete_pseudo.json`. Nothing enforces the name, so check the failure comes from the definition you meant to test.
 
