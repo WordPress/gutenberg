@@ -79,7 +79,7 @@ acceptance is a separately attributed event (dual attribution: suggested by X,
 accepted by Y). Capability checks bind to the accepter and to exactly the
 reviewed (hash-pinned) intents.
 
-## Intent vocabulary (13 types)
+## Intent vocabulary (14 types)
 
 Design principles: identity-addressed (never position-addressed); closed
 vocabulary with explicit lifecycle ops (split/merge are first-class, never
@@ -90,6 +90,18 @@ Map family:
 
 - `set_attr { syncId, key, value, observedVersion }`
 - `remove_attr { syncId, key, observedVersion }`
+
+Entity family (document-level properties — title, excerpt, … — as per-name
+registers on the document itself, the entity analog of the block attr map;
+carried as `props`/`propVersions` on the document, present only once
+written so pre-entity documents canonicalize unchanged):
+
+- `set_property { name, value, observedVersion }`
+
+Concurrent writes to the SAME property escalate (`property-conflict`, the
+rule-3 analog); different properties, and property-vs-block edits, always
+merge clean. Whole-value registers, not text merging: entity properties are
+short scalars where "review the loser" beats character interleaving.
 
 Structure family:
 
@@ -202,6 +214,8 @@ An intent escalates to the proposal lane iff:
    dropped the field the intent addresses).
 3. `attr-conflict` — it is a map write whose `observedVersion` lost the
    versioned-register race on the same key to another actor.
+   `property-conflict` is the entity analog: a `set_property` racing another
+   actor's write to the same property name.
 4. It shares a `txnId` with an intent that escalated (settled as a unit at
    the earliest member trigger).
 5. `frame-conflict` — its text coordinates read a block FIELD that BOTH an

@@ -40,6 +40,7 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 			'content-replaced',
 			'merge-dropped-field',
 			'attr-conflict',
+			'property-conflict',
 			'frame-conflict',
 			'dependent-on-escalated',
 		);
@@ -216,6 +217,9 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 		private static function required_targets( array $intent ): array {
 			$payload = $intent['payload'];
 			switch ( $intent['type'] ) {
+				case 'set_property':
+					// Entity properties target the document, not a block.
+					return array();
 				case 'insert_block':
 					return null === $payload['parentId'] ? array() : array( $payload['parentId'] );
 				case 'move_block':
@@ -673,6 +677,17 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 						$payload['key'] === $prior_payload['key']
 					) {
 						return $escalate( $intent, 'attr-conflict' );
+					}
+					return $clean( $intent );
+
+				case 'set_property':
+					if (
+						'set_property' === $intent['type'] &&
+						$payload['name'] === $prior_payload['name']
+					) {
+						// Escalation rule 3, entity analog: the per-property
+						// register saw a write this intent did not observe.
+						return $escalate( $intent, 'property-conflict' );
 					}
 					return $clean( $intent );
 			}

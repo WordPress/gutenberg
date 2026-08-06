@@ -16,6 +16,11 @@ const VALID_PAYLOADS = {
 		key: 'align',
 		observedVersion: 1,
 	},
+	[ IntentTypes.SET_PROPERTY ]: {
+		name: 'title',
+		value: 'A new title',
+		observedVersion: 0,
+	},
 	[ IntentTypes.INSERT_BLOCK ]: {
 		block: { syncId: 'b9', blockType: 'core/paragraph' },
 		parentId: null,

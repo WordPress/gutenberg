@@ -26,6 +26,9 @@ for ( let seed = 1; seed <= seedCount; seed++ ) {
 		seed,
 		steps,
 		clientCount,
+		// Sweeps are not frozen artifacts: run the full vocabulary,
+		// including the entity property family.
+		propertyOps: true,
 	} );
 	intents += authored.size;
 	logEntries += server.log.length;

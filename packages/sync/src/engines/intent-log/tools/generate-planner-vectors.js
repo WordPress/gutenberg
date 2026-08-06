@@ -23,14 +23,20 @@ import { runSimulation } from '../simulator.js';
 
 const CASES = [];
 
-// Simulator transcripts across client counts and agent rates.
-for ( const [ seed, steps, clientCount, agentChance ] of [
-	[ 1, 120, 3, 0.02 ],
-	[ 7, 150, 2, 0 ],
-	[ 9, 150, 3, 0.05 ],
-	[ 23, 200, 4, 0.03 ],
-	[ 42, 100, 3, 0.1 ],
-	[ 65, 180, 5, 0.02 ],
+// Simulator transcripts across client counts and agent rates. The
+// property-op seeds (propertyOps: true) were added with the entity family;
+// the earlier seeds MUST keep propertyOps off — enabling it changes their
+// RNG draws and would silently rewrite the pre-entity transcripts.
+for ( const [ seed, steps, clientCount, agentChance, propertyOps ] of [
+	[ 1, 120, 3, 0.02, false ],
+	[ 7, 150, 2, 0, false ],
+	[ 9, 150, 3, 0.05, false ],
+	[ 23, 200, 4, 0.03, false ],
+	[ 42, 100, 3, 0.1, false ],
+	[ 65, 180, 5, 0.02, false ],
+	[ 101, 150, 3, 0.02, true ],
+	[ 137, 200, 4, 0, true ],
+	[ 151, 120, 2, 0.05, true ],
 ] ) {
 	const recorder = [];
 	const { server, violations } = runSimulation( {
@@ -38,6 +44,7 @@ for ( const [ seed, steps, clientCount, agentChance ] of [
 		steps,
 		clientCount,
 		agentChance,
+		propertyOps,
 		recorder,
 	} );
 	if ( violations.length > 0 ) {
@@ -46,7 +53,9 @@ for ( const [ seed, steps, clientCount, agentChance ] of [
 		);
 	}
 	CASES.push( {
-		name: `simulation seed=${ seed } steps=${ steps } clients=${ clientCount } agents=${ agentChance }`,
+		name: `simulation seed=${ seed } steps=${ steps } clients=${ clientCount } agents=${ agentChance }${
+			propertyOps ? ' props=on' : ''
+		}`,
 		genesis: { postId: 10, revisionId: 100 },
 		batches: recorder,
 		expected: {

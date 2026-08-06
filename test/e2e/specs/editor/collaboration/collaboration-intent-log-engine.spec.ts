@@ -674,6 +674,97 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		} ).toPass( { timeout: 15000 } );
 	} );
 
+	test( 'title edits sync between users in both directions', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Original Title',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Body</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2 } = collaborationUtils;
+
+		// User 1 rewrites the title; user 2 sees it.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title from user one' );
+		await expect(
+			editor2.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'Title from user one', { timeout: 10000 } );
+
+		// User 2 rewrites it back; user 1 sees it (sequential, no conflict).
+		await editor2.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title from user two' );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'Title from user two', { timeout: 10000 } );
+
+		// The synced title persists through a save by the non-author.
+		await editor.saveDraft();
+		const saved = await requestUtils.rest< { title: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.title.raw ).toBe( 'Title from user two' );
+	} );
+
+	test( 'concurrent divergent title edits surface an escalation notice, and editors converge', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Contested',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Body</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		// Both users rewrite the title at the same moment: one write wins
+		// the register, the other is set aside for review.
+		await Promise.all( [
+			editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Title A' ),
+			editor2.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Title B' ),
+		] );
+
+		await expect( async () => {
+			const counts = await Promise.all( [
+				page1.getByText( /set aside for review/ ).count(),
+				page2.getByText( /set aside for review/ ).count(),
+			] );
+			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
+		} ).toPass( { timeout: 15000 } );
+
+		// Both editors converge on the winning title.
+		await expect( async () => {
+			const titles = await Promise.all(
+				[ editor, editor2 ].map( ( currentEditor ) =>
+					currentEditor.canvas
+						.getByRole( 'textbox', { name: 'Add title' } )
+						.textContent()
+				)
+			);
+			expect( titles[ 0 ] ).toBe( titles[ 1 ] );
+			expect( [ 'Title A', 'Title B' ] ).toContain( titles[ 0 ] );
+		} ).toPass( { timeout: 15000 } );
+	} );
+
 	test( 'a mid-session engine change drops open tabs into the lock modal instead of retry-hammering', async ( {
 		collaborationUtils,
 		requestUtils,

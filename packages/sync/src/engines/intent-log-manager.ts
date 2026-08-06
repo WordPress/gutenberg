@@ -44,10 +44,11 @@ import type {
  *   blocks and dispatch editRecord, guarded against echo loops by
  *   canonical-state comparison.
  *
- * v1 scope (documented in ARCHITECTURE.md):
- * - Only the `blocks` property syncs. Other entity properties (title,
- *   status, …) flow through WordPress saves as usual — the intent log's
- *   entity-graph layer arrives later.
+ * Scope (documented in ARCHITECTURE.md):
+ * - Blocks sync through the capture bridge; whitelisted entity properties
+ *   (SYNCED_PROPERTIES — currently the title) sync as per-name registers
+ *   via set_property intents. Other entity properties (status, …) flow
+ *   through WordPress saves as usual.
  * - Undo rides core's default WPUndoManager (`undoManager` stays
  *   undefined; core-data falls back automatically). Escalated intents are
  *   surfaced via console warning; the review-lane UI is Phase 2d.
@@ -94,6 +95,45 @@ interface EntityState {
 	 * still showing them must not resurrect them.
 	 */
 	docTombstones: Set< string >;
+	/**
+	 * Last property values pushed to (or captured from) the editor, for
+	 * property echo suppression. Seeded from the loaded record so the
+	 * genesis snapshot's properties are not re-pushed as edits.
+	 */
+	lastPushedProps: Record< string, string >;
+}
+
+/**
+ * Entity properties synced as per-name registers (set_property intents).
+ * Must be raw strings in both the edited record and the engine document.
+ */
+const SYNCED_PROPERTIES = [ 'title' ];
+
+/**
+ * Reads a synced property from a record or edits object as a raw string.
+ * REST records carry title as `{ raw, rendered }`; editor edits carry it as
+ * a plain string.
+ *
+ * @param source Record or edits object.
+ * @param name   Property name.
+ * @return The raw string value, or undefined.
+ */
+function rawPropertyValue(
+	source: Record< string, unknown >,
+	name: string
+): string | undefined {
+	const value = source[ name ];
+	if ( 'string' === typeof value ) {
+		return value;
+	}
+	if (
+		value &&
+		'object' === typeof value &&
+		'string' === typeof ( value as { raw?: unknown } ).raw
+	) {
+		return ( value as { raw: string } ).raw;
+	}
+	return undefined;
 }
 
 /**
@@ -229,6 +269,23 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			clientId,
 			awareness,
 		} );
+		/*
+		 * Seed property echo suppression from the record the editor loaded:
+		 * a genesis snapshot whose properties match what the editor already
+		 * shows must not be re-pushed as an edit. A ROOM value that differs
+		 * (another client changed the title before we joined) still pushes.
+		 */
+		const initialProps: Record< string, string > = {};
+		for ( const name of SYNCED_PROPERTIES ) {
+			const value = rawPropertyValue(
+				record as Record< string, unknown >,
+				name
+			);
+			if ( undefined !== value ) {
+				initialProps[ name ] = value;
+			}
+		}
+
 		const state: EntityState = {
 			session,
 			awareness,
@@ -242,8 +299,34 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			docTombstones: new Set(),
 			clientIds: new Map(),
 			pushSeq: 0,
+			lastPushedProps: initialProps,
 		};
 		entityStates.set( key, state );
+
+		/**
+		 * Pushes engine property values the editor has not seen yet.
+		 */
+		const pushPropertyChanges = () => {
+			const doc = session.getDocument();
+			if ( ! doc ) {
+				return;
+			}
+			const edits: Record< string, string > = {};
+			for ( const name of SYNCED_PROPERTIES ) {
+				const value = doc.props?.[ name ];
+				if ( 'string' !== typeof value ) {
+					continue;
+				}
+				if ( state.lastPushedProps[ name ] === value ) {
+					continue;
+				}
+				state.lastPushedProps[ name ] = value;
+				edits[ name ] = value;
+			}
+			if ( Object.keys( edits ).length > 0 ) {
+				handlers.editRecord( edits, { undoIgnore: true } );
+			}
+		};
 
 		session.onChange( () => {
 			if ( state.unloaded || ! session.isInitialized() ) {
@@ -272,6 +355,9 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			if ( state.capturing ) {
 				return;
 			}
+			// Entity properties push independently of the block logic below
+			// (its early returns must not swallow a title change).
+			pushPropertyChanges();
 			/*
 			 * Never push an EMPTY shared document over a live editor as the
 			 * first push (fresh post: the genesis is empty while the user
@@ -350,9 +436,41 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			if ( ! state.session.isInitialized() ) {
 				return; // Snapshot not yet received; the editor still owns state.
 			}
+
+			/*
+			 * Entity property capture: an edits object carries a property
+			 * only when the editor changed it, so presence IS intent (unlike
+			 * block-tree absence). Same-value writes are echoes of our own
+			 * push or of the document state and are suppressed.
+			 */
+			const doc = state.session.getDocument()!;
+			for ( const name of SYNCED_PROPERTIES ) {
+				if ( ! ( name in changes ) ) {
+					continue;
+				}
+				const value = rawPropertyValue(
+					changes as Record< string, unknown >,
+					name
+				);
+				if ( undefined === value || doc.props?.[ name ] === value ) {
+					continue;
+				}
+				state.lastPushedProps[ name ] = value;
+				state.capturing = true;
+				try {
+					state.session.author( 'set_property', {
+						name,
+						value,
+						observedVersion: doc.propVersions?.[ name ] ?? 0,
+					} );
+				} finally {
+					state.capturing = false;
+				}
+			}
+
 			const blocks = changes.blocks as BridgeBlock[] | undefined;
 			if ( ! blocks ) {
-				return; // v1: only block content syncs.
+				return; // Only whitelisted properties and blocks sync.
 			}
 
 			/*

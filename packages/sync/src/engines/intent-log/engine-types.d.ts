@@ -31,6 +31,9 @@ export interface EngineBlock {
 
 export interface EngineDocument {
 	root: EngineBlock[];
+	/** Entity properties (title, excerpt, …); absent until first write. */
+	props?: Record< string, unknown >;
+	propVersions?: Record< string, number >;
 }
 
 export interface IntentEnvelope {

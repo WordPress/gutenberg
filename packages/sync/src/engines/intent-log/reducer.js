@@ -15,6 +15,7 @@
 import {
 	cloneDocument,
 	ensureField,
+	ensureProps,
 	getBlock,
 	locateBlock,
 	makeBlock,
@@ -112,6 +113,14 @@ export function applyIntent( doc, intent ) {
 			delete block.attrs[ payload.key ];
 			block.attrVersions[ payload.key ] =
 				( block.attrVersions[ payload.key ] ?? 0 ) + 1;
+			return applied( next );
+		}
+
+		case IntentTypes.SET_PROPERTY: {
+			const { props, propVersions } = ensureProps( next );
+			props[ payload.name ] = payload.value;
+			propVersions[ payload.name ] =
+				( propVersions[ payload.name ] ?? 0 ) + 1;
 			return applied( next );
 		}
 

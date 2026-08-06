@@ -46,6 +46,7 @@ export const ESCALATION_REASONS = new Set( [
 	'content-replaced', // Rule 2 (coarse family).
 	'merge-dropped-field', // Rule 2 (merge drops the absorbed block's other fields).
 	'attr-conflict', // Rule 3.
+	'property-conflict', // Rule 3 (entity property register analog).
 	'frame-conflict', // Rule 5.
 	'dependent-on-escalated', // Rule 6.
 ] );
@@ -60,6 +61,9 @@ export const ESCALATION_REASONS = new Set( [
 function requiredTargets( intent ) {
 	const { type, payload } = intent;
 	switch ( type ) {
+		case IntentTypes.SET_PROPERTY:
+			// Entity properties target the document, not a block.
+			return [];
 		case IntentTypes.INSERT_BLOCK:
 			return payload.parentId === null ? [] : [ payload.parentId ];
 		case IntentTypes.MOVE_BLOCK:
@@ -719,6 +723,18 @@ function transformOne( intent, prior, doc ) {
 				// Escalation rule 3: the per-key register saw a write this
 				// intent did not observe.
 				return escalate( intent, 'attr-conflict' );
+			}
+			return clean( intent );
+		}
+
+		case IntentTypes.SET_PROPERTY: {
+			if (
+				type === IntentTypes.SET_PROPERTY &&
+				payload.name === priorPayload.name
+			) {
+				// Escalation rule 3, entity analog: the per-property register
+				// saw a write this intent did not observe.
+				return escalate( intent, 'property-conflict' );
 			}
 			return clean( intent );
 		}

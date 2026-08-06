@@ -463,13 +463,21 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 
 			if ( null !== $parsed && 'postType' === $parsed['entity_kind'] && ! empty( $parsed['object_id'] ) ) {
 				$post = get_post( (int) $parsed['object_id'] );
-				if ( $post instanceof WP_Post && '' !== $post->post_content ) {
-					$specs   = self::blocks_to_specs(
-						parse_blocks( $post->post_content ),
-						(int) $post->ID,
-						array()
+				if ( $post instanceof WP_Post ) {
+					$specs = '' === $post->post_content
+						? array()
+						: self::blocks_to_specs(
+							parse_blocks( $post->post_content ),
+							(int) $post->ID,
+							array()
+						);
+					// Entity properties are per-name registers on the
+					// document; genesis seeds them from the post so a
+					// joining client sees the current title.
+					$genesis = WP_Intent_Log_Document::create_document(
+						$specs,
+						array( 'title' => $post->post_title )
 					);
-					$genesis = WP_Intent_Log_Document::create_document( $specs );
 				}
 			}
 

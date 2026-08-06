@@ -373,12 +373,30 @@ inside intent payloads, not the transport.
   observer's four scenarios all converge cleanly against the
   SCRIPT_DEBUG=true dev environment (the bundle-divergence class).
 
+  **2d-xii (title/entity-property sync) DONE.** The engine gains an
+  entity family: `set_property { name, value, observedVersion }` writes
+  document-level per-name registers (`props`/`propVersions`, emitted in
+  canonical form only when non-empty so pre-entity documents — and the
+  six frozen vector seeds — stay byte-identical). Conflict semantics
+  are the rule-3 analog: concurrent same-property writes escalate
+  (`property-conflict`), different properties and property-vs-block
+  edits merge clean; whole-value registers, not text merging (short
+  scalars where reviewing the loser beats character interleaving).
+  PHP twin mirrors it; three new frozen vector seeds run property ops
+  (37 intents, 17 conflicts) and the twin reproduces them exactly.
+  Integration: PHP genesis seeds the title from the post; the manager
+  captures title edits (presence-is-intent — an edits object carries a
+  property only when changed), pushes remote values via editRecord,
+  and seeds echo suppression from the loaded record so a matching
+  genesis is not re-pushed while a NEWER room title still pushes on
+  join. E2e: title syncs both directions and persists through a save
+  by the non-author; concurrent divergent titles escalate a notice and
+  both editors converge on the winner.
+
   Remaining in 2d, all design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport),
-  title/entity-property sync (deliberate v1 exclusion; the one gap
-  users notice), deterministic genesis client-side, and the escalation
-  REVIEW UI (inspect/apply/discard a parked proposal) beyond the
-  notice.
+  deterministic genesis client-side, and the escalation REVIEW UI
+  (inspect/apply/discard a parked proposal) beyond the notice.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

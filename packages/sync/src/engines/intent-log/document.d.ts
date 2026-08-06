@@ -10,8 +10,14 @@ export declare const DEFAULT_FIELD: string;
 export function makeBlock( spec: Record< string, unknown > ): EngineBlock;
 
 export function createDocument(
-	blocks?: Array< Record< string, unknown > >
+	blocks?: Array< Record< string, unknown > >,
+	props?: Record< string, unknown >
 ): EngineDocument;
+
+export function ensureProps( doc: EngineDocument ): {
+	props: Record< string, unknown >;
+	propVersions: Record< string, number >;
+};
 
 export function cloneDocument( doc: EngineDocument ): EngineDocument;
 

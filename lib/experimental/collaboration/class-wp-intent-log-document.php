@@ -89,15 +89,22 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 		}
 
 		/**
-		 * Creates a document from root block specs.
+		 * Creates a document from root block specs and optional entity
+		 * properties (title, excerpt, …).
 		 *
 		 * @since 7.2.0
 		 *
 		 * @param array $blocks Root block specs.
+		 * @param array $props  Entity properties ( name => value ).
 		 * @return array Document.
 		 */
-		public static function create_document( array $blocks = array() ): array {
-			return array( 'root' => array_map( array( __CLASS__, 'make_block' ), $blocks ) );
+		public static function create_document( array $blocks = array(), array $props = array() ): array {
+			$doc = array( 'root' => array_map( array( __CLASS__, 'make_block' ), $blocks ) );
+			if ( count( $props ) > 0 ) {
+				$doc['props']        = $props;
+				$doc['propVersions'] = array();
+			}
+			return $doc;
 		}
 
 		/**
@@ -236,7 +243,21 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 		 * @return array Canonical structure.
 		 */
 		public static function canonicalize( array $doc ): array {
-			return array( 'root' => array_map( array( __CLASS__, 'canonical_block' ), $doc['root'] ) );
+			$canonical = array( 'root' => array_map( array( __CLASS__, 'canonical_block' ), $doc['root'] ) );
+			// Entity property maps are emitted ONLY when non-empty, so
+			// documents predating the entity family canonicalize identically
+			// to their original form (the frozen vectors depend on this).
+			if ( ! empty( $doc['props'] ) ) {
+				$props = $doc['props'];
+				ksort( $props, SORT_STRING );
+				$canonical['props'] = $props;
+			}
+			if ( ! empty( $doc['propVersions'] ) ) {
+				$prop_versions = $doc['propVersions'];
+				ksort( $prop_versions, SORT_STRING );
+				$canonical['propVersions'] = $prop_versions;
+			}
+			return $canonical;
 		}
 
 		/**
@@ -438,6 +459,18 @@ if ( ! class_exists( 'WP_Intent_Log_Document' ) ) {
 					unset( $block['attrs'][ $payload['key'] ] );
 					$block['attrVersions'][ $payload['key'] ] =
 						( $block['attrVersions'][ $payload['key'] ] ?? 0 ) + 1;
+					return $applied( $next );
+
+				case 'set_property':
+					if ( ! isset( $next['props'] ) ) {
+						$next['props'] = array();
+					}
+					if ( ! isset( $next['propVersions'] ) ) {
+						$next['propVersions'] = array();
+					}
+					$next['props'][ $payload['name'] ]        = $payload['value'];
+					$next['propVersions'][ $payload['name'] ] =
+						( $next['propVersions'][ $payload['name'] ] ?? 0 ) + 1;
 					return $applied( $next );
 
 				case 'insert_block':

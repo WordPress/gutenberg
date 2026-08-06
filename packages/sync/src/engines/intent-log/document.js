@@ -72,13 +72,37 @@ export function ensureField( block, name ) {
 }
 
 /**
- * Creates a document from root block specs.
+ * Creates a document from root block specs and optional entity properties.
  *
  * @param {Object[]} blocks Root block specs.
+ * @param {Object}   props  Entity properties (name → value).
  * @return {Object} Document.
  */
-export function createDocument( blocks = [] ) {
-	return { root: blocks.map( makeBlock ) };
+export function createDocument( blocks = [], props = {} ) {
+	const doc = { root: blocks.map( makeBlock ) };
+	if ( Object.keys( props ).length ) {
+		doc.props = { ...props };
+		doc.propVersions = {};
+	}
+	return doc;
+}
+
+/**
+ * Ensures a document has entity property maps, creating them on first
+ * write-style access — documents predating the entity family (or created
+ * without properties) lack them.
+ *
+ * @param {Object} doc Document (mutated if the maps are missing).
+ * @return {Object} The document's { props, propVersions }.
+ */
+export function ensureProps( doc ) {
+	if ( ! doc.props ) {
+		doc.props = {};
+	}
+	if ( ! doc.propVersions ) {
+		doc.propVersions = {};
+	}
+	return { props: doc.props, propVersions: doc.propVersions };
 }
 
 /**
@@ -195,11 +219,26 @@ function canonicalBlock( block ) {
  * Canonical JSON of a document — key- and span-order independent, so
  * incrementally maintained documents can be compared with fresh replays.
  *
+ * Entity property maps are emitted ONLY when non-empty, so documents
+ * predating the entity family canonicalize byte-identically to their
+ * original form (the frozen cross-language vectors depend on this).
+ *
  * @param {Object} doc Document.
  * @return {string} Canonical JSON.
  */
 export function canonicalJson( doc ) {
-	return JSON.stringify( { root: doc.root.map( canonicalBlock ) } );
+	const sortEntries = ( obj ) =>
+		Object.fromEntries(
+			Object.entries( obj ).sort( ( [ a ], [ b ] ) => ( a < b ? -1 : 1 ) )
+		);
+	const canonical = { root: doc.root.map( canonicalBlock ) };
+	if ( doc.props && Object.keys( doc.props ).length ) {
+		canonical.props = sortEntries( doc.props );
+	}
+	if ( doc.propVersions && Object.keys( doc.propVersions ).length ) {
+		canonical.propVersions = sortEntries( doc.propVersions );
+	}
+	return JSON.stringify( canonical );
 }
 
 /**

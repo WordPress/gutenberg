@@ -72,8 +72,11 @@ function makeHandlers(): RecordHandlers & { edits: unknown[] } {
 	};
 }
 
-const snapshotRow = ( blocks: Array< Record< string, unknown > > ) => ( {
-	data: JSON.stringify( { doc: createDocument( blocks ) } ),
+const snapshotRow = (
+	blocks: Array< Record< string, unknown > >,
+	props: Record< string, unknown > = {}
+) => ( {
+	data: JSON.stringify( { doc: createDocument( blocks, props ) } ),
 	type: INTENT_LOG_UPDATE_TYPES.SNAPSHOT,
 } );
 
@@ -89,14 +92,20 @@ describe( 'intent-log manager', () => {
 		delete window._wpCollaborationSync;
 	} );
 
-	async function loadManagedEntity() {
+	async function loadManagedEntity( record: Record< string, unknown > = {} ) {
 		const transport = makeFakeTransport();
 		window._wpCollaborationEnabled = '1';
 		addFilter( FILTER, HOOK, () => [ transport.creator ] );
 
 		const manager = createIntentLogManager();
 		const handlers = makeHandlers();
-		await manager.load( {} as never, 'postType/post', '1', {}, handlers );
+		await manager.load(
+			{} as never,
+			'postType/post',
+			'1',
+			record,
+			handlers
+		);
 		return { manager, handlers, transport };
 	}
 
@@ -593,6 +602,82 @@ describe( 'intent-log manager', () => {
 		expect( secondPush.blocks[ 0 ].clientId ).toBe(
 			firstPush.blocks[ 0 ].clientId
 		);
+	} );
+
+	it( 'title: genesis matching the loaded record is NOT re-pushed as an edit', async () => {
+		const { handlers, transport } = await loadManagedEntity( {
+			title: { raw: 'Same title' },
+		} );
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [], { title: 'Same title' } )
+		);
+		expect(
+			handlers.edits.filter(
+				( edit ) => 'title' in ( edit as Record< string, unknown > )
+			)
+		).toHaveLength( 0 );
+	} );
+
+	it( 'title: a room value newer than the loaded record pushes on snapshot', async () => {
+		const { handlers, transport } = await loadManagedEntity( {
+			title: { raw: 'Stale title' },
+		} );
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [], { title: 'Fresh title' } )
+		);
+		expect( handlers.edits.at( -1 ) ).toEqual( { title: 'Fresh title' } );
+	} );
+
+	it( 'title: a remote set_property pushes into the editor; a local edit authors one and suppresses the echo', async () => {
+		const { manager, handlers, transport } = await loadManagedEntity( {
+			title: { raw: 'Original' },
+		} );
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [], { title: 'Original' } )
+		);
+
+		// Local edit: authors a set_property on the wire…
+		manager.update( 'postType/post', '1', { title: 'Locally typed' }, 'e' );
+		const sent = transport.captured.sent.map(
+			( update ) => JSON.parse( update.data ).type
+		);
+		expect( sent ).toContain( 'set_property' );
+		// …and the session change events it produced do not bounce the
+		// value back into the editor.
+		expect(
+			handlers.edits.filter(
+				( edit ) => 'title' in ( edit as Record< string, unknown > )
+			)
+		).toHaveLength( 0 );
+
+		// Remote title change (sequential: observed our version) pushes.
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intentId: 'remote-title-1',
+				actorId: 'u9c9',
+				baseSeq: 1,
+				txnId: null,
+				type: 'set_property',
+				payload: {
+					name: 'title',
+					value: 'Remote title',
+					observedVersion: 1,
+				},
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.INTENT,
+		} );
+		expect( handlers.edits.at( -1 ) ).toEqual( { title: 'Remote title' } );
+
+		// The push's echo (editor reports the same value back) is inert.
+		const editsBefore = handlers.edits.length;
+		manager.update( 'postType/post', '1', { title: 'Remote title' }, 'e' );
+		const sentAfter = transport.captured.sent.map(
+			( update ) => JSON.parse( update.data ).type
+		);
+		expect(
+			sentAfter.filter( ( t ) => 'set_property' === t )
+		).toHaveLength( 1 );
+		expect( handlers.edits ).toHaveLength( editsBefore );
 	} );
 
 	it( 'surfaces proposals through onEscalation with local/remote attribution', async () => {

@@ -130,18 +130,38 @@ function envelopeFor( client, extra = {} ) {
 	};
 }
 
+const PROPERTY_NAMES = [ 'title', 'excerpt' ];
+
 /**
  * Authors one pseudo-random intent (occasionally an atomic pair) against the
  * client's local view, applies it optimistically, and queues it.
  *
- * Covers the full 13-type vocabulary so the randomized sweeps exercise every
- * merge combination the matrix tests enumerate pairwise.
+ * Covers the full vocabulary so the randomized sweeps exercise every merge
+ * combination the matrix tests enumerate pairwise. Entity property ops are
+ * opt-in: enabling them consumes extra RNG draws, so the frozen vector
+ * seeds (generated without them) stay byte-identical.
  *
- * @param {Object}       client Client.
- * @param {() => number} rng    Seeded RNG.
+ * @param {Object}       client                Client.
+ * @param {() => number} rng                   Seeded RNG.
+ * @param {Object}       [options]             Options.
+ * @param {boolean}      [options.propertyOps] Author set_property intents.
  * @return {Object[]} The authored intents (empty if the document is empty).
  */
-export function authorRandomIntent( client, rng ) {
+export function authorRandomIntent( client, rng, options = {} ) {
+	if ( options.propertyOps && rng() < 0.1 ) {
+		const name = pick( rng, PROPERTY_NAMES );
+		const propertyIntent = createIntent(
+			IntentTypes.SET_PROPERTY,
+			{
+				name,
+				value: pick( rng, WORDS ),
+				observedVersion: client.doc.propVersions?.[ name ] ?? 0,
+			},
+			envelopeFor( client )
+		);
+		authorIntent( client, propertyIntent );
+		return [ propertyIntent ];
+	}
 	const ids = allSyncIds( client.doc );
 	if ( ids.length === 0 ) {
 		return [];
@@ -363,16 +383,20 @@ export function syncClient( server, client ) {
 /**
  * Runs one seeded schedule.
  *
- * @param {Object} options               Options.
- * @param {number} options.seed          PRNG seed.
- * @param {number} [options.steps]       Schedule steps.
- * @param {number} [options.clientCount] Number of clients.
- * @param {number} [options.agentChance] Chance per step of a server-agent
- *                                       write (bot/CLI path, authored at
- *                                       head).
- * @param {Array}  [options.recorder]    Ingest transcript recorder; every
- *                                       serverIngestBatch call is pushed
- *                                       onto it (vector generation).
+ * @param {Object}  options               Options.
+ * @param {number}  options.seed          PRNG seed.
+ * @param {number}  [options.steps]       Schedule steps.
+ * @param {number}  [options.clientCount] Number of clients.
+ * @param {number}  [options.agentChance] Chance per step of a server-agent
+ *                                        write (bot/CLI path, authored at
+ *                                        head).
+ * @param {boolean} [options.propertyOps] Author entity set_property intents
+ *                                        (opt-in: changes RNG draws, so the
+ *                                        pre-entity vector seeds keep it
+ *                                        off).
+ * @param {Array}   [options.recorder]    Ingest transcript recorder; every
+ *                                        serverIngestBatch call is pushed
+ *                                        onto it (vector generation).
  * @return {Object} { server, clients, authored, finalDoc, violations }.
  */
 export function runSimulation( {
@@ -380,6 +404,7 @@ export function runSimulation( {
 	steps = 200,
 	clientCount = 3,
 	agentChance = 0.02,
+	propertyOps = false,
 	recorder = null,
 } ) {
 	const rng = mulberry32( seed );
@@ -474,7 +499,9 @@ export function runSimulation( {
 				);
 			}
 		} else {
-			for ( const intent of authorRandomIntent( client, rng ) ) {
+			for ( const intent of authorRandomIntent( client, rng, {
+				propertyOps,
+			} ) ) {
 				authored.set( intent.intentId, intent );
 			}
 		}
@@ -525,6 +552,21 @@ export function verifyEffect( before, after, entry ) {
 					JSON.stringify( payload.value )
 			) {
 				return fail( 'attribute value not set' );
+			}
+			return null;
+		}
+		case IntentTypes.SET_PROPERTY: {
+			if (
+				JSON.stringify( after.props?.[ payload.name ] ) !==
+				JSON.stringify( payload.value )
+			) {
+				return fail( 'property value not set' );
+			}
+			if (
+				( after.propVersions?.[ payload.name ] ?? 0 ) !==
+				( before.propVersions?.[ payload.name ] ?? 0 ) + 1
+			) {
+				return fail( 'property version not bumped' );
 			}
 			return null;
 		}

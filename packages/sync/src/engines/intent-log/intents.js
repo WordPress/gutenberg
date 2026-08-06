@@ -11,6 +11,9 @@ export const IntentTypes = {
 	// Map family (the sync-map layer riding the same log).
 	SET_ATTR: 'set_attr',
 	REMOVE_ATTR: 'remove_attr',
+	// Entity family: document-level properties (title, excerpt, …) as
+	// per-name registers — the entity analog of the block attr map.
+	SET_PROPERTY: 'set_property',
 	// Structure family.
 	INSERT_BLOCK: 'insert_block',
 	REMOVE_BLOCK: 'remove_block',
@@ -57,6 +60,11 @@ const PAYLOAD_SCHEMAS = {
 	[ IntentTypes.REMOVE_ATTR ]: {
 		syncId: isString,
 		key: isString,
+		observedVersion: isNonNegativeInt,
+	},
+	[ IntentTypes.SET_PROPERTY ]: {
+		name: isString,
+		value: isAny,
 		observedVersion: isNonNegativeInt,
 	},
 	[ IntentTypes.INSERT_BLOCK ]: {
