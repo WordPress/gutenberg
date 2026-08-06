@@ -2,11 +2,14 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
+import { Fragment } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 
@@ -27,14 +30,53 @@ import type {
 	ToolsPanelHeaderProps,
 } from '../types';
 
+// Renders a menu item's description, when the consumer supplies one, as an
+// `aria-hidden` sibling referenced by the item's `aria-describedby`. Keeping it
+// out of the menu's role structure avoids putting non-menuitem children inside
+// `role="menu"`, while `aria-describedby` still surfaces it to assistive
+// technology as that item's description.
+const createDescriptionRenderer = (
+	menuItemDescription: ToolsPanelControlsGroupProps[ 'menuItemDescription' ],
+	descriptionIdPrefix: string | undefined
+) =>
+	function renderDescription( label: string ) {
+		const description = menuItemDescription?.( label );
+		if ( ! description || ! descriptionIdPrefix ) {
+			return { descriptionId: undefined, descriptionNode: null };
+		}
+		const descriptionId = `${ descriptionIdPrefix }-${ label.replace(
+			/\W+/g,
+			'-'
+		) }`;
+		return {
+			descriptionId,
+			descriptionNode: (
+				<div
+					id={ descriptionId }
+					aria-hidden="true"
+					className={ styles[ 'menu-item-description' ] }
+				>
+					{ description }
+				</div>
+			),
+		};
+	};
+
 const DefaultControlsGroup = ( {
 	itemClassName,
 	items,
 	toggleItem,
+	menuItemDescription,
+	descriptionIdPrefix,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
+
+	const renderDescription = createDescriptionRenderer(
+		menuItemDescription,
+		descriptionIdPrefix
+	);
 
 	const resetSuffix = (
 		<span aria-hidden className={ styles[ 'reset-label' ] }>
@@ -45,46 +87,60 @@ const DefaultControlsGroup = ( {
 	return (
 		<>
 			{ items.map( ( [ label, hasValue ] ) => {
+				const { descriptionId, descriptionNode } =
+					renderDescription( label );
 				if ( hasValue ) {
 					return (
-						<MenuItem
-							key={ label }
-							className={ itemClassName }
-							role="menuitem"
-							label={ sprintf(
-								// translators: %s: The name of the control being reset e.g. "Padding".
-								__( 'Reset %s' ),
-								label
-							) }
-							onClick={ () => {
-								toggleItem( label );
-								speak(
-									sprintf(
-										// translators: %s: The name of the control being reset e.g. "Padding".
-										__( '%s reset to default' ),
-										label
-									),
-									'assertive'
-								);
-							} }
-							suffix={ resetSuffix }
-						>
-							{ label }
-						</MenuItem>
+						<Fragment key={ label }>
+							<MenuItem
+								className={ clsx( itemClassName, {
+									[ styles[ 'menu-item-described' ] ]:
+										!! descriptionId,
+								} ) }
+								role="menuitem"
+								aria-describedby={ descriptionId }
+								label={ sprintf(
+									// translators: %s: The name of the control being reset e.g. "Padding".
+									__( 'Reset %s' ),
+									label
+								) }
+								onClick={ () => {
+									toggleItem( label );
+									speak(
+										sprintf(
+											// translators: %s: The name of the control being reset e.g. "Padding".
+											__( '%s reset to default' ),
+											label
+										),
+										'assertive'
+									);
+								} }
+								suffix={ resetSuffix }
+							>
+								{ label }
+							</MenuItem>
+							{ descriptionNode }
+						</Fragment>
 					);
 				}
 
 				return (
-					<MenuItem
-						key={ label }
-						icon={ check }
-						className={ itemClassName }
-						role="menuitemcheckbox"
-						isSelected
-						aria-disabled
-					>
-						{ label }
-					</MenuItem>
+					<Fragment key={ label }>
+						<MenuItem
+							icon={ check }
+							className={ clsx( itemClassName, {
+								[ styles[ 'menu-item-described' ] ]:
+									!! descriptionId,
+							} ) }
+							role="menuitemcheckbox"
+							aria-describedby={ descriptionId }
+							isSelected
+							aria-disabled
+						>
+							{ label }
+						</MenuItem>
+						{ descriptionNode }
+					</Fragment>
 				);
 			} ) }
 		</>
@@ -94,14 +150,23 @@ const DefaultControlsGroup = ( {
 const OptionalControlsGroup = ( {
 	items,
 	toggleItem,
+	menuItemDescription,
+	descriptionIdPrefix,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
 
+	const renderDescription = createDescriptionRenderer(
+		menuItemDescription,
+		descriptionIdPrefix
+	);
+
 	return (
 		<>
 			{ items.map( ( [ label, isSelected ] ) => {
+				const { descriptionId, descriptionNode } =
+					renderDescription( label );
 				const itemLabel = isSelected
 					? sprintf(
 							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
@@ -115,37 +180,46 @@ const OptionalControlsGroup = ( {
 					  );
 
 				return (
-					<MenuItem
-						key={ label }
-						icon={ isSelected ? check : null }
-						isSelected={ isSelected }
-						label={ itemLabel }
-						onClick={ () => {
-							if ( isSelected ) {
-								speak(
-									sprintf(
-										// translators: %s: The name of the control being reset e.g. "Padding".
-										__( '%s hidden and reset to default' ),
-										label
-									),
-									'assertive'
-								);
-							} else {
-								speak(
-									sprintf(
-										// translators: %s: The name of the control being reset e.g. "Padding".
-										__( '%s is now visible' ),
-										label
-									),
-									'assertive'
-								);
-							}
-							toggleItem( label );
-						} }
-						role="menuitemcheckbox"
-					>
-						{ label }
-					</MenuItem>
+					<Fragment key={ label }>
+						<MenuItem
+							className={ clsx( {
+								[ styles[ 'menu-item-described' ] ]:
+									!! descriptionId,
+							} ) }
+							icon={ isSelected ? check : null }
+							isSelected={ isSelected }
+							aria-describedby={ descriptionId }
+							label={ itemLabel }
+							onClick={ () => {
+								if ( isSelected ) {
+									speak(
+										sprintf(
+											// translators: %s: The name of the control being reset e.g. "Padding".
+											__(
+												'%s hidden and reset to default'
+											),
+											label
+										),
+										'assertive'
+									);
+								} else {
+									speak(
+										sprintf(
+											// translators: %s: The name of the control being reset e.g. "Padding".
+											__( '%s is now visible' ),
+											label
+										),
+										'assertive'
+									);
+								}
+								toggleItem( label );
+							} }
+							role="menuitemcheckbox"
+						>
+							{ label }
+						</MenuItem>
+						{ descriptionNode }
+					</Fragment>
 				);
 			} ) }
 		</>
@@ -168,8 +242,14 @@ const ToolsPanelHeader = (
 		resetAll,
 		toggleItem,
 		dropdownMenuProps,
+		__experimentalMenuItemDescription,
 		...headerProps
 	} = useToolsPanelHeader( props );
+
+	const instanceId = useInstanceId(
+		ToolsPanelHeader,
+		'tools-panel-item-description'
+	);
 
 	if ( ! labelText ) {
 		return null;
@@ -216,10 +296,18 @@ const ToolsPanelHeader = (
 									itemClassName={
 										defaultControlsItemClassName
 									}
+									menuItemDescription={
+										__experimentalMenuItemDescription
+									}
+									descriptionIdPrefix={ instanceId }
 								/>
 								<OptionalControlsGroup
 									items={ optionalItems }
 									toggleItem={ toggleItem }
+									menuItemDescription={
+										__experimentalMenuItemDescription
+									}
+									descriptionIdPrefix={ instanceId }
 								/>
 							</MenuGroup>
 							<MenuGroup>

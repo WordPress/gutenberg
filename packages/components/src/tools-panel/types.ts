@@ -65,6 +65,19 @@ export type ToolsPanelProps = {
 	 */
 	shouldRenderPlaceholderItems?: boolean;
 	/**
+	 * Experimental prop supplying extra descriptive content to render beneath an
+	 * individual menu item in the panel's options dropdown, given that item's
+	 * label. Return `null` for items with nothing to add.
+	 *
+	 * The content is rendered `aria-hidden` and referenced by the menu item's
+	 * `aria-describedby`, so it stays out of the menu's role structure while
+	 * still reaching assistive technology as that item's description.
+	 *
+	 * Called within the panel's own React tree, so it can read context provided
+	 * around the `ToolsPanel`.
+	 */
+	__experimentalMenuItemDescription?: ( label: string ) => ReactNode;
+	/**
 	 * Experimental prop allowing for a custom CSS class to be applied to the
 	 * first visible `ToolsPanelItem` within the `ToolsPanel`.
 	 */
@@ -107,6 +120,11 @@ export type ToolsPanelHeaderProps = {
 	 * `onSelect` or `onDeselect` callbacks as appropriate.
 	 */
 	toggleItem: ( label: string ) => void;
+	/**
+	 * Supplies extra descriptive content rendered beneath an individual menu
+	 * item, given that item's label.
+	 */
+	__experimentalMenuItemDescription?: ( label: string ) => ReactNode;
 };
 
 export type ToolsPanelItem = {
@@ -199,6 +217,15 @@ export type ToolsPanelControlsGroupProps = {
 	itemClassName?: string;
 	items: [ string, boolean ][];
 	toggleItem: ( label: string ) => void;
+	/**
+	 * Returns descriptive content to render beneath the item with this label.
+	 */
+	menuItemDescription?: ( label: string ) => ReactNode;
+	/**
+	 * Prefix for the generated `id` linking an item to its description. Unique
+	 * per panel, so several panels can be open without colliding.
+	 */
+	descriptionIdPrefix?: string;
 };
 
 export type ToolsPanelMenuItemsConfig = {

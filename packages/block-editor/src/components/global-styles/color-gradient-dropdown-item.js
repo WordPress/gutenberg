@@ -28,7 +28,6 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
@@ -214,6 +213,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
+	stylePaths,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
@@ -229,6 +229,7 @@ export default function ColorGradientDropdownItem( {
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
+			stylePaths={ stylePaths }
 			showLocalOverrideActionsInLabel={ false }
 			hasValue={ hasValue }
 			label={ label }
@@ -261,34 +262,22 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) : (
-									<Button
-										__next40pxDefaultSize
-										label={ __( 'Reset' ) }
-										className="block-editor-panel-color-gradient-settings__reset"
-										size="small"
-										icon={ resetIcon }
-										onClick={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) ) }
+							{ hasValue() && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;

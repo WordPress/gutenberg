@@ -7,7 +7,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -38,6 +37,7 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -321,14 +321,14 @@ function DimensionsToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -766,6 +766,7 @@ export default function DimensionsPanel( {
 							inheritedContentSizeValue !== undefined
 					) }
 					label={ __( 'Content width' ) }
+					stylePaths={ [ 'layout.contentSize' ] }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={
@@ -812,6 +813,7 @@ export default function DimensionsPanel( {
 							inheritedWideSizeValue !== undefined
 					) }
 					label={ __( 'Wide width' ) }
+					stylePaths={ [ 'layout.wideSize' ] }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={
@@ -851,6 +853,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
+					stylePaths={ [ 'spacing.padding' ] }
 					hasInlineEndToggle={ hasSpacingToggle(
 						paddingSides,
 						showSpacingPresetsControl
@@ -905,6 +908,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
+					stylePaths={ [ 'spacing.margin' ] }
 					hasInlineEndToggle={ hasSpacingToggle(
 						marginSides,
 						showSpacingPresetsControl
@@ -968,6 +972,7 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
+					stylePaths={ [ 'spacing.blockGap' ] }
 					hasInlineEndToggle={ isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
@@ -1049,6 +1054,7 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasMinHeightValue }
 					label={ __( 'Minimum height' ) }
+					stylePaths={ [ 'dimensions.minHeight' ] }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={
 						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
@@ -1084,6 +1090,7 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasMinWidthValue }
 					label={ __( 'Minimum width' ) }
+					stylePaths={ [ 'dimensions.minWidth' ] }
 					onDeselect={ resetMinWidthValue }
 					isShownByDefault={
 						defaultControls.minWidth ?? DEFAULT_CONTROLS.minWidth
@@ -1117,6 +1124,7 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasHeightValue }
 					label={ __( 'Height' ) }
+					stylePaths={ [ 'dimensions.height' ] }
 					onDeselect={ resetHeightValue }
 					isShownByDefault={
 						defaultControls.height ?? DEFAULT_CONTROLS.height
@@ -1144,6 +1152,7 @@ export default function DimensionsPanel( {
 					) }
 					hasValue={ hasWidthValue }
 					label={ __( 'Width' ) }
+					stylePaths={ [ 'dimensions.width' ] }
 					onDeselect={ resetWidthValue }
 					isShownByDefault={
 						defaultControls.width ?? DEFAULT_CONTROLS.width

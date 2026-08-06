@@ -142,14 +142,15 @@ function renderPanel( props ) {
 	);
 }
 
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
+// With nothing rendered in the row at rest, the per-row signal for an override
+// is the class hook the SCSS keys off. The actionable part — the cascade and
+// its reset — lives in the panel's options menu, covered in
+// `inheritance/test/panel-menu.js`.
 function expectLocalOverride() {
 	expect(
-		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} )
-	).toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-node-access
+		document.querySelector( '.has-local-override-from-global-styles' )
+	).not.toBeNull();
 }
 
 // Asserts the placeholder treatment for a control. A control can inherit a

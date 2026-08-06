@@ -39,10 +39,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import {
-	InheritanceResetButton,
-	isGlobalStylesInheritanceEnabled,
-} from '../global-styles/inheritance';
+import { isGlobalStylesInheritanceEnabled } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -197,7 +194,6 @@ function BackgroundControlsPanel( {
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 	onReset,
-	hasLocalOverride,
 	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
@@ -230,38 +226,24 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
-							( hasLocalOverride ? (
-								<InheritanceResetButton
-									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) : (
-								<Button
-									__next40pxDefaultSize
-									label={ __( 'Reset' ) }
-									className="block-editor-global-styles-background-panel__reset"
-									size="small"
-									icon={ resetIcon }
-									onClick={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) ) }
+						{ onReset && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
+								} }
+							/>
+						) }
 					</>
 				);
 			} }

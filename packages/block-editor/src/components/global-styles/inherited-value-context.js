@@ -237,7 +237,7 @@ function useVariationAndElements( blockName, className ) {
  * @param {?string} blockName       Selected block name (e.g. `core/heading`).
  * @param {?string} className       Block `className` used to detect an applied variation.
  * @param {?Object} [selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
+ * @return {{ value: Object, sources: Object, cascade: Object }} Merged panel-scoped payload, winning-source map, and full per-path cascade.
  */
 export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const { variationName, headingLevel } = useVariationAndElements(
@@ -252,7 +252,7 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 			return NO_RESOLVED_STYLE;
 		}
 		if ( ! blockName ) {
-			return { value: {}, sources: {} };
+			return { value: {}, sources: {}, cascade: {} };
 		}
 		return resolveStyle( globalStyles, {
 			blockName,

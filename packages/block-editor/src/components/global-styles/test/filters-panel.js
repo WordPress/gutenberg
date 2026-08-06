@@ -77,7 +77,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		expect(
 			screen.getByRole( 'button', {
-				name: /reset to inherited value/i,
+				name: /^reset$/i,
 			} )
 		).toBeInTheDocument();
 	} );

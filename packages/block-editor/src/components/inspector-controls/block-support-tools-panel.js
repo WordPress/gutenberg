@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 
@@ -11,6 +10,7 @@ import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { InheritanceToolsPanel } from '../global-styles/inheritance/panel-menu';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -70,7 +70,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 	);
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			className={ `${ group }-block-support-panel` }
 			label={ label }
 			resetAll={ resetAll }
@@ -83,6 +83,6 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }

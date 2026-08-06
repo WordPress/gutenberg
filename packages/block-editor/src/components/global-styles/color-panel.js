@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
@@ -22,6 +21,7 @@ import {
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
 import { isGlobalStylesInheritanceEnabled } from './inheritance';
+import { InheritanceToolsPanel } from './inheritance/panel-menu';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -113,7 +113,7 @@ export function ColorToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<InheritanceToolsPanel
 			label={ label || __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -127,7 +127,7 @@ export function ColorToolsPanel( {
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
 			</div>
-		</ToolsPanel>
+		</InheritanceToolsPanel>
 	);
 }
 
@@ -302,6 +302,7 @@ export default function ColorPanel( {
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),
+			stylePaths: [ 'elements.link.color.text' ],
 			hasValue: hasLink,
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
@@ -462,6 +463,11 @@ export default function ColorPanel( {
 		items.push( {
 			key: name,
 			label: elementLabel,
+			stylePaths: [
+				`elements.${ name }.color.text`,
+				`elements.${ name }.color.background`,
+				`elements.${ name }.color.gradient`,
+			],
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],

@@ -655,12 +655,14 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 
-		// Both zero values are local overrides, so each control surfaces the
-		// accessible reset-to-inherited affordance.
+		// Both zero values are local overrides. Nothing is rendered in the
+		// rows for that; the class hook is the per-row signal and the cascade
+		// itself lives in the panel's options menu.
 		expect(
-			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
+			// eslint-disable-next-line testing-library/no-node-access
+			document.querySelectorAll(
+				'.has-local-override-from-global-styles'
+			)
 		).toHaveLength( 2 );
 	} );
 } );
