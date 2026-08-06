@@ -393,10 +393,27 @@ inside intent payloads, not the transport.
   by the non-author; concurrent divergent titles escalate a notice and
   both editors converge on the winner.
 
+  **2d-xiii (deterministic client-side genesis) DONE.** The stamper now
+  implements both minting regimes: on the first populated pass over a
+  pristine (not-yet-dirty) editor, unstamped blocks get DETERMINISTIC
+  genesis ids — the WebCrypto mirror of genesis_sync_id (sha256 of
+  `postId:0:path`, first 16 bytes, base64url), the same function the
+  server's room genesis uses, pinned by the frozen sync-id vectors.
+  Every independent minter (each tab, the server, a tab that never
+  connects) derives identical ids from the same saved content, so
+  identity agreement needs no adoption heuristics and survives
+  sessions. Blocks created later (insert, paste, split, duplicate
+  re-mints) stay random-regime; if the user edited before the first
+  pass, everything falls back to random + adoption (the safety net
+  stays). Known limitation: classic/freeform content shifts server
+  paths — such posts fall back to adoption. E2e: a legacy post's ids
+  in both tabs equal the imported engine function's output exactly and
+  persist verbatim through an edit + save.
+
   Remaining in 2d, all design-scoped: selection/caret sharing for
-  intent-log (presence works; carets need engine-side transport),
-  deterministic genesis client-side, and the escalation REVIEW UI
-  (inspect/apply/discard a parked proposal) beyond the notice.
+  intent-log (presence works; carets need engine-side transport) and
+  the escalation REVIEW UI (inspect/apply/discard a parked proposal)
+  beyond the notice.
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

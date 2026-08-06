@@ -7,6 +7,9 @@ import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+// The engine's deterministic genesis id function (vector-pinned against the
+// PHP twin) — imported directly so the spec asserts EXACT id agreement.
+import { genesisSyncId } from '../../../../../packages/sync/src/engines/intent-log/sync-id.js';
 
 /**
  * Two-client collaboration through the intent-log sync engine.
@@ -672,6 +675,69 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			] );
 			expect( counts[ 0 ] + counts[ 1 ] ).toBeGreaterThan( 0 );
 		} ).toPass( { timeout: 15000 } );
+	} );
+
+	test( 'legacy blocks get DETERMINISTIC genesis ids: both tabs and the server mint identical identities with no adoption round-trip', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		// A legacy post: saved content with NO syncIds.
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Deterministic Genesis Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>First legacy</p>\n<!-- /wp:paragraph -->\n' +
+				'<!-- wp:paragraph -->\n<p>Second legacy</p>\n<!-- /wp:paragraph -->\n' +
+				'<!-- wp:paragraph -->\n<p>Third legacy</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		// The ids every independent minter must derive from this content.
+		const expectedIds = [ 0, 1, 2 ].map( ( index ) =>
+			genesisSyncId( { postId: post.id, revisionId: 0 }, [ index ] )
+		);
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2 } = collaborationUtils;
+
+		// Both tabs converge on the EXACT deterministic ids — not merely on
+		// matching ids (which adoption could also produce, slower).
+		for ( const currentEditor of [ editor, editor2 ] ) {
+			await expect( async () => {
+				const blocks = await currentEditor.getBlocks();
+				const ids = blocks.map(
+					( block ) =>
+						(
+							block.attributes.metadata as {
+								syncId?: string;
+							}
+						 )?.syncId
+				);
+				expect( ids ).toEqual( expectedIds );
+			} ).toPass( { timeout: 15000 } );
+		}
+
+		/*
+		 * The identities are durable: a real edit + save persists them
+		 * verbatim. (Identity stamping alone is deliberately non-persistent
+		 * — it must never dirty an untouched post — so the spec makes a
+		 * content edit first.)
+		 */
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await editor.page.keyboard.press( 'End' );
+		await editor.page.keyboard.type( ' edited' );
+		await editor.saveDraft();
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		for ( const id of expectedIds ) {
+			expect( saved.content.raw ).toContain( `"syncId":"${ id }"` );
+		}
 	} );
 
 	test( 'title edits sync between users in both directions', async ( {
