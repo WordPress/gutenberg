@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
 import globals from 'globals';
