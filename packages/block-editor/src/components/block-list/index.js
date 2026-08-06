@@ -11,17 +11,11 @@ import {
 	useEffect,
 	useMemo,
 	useCallback,
-	useRef,
 } from '@wordpress/element';
-import {
-	createBlock,
-	getDefaultBlockName,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
-import { useBlockElement } from './use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
@@ -168,52 +162,6 @@ export default function BlockList( settings ) {
 const EMPTY_ARRAY = [];
 const EMPTY_SET = new Set();
 
-/**
- * Renders the ghost of a block list's default block while the list is
- * empty: a real block object rendered before it exists in the store, and
- * inserted, unchanged, when the user enters it.
- *
- * @param {Object} props              Component props.
- * @param {string} props.rootClientId The block list's root client ID.
- * @param {Object} props.block        The ghost block object.
- */
-function GhostBlock( { rootClientId, block } ) {
-	const { insertBlocks } = useDispatch( blockEditorStore );
-	const element = useBlockElement( block.clientId );
-	const materializedRef = useRef( false );
-
-	useEffect( () => {
-		materializedRef.current = false;
-	}, [ block ] );
-
-	useEffect( () => {
-		if ( ! element ) {
-			return;
-		}
-		function materialize() {
-			if ( materializedRef.current ) {
-				return;
-			}
-			materializedRef.current = true;
-			insertBlocks( [ block ], undefined, rootClientId, false );
-		}
-		element.addEventListener( 'pointerdown', materialize, true );
-		element.addEventListener( 'focusin', materialize, true );
-		return () => {
-			element.removeEventListener( 'pointerdown', materialize, true );
-			element.removeEventListener( 'focusin', materialize, true );
-		};
-	}, [ element, block, rootClientId, insertBlocks ] );
-
-	return (
-		<BlockListBlock
-			rootClientId={ rootClientId }
-			clientId={ block.clientId }
-			ghostBlock={ block }
-		/>
-	);
-}
-
 function Items( {
 	placeholder,
 	rootClientId,
@@ -268,10 +216,7 @@ function Items( {
 			let _ghostBlockAttributes;
 			if ( hasAppender && ! hasCustomAppender && ! _order.length ) {
 				const defaultBlock = ( rootClientId
-					? getBlockListSettings( rootClientId )?.defaultBlock ??
-					  select( blocksStore ).getBlockType(
-							getBlockName( rootClientId )
-					  )?.defaultBlock
+					? getBlockListSettings( rootClientId )?.defaultBlock
 					: undefined ) ?? { name: getDefaultBlockName() };
 				if (
 					defaultBlock.name &&
@@ -337,14 +282,17 @@ function Items( {
 	);
 	const showGhost = !! ghostBlock && shouldRenderAppender;
 
+	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
+
 	return (
 		<LayoutProvider value={ layout }>
-			{ order.map( ( clientId ) => (
+			{ items.map( ( clientId ) => (
 				<AsyncModeProvider
 					key={ clientId }
 					value={
 						// Only provide data asynchronously if the block is
-						// not visible and not selected.
+						// not visible, not selected, and not the ghost.
+						clientId !== ghostBlock?.clientId &&
 						! visibleBlocks.has( clientId ) &&
 						! selectedBlocks.includes( clientId )
 					}
@@ -359,6 +307,11 @@ function Items( {
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						ghostBlock={
+							clientId === ghostBlock?.clientId
+								? ghostBlock
+								: undefined
+						}
 					/>
 					{ isZoomOut && (
 						<ZoomOutSeparator
@@ -369,14 +322,6 @@ function Items( {
 					) }
 				</AsyncModeProvider>
 			) ) }
-			{ showGhost && (
-				<AsyncModeProvider key={ ghostBlock.clientId } value={ false }>
-					<GhostBlock
-						rootClientId={ rootClientId }
-						block={ ghostBlock }
-					/>
-				</AsyncModeProvider>
-			) }
 			{ order.length < 1 && placeholder }
 			{ shouldRenderAppender && ! showGhost && (
 				<BlockListAppender

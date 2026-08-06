@@ -1,5 +1,12 @@
 import clsx from 'clsx';
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import {
+	memo,
+	RawHTML,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -15,7 +22,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 import BlockEdit from '../block-edit';
@@ -24,6 +31,7 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
+import { useBlockElement } from './use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
@@ -562,8 +570,46 @@ BlockListBlock = compose(
 // props are public API. To avoid adding to the public API, we use a private
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
+/**
+ * Inserts a ghost block when the user enters it: the same block object the
+ * ghost has rendered from all along, so nothing about the element changes.
+ *
+ * @param {string}  clientId     The block client ID.
+ * @param {string}  rootClientId The block's root client ID.
+ * @param {?Object} ghostBlock   The ghost block object, while not inserted.
+ */
+function useGhostMaterialize( clientId, rootClientId, ghostBlock ) {
+	const { insertBlocks } = useDispatch( blockEditorStore );
+	const element = useBlockElement( clientId );
+	const materializedRef = useRef( false );
+
+	useEffect( () => {
+		materializedRef.current = false;
+	}, [ ghostBlock ] );
+
+	useEffect( () => {
+		if ( ! element || ! ghostBlock ) {
+			return;
+		}
+		function materialize() {
+			if ( materializedRef.current ) {
+				return;
+			}
+			materializedRef.current = true;
+			insertBlocks( [ ghostBlock ], undefined, rootClientId, false );
+		}
+		element.addEventListener( 'pointerdown', materialize, true );
+		element.addEventListener( 'focusin', materialize, true );
+		return () => {
+			element.removeEventListener( 'pointerdown', materialize, true );
+			element.removeEventListener( 'focusin', materialize, true );
+		};
+	}, [ element, ghostBlock, rootClientId, insertBlocks ] );
+}
+
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId, ghostBlock } = props;
+	useGhostMaterialize( clientId, rootClientId, ghostBlock );
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
