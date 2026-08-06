@@ -145,12 +145,11 @@ function pairChangedLines( removedLines, addedLines ) {
  *
  * @param {string} removedLine Removed line.
  * @param {string} addedLine   Added line.
+ * @param {number} timeout     Milliseconds left for this word diff.
  * @return {?{removedSegments: Array<Object>, addedSegments: Array<Object>}} Segments per side.
  */
-function getLineSegments( removedLine, addedLine ) {
-	const wordDiff = diffWordsWithSpace( removedLine, addedLine, {
-		timeout: DIFF_TIMEOUT,
-	} );
+function getLineSegments( removedLine, addedLine, timeout ) {
+	const wordDiff = diffWordsWithSpace( removedLine, addedLine, { timeout } );
 	if ( ! wordDiff ) {
 		return null;
 	}
@@ -204,7 +203,10 @@ function getLineSegments( removedLine, addedLine ) {
  */
 function getIntraLineSegments( parts ) {
 	const segmentsByPart = new Map();
-	for ( let i = 0; i < parts.length - 1; i++ ) {
+	// Share one timeout across the pass so it cannot reset for every line pair.
+	const deadline = Date.now() + DIFF_TIMEOUT;
+
+	for ( let i = 0; i < parts.length - 1 && Date.now() < deadline; i++ ) {
 		if ( ! parts[ i ].removed || ! parts[ i + 1 ].added ) {
 			continue;
 		}
@@ -214,9 +216,14 @@ function getIntraLineSegments( parts ) {
 			removedLines,
 			addedLines
 		) ) {
+			const remaining = deadline - Date.now();
+			if ( remaining <= 0 ) {
+				break;
+			}
 			const segments = getLineSegments(
 				removedLines[ removedIndex ],
-				addedLines[ addedIndex ]
+				addedLines[ addedIndex ],
+				remaining
 			);
 			if ( ! segments ) {
 				continue;

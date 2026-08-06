@@ -205,6 +205,27 @@ describe( 'getCodeDiffRows', () => {
 		expect( rows.every( ( row ) => ! ( 'segments' in row ) ) ).toBe( true );
 	} );
 
+	it( 'shares one time budget across word-level diffs', () => {
+		// These unrelated lines force word diffing to time out. All word diffs
+		// share one budget.
+		const makeContent = ( seed ) =>
+			Array.from( { length: 50 }, ( _, line ) =>
+				[ ...Array( 1000 ).keys() ]
+					.map( ( token ) => `w${ seed }${ line }_${ token }` )
+					.join( ' ' )
+			).join( '\n' );
+		const previousContent = `Start\n${ makeContent( 'a' ) }\nEnd\n`;
+		const currentContent = `Start\n${ makeContent( 'b' ) }\nEnd\n`;
+
+		const start = Date.now();
+		const rows = getCodeDiffRows( previousContent, currentContent, true );
+		const elapsed = Date.now() - start;
+
+		expect( rows ).toHaveLength( 102 );
+		expect( rows.every( ( row ) => ! ( 'segments' in row ) ) ).toBe( true );
+		expect( elapsed ).toBeLessThan( 1000 );
+	} );
+
 	it( 'skips blank lines when pairing changed blocks', () => {
 		const rows = getCodeDiffRows(
 			'Start\nAlpha beta gamma\n\nDelta epsilon zeta\nEnd\n',

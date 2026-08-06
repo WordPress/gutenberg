@@ -95,6 +95,18 @@ $revision-code-diff-marker-width: 3ch;
 	&.is-removed {
 		background: rgba($revision-diff-removed-color, 0.3);
 	}
+
+	// Forced colors replace both background tints, so use text decoration to
+	// keep word-level changes visible.
+	@media (forced-colors: active) {
+		&.is-added {
+			text-decoration: underline;
+		}
+
+		&.is-removed {
+			text-decoration: line-through;
+		}
+	}
 }
 
 .editor-revisions-code-diff__line-number,
