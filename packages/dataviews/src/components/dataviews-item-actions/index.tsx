@@ -22,9 +22,10 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { kebabCase } from '../../utils/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 
-const { Menu, kebabCase } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
