@@ -3,8 +3,10 @@
 	"version": 3,
 	"styles": {
 		"blocks": {
-			"core/paragraph": {
-				"invalidAdditionalProperty": true
+			"core/navigation-link": {
+				"-current": {
+					"invalidAdditionalProperty": true
+				}
 			}
 		}
 	}
