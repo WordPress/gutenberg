@@ -207,6 +207,13 @@ export function createYjsSessionCodec(
 				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
+		// Yjs deltas are not idempotent on the server (re-sending doubles
+		// storage), so unknown-outcome recovery sends full state instead.
+		createRecoveryUpdate: () =>
+			createSyncUpdate(
+				Y.encodeStateAsUpdateV2( doc ),
+				SyncUpdateType.COMPACTION
+			),
 		createCompactionFromUpdates: createDeprecatedCompactionUpdate,
 		destroy() {
 			if ( isDocListenerAttached ) {

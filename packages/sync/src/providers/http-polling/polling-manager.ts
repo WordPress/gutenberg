@@ -804,16 +804,16 @@ function poll(): void {
 					isManualRetry = false;
 				}
 
-				// Recover from the failed request. We don't know whether the server stored
-				// our updates before the error occurred (e.g. a network timeout after a
-				// successful write). Re-sending the same updates via restore() would
-				// duplicate them on the server and cause unbounded storage growth.
-				//
-				// Instead, for rooms that had outgoing updates, replace the queue with a
-				// single compaction (full document state). This is idempotent: if the
-				// server already stored the updates, the compaction safely supersedes
-				// them; if it didn't, the compaction includes them. Updates not seen by
-				// this client are preserved in both cases.
+				// Recover from the failed request. We don't know whether the
+				// server stored our updates before the error occurred (e.g. a
+				// network timeout after a successful write). Recovery is
+				// CODEC-DRIVEN: an engine whose updates are not idempotent on
+				// the server (Yjs deltas) provides createRecoveryUpdate — a
+				// full-state update that safely supersedes either outcome.
+				// Engines without it (the intent log dedupes ingest by
+				// intentId) get their exact updates restored and re-sent.
+				// The recovery update is created BEFORE the queue is cleared
+				// so a throwing codec can never lose queued work.
 				for ( const room of payload.rooms ) {
 					if ( ! roomStates.has( room.room ) ) {
 						continue;
@@ -821,13 +821,30 @@ function poll(): void {
 
 					const state = roomStates.get( room.room )!;
 
-					if ( room.updates.length > 0 && state.endCursor > 0 ) {
-						state.updateQueue.clear();
-						state.updateQueue.add(
-							state.session.createCompactionUpdate()
-						);
-					} else if ( room.updates.length > 0 ) {
-						state.updateQueue.restore( room.updates );
+					if ( room.updates.length > 0 ) {
+						let recoveryUpdate: SyncUpdate | null = null;
+						if (
+							state.session.createRecoveryUpdate &&
+							state.endCursor > 0
+						) {
+							try {
+								recoveryUpdate =
+									state.session.createRecoveryUpdate();
+							} catch ( recoveryError ) {
+								state.log(
+									'Recovery update failed; restoring original updates',
+									{ error: recoveryError },
+									'error',
+									true // force
+								);
+							}
+						}
+						if ( recoveryUpdate ) {
+							state.updateQueue.clear();
+							state.updateQueue.add( recoveryUpdate );
+						} else {
+							state.updateQueue.restore( room.updates );
+						}
 					}
 
 					state.log(

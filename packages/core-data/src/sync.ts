@@ -44,6 +44,7 @@ export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
 
 let syncManager: SyncManager;
 let engineMismatchWarned = false;
+let engineUnavailable = false;
 
 export function getSyncManager(): SyncManager | undefined {
 	if ( syncManager ) {
@@ -55,11 +56,14 @@ export function getSyncManager(): SyncManager | undefined {
 	 * (window._wpCollaborationSync) and enforces it per-request with a 409.
 	 * When this client cannot provide the announced engine at the announced
 	 * protocol version, do not create a sync manager at all — entity syncing
-	 * stays off and WordPress's regular post locking applies, the same
-	 * posture as collaboration disabled.
+	 * stays off. Callers observe this via isSyncEngineUnavailable() and must
+	 * flip collaborationSupported so WordPress's regular post locking
+	 * re-engages (without that flip the degraded state would be no sync AND
+	 * no lock: concurrent editors silently overwrite each other on save).
 	 */
 	const adapter = resolveEngineAdapter();
 	if ( ! adapter ) {
+		engineUnavailable = true;
 		if ( ! engineMismatchWarned ) {
 			engineMismatchWarned = true;
 			// eslint-disable-next-line no-console
@@ -73,6 +77,15 @@ export function getSyncManager(): SyncManager | undefined {
 	syncManager = adapter.createManager();
 
 	return syncManager;
+}
+
+/**
+ * Whether sync is unavailable because the server announced an engine this
+ * client cannot provide (as opposed to collaboration simply being disabled).
+ * Only meaningful after a getSyncManager() call attempted resolution.
+ */
+export function isSyncEngineUnavailable(): boolean {
+	return engineUnavailable;
 }
 
 /**

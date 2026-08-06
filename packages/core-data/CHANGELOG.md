@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Surface sync engine escalations (edits set aside for review instead of merged) as a dismissible warning notice in the editor.
+-   When the server announces a sync engine this client cannot provide, collaboration is now marked unsupported so WordPress's regular post locking re-engages (previously the degraded state was silently no-sync-and-no-lock), with a warning notice explaining why.
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
 
 ### Bug Fixes

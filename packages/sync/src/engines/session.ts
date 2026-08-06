@@ -91,10 +91,21 @@ export interface EngineSessionCodec {
 
 	/**
 	 * Creates a single update representing the full local state, replacing
-	 * all prior updates (compaction-on-request and idempotent error
-	 * recovery).
+	 * all prior updates (compaction-on-request).
 	 */
 	createCompactionUpdate: () => EngineUpdate;
+
+	/**
+	 * Creates the update the transport should send after a request whose
+	 * outcome is unknown (e.g. a network timeout after a possible write).
+	 * Only engines whose UPDATES ARE NOT IDEMPOTENT need this: re-sending a
+	 * Yjs delta the server already stored would grow storage unboundedly, so
+	 * the Yjs codec answers with a full-state compaction that safely
+	 * supersedes either outcome. Engines with server-side idempotent ingest
+	 * (e.g. the intent log's per-intentId dedup) OMIT this method and the
+	 * transport simply re-sends the original updates.
+	 */
+	createRecoveryUpdate?: () => EngineUpdate;
 
 	/**
 	 * Creates a compaction by merging the given server-provided updates,
