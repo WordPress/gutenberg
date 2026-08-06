@@ -28,6 +28,7 @@
 
 ### Bug Fixes
 
+-   `selectedBlockStyleState`: Resolve the client ID from the `start`/`end` payload shape of `SELECTION_CHANGE`, so a caret change inside the block's rich text no longer clears the selected pseudo-state. Placing the caret in a Button's label reverted the block inspector's state picker to Default ([#81254](https://github.com/WordPress/gutenberg/issues/81254)).
 -   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).

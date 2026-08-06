@@ -2339,7 +2339,22 @@ export function selectedBlockStyleState( state = undefined, action ) {
 
 		case 'SELECT_BLOCK':
 		case 'SELECTION_CHANGE': {
-			if ( state?.clientId && state.clientId !== action.clientId ) {
+			if ( ! state?.clientId ) {
+				break;
+			}
+
+			// `SELECTION_CHANGE` has two payload shapes: a flat one with a
+			// `clientId`, and one carrying `start`/`end` selection points
+			// instead, as dispatched by rich text on every caret change.
+			const clientIds = [
+				action.clientId,
+				action.start?.clientId,
+				action.end?.clientId,
+			].filter( Boolean );
+
+			// Without a client ID there's nothing to compare against, so the
+			// selected state is left untouched rather than cleared.
+			if ( clientIds.length && ! clientIds.includes( state.clientId ) ) {
 				return undefined;
 			}
 
