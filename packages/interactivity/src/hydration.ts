@@ -124,6 +124,9 @@ export const hydrateRegions = async () => {
 				const node = entry.target;
 				intersectionObserverInstance.unobserve( node );
 				observedNodes.delete( node );
+
+				await hydrateNode( node );
+
 				if ( observedNodes.size === 0 ) {
 					intersectionObserverInstance.disconnect();
 					// All islands have been hydrated: resolve the promise with
@@ -132,8 +135,6 @@ export const hydrateRegions = async () => {
 					idleFired = true; // Disarm the idle-time sweep.
 					resolveInitialVdom( initialVdom );
 				}
-
-				await hydrateNode( node );
 			}
 		},
 		{
