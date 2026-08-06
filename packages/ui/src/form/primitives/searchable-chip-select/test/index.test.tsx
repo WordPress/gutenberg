@@ -54,6 +54,27 @@ describe( 'SearchableChipSelect', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders flat items with the default renderer', async () => {
+		const user = userEvent.setup();
+		const items = ITEMS.slice( 0, 3 );
+
+		render( <SearchableChipSelect items={ items } /> );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'option', { name: 'Apple' } )
+			).toBeVisible();
+		} );
+		expect(
+			screen.getByRole( 'option', { name: 'Apricot' } )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'option', { name: 'Banana' } )
+		).toBeVisible();
+	} );
+
 	it( 'renders grouped items in the popup', async () => {
 		const user = userEvent.setup();
 
@@ -91,6 +112,57 @@ describe( 'SearchableChipSelect', () => {
 		expect( screen.getByText( 'Berries' ) ).toBeVisible();
 		expect( screen.getByText( 'Apple' ) ).toBeVisible();
 		expect( screen.getByText( 'Strawberry' ) ).toBeVisible();
+	} );
+
+	it( 'selects a grouped item', async () => {
+		const user = userEvent.setup();
+		const onValueChange = jest.fn();
+
+		render(
+			<SearchableChipSelect
+				items={ GROUPED_ITEMS }
+				onValueChange={ onValueChange }
+				children={ ( group: FixtureGroup ) => (
+					<SearchableChipSelect.Group
+						key={ group.label }
+						items={ group.items }
+					>
+						<SearchableChipSelect.GroupLabel>
+							{ group.label }
+						</SearchableChipSelect.GroupLabel>
+						<SearchableChipSelect.Collection>
+							{ ( item: FixtureItem ) => (
+								<SearchableChipSelect.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</SearchableChipSelect.Item>
+							) }
+						</SearchableChipSelect.Collection>
+					</SearchableChipSelect.Group>
+				) }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Strawberry' } )
+		);
+
+		expect( onValueChange ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					value: 'strawberry',
+					label: 'Strawberry',
+				} ),
+			] ),
+			expect.anything()
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toBeVisible();
 	} );
 
 	describe( 'creatable item', () => {
