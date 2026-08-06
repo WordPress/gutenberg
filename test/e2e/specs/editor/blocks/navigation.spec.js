@@ -1122,14 +1122,19 @@ test.describe( 'Navigation block', () => {
 		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
 
-			// Restore plain permalinks
-			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// Restore the "Day and name" permalink structure
+			// (/%year%/%monthnum%/%day%/%postname%/) that wp-env configures at
+			// install time. Restoring "Plain" instead would leave the shared
+			// site without pretty permalinks for every spec that runs after
+			// this one in the same shard (e.g. the preload specs assert
+			// /wp-json/-style request URLs).
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks() style util
 			// We need to run this in afterEach instead of afterAll since we don't have page context
 			// in afterAll
 			await admin.visitAdminPage( 'options-permalink.php' );
 
-			// Select Plain permalinks
-			await page.locator( '#permalink-input-plain' ).click();
+			// Select the Day and name permalink structure
+			await page.locator( '#permalink-input-day-name' ).click();
 
 			// Click Save Changes
 			await page.locator( '#submit' ).click();
@@ -1137,10 +1142,8 @@ test.describe( 'Navigation block', () => {
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
 
-			// Force re-discovery of REST API root URL after disabling pretty permalinks.
-			// When permalinks change from pretty to plain, the REST API URL changes
-			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
-			// to prevent 404 errors.
+			// Force re-discovery of the REST API root URL after changing the
+			// permalink structure, so the cached URL cannot go stale.
 			await requestUtils.setupRest();
 		} );
 
