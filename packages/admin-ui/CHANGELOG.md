@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Breadcrumbs`: Let the `nav` shrink below its content width (`min-width: 0`) so a long current crumb truncates with an ellipsis instead of widening the page into horizontal scrolling ([#81301](https://github.com/WordPress/gutenberg/pull/81301)).
+
 ### Internal
 
 -   Stop publishing the `src` directory to npm. The package's `exports` field only exposes the built artifacts, so the source files were unreachable by consumers and only inflated the package size ([#77285](https://github.com/WordPress/gutenberg/pull/77285)).

@@ -1,3 +1,12 @@
+/*
+ * The nav renders as a flex item in the page header; the default
+ * `min-width: auto` would keep the list from shrinking and the `.current`
+ * truncation styles below from engaging.
+ */
+.root {
+	min-width: 0;
+}
+
 .list {
 	list-style: none;
 	padding: 0;
