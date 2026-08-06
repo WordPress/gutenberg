@@ -108,6 +108,19 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		const UPDATE_TYPE_RESOLVED = 'resolved';
 
 		/**
+		 * Escalation reason for intents whose payload carries markup the
+		 * authoring user may not publish (per `wp_kses_post`): the intent is
+		 * parked for review instead of applied, and only a user with
+		 * `unfiltered_html` can meaningfully restore it (a restore re-authors
+		 * the content as ordinary intents under the RESTORER's capability, so
+		 * an unprivileged restore simply re-escalates).
+		 *
+		 * @since 7.2.0
+		 * @var string
+		 */
+		const ESCALATION_REQUIRES_APPROVAL = 'requires-approval';
+
+		/**
 		 * Storage backend.
 		 *
 		 * @since 7.2.0
@@ -421,6 +434,38 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				}
 			}
 
+			/*
+			 * Capability enforcement (the kses lane): when the authoring user
+			 * lacks `unfiltered_html`, an intent whose payload carries
+			 * protected markup never reaches the planner — its WHOLE unit (a
+			 * batch of edits made together) parks as a `requires-approval`
+			 * proposal instead. This closes the laundering hole where a
+			 * filtered user's markup would otherwise materialize into every
+			 * collaborator's editor and then persist under a privileged
+			 * saver's capability. Restoring the proposal re-authors the
+			 * content as ordinary intents under the RESTORER's capability, so
+			 * approval semantics need no separate machinery.
+			 */
+			$requires_approval = array();
+			if ( ! current_user_can( 'unfiltered_html' ) ) {
+				$kept = array();
+				foreach ( $units as $unit ) {
+					$protected = false;
+					foreach ( $unit as $intent ) {
+						if ( self::intent_requires_unfiltered_html( $intent ) ) {
+							$protected = true;
+							break;
+						}
+					}
+					if ( $protected ) {
+						$requires_approval[] = $unit;
+					} else {
+						$kept[] = $unit;
+					}
+				}
+				$units = $kept;
+			}
+
 			$log       = $state['log'];
 			$doc_cache = array( $base_seq => $state['genesis'] );
 			$doc_at    = function ( int $seq ) use ( $log, $base_seq, &$doc_cache ): array {
@@ -440,6 +485,42 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				$doc_cache[ $seq ] = $doc;
 				return $doc;
 			};
+
+			// Park capability-gated units as proposals (same row shape as
+			// planner escalations, so replay/retention/resolution machinery
+			// applies unchanged).
+			foreach ( $requires_approval as $unit ) {
+				foreach ( $unit as $intent ) {
+					$intent_id = $intent['intentId'];
+					$stored    = $this->add_row(
+						$room,
+						$client_id,
+						self::UPDATE_TYPE_PROPOSAL,
+						array(
+							'intent'  => $intent,
+							'actorId' => $intent['actorId'],
+							'reason'  => self::ESCALATION_REQUIRES_APPROVAL,
+							'at'      => $head_seq,
+							'time'    => time(),
+							'context' => array(
+								'excerpt' => self::proposal_excerpt( $doc_at( $head_seq ), $intent ),
+							),
+						)
+					);
+					if ( ! $stored ) {
+						return new WP_Error(
+							'rest_sync_storage_error',
+							__( 'Failed to store sync update.', 'gutenberg' ),
+							array( 'status' => 500 )
+						);
+					}
+					$state['proposals_open'][ $intent_id ] = true;
+					$state['settled'][ $intent_id ]        = array(
+						'status' => 'escalated',
+						'reason' => self::ESCALATION_REQUIRES_APPROVAL,
+					);
+				}
+			}
 
 			$plan = WP_Intent_Log_Planner::plan_batch( $units, $state['log'], $doc_at, $base_seq );
 
@@ -519,9 +600,13 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 					++$plan_counts[ $status ];
 				}
 			}
-			$plan_counts['stale'] = count( $stale );
+			$plan_counts['stale']    = count( $stale );
+			$plan_counts['approval'] = array_sum( array_map( 'count', $requires_approval ) );
 			if ( $plan_counts['escalated'] > 0 ) {
 				do_action( 'qm/debug', "wp-sync: {$plan_counts['escalated']} intent(s) escalated for review in {$room}" );
+			}
+			if ( $plan_counts['approval'] > 0 ) {
+				do_action( 'qm/debug', "wp-sync: {$plan_counts['approval']} intent(s) parked for approval in {$room} (author lacks unfiltered_html)" );
 			}
 			if ( $plan_counts['stale'] > 0 ) {
 				do_action( 'qm/debug', "wp-sync: {$plan_counts['stale']} stale-base intent(s) voided in {$room} (client below retention horizon)" );
@@ -586,6 +671,172 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			}
 
 			return array( 'dispositions' => $dispositions );
+		}
+
+		/**
+		 * Whether an HTML fragment carries markup the kses post filter would
+		 * alter — content a user without `unfiltered_html` could not have
+		 * authored through a normal filtered save.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $html Fragment.
+		 * @return bool True when protected.
+		 */
+		private static function fragment_requires_unfiltered_html( string $html ): bool {
+			return wp_kses_post( $html ) !== $html;
+		}
+
+		/**
+		 * Whether a rich-text span format id would emit protected markup.
+		 *
+		 * Object formats (`obj|{"html":…}`) re-emit their HTML verbatim, so
+		 * the embedded fragment is checked directly. Element formats are run
+		 * through the codec's own serializer so the exact emitted bytes are
+		 * what kses judges. Malformed ids are protected: never trust what
+		 * cannot be fully understood.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $format Span format id.
+		 * @return bool True when protected.
+		 */
+		private static function format_requires_unfiltered_html( string $format ): bool {
+			$pipe = strpos( $format, '|' );
+			$tag  = false === $pipe ? $format : substr( $format, 0, $pipe );
+			if ( 'obj' === $tag ) {
+				$args = json_decode( substr( $format, $pipe + 1 ), true );
+				if ( ! is_array( $args ) || ! is_string( $args['html'] ?? null ) ) {
+					return true;
+				}
+				return self::fragment_requires_unfiltered_html( $args['html'] );
+			}
+			$decoded = WP_Intent_Log_Rich_Text::decode_format( $format );
+			if (
+				null === $decoded ||
+				! is_array( $decoded['attrs'] ) ||
+				! preg_match( '/^[a-z][a-z0-9-]*$/', $decoded['tag'] )
+			) {
+				return true;
+			}
+			foreach ( $decoded['attrs'] as $name => $value ) {
+				if ( ! is_string( $name ) || ! is_string( $value ) ) {
+					return true;
+				}
+			}
+			$html = WP_Intent_Log_Rich_Text::field_to_html(
+				array(
+					'text'    => 'x',
+					'formats' => array(
+						array(
+							'start'  => 0,
+							'end'    => 1,
+							'format' => $format,
+						),
+					),
+				)
+			);
+			return self::fragment_requires_unfiltered_html( $html );
+		}
+
+		/**
+		 * Whether an inserted block spec (recursively) carries protected
+		 * markup. Field text is entity-encoded by the serializer so only
+		 * span formats can smuggle markup; block attributes serialize into
+		 * the block comment (no more power than a kses-filtered save, which
+		 * preserves comments) and are not judged here.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $block Block spec from an insert_block payload.
+		 * @return bool True when protected.
+		 */
+		/**
+		 * Whether a `_wrapper` internal attr would emit protected markup.
+		 * materialize() rebuilds the wrapper's open/close fragments VERBATIM
+		 * around the field content, so they are judged as a fragment.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $wrapper The _wrapper attr value.
+		 * @return bool True when protected.
+		 */
+		private static function wrapper_requires_unfiltered_html( $wrapper ): bool {
+			if ( ! is_array( $wrapper ) ) {
+				return true;
+			}
+			$open  = $wrapper['open'] ?? '';
+			$close = $wrapper['close'] ?? '';
+			if ( ! is_string( $open ) || ! is_string( $close ) ) {
+				return true;
+			}
+			return self::fragment_requires_unfiltered_html( $open . 'x' . $close );
+		}
+
+		private static function block_spec_requires_unfiltered_html( array $block ): bool {
+			// The _wrapper internal attr re-emits as raw markup on
+			// materialize; a crafted spec could smuggle an element through
+			// it.
+			$attrs = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
+			if (
+				array_key_exists( '_wrapper', $attrs ) &&
+				self::wrapper_requires_unfiltered_html( $attrs['_wrapper'] )
+			) {
+				return true;
+			}
+			// make_block() also accepts block-level text/formats shorthand
+			// (they become the content field); judge both shapes.
+			$span_lists = array( $block['formats'] ?? array() );
+			foreach ( $block['fields'] ?? array() as $field ) {
+				$span_lists[] = is_array( $field ) ? ( $field['formats'] ?? array() ) : array();
+			}
+			foreach ( $span_lists as $spans ) {
+				foreach ( $spans as $span ) {
+					$format = is_array( $span ) ? ( $span['format'] ?? null ) : null;
+					if ( ! is_string( $format ) || self::format_requires_unfiltered_html( $format ) ) {
+						return true;
+					}
+				}
+			}
+			foreach ( $block['children'] ?? array() as $child ) {
+				if ( self::block_spec_requires_unfiltered_html( $child ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Whether applying this intent would introduce markup its author may
+		 * not publish without `unfiltered_html`.
+		 *
+		 * Only two payload surfaces can carry markup: format_text (the span
+		 * format id, when turning a format ON) and insert_block (the block
+		 * spec's field formats). Plain text payloads are entity-encoded by
+		 * the serializer and are always safe.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $intent Validated intent envelope.
+		 * @return bool True when the intent requires the capability.
+		 */
+		public static function intent_requires_unfiltered_html( array $intent ): bool {
+			$payload = $intent['payload'];
+			switch ( $intent['type'] ) {
+				case 'format_text':
+					return ! empty( $payload['on'] )
+						&& self::format_requires_unfiltered_html( $payload['format'] );
+				case 'insert_block':
+					return self::block_spec_requires_unfiltered_html( $payload['block'] );
+				case 'set_attr':
+					// The only attr materialize() renders as markup; the
+					// rest serialize into the block comment, which a
+					// kses-filtered save preserves anyway.
+					return '_wrapper' === $payload['key']
+						&& self::wrapper_requires_unfiltered_html( $payload['value'] );
+				default:
+					return false;
+			}
 		}
 
 		/**

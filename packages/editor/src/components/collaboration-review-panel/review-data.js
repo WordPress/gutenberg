@@ -18,6 +18,9 @@ export const REASON_LABELS = {
 	'dependent-on-escalated': __(
 		'It depended on another edit that was set aside.'
 	),
+	'requires-approval': __(
+		'It contains content that needs approval from someone allowed to publish unfiltered HTML. Restoring it publishes the content under your account.'
+	),
 };
 
 const EMPTY_CLIENT_IDS = {};

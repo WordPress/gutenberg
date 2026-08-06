@@ -599,6 +599,39 @@ inside intent payloads, not the transport.
   conflicts (`requires-approval` lane, ingest enforcement — a known
   gap) would join this same surface with capability-gated actions.
 
+  **2d-xxi (kses/approval ingest lane) DONE.** Closes the capability
+  gap called out in the review-panel design discussion: intent-log
+  ingest did no kses enforcement, so a filtered user's protected
+  markup would materialize into every collaborator's editor and then
+  persist under a privileged saver's capability (laundering). Now
+  `handle_updates_locked` parks any unit containing a protected
+  intent as a `requires-approval` proposal BEFORE planning, judged
+  per the AUTHORING user's `unfiltered_html` at ingest (attribution
+  is a server-side fact). Protected surfaces: format_text span ids
+  (obj formats judged on their verbatim HTML, element formats
+  through the codec's own serializer — the exact emitted bytes are
+  what kses sees), insert_block specs (field formats recursively,
+  block-level text/formats shorthand, and `attrs._wrapper` which
+  materialize re-emits raw), and set_attr on `_wrapper`. Plain text
+  is entity-encoded and always safe; other attrs land in the block
+  comment (kses-filtered saves preserve comments — same power).
+  Approval needs NO new machinery: proposals use the ordinary row
+  shape (replay/retention/resolution/review UI unchanged), and
+  restore re-authors content under the RESTORER's capability — a
+  privileged restore IS the approval, an unprivileged restore
+  re-escalates harmlessly. Policy layer only: planner untouched,
+  vectors byte-stable, no JS-twin analog (documented in SPEC.md).
+  Bonus validity fix found en route: block type names materialize
+  into comment delimiters UNESCAPED (`serialize_block` escapes
+  attrs, not names) — `core/x --><script>` would break out of the
+  comment; `is_valid_payload` now enforces the block-name grammar
+  for insert_block and transform_block for EVERY user. 7 new
+  route-level PHPUnit tests (park + deliver + redeliver + resolve,
+  benign formats pass, plain-text encode, whole-unit park, wrapper
+  gate both ways, privileged direct-author, grammar 400s), with
+  capability control via map_meta_cap filters so single-site and
+  multisite behave identically.
+
   Remaining in 2d, design-scoped: selection/caret sharing for
   intent-log (presence works; carets need engine-side transport).
   Review findings NOT yet addressed (next tier):

@@ -886,4 +886,338 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$reparsed = parse_blocks( $content );
 		$this->assertCount( 2, array_values( array_filter( array_column( $reparsed, 'blockName' ) ) ) );
 	}
+
+	/**
+	 * Proposal rows currently in the room feed, decoded.
+	 *
+	 * @param int $client_id Polling client.
+	 * @return array Decoded proposal payloads.
+	 */
+	private function proposal_rows( int $client_id = 909 ): array {
+		$catchup = $this->poll( array(), array( 'client_id' => $client_id ) );
+		$rows    = array();
+		foreach ( $catchup['updates'] as $update ) {
+			if ( WP_Intent_Log_Engine::UPDATE_TYPE_PROPOSAL === $update['type'] ) {
+				$rows[] = json_decode( $update['data'], true );
+			}
+		}
+		return $rows;
+	}
+
+	/**
+	 * A format_text intent update carrying the given span format id.
+	 *
+	 * @param string $intent_id Intent id.
+	 * @param string $format    Span format id.
+	 * @return array Typed update.
+	 */
+	private static function format_intent( string $intent_id, string $format ): array {
+		return self::intent_update(
+			array(
+				'intentId' => $intent_id,
+				'baseSeq'  => 0,
+				'type'     => 'format_text',
+				'payload'  => array(
+					'syncId' => self::paragraph_id(),
+					'field'  => 'content',
+					'start'  => 0,
+					'end'    => 5,
+					'format' => $format,
+					'on'     => true,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Revokes unfiltered_html from the current user via map_meta_cap
+	 * (deterministic across single site and multisite; the test framework
+	 * restores hooks between tests).
+	 */
+	private function revoke_unfiltered_html() {
+		add_filter(
+			'map_meta_cap',
+			static function ( $caps, $cap ) {
+				return 'unfiltered_html' === $cap ? array( 'do_not_allow' ) : $caps;
+			},
+			10,
+			2
+		);
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+	}
+
+	/**
+	 * Grants unfiltered_html to the current user (multisite normally
+	 * reserves it for super admins).
+	 */
+	private function grant_unfiltered_html() {
+		add_filter(
+			'map_meta_cap',
+			static function ( $caps, $cap ) {
+				return 'unfiltered_html' === $cap ? array( 'exist' ) : $caps;
+			},
+			10,
+			2
+		);
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+	}
+
+	/**
+	 * An insert_block intent whose spec smuggles verbatim HTML through an
+	 * object span.
+	 *
+	 * @param string $intent_id Intent id.
+	 * @param string $html      The embedded fragment.
+	 * @param string $txn_id    Optional unit id.
+	 * @return array Typed update.
+	 */
+	private static function object_block_intent( string $intent_id, string $html, ?string $txn_id = null ): array {
+		return self::intent_update(
+			array(
+				'intentId' => $intent_id,
+				'txnId'    => $txn_id,
+				'baseSeq'  => 0,
+				'type'     => 'insert_block',
+				'payload'  => array(
+					'block'          => array(
+						'syncId'    => 'kses-nb',
+						'blockType' => 'core/paragraph',
+						'fields'    => array(
+							'content' => array(
+								'text'    => "\u{FFFC}",
+								'formats' => array(
+									array(
+										'start'  => 0,
+										'end'    => 1,
+										'format' => 'obj|' . wp_json_encode( array( 'html' => $html ), JSON_UNESCAPED_SLASHES ),
+									),
+								),
+							),
+						),
+					),
+					'parentId'       => null,
+					'afterSiblingId' => self::paragraph_id(),
+				),
+			)
+		);
+	}
+
+	public function test_protected_markup_from_filtered_author_parks_for_approval() {
+		$this->revoke_unfiltered_html();
+
+		$response = $this->poll(
+			array( self::object_block_intent( 'kses-1', '<script>alert(1)</script>' ) )
+		);
+		$this->assertSame(
+			array(
+				'intentId' => 'kses-1',
+				'status'   => 'escalated',
+				'reason'   => WP_Intent_Log_Engine::ESCALATION_REQUIRES_APPROVAL,
+			),
+			$response['dispositions'][0]
+		);
+
+		// The parked proposal is delivered like any other, with the reason,
+		// server-side attribution, and review context.
+		$proposals = $this->proposal_rows();
+		$this->assertCount( 1, $proposals );
+		$this->assertSame( 'requires-approval', $proposals[0]['reason'] );
+		$this->assertSame( 'u' . self::$editor_id . 'c101', $proposals[0]['actorId'] );
+		$this->assertArrayHasKey( 'at', $proposals[0] );
+		$this->assertArrayHasKey( 'time', $proposals[0] );
+
+		// Nothing reached the document.
+		$engine = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$this->assertStringNotContainsString( '<script>', (string) $engine->materialize( $this->room() ) );
+
+		// Redelivery acks identically without a second proposal row.
+		$again = $this->poll(
+			array( self::object_block_intent( 'kses-1', '<script>alert(1)</script>' ) )
+		);
+		$this->assertSame( 'escalated', $again['dispositions'][0]['status'] );
+		$this->assertCount( 1, $this->proposal_rows( 910 ) );
+
+		// The proposal resolves like any other (a discard here).
+		$resolve = $this->poll( array( self::resolution_update( 'kses-1', 'dismissed' ) ) );
+		$this->assertSame( 'resolved', $resolve['dispositions'][0]['status'] );
+	}
+
+	public function test_benign_formats_from_filtered_author_apply() {
+		$this->revoke_unfiltered_html();
+
+		$response = $this->poll(
+			array( self::format_intent( 'kses-ok', 'a|{"href":"https://example.com/"}' ) )
+		);
+		$this->assertSame( 'applied', $response['dispositions'][0]['status'] );
+
+		$engine  = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$content = $engine->materialize( $this->room() );
+		$this->assertStringContainsString( '<a href="https://example.com/">Hello</a>', $content );
+	}
+
+	public function test_plain_text_markup_is_entity_encoded_and_applies() {
+		$this->revoke_unfiltered_html();
+
+		$response = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-text',
+						'baseSeq'  => 0,
+						'type'     => 'insert_text',
+						'payload'  => array(
+							'syncId' => self::paragraph_id(),
+							'field'  => 'content',
+							'offset' => 0,
+							'text'   => '<script>x</script> ',
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'applied', $response['dispositions'][0]['status'] );
+
+		$engine  = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$content = $engine->materialize( $this->room() );
+		$this->assertStringNotContainsString( '<script>', $content );
+		$this->assertStringContainsString( '&lt;script&gt;', $content );
+	}
+
+	public function test_protected_insert_block_parks_its_whole_unit() {
+		$this->revoke_unfiltered_html();
+
+		$response = $this->poll(
+			array(
+				self::object_block_intent( 'kses-b1', '<script>x</script>', 'kses-txn' ),
+				self::intent_update(
+					array(
+						'intentId' => 'kses-b2',
+						'txnId'    => 'kses-txn',
+						'baseSeq'  => 0,
+						'type'     => 'insert_text',
+						'payload'  => array(
+							'syncId' => 'kses-nb',
+							'field'  => 'content',
+							'offset' => 1,
+							'text'   => ' benign tail',
+						),
+					)
+				),
+			)
+		);
+
+		// The WHOLE unit parks: the benign member depends on the escalated
+		// block existing, so applying it alone would be meaningless.
+		$reasons = array_column( $response['dispositions'], 'reason' );
+		$this->assertSame( array( 'requires-approval', 'requires-approval' ), $reasons );
+		$this->assertCount( 2, $this->proposal_rows() );
+
+		$engine = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$this->assertStringNotContainsString( 'kses-nb', (string) $engine->materialize( $this->room() ) );
+	}
+
+	public function test_wrapper_attr_injection_parks_for_approval() {
+		$this->revoke_unfiltered_html();
+
+		$response = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-w1',
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => self::paragraph_id(),
+							'key'             => '_wrapper',
+							'value'           => array(
+								'open'  => '<script>',
+								'close' => '</script>',
+							),
+							'observedVersion' => 0,
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'escalated', $response['dispositions'][0]['status'] );
+		$this->assertSame( 'requires-approval', $response['dispositions'][0]['reason'] );
+
+		// A benign wrapper (the codec's own shape for wrapped blocks) is
+		// fine.
+		$benign = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-w2',
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => self::paragraph_id(),
+							'key'             => '_wrapper',
+							'value'           => array(
+								'open'  => '<pre class="wp-block-code">',
+								'close' => '</pre>',
+							),
+							'observedVersion' => 0,
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'applied', $benign['dispositions'][0]['status'] );
+	}
+
+	public function test_unfiltered_html_users_author_protected_markup_directly() {
+		$this->grant_unfiltered_html();
+
+		$response = $this->poll(
+			array( self::object_block_intent( 'kses-priv', '<script>x</script>' ) )
+		);
+		$this->assertSame( 'applied', $response['dispositions'][0]['status'] );
+
+		$engine = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$this->assertStringContainsString( '<script>x</script>', (string) $engine->materialize( $this->room() ) );
+	}
+
+	public function test_block_names_outside_the_grammar_are_rejected_for_everyone() {
+		// Block names materialize into comment delimiters unescaped; a
+		// crafted name could close the comment and inject markup.
+		$insert = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'name-1',
+						'baseSeq'  => 0,
+						'type'     => 'insert_block',
+						'payload'  => array(
+							'block'          => array(
+								'syncId'    => 'name-nb',
+								'blockType' => 'core/x --><script>',
+							),
+							'parentId'       => null,
+							'afterSiblingId' => null,
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $insert, 400 );
+
+		$transform = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'name-2',
+						'baseSeq'  => 0,
+						'type'     => 'transform_block',
+						'payload'  => array(
+							'syncId'       => self::paragraph_id(),
+							'newBlockType' => 'evil -->',
+						),
+					)
+				),
+			)
+		);
+		$this->assertErrorResponse( 'rest_sync_invalid_intent', $transform, 400 );
+	}
 }

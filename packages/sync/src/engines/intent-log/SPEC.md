@@ -245,6 +245,32 @@ absorption must never silently swallow another actor's work.
 `ESCALATION_REASONS` in `src/rebase.js` is the closed set of reasons; the
 escalation-soundness oracle rejects anything else.
 
+## Server policy escalations (outside the planner)
+
+`requires-approval` is a WordPress-side POLICY escalation, not a planner
+rule: it never appears in the frozen vectors and has no JS-twin analog. At
+ingest, before planning, the PHP engine parks any unit containing an intent
+whose payload would materialize markup its author may not publish (per
+`wp_kses_post`, when the authoring user lacks `unfiltered_html`). The
+markup-bearing surfaces are: `format_text` span format ids when turning a
+format ON (element formats are judged through the codec's own serializer;
+`obj|{"html":…}` object formats re-emit verbatim HTML and are judged
+directly), `insert_block` specs (field formats, recursively, plus the
+`_wrapper` internal attr, which materialize rebuilds as raw markup), and
+`set_attr` writes to `_wrapper`. Plain text payloads are entity-encoded by
+the serializer and always safe; other block attrs serialize into the block
+comment, which a kses-filtered save preserves anyway. The parked proposal
+uses the ordinary proposal row shape, so replay, retention, resolution, and
+review UI apply unchanged — and a restore re-authors the content as new
+intents under the RESTORER's capability, which is what makes restore-by-a-
+privileged-reviewer an approval and restore-by-anyone-else a safe no-op
+(it simply re-escalates).
+
+Relatedly (validity, not capability): block type names materialize into
+comment delimiters unescaped, so `is_valid_payload` rejects names outside
+the block-name grammar (`namespace/name`, lowercase alphanumeric-dash) for
+every user — a crafted name could close the comment and inject markup.
+
 ## Validation oracles
 
 Checked by the deterministic simulator after every seeded schedule

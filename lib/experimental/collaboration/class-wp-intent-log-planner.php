@@ -238,9 +238,19 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 			$is_any             = static function (): bool {
 				return true;
 			};
-			$is_block           = null;
-			$is_block           = static function ( $value ) use ( &$is_block, $is_sync_id, $is_nonempty_string ): bool {
-				if ( ! is_array( $value ) || ! $is_sync_id( $value['syncId'] ?? null ) || ! $is_nonempty_string( $value['blockType'] ?? null ) ) {
+			/*
+			 * Block names materialize into comment delimiters UNESCAPED
+			 * (serialize_block escapes attrs, not the name), so a name
+			 * outside the block-name grammar could break out of the comment
+			 * and inject markup. Reject for everyone.
+			 */
+			$is_block_type = static function ( $value ): bool {
+				return is_string( $value )
+					&& (bool) preg_match( '/^[a-z][a-z0-9-]*(\/[a-z][a-z0-9-]*)?$/', $value );
+			};
+			$is_block      = null;
+			$is_block      = static function ( $value ) use ( &$is_block, $is_sync_id, $is_block_type ): bool {
+				if ( ! is_array( $value ) || ! $is_sync_id( $value['syncId'] ?? null ) || ! $is_block_type( $value['blockType'] ?? null ) ) {
 					return false;
 				}
 				foreach ( $value['children'] ?? array() as $child ) {
@@ -295,7 +305,7 @@ if ( ! class_exists( 'WP_Intent_Log_Planner' ) ) {
 				),
 				'transform_block'      => array(
 					'syncId'       => $is_sync_id,
-					'newBlockType' => $is_nonempty_string,
+					'newBlockType' => $is_block_type,
 				),
 				'insert_text'          => array(
 					'syncId' => $is_sync_id,
