@@ -218,6 +218,21 @@ describe( 'Function date', () => {
 	} );
 } );
 
+describe( 'Function date, ISO week number padding', () => {
+	// PHP pads the ISO week number to two digits, so a single digit week has to
+	// come back as `03` rather than `3`. Expected values are PHP's:
+	//   php -r 'echo date( "W", strtotime( "2024-01-15" ) );'
+	test.each( [
+		[ '2024-01-15T11:00:00.000Z', '03' ],
+		[ '2024-01-01T11:00:00.000Z', '01' ],
+		[ '2020-02-29T11:00:00.000Z', '09' ],
+		[ '2024-03-05T11:00:00.000Z', '10' ],
+		[ '2026-12-31T11:00:00.000Z', '53' ],
+	] )( 'should pad the week number for %s', ( dateValue, expected ) => {
+		expect( dateNoI18n( 'W', dateValue ) ).toBe( expected );
+	} );
+} );
+
 describe( 'Function gmdate', () => {
 	test.each( [
 		[ 'j/n/y', '18/6/19' ],

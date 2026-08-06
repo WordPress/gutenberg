@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 5.53.0 (2026-08-12)
+### Bug Fixes
 
+-   `format` now pads the `W` (ISO week number) format character to two digits, matching PHP. Previously `format( 'W', '2024-01-15' )` returned `'3'` where PHP's `date( 'W' )` returns `'03'`, so any week before the tenth of the year came out a character short ([#81299](https://github.com/WordPress/gutenberg/pull/81299)).
+
+## 5.53.0 (2026-08-12)
 
 ## 5.52.0 (2026-07-29)
 

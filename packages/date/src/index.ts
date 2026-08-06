@@ -286,7 +286,9 @@ const formatMap = {
 	},
 
 	// Week.
-	W: 'W',
+	// `WW` rather than `W`, because PHP pads the ISO week number to two digits
+	// and Moment's unpadded `W` would give `3` where PHP gives `03`.
+	W: 'WW',
 
 	// Month.
 	F: 'MMMM',
