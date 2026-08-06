@@ -13,6 +13,7 @@ import type {
 	IntentDisposition,
 	IntentEnvelope,
 } from './intent-log/engine-types';
+import { applyServerAwarenessStates } from './awareness-sync';
 import type {
 	AwarenessState,
 	EngineDisposition,
@@ -80,7 +81,19 @@ export interface IntentLogSessionOptions {
 
 	/** Per-tab client id; minted when omitted. */
 	clientId?: number;
+
+	/**
+	 * Presence surface (a y-protocols Awareness instance, constructed over a
+	 * stub doc — see createAwarenessDoc). When provided, local awareness is
+	 * read from it and server states are applied onto it, so the editor's
+	 * collaborator UI works; when omitted, awareness passes through plain
+	 * objects (tests, headless use).
+	 */
+	awareness?: import('y-protocols/awareness').Awareness;
 }
+
+/** Origin tag for awareness removals applied by this session. */
+const INTENT_LOG_SESSION_ORIGIN = 'intent-log-session';
 
 /**
  * The intent-log session: EngineSessionCodec toward the transport, plus the
@@ -274,10 +287,20 @@ export function createIntentLogSession(
 			notifyChange();
 		},
 
-		getLocalAwareness: () => localAwareness,
+		getLocalAwareness: () =>
+			options.awareness
+				? options.awareness.getLocalState() ?? {}
+				: localAwareness,
 
 		applyRemoteAwareness: ( state: AwarenessState ) => {
 			peers = state;
+			if ( options.awareness ) {
+				applyServerAwarenessStates(
+					state,
+					options.awareness,
+					INTENT_LOG_SESSION_ORIGIN
+				);
+			}
 		},
 
 		createCompactionUpdate: (): EngineUpdate => {

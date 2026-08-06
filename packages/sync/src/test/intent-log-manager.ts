@@ -11,6 +11,7 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import { Awareness } from 'y-protocols/awareness';
 import { createIntentLogManager } from '../engines/intent-log-manager';
 import { INTENT_LOG_UPDATE_TYPES } from '../engines/intent-log-session';
 import {
@@ -595,5 +596,66 @@ describe( 'intent-log manager', () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );
 		expect( transport.captured.destroyed ).toBe( true );
+	} );
+} );
+
+describe( 'intent-log manager awareness', () => {
+	afterEach( () => {
+		removeFilter( FILTER, HOOK );
+		resetEngineAdaptersForTesting();
+		resetProviderCreatorsForTesting();
+		delete window._wpCollaborationEnabled;
+		delete window._wpCollaborationSync;
+	} );
+
+	it( 'constructs the syncConfig awareness over a stub doc and bridges it to the wire', async () => {
+		const transport = makeFakeTransport();
+		window._wpCollaborationEnabled = '1';
+		addFilter( FILTER, HOOK, () => [ transport.creator ] );
+
+		const created: Awareness[] = [];
+		const syncConfig = {
+			createAwareness: ( doc: never ) => {
+				const awareness = new Awareness( doc );
+				created.push( awareness );
+				return awareness;
+			},
+		} as never;
+
+		const manager = createIntentLogManager();
+		await manager.load(
+			syncConfig,
+			'postType/post',
+			'1',
+			{},
+			makeHandlers()
+		);
+
+		// The typed awareness is constructed and exposed.
+		expect( created ).toHaveLength( 1 );
+		const awareness = manager.getAwareness( 'postType/post', '1' );
+		expect( awareness ).toBe( created[ 0 ] );
+
+		// Local presence flows to the wire payload…
+		awareness!.setLocalStateField( 'collaboratorInfo', { id: 7 } );
+		expect( transport.captured.session!.getLocalAwareness() ).toEqual( {
+			collaboratorInfo: { id: 7 },
+		} );
+
+		// …and server states flow into the instance with a change event.
+		const changes: unknown[] = [];
+		awareness!.on( 'change', ( change: unknown ) =>
+			changes.push( change )
+		);
+		transport.captured.session!.applyRemoteAwareness( {
+			999: { collaboratorInfo: { id: 42 } },
+		} );
+		expect( awareness!.getStates().get( 999 ) ).toEqual( {
+			collaboratorInfo: { id: 42 },
+		} );
+		expect( changes.length ).toBeGreaterThan( 0 );
+
+		// Teardown clears the outdated-pruning interval.
+		manager.unload( 'postType/post', '1' );
 	} );
 } );

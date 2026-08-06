@@ -332,11 +332,24 @@ inside intent payloads, not the transport.
   passes. Build note: hand-written .d.ts files need explicit `declare`
   on consts (esbuild parses declaration files as source).
 
-  Remaining in 2d: escalation surfacing UI (notice, not console),
-  presence/awareness wiring for the intent-log manager, a same-block
-  conflict e2e (escalation visible in the editor), the stale-tab
-  mid-session engine-flip e2e (409 → lock fallback), and save-flow
-  verification (materialize vs client save).
+  **2d-viii (presence) LANDED.** The intent-log manager constructs the
+  entity syncConfig's typed awareness (`PostEditorAwareness`) over a stub
+  doc — the y-protocols `Awareness` class only needs `clientID` and a
+  destroy listener from its doc — and the session bridges it to the poll
+  wire via `engines/awareness-sync.ts` (`applyServerAwarenessStates`,
+  extracted from the yjs codec and now shared by both engines). The
+  collaborator UI (avatars, list) works unchanged; consumers reaching
+  through `awareness.doc` for real Y.Doc features (selection anchoring,
+  peer-save notifications, debug doc dump) degrade gracefully on stub
+  docs and are engine-side future work. The intent-log e2e suite is back
+  on the shared presence-gated `openCollaborativeSession` fixture, so
+  every spec doubles as a presence assertion; 9/9 green.
+
+  Remaining in 2d: escalation surfacing UI (notice, not console), a
+  same-block conflict e2e (escalation visible in the editor), the
+  stale-tab mid-session engine-flip e2e (409 → lock fallback), save-flow
+  verification (materialize vs client save), selection/caret sharing for
+  intent-log, and title/entity-property sync (deliberate v1 exclusion).
 - **Phase 3 — benchmark through the seam.** Point the cost/quality harness
   (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
   head-to-head over identical transports and fixtures — the seam is what

@@ -4,18 +4,18 @@
 import * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
-import { Awareness, removeAwarenessStates } from 'y-protocols/awareness';
+import { Awareness } from 'y-protocols/awareness';
 import * as syncProtocol from 'y-protocols/sync';
 
 /**
  * Internal dependencies
  */
 import type {
-	AwarenessState,
 	EngineLocalUpdateListener,
 	EngineSessionCodec,
 	EngineUpdate,
 } from '../session';
+import { applyServerAwarenessStates } from '../awareness-sync';
 import { SyncUpdateType } from '../../providers/http-polling/types';
 import {
 	base64ToUint8Array,
@@ -111,78 +111,6 @@ function createDeprecatedCompactionUpdate(
 }
 
 /**
- * Process an incoming awareness update from the server.
- *
- * @param state     The awareness state received
- * @param awareness The local Awareness instance
- */
-function processAwarenessUpdate(
-	state: AwarenessState,
-	awareness: Awareness
-): void {
-	const currentStates = awareness.getStates();
-	const added = new Set< number >();
-	const updated = new Set< number >();
-
-	// Removed clients are missing from the server state.
-	const removed = new Set< number >(
-		Array.from( currentStates.keys() ).filter(
-			( clientId ) => ! state[ clientId ]
-		)
-	);
-
-	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
-		const clientId = Number( clientIdString );
-
-		// Skip our own state (we already have it locally).
-		if ( clientId === awareness.clientID ) {
-			return;
-		}
-
-		// A null state should be removed by the server, but handle it here just in case.
-		if ( null === awarenessState ) {
-			currentStates.delete( clientId );
-			removed.add( clientId );
-			return;
-		}
-
-		if ( ! currentStates.has( clientId ) ) {
-			currentStates.set( clientId, awarenessState );
-			added.add( clientId );
-			return;
-		}
-
-		const currentState = currentStates.get( clientId );
-
-		if (
-			JSON.stringify( currentState ) !== JSON.stringify( awarenessState )
-		) {
-			currentStates.set( clientId, awarenessState );
-			updated.add( clientId );
-		}
-	} );
-
-	if ( added.size + updated.size > 0 ) {
-		awareness.emit( 'change', [
-			{
-				added: Array.from( added ),
-				updated: Array.from( updated ),
-				// Left blank on purpose, as the removal of clients is handled in the if condition below.
-				removed: [],
-			},
-		] );
-	}
-
-	if ( removed.size > 0 ) {
-		removeAwarenessStates(
-			awareness,
-			Array.from( removed ),
-			YJS_RELAY_SESSION_ORIGIN
-		);
-	}
-}
-
-/**
  * Process an incoming sync / document update based on its type.
  *
  * @param update The typed update received
@@ -253,7 +181,11 @@ export function createYjsSessionCodec(
 
 	return {
 		applyRemoteAwareness: ( state ) =>
-			processAwarenessUpdate( state, awareness ),
+			applyServerAwarenessStates(
+				state,
+				awareness,
+				YJS_RELAY_SESSION_ORIGIN
+			),
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
 			createSyncUpdate(

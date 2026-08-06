@@ -7,7 +7,6 @@ import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
-import { SECOND_USER } from './fixtures/collaboration-utils';
 
 /**
  * Two-client collaboration through the intent-log sync engine.
@@ -28,38 +27,6 @@ async function setSyncEngine(
 		path: '/wp/v2/settings',
 		data: { wp_sync_engine: engine },
 	} );
-}
-
-/**
- * Opens a two-user session WITHOUT the presence-based mutual-discovery
- * gate: the intent-log manager does not implement awareness/presence yet
- * (tracked in ARCHITECTURE.md), so the collaborators-list UI the shared
- * fixture waits for never appears. Sessions are instead considered open
- * once both pages announce the intent-log engine; each spec's own
- * convergence assertions do the rest.
- *
- * @param collaborationUtils Collaboration fixture instance.
- * @param postId             Post to open.
- */
-async function openIntentLogSession(
-	collaborationUtils: InstanceType<
-		typeof import('./fixtures/collaboration-utils').default
-	>,
-	postId: number
-) {
-	await collaborationUtils.openPost( postId );
-	await collaborationUtils.joinUser( postId, SECOND_USER );
-	await Promise.all(
-		collaborationUtils.allPages.map( ( page ) =>
-			page.waitForFunction(
-				() =>
-					( window as { _wpCollaborationSync?: { engine?: string } } )
-						._wpCollaborationSync?.engine === 'intent-log',
-				undefined,
-				{ timeout: 10000 }
-			)
-		)
-	);
 }
 
 test.describe( 'Collaboration - intent-log engine', () => {
@@ -87,7 +54,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2 } = collaborationUtils;
 
 		// User 1 appends a paragraph.
@@ -145,7 +112,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -199,7 +166,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -255,7 +222,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -303,7 +270,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -348,7 +315,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -438,7 +405,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2 } = collaborationUtils;
 		const page1 = editor.page;
 
@@ -488,7 +455,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const page1 = editor.page;
 
 		await editor.canvas
@@ -503,11 +470,21 @@ test.describe( 'Collaboration - intent-log engine', () => {
 					( block.attributes.metadata as { syncId?: string } )?.syncId
 			);
 		};
+		/*
+		 * Wait for the SETTLED identity, not the first stamped one: the
+		 * stamper assigns a tab-local id immediately, then the shared
+		 * document's identity wins during settle. The durable invariant is
+		 * about the converged id — stable across consecutive reads.
+		 */
 		let stampedId: string | undefined;
 		await expect( async () => {
-			[ stampedId ] = await idsOf();
-			expect( stampedId ).toBeTruthy();
-		} ).toPass( { timeout: 15000 } );
+			const [ current ] = await idsOf();
+			expect( current ).toBeTruthy();
+			await page1.waitForTimeout( 2000 );
+			const [ settled ] = await idsOf();
+			expect( settled ).toBe( current );
+			stampedId = settled;
+		} ).toPass( { timeout: 30000 } );
 
 		await editor.saveDraft();
 
@@ -538,7 +515,7 @@ test.describe( 'Collaboration - intent-log engine', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await openIntentLogSession( collaborationUtils, post.id );
+		await collaborationUtils.openCollaborativeSession( post.id );
 		const { editor2, page2 } = collaborationUtils;
 		const page1 = editor.page;
 

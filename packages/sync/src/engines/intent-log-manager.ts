@@ -1,6 +1,15 @@
 /**
  * Internal dependencies
  */
+/**
+ * External dependencies
+ */
+import type { Awareness } from 'y-protocols/awareness';
+
+/**
+ * Internal dependencies
+ */
+import { createAwarenessDoc } from './awareness-sync';
 import {
 	deriveIntents,
 	engineDocumentToBlocks,
@@ -52,6 +61,8 @@ interface EntityState {
 	handlers: RecordHandlers;
 	providers: ProviderCreatorResult[];
 	unloaded: boolean;
+	/** Presence surface for the collaborator UI (see getAwareness). */
+	awareness?: Awareness;
 	/**
 	 * Stable clientId per syncId for blocks pushed to the editor. The
 	 * block-editor store keys blocks by clientId; pushing without one makes
@@ -201,9 +212,26 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			return;
 		}
 
-		const session = createIntentLogSession( { userId } );
+		/*
+		 * The presence surface: the entity's syncConfig constructs the typed
+		 * Awareness (e.g. PostEditorAwareness with collaborator info and
+		 * selection tracking). The y-protocols Awareness base only reads
+		 * `clientID` (and a destroy listener) from its doc argument, so a
+		 * stub suffices — presence is transport data, engine-independent.
+		 */
+		const clientId = Math.floor( Math.random() * ( 2 ** 31 - 1 ) ) + 1;
+		const awareness = syncConfig.createAwareness?.(
+			createAwarenessDoc( clientId ) as never,
+			objectId
+		);
+		const session = createIntentLogSession( {
+			userId,
+			clientId,
+			awareness,
+		} );
 		const state: EntityState = {
 			session,
+			awareness,
 			handlers,
 			providers: [],
 			unloaded: false,
@@ -463,12 +491,12 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			state.lastPushedState = capturedJson;
 		},
 
-		getAwareness: ( objectType, objectId ) => {
-			void entityKey( objectType, objectId );
-			// The Yjs Awareness class does not exist here. Peer state is
-			// available via the session; the presence UI integration is
-			// Phase 2d work.
-			return undefined;
+		getAwareness: < State extends Awareness >(
+			objectType: ObjectType,
+			objectId: ObjectID | null
+		) => {
+			return entityStates.get( entityKey( objectType, objectId ) )
+				?.awareness as State | undefined;
 		},
 
 		// The server materializes; there is no client-side persisted doc.
@@ -487,6 +515,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			}
 			state.unloaded = true;
 			state.providers.forEach( ( provider ) => provider.destroy() );
+			state.awareness?.destroy();
 			state.session.destroy();
 			entityStates.delete( key );
 		},
@@ -495,6 +524,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			for ( const [ , state ] of entityStates ) {
 				state.unloaded = true;
 				state.providers.forEach( ( provider ) => provider.destroy() );
+				state.awareness?.destroy();
 				state.session.destroy();
 			}
 			entityStates.clear();
