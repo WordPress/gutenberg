@@ -183,10 +183,10 @@ test.describe( 'List View', () => {
 			} )
 		).toBeVisible();
 
-		// The child paragraph block should be selected.
+		// The child heading block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Heading',
 				exact: true,
 				selected: true,
 			} )
@@ -215,24 +215,24 @@ test.describe( 'List View', () => {
 		// Click the Cover block title placeholder.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Block: Heading' } )
 			.click();
 
-		// The child paragraph block in List View should be selected.
+		// The child heading block in List View should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Heading',
 				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Check that blocks are expanded:
-		// 3 blocks: (one Cover block containing a Paragraph block, one Group block).
+		// 3 blocks: (one Cover block containing a Heading block, one Group block).
 		await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
 
 		await listView
-			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
 			.click();
 
 		// Move down to the Group block.
