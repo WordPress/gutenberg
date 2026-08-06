@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ export default function Text< Item >( {
 				validity,
 				prefix: prefix ? createElement( prefix ) : undefined,
 				suffix: suffix ? createElement( suffix ) : undefined,
+				transformValue: decodeEntities,
 			} }
 		/>
 	);
