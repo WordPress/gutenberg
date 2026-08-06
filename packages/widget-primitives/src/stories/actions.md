@@ -32,6 +32,8 @@ next to the widget (resolved to a plugin URL on the server). `data:` and
 files. Query strings on local filenames (e.g. `report.csv?v=2`) are not
 resolved as widget files.
 
+A file next to the widget resolves only where that directory ships. The Gutenberg plugin zip carries `build/`, not `widgets/`, so a relative `href` in a bundled widget resolves from a checkout and is dropped once installed. Use an absolute URL for anything that has to work in both.
+
 Two more keys belong to the link, not to the envelope, so they only mean something alongside an `href`:
 
 -   `download`: download instead of navigate; a string sets the filename.

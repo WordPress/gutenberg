@@ -19,6 +19,8 @@
 
 ### Documentation
 
+-   Document that widget-local action `href`s resolve only where `widgets/`
+    ships; bundled widgets use absolute URLs.
 -   Add an Icons doc page and a `WithIconReference` story ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 -   Describe actions as verbs ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
