@@ -6108,6 +6108,60 @@ describe( 'state', () => {
 			expect( state ).toBeUndefined();
 		} );
 
+		it( 'keeps the selected state for rich text selection changes in the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				start: {
+					clientId: 'client-1',
+					attributeKey: 'text',
+					offset: 0,
+				},
+				end: { clientId: 'client-1', attributeKey: 'text', offset: 0 },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for rich text selection changes in another block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					start: {
+						clientId: 'client-2',
+						attributeKey: 'text',
+						offset: 0,
+					},
+					end: {
+						clientId: 'client-2',
+						attributeKey: 'text',
+						offset: 0,
+					},
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes without a client ID', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
 		it( 'keeps the selected state when selection resets to the same block', () => {
 			const originalState = {
 				clientId: 'client-1',
