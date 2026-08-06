@@ -1,0 +1,110 @@
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.describe( 'adding inline tokens', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'should insert inline image', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( 'a ' );
+
+		await editor.showBlockToolbar();
+		await page.getByRole( 'button', { name: 'More' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Inline image' } ).click();
+
+		const testImagePath = './assets/10x10_e2e_test_image_z9T8jK.png';
+		const fileName = randomUUID();
+		const tmpFileName = path.join( os.tmpdir(), fileName + '.png' );
+		fs.copyFileSync( testImagePath, tmpFileName );
+		await page
+			.locator( '.media-modal .moxie-shim input[type=file]' )
+			.setInputFiles( tmpFileName );
+
+		// Insert the uploaded image.
+		await page
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		// Check the content.
+		const contentRegex = new RegExp(
+			`a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ fileName }\\.png" alt=""\\/?>`
+		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: expect.stringMatching( contentRegex ) },
+			},
+		] );
+
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			page.locator( 'role=spinbutton[name="Width"i]' )
+		).toBeFocused();
+		await page.getByRole( 'spinbutton', { name: 'Width' } ).fill( '20' );
+		await page
+			.getByRole( 'textbox', { name: 'Alternative text' } )
+			.fill( 'Alt' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Check the content.
+		const contentRegex2 = new RegExp(
+			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ fileName }\\.png" alt="Alt"\\/?>`
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: expect.stringMatching( contentRegex2 ) },
+			},
+		] );
+	} );
+
+	test( 'should select an inline image by clicking it @webkit @firefox', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		const { source_url: src } = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		// Two images of different widths, so the popover shows which one is
+		// selected.
+		const image = ( width ) =>
+			`<img class="wp-image-1" style="width: ${ width }px;" src="${ src }" alt="">`;
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: `a ${ image( 10 ) } b ${ image( 20 ) } c` },
+		} );
+
+		const images = editor.canvas.locator( 'img' );
+		const width = page.getByRole( 'spinbutton', { name: 'Width' } );
+
+		// A click on the image selects it and opens its popover.
+		await images.first().click();
+		await expect( width ).toHaveValue( '10' );
+
+		// A click on another image moves the selection and the popover to
+		// it, without going through the text in between.
+		await images.last().click();
+		await expect( width ).toHaveValue( '20' );
+		await expect( width ).toBeInViewport();
+
+		await images.first().click();
+		await expect( width ).toHaveValue( '10' );
+	} );
+} );

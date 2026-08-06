@@ -1,0 +1,16 @@
+.edit-site-sidebar-button {
+	color: var(--wpds-color-foreground-interactive-neutral);
+	flex-shrink: 0;
+
+	&:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	&:hover:not(:disabled,[aria-disabled="true"]),
+	&:focus-visible,
+	&:focus,
+	&:not(:disabled,[aria-disabled="true"]):active,
+	&[aria-expanded="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+}

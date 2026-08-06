@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"style": {
+				"dimensions": {
+					"width": "150px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Custom Width Button</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Custom Width Button</a></div>\n"
+		]
+	}
+]

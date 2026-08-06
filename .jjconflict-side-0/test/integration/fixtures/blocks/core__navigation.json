@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"submenuVisibility": "hover",
+			"overlayMenu": "mobile",
+			"icon": "handle",
+			"hasIcon": true,
+			"maxNestingLevel": 5
+		},
+		"innerBlocks": []
+	}
+]

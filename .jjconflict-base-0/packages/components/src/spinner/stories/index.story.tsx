@@ -1,0 +1,31 @@
+import type { StoryFn, Meta } from '@storybook/react-vite';
+import Spinner from '../';
+import { space } from '../../utils/space';
+
+const meta: Meta< typeof Spinner > = {
+	title: 'Components/@wordpress-components/Feedback/Spinner',
+	id: 'components-spinner',
+	component: Spinner,
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Spinner`](?path=/docs/design-system-components-spinner--docs) from `@wordpress/ui` instead.',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof Spinner > = ( args ) => {
+	return <Spinner { ...args } />;
+};
+
+export const Default: StoryFn< typeof Spinner > = Template.bind( {} );
+
+// The Spinner can be resized to any size, but the stroke width will remain unchanged.
+export const CustomSize: StoryFn< typeof Spinner > = Template.bind( {} );
+CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };

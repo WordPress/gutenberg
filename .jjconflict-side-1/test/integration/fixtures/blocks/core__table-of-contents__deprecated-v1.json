@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/table-of-contents",
+		"isValid": true,
+		"attributes": {
+			"onlyIncludeCurrentPage": false,
+			"maxLevel": 3,
+			"ordered": false
+		},
+		"innerBlocks": []
+	}
+]

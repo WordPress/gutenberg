@@ -1,0 +1,68 @@
+{
+	"name": "@wordpress/data-controls",
+	"version": "4.57.0",
+	"description": "A set of common controls for the @wordpress/data api.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"data",
+		"controls"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/data-controls/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/data-controls"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

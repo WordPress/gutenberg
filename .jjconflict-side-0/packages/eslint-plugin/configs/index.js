@@ -1,0 +1,15 @@
+module.exports = {
+	custom: require( './custom' ),
+	es5: require( './es5' ),
+	esnext: require( './esnext' ),
+	i18n: require( './i18n' ),
+	jsdoc: require( './jsdoc' ),
+	jshint: require( './jshint' ),
+	'jsx-a11y': require( './jsx-a11y' ),
+	react: require( './react' ),
+	recommended: require( './recommended' ),
+	'recommended-with-formatting': require( './recommended-with-formatting' ),
+	'test-e2e': require( './test-e2e' ),
+	'test-playwright': require( './test-playwright' ),
+	'test-unit': require( './test-unit' ),
+};

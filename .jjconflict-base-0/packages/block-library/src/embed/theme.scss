@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block-embed :where(figcaption) {
+	@include caption-style-theme();
+}
+
+.wp-block-embed {
+	margin: 0 0 1em 0;
+}

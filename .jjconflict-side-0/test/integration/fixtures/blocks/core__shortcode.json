@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/shortcode",
+		"isValid": true,
+		"attributes": {
+			"text": "[gallery ids=\"238,338\"]"
+		},
+		"innerBlocks": []
+	}
+]

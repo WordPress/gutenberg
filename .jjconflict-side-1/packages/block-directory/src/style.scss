@@ -1,0 +1,8 @@
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/block-ratings/style.scss" as *;
+@use "./components/compact-list/style.scss" as *;
+@use "./components/downloadable-block-icon/style.scss" as *;
+@use "./components/downloadable-block-list-item/style.scss" as *;
+@use "./components/downloadable-block-notice/style.scss" as *;
+@use "./components/downloadable-blocks-panel/style.scss" as *;
+@use "./plugins/installed-blocks-pre-publish-panel/style.scss" as *;

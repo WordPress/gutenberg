@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"align": "left",
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"width": "164px",
+			"height": "164px",
+			"sizeSlug": "large",
+			"className": "is-style-rounded",
+			"style": {
+				"border": {
+					"radius": "100%"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

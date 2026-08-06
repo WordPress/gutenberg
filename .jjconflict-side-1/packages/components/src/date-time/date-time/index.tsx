@@ -1,0 +1,78 @@
+import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
+import { forwardRef } from '@wordpress/element';
+import { default as DatePicker } from '../date-picker';
+import { default as TimePicker } from '../time-picker';
+import type { DateTimePickerProps } from '../types';
+import { VStack } from '../../v-stack';
+import styles from './style.module.scss';
+
+export { DatePicker, TimePicker };
+
+const noop = () => {};
+
+function UnforwardedDateTimePicker(
+	{
+		currentDate,
+		is12Hour,
+		dateOrder,
+		isInvalidDate,
+		onMonthPreviewed = noop,
+		onChange,
+		events,
+		startOfWeek,
+	}: DateTimePickerProps,
+	ref: ForwardedRef< any >
+) {
+	return (
+		<VStack
+			ref={ ref }
+			className={ clsx( 'components-datetime', styles.wrapper ) }
+			spacing={ 4 }
+		>
+			<>
+				<TimePicker
+					currentTime={ currentDate }
+					onChange={ onChange }
+					is12Hour={ is12Hour }
+					dateOrder={ dateOrder }
+				/>
+				<DatePicker
+					currentDate={ currentDate }
+					onChange={ onChange }
+					isInvalidDate={ isInvalidDate }
+					events={ events }
+					onMonthPreviewed={ onMonthPreviewed }
+					startOfWeek={ startOfWeek }
+				/>
+			</>
+		</VStack>
+	);
+}
+
+/**
+ * DateTimePicker is a React component that renders a calendar and clock for
+ * date and time selection. The calendar and clock components can be accessed
+ * individually using the `DatePicker` and `TimePicker` components respectively.
+ *
+ * ```jsx
+ * import { DateTimePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyDateTimePicker = () => {
+ *   const [ date, setDate ] = useState( new Date() );
+ *
+ *   return (
+ *     <DateTimePicker
+ *       currentDate={ date }
+ *       onChange={ ( newDate ) => setDate( newDate ) }
+ *       is12Hour
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+DateTimePicker.displayName = 'DateTimePicker';
+
+export default DateTimePicker;
