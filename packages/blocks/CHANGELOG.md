@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   `getBlockAttributesNamesByRole`: The `content` role now includes the `metadata` attribute, matching the special case `isUnmodifiedBlock` already applied.
-
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
