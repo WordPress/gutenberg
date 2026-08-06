@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`jsdoc-valid-since`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/jsdoc-valid-since.md) rule to enforce semantic versions in `@since` JSDoc tags while allowing optional descriptions ([#20859](https://github.com/WordPress/gutenberg/issues/20859)).
+
 ## 25.7.0 (2026-07-14)
 
 ## 25.6.0 (2026-07-01)
