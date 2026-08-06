@@ -1,11 +1,6 @@
 import removeAccents from 'remove-accents';
 
 /**
- * WordPress dependencies
- */
-export { kebabCase } from '@wordpress/kebab-case';
-
-/**
  * All unicode characters that we consider "dash-like":
  * - `\u007e`: ~ (tilde)
  * - `\u00ad`: ­ (soft hyphen)

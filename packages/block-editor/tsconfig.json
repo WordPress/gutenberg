@@ -26,6 +26,7 @@
 		{ "path": "../image-cropper" },
 		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices" },

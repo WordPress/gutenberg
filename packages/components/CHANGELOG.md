@@ -69,7 +69,7 @@
 
 ### Internal
 
--   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package; the private API re-exports it unchanged ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
+-   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package and remove it from the private APIs; all consumers now use the package directly ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
 
 ### TypeScript
 

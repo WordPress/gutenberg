@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
+
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).

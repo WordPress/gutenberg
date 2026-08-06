@@ -86,6 +86,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-editor": "file:../media-editor",
 		"@wordpress/media-fields": "file:../media-fields",
