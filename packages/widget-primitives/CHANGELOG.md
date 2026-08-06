@@ -19,6 +19,8 @@
 
 ### Documentation
 
+-   Simplify the actions doc: the accepted `href` forms in one statement and
+    an absolute-URL download example ([#81272](https://github.com/WordPress/gutenberg/pull/81272)).
 -   Add an Icons doc page and a `WithIconReference` story ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 -   Describe actions as verbs ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
 -   Prefer widget-local files over `data:` URLs for action downloads ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
