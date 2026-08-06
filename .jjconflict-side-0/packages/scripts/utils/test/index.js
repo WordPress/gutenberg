@@ -1,0 +1,250 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
+const crossSpawn = require( 'cross-spawn' );
+const processUtils = require( '../process' );
+const getArgsFromCLIMock = vi.spyOn( processUtils, 'getArgsFromCLI' );
+const exitMock = vi.spyOn( processUtils, 'exit' );
+const packageUtils = require( '../package' );
+const getPackagePathMock = vi.spyOn( packageUtils, 'getPackagePath' );
+const fileUtils = require( '../file' );
+const hasProjectFileMock = vi.spyOn( fileUtils, 'hasProjectFile' );
+const fromProjectRootMock = vi.spyOn( fileUtils, 'fromProjectRoot' );
+const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
+let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+const {
+	hasArgInCLI,
+	hasFileArgInCLI,
+	hasProjectFile,
+	getWebpackArgs,
+	spawnScript,
+} = require( '../' );
+
+beforeEach( () => {
+	crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+} );
+
+describe( 'utils', () => {
+	describe( 'hasArgInCLI', () => {
+		beforeEach( () => {
+			getArgsFromCLIMock.mockReturnValue( [
+				'-a',
+				'--b',
+				'--config=test',
+			] );
+		} );
+
+		afterAll( () => {
+			getArgsFromCLIMock.mockReset();
+		} );
+
+		test( 'should return false when no args passed', () => {
+			getArgsFromCLIMock.mockReturnValueOnce( [] );
+
+			expect( hasArgInCLI( '--no-args' ) ).toBe( false );
+		} );
+
+		test( 'should return false when checking for unrecognized arg', () => {
+			expect( hasArgInCLI( '--non-existent' ) ).toBe( false );
+		} );
+
+		test( 'should return true when CLI arg found', () => {
+			expect( hasArgInCLI( '-a' ) ).toBe( true );
+			expect( hasArgInCLI( '--b' ) ).toBe( true );
+			expect( hasArgInCLI( '--config' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'hasFileArgInCLI', () => {
+		afterAll( () => {
+			getArgsFromCLIMock.mockReset();
+		} );
+
+		test( 'should treat a file after --fix as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--fix', 'style.scss' ] );
+
+			expect( hasFileArgInCLI() ).toBe( true );
+		} );
+
+		test( 'should treat a file after --require-pragma as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [
+				'--require-pragma',
+				'index.js',
+			] );
+
+			expect( hasFileArgInCLI() ).toBe( true );
+		} );
+
+		test( 'should not treat the stylelint --fix mode as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--fix', 'lax' ] );
+
+			expect( hasFileArgInCLI() ).toBe( false );
+		} );
+
+		test( 'should not treat the value of --config as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--config', 'custom.json' ] );
+
+			expect( hasFileArgInCLI() ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasProjectFile', () => {
+		test( 'should return false for the current directory and unknown file', () => {
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
+
+			expect( hasProjectFile( 'unknown-file.name' ) ).toBe( false );
+		} );
+
+		test( 'should return true for the current directory and this file', () => {
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
+
+			expect( hasProjectFile( 'index.js' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getWebpackArgs', () => {
+		beforeEach( () => {
+			hasProjectFileMock.mockReturnValue( false );
+			fromProjectRootMock.mockImplementation(
+				( filePath ) => '/p/' + filePath
+			);
+			fromConfigRootMock.mockImplementation(
+				( filePath ) => '/c/' + filePath
+			);
+		} );
+
+		afterEach( () => {
+			getArgsFromCLIMock.mockReset();
+			hasProjectFileMock.mockReset();
+			fromProjectRootMock.mockReset();
+			fromConfigRootMock.mockReset();
+			delete process.env.WP_ENTRY;
+		} );
+
+		it.each( [ 'js', 'jsx', 'ts', 'tsx' ] )(
+			'removes the .%s extension from direct build entry names',
+			( extension ) => {
+				getArgsFromCLIMock.mockReturnValue( [
+					`entry.${ extension }`,
+				] );
+
+				getWebpackArgs();
+
+				expect( JSON.parse( process.env.WP_ENTRY ) ).toEqual( {
+					entry: `/p/entry.${ extension }`,
+				} );
+			}
+		);
+	} );
+
+	describe( 'spawnScript', () => {
+		const scriptName = 'test-unit-js';
+
+		beforeEach( () => {
+			exitMock.mockImplementation( ( code ) => {
+				throw new Error( `Exit code: ${ code }.` );
+			} );
+		} );
+
+		afterAll( () => {
+			exitMock.mockReset();
+		} );
+
+		test( 'should exit when no script name provided', () => {
+			expect( () => spawnScript() ).toThrow( 'Exit code: 1.' );
+			expect( console ).toHaveLoggedWith( 'Script name is missing.' );
+		} );
+
+		test( 'should exit when an unknown script name provided', () => {
+			expect( () => spawnScript( 'unknown-script' ) ).toThrow(
+				'Exit code: 1.'
+			);
+			expect( console ).toHaveLoggedWith(
+				'Unknown script "unknown-script". Perhaps you need to update @wordpress/scripts?'
+			);
+		} );
+
+		test( 'should exit when the script failed because of SIGKILL signal', () => {
+			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGKILL' } );
+
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 1.'
+			);
+			expect( console ).toHaveLogged();
+		} );
+
+		test( 'should exit when the script failed because of SIGTERM signal', () => {
+			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGTERM' } );
+
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 1.'
+			);
+			expect( console ).toHaveLogged();
+		} );
+
+		test( 'should pass inspect args to node', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+
+			expect( () =>
+				spawnScript( scriptName, [], [ '--inspect-brk' ] )
+			).toThrow( 'Exit code: 0.' );
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ '--inspect-brk', expect.stringContaining( scriptName ) ],
+				{ stdio: 'inherit' }
+			);
+		} );
+
+		test( 'should pass script args to the script', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+
+			expect( () =>
+				spawnScript( scriptName, [ '--runInBand' ] )
+			).toThrow( 'Exit code: 0.' );
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ expect.stringContaining( scriptName ), '--runInBand' ],
+				{ stdio: 'inherit' }
+			);
+		} );
+
+		test( 'should finish successfully when the script properly executed', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 0.'
+			);
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ expect.stringContaining( scriptName ) ],
+				{ stdio: 'inherit' }
+			);
+		} );
+
+		test( 'should finish successfully when the script properly executed with args', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+			const args = [ '-a', '--bbb', '-c=ccccc' ];
+
+			expect( () => spawnScript( scriptName, args ) ).toThrow(
+				'Exit code: 0.'
+			);
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ expect.stringContaining( scriptName ), ...args ],
+				{ stdio: 'inherit' }
+			);
+		} );
+	} );
+} );

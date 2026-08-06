@@ -1,0 +1,14 @@
+import { createContext } from '@wordpress/element';
+import type { NavigatorContext as NavigatorContextType } from './types';
+
+const initialContextValue: NavigatorContextType = {
+	location: {},
+	goTo: () => {},
+	goBack: () => {},
+	goToParent: () => {},
+	addScreen: () => {},
+	removeScreen: () => {},
+	params: {},
+};
+export const NavigatorContext = createContext( initialContextValue );
+NavigatorContext.displayName = 'NavigatorContext';

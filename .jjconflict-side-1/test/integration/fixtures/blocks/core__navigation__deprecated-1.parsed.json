@@ -1,0 +1,22 @@
+[
+	{
+		"blockName": "core/navigation",
+		"attrs": {
+			"isResponsive": true
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/navigation-link",
+				"attrs": {
+					"label": "WordPress",
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			}
+		],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n", null, "\n" ]
+	}
+]

@@ -1,0 +1,283 @@
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.use( {
+	templateRevertUtils: async ( { editor, page }, use ) => {
+		await use( new TemplateRevertUtils( { editor, page } ) );
+	},
+} );
+
+test.describe( 'Template Revert', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template revert involves visitSiteEditor() page navigations to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test( 'should delete the template after saving the reverted template', async ( {
+		editor,
+		page,
+		templateRevertUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await templateRevertUtils.revertTemplate();
+
+		const isTemplateTabVisible = await page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Template' } )
+				.click();
+		}
+
+		// The revert button isn't visible anymore.
+		await expect(
+			page.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+			)
+		).toBeDisabled();
+	} );
+
+	test( 'should show the original content after revert', async ( {
+		editor,
+		templateRevertUtils,
+	} ) => {
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await templateRevertUtils.revertTemplate();
+
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+		expect( contentAfter ).toEqual( contentBefore );
+	} );
+
+	test( 'should show the original content after revert and page reload', async ( {
+		admin,
+		editor,
+		templateRevertUtils,
+	} ) => {
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await templateRevertUtils.revertTemplate();
+		await admin.visitSiteEditor();
+
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
+	} );
+
+	test( 'should show the edited content after revert and clicking undo in the header toolbar', async ( {
+		editor,
+		page,
+		templateRevertUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+
+		// Revert template and check state.
+		await templateRevertUtils.revertTemplate();
+		const contentAfterSave =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+		expect( contentAfterSave ).not.toEqual( contentBefore );
+
+		// Undo revert by clicking header button and check state again.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		const contentAfterUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+		expect( contentAfterUndo ).toEqual( contentBefore );
+	} );
+
+	test( 'should show the original content after revert, clicking undo then redo in the header toolbar', async ( {
+		editor,
+		page,
+		templateRevertUtils,
+	} ) => {
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await templateRevertUtils.revertTemplate();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+
+		const contentAfterUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+		expect( contentAfterUndo ).not.toEqual( contentBefore );
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Redo' } )
+			.click();
+
+		const contentAfterRedo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+		expect( contentAfterRedo ).toEqual( contentBefore );
+	} );
+
+	test( 'should show the edited content after revert, clicking undo in the header toolbar, save and reload', async ( {
+		admin,
+		editor,
+		page,
+		templateRevertUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.click();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
+
+		await templateRevertUtils.revertTemplate();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await admin.visitSiteEditor();
+
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
+	} );
+} );
+
+class TemplateRevertUtils {
+	constructor( { editor, page } ) {
+		this.editor = editor;
+		this.page = page;
+	}
+
+	async revertTemplate() {
+		await this.editor.openDocumentSettingsSidebar();
+		const isTemplateTabVisible = await this.page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await this.page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tab', { name: 'Template' } )
+				.click();
+		}
+		await this.page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await this.page.getByRole( 'menuitem', { name: /Reset/i } ).click();
+		await this.page.getByRole( 'button', { name: 'Reset' } ).click();
+		await this.page.waitForSelector(
+			'role=button[name="Dismiss this notice"i] >> text=/ reset./'
+		);
+	}
+
+	async getCurrentSiteEditorContent() {
+		// Serialize the block list rather than reading the edited entity's
+		// content: right after a load the latter still holds the raw REST
+		// string, which can differ from a serialization round-trip. Then wait
+		// until the serialization is stable, so a capture cannot race the
+		// block mount effects that normalize attributes (e.g. the Query
+		// block's `excludeCurrent`) and consecutive captures compare like
+		// for like.
+		return this.page.evaluate( async () => {
+			const read = () =>
+				window.wp.blocks.serialize(
+					window.wp.data.select( 'core/block-editor' ).getBlocks()
+				);
+			let previous = read();
+			for ( let i = 0; i < 20; i++ ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+				const next = read();
+				if ( next === previous ) {
+					return next;
+				}
+				previous = next;
+			}
+			return previous;
+		} );
+	}
+}

@@ -1,0 +1,29 @@
+[
+	{
+		"blockName": "core/avatar",
+		"attrs": {
+			"userId": 4,
+			"size": 85,
+			"isLink": true,
+			"align": "right",
+			"style": {
+				"spacing": {
+					"margin": {
+						"bottom": "40px"
+					}
+				},
+				"border": {
+					"radius": "47px",
+					"width": "3px"
+				},
+				"color": {
+					"duotone": [ "#000000", "#ffe2c7" ]
+				}
+			},
+			"borderColor": "vivid-red"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -1,0 +1,121 @@
+import type {
+	KeyboardEvent,
+	KeyboardEventHandler,
+	RefCallback,
+	SyntheticEvent,
+} from 'react';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
+import useConstrainedTabbing from '../use-constrained-tabbing';
+import { useFocusOnMount } from '../use-focus-on-mount';
+import useFocusReturn from '../use-focus-return';
+import useFocusOutside from '../use-focus-outside';
+import useMergeRefs from '../use-merge-refs';
+
+type DialogOptions = {
+	/**
+	 * Determines focus behavior when the dialog mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
+	 *
+	 * @default 'firstElement'
+	 */
+	focusOnMount?: useFocusOnMount.Mode;
+	/**
+	 * Determines whether tabbing is constrained to within the popover,
+	 * preventing keyboard focus from leaving the popover content without
+	 * explicit focus elsewhere, or whether the popover remains part of the
+	 * wider tab order.
+	 * If no value is passed, it will be derived from `focusOnMount`.
+	 *
+	 * @see focusOnMount
+	 * @default `focusOnMount` !== false
+	 */
+	constrainTabbing?: boolean;
+	onClose?: () => void;
+	/**
+	 * Optional `onKeyDown` handler, merged with the built-in one.
+	 */
+	onKeyDown?: KeyboardEventHandler< HTMLElement >;
+	/**
+	 * Use the `onClose` prop instead.
+	 *
+	 * @deprecated
+	 */
+	__unstableOnClose?: (
+		type: string | undefined,
+		event: SyntheticEvent
+	) => void;
+};
+
+type useDialogReturn = [
+	RefCallback< HTMLElement >,
+	ReturnType< typeof useFocusOutside > & {
+		onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+	} & Pick< HTMLElement, 'tabIndex' >,
+];
+
+/**
+ * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
+ *  - constrained tabbing.
+ *  - focus on mount.
+ *  - return focus on unmount.
+ *  - focus outside.
+ *
+ * @param options Dialog Options.
+ */
+function useDialog( options: DialogOptions ): useDialogReturn {
+	const currentOptions = useRef< DialogOptions >( undefined );
+	const { constrainTabbing = options.focusOnMount !== false } = options;
+	useEffect( () => {
+		currentOptions.current = options;
+	}, Object.values( options ) );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusOnMountRef = useFocusOnMount( options.focusOnMount );
+	const focusReturnRef = useFocusReturn();
+	const focusOutsideProps = useFocusOutside( ( event ) => {
+		// This unstable prop  is here only to manage backward compatibility
+		// for the Popover component otherwise, the onClose should be enough.
+		if ( currentOptions.current?.__unstableOnClose ) {
+			currentOptions.current.__unstableOnClose( 'focus-outside', event );
+		} else if ( currentOptions.current?.onClose ) {
+			currentOptions.current.onClose();
+		}
+	} );
+	// Close on Escape via a React `onKeyDown` (rather than a native listener)
+	// so portaled descendants that handle Escape and call
+	// `event.stopPropagation()` correctly prevent the dialog from closing.
+	// See https://github.com/WordPress/gutenberg/issues/78432.
+	const onKeyDown = useCallback( ( event: KeyboardEvent< HTMLElement > ) => {
+		// Let the consumer-provided handler (if any) run first so it can
+		// call `preventDefault()` to opt out of close-on-Escape.
+		currentOptions.current?.onKeyDown?.( event );
+		if (
+			event.key === 'Escape' &&
+			! event.defaultPrevented &&
+			currentOptions.current?.onClose
+		) {
+			event.preventDefault();
+			event.stopPropagation();
+			currentOptions.current.onClose();
+		}
+	}, [] );
+
+	return [
+		useMergeRefs( [
+			constrainTabbing ? constrainedTabbingRef : null,
+			options.focusOnMount !== false ? focusReturnRef : null,
+			options.focusOnMount !== false ? focusOnMountRef : null,
+		] ),
+		{
+			...focusOutsideProps,
+			onKeyDown,
+			tabIndex: -1,
+		},
+	];
+}
+
+export default useDialog;
