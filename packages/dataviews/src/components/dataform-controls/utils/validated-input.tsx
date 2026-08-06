@@ -27,10 +27,6 @@ export type DataFormValidatedTextControlProps< Item > =
 		 * Optional suffix element to display after the input.
 		 */
 		suffix?: React.ReactElement;
-		/**
-		 * Optional transformation applied to string values before display.
-		 */
-		transformValue?: ( value: string ) => string;
 	};
 
 export default function ValidatedText< Item >( {
@@ -42,16 +38,11 @@ export default function ValidatedText< Item >( {
 	type,
 	prefix,
 	suffix,
-	transformValue,
 	validity,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
-	const displayValue =
-		transformValue && typeof value === 'string'
-			? transformValue( value )
-			: value;
 	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
@@ -72,7 +63,7 @@ export default function ValidatedText< Item >( {
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
-			value={ displayValue ?? '' }
+			value={ value ?? '' }
 			help={ description }
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }

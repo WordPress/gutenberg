@@ -13,7 +13,6 @@
 
 ### Bug Fix
 
--   DataForms: Decode HTML entities when displaying values in plain text inputs. [#81269](https://github.com/WordPress/gutenberg/pull/81269)
 -   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
 -   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)
 -   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)

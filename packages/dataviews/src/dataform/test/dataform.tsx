@@ -102,46 +102,6 @@ describe( 'DataForm component', () => {
 			expect( fieldsSelector.author.edit() ).toBeInTheDocument();
 		} );
 
-		it( 'should decode HTML entities only in text controls', async () => {
-			const onChange = jest.fn();
-			const fieldsWithPassword = [
-				...fields,
-				{
-					id: 'password',
-					label: 'Password',
-					type: 'password' as const,
-				},
-			];
-			render(
-				<Dataform
-					onChange={ onChange }
-					fields={ fieldsWithPassword }
-					form={ {
-						...form,
-						fields: [ ...form.fields, 'password' ],
-					} }
-					data={ {
-						...data,
-						title: 'Jordan&#039;s Test &lt;Preview&gt;',
-						password: 'secret&amp;value',
-					} }
-				/>
-			);
-
-			expect( fieldsSelector.title.edit() ).toHaveValue(
-				"Jordan's Test <Preview>"
-			);
-			expect( screen.getByLabelText( 'Password' ) ).toHaveValue(
-				'secret&amp;value'
-			);
-
-			const user = userEvent.setup();
-			await user.type( fieldsSelector.title.edit(), '!' );
-			expect( onChange ).toHaveBeenLastCalledWith( {
-				title: "Jordan's Test <Preview>!",
-			} );
-		} );
-
 		it( 'should render custom Edit component', () => {
 			const fieldsWithCustomEditComponent = fields.map( ( field ) => {
 				if ( field.id === 'title' ) {

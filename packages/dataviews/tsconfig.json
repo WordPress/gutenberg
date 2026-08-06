@@ -19,7 +19,6 @@
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
-		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
