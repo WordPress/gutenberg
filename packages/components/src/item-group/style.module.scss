@@ -59,6 +59,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 
 	&.is-unstyled-button,
 	&.is-unstyled-link {
+		color: var(--wpds-color-foreground-interactive-neutral);
 		font-size: var(--wpds-typography-font-size-md);
 		font-family: var(--wpds-typography-font-family-body);
 		appearance: none;
@@ -73,7 +74,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		}
 
 		&:hover {
-			color: var(--wpds-color-foreground-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 
 		&:focus {
