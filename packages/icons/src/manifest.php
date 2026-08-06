@@ -221,6 +221,10 @@ return array(
 		'label'    => _x( 'Mobile', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/mobile.svg',
 	),
+	'moon'                => array(
+		'label'    => _x( 'Moon', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/moon.svg',
+	),
 	'more-horizontal'     => array(
 		'label'    => _x( 'More Horizontal', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/more-horizontal.svg',
@@ -324,6 +328,10 @@ return array(
 	'styles'              => array(
 		'label'    => _x( 'Styles', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/styles.svg',
+	),
+	'sun'                 => array(
+		'label'    => _x( 'Sun', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/sun.svg',
 	),
 	'symbol'              => array(
 		'label'    => _x( 'Symbol', 'icon label', 'gutenberg' ),

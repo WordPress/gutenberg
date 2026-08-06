@@ -5,21 +5,25 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
-	__experimentalSpacer as Spacer,
-	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import type { Gradient } from '@wordpress/global-styles-engine';
+import type {
+	ColorSchemePreset,
+	Gradient,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
+import {
+	addBasePresetNames,
+	flattenSchemePresets,
+	SchemePaletteIcon,
+	type SchemePresetCollection,
+} from './color-scheme-palette';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
-
-const noop = () => {};
 
 interface GradientPalettePanelProps {
 	name?: string;
@@ -50,22 +54,34 @@ export default function GradientPalettePanel( {
 		'color.gradients.custom',
 		name
 	);
+	const [ lightGradients, setLightGradients ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Gradient > >
+	>( 'color.light.gradients', name );
+	const [ userLightGradients ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Gradient > >
+	>( 'color.light.gradients', name, 'user' );
+	const [ darkGradients, setDarkGradients ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Gradient > >
+	>( 'color.dark.gradients', name );
+	const [ userDarkGradients ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Gradient > >
+	>( 'color.dark.gradients', name, 'user' );
+
+	const namedLightGradients = addBasePresetNames(
+		flattenSchemePresets( lightGradients ),
+		themeGradients
+	);
+	const namedDarkGradients = addBasePresetNames(
+		flattenSchemePresets( darkGradients ),
+		themeGradients
+	);
+	const hasLightGradients = namedLightGradients.length > 0;
+	const hasDarkGradients = namedDarkGradients.length > 0;
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultGradients',
 		name
 	);
-
-	const [ customDuotone ] = useSetting( 'color.duotone.custom' ) || [];
-	const [ defaultDuotone ] = useSetting( 'color.duotone.default' ) || [];
-	const [ themeDuotone ] = useSetting( 'color.duotone.theme' ) || [];
-	const [ defaultDuotoneEnabled ] = useSetting( 'color.defaultDuotone' );
-
-	const duotonePalette = [
-		...( customDuotone || [] ),
-		...( themeDuotone || [] ),
-		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
-	];
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
@@ -83,6 +99,36 @@ export default function GradientPalettePanel( {
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
+					paletteVariations={ [
+						...( hasLightGradients
+							? [
+									{
+										canReset:
+											userLightGradients !== undefined,
+										gradients: namedLightGradients,
+										onChange: setLightGradients,
+										paletteIcon: (
+											<SchemePaletteIcon scheme="light" />
+										),
+										paletteLabel: __( 'Light gradients' ),
+									},
+							  ]
+							: [] ),
+						...( hasDarkGradients
+							? [
+									{
+										canReset:
+											userDarkGradients !== undefined,
+										gradients: namedDarkGradients,
+										onChange: setDarkGradients,
+										paletteIcon: (
+											<SchemePaletteIcon scheme="dark" />
+										),
+										paletteLabel: __( 'Dark gradients' ),
+									},
+							  ]
+							: [] ),
+					] }
 					popoverProps={ popoverProps }
 				/>
 			) }
@@ -107,20 +153,6 @@ export default function GradientPalettePanel( {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			{ !! duotonePalette && !! duotonePalette.length && (
-				<div>
-					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
-					<Spacer margin={ 3 } />
-					<DuotonePicker
-						duotonePalette={ duotonePalette }
-						disableCustomDuotone
-						disableCustomColors
-						clearable={ false }
-						onChange={ noop }
-						colorPalette={ [] }
-					/>
-				</div>
-			) }
 		</VStack>
 	);
 }

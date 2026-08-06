@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import type { Color } from '@wordpress/global-styles-engine';
+import type { Color, ColorSchemePreset } from '@wordpress/global-styles-engine';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalPaletteEdit as PaletteEdit,
@@ -16,6 +16,12 @@ import { shuffle } from '@wordpress/icons';
  */
 import { useSetting, useColorRandomizer } from './hooks';
 import ColorVariations from './variations/variations-color';
+import {
+	addBasePresetNames,
+	flattenSchemePresets,
+	SchemePaletteIcon,
+	type SchemePresetCollection,
+} from './color-scheme-palette';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
 
@@ -46,6 +52,29 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 		'color.palette.custom',
 		name
 	);
+	const [ lightColors, setLightColors ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Color > >
+	>( 'color.light.palette', name );
+	const [ userLightColors ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Color > >
+	>( 'color.light.palette', name, 'user' );
+	const [ darkColors, setDarkColors ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Color > >
+	>( 'color.dark.palette', name );
+	const [ userDarkColors ] = useSetting<
+		SchemePresetCollection< ColorSchemePreset< Color > >
+	>( 'color.dark.palette', name, 'user' );
+
+	const namedLightColors = addBasePresetNames(
+		flattenSchemePresets( lightColors ),
+		themeColors
+	);
+	const namedDarkColors = addBasePresetNames(
+		flattenSchemePresets( darkColors ),
+		themeColors
+	);
+	const hasLightColors = namedLightColors.length > 0;
+	const hasDarkColors = namedDarkColors.length > 0;
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultPalette',
@@ -68,6 +97,36 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						onChange={ setThemeColors }
 						paletteLabel={ __( 'Theme' ) }
 						paletteLabelHeadingLevel={ 3 }
+						paletteVariations={ [
+							...( hasLightColors
+								? [
+										{
+											canReset:
+												userLightColors !== undefined,
+											colors: namedLightColors,
+											onChange: setLightColors,
+											paletteIcon: (
+												<SchemePaletteIcon scheme="light" />
+											),
+											paletteLabel: __( 'Light palette' ),
+										},
+								  ]
+								: [] ),
+							...( hasDarkColors
+								? [
+										{
+											canReset:
+												userDarkColors !== undefined,
+											colors: namedDarkColors,
+											onChange: setDarkColors,
+											paletteIcon: (
+												<SchemePaletteIcon scheme="dark" />
+											),
+											paletteLabel: __( 'Dark palette' ),
+										},
+								  ]
+								: [] ),
+						] }
 						popoverProps={ popoverProps }
 					/>
 				) }

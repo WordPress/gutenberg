@@ -10,11 +10,28 @@
 .global-styles-ui-preview__wrapper {
 	max-width: 100%;
 	display: block;
+	position: relative;
 	width: 100%;
 
 	&.is-hoverable {
 		cursor: var(--wpds-cursor-control);
 	}
+}
+
+.global-styles-ui-preview__scheme-indicators {
+	display: flex;
+	position: absolute;
+	z-index: 1;
+}
+
+.global-styles-ui-preview__scheme-indicator {
+	align-items: center;
+	background: rgba(colors.$white, 0.9);
+	border-radius: 50%;
+	box-shadow: inset 0 0 0 1px rgba(colors.$black, 0.1);
+	color: colors.$gray-900;
+	display: flex;
+	justify-content: center;
 }
 
 .global-styles-ui-typography-preview {
@@ -269,6 +286,18 @@
 }
 
 .global-styles-ui-color-palette-panel,
-.global-styles-ui-gradient-palette-panel {
+.global-styles-ui-gradient-palette-panel,
+.global-styles-ui-duotone-palette-panel {
 	padding: variables.$grid-unit-20;
+}
+
+.global-styles-ui-duotone-palette-panel .global-styles-ui-subtitle {
+	align-items: center;
+	display: flex;
+	gap: variables.$grid-unit-05;
+	line-height: variables.$grid-unit-30;
+}
+
+.global-styles-ui-duotone-palette-panel .components-circular-option-picker > .components-spacer {
+	display: none;
 }

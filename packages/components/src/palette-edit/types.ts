@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Key, MouseEventHandler } from 'react';
+import type { Key, MouseEventHandler, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -48,6 +48,10 @@ export type BasePaletteEdit = {
 	 */
 	paletteLabel: string;
 	/**
+	 * An optional icon displayed before the palette label.
+	 */
+	paletteIcon?: ReactNode;
+	/**
 	 * The label's heading level.
 	 *
 	 * @default 2
@@ -68,6 +72,54 @@ export type BasePaletteEdit = {
 	>;
 };
 
+export type PaletteEditColorVariation = {
+	/**
+	 * Whether this variation can be reset.
+	 */
+	canReset?: boolean;
+	/**
+	 * The colors in this variation.
+	 */
+	colors: Color[];
+	gradients?: never;
+	/**
+	 * Runs on changing the variation.
+	 */
+	onChange: ( values?: Color[] ) => void;
+	/**
+	 * An optional icon displayed before the variation label.
+	 */
+	paletteIcon?: ReactNode;
+	/**
+	 * A heading label for the variation.
+	 */
+	paletteLabel: string;
+};
+
+export type PaletteEditGradientVariation = {
+	/**
+	 * Whether this variation can be reset.
+	 */
+	canReset?: boolean;
+	colors?: never;
+	/**
+	 * The gradients in this variation.
+	 */
+	gradients: Gradient[];
+	/**
+	 * Runs on changing the variation.
+	 */
+	onChange: ( values?: Gradient[] ) => void;
+	/**
+	 * An optional icon displayed before the variation label.
+	 */
+	paletteIcon?: ReactNode;
+	/**
+	 * A heading label for the variation.
+	 */
+	paletteLabel: string;
+};
+
 type PaletteEditColors = {
 	/**
 	 * The colors in the palette.
@@ -78,6 +130,10 @@ type PaletteEditColors = {
 	 */
 	onChange: ( values?: Color[] ) => void;
 	gradients?: never;
+	/**
+	 * Related color variations edited from the same palette controls.
+	 */
+	paletteVariations?: PaletteEditColorVariation[];
 };
 
 type PaletteEditGradients = {
@@ -90,6 +146,10 @@ type PaletteEditGradients = {
 	 */
 	onChange: ( values?: Gradient[] ) => void;
 	colors?: never;
+	/**
+	 * Related gradient variations edited from the same palette controls.
+	 */
+	paletteVariations?: PaletteEditGradientVariation[];
 };
 
 export type PaletteEditProps = BasePaletteEdit &

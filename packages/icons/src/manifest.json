@@ -1009,6 +1009,12 @@
 		"public": true
 	},
 	{
+		"slug": "moon",
+		"label": "Moon",
+		"filePath": "library/moon.svg",
+		"public": true
+	},
+	{
 		"slug": "more",
 		"label": "More",
 		"filePath": "library/more.svg"
@@ -1563,6 +1569,12 @@
 		"slug": "subscript",
 		"label": "Subscript",
 		"filePath": "library/subscript.svg"
+	},
+	{
+		"slug": "sun",
+		"label": "Sun",
+		"filePath": "library/sun.svg",
+		"public": true
 	},
 	{
 		"slug": "superscript",

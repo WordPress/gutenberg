@@ -40,6 +40,7 @@ import {
 	DoneButton,
 	RemoveButton,
 	PaletteEditContents,
+	PaletteVariation,
 } from './styles';
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
@@ -52,6 +53,8 @@ import type {
 	OptionProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
+	PaletteEditColorVariation,
+	PaletteEditGradientVariation,
 	PaletteElement,
 } from './types';
 
@@ -353,6 +356,10 @@ function PaletteEditListView< T extends PaletteElement >( {
 }
 
 const EMPTY_ARRAY: Color[] = [];
+const EMPTY_VARIATIONS: (
+	| PaletteEditColorVariation
+	| PaletteEditGradientVariation
+)[] = [];
 
 /**
  * Allows editing a palette of colors or gradients.
@@ -379,6 +386,8 @@ export function PaletteEdit( {
 	colors = EMPTY_ARRAY,
 	onChange,
 	paletteLabel,
+	paletteIcon,
+	paletteVariations = EMPTY_VARIATIONS,
 	paletteLabelHeadingLevel = 2,
 	emptyMessage,
 	canOnlyChangeValues,
@@ -388,6 +397,10 @@ export function PaletteEdit( {
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
+	const variations = paletteVariations.map( ( variation ) => ( {
+		...variation,
+		elements: isGradient ? variation.gradients : variation.colors,
+	} ) );
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -399,6 +412,12 @@ export function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
+	const hasVariations = variations.some(
+		( variation ) => variation.elements.length > 0
+	);
+	const hasAnyElements = hasElements || hasVariations;
+	const canResetAny =
+		canReset || variations.some( ( variation ) => variation.canReset );
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
 		(
@@ -426,10 +445,11 @@ export function PaletteEdit( {
 		<PaletteEditStyles>
 			<HStack>
 				<PaletteHeading level={ paletteLabelHeadingLevel }>
+					{ paletteIcon }
 					{ paletteLabel }
 				</PaletteHeading>
 				<PaletteActionsContainer>
-					{ hasElements && isEditing && (
+					{ hasAnyElements && isEditing && (
 						<DoneButton
 							size="small"
 							onClick={ () => {
@@ -483,10 +503,10 @@ export function PaletteEdit( {
 						/>
 					) }
 
-					{ hasElements &&
+					{ hasAnyElements &&
 						( ! isEditing ||
 							! canOnlyChangeValues ||
-							canReset ) && (
+							canResetAny ) && (
 							<DropdownMenu
 								icon={ moreVertical }
 								label={
@@ -537,7 +557,7 @@ export function PaletteEdit( {
 														  ) }
 												</Button>
 											) }
-											{ canReset && (
+											{ canResetAny && (
 												<Button
 													__next40pxDefaultSize
 													className="components-palette-edit__menu-button"
@@ -546,7 +566,18 @@ export function PaletteEdit( {
 														setEditingElement(
 															null
 														);
-														onChange();
+														if ( canReset ) {
+															onChange();
+														}
+														variations.forEach(
+															( variation ) => {
+																if (
+																	variation.canReset
+																) {
+																	variation.onChange();
+																}
+															}
+														);
 														onClose();
 													} }
 												>
@@ -621,6 +652,53 @@ export function PaletteEdit( {
 							/>
 						) ) }
 				</PaletteEditContents>
+			) }
+			{ variations.map(
+				( variation ) =>
+					variation.elements.length > 0 && (
+						<PaletteVariation key={ variation.paletteLabel }>
+							<PaletteHeading level={ paletteLabelHeadingLevel }>
+								{ variation.paletteIcon }
+								{ variation.paletteLabel }
+							</PaletteHeading>
+							<PaletteEditContents>
+								{ isEditing && (
+									<PaletteEditListView<
+										( typeof variation.elements )[ number ]
+									>
+										canOnlyChangeValues={
+											canOnlyChangeValues
+										}
+										elements={ variation.elements }
+										// @ts-expect-error The variation type matches the parent palette type.
+										onChange={ variation.onChange }
+										slugPrefix={ slugPrefix }
+										isGradient={ isGradient }
+										popoverProps={ popoverProps }
+										addColorRef={ addColorRef }
+									/>
+								) }
+								{ ! isEditing && isGradient && (
+									<GradientPicker
+										gradients={
+											variation.elements as Gradient[]
+										}
+										onChange={ () => {} }
+										clearable={ false }
+										disableCustomGradients
+									/>
+								) }
+								{ ! isEditing && ! isGradient && (
+									<ColorPalette
+										colors={ variation.elements as Color[] }
+										onChange={ () => {} }
+										clearable={ false }
+										disableCustomColors
+									/>
+								) }
+							</PaletteEditContents>
+						</PaletteVariation>
+					)
 			) }
 			{ ! hasElements && emptyMessage && (
 				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>

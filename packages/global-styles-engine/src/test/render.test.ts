@@ -393,6 +393,53 @@ describe( 'global styles renderer', () => {
 				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
+
+		it( 'should output live color scheme preset variables', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {
+					color: {
+						palette: {
+							theme: [
+								{
+									name: 'Base',
+									slug: 'base',
+									color: '#ffffff',
+								},
+							],
+						},
+						dark: {
+							palette: [
+								{
+									name: 'Base',
+									slug: 'base',
+									color: '#111111',
+								},
+								{
+									name: 'Scheme only',
+									slug: 'scheme-only',
+									color: '#222222',
+								},
+							],
+						},
+					},
+				},
+			};
+
+			const ruleset = generateCustomProperties( tree, {} );
+
+			expect( ruleset ).toContain(
+				':root{--wp--preset--color--base: #ffffff;}'
+			);
+			expect( ruleset ).toContain(
+				'@media (prefers-color-scheme: dark){:root:not([data-scheme="light"]){--wp--preset--color--base: #111111;}}'
+			);
+			expect( ruleset ).toContain(
+				':root[data-scheme="dark"]{--wp--preset--color--base: #111111;}'
+			);
+			expect( ruleset ).not.toContain(
+				'--wp--preset--color--scheme-only'
+			);
+		} );
 	} );
 
 	describe( 'transformToStyles', () => {
@@ -1616,6 +1663,15 @@ describe( 'global styles renderer', () => {
 								},
 							],
 						},
+						dark: {
+							duotone: [
+								{
+									slug: 'midnight',
+									name: 'Midnight',
+									colors: [ '#111111', '#eeeeee' ],
+								},
+							],
+						},
 					},
 				},
 				styles: {},
@@ -1641,6 +1697,9 @@ describe( 'global styles renderer', () => {
 			expect( svgStyle.__unstableType ).toBe( 'svgs' );
 			expect( svgStyle.assets.join( '' ) ).toContain(
 				'wp-duotone-midnight'
+			);
+			expect( svgStyle.assets.join( '' ) ).toContain(
+				'wp-duotone-midnight--dark'
 			);
 		} );
 	} );
