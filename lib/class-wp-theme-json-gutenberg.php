@@ -3769,16 +3769,10 @@ class WP_Theme_JSON_Gutenberg {
 								}
 							}
 
-							if ( $has_element_pseudo ) {
-								$element_pseudo_path = array( 'styles', 'blocks', $name, 'elements', $element );
-								if ( $include_node_paths_only ) {
-									$nodes[] = array(
-										'path' => $element_pseudo_path,
-									);
-									continue;
-								}
+						if ( $has_element_pseudo ) {
+							$element_pseudo_path = array( 'styles', 'blocks', $name, 'elements', $element );
 
-								$nodes[] = array(
+							$nodes[] = array(
 									'path'     => $element_pseudo_path,
 									'selector' => static::append_to_selector( $element_selector, $pseudo_selector ),
 								);
