@@ -6,7 +6,11 @@
 			"custom-variation": {
 				"blocks": {
 					"core/paragraph": {
-						"invalidAdditionalProperty": true
+						":hover": {
+							"color": {
+								"text": "red"
+							}
+						}
 					}
 				}
 			}
