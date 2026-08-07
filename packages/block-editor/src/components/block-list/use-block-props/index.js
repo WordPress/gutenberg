@@ -219,7 +219,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label': ariaLabel ?? props[ 'aria-label' ] ?? blockLabel,
+		'aria-label':
+			ariaLabel ??
+			( clientId === ghostBlock?.clientId
+				? __( 'Add default block' )
+				: undefined ) ??
+			props[ 'aria-label' ] ??
+			blockLabel,
 		...ghostProps,
 		'data-block': clientId,
 		'data-type': name,
