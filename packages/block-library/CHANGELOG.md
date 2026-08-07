@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 9.33.11 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 9.33.0 (2025-10-17)
 
 ### Enhancements
