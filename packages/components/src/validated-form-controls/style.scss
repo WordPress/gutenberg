@@ -25,7 +25,9 @@
 	.components-combobox-control__suggestions-container:has(
 	input:invalid[data-validity-visible]
 ):not(:has([aria-expanded="true"])) {
-		--wp-admin-theme-color: #{$alert-red};
+		@extend %red-focus-ring;
+
+		border-color: $alert-red;
 	}
 }
 
