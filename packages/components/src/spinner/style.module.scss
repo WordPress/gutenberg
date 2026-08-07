@@ -1,0 +1,39 @@
+@use "../utils/theme-variables" as *;
+
+.spinner {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	margin: 5px 11px 0;
+	position: relative;
+	color: $components-color-accent;
+	overflow: visible;
+	opacity: 1;
+	background-color: transparent;
+}
+
+.track,
+.indicator {
+	fill: transparent;
+	stroke-width: 1.5px;
+}
+
+.track {
+	stroke: $components-color-gray-300;
+}
+
+.indicator {
+	stroke: currentColor;
+	stroke-linecap: round;
+	transform-origin: 50% 50%;
+	animation: spin 1.4s linear infinite both;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
