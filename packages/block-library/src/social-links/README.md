@@ -26,6 +26,8 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `iconBackgroundColor` | `string` | — | — |
 | `customIconBackgroundColor` | `string` | — | — |
 | `iconBackgroundColorValue` | `string` | — | — |
+| `iconBackgroundGradient` | `string` | — | — |
+| `iconBackgroundGradientValue` | `string` | — | — |
 | `openInNewTab` | `boolean` | `false` | — |
 | `showLabels` | `boolean` | `false` | — |
 | `size` | `string` | — | — |
@@ -69,6 +71,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `iconColorValue` → attribute `iconColorValue`
 - `iconBackgroundColor` → attribute `iconBackgroundColor`
 - `iconBackgroundColorValue` → attribute `iconBackgroundColorValue`
+- `iconBackgroundGradient` → attribute `iconBackgroundGradient`
+- `iconBackgroundGradientValue` → attribute `iconBackgroundGradientValue`
 
 ## Block Styles
 

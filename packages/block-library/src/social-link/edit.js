@@ -120,6 +120,8 @@ const SocialLinkEdit = ( {
 		iconColorValue,
 		iconBackgroundColor,
 		iconBackgroundColorValue,
+		iconBackgroundGradient,
+		iconBackgroundGradientValue,
 	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const wrapperClasses = clsx(
@@ -133,6 +135,8 @@ const SocialLinkEdit = ( {
 			[ `has-${ iconColor }-color` ]: iconColor,
 			[ `has-${ iconBackgroundColor }-background-color` ]:
 				iconBackgroundColor,
+			[ `has-${ iconBackgroundGradient }-gradient-background` ]:
+				iconBackgroundGradient,
 		}
 	);
 
@@ -263,7 +267,11 @@ const SocialLinkEdit = ( {
 				className={ wrapperClasses }
 				style={ {
 					color: iconColorValue,
-					backgroundColor: iconBackgroundColorValue,
+					// A gradient replaces the background colour rather than
+					// layering on top of it, so only one of the two is set.
+					...( iconBackgroundGradientValue
+						? { background: iconBackgroundGradientValue }
+						: { backgroundColor: iconBackgroundColorValue } ),
 				} }
 			>
 				{ /*

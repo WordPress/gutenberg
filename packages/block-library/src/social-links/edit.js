@@ -55,6 +55,8 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
+		iconBackgroundGradient,
+		iconBackgroundGradientValue,
 		iconColorValue,
 		openInNewTab,
 		showLabels,
@@ -95,11 +97,16 @@ export function SocialLinksEdit( props ) {
 					iconBackgroundColor: prev.iconBackgroundColor,
 					iconBackgroundColorValue: prev.iconBackgroundColorValue,
 					customIconBackgroundColor: prev.customIconBackgroundColor,
+					iconBackgroundGradient: prev.iconBackgroundGradient,
+					iconBackgroundGradientValue:
+						prev.iconBackgroundGradientValue,
 				};
 				return {
 					iconBackgroundColor: undefined,
 					iconBackgroundColorValue: undefined,
 					customIconBackgroundColor: undefined,
+					iconBackgroundGradient: undefined,
+					iconBackgroundGradientValue: undefined,
 				};
 			} );
 
@@ -114,6 +121,7 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
+		'has-icon-background-gradient': iconBackgroundGradientValue,
 	} );
 
 	const blockProps = useBlockProps( { className } );
@@ -155,10 +163,25 @@ export function SocialLinksEdit( props ) {
 					iconBackgroundColorValue: colorValue,
 				} );
 			},
+			// As with the colors above, the resolved value is stored alongside
+			// the named slug so the selection survives a theme switch to a
+			// theme without a matching named gradient.
+			gradientValue: iconBackgroundGradientValue,
+			gradientSlug: iconBackgroundGradient,
+			onGradientChange: ( gradientValue, gradientSlug ) => {
+				setAttributes( {
+					iconBackgroundGradient: gradientSlug,
+					iconBackgroundGradientValue: gradientValue,
+				} );
+			},
 			label: __( 'Icon background' ),
 			resetAllFilter: () => {
 				setIconBackgroundColor( undefined );
-				setAttributes( { iconBackgroundColorValue: undefined } );
+				setAttributes( {
+					iconBackgroundColorValue: undefined,
+					iconBackgroundGradient: undefined,
+					iconBackgroundGradientValue: undefined,
+				} );
 			},
 		} );
 	}
@@ -239,15 +262,26 @@ export function SocialLinksEdit( props ) {
 			{ showColorControls && (
 				<InspectorControls group="color">
 					{ colorSettings.map(
-						( { onChange, label, value, resetAllFilter } ) => (
+						( {
+							onChange,
+							onGradientChange,
+							label,
+							value,
+							gradientValue,
+							gradientSlug,
+							resetAllFilter,
+						} ) => (
 							<ColorGradientSettingsDropdown
 								key={ `social-links-color-${ label }` }
 								__experimentalIsRenderedInSidebar
 								settings={ [
 									{
 										colorValue: value,
+										gradientValue,
+										gradientSlug,
 										label,
 										onColorChange: onChange,
+										onGradientChange,
 										isShownByDefault: true,
 										resetAllFilter,
 										enableAlpha: true,
@@ -259,7 +293,7 @@ export function SocialLinksEdit( props ) {
 							/>
 						)
 					) }
-					{ ! logosOnly && (
+					{ ! logosOnly && ! iconBackgroundGradientValue && (
 						<ContrastChecker
 							{ ...{
 								textColor: iconColorValue,
