@@ -1851,7 +1851,7 @@
 	},
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
-			"count": 12
+			"count": 10
 		}
 	},
 	"packages/ui/src/alert-dialog/root.tsx": {

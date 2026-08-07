@@ -210,7 +210,13 @@ function useRichTextBase( {
 
 		applyRecord( recordRef.current );
 		hadSelectionUpdateRef.current = false;
-	}, [ hadSelectionUpdateRef.current ] );
+		// The selection props are the dependencies, not the had-update flag:
+		// the flag is reset above, after the render snapshot these
+		// dependencies are compared against, so two consecutive selection
+		// updates would render with an identical flag and the second would
+		// never be applied (e.g. the caret placement and the full paragraph
+		// selection of one triple click).
+	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,

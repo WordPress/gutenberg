@@ -3,6 +3,7 @@
  */
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
 import {
@@ -131,8 +132,13 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
-			// Move focus to the related block.
-			relatedBlockElement?.focus();
+			// Move focus to the related block. Its editable element may be
+			// an inert part of the editing host (not focusable on its own);
+			// placing the caret focuses the host in that case, and plain
+			// focuses non-editable blocks.
+			if ( relatedBlockElement ) {
+				placeCaretAtHorizontalEdge( relatedBlockElement, false );
+			}
 		}
 	};
 

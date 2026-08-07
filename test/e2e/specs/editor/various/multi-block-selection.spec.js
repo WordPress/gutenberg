@@ -983,6 +983,53 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			} );
 	} );
 
+	test( 'should extend the selection past a container edge with shift+arrow', async ( {
+		editor,
+		page,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'first' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'second' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'after' },
+		} );
+
+		// Deselect so no block toolbar overlays the paragraph to click.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		// Place the caret in the last paragraph within the group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'second' } )
+			.click();
+
+		// The block after the group is adjacent to an ancestor, not a
+		// sibling: the selection must still extend into it.
+		await pageUtils.pressKeys( 'shift+ArrowDown' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/paragraph', attributes: { content: 'after' } },
+			] );
+	} );
+
 	test( 'should gradually multi-select', async ( {
 		page,
 		editor,

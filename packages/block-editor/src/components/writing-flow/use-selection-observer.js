@@ -191,19 +191,76 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons) or editables outside the block (e.g.
-						// the post title). The rich text instance owning the
-						// selection syncs it to the store itself.
+						// across browsers). The focused element may also be an
+						// ancestor block wrapper: Firefox focuses the nearest
+						// focusable ancestor when the click lands on an inert
+						// editable. The caret says where the user is, so any
+						// focused element within the wrapper that contains the
+						// caret hands focus to the host. Focus is never stolen
+						// from UI elements (they do not contain the caret) or
+						// editables outside the block (e.g. the post title).
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							getBlockClientId( activeElement ) ===
-								collapsedClientId
+							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
+						} else if (
+							// The selected block's editable is an inert part
+							// of the host (no contenteditable attribute):
+							// clicking it, or it turning inert while it held
+							// focus, drops focus onto the document's default
+							// target without actually focusing it. That
+							// target is the wrapper itself in an iframed
+							// editor (the wrapper is the body) and the page
+							// body in an inline editor (e.g. the widgets
+							// screen). The collapsed selection is in the
+							// selected block here, so reclaim focus for the
+							// host.
+							( activeElement === node ||
+								activeElement === ownerDocument.body ) &&
+							ownerDocument.hasFocus() &&
+							! activeElement.matches( ':focus' )
+						) {
+							node.focus( { preventScroll: true } );
+						}
+
+						// The wrapper holds focus, so the block's rich text
+						// element receives no focus event and does not sync
+						// the caret placed by a click to the store itself.
+						// Without the synced identity the store holds only a
+						// block-level selection, and the rich text handlers,
+						// which attach to the selected instance, never
+						// attach: the next keystroke is left to the native
+						// editing behavior of the host (e.g. forward delete
+						// joins the next block's text instead of merging the
+						// blocks). Sync the selection here.
+						if ( ! getSelectionStart().attributeKey ) {
+							const richTextElement =
+								getRichTextElement( startNode );
+							const attributeKey =
+								richTextElement?.dataset.wpBlockAttributeKey;
+
+							if ( attributeKey ) {
+								const richTextData = create( {
+									element: richTextElement,
+									range: selection.getRangeAt( 0 ),
+									__unstableIsEditableTree: true,
+								} );
+								const offset =
+									richTextData.start ?? richTextData.end;
+								const position = {
+									clientId: collapsedClientId,
+									attributeKey,
+									offset,
+								};
+								selectionChange( {
+									start: position,
+									end: position,
+								} );
+							}
 						}
 						return;
 					}
@@ -217,8 +274,26 @@ export default function useSelectionObserver() {
 							startNode.nodeType === startNode.ELEMENT_NODE
 								? startNode
 								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						// The editable may be editable by inheritance, without
+						// a contenteditable attribute of its own; rich text
+						// elements are matched by class.
+						element = element?.closest(
+							'[contenteditable], .rich-text'
+						);
+						// Only move focus into the editable when it belongs to
+						// the selected block. The collapsed selection can be a
+						// stale caret from before the block selection moved
+						// through the store (e.g. select all promoting the
+						// selection to the parent block): focusing an editable
+						// of a deselected block would make its focus handler
+						// hijack the block selection back.
+						if (
+							element &&
+							getBlockClientId( element ) ===
+								getSelectedBlockClientId()
+						) {
+							element.focus();
+						}
 					}
 					return;
 				}
@@ -460,6 +535,35 @@ export default function useSelectionObserver() {
 				onSelectionChange
 			);
 			function onMouseUp( event ) {
+				// WebKit does not expand a triple click on the editing host's
+				// padding into a selection of the adjacent paragraph, leaving
+				// no selection at all. Build the selection of the rich text
+				// element at the click point instead; the selection observer
+				// then maps it to the block exactly as for a native
+				// expansion. Only WebKit implements caretRangeFromPoint, and
+				// only WebKit drops the expansion.
+				if ( isTripleClick ) {
+					const selection = defaultView.getSelection();
+					if ( ! selection.rangeCount || selection.isCollapsed ) {
+						const range = ownerDocument.caretRangeFromPoint?.(
+							event.clientX,
+							event.clientY
+						);
+						const element =
+							range &&
+							( range.startContainer.nodeType ===
+							range.startContainer.ELEMENT_NODE
+								? range.startContainer
+								: range.startContainer.parentElement );
+						const richText = element?.closest(
+							'[data-wp-block-attribute-key]'
+						);
+						if ( richText ) {
+							selection.selectAllChildren( richText );
+						}
+					}
+				}
+
 				onSelectionChange( event );
 				stopMultiSelect();
 			}

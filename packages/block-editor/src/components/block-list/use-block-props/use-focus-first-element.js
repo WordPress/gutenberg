@@ -65,6 +65,11 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
+		// While the writing flow wrapper hosts editing, the block's editable
+		// element is an inert part of the host, which the tabbable search
+		// cannot find. The block node is that editable element itself for
+		// blocks that support `editableRoot`, and the caret placement below
+		// accepts it as an inherited editable.
 		const target =
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 

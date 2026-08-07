@@ -55,9 +55,18 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	const editable = element?.closest( '[contenteditable="true"]' );
+	// While the wrapper is the editing host, the selected block's editable
+	// is editable by inheritance without a contenteditable attribute of its
+	// own (Gecko treats any explicit value other than true/false as
+	// non-editable), so rich text elements are matched by class.
+	const editable = element?.closest( '[contenteditable], .rich-text' );
 
-	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
+	if (
+		! editable ||
+		editable === root ||
+		! ( editable as HTMLElement ).isContentEditable ||
+		! editable.contains( focusNode )
+	) {
 		return;
 	}
 

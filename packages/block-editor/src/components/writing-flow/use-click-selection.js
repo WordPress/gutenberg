@@ -10,6 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -18,7 +19,8 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
-	} = useSelect( blockEditorStore );
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
@@ -91,6 +93,35 @@ export default function useClickSelection() {
 					// multiselection (focus moved to first block's multi-
 					// controls).
 					selectBlock( clickedClientId );
+				} else if (
+					clickedClientId &&
+					clickedClientId !== startClientId &&
+					canHostEditableRoot( clickedClientId )
+				) {
+					// Selecting the block turns its editable element into an
+					// inert part of the editing host. Make the DOM reflect
+					// that before the browser acts on this mousedown: the
+					// default action then places the caret into content
+					// editable through the host, and focuses the host,
+					// natively. Left to the re-render, the flip lands
+					// mid-click, after the browser placed the caret in the
+					// editable element, destroying both the caret and focus.
+					const editable = event.target.closest(
+						'[contenteditable="true"]'
+					);
+
+					if (
+						editable &&
+						editable !== node &&
+						getBlockClientId( editable ) === clickedClientId
+					) {
+						setContentEditableWrapper( node, true );
+						// Remove the attribute rather than set "inherit":
+						// Gecko does not map the invalid value to the inherit
+						// state and treats the element as non-editable.
+						editable.removeAttribute( 'contenteditable' );
+						selectBlock( clickedClientId, null );
+					}
 				}
 			}
 

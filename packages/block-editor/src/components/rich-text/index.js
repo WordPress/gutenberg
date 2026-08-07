@@ -247,25 +247,40 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// Whether the wrapper is the editing host, which depends on the selected
-	// block, not necessarily this one. Only the selected, default-mode block
-	// can be it, so others skip the subscription entirely.
+	// Whether the wrapper is the editing host for this block: its block is
+	// the selected block, or part of a multi-selection, while the wrapper
+	// hosts editing. The child must not revert to an editing area of its own
+	// when a single selection grows into a multi-selection: that rewrites
+	// the element under the pointer mid-gesture (breaking the native
+	// selection drag) and reintroduces a nested editable inside the host.
 	const isEditingHost = useSelect(
 		( select ) => {
-			if (
-				shouldDisableEditing ||
-				! hasDefaultEditingMode ||
-				! isBlockSelected
-			) {
+			if ( shouldDisableEditing || ! hasDefaultEditingMode ) {
 				return false;
 			}
 
-			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
-				select( blockEditorStore )
-			);
-			return canHostEditableRoot( getSelectedBlockClientId() );
+			const {
+				getSelectedBlockClientId,
+				canHostEditableRoot,
+				isBlockMultiSelected,
+			} = unlock( select( blockEditorStore ) );
+
+			if ( isBlockSelected ) {
+				return canHostEditableRoot( getSelectedBlockClientId() );
+			}
+
+			// Any multi-selection makes the wrapper the editing host,
+			// regardless of editableRoot support: a block within the
+			// selection is inside the host's live range and must not be an
+			// editing area of its own there.
+			return isBlockMultiSelected( clientId );
 		},
-		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+		[
+			shouldDisableEditing,
+			hasDefaultEditingMode,
+			isBlockSelected,
+			clientId,
+		]
 	);
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
@@ -445,7 +460,14 @@ export function RichTextWrapper(
 	// focusability.
 	let tabIndex = props.tabIndex;
 	if ( isEditingHost ) {
-		tabIndex = props.tabIndex ?? 0;
+		// Do NOT make the child a focusable editing area under the host. iOS
+		// focuses a focusable child on tap, thrashing focus with the host and
+		// canceling native selection gestures (double-tap to select a word).
+		// Focus must stay on the host, which owns editing for the whole canvas;
+		// the child is editable by inheritance (contentEditable="inherit"
+		// below), not on its own. Block props pass tabIndex 0, so it must be
+		// explicitly removed here.
+		tabIndex = null;
 	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
 		tabIndex = null;
 	}
@@ -526,7 +548,15 @@ export function RichTextWrapper(
 					anchorRef,
 					setAnchorElement,
 				] ) }
-				contentEditable={ ! shouldDisableEditing }
+				contentEditable={
+					// Under the editing host the child is editable by
+					// inheritance, not a nested editing host of its own, so iOS
+					// keeps focus on the host and native word selection works.
+					// The attribute must be absent, not "inherit": Gecko does
+					// not map the invalid value to the inherit state and
+					// treats the element as non-editable.
+					isEditingHost ? undefined : ! shouldDisableEditing
+				}
 				suppressContentEditableWarning
 				className={ clsx(
 					'block-editor-rich-text__editable',
