@@ -784,6 +784,72 @@ describe( 'intent-log manager', () => {
 		] );
 	} );
 
+	it( 'a parked insert_block proposal surfaces its position and decoded content for inline approval', async () => {
+		const { handlers, transport } = await loadManagedEntity();
+		const onProposalsChange = jest.fn();
+		handlers.onProposalsChange = onProposalsChange;
+		handlers.onEscalation = jest.fn();
+
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'p1',
+					blockType: 'core/paragraph',
+					text: 'Anchor',
+				},
+			] )
+		);
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'ins-1',
+					txnId: null,
+					type: 'insert_block',
+					payload: {
+						block: {
+							syncId: 'nb',
+							blockType: 'core/html',
+							fields: {
+								content: {
+									text: '￼',
+									formats: [
+										{
+											start: 0,
+											end: 1,
+											format: 'obj|{"html":"<script>x</script>"}',
+										},
+									],
+								},
+							},
+						},
+						parentId: null,
+						afterSiblingId: 'p1',
+					},
+				},
+				actorId: 'u9c9',
+				reason: 'requires-approval',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+
+		const [ item ] = onProposalsChange.mock.calls.at( -1 )![ 0 ] as Array< {
+			proposedInsertion?: {
+				blockType?: string;
+				html: string;
+				afterSiblingId?: string;
+			};
+		} >;
+		// The card can position itself after 'p1' and preview the DECODED
+		// markup (not the object-replacement char).
+		expect( item.proposedInsertion ).toEqual( {
+			blockType: 'core/html',
+			html: '<script>x</script>',
+			afterSiblingId: 'p1',
+			parentId: undefined,
+		} );
+	} );
+
 	it( 'a proposal resolved within the same delivery batch never notifies, and resolution round-trips', async () => {
 		const { manager, handlers, transport } = await loadManagedEntity();
 		const onEscalation = jest.fn();

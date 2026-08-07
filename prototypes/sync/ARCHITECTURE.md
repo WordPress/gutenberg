@@ -699,6 +699,31 @@ inside intent payloads, not the transport.
   UI hint only — ingest re-enforces regardless. An internals test
   asserting the OLD drop-freeform behavior was updated (the
   asserted behavior WAS the bug).
+
+  **2d-xxiii (INLINE APPROVAL UI) DONE.** The block-anchored
+  markers (2d-xx) only cover conflicts on blocks that EXIST in the
+  reviewer's canvas; a parked insert_block (the Custom HTML
+  approval case) proposes NEW content with no anchor block, so it
+  showed only in the sidebar as escaped text. Now
+  SyncReviewItem.proposedInsertion carries {blockType, decoded
+  html (via the codec — obj-span → readable markup, not the U+FFFC
+  char), afterSiblingId, parentId}; the editor renders an inline
+  card via BlockPopover anchored bottom-start of the afterSibling
+  block (or top-start of the first root block for
+  insert-at-top; anchor-gone / empty-canvas falls back to the
+  panel). The card shows attribution + the proposed markup as
+  INERT text in a <pre> (never live DOM — the security invariant:
+  unapproved markup is shown, not executed) + Approve/Discard.
+  Approve is the capability-gated restore (2d-xxii) — re-authors
+  the block under the APPROVER's account (fresh identity,
+  materializes to everyone); Discard universal. InsertionCardBody
+  extracted as a pure export so the security + gating tests run
+  without the popover. Live-verified full loop on the dev env:
+  author's script parks → admin sees inline card with inert
+  preview → Approve → core/html block lands in BOTH editors under
+  the admin, card gone. E2e harness uses editor-cap users (lane
+  inert there), so this path is covered by manager/component tests
+  + the live probe, not an e2e spec.
   Approval needs NO new machinery: proposals use the ordinary row
   shape (replay/retention/resolution/review UI unchanged), and
   restore re-authors content under the RESTORER's capability — a

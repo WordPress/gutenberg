@@ -159,6 +159,18 @@ export interface SyncReviewItem {
 	 * editor. Absent for document-level intents (e.g. entity properties).
 	 */
 	targetId?: string;
+	/**
+	 * For a parked NEW-block proposal (insert_block): the block it would
+	 * create, its readable content, and where it would land — so the
+	 * editor can render it inline at that position for approval (the block
+	 * is not in the reviewer's canvas, so `targetId` cannot anchor it).
+	 */
+	proposedInsertion?: {
+		blockType?: string;
+		html: string;
+		afterSiblingId?: string;
+		parentId?: string;
+	};
 }
 
 export interface SyncManagerUpdateOptions {

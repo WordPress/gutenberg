@@ -88,8 +88,14 @@ export function useReviewData() {
 	);
 	const clientIdByTarget = useSelect(
 		( select ) => {
+			// Resolve both on-block conflict targets AND the anchor sibling
+			// of parked insertions (so an inline approval card can position
+			// itself where the proposed block would land).
 			const targetIds = items
-				.map( ( item ) => item.targetId )
+				.flatMap( ( item ) => [
+					item.targetId,
+					item.proposedInsertion?.afterSiblingId,
+				] )
 				.filter( Boolean );
 			if ( ! targetIds.length ) {
 				return EMPTY_CLIENT_IDS;

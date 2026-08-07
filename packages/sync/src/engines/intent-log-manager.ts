@@ -22,6 +22,7 @@ import {
 	type IntentLogSession,
 } from './intent-log-session';
 import { mintSyncId } from './intent-log/sync-id.js';
+import { fieldToHtml } from './intent-log/rich-text.js';
 import { getProviderCreators } from '../providers';
 import type {
 	ObjectData,
@@ -481,6 +482,46 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					return undefined;
 			}
 		};
+		// A parked new-block proposal (insert_block) has no block in the
+		// reviewer's canvas to anchor to. Surface its intended position and
+		// a readable content preview so the editor can render it INLINE
+		// where it would land, with approve/discard in place.
+		const proposedInsertionFor = ( proposal: {
+			intent: { type: string; payload: Record< string, unknown > };
+		} ) => {
+			if ( 'insert_block' !== proposal.intent.type ) {
+				return undefined;
+			}
+			const payload = proposal.intent.payload;
+			const block = payload.block as
+				| {
+						blockType?: string;
+						fields?: {
+							content?: { text: string; formats?: unknown[] };
+						};
+						attrs?: Record< string, unknown >;
+				  }
+				| undefined;
+			const field = block?.fields?.content;
+			let html = '';
+			if ( field ) {
+				html = fieldToHtml( field as never );
+			} else if ( typeof block?.attrs?.content === 'string' ) {
+				html = block.attrs.content as string;
+			}
+			return {
+				blockType: block?.blockType,
+				html,
+				afterSiblingId:
+					typeof payload.afterSiblingId === 'string'
+						? payload.afterSiblingId
+						: undefined,
+				parentId:
+					typeof payload.parentId === 'string'
+						? payload.parentId
+						: undefined,
+			};
+		};
 		const mapReviewItems = () =>
 			session.getOpenProposals().map( ( proposal ) => ( {
 				id: proposal.intent.intentId,
@@ -495,6 +536,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					typeof proposal.intent.payload.syncId === 'string'
 						? proposal.intent.payload.syncId
 						: undefined,
+				proposedInsertion: proposedInsertionFor( proposal ),
 			} ) );
 		session.onProposalsChange( () => {
 			if ( proposalsNotifyScheduled ) {
