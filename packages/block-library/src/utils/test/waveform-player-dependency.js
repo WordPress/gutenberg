@@ -34,17 +34,7 @@ function loadWaveformPlayer() {
 }
 
 function getFragmentedAttributeValue( prefix = '' ) {
-	const quotationMark = String.fromCharCode( 34 );
-
-	return [
-		prefix,
-		quotationMark,
-		' ',
-		FIXTURE_ATTRIBUTE,
-		'=',
-		quotationMark,
-		'sample',
-	].join( '' );
+	return `${ prefix }" ${ FIXTURE_ATTRIBUTE }="sample`;
 }
 
 describe( 'Waveform Player dependency', () => {
@@ -92,17 +82,7 @@ describe( 'Waveform Player dependency', () => {
 	} );
 
 	it( 'uses the default control icons when declarative icon values are unsupported', () => {
-		const openingBracket = String.fromCharCode( 60 );
-		const closingBracket = String.fromCharCode( 62 );
-		const iconValue = [
-			openingBracket,
-			'span ',
-			FIXTURE_ATTRIBUTE,
-			closingBracket,
-			openingBracket,
-			'/span',
-			closingBracket,
-		].join( '' );
+		const iconValue = `<span ${ FIXTURE_ATTRIBUTE }></span>`;
 		const element = createDeclarativePlayer( {
 			'data-play-icon': iconValue,
 			'data-pause-icon': iconValue,
