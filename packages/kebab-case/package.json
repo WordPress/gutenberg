@@ -1,20 +1,19 @@
 {
-	"name": "@wordpress/string",
+	"name": "@wordpress/kebab-case",
 	"version": "1.0.0-prerelease",
-	"description": "String utilities for WordPress development.",
+	"description": "Convert strings to kebab-case, matching WordPress Core's `_wp_to_kebab_case()`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"string",
 		"kebab-case"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/string/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/kebab-case/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/string"
+		"directory": "packages/kebab-case"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

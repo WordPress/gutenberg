@@ -19,7 +19,7 @@
 		{ "path": "../global-styles-engine" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
-		{ "path": "../string" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui" }

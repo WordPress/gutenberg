@@ -1,7 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { kebabCase } from '@wordpress/string';
+import { kebabCase } from '@wordpress/kebab-case';
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 

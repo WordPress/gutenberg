@@ -1,15 +1,15 @@
-# String
+# Kebab case
 
-String utilities for WordPress development.
+Convert strings to kebab-case, matching WordPress Core's [`_wp_to_kebab_case()`](https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/).
 
-This package hosts string manipulation functions that WordPress needs to maintain itself because of WordPress-specific requirements. Before adding a new function here, prefer an existing third-party library when one matches the required semantics.
+This package exists because no off-the-shelf library matches the semantics of WordPress Core's `_wp_to_kebab_case()` function, which WordPress needs to preserve for backwards compatibility.
 
 ## Installation
 
 Install the module
 
 ```bash
-npm install @wordpress/string --save
+npm install @wordpress/kebab-case --save
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ Converts any string to kebab-case.
 The conversion is designed to match WordPress Core's [`_wp_to_kebab_case()`](https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/) function (and, transitively, Lodash's [`_.kebabCase()`](https://lodash.com/docs/4.17.15#kebabCase)): the package's test suite covers every test case of the Core function. These semantics differ from other kebab-case implementations in how numbers are handled (`'white23'` becomes `'white-23'`, `'font2xl'` becomes `'font-2-xl'`, yet `'white4th'` stays `'white-4th'`).
 
 ```js
-import { kebabCase } from '@wordpress/string';
+import { kebabCase } from '@wordpress/kebab-case';
 
 kebabCase( 'whiteToWhite' ); // 'white-to-white'
 kebabCase( 'white2white' ); // 'white-2-white'

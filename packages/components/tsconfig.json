@@ -23,7 +23,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../string" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },

@@ -1,6 +1,6 @@
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
-import { kebabCase } from '@wordpress/string';
+import { kebabCase } from '@wordpress/kebab-case';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';

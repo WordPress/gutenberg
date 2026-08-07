@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
-import { kebabCase } from '@wordpress/string';
+import { kebabCase } from '@wordpress/kebab-case';
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
 

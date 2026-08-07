@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { kebabCase } from '@wordpress/string';
+import { kebabCase } from '@wordpress/kebab-case';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 
