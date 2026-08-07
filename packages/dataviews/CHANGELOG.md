@@ -19,6 +19,7 @@
 
 ### Internal
 
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   DataViews: Inline a verbatim copy of the `kebabCase` utility instead of unlocking the private one from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `change-case` dependency; no behavior change. ([#81284](https://github.com/WordPress/gutenberg/pull/81284))
 -   Update `@ariakit/react` to 0.4.35 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
 
