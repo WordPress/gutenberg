@@ -3,7 +3,6 @@
  */
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
-// @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
 import {
 	store as coreDataStore,

@@ -1186,6 +1186,134 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the server leaves the uploaded full-size image untouched
+	 * when the client generates the sub-sizes.
+	 *
+	 * Scaling it here would create a `-scaled` file that the client's own
+	 * scaled sideload then collides with.
+	 *
+	 * @link https://core.trac.wordpress.org/ticket/65708
+	 *
+	 * @covers ::create_item
+	 */
+	public function test_create_item_does_not_scale_when_client_generates_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		// canola.jpg is 640x480, so a 100px threshold would scale it down.
+		add_filter( 'big_image_size_threshold', array( $this, 'filter_low_big_image_size_threshold' ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=big-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $response->get_data()['id'];
+
+		$this->assertSame( 'big-photo.jpg', wp_basename( get_attached_file( $attachment_id, true ) ), 'The upload should be stored untouched.' );
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertArrayNotHasKey( 'original_image', $metadata, 'No original_image should be recorded when the server does not scale the upload.' );
+	}
+
+	/**
+	 * Verifies that the full client-side flow for an image over the "big image"
+	 * threshold writes only files that the metadata tracks.
+	 *
+	 * When the server scales the upload as well, its full-size file is left
+	 * orphaned on disk, the client's scaled sideload is renamed `-scaled-1`,
+	 * and the sub-sizes inherit the numbered name.
+	 *
+	 * @link https://core.trac.wordpress.org/ticket/65708
+	 *
+	 * @covers ::create_item
+	 * @covers ::sideload_item
+	 * @covers ::finalize_item
+	 */
+	public function test_client_side_big_image_flow_leaves_no_orphaned_files() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'big_image_size_threshold', array( $this, 'filter_low_big_image_size_threshold' ) );
+
+		$upload_dir   = wp_upload_dir();
+		$files_before = glob( $upload_dir['path'] . '/*' );
+
+		// 1. Upload the full-size image; the client owns all derivatives.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=big-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $response->get_data()['id'];
+
+		// 2. Sideload a thumbnail, as the client does for each missing size.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=big-photo-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+		$response       = rest_get_server()->dispatch( $request );
+		$thumbnail_data = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'big-photo-150x150.jpg', $thumbnail_data['file'], 'The thumbnail should not inherit a numeric collision suffix.' );
+
+		// 3. Sideload the scaled full-size image.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=big-photo-scaled.jpg' );
+		$request->set_param( 'image_size', 'scaled' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response    = rest_get_server()->dispatch( $request );
+		$scaled_data = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		// 4. Finalize, writing the collected sub-size metadata in one pass.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', array( $thumbnail_data, $scaled_data ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+
+		$this->assertSame( 'big-photo.jpg', $metadata['original_image'], 'The untouched upload should be recorded as original_image.' );
+		$this->assertSame( 'big-photo-scaled.jpg', wp_basename( $metadata['file'] ), 'The scaled image should become the attached file.' );
+		$this->assertSame( 'big-photo-150x150.jpg', $metadata['sizes']['thumbnail']['file'], 'The thumbnail should keep its dimension-based name.' );
+
+		// Every file written for this attachment must be reachable from the
+		// metadata, otherwise it is orphaned on disk.
+		$written = array_map( 'wp_basename', array_diff( glob( $upload_dir['path'] . '/*' ), (array) $files_before ) );
+		sort( $written );
+		$this->assertSame(
+			array( 'big-photo-150x150.jpg', 'big-photo-scaled.jpg', 'big-photo.jpg' ),
+			$written,
+			'The flow should write only the full-size upload, its scaled copy, and the sub-sizes.'
+		);
+
+		// Deleting the attachment should clean all of them up.
+		wp_delete_attachment( $attachment_id, true );
+
+		$remaining = array_diff( glob( $upload_dir['path'] . '/*' ), (array) $files_before );
+		$this->assertSame( array(), array_values( $remaining ), 'Deleting the attachment should leave no files behind.' );
+	}
+
+	/**
+	 * Returns a "big image" threshold low enough that the test images exceed it.
+	 *
+	 * @return int Threshold in pixels.
+	 */
+	public function filter_low_big_image_size_threshold() {
+		return 100;
+	}
+
+	/**
 	 * Verifies that the sideload route declares `convert_format` as a boolean arg.
 	 *
 	 * Without this declaration, multipart/form-data requests deliver the value as

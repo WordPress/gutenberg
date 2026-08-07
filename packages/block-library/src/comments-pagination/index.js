@@ -14,8 +14,15 @@ import save from './save';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[ 'core/comments-pagination-previous' ],
+	[ 'core/comments-pagination-numbers' ],
+	[ 'core/comments-pagination-next' ],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 };

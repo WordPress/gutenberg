@@ -265,10 +265,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
-					'id'       => 'download-lyrics',
-					'label'    => 'Download lyrics',
-					'href'     => 'hello-dolly-lyrics.txt',
-					'download' => 'hello-dolly-lyrics.txt',
+					'id'       => 'export-metadata',
+					'label'    => 'Export metadata',
+					'href'     => 'widget.json',
+					'download' => 'hello-dolly.json',
 				),
 				array(
 					'id'    => 'health',
@@ -285,10 +285,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 2, $actions );
-		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
-		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
+		$this->assertSame( 'export-metadata', $actions[0]['id'] );
+		$this->assertSame( 'hello-dolly.json', $actions[0]['download'] );
 		$this->assertMatchesRegularExpression(
-			'#/widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
+			'#/widgets/hello-dolly/widget\.json$#',
 			$actions[0]['href']
 		);
 		$this->assertSame(

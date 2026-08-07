@@ -28,6 +28,7 @@ import {
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
 	isSectionBlock,
+	isSyncedBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
@@ -2509,6 +2510,55 @@ describe( 'private selectors', () => {
 			};
 			// pattern-b is not the edited section and not within it
 			expect( isSectionBlock( state, 'pattern-b' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSyncedBlock', () => {
+		const createState = ( { blockName, patternName } = {} ) => ( {
+			blocks: {
+				byClientId: new Map( [ [ 'block-1', { name: blockName } ] ] ),
+				attributes: new Map( [
+					[
+						'block-1',
+						patternName ? { metadata: { patternName } } : {},
+					],
+				] ),
+				parents: new Map( [ [ 'block-1', '' ] ] ),
+			},
+		} );
+
+		it( 'returns true for synced patterns', () => {
+			const state = createState( { blockName: 'core/block' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true for template parts', () => {
+			const state = createState( { blockName: 'core/template-part' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false for blocks that are neither', () => {
+			const state = createState( { blockName: 'core/group' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false for a synced block that is displayed as a pattern', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				patternName: 'my-pattern',
+			} );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true for a synced block whose pattern is being edited', () => {
+			const state = {
+				...createState( {
+					blockName: 'core/template-part',
+					patternName: 'my-pattern',
+				} ),
+				editedContentOnlySection: 'block-1',
+			};
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 	} );
 

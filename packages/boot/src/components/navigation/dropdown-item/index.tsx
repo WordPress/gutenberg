@@ -10,7 +10,6 @@ import type { ReactNode } from 'react';
 import {
 	FlexBlock,
 	__experimentalItem as Item,
-	// @ts-ignore
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 	__unstableMotion as motion,
@@ -72,7 +71,7 @@ export default function DropdownItem( {
 }: DropdownItemProps ) {
 	const menuItems: MenuItem[] = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems(),
 		[]
 	);

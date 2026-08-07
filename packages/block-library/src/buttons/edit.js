@@ -10,17 +10,6 @@ import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 const DEFAULT_BLOCK = {
 	name: 'core/button',
-	attributesToCopy: [
-		'backgroundColor',
-		'border',
-		'className',
-		'fontFamily',
-		'fontSize',
-		'gradient',
-		'style',
-		'textColor',
-		'width',
-	],
 };
 
 function ButtonsEdit( { attributes, className } ) {
@@ -33,8 +22,6 @@ function ButtonsEdit( { attributes, className } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
-		template: [ [ 'core/button' ] ],
-		templateInsertUpdatesSelection: true,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );
 

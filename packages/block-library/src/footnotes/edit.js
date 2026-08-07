@@ -15,7 +15,17 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		postId
 	);
 	const footnotesSupported = 'string' === typeof meta?.footnotes;
-	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
+	// The meta is a string that something else may have written, so it can be
+	// malformed or hold something other than an array. Treat anything
+	// unreadable as no footnotes and fall through to the placeholder below.
+	let parsed;
+	try {
+		parsed = JSON.parse( meta?.footnotes || '[]' );
+	} catch {
+		// Left undefined, which the check below treats as no footnotes, along
+		// with a value of the wrong shape.
+	}
+	const footnotes = Array.isArray( parsed ) ? parsed : [];
 	const blockProps = useBlockProps();
 
 	if ( ! footnotesSupported ) {

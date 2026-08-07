@@ -4,7 +4,13 @@
 
 ### Bug Fixes
 
--   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero. Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+-   `Metrics.getSelectionEventDurations()`: Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+
+## 1.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
 
 ## 1.51.0 (2026-07-14)
 

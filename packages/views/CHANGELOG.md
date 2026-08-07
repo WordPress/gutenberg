@@ -10,6 +10,8 @@
 
 -   Add `react` and `react-dom` to the package's dev dependencies, so the tests resolve them from the package rather than relying on a hoisted install. [#81139](https://github.com/WordPress/gutenberg/pull/81139)
 
+## 1.19.0 (2026-07-29)
+
 ## 1.18.0 (2026-07-14)
 
 ## 1.17.0 (2026-07-01)

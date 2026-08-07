@@ -26,8 +26,6 @@ import { verse } from '@wordpress/icons';
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
 
-const TEMPLATE = [ [ 'core/paragraph', {} ] ];
-
 /**
  * At the moment, deprecations don't handle create blocks from attributes
  * (like when using CPT templates). For this reason, this hook is necessary
@@ -38,7 +36,7 @@ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
  */
 const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
@@ -57,9 +55,19 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			alternative: 'inner blocks',
 		} );
 
+		// The selection can be inside an inner block created from the block
+		// type template at insertion, which the migration replaces; restore
+		// the selection to the migrated block in that case.
+		const shouldReselectBlock = registry
+			.select( blockEditorStore )
+			.hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.value ] );
 };
@@ -92,8 +100,6 @@ export default function QuoteEdit( {
 		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 		renderAppender: hasInnerBlocks ? false : undefined,
 		allowedBlocks,
