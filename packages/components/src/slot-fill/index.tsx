@@ -6,7 +6,6 @@ import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import SlotFillProvider from './provider';
 import SlotFillContext from './context';
 import type { WordPressComponentProps } from '../context';
-
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 import type {

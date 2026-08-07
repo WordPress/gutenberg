@@ -1,5 +1,4 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
 // Mock @wordpress/api-fetch
 jest.mock( '@wordpress/api-fetch', () => ( {
 	__esModule: true,

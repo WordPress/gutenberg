@@ -15,7 +15,6 @@ import {
 import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-
 /**
  * Mock sync manager accessor.
  */

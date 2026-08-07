@@ -7,14 +7,12 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
 /**
  * Mock uuid module
  */
 jest.mock( 'uuid', () => ( {
 	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
-
 /**
  * Mock @wordpress/blocks module
  */

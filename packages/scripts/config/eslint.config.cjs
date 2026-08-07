@@ -4,10 +4,6 @@
  * Projects using `wp-scripts lint-js` that do not provide their own
  * eslint.config.* will use this config automatically.
  */
-
-/**
- * Internal dependencies
- */
 const { hasBabelConfig } = require( '../utils' );
 
 const wpPlugin = require( '@wordpress/eslint-plugin' );

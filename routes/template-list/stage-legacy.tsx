@@ -26,11 +26,9 @@ import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
 import { useTemplatesLegacy } from './use-templates-legacy';
 import AddNewTemplate from './add-new-template';
-
 // Unlock WordPress private APIs
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */

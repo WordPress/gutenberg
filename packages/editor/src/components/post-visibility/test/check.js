@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
-
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 import PostVisibilityCheck from '../check';
 

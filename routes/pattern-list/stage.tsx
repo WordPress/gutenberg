@@ -26,12 +26,10 @@ import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
-
 // Unlock WordPress private APIs
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
-
 /**
  * Style dependencies
  */

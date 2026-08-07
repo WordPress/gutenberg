@@ -1,6 +1,5 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { getSyncManager } from '../sync';
-
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),

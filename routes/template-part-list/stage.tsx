@@ -30,12 +30,10 @@ import {
 	viewToQuery,
 } from './view-utils';
 import { previewField } from './fields/preview';
-
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */

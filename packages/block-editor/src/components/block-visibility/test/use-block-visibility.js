@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react';
 import { useMediaQuery } from '@wordpress/compose';
-
 // Mock WordPress dependencies before importing the hook
 jest.mock( '@wordpress/compose', () => ( {
 	...jest.requireActual( '@wordpress/compose' ),
