@@ -1,12 +1,12 @@
 import clsx from 'clsx';
+import type { ComponentProps } from 'react';
 import { forwardRef } from '@wordpress/element';
-import { type SpinnerProps } from './types';
 import styles from './style.module.css';
 
 /**
  * A component used to notify users that their action is being processed.
  */
-export const Spinner = forwardRef< SVGSVGElement, SpinnerProps >(
+export const Spinner = forwardRef< SVGSVGElement, ComponentProps< 'svg' > >(
 	function Spinner( { className, ...props }, ref ) {
 		return (
 			<svg
