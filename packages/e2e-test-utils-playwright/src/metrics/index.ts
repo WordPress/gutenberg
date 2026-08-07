@@ -230,7 +230,7 @@ export class Metrics {
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
 	async startTracing( options = {} ) {
-		const result = await this.browser.startTracing( this.page, {
+		await this.browser.startTracing( this.page, {
 			screenshots: false,
 			categories: [
 				'devtools.timeline',
@@ -246,10 +246,17 @@ export class Metrics {
 		// logs every function compiled so far. It runs on the next stack
 		// guard check, so its cost would land in the first thing the test
 		// does, which is usually the interaction being measured. Absorb it
-		// here instead.
-		await this.page.evaluate( () => {} );
-
-		return result;
+		// here instead. A cross-origin iframe runs in its own isolate and
+		// gets its own interrupt, so every frame needs the warm-up, not just
+		// the main one.
+		await Promise.all(
+			this.page
+				.frames()
+				// A frame can detach between listing and evaluating.
+				.map( ( frame ) =>
+					frame.evaluate( () => {} ).catch( () => {} )
+				)
+		);
 	}
 
 	/**
