@@ -2,15 +2,17 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
-
 ## 9.19.7 (2026-08-06)
 
 ### Bug Fixes
 
 -   Post Date: Escape date values and link URLs before rendering the block.
+
+## 9.19.1 (2025-03-10)
+
+### Enhancements
+
+-   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
 
 ## 9.19.0 (2025-02-28)
 
