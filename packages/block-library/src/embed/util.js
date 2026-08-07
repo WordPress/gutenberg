@@ -7,7 +7,7 @@ import {
 	getBlockVariations,
 } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
-import { kebabCase } from '@wordpress/kebab-case';
+import { kebabCase } from '@wordpress/string';
 import metadata from './block.json';
 import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
 

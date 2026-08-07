@@ -1,6 +1,6 @@
 import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
-import { kebabCase } from '@wordpress/kebab-case';
+import { kebabCase } from '@wordpress/string';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,

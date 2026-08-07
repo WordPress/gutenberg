@@ -4,7 +4,7 @@
 
 ### Internal
 
--   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81285](https://github.com/WordPress/gutenberg/pull/81285)
+-   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/string` package. [#81285](https://github.com/WordPress/gutenberg/pull/81285)
 
 ### New Features
 

@@ -1,5 +1,5 @@
 import type { FontFamily, FontFace } from '@wordpress/core-data';
-import { kebabCase } from '@wordpress/kebab-case';
+import { kebabCase } from '@wordpress/string';
 
 export default function makeFamiliesFromFaces(
 	fontFaces: FontFace[]

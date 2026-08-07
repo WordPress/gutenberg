@@ -1,4 +1,4 @@
-import { kebabCase } from '@wordpress/kebab-case';
+import { kebabCase } from '@wordpress/string';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.

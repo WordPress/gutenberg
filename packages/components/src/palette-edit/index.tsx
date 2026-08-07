@@ -9,7 +9,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
-import { kebabCase } from '@wordpress/kebab-case';
+import { kebabCase } from '@wordpress/string';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';

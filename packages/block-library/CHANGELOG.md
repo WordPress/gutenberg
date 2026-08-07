@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Embed: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
+-   Embed: Use the new `@wordpress/string` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
 
 ### Enhancements
 
