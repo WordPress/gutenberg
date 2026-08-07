@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { ThunkArgs } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type {
 	BlockType,
 	BlockCategory,

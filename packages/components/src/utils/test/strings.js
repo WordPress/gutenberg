@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { kebabCase, normalizeTextString } from '../strings';
 
 describe( 'kebabCase', () => {

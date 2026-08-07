@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import {
 	currentlyPreviewingTheme,

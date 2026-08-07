@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getFilename } from '@wordpress/url';
 import { _x } from '@wordpress/i18n';
 

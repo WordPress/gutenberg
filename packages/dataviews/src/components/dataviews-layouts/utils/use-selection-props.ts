@@ -1,15 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { SELECTION_CHECKBOX_CLASS } from '../../dataviews-selection-checkbox';
-import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
-import type { Action } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 
 interface RangeSelectionArgs {
@@ -133,11 +124,15 @@ export function getClosestSelectedId( {
 	return closestId;
 }
 
+// How many items the selection can hold, and — for single selection — whether a
+// plain click on the selected item may clear it. See `useSelectionProps`.
+export type SelectionMode = 'multi' | 'single-required' | 'single-clearable';
+
 export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
-	// Only returned to the picker layouts, whose plain clicks select.
-	onClick?: () => void;
+	// Only returned when a plain click selects (`shouldSelectOnClick`).
+	onClick?: ( event: React.MouseEvent ) => void;
 }
 
 // Encapsulates the pointer gestures for multi-selection, shared by layouts:
@@ -145,15 +140,23 @@ export interface SelectionProps {
 // the anchor (the last item whose selection was directly toggled) and the
 // clicked item, leaving the selection outside the range untouched.
 //
-// Layouts pass `data` in the order they render it, along with `actions` and
-// `getItemId`; the hook derives the selectable items itself (those with a
-// possible bulk action) so every layout doesn't repeat that logic. Spread
-// `getSelectionProps( id )` on each item's container element.
+// Layouts pass `data` in the order they render it, along with `getItemId` and
+// an `isItemSelectable` predicate; the hook derives the selectable items from
+// those. Spread `getSelectionProps( id )` on each item's container element.
 //
-// The picker layouts select on a plain click instead, and set
-// `pickerMultiselect`; for them the hook also returns the `onClick` that
-// selects and anchors the range, and every rendered item is selectable rather
-// than only those with a bulk action.
+// The selection semantics are described by three props. `selectionMode` says
+// how many items the selection can hold and, for single selection, whether a
+// plain click on the selected item may clear it:
+//   - `'multi'`: the selection can hold more than one item, which enables the
+//     Shift+Click range gesture and makes modifier clicks add rather than
+//     replace. A plain click on a selected item removes it from the selection.
+//   - `'single-required'`: at most one item, and a plain click always leaves
+//     something selected — re-clicking the selected item keeps it (one-of-N).
+//   - `'single-clearable'`: at most one item, but a plain click on the selected
+//     item clears the selection (zero-or-one).
+// `selectOnClick` says whether a plain click selects (and anchors the range)
+// instead of opening the item; when it does, the hook also returns the `onClick`
+// that performs it. `isItemSelectable` says which items can be selected.
 //
 // The selection model is one-dimensional: a range is the contiguous run of
 // selectable items between the anchor and the target. Two-dimensional layouts
@@ -168,24 +171,35 @@ export interface SelectionProps {
 // layouts wrap the returned handlers to compose extra behavior ad-hoc.
 export default function useSelectionProps< Item >( {
 	data,
-	actions,
 	getItemId,
+	isItemSelectable,
 	selection,
 	onChangeSelection,
-	pickerMultiselect,
+	selectionMode,
+	shouldSelectOnClick,
 }: {
 	data: Item[];
-	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	// The caller-supplied predicate for which items can be selected.
+	isItemSelectable: ( item: Item ) => boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
-	// Set by the picker layouts, where clicking an item is what selects it:
-	// `true` toggles the item into a multi-selection, `false` replaces the
-	// selection. Omitted by the other layouts, where a click opens the item and
-	// only the checkbox and modifier gestures select. `isEligible` is
-	// unsupported in a picker, so every rendered item is selectable there.
-	pickerMultiselect?: boolean;
+	// How the selection behaves: `'multi'` allows more than one item (enabling
+	// the Shift+Click range gesture and making modifier clicks add rather than
+	// replace), while `'single-required'` and `'single-clearable'` cap it at one
+	// item and differ only in whether a plain click on the selected item clears
+	// the selection.
+	selectionMode: SelectionMode;
+	// Whether a plain click selects (and anchors the range) rather than opening
+	// the item. When it does, the hook returns the `onClick` that performs it.
+	shouldSelectOnClick: boolean;
 } ) {
+	// `multi` is the only mode holding more than one item, so it alone enables
+	// the range gesture and additive modifier clicks. Deselecting on a plain
+	// click is offered by every mode except `single-required`, which always
+	// keeps something selected.
+	const isMultiselect = selectionMode === 'multi';
+	const allowDeselect = selectionMode !== 'single-required';
 	// The Shift+Click range gesture in progress: the anchor ranges extend from
 	// — the last item whose selection was directly toggled — and the target of
 	// the last Shift+Click, which is the other end of the range currently
@@ -214,38 +228,30 @@ export default function useSelectionProps< Item >( {
 	}, [] );
 
 	// The ids of all selectable items, in the order the layout renders them;
-	// ranges follow this order. A picker selects from every item it renders, so
-	// bulk actions don't gate it: `isEligible` is unsupported there, and reading
-	// `supportsBulk` with `some` would contradict the `every` that made the
-	// picker single-select in the first place.
-	const isPicker = pickerMultiselect !== undefined;
-	const selectableIds = (
-		isPicker
-			? data
-			: data.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
-	).map( getItemId );
+	// ranges follow this order.
+	const selectableIds = data.filter( isItemSelectable ).map( getItemId );
 	const selectableIdSet = new Set( selectableIds );
 	const hasSelectableItems = selectableIds.length > 0;
-	// A single-select picker has no range to extend and no second item to add,
-	// so the modifier gestures have nothing to offer; its plain clicks are
-	// handled in `onClick` below.
-	const hasRangeGesture = hasSelectableItems && pickerMultiselect !== false;
+	// A single-select view has no range to extend and no second item to add, so
+	// the modifier gestures have nothing to offer; plain clicks, when they
+	// select, are handled in `onClick` below.
+	const hasRangeGesture = hasSelectableItems && isMultiselect;
 
 	const getSelectionProps = ( id: string ): SelectionProps => {
 		const isSelectable = selectableIdSet.has( id );
 		return {
-			// A picker selects on a plain click, so that click is also what
-			// anchors the range a following Shift+Click extends from. Modifier
-			// clicks never reach here: `onClickCapture` stops them.
-			...( isPicker && {
+			// When a plain click selects, that click is also what anchors the
+			// range a following Shift+Click extends from. Modifier clicks never
+			// reach here: `onClickCapture` stops them.
+			...( shouldSelectOnClick && {
 				onClick: () => {
-					if ( selection.includes( id ) ) {
+					if ( allowDeselect && selection.includes( id ) ) {
 						onChangeSelection(
 							selection.filter( ( itemId ) => id !== itemId )
 						);
 					} else {
 						onChangeSelection(
-							pickerMultiselect ? [ ...selection, id ] : [ id ]
+							isMultiselect ? [ ...selection, id ] : [ id ]
 						);
 					}
 					anchorTo( id );

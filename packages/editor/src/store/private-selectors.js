@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
@@ -15,10 +12,6 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	getRenderingMode,
 	getCurrentPost,
@@ -525,8 +518,23 @@ export const getCurrentRevision = createRegistrySelector(
 		if ( ! revisions ) {
 			return null;
 		}
+		const revision = revisions.find(
+			( record ) => record[ revisionKey ] === revisionId
+		);
+		if ( revision ) {
+			return revision;
+		}
+
+		// When revisions are disabled, autosaves are missing from the collection
+		// but still available through the individual endpoint.
 		return (
-			revisions.find( ( r ) => r[ revisionKey ] === revisionId ) ?? null
+			select( coreStore ).getRevision(
+				'postType',
+				postType,
+				postId,
+				revisionId,
+				{ context: 'edit' }
+			) ?? null
 		);
 	}
 );

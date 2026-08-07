@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Layout, PostTypesList } from '@wordpress/content-types';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 function Stage() {

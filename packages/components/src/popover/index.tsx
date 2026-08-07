@@ -51,21 +51,18 @@ import type {
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
 import { StyleProvider } from '../style-provider';
-
 /**
  * Name of slot in which popover should fill.
  *
  * @type {string}
  */
 export const SLOT_NAME = 'Popover';
-
 /**
  * Virtual padding to account for overflow boundaries.
  *
  * @type {number}
  */
 const OVERFLOW_PADDING = 8;
-
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
 // Keeping the SVG's viewbox squared simplify the arrow positioning
@@ -88,7 +85,6 @@ const ArrowTriangle = () => (
 		/>
 	</SVG>
 );
-
 import { slotNameContext } from './context';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';

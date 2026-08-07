@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import {
@@ -15,10 +8,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -267,11 +256,12 @@ function ViewPickerTable< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
+		isItemSelectable: () => true,
 		selection,
 		onChangeSelection,
-		pickerMultiselect: isMultiselect,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
 	} );
 
 	const tableNoticeId = useId();

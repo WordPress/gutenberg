@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 
 const BASE_ENTITY = {

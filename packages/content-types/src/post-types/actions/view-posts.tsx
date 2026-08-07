@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import type { Action } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import type { PostTypeFormData } from '../types';
 
 const viewPostsAction: Action< PostTypeFormData > = {

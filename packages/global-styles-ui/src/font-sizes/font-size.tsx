@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
@@ -21,10 +18,6 @@ import type {
 	FontSize,
 	FluidTypographyConfig,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from '../screen-header';
 import FontSizePreview from './font-size-preview';
 import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
 import { unlock } from '../lock-unlock';

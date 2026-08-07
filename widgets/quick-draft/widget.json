@@ -5,6 +5,7 @@
 	"help": {
 		"content": "Drafts saved here are <em>private</em> until you publish them."
 	},
+	"icon": "dashboard-widgets/drafts",
 	"category": "dashboard",
 	"presentation": "content-bleed",
 	"textdomain": "default"

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -241,7 +238,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1 ] );
 	} );
 
-	test( 'should keep the editing host semantics across a cross-block selection', async ( {
+	test( 'should present the editing host semantics during a cross-block selection', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -253,16 +250,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		// The wrapper hosts editing for the selected block: it must present
-		// as a named multiline textbox for as long as it is the editing
-		// host, including while a selection crosses blocks.
+		// Without a cross-block selection, the block is edited on its own
+		// element and the canvas wrapper is not an editing host.
 		const host = editor.canvas.locator( 'body' );
-		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
-		await expect( host ).toHaveAttribute( 'role', 'textbox' );
-		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
-		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
+		await expect( host ).not.toHaveAttribute( 'contenteditable', 'true' );
 
-		// Extend the selection across blocks: the host semantics remain.
+		// Extend the selection across blocks: the wrapper becomes the
+		// editing host and must present as a named multiline textbox.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
@@ -281,18 +275,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			'Multiple selected blocks'
 		);
 
-		// Collapse into a block: the block still hosts, so the semantics
-		// remain and the generic host name returns.
-		await page.keyboard.press( 'ArrowLeft' );
-		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
-		await expect( host ).toHaveAttribute( 'role', 'textbox' );
-		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
-
-		// Move to the post title: the editability and the textbox semantics
+		// Collapse into a block: the editability and the textbox semantics
 		// are removed together.
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.click();
+		await page.keyboard.press( 'ArrowLeft' );
 		await expect( host ).toHaveAttribute( 'contenteditable', 'false' );
 		await expect( host ).not.toHaveAttribute( 'role' );
 		await expect( host ).not.toHaveAttribute( 'aria-multiline' );
@@ -1674,6 +1659,83 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				.toMatchObject( [
 					{ name: 'core/spacer' },
 					{ name: 'core/spacer' },
+				] );
+		} );
+
+		test( 'should grow and shrink a full selection with shift+arrow', async ( {
+			editor,
+			page,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			const spacerBlocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Spacer',
+			} );
+
+			await spacerBlocks.nth( 0 ).click();
+			await spacerBlocks.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
+
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+
+			// A fully selected multi-selection grows by one block at the
+			// focus end.
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
+				] );
+
+			// And shrinks the same way.
+			await page.keyboard.press( 'Shift+ArrowUp' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+		} );
+
+		test( 'should extend the selection from a block without a text selection', async ( {
+			page,
+			editor,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Spacer' } )
+				.click();
+
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
 				] );
 		} );
 

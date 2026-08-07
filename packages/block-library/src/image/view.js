@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -9,10 +6,6 @@ import {
 	withSyncEvent,
 	withScope,
 } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { IMAGE_PRELOAD_DELAY } from './constants';
 
 /**

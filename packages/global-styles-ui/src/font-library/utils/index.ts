@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';
