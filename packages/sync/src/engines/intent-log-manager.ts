@@ -317,6 +317,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					? {
 							is: syncConfig.isRawContentBlock,
 							serialize: syncConfig.serializeRawContent,
+							hydrate: syncConfig.hydrateRawContent,
 					  }
 					: undefined,
 		};

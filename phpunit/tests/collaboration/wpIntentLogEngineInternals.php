@@ -61,14 +61,19 @@ class Tests_Collaboration_WpIntentLogEngineInternals extends WP_UnitTestCase {
 		return $snapshot['doc'];
 	}
 
-	public function test_genesis_skips_freeform_content_and_yields_empty_root() {
+	public function test_genesis_carries_classic_content_as_freeform() {
+		// Previously classic runs were silently DROPPED from genesis —
+		// erasing them from the shared document and every collaborator's
+		// editor. They now sync as core/freeform with a content field.
 		$post_id = self::factory()->post->create(
 			array( 'post_content' => "<p>classic content, no block comments</p>\n<div>more</div>" )
 		);
 
 		$doc = self::snapshot_doc( self::engine(), 'postType/post:' . $post_id );
 
-		$this->assertSame( array(), $doc['root'] );
+		$this->assertCount( 1, $doc['root'] );
+		$this->assertSame( 'core/freeform', $doc['root'][0]['blockType'] );
+		$this->assertNotSame( '', $doc['root'][0]['fields']['content']['text'] );
 	}
 
 	public function test_genesis_maps_nested_blocks_with_deterministic_path_ids() {

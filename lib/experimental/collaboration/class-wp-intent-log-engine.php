@@ -1310,7 +1310,31 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			$index = 0;
 			foreach ( $blocks as $block ) {
 				if ( empty( $block['blockName'] ) ) {
-					continue; // Freeform/whitespace fragments.
+					/*
+					 * Null-name fragments: whitespace between blocks is
+					 * noise, but a run with real content is CLASSIC
+					 * content — the editor models it as core/freeform, and
+					 * dropping it here would erase it from the shared
+					 * document (and from every collaborator's editor).
+					 * Freeform content is arbitrary multi-fragment HTML, so
+					 * no wrapper stripping: the full run goes through the
+					 * codec.
+					 */
+					$text = trim( $block['innerHTML'] );
+					if ( '' === $text ) {
+						continue;
+					}
+					$specs[] = array(
+						'syncId'    => WP_Intent_Log_Planner::genesis_sync_id( $post_id, 0, array_merge( $path, array( $index ) ) ),
+						'blockType' => 'core/freeform',
+						'attrs'     => array(),
+						'fields'    => array(
+							'content' => WP_Intent_Log_Rich_Text::html_to_field( $text ),
+						),
+						'children'  => array(),
+					);
+					++$index;
+					continue;
 				}
 				$block_path = array_merge( $path, array( $index ) );
 				$attrs      = is_array( $block['attrs'] ) ? $block['attrs'] : array();
@@ -1373,6 +1397,24 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 * @return array WP_Block_Parser_Block-shaped array.
 		 */
 		private static function to_serializable_block( array $block ): array {
+			// Classic content serializes BARE (null block name → no comment
+			// delimiters, so no attrs and no persisted identity either —
+			// freeform ids re-derive deterministically from genesis paths).
+			if ( 'core/freeform' === $block['blockType'] ) {
+				$text = WP_Intent_Log_Rich_Text::field_to_html(
+					$block['fields']['content'] ?? array(
+						'text'    => '',
+						'formats' => array(),
+					)
+				);
+				return array(
+					'blockName'    => null,
+					'attrs'        => array(),
+					'innerBlocks'  => array(),
+					'innerHTML'    => $text,
+					'innerContent' => '' === $text ? array() : array( $text ),
+				);
+			}
 			$attrs   = $block['attrs'];
 			$wrapper = $attrs['_wrapper'] ?? null;
 			unset( $attrs['_wrapper'] );

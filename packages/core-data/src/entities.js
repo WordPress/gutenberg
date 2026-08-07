@@ -517,7 +517,8 @@ async function loadPostTypeEntities() {
 			 * @param {string} blockName Block type name.
 			 * @return {boolean} Whether the block is a raw-content block.
 			 */
-			isRawContentBlock: ( blockName ) => 'core/html' === blockName,
+			isRawContentBlock: ( blockName ) =>
+				'core/html' === blockName || 'core/freeform' === blockName,
 
 			/**
 			 * The full inner HTML of a raw-content block: static fragments
@@ -537,6 +538,20 @@ async function loadPostTypeEntities() {
 					? block.attributes.content
 					: '';
 			},
+
+			/**
+			 * Where a raw-content block's HTML re-enters the editor block:
+			 * core/html models content as innerContent fragments; classic
+			 * content (core/freeform) as a raw-sourced content attribute.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @param {string} html      The block's inner HTML.
+			 * @return {Object} Partial block (attributes or innerContent).
+			 */
+			hydrateRawContent: ( blockName, html ) =>
+				'core/freeform' === blockName
+					? { attributes: { content: html } }
+					: { innerContent: '' === html ? [] : [ html ] },
 		};
 
 		return entity;

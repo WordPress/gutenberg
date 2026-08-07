@@ -1381,6 +1381,49 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$this->assertSame( 'escalated', $partial['dispositions'][0]['status'] );
 	}
 
+	public function test_classic_content_syncs_as_freeform_and_materializes_bare() {
+		// A post mixing a block with a CLASSIC (comment-less) run.
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$editor_id,
+				'post_content' => "<!-- wp:paragraph -->\n<p>Block one</p>\n<!-- /wp:paragraph -->\n\n<div>classic <strong>legacy</strong> run</div>",
+			)
+		);
+		$room    = 'postType/post:' . $post_id;
+
+		// Genesis carries the classic run as a core/freeform spec with a
+		// content field (previously it was silently dropped).
+		$response = $this->poll( array(), array( 'room' => $room ) );
+		$snapshot = json_decode( $response['updates'][0]['data'], true );
+		$types    = array_column( $snapshot['doc']['root'], 'blockType' );
+		$this->assertSame( array( 'core/paragraph', 'core/freeform' ), $types );
+		$freeform = $snapshot['doc']['root'][1];
+		$this->assertArrayNotHasKey( '_wrapper', $freeform['attrs'] );
+		$this->assertNotSame( '', $freeform['fields']['content']['text'] );
+
+		// Materialize emits the classic run BARE: no comment delimiters,
+		// content byte-preserved.
+		$engine  = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$content = (string) $engine->materialize( $room );
+		$this->assertStringContainsString( '<div>classic <strong>legacy</strong> run</div>', $content );
+		$this->assertStringNotContainsString( 'wp:freeform', $content );
+		$this->assertStringContainsString( 'wp:paragraph', $content );
+
+		// The materialized content re-parses into the same shapes.
+		$reparsed = array_values(
+			array_filter(
+				parse_blocks( $content ),
+				static function ( $block ) {
+					return '' !== trim( $block['innerHTML'] );
+				}
+			)
+		);
+		$this->assertCount( 2, $reparsed );
+		$this->assertNull( $reparsed[1]['blockName'] );
+
+		wp_delete_post( $post_id, true );
+	}
+
 	public function test_block_names_outside_the_grammar_are_voided_for_everyone() {
 		// Block names materialize into comment delimiters unescaped; a
 		// crafted name could close the comment and inject markup.

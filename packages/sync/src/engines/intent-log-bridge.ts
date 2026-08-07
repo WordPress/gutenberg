@@ -76,6 +76,15 @@ export interface RawContentAdapter {
 	is: ( blockName: string ) => boolean;
 	/** The block's full inner HTML (fragments + serialized inner blocks). */
 	serialize: ( block: BridgeBlock ) => string;
+	/**
+	 * Where the HTML lives on the editor block: core/html uses
+	 * innerContent fragments, core/freeform a source:"raw" content
+	 * attribute. Omitted, innerContent form is used.
+	 */
+	hydrate?: (
+		blockName: string,
+		html: string
+	) => Pick< Partial< BridgeBlock >, 'attributes' | 'innerContent' >;
 }
 
 /** The engine field a raw-content block's markup lives in. */
@@ -287,16 +296,21 @@ export function engineBlockToBlock(
 	};
 	attributes.metadata = metadata;
 	if ( raw?.is( block.blockType ) ) {
-		// Raw-content block: the content field's HTML becomes innerContent
-		// (the editor's own content model for these blocks — any nested
-		// block markup stays inline as static fragments).
+		// Raw-content block: the content field's HTML re-enters the
+		// block's own content model — innerContent fragments (core/html)
+		// or a raw content attribute (core/freeform).
 		const field = block.fields.content;
 		const html = field ? fieldToHtml( field ) : '';
+		const hydrated = raw.hydrate?.( block.blockType, html ) ?? {
+			innerContent: '' === html ? [] : [ html ],
+		};
 		return {
 			name: block.blockType,
-			attributes,
+			attributes: { ...attributes, ...( hydrated.attributes ?? {} ) },
 			innerBlocks: [],
-			innerContent: '' === html ? [] : [ html ],
+			...( hydrated.innerContent
+				? { innerContent: hydrated.innerContent }
+				: {} ),
 		};
 	}
 	for ( const name of resolver( block.blockType ) ) {

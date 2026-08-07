@@ -1175,6 +1175,88 @@ describe( 'intent-log manager', () => {
 		);
 	} );
 
+	it( 'classic (core/freeform) blocks hydrate to a raw content attribute', async () => {
+		const transport = makeFakeTransport();
+		window._wpCollaborationEnabled = '1';
+		addFilter( FILTER, HOOK, () => [ transport.creator ] );
+		const manager = createIntentLogManager();
+		const handlers = makeHandlers();
+		await manager.load(
+			{
+				richTextFields: ( name: string ) =>
+					name.startsWith( 'core/f' ) || 'core/html' === name
+						? []
+						: [ 'content' ],
+				isRawContentBlock: ( name: string ) =>
+					'core/html' === name || 'core/freeform' === name,
+				serializeRawContent: ( block: {
+					attributes: Record< string, unknown >;
+					innerContent?: Array< string | null >;
+				} ) =>
+					( block.innerContent ?? [] )
+						.filter( ( f ): f is string => 'string' === typeof f )
+						.join( '' ) ||
+					( ( block.attributes.content as string ) ?? '' ),
+				hydrateRawContent: ( name: string, html: string ) =>
+					'core/freeform' === name
+						? { attributes: { content: html } }
+						: { innerContent: [ html ] },
+			} as never,
+			'postType/post',
+			'1',
+			{},
+			handlers
+		);
+
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'f1',
+					blockType: 'core/freeform',
+					fields: {
+						content: {
+							text: '￼',
+							formats: [
+								{
+									start: 0,
+									end: 1,
+									format: 'obj|{"html":"<div>classic run</div>"}',
+								},
+							],
+						},
+					},
+				},
+			] )
+		);
+		const pushed = ( handlers.edits.at( -1 ) as { blocks: unknown[] } )
+			.blocks as Array< {
+			name: string;
+			attributes: Record< string, unknown >;
+			innerContent?: Array< string | null >;
+		} >;
+		// Classic content re-enters through the raw content ATTRIBUTE (its
+		// parser source), not innerContent.
+		expect( pushed[ 0 ].name ).toBe( 'core/freeform' );
+		expect( pushed[ 0 ].attributes.content ).toBe(
+			'<div>classic run</div>'
+		);
+		expect( pushed[ 0 ].innerContent ).toBeUndefined();
+
+		// The echo (editor handing the same tree back) derives nothing.
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: pushed.map( ( block ) => ( {
+					...block,
+					innerBlocks: [],
+				} ) ),
+			},
+			'gutenberg'
+		);
+		expect( transport.captured.sent ).toHaveLength( 0 );
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

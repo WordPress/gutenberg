@@ -251,6 +251,18 @@ export interface SyncConfig {
 		innerBlocks: unknown[];
 		innerContent?: Array< string | null >;
 	} ) => string;
+	/**
+	 * Where a raw-content block's HTML lives on the editor block:
+	 * innerContent fragments (core/html) or attributes (core/freeform's
+	 * raw-sourced content). Omitted, innerContent form is used.
+	 */
+	hydrateRawContent?: (
+		blockName: string,
+		html: string
+	) => {
+		attributes?: Record< string, unknown >;
+		innerContent?: Array< string | null >;
+	};
 }
 
 export interface SyncManager {
