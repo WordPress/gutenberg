@@ -41,6 +41,7 @@
 -   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
 -   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
 -   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
+-   `ItemGroup`: Use WPDS design tokens for focus, hover, border, typography, and default text colors so themed values from `ThemeProvider` apply correctly ([#81088](https://github.com/WordPress/gutenberg/pull/81088)).
 
 ## 38.0.0 (2026-07-29)
 

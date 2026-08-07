@@ -1,7 +1,4 @@
-@use "../utils/theme-variables" as *;
-
-// Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
-$surface-border-color: rgba(0, 0, 0, 0.1);
+@use "@wordpress/base-styles/mixins";
 
 // Matches CONFIG.controlHeight.
 $control-height: 36px;
@@ -20,12 +17,12 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 
 .item-group {
 	&.is-bordered {
-		border: 1px solid $surface-border-color;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&.is-separated {
 		> *:not(marquee) > * {
-			border-block-end: 1px solid $surface-border-color;
+			border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 
 		> *:last-of-type > * {
@@ -58,14 +55,15 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	width: 100%;
 	display: block;
 	margin: 0;
-	color: inherit;
+	color: var(--wpds-color-foreground-content-neutral);
 
 	&.is-unstyled-button,
 	&.is-unstyled-link {
-		font-size: 13px;
-		font-family: inherit;
+		color: var(--wpds-color-foreground-interactive-neutral);
+		font-size: var(--wpds-typography-font-size-md);
+		font-family: var(--wpds-typography-font-family-body);
 		appearance: none;
-		border: 1px solid transparent;
+		border: var(--wpds-border-width-xs) solid transparent;
 		cursor: var(--wpds-cursor-control);
 		background: none;
 		text-align: start;
@@ -76,7 +74,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		}
 
 		&:hover {
-			color: $components-color-accent;
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 
 		&:focus {
@@ -85,10 +83,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		}
 
 		&:focus-visible {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: 0;
+			@include mixins.outset-ring__focus();
 		}
 	}
 
