@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Render block element styles defined only inside responsive viewport states.
 -   Wrap block-level preset class selectors in `:where()` so they keep the same `0-1-0` specificity as root-level presets, preventing block-level palettes (e.g. via the `wp_theme_json_data_theme` filter) from overriding responsive state styles ([#80580](https://github.com/WordPress/gutenberg/issues/80580)).
 
 ### New Features
