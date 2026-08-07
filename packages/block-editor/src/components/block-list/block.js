@@ -686,13 +686,9 @@ function BlockListBlockProvider( props ) {
 			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
-			// Without a section block there is nothing for the deep check to
-			// match, and it walks the parents of every selected block to find
-			// that out.
 			const isSelectionWithinCurrentSection =
 				isBlockSelected( sectionBlockClientId ) ||
-				( !! sectionBlockClientId &&
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
+				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
