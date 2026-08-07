@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.0.32 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 6.0.0 (2021-09-09)
 
 ### Breaking Change
