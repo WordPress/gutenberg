@@ -29,10 +29,6 @@
 			transform-origin: 50% 50%;
 
 			@media not ( prefers-reduced-motion ) {
-				/*
-				 * 1.4s matches the legacy `@wordpress/components` spinner
-				 * animation duration.
-				 */
 				animation: spinner-spin 1.4s linear infinite both;
 			}
 		}
