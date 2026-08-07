@@ -677,6 +677,28 @@ inside intent payloads, not the transport.
   capture surfaces must be enumerated from the BLOCK'S OWN
   content model (save/serializer behavior), not from attribute
   schemas alone.
+
+  **2d-xxii (quick wins) DONE.** (1) CLASSIC CONTENT: server
+  genesis silently DROPPED comment-less freeform runs (an
+  `empty(blockName) → continue` with a fatal comment: real
+  classic content was erased from the shared doc and every
+  collaborator's editor). Genesis now emits non-whitespace runs
+  as core/freeform specs (full run through the codec, no wrapper
+  strip — classic is multi-fragment); materialize serializes them
+  BARE (null blockName → no comment delimiters, no persisted
+  identity — ids re-derive from genesis paths); the client treats
+  core/freeform as a raw-content block hydrating to its
+  raw-sourced `content` ATTRIBUTE via the new
+  `SyncConfig.hydrateRawContent` hook (vs core/html's
+  innerContent form). (2) CAPABILITY-GATED RESTORE:
+  `window._wpCollaborationCanUnfilteredHtml` joins the bootstrap
+  flags; review surfaces hide Restore on requires-approval
+  conflicts for filtered users and say why ("Only someone allowed
+  to publish unfiltered HTML can restore it"), capable reviewers
+  see "publishes under your account"; Discard stays universal.
+  UI hint only — ingest re-enforces regardless. An internals test
+  asserting the OLD drop-freeform behavior was updated (the
+  asserted behavior WAS the bug).
   Approval needs NO new machinery: proposals use the ordinary row
   shape (replay/retention/resolution/review UI unchanged), and
   restore re-authors content under the RESTORER's capability — a

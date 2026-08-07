@@ -19,9 +19,26 @@ export const REASON_LABELS = {
 		'It depended on another edit that was set aside.'
 	),
 	'requires-approval': __(
-		'It contains content that needs approval from someone allowed to publish unfiltered HTML. Restoring it publishes the content under your account.'
+		'It contains content that needs approval from someone allowed to publish unfiltered HTML.'
 	),
 };
+
+/**
+ * Whether the current user may restore a group of review items. Restoring
+ * a requires-approval conflict IS the approval (the content re-publishes
+ * under the restorer's account), so it is reserved for users who can
+ * publish unfiltered HTML. UI hint only — ingest re-enforces per the
+ * authoring user's capability regardless.
+ *
+ * @param {Array} items The group's review items.
+ * @return {boolean} Whether restore is available.
+ */
+export function canRestoreItems( items ) {
+	return (
+		items.every( ( item ) => 'requires-approval' !== item.reason ) ||
+		false !== window._wpCollaborationCanUnfilteredHtml
+	);
+}
 
 const EMPTY_CLIENT_IDS = {};
 

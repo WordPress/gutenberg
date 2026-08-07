@@ -7,7 +7,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { REASON_LABELS } from './review-data';
+import { canRestoreItems, REASON_LABELS } from './review-data';
 
 /**
  * One conflict group (a unit of edits set aside together): attribution,
@@ -24,7 +24,18 @@ export default function ReviewGroup( { items, onResolve, onNavigate } ) {
 	const attribution = first.isLocal
 		? __( 'One of your edits was set aside.' )
 		: __( 'A collaborator’s edit was set aside.' );
-	const reason = REASON_LABELS[ first.reason ];
+	const restorable = canRestoreItems( items );
+	const isApproval = 'requires-approval' === first.reason;
+	let reason = REASON_LABELS[ first.reason ];
+	if ( isApproval ) {
+		reason = restorable
+			? `${ reason } ${ __(
+					'Restoring it publishes the content under your account.'
+			  ) }`
+			: `${ reason } ${ __(
+					'Only someone allowed to publish unfiltered HTML can restore it.'
+			  ) }`;
+	}
 	const summaries = items
 		.map( ( item ) => item.summary ?? item.excerpt )
 		.filter( Boolean );
@@ -57,14 +68,16 @@ export default function ReviewGroup( { items, onResolve, onNavigate } ) {
 				</p>
 			) }
 			<div className="editor-collaboration-review-panel__actions">
-				<Button
-					__next40pxDefaultSize
-					size="compact"
-					variant="secondary"
-					onClick={ () => onResolve( items, 'restored' ) }
-				>
-					{ __( 'Restore' ) }
-				</Button>
+				{ restorable && (
+					<Button
+						__next40pxDefaultSize
+						size="compact"
+						variant="secondary"
+						onClick={ () => onResolve( items, 'restored' ) }
+					>
+						{ __( 'Restore' ) }
+					</Button>
+				) }
 				<Button
 					__next40pxDefaultSize
 					size="compact"

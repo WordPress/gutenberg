@@ -391,7 +391,10 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		'window._wpCollaborationSync = ' . wp_json_encode( $sync ) . ';' .
 		// Informational half of the intent-log actor id; the server stamps
 		// the authoritative value from the authenticated request.
-		'window._wpCollaborationUserId = ' . wp_json_encode( get_current_user_id() ) . ';',
+		'window._wpCollaborationUserId = ' . wp_json_encode( get_current_user_id() ) . ';' .
+		// UI hint only — restore/approval is enforced at ingest per the
+		// authoring user's capability regardless of what the client shows.
+		'window._wpCollaborationCanUnfilteredHtml = ' . wp_json_encode( current_user_can( 'unfiltered_html' ) ) . ';',
 		'after'
 	);
 }
