@@ -47,7 +47,7 @@ const mockedSpeak = jest.mocked( speak );
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
-		// @ts-ignore
+		// @ts-expect-error The imported hook is not typed as a Jest mock.
 		useResizeObserver.mockReturnValue( [
 			<div key="1" />,
 			{ width: 320 },
@@ -164,7 +164,7 @@ describe( 'Placeholder', () => {
 
 	describe( 'resize aware', () => {
 		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
-			// @ts-ignore
+			// @ts-expect-error The imported hook is not typed as a Jest mock.
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 480 },
@@ -179,7 +179,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
-			// @ts-ignore
+			// @ts-expect-error The imported hook is not typed as a Jest mock.
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },

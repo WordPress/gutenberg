@@ -256,7 +256,7 @@ export function scopeFeatureSelectors(
 
 			Object.entries( selector ).forEach(
 				( [ subfeature, subfeatureSelector ] ) => {
-					// @ts-expect-error
+					// @ts-expect-error A string key cannot index `string | Record<string, string>`.
 					featureSelectors[ feature ][ subfeature ] = scopeSelector(
 						scope,
 						subfeatureSelector as string
@@ -509,7 +509,7 @@ function findInPresetsBy(
 			// Preset origins ordered by priority.
 			const origins = [ 'custom', 'theme', 'default' ];
 			for ( const origin of origins ) {
-				// @ts-expect-error
+				// @ts-expect-error `presetByOrigin` is typed as `Object`, which has no index signature.
 				const presets = presetByOrigin[ origin ];
 				if ( presets ) {
 					const presetObject = presets.find(

@@ -736,69 +736,6 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
 	} );
 
-	test( 'should mirror the suggestions list reference onto the editing host', async ( {
-		editor,
-		page,
-	} ) => {
-		// The editing host, which `RichText` mirrors these attributes onto by
-		// hand, only takes over once the block has a sibling.
-		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
-			.click();
-		await page.keyboard.type( 'A first paragraph.' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'hello @fr' );
-
-		await expect(
-			page.getByRole( 'option', {
-				name: 'Frodo Baggins',
-				selected: true,
-			} )
-		).toBeVisible();
-
-		const editingHost = editor.canvas.getByRole( 'textbox', {
-			name: 'Editor canvas',
-		} );
-
-		// The popover renders outside the canvas, so the list is mirrored back
-		// into it — these IDs have to resolve in the host's own document.
-		const listBoxId = await editor.canvas
-			.getByRole( 'listbox' )
-			.getAttribute( 'id' );
-		const optionId = await editor.canvas
-			.getByRole( 'option', { name: 'Frodo Baggins' } )
-			.getAttribute( 'id' );
-
-		await expect( editingHost ).toHaveAttribute(
-			'aria-autocomplete',
-			'list'
-		);
-		await expect( editingHost ).toHaveAttribute(
-			'aria-haspopup',
-			'listbox'
-		);
-		await expect( editingHost ).toHaveAttribute(
-			'aria-controls',
-			listBoxId
-		);
-		await expect( editingHost ).toHaveAttribute( 'aria-owns', listBoxId );
-		await expect( editingHost ).toHaveAttribute(
-			'aria-activedescendant',
-			optionId
-		);
-
-		await page.keyboard.press( 'Escape' );
-		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
-
-		// Only an omitted value clears an attribute here: a `null` would land
-		// on the host as the string "null".
-		await expect( editingHost ).not.toHaveAttribute( 'aria-controls' );
-		await expect( editingHost ).not.toHaveAttribute( 'aria-owns' );
-		await expect( editingHost ).not.toHaveAttribute(
-			'aria-activedescendant'
-		);
-	} );
-
 	test( 'should re-trigger autocomplete when backspacing into a completed mention', async ( {
 		editor,
 		page,

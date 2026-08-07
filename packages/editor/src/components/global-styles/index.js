@@ -27,6 +27,8 @@ function useServerData( settings ) {
 		settings?.__experimentalDiscussionSettings;
 	const fontLibraryEnabled = settings?.fontLibraryEnabled ?? true;
 	const responsiveEditingEnabled = settings?.responsiveEditingEnabled ?? true;
+	const blockStatesEditingEnabled =
+		settings?.blockStatesEditingEnabled ?? true;
 
 	const mediaUploadHandler = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
@@ -78,6 +80,7 @@ function useServerData( settings ) {
 		serverSettings,
 		fontLibraryEnabled,
 		responsiveEditingEnabled,
+		blockStatesEditingEnabled,
 	};
 }
 
@@ -99,6 +102,7 @@ export default function GlobalStylesUIWrapper( {
 		serverSettings,
 		fontLibraryEnabled,
 		responsiveEditingEnabled,
+		blockStatesEditingEnabled,
 	} = useServerData( settings );
 
 	// Show loading state while data is being fetched
@@ -121,6 +125,7 @@ export default function GlobalStylesUIWrapper( {
 				showResponsiveStateControls={
 					showResponsiveStateControls && responsiveEditingEnabled
 				}
+				showBlockStateControls={ blockStatesEditingEnabled }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

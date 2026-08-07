@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widget chrome and picker preview chrome: preserve their flex-column layout
+    when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
+
+### Documentation
+
+-   Describe what the "More" menu mounts for a link fulfillment ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+
+## 0.4.0 (2026-07-29)
+
 ### New Features
 
 -   Surface a widget's declared `actions` in the tile chrome as a "More"

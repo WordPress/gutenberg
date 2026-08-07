@@ -211,6 +211,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['help'] = $widget_type->help;
 			}
 
+			if ( rest_is_field_included( 'icon', $fields ) ) {
+				$data['icon'] = $widget_type->icon;
+			}
+
 			if ( rest_is_field_included( 'actions', $fields ) ) {
 				$data['actions'] = $widget_type->actions;
 			}
@@ -311,6 +315,13 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 								),
 							),
 						),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'icon'          => array(
+						'description' => __( 'Registered icon name identifying the widget type visually.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

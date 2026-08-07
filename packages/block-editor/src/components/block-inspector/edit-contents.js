@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
@@ -13,43 +14,42 @@ import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit
 import { store as blockEditorStore } from '../../store';
 
 function IsolatedEditButton( {
-	block,
+	attributes = {},
 	onNavigateToEntityRecord,
-	isSyncedPattern,
 	isTemplatePartBlock,
 } ) {
-	const blockAttributes = block?.attributes || {};
+	const { ref, theme, slug } = attributes;
+	const entityId = isTemplatePartBlock
+		? theme && slug && `${ theme }//${ slug }`
+		: ref;
 
 	const handleClick = () => {
-		if ( isSyncedPattern ) {
-			onNavigateToEntityRecord( {
-				postId: blockAttributes.ref,
-				postType: 'wp_block',
-			} );
-		} else if ( isTemplatePartBlock ) {
-			const { theme, slug } = blockAttributes;
-			const templatePartId =
-				theme && slug ? `${ theme }//${ slug }` : null;
-			if ( templatePartId ) {
-				onNavigateToEntityRecord( {
-					postId: templatePartId,
-					postType: 'wp_template_part',
-				} );
-			}
+		if ( ! entityId ) {
+			return;
 		}
+
+		onNavigateToEntityRecord( {
+			postId: entityId,
+			postType: isTemplatePartBlock ? 'wp_template_part' : 'wp_block',
+		} );
 	};
 
 	return (
-		<VStack className="block-editor-block-inspector-edit-contents" expanded>
+		<Stack
+			direction="column"
+			className="block-editor-block-inspector-edit-contents"
+		>
 			<Button
 				className="block-editor-block-inspector-edit-contents__button"
 				__next40pxDefaultSize
 				variant="secondary"
 				onClick={ handleClick }
+				accessibleWhenDisabled
+				disabled={ ! entityId }
 			>
 				{ __( 'Edit original' ) }
 			</Button>
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -72,7 +72,10 @@ function InlineEditButton( {
 	};
 
 	return (
-		<VStack className="block-editor-block-inspector-edit-contents" expanded>
+		<Stack
+			direction="column"
+			className="block-editor-block-inspector-edit-contents"
+		>
 			<Button
 				className="block-editor-block-inspector-edit-contents__button"
 				__next40pxDefaultSize
@@ -85,7 +88,7 @@ function InlineEditButton( {
 					: /* translators: Button label to enter pattern editing mode. */
 					  __( 'Edit pattern' ) }
 			</Button>
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -124,9 +127,8 @@ export default function EditContents( { clientId } ) {
 	if ( shouldUseIsolatedEditor ) {
 		return (
 			<IsolatedEditButton
-				block={ block }
+				attributes={ block?.attributes }
 				onNavigateToEntityRecord={ onNavigateToEntityRecord }
-				isSyncedPattern={ isSyncedPattern }
 				isTemplatePartBlock={ isTemplatePartBlock }
 			/>
 		);

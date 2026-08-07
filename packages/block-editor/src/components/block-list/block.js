@@ -464,7 +464,23 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
-				if ( getBlockOrder( nextBlockClientId ).length ) {
+				// Forward deleting an unmodified default block should
+				// remove it and move into the next block, not pull the
+				// next block's first item out of it.
+				if ( isUnmodifiedDefaultBlock( getBlock( clientId ) ) ) {
+					// Select the first leaf block, so the caret starts at
+					// the beginning of the block's content rather than on
+					// a container's shell.
+					let firstLeafClientId = nextBlockClientId;
+					while ( getBlockOrder( firstLeafClientId ).length ) {
+						firstLeafClientId =
+							getBlockOrder( firstLeafClientId )[ 0 ];
+					}
+					registry.batch( () => {
+						removeBlock( clientId );
+						selectBlock( firstLeafClientId );
+					} );
+				} else if ( getBlockOrder( nextBlockClientId ).length ) {
 					moveFirstItemUp( nextBlockClientId, false );
 				} else {
 					mergeBlocks( clientId, nextBlockClientId );
@@ -666,9 +682,13 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const sectionBlockClientId = _isSectionBlock( clientId )
+			const isSectionBlock = _isSectionBlock( clientId );
+			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			const isSelectionWithinCurrentSection =
+				isBlockSelected( sectionBlockClientId ) ||
+				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -686,11 +706,9 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				isSectionBlock,
 				isWithinSectionBlock: !! sectionBlockClientId,
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				isSelectionWithinCurrentSection,
 				blockType,
 				canRemove,
 				canMove,

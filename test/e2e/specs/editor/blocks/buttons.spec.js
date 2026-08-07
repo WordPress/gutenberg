@@ -281,7 +281,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Cyan bluish gray"i]' );
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
 		await editorSettings
 			.locator( '.components-tools-panel' )
 			.filter( {
@@ -289,7 +289,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Vivid red"i]' );
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -320,8 +320,12 @@ test.describe( 'Buttons', () => {
 		// Match by substring: when the control has a value (e.g. an inherited
 		// color), the button's accessible name gains a "The currently selected
 		// color is…" suffix, so an exact-name match no longer works.
-		await page.click( 'role=button[name=/Custom color picker/i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
 
 		await editorSettings
 			.locator( '.components-tools-panel' )
@@ -330,8 +334,12 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=button[name=/Custom color picker/i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -356,7 +364,9 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Gradient', exact: true } )
 			.click();
-		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
+		await page
+			.getByRole( 'option', { name: 'Gradient: Purple to yellow' } )
+			.click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -381,15 +391,23 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Gradient', exact: true } )
 			.click();
-		await page.click(
-			'role=button[name=/^Gradient control point at position 0% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 0% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
 		await page.keyboard.press( 'Escape' );
-		await page.click(
-			'role=button[name=/^Gradient control point at position 100% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 100% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -458,6 +476,61 @@ test.describe( 'Buttons', () => {
 					{
 						name: 'core/button',
 						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'copies attributes when adding a sibling with Enter', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'Content',
+						backgroundColor: 'vivid-red',
+						textColor: 'cyan-bluish-gray',
+						anchor: 'first-button',
+					},
+				},
+			],
+		} );
+
+		// Place the caret at the end of the button text and press Enter.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		// The new button inherits everything but the content, like a
+		// duplicated block would.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+							anchor: 'first-button',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Second',
 							backgroundColor: 'vivid-red',
 							textColor: 'cyan-bluish-gray',
 						},

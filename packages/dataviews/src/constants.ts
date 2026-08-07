@@ -57,3 +57,17 @@ export const LAYOUT_PICKER_TABLE = 'pickerTable';
 export const LAYOUT_PICKER_ACTIVITY = 'pickerActivity';
 
 export const DAYS_OF_WEEK: DayNumber[] = [ 0, 1, 2, 3, 4, 5, 6 ];
+
+// The preset aspect ratios available for item media previews. Source of
+// truth for the `MediaAspectRatio` type (derived from this array), and used
+// by layouts to validate the configured `layout.aspectRatio` before
+// applying it.
+export const MEDIA_ASPECT_RATIOS = [
+	'1/1',
+	'4/3',
+	'3/4',
+	'3/2',
+	'2/3',
+	'16/9',
+	'9/16',
+] as const;

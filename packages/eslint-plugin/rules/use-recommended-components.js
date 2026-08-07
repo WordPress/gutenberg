@@ -56,13 +56,15 @@ const DENYLIST = {
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalScrollable: '{{ name }} is planned for deprecation.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
-		__experimentalSurface: '{{ name }} is planned for deprecation.',
+		__experimentalSurface:
+			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
-		Animate: '{{ name }} is planned for deprecation.',
+		Animate:
+			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',

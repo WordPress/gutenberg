@@ -7,14 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
 	Popover,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -327,18 +326,18 @@ export default function ListViewDropIndicatorPreview( {
 							showColors
 							context="list-view"
 						/>
-						<HStack
-							alignment="center"
+						<Stack
+							align="center"
 							className="block-editor-list-view-block-select-button__label-wrapper"
 							justify="flex-start"
-							spacing={ 1 }
+							gap="xs"
 						>
 							<span className="block-editor-list-view-block-select-button__title">
 								<Truncate ellipsizeMode="auto">
 									{ blockTitle }
 								</Truncate>
 							</span>
-						</HStack>
+						</Stack>
 					</div>
 					<div className="block-editor-list-view-block__menu-cell"></div>
 				</div>
