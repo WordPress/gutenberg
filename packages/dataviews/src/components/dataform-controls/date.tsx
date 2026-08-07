@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import {
 	format,
 	isValid as isValidDate,
+	parseISO,
 	subMonths,
 	subDays,
 	subYears,
@@ -126,12 +127,16 @@ const DATE_RANGE_PRESETS = [
 	},
 ];
 
+// A `date` value is a plain calendar day with no timezone attached, and the
+// calendar reads and reports the `Date`s it is given in the browser timezone.
+// Anchoring the day there — rather than to the site timezone, which shifts it
+// onto an adjacent day — keeps the day shown the day the field holds.
 const parseDate = ( dateString?: string ): Date | null => {
 	if ( ! dateString ) {
 		return null;
 	}
-	const parsed = getDate( dateString );
-	return parsed && isValidDate( parsed ) ? parsed : null;
+	const parsed = parseISO( dateString );
+	return isValidDate( parsed ) ? parsed : null;
 };
 
 const formatDate = ( date?: Date | string ): string => {
@@ -363,10 +368,6 @@ function CalendarDateControl< Item >( {
 		[ onChangeCallback ]
 	);
 
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
-
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional ) {
 		displayLabel = `${ label } (${ __( 'Required' ) })`;
@@ -451,7 +452,6 @@ function CalendarDateControl< Item >( {
 						onSelect={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
@@ -599,8 +599,6 @@ function CalendarDateRangeControl< Item >( {
 		[ value, updateDateRange ]
 	);
 
-	const { timezone } = getSettings();
-
 	let displayLabel = label;
 	if ( field.isValid?.required && ! markWhenOptional ) {
 		displayLabel = `${ label } (${ __( 'Required' ) })`;
@@ -705,7 +703,6 @@ function CalendarDateRangeControl< Item >( {
 						onSelect={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

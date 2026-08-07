@@ -1,0 +1,97 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
+import { setSettings, getSettings } from '@wordpress/date';
+import DataForm from '../../../dataform';
+import type { Field } from '../../../types';
+
+type TestItem = { id: number; publishedOn: string };
+
+const fields: Field< TestItem >[] = [
+	{
+		id: 'publishedOn',
+		label: 'Published on',
+		type: 'date',
+	},
+];
+
+const form = { fields: [ 'publishedOn' ] };
+
+function ControlledDataForm( { initialValue }: { initialValue: string } ) {
+	const [ item, setItem ] = useState< TestItem >( {
+		id: 1,
+		publishedOn: initialValue,
+	} );
+	return (
+		<DataForm
+			data={ item }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setItem( ( previous ) => ( { ...previous, ...edits } ) )
+			}
+		/>
+	);
+}
+
+describe( 'dataform-controls/date', () => {
+	const originalSettings = getSettings();
+
+	afterEach( () => {
+		setSettings( originalSettings );
+	} );
+
+	// Jest pins the browser timezone to UTC, so the mismatch is created from the
+	// WordPress side: a site behind UTC used to shift the plain calendar day
+	// onto the previous one.
+	it.each( [ -8, -5, 5.5, 9 ] )(
+		'shows the stored day as selected on a site at UTC%s',
+		async ( offset ) => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset,
+					offsetFormatted: String( offset ),
+					string: '',
+					abbr: '',
+				},
+			} );
+
+			render( <ControlledDataForm initialValue="2026-08-20" /> );
+
+			expect(
+				screen.getByRole( 'button', {
+					name: /august 20, 2026, selected/i,
+				} )
+			).toBeInTheDocument();
+		}
+	);
+
+	it( 'commits the day that was clicked', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: -8,
+				offsetFormatted: '-8',
+				string: '',
+				abbr: '',
+			},
+		} );
+		const user = userEvent.setup();
+
+		render( <ControlledDataForm initialValue="2026-08-20" /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: /august 25, 2026/i } )
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
+		).toBe( '2026-08-25' );
+		expect(
+			screen.getByRole( 'button', {
+				name: /august 25, 2026, selected/i,
+			} )
+		).toBeInTheDocument();
+	} );
+} );

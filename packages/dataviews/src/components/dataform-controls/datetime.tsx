@@ -1,3 +1,4 @@
+import { format, isValid as isValidDate, parseISO } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -11,7 +12,6 @@ import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
-import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
@@ -22,6 +22,28 @@ const formatDateTime = ( value?: string ): string => {
 	}
 	// Format in WordPress timezone for datetime-local input: YYYY-MM-DDTHH:mm
 	return dateI18n( 'Y-m-d\\TH:i', getDate( value ) );
+};
+
+/**
+ * Turns a stored value into the `Date` the calendar should work with.
+ *
+ * The value is an instant, but the control edits it as a wall clock in the
+ * WordPress timezone, while the calendar reads and reports the plain `Date`s it
+ * is given in the browser timezone. Re-anchoring the wall clock to the browser
+ * timezone puts both in the same frame, so the day the calendar shows and
+ * reports is the day the field holds.
+ *
+ * @param value Stored value, parsable by `getDate`.
+ *
+ * @return The calendar's date, or `null` if the value is missing or invalid.
+ */
+const getCalendarDate = ( value?: string ): Date | null => {
+	const wallClock = formatDateTime( value );
+	if ( ! wallClock ) {
+		return null;
+	}
+	const date = parseISO( wallClock );
+	return isValidDate( date ) ? date : null;
 };
 
 function CalendarDateTimeControl< Item >( {
@@ -40,7 +62,7 @@ function CalendarDateTimeControl< Item >( {
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		const parsedDate = parseDateTime( value );
+		const parsedDate = getCalendarDate( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
 
@@ -50,7 +72,7 @@ function CalendarDateTimeControl< Item >( {
 	const previousFocusRef = useRef< Element | null >( null );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
-		useDisabledDateMatchers( isValid, parseDateTime );
+		useDisabledDateMatchers( isValid, getCalendarDate );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -71,16 +93,16 @@ function CalendarDateTimeControl< Item >( {
 		( newDate: Date | undefined | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
-				// Extract the date part in WP timezone from the calendar selection
-				const wpDate = dateI18n( 'Y-m-d', newDate );
+				// Read the day the calendar reported, rather than re-anchoring
+				// the instant to the WordPress timezone, which lands on the
+				// adjacent day whenever the two timezones disagree.
+				const wpDate = format( newDate, 'yyyy-MM-dd' );
 
-				// Preserve time if it exists in current value, otherwise use current time
-				let wpTime: string;
-				if ( value ) {
-					wpTime = dateI18n( 'H:i', getDate( value ) );
-				} else {
-					wpTime = dateI18n( 'H:i', newDate );
-				}
+				// Preserve the time from the current value; a value set for the
+				// first time starts at the beginning of the day.
+				const wpTime = value
+					? dateI18n( 'H:i', getDate( value ) )
+					: '00:00';
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
@@ -128,7 +150,7 @@ function CalendarDateTimeControl< Item >( {
 				onChangeCallback( dateTime.toISOString() );
 
 				// Update calendar month to match
-				const parsedDate = parseDateTime( dateTime.toISOString() );
+				const parsedDate = getCalendarDate( dateTime.toISOString() );
 				if ( parsedDate ) {
 					setCalendarMonth( parsedDate );
 				}
@@ -143,9 +165,6 @@ function CalendarDateTimeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -192,15 +211,10 @@ function CalendarDateTimeControl< Item >( {
 				{ ! compact && (
 					<DateCalendar
 						style={ { width: '100%' } }
-						selected={
-							value
-								? parseDateTime( value ) || undefined
-								: undefined
-						}
+						selected={ getCalendarDate( value ) || undefined }
 						onSelect={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
