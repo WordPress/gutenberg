@@ -1,5 +1,5 @@
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
@@ -166,6 +166,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ filteredTermsTree, setFilteredTermsTree ] = useState( [] );
 	const debouncedSpeak = useDebounce( speak, 500 );
+	const isCategoryTaxonomy = slug === 'category';
 
 	const {
 		hasCreateAction,
@@ -174,6 +175,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		loading,
 		availableTerms,
 		taxonomy,
+		isNewPost,
+		defaultCategory,
+		hasSettingsLoaded,
 	} = useSelect(
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
@@ -206,6 +210,21 @@ export function HierarchicalTermSelector( { slug } ) {
 					getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
 					EMPTY_ARRAY,
 				taxonomy: _taxonomy,
+				isNewPost:
+					! getCurrentPost().id ||
+					select( editorStore ).isEditedPostNew(),
+				defaultCategory:
+					slug === 'category'
+						? select( coreStore ).getEntityRecord( 'root', 'site' )
+								?.default_category
+						: null,
+				hasSettingsLoaded:
+					slug === 'category'
+						? select( coreStore ).hasFinishedResolution(
+								'getEntityRecord',
+								[ 'root', 'site' ]
+						  )
+						: true,
 			};
 		},
 		[ slug ]
@@ -213,6 +232,27 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+
+	// Set default category for new posts
+	useEffect( () => {
+		if (
+			isCategoryTaxonomy &&
+			isNewPost &&
+			! terms?.length &&
+			hasSettingsLoaded &&
+			defaultCategory
+		) {
+			editPost( { [ taxonomy.rest_base ]: [ defaultCategory ] } );
+		}
+	}, [
+		isNewPost,
+		terms,
+		hasSettingsLoaded,
+		defaultCategory,
+		editPost,
+		isCategoryTaxonomy,
+		taxonomy?.rest_base,
+	] );
 
 	const availableTermsTree = useMemo(
 		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
