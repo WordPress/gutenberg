@@ -12,4 +12,5 @@
 
 ### Internal
 
+-   Import the validated form controls from the public `@wordpress/components` API instead of unlocking them ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). No behavior change.
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).

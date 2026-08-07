@@ -18,6 +18,8 @@
 
 ### Enhancements
 
+-   Validated form controls: Stabilize `ValidatedCheckboxControl`, `ValidatedComboboxControl`, `ValidatedFormTokenField`, `ValidatedInputControl`, `ValidatedNumberControl`, `ValidatedRadioControl`, `ValidatedSelectControl`, `ValidatedTextControl`, `ValidatedTextareaControl`, `ValidatedToggleControl`, and `ValidatedToggleGroupControl` as public exports, along with the `ValidatedControlProps` type, and remove them from private APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
+-   `ValidatedSelectControl`: Support multiple selection, mirroring `SelectControl`'s own single/multiple props union ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
 -   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
 -   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
 -   `SandBox`: Add `allowForms` prop to opt into `allow-forms` in the iframe's sandbox attribute ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).

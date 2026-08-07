@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Import the validated form controls from the public `@wordpress/components` API instead of unlocking them ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). No behavior change.
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements

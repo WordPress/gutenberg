@@ -27,6 +27,7 @@
 
 ### Internal
 
+-   DataViews: Import the validated form controls from the public `@wordpress/components` API instead of unlocking them, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Type-checking the migrated call sites also fixed a handful of latent type errors that the private `unlock()` helper's `any` return had hidden; no behavior change.
 -   DataViews: Inline a verbatim copy of the `kebabCase` utility instead of unlocking the private one from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `change-case` dependency; no behavior change. ([#81284](https://github.com/WordPress/gutenberg/pull/81284))
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
