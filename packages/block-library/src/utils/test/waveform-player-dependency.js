@@ -178,6 +178,30 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
+	it( 'skips programmatic players during explicit declarative scans', () => {
+		const element = createDeclarativePlayer();
+		const icon = document.createElementNS(
+			'http://www.w3.org/2000/svg',
+			'svg'
+		);
+		icon.setAttribute( FIXTURE_ATTRIBUTE, 'constructor-scan' );
+
+		WaveformPlayer = loadWaveformPlayer();
+		const player = new WaveformPlayer( element, {
+			playIcon: icon.outerHTML,
+		} );
+
+		WaveformPlayer.init();
+
+		expect( WaveformPlayer.getAllInstances() ).toHaveLength( 1 );
+		expect( WaveformPlayer.getInstance( element ) ).toBe( player );
+		expect(
+			element.querySelector(
+				`[${ FIXTURE_ATTRIBUTE }="constructor-scan"]`
+			)
+		).not.toBeNull();
+	} );
+
 	it( 'initializes declarative players only after an explicit request', () => {
 		const element = createDeclarativePlayer();
 
