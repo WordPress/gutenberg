@@ -12,12 +12,14 @@ import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import OverlayMenuIcon from './overlay-menu-icon';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import { DEFAULT_OVERLAY_BREAKPOINT } from '../constants';
 
 export default function ResponsiveWrapper( {
 	children,
@@ -32,10 +34,15 @@ export default function ResponsiveWrapper( {
 	icon,
 	overlay,
 	onNavigateToEntityRecord,
+	overlayBreakpoint = DEFAULT_OVERLAY_BREAKPOINT,
+	hasCustomOverlayBreakpoint = false,
 } ) {
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
+	);
+	const isCustomOverlayBreakpointInline = useMediaQuery(
+		`(min-width: ${ overlayBreakpoint })`
 	);
 
 	if ( ! isResponsive ) {
@@ -44,6 +51,8 @@ export default function ResponsiveWrapper( {
 
 	// Only apply overlay colors if there's no custom overlay template part.
 	const hasCustomOverlay = !! overlay;
+	const shouldUseInlineLayout =
+		hasCustomOverlayBreakpoint && isCustomOverlayBreakpointInline;
 
 	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
@@ -63,6 +72,7 @@ export default function ResponsiveWrapper( {
 		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
+			'is-custom-overlay-breakpoint-inline': shouldUseInlineLayout,
 		}
 	);
 
@@ -78,7 +88,10 @@ export default function ResponsiveWrapper( {
 
 	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
-		{ 'always-shown': isHiddenByDefault }
+		{
+			'always-shown': isHiddenByDefault,
+			'is-custom-overlay-breakpoint-inline': shouldUseInlineLayout,
+		}
 	);
 
 	const modalId = `${ id }-modal`;

@@ -4,8 +4,51 @@
 import clsx from 'clsx';
 import { paramCase as kebabCase } from 'change-case';
 
+/**
+ * Internal dependencies
+ */
+import { DEFAULT_OVERLAY_BREAKPOINT } from '../constants';
+
+const VALID_OVERLAY_BREAKPOINT = /^([0-9]*\.?[0-9]+)(px|em|rem)$/i;
+const UNSAFE_CSS_VALUE = /[\\{}();&=<>`]|\/\*/;
+
+function getOverlayBreakpointMatch( value ) {
+	if ( typeof value !== 'string' ) {
+		return null;
+	}
+
+	const trimmedValue = value.trim();
+	if ( UNSAFE_CSS_VALUE.test( trimmedValue ) ) {
+		return null;
+	}
+
+	const match = trimmedValue.match( VALID_OVERLAY_BREAKPOINT );
+	if ( ! match || parseFloat( match[ 1 ] ) <= 0 ) {
+		return null;
+	}
+
+	return match;
+}
+
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
+export function isValidOverlayBreakpoint( value ) {
+	return !! getOverlayBreakpointMatch( value );
+}
+
+export function normalizeOverlayBreakpoint( value ) {
+	const match = getOverlayBreakpointMatch( value );
+	if ( ! match ) {
+		return DEFAULT_OVERLAY_BREAKPOINT;
+	}
+
+	return `${ match[ 1 ] }${ match[ 2 ].toLowerCase() }`;
+}
+
+export function hasCustomOverlayBreakpoint( value ) {
+	return normalizeOverlayBreakpoint( value ) !== DEFAULT_OVERLAY_BREAKPOINT;
 }
 
 export function detectColors(

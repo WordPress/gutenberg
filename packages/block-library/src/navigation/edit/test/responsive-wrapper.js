@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
+import { useMediaQuery } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -17,6 +18,31 @@ import ResponsiveWrapper from '../responsive-wrapper';
 // Mock block-editor to avoid private API issues
 jest.mock( '@wordpress/block-editor', () => ( {
 	getColorClassName: jest.fn( () => '' ),
+} ) );
+
+jest.mock( '@wordpress/components', () => ( {
+	Button: ( { children, className, onClick, ...props } ) => {
+		const buttonProps = Object.fromEntries(
+			Object.entries( props ).filter(
+				( [ key, value ] ) =>
+					key !== '__next40pxDefaultSize' && value !== false
+			)
+		);
+
+		return (
+			<button
+				className={ className }
+				onClick={ onClick }
+				{ ...buttonProps }
+			>
+				{ children }
+			</button>
+		);
+	},
+} ) );
+
+jest.mock( '@wordpress/compose', () => ( {
+	useMediaQuery: jest.fn(),
 } ) );
 
 // Mock core-data store
@@ -43,6 +69,12 @@ jest.mock( '@wordpress/data', () => ( {
 describe( 'ResponsiveWrapper', () => {
 	const mockOnToggle = jest.fn();
 	const mockOnNavigateToEntityRecord = jest.fn();
+	const getResponsiveContainer = () => {
+		// eslint-disable-next-line testing-library/no-node-access
+		return document.querySelector(
+			'.wp-block-navigation__responsive-container'
+		);
+	};
 
 	const defaultProps = {
 		id: 'test-navigation',
@@ -61,6 +93,7 @@ describe( 'ResponsiveWrapper', () => {
 
 	beforeEach( () => {
 		jest.clearAllMocks();
+		useMediaQuery.mockReturnValue( false );
 		// Mock useSelect - component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockImplementation( ( selector ) => {
 			if ( typeof selector === 'function' ) {
@@ -72,6 +105,73 @@ describe( 'ResponsiveWrapper', () => {
 				return selector( mockSelect );
 			}
 			return 'twentytwentyfive';
+		} );
+	} );
+
+	describe( 'Custom overlay breakpoints', () => {
+		it( 'preserves the default breakpoint behavior without inline state classes', () => {
+			useMediaQuery.mockReturnValue( true );
+
+			render(
+				<ResponsiveWrapper
+					{ ...defaultProps }
+					overlayBreakpoint="600px"
+				/>
+			);
+
+			expect( useMediaQuery ).toHaveBeenCalledWith(
+				'(min-width: 600px)'
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Menu' } )
+			).not.toHaveClass( 'is-custom-overlay-breakpoint-inline' );
+			expect( getResponsiveContainer() ).not.toHaveClass(
+				'is-custom-overlay-breakpoint-inline'
+			);
+		} );
+
+		it.each( [ '10px', '37.5em', '48rem' ] )(
+			'adds inline state classes when the custom %s breakpoint matches',
+			( overlayBreakpoint ) => {
+				useMediaQuery.mockReturnValue( true );
+
+				render(
+					<ResponsiveWrapper
+						{ ...defaultProps }
+						overlayBreakpoint={ overlayBreakpoint }
+						hasCustomOverlayBreakpoint
+					/>
+				);
+
+				expect( useMediaQuery ).toHaveBeenCalledWith(
+					`(min-width: ${ overlayBreakpoint })`
+				);
+				expect(
+					screen.getByRole( 'button', { name: 'Menu' } )
+				).toHaveClass( 'is-custom-overlay-breakpoint-inline' );
+				expect( getResponsiveContainer() ).toHaveClass(
+					'is-custom-overlay-breakpoint-inline'
+				);
+			}
+		);
+
+		it( 'keeps collapsed state classes when the custom breakpoint does not match', () => {
+			useMediaQuery.mockReturnValue( false );
+
+			render(
+				<ResponsiveWrapper
+					{ ...defaultProps }
+					overlayBreakpoint="48rem"
+					hasCustomOverlayBreakpoint
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Menu' } )
+			).not.toHaveClass( 'is-custom-overlay-breakpoint-inline' );
+			expect( getResponsiveContainer() ).not.toHaveClass(
+				'is-custom-overlay-breakpoint-inline'
+			);
 		} );
 	} );
 

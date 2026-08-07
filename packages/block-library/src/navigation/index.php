@@ -40,6 +40,79 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 	return $submenu_visibility ?? 'hover';
 }
 
+const BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT        = '600px';
+const BLOCK_CORE_NAVIGATION_UNSAFE_OVERLAY_BREAKPOINT_PATTERN = '%[\\\\{}();&=<>`]|/\*%';
+
+/**
+ * Returns whether or not this is responsive navigation.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes The block attributes.
+ * @return bool Returns whether or not this is responsive navigation.
+ */
+function block_core_navigation_is_responsive( $attributes ) {
+	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+	return (
+		isset( $attributes['overlayMenu'] ) &&
+		'never' !== $attributes['overlayMenu']
+	) || $has_old_responsive_attribute;
+}
+
+/**
+ * Returns a valid Navigation overlay breakpoint.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes The block attributes.
+ * @return string Overlay breakpoint with a supported CSS length unit.
+ */
+function block_core_navigation_get_overlay_breakpoint( $attributes ) {
+	if ( ! isset( $attributes['overlayBreakpoint'] ) || ! is_string( $attributes['overlayBreakpoint'] ) ) {
+		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
+	}
+
+	$overlay_breakpoint = trim( $attributes['overlayBreakpoint'] );
+	if (
+		'' === $overlay_breakpoint ||
+		wp_strip_all_tags( $overlay_breakpoint, true ) !== $overlay_breakpoint ||
+		preg_match( BLOCK_CORE_NAVIGATION_UNSAFE_OVERLAY_BREAKPOINT_PATTERN, $overlay_breakpoint )
+	) {
+		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
+	}
+
+	if ( ! preg_match( '/^([0-9]*\.?[0-9]+)(px|em|rem)$/i', $overlay_breakpoint, $matches ) ) {
+		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
+	}
+
+	if ( (float) $matches[1] <= 0 || ! is_finite( (float) $matches[1] ) ) {
+		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
+	}
+
+	$normalized_overlay_breakpoint = $matches[1] . strtolower( $matches[2] );
+	if ( "width:{$normalized_overlay_breakpoint}" !== safecss_filter_attr( "width:{$normalized_overlay_breakpoint}" ) ) {
+		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
+	}
+
+	return $normalized_overlay_breakpoint;
+}
+
+/**
+ * Returns whether a Navigation block uses a custom overlay breakpoint.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes The block attributes.
+ * @return bool Whether the block uses a non-default overlay breakpoint.
+ */
+function block_core_navigation_has_custom_overlay_breakpoint( $attributes ) {
+	return (
+		'mobile' === ( $attributes['overlayMenu'] ?? null ) &&
+		block_core_navigation_get_overlay_breakpoint( $attributes ) !==
+		BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT
+	);
+}
+
 /**
  * Returns the custom properties used by the Navigation block for a layout.
  *
@@ -129,8 +202,7 @@ class WP_Navigation_Block_Renderer {
 		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
 
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
-		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
+		return block_core_navigation_is_responsive( $attributes );
 	}
 
 	/**
@@ -643,10 +715,11 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
-		$layout_class       = static::get_layout_class( $attributes );
-		$colors             = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
-		$is_responsive_menu = static::is_responsive( $attributes );
+		$layout_class                  = static::get_layout_class( $attributes );
+		$colors                        = block_core_navigation_build_css_colors( $attributes );
+		$font_sizes                    = block_core_navigation_build_css_font_sizes( $attributes );
+		$is_responsive_menu            = static::is_responsive( $attributes );
+		$has_custom_overlay_breakpoint = block_core_navigation_has_custom_overlay_breakpoint( $attributes );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -656,6 +729,9 @@ class WP_Navigation_Block_Renderer {
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
+			$has_custom_overlay_breakpoint
+				? array( 'has-custom-overlay-breakpoint' )
+				: array(),
 			$layout_class ? array( $layout_class ) : array(),
 			$text_decoration ? array( $text_decoration_class ) : array()
 		);
@@ -1621,6 +1697,10 @@ add_action( 'init', 'register_block_core_navigation' );
  * change those classes, so equivalent custom properties and a scoping class
  * are generated for each configured viewport layout.
  *
+ * Navigation blocks with custom overlay breakpoints also need scoped rules so
+ * they can opt out of the default static breakpoint without affecting other
+ * Navigation blocks on the page.
+ *
  * Currently this is required as a workaround because of how difficult it is for nav
  * child blocks to inherit styles through the complex responsive nav block html. The
  * bug in https://github.com/WordPress/gutenberg/issues/62690 also prevents inheritance.
@@ -1682,6 +1762,10 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 	if ( is_string( $class_attribute ) && preg_match( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute, $matches ) ) {
 		$state_class = $matches[0];
 	}
+	$has_custom_overlay_breakpoint =
+		is_string( $class_attribute ) &&
+		preg_match( '/\bhas-custom-overlay-breakpoint\b/', $class_attribute ) &&
+		block_core_navigation_has_custom_overlay_breakpoint( $attributes );
 
 	$layout_class = null;
 	if ( ! empty( $styles ) ) {
@@ -1701,7 +1785,58 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		);
 	}
 
-	if ( null === $state_class && null === $layout_class ) {
+	$custom_overlay_breakpoint_class = null;
+	if ( $has_custom_overlay_breakpoint ) {
+		$custom_overlay_breakpoint_class = wp_unique_id( 'wp-block-navigation-custom-overlay-breakpoint-' );
+		$processor->add_class( $custom_overlay_breakpoint_class );
+
+		$overlay_breakpoint          = block_core_navigation_get_overlay_breakpoint( $attributes );
+		$selector_base               = ".wp-block-navigation.{$custom_overlay_breakpoint_class}.has-custom-overlay-breakpoint";
+		$container_selector          = $selector_base . ' .wp-block-navigation__responsive-container';
+		$container_inline_selector   = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
+		$submenu_container_selectors = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
+		$rules_group                 = "@media (min-width: {$overlay_breakpoint})";
+
+		wp_style_engine_get_stylesheet_from_css_rules(
+			array(
+				array(
+					'selector'     => $container_inline_selector,
+					'declarations' => array(
+						'display'          => 'block',
+						'width'            => '100%',
+						'position'         => 'relative',
+						'z-index'          => 'auto',
+						'background-color' => 'inherit',
+					),
+					'rules_group'  => $rules_group,
+				),
+				array(
+					'selector'     => $container_inline_selector . ' .wp-block-navigation__responsive-container-close',
+					'declarations' => array(
+						'display' => 'none',
+					),
+					'rules_group'  => $rules_group,
+				),
+				array(
+					'selector'     => $container_selector . '.is-menu-open ' . $submenu_container_selectors,
+					'declarations' => array(
+						'left' => '0',
+					),
+					'rules_group'  => $rules_group,
+				),
+				array(
+					'selector'     => $selector_base . ' .wp-block-navigation__responsive-container-open:not(.always-shown)',
+					'declarations' => array(
+						'display' => 'none',
+					),
+					'rules_group'  => $rules_group,
+				),
+			),
+			array( 'context' => 'block-supports' )
+		);
+	}
+
+	if ( null === $state_class && null === $layout_class && null === $custom_overlay_breakpoint_class ) {
 		return $block_content;
 	}
 

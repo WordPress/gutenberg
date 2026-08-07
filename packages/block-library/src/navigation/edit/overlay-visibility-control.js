@@ -25,7 +25,7 @@ export default function OverlayVisibilityControl( {
 			aria-label={ __( 'Configure overlay visibility' ) }
 			value={ overlayMenu }
 			help={ __(
-				'Collapses the navigation options in a menu icon opening an overlay.'
+				'Collapses the navigation items behind a menu button that opens an overlay.'
 			) }
 			onChange={ ( value ) => setAttributes( { overlayMenu: value } ) }
 			isBlock

@@ -719,7 +719,36 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
+	// Keep the static default breakpoint for Navigation blocks without a
+	// custom overlay breakpoint. Custom overlay breakpoint blocks opt out here
+	// and receive instance-scoped rules from server rendering.
 	@include break-small() {
+		.wp-block-navigation:not(.has-custom-overlay-breakpoint) & {
+			&:not(.hidden-by-default) {
+				&:not(.is-menu-open) {
+					display: block;
+					width: 100%;
+					position: relative;
+					z-index: auto;
+					background-color: inherit;
+
+					.wp-block-navigation__responsive-container-close {
+						display: none;
+					}
+				}
+			}
+
+			&.is-menu-open {
+				// Preserve open-overlay submenu positioning after the default
+				// breakpoint styles are scoped away from custom breakpoints.
+				.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+					left: 0;
+				}
+			}
+		}
+	}
+
+	&.is-custom-overlay-breakpoint-inline {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
 				display: block;
@@ -735,7 +764,8 @@ button.wp-block-navigation-item__content {
 		}
 
 		&.is-menu-open {
-			// Override breakpoint-inherited submenu rules.
+			// Match the default breakpoint path so custom breakpoints keep
+			// open-overlay submenus positioned as overlay content.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
 			}
@@ -796,7 +826,16 @@ button.wp-block-navigation-item__content {
 	}
 
 	&:not(.always-shown) {
+		// Keep the static default breakpoint for Navigation blocks without a
+		// custom overlay breakpoint. Custom overlay breakpoint blocks opt out here
+		// and receive instance-scoped rules from server rendering.
 		@include break-small {
+			.wp-block-navigation:not(.has-custom-overlay-breakpoint) & {
+				display: none;
+			}
+		}
+
+		&.is-custom-overlay-breakpoint-inline {
 			display: none;
 		}
 	}

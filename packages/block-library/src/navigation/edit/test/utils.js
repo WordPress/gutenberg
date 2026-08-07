@@ -1,7 +1,60 @@
 /**
  * Internal dependencies
  */
-import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
+import {
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+	hasCustomOverlayBreakpoint,
+	isValidOverlayBreakpoint,
+	normalizeOverlayBreakpoint,
+} from '../utils';
+
+describe( 'normalizeOverlayBreakpoint', () => {
+	it( 'normalizes valid breakpoint values', () => {
+		expect( normalizeOverlayBreakpoint( '48rem' ) ).toBe( '48rem' );
+		expect( normalizeOverlayBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
+		expect( normalizeOverlayBreakpoint( ' 720px ' ) ).toBe( '720px' );
+	} );
+
+	it( 'falls back to the default for empty, invalid, or non-positive values', () => {
+		expect( normalizeOverlayBreakpoint() ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '0px' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '-1px' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '40vw' ) ).toBe( '600px' );
+	} );
+
+	it.each( [
+		'10px);body{background:red}',
+		'10px;background:url(javascript:alert(1))',
+		'10px/*comment*/',
+		'<style>10px</style>',
+		'expression(alert(1))',
+		'url(javascript:alert(1))',
+		'calc(100vw - 1rem)',
+	] )( 'rejects unsafe CSS breakpoint value %p', ( value ) => {
+		expect( normalizeOverlayBreakpoint( value ) ).toBe( '600px' );
+	} );
+} );
+
+describe( 'hasCustomOverlayBreakpoint', () => {
+	it( 'returns true only for valid non-default breakpoints', () => {
+		expect( hasCustomOverlayBreakpoint( '600px' ) ).toBe( false );
+		expect( hasCustomOverlayBreakpoint( '0px' ) ).toBe( false );
+		expect( hasCustomOverlayBreakpoint( '48rem' ) ).toBe( true );
+	} );
+} );
+
+describe( 'isValidOverlayBreakpoint', () => {
+	it( 'returns true only for valid positive breakpoints with supported units', () => {
+		expect( isValidOverlayBreakpoint( '600px' ) ).toBe( true );
+		expect( isValidOverlayBreakpoint( '37.5rem' ) ).toBe( true );
+		expect( isValidOverlayBreakpoint( '0px' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '37.' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '40vw' ) ).toBe( false );
+	} );
+} );
 
 describe( 'getUniqueTemplatePartTitle', () => {
 	it( 'should return the title if it is unique', () => {
