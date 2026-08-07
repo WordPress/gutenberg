@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 // The rich-text assembly (`./control`) wires `@wordpress/rich-text`'s
 // useRichText hook (format types, event listeners, etc.) into the
 // presentational `RichTextControl` shell from `@wordpress/components`, which is
@@ -12,7 +11,6 @@ jest.mock( '../richtext/control', () => ( {
 	default( props: any ) {
 		const handleChange = ( event: any ) =>
 			props.onChange( event.target.value );
-
 		return (
 			<textarea
 				aria-label={ props.label }

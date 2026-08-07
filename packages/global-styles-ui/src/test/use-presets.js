@@ -1,5 +1,4 @@
 import { renderHook } from '@testing-library/react';
-
 jest.mock( '../hooks', () => ( {
 	useSetting: jest.fn(),
 } ) );

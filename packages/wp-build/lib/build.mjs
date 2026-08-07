@@ -17,7 +17,6 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
 // Optional dependency: @wordpress/theme provides plugins that inject fallback
 // values for design system tokens. Fails gracefully when the package is not
 // installed (it is an optional peerDependency).

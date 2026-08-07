@@ -11,7 +11,6 @@ import {
 	statusField,
 	titleField,
 } from '../fields';
-
 // Fields not yet covered:
 // featuredImageField,
 // pageTitleField,
@@ -19,7 +18,6 @@ import {
 // patternTitleField,
 // templateField,
 // templateTitleField,
-
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
 
 // Mock users for the story.

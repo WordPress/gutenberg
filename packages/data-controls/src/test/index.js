@@ -1,5 +1,4 @@
 import triggerFetch from '@wordpress/api-fetch';
-
 jest.mock( '@wordpress/api-fetch' );
 import { controls } from '../index';
 

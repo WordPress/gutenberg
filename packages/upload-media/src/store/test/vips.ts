@@ -13,7 +13,6 @@ jest.mock( '@wordpress/vips/worker', () => ( {
 import * as vipsWorker from '@wordpress/vips/worker';
 import { ImageFile } from '../../image-file';
 import type { ImageSizeCrop } from '../types';
-
 // Import after mock is set up.
 import {
 	vipsConvertImageFormat,

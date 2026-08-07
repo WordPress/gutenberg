@@ -1,12 +1,10 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Y } from '@wordpress/sync';
-
 /**
  * Mock block schemas and sync providers.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' );
-
 	return {
 		...actual,
 		getBlockTypes: () => [
@@ -19,7 +17,6 @@ jest.mock( '@wordpress/blocks', () => {
 		],
 	};
 } );
-
 jest.mock( '../../../../sync/src/providers', () => ( {
 	getProviderCreators: jest.fn(),
 } ) );

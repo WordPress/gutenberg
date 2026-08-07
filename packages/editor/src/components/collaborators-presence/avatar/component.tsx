@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
 extend( [ a11yPlugin ] );
 import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';

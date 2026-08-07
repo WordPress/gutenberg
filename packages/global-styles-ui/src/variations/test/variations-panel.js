@@ -1,12 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
-
 // Only mock the internal hooks - let the real blocks store work
 jest.mock( '../../hooks', () => ( {
 	useStyle: jest.fn(),
 } ) );
-
 jest.mock( '@wordpress/components', () => ( {
 	__experimentalItemGroup: jest.fn( ( { children } ) => children ),
 } ) );

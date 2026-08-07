@@ -1,5 +1,4 @@
 import apiFetch from '@wordpress/api-fetch';
-
 jest.mock( '@wordpress/api-fetch' );
 import {
 	editEntityRecord,

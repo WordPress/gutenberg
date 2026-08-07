@@ -8,7 +8,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-
 const EMPTY_OBJECT = {};
 const MIN_FONT_SIZE_FOR_WARNING = 12;
 import { optimizeFitText } from '../utils/fit-text-utils';
