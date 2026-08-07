@@ -22,7 +22,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -62,23 +61,6 @@ const DEFAULT_BLOCK = {
 		placeholder: __( 'Write title…' ),
 	},
 };
-
-function getInnerBlocksTemplate( attributes ) {
-	return [
-		[
-			'core/paragraph',
-			{
-				style: {
-					typography: {
-						textAlign: 'center',
-					},
-				},
-				placeholder: __( 'Write title…' ),
-				...attributes,
-			},
-		],
-	];
-}
 
 /**
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
@@ -136,7 +118,7 @@ function CoverEdit( {
 		[]
 	);
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
+	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
@@ -228,35 +210,6 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
-	// Create the initial inner paragraph when the block gains a background
-	// and has no content yet.
-	const scaffoldInnerBlocks = () => {
-		const {
-			getBlocks,
-			isBlockSelected,
-			getSelectedBlocksInitialCaretPosition,
-		} = registry.select( blockEditorStore );
-		if ( getBlocks( clientId ).length > 0 ) {
-			return;
-		}
-		// Check for fontSize support before we pass a fontSize attribute to
-		// the innerBlocks.
-		const [ fontSizes ] = unlock(
-			registry.select( blockEditorStore )
-		).getBlockSettings( clientId, 'typography.fontSizes' );
-		const hasFontSizes = fontSizes?.length > 0;
-		replaceInnerBlocks(
-			clientId,
-			createBlocksFromInnerBlocksTemplate(
-				getInnerBlocksTemplate( {
-					fontSize: hasFontSizes ? 'large' : undefined,
-				} )
-			),
-			isBlockSelected( clientId ),
-			getSelectedBlocksInitialCaretPosition()
-		);
-	};
-
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
 		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
@@ -330,8 +283,6 @@ function CoverEdit( {
 				isDark: newIsDark,
 				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
-
-			scaffoldInnerBlocks();
 		} );
 	};
 
@@ -386,12 +337,6 @@ function CoverEdit( {
 				isUserOverlayColor: true,
 				isDark: newIsDark,
 			} );
-
-			// Skip when the color is cleared: that returns the block to its
-			// placeholder, which only renders while there is no content.
-			if ( newOverlayColor ) {
-				scaffoldInnerBlocks();
-			}
 		} );
 	};
 
@@ -541,11 +486,13 @@ function CoverEdit( {
 
 	const mediaElement = useRef();
 	const editMediaButtonRef = useRef();
+	const isPlaceholder =
+		! useFeaturedImage && ! hasInnerBlocks && ! hasBackground;
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
 		mediaElement,
-		hasInnerBlocks,
+		isPlaceholder,
 		url,
 		isImgElement,
 		overlayColor,
@@ -681,13 +628,6 @@ function CoverEdit( {
 					: undefined,
 				isDark: newIsDark,
 			} );
-
-			// Skip when the featured image is disabled: that can return the
-			// block to its placeholder, which only renders while there is no
-			// content.
-			if ( newUseFeaturedImage ) {
-				scaffoldInnerBlocks();
-			}
 		} );
 	};
 
@@ -745,7 +685,7 @@ function CoverEdit( {
 		width,
 	};
 
-	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
+	if ( isPlaceholder ) {
 		return (
 			<>
 				{ blockControls }

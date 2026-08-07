@@ -155,8 +155,8 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		await editor.insertBlock( { name: 'core/group' } );
 
-		// Click first color option from the block placeholder's color picker to
-		// make the inner blocks appear.
+		// Click first color option from the block placeholder's color picker,
+		// then click the title ghost to materialise the inner paragraph.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
 			.getByRole( 'group', {
@@ -164,6 +164,10 @@ test.describe( 'List View', () => {
 			} )
 			.getByRole( 'button' )
 			.first()
+			.click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Cover' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		// Open List View.
@@ -209,7 +213,7 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Click the Cover block title placeholder.
+		// Click the Cover block title paragraph.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
 			.getByRole( 'document', { name: /Empty block/i } )

@@ -39,7 +39,7 @@ export default function CoverBlockControls( {
 		backgroundType,
 		allowedVideoProviders,
 	} = attributes;
-	const { hasInnerBlocks, url } = currentSettings;
+	const { isPlaceholder, url } = currentSettings;
 
 	const filteredVideoProviders = getAllowedVideoProviders(
 		allowedVideoProviders
@@ -102,12 +102,12 @@ export default function CoverBlockControls( {
 								contentPosition: nextPosition,
 							} )
 						}
-						isDisabled={ ! hasInnerBlocks }
+						isDisabled={ isPlaceholder }
 					/>
 					<FullHeightAlignmentControl
 						isActive={ isMinFullHeight }
 						onToggle={ toggleMinFullHeight }
-						isDisabled={ ! hasInnerBlocks }
+						isDisabled={ isPlaceholder }
 					/>
 					{ showEditMediaButton && (
 						<ToolbarButton
