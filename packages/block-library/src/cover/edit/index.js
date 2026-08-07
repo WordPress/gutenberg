@@ -51,6 +51,18 @@ import { unlock } from '../../lock-unlock';
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
+const DEFAULT_BLOCK = {
+	name: 'core/paragraph',
+	attributes: {
+		style: {
+			typography: {
+				textAlign: 'center',
+			},
+		},
+		placeholder: __( 'Write title…' ),
+	},
+};
+
 function getInnerBlocksTemplate( attributes ) {
 	return [
 		[
@@ -521,6 +533,7 @@ function CoverEdit( {
 		},
 		{
 			allowedBlocks,
+			defaultBlock: DEFAULT_BLOCK,
 			templateLock,
 			dropZoneElement: ref.current,
 		}
