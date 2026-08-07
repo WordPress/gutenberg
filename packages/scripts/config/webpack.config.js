@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { basename, dirname, relative, resolve, sep } = require( 'path' );
-const { realpathSync } = require( 'fs' );
+const { existsSync, readFileSync, realpathSync } = require( 'fs' );
 const { exec } = require( 'child_process' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
@@ -365,6 +365,68 @@ const scriptConfig = {
 									}
 								}
 							} );
+
+							// Inline SVG icon files referenced via file: prefix.
+							const resolveIconPath = ( iconPath ) => {
+								if (
+									typeof iconPath === 'string' &&
+									iconPath.startsWith( 'file:' )
+								) {
+									const resolved = resolve(
+										dirname( absoluteFrom ),
+										iconPath.replace( 'file:', '' )
+									);
+									if ( existsSync( resolved ) ) {
+										return sanitizeSvgContent(
+											readFileSync( resolved, 'utf8' )
+										);
+									}
+								}
+								return iconPath;
+							};
+
+							/**
+							 * Sanitize SVG content to remove dangerous elements.
+							 * Strips scripts, event handlers, and javascript: URLs.
+							 *
+							 * @param {string} svg Raw SVG content.
+							 * @return {string} Sanitized SVG content.
+							 */
+							const sanitizeSvgContent = ( svg ) => {
+								return svg
+									.replace( /<\?xml[^>]*\?>\s*/gi, '' )
+									.replace(
+										/<script[\s\S]*?<\/script>/gi,
+										''
+									)
+									.replace(
+										/\s+on\w+\s*=\s*["'][^"']*["']/gi,
+										''
+									)
+									.replace(
+										/\bhref\s*=\s*["']\s*javascript:/gi,
+										'href=""'
+									)
+									.trim();
+							};
+
+							if ( blockJson.icon ) {
+								if ( typeof blockJson.icon === 'string' ) {
+									blockJson.icon = resolveIconPath(
+										blockJson.icon
+									);
+								} else if (
+									typeof blockJson.icon === 'object' &&
+									blockJson.icon.src
+								) {
+									blockJson.icon = {
+										...blockJson.icon,
+										src: resolveIconPath(
+											blockJson.icon.src
+										),
+									};
+								}
+							}
 
 							if ( hasReactFastRefresh ) {
 								// Prepends the file reference to the shared runtime chunk to every script type defined for the block.

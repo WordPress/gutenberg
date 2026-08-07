@@ -8,7 +8,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { Component, isValidElement } from '@wordpress/element';
+import { Component, createElement, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
@@ -35,6 +35,98 @@ extend( [ namesPlugin, a11yPlugin ] );
  * was not explicitly set but the icon background color was.
  */
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
+
+/**
+ * Recursively converts a DOM node to a React element.
+ *
+ * @param node The DOM node to convert.
+ * @return A React element representing the DOM node.
+ */
+function domNodeToReactElement(
+	node: globalThis.Element | globalThis.Text
+): React.ReactNode {
+	if ( node.nodeType === Node.TEXT_NODE ) {
+		const text = ( node as globalThis.Text ).textContent;
+		if ( text?.trim() ) {
+			return text;
+		}
+		return null;
+	}
+
+	if ( node.nodeType !== Node.ELEMENT_NODE ) {
+		return null;
+	}
+
+	const element = node as globalThis.Element;
+	const tagName = element.tagName.toLowerCase();
+	const props: Record< string, string > = {};
+
+	for ( let i = 0; i < element.attributes.length; i++ ) {
+		const attr = element.attributes[ i ];
+		if ( attr.name === 'xmlns' ) {
+			continue;
+		}
+		props[ attr.name ] = attr.value;
+	}
+
+	const children: React.ReactNode[] = [];
+	for ( let i = 0; i < element.childNodes.length; i++ ) {
+		const child = element.childNodes[ i ];
+		if (
+			child.nodeType === Node.ELEMENT_NODE ||
+			child.nodeType === Node.TEXT_NODE
+		) {
+			const converted = domNodeToReactElement(
+				child as globalThis.Element | globalThis.Text
+			);
+			if ( converted !== null ) {
+				children.push( converted );
+			}
+		}
+	}
+
+	if ( children.length > 0 ) {
+		return createElement( tagName, props, ...children );
+	}
+
+	return createElement( tagName, props );
+}
+
+/**
+ * Converts an SVG markup string to a React element.
+ *
+ * Uses the browser's native DOMParser to safely parse the SVG without
+ * executing any scripts. The resulting React element can be rendered
+ * by the `<Icon>` component which handles `icon.type === 'svg'`.
+ *
+ * @param icon The icon value, possibly an SVG string.
+ * @return A React element if the input is an SVG string, otherwise the original value.
+ */
+export function convertSvgStringToIconElement( icon: unknown ): unknown {
+	if ( typeof icon !== 'string' ) {
+		return icon;
+	}
+
+	if ( ! icon.startsWith( '<svg' ) && ! icon.startsWith( '<?xml' ) ) {
+		return icon;
+	}
+
+	const svgContent = icon.replace( /^<\?xml[^>]*\?>/, '' ).trim();
+
+	try {
+		const doc = new window.DOMParser().parseFromString(
+			svgContent,
+			'image/svg+xml'
+		);
+		const svgElement = doc.querySelector( 'svg' );
+		if ( ! svgElement ) {
+			return icon;
+		}
+		return domNodeToReactElement( svgElement );
+	} catch {
+		return icon;
+	}
+}
 
 /**
  * Determines whether the block's attributes are equal to the default attributes
