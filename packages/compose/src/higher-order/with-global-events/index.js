@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, forwardRef } from '@wordpress/element';
+import { useEffect, useRef, forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -41,56 +41,47 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 	} );
 
 	return createHigherOrderComponent( ( WrappedComponent ) => {
-		class Wrapper extends Component {
-			constructor( /** @type {any} */ props ) {
-				super( props );
+		function Wrapper( /** @type {any} */ { ownProps, forwardedRef } ) {
+			/** @type {any} */
+			const wrappedRef = useRef( null );
 
-				this.handleEvent = this.handleEvent.bind( this );
-				this.handleRef = this.handleRef.bind( this );
-			}
-
-			componentDidMount() {
+			useEffect( () => {
 				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
-					listener.add( eventType, this );
+					listener.add( eventType, { handleEvent } );
 				} );
-			}
 
-			componentWillUnmount() {
-				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
-					listener.remove( eventType, this );
-				} );
-			}
+				return () => {
+					Object.keys( eventTypesToHandlers ).forEach(
+						( eventType ) => {
+							listener.remove( eventType, { handleEvent } );
+						}
+					);
+				};
+			}, [] );
 
-			handleEvent( /** @type {any} */ event ) {
+			function handleEvent( /** @type {any} */ event ) {
 				const handler =
 					eventTypesToHandlers[
 						/** @type {keyof GlobalEventHandlersEventMap} */ (
 							event.type
 						)
 					];
-				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
-					this.wrappedRef[ handler ]( event );
+				if (
+					wrappedRef.current &&
+					typeof wrappedRef.current[ handler ] === 'function'
+				) {
+					wrappedRef.current[ handler ]( event );
 				}
 			}
 
-			handleRef( /** @type {any} */ el ) {
-				this.wrappedRef = el;
-				// Any component using `withGlobalEvents` that is not setting a `ref`
-				// will cause `this.props.forwardedRef` to be `null`, so we need this
-				// check.
-				if ( this.props.forwardedRef ) {
-					this.props.forwardedRef( el );
+			function handleRef( /** @type {any} */ el ) {
+				wrappedRef.current = el;
+				if ( forwardedRef ) {
+					forwardedRef( el );
 				}
 			}
 
-			render() {
-				return (
-					<WrappedComponent
-						{ ...this.props.ownProps }
-						ref={ this.handleRef }
-					/>
-				);
-			}
+			return <WrappedComponent { ...ownProps } ref={ handleRef } />;
 		}
 
 		return forwardRef( ( props, ref ) => {
