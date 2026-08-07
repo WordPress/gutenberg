@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 import type {

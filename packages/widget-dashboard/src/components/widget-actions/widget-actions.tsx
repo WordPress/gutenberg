@@ -1,19 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton, Link } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
-
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );

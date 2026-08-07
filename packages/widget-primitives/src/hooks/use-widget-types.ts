@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	createElement,
 	isValidElement,
 	useEffect,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { resolveFields } from '../field-types';
 import { resolveIcon } from '../icon-resolver';
 import type {

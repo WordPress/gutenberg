@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';

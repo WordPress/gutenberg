@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import {
 	LAYOUT_ACTIVITY,

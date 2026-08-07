@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as commandsStore } from '@wordpress/commands';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetDashboard } from '../widget-dashboard';
 import { DASHBOARD_COMMAND_CONTEXT } from '../components/commands';
 import type { DashboardWidget } from '../types';

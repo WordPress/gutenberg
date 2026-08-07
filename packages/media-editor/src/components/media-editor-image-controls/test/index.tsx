@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';

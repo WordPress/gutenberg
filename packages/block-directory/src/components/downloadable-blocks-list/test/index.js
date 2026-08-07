@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlocksList from '../';
 import { items } from '../../test/fixtures';
 

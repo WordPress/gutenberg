@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { kebabCase } from '../kebab-case';
 
 // Mirrors the test suite of the private `kebabCase` utility of

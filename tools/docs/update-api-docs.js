@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { relative, resolve, sep, dirname } = require( 'path' );
 const { Transform } = require( 'stream' );
 const { readFile } = require( 'fs' ).promises;

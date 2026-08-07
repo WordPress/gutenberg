@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
@@ -16,10 +9,6 @@ import { VisuallyHidden, Text, Tooltip } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';

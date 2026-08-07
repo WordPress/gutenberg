@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	pasteHandler,
 	findTransform,
@@ -15,10 +12,6 @@ import {
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';

@@ -10,7 +10,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── .editorconfig
     ├── eslint.config.cjs
-    ├── eslint.config.strict.cjs
     ├── .jshintignore
     ├── prettier.config.mjs
     ├── .stylelintignore

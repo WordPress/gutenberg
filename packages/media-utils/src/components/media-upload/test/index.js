@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import MediaUpload from '../index';
 import { invalidateAttachmentResolutions } from '../../../utils/invalidate-attachment-resolutions';
 

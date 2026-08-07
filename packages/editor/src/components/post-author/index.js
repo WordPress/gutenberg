@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import PostAuthorCombobox from './combobox';
 import PostAuthorSelect from './select';
 import { AUTHORS_QUERY } from './constants';

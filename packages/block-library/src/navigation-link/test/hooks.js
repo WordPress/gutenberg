@@ -1,11 +1,5 @@
-/**
- * Internal dependencies
- */
-import { enhanceNavigationLinkVariations } from '../hooks';
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
+import { enhanceNavigationLinkVariations } from '../hooks';
 
 describe( 'hooks', () => {
 	describe( 'enhanceNavigationLinkVariations', () => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { parseContent, serializeContent } from '../utils';
 
 describe( 'core/html', () => {

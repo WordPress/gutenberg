@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 

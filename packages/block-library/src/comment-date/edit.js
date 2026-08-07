@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	dateI18n,
@@ -18,10 +15,6 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**

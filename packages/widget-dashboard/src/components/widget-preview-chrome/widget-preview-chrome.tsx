@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useId, useMemo } from '@wordpress/element';
 import { Card } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetFrame } from '../widget-frame';
 import styles from './widget-preview-chrome.module.css';

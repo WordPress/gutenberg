@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,

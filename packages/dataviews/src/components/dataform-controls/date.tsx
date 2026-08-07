@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import {
 	format,
@@ -11,10 +8,6 @@ import {
 	startOfMonth,
 	startOfYear,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
@@ -34,10 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {

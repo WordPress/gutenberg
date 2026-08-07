@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useRef,
@@ -16,10 +9,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';

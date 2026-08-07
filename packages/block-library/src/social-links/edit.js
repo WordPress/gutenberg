@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import {
 	useInnerBlocksProps,
@@ -26,10 +19,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
