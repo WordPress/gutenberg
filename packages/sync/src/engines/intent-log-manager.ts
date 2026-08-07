@@ -441,6 +441,31 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					return `${ payload.name as string }: ${ JSON.stringify(
 						payload.value
 					) }`;
+				case 'format_text':
+					return payload.format as string;
+				case 'insert_block': {
+					// The reviewer must SEE what they would approve —
+					// notably a raw-attr block's markup (core/html).
+					const block = payload.block as
+						| {
+								blockType?: string;
+								text?: string;
+								fields?: {
+									content?: { text?: string };
+								};
+								attrs?: Record< string, unknown >;
+						  }
+						| undefined;
+					const text =
+						block?.fields?.content?.text ??
+						block?.text ??
+						( typeof block?.attrs?.content === 'string'
+							? ( block.attrs.content as string )
+							: undefined );
+					return text
+						? `${ block?.blockType ?? 'block' }: ${ text }`
+						: block?.blockType;
+				}
 				default:
 					return undefined;
 			}
@@ -816,6 +841,41 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					value: payload.value,
 					observedVersion:
 						doc.propVersions?.[ payload.name as string ] ?? 0,
+				} );
+			} else if ( 'insert_block' === type && doc ) {
+				/*
+				 * Re-insert the parked block spec under FRESH identities
+				 * (the original insert never applied; reminting sidesteps
+				 * any duplicate/tombstone history). Anchors degrade: a
+				 * vanished parent falls back to the root, a vanished
+				 * sibling to the end. This is what makes restoring a
+				 * requires-approval block an approval — the re-authored
+				 * intent carries the RESTORER's capability.
+				 */
+				type SpecShape = {
+					syncId: string;
+					children?: SpecShape[];
+					[ key: string ]: unknown;
+				};
+				const remint = ( spec: SpecShape ): SpecShape => ( {
+					...spec,
+					syncId: mintSyncId(),
+					children: ( spec.children ?? [] ).map( remint ),
+				} );
+				const parentId =
+					typeof payload.parentId === 'string' &&
+					findBlock( doc.root, payload.parentId )
+						? ( payload.parentId as string )
+						: null;
+				const afterSiblingId =
+					typeof payload.afterSiblingId === 'string' &&
+					findBlock( doc.root, payload.afterSiblingId )
+						? ( payload.afterSiblingId as string )
+						: ( ! parentId && doc.root.at( -1 )?.syncId ) || null;
+				session.author( 'insert_block', {
+					block: remint( payload.block as SpecShape ),
+					parentId,
+					afterSiblingId,
 				} );
 			}
 			session.resolveProposal( proposalId, 'restored' );

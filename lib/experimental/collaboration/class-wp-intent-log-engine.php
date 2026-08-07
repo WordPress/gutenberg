@@ -773,16 +773,51 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			return self::fragment_requires_unfiltered_html( $open . 'x' . $close );
 		}
 
+		/**
+		 * Whether an attribute value carries protected markup in any string
+		 * leaf (recursively).
+		 *
+		 * Attribute strings are NOT merely comment-JSON: blocks whose save()
+		 * emits an attribute as raw markup (core/html `content` being the
+		 * canonical case — it has no html/rich-text source, so it rides the
+		 * attr lane, not the codec field lane) round-trip attr strings
+		 * straight into post_content on the next privileged save.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $value Attribute value.
+		 * @return bool True when protected.
+		 */
+		private static function attr_value_requires_unfiltered_html( $value ): bool {
+			if ( is_string( $value ) ) {
+				return self::fragment_requires_unfiltered_html( $value );
+			}
+			if ( is_array( $value ) ) {
+				foreach ( $value as $item ) {
+					if ( self::attr_value_requires_unfiltered_html( $item ) ) {
+						return true;
+					}
+				}
+			}
+			// Numbers, booleans, and null carry no markup.
+			return false;
+		}
+
 		private static function block_spec_requires_unfiltered_html( array $block ): bool {
-			// The _wrapper internal attr re-emits as raw markup on
-			// materialize; a crafted spec could smuggle an element through
-			// it.
+			/*
+			 * Attributes: the _wrapper internal attr re-emits as raw markup
+			 * on materialize; every OTHER attr's string leaves are judged
+			 * too, because blocks like core/html render an attr as raw
+			 * markup client-side (see attr_value_requires_unfiltered_html).
+			 */
 			$attrs = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
-			if (
-				array_key_exists( '_wrapper', $attrs ) &&
-				self::wrapper_requires_unfiltered_html( $attrs['_wrapper'] )
-			) {
-				return true;
+			foreach ( $attrs as $key => $value ) {
+				$protected = '_wrapper' === $key
+					? self::wrapper_requires_unfiltered_html( $value )
+					: self::attr_value_requires_unfiltered_html( $value );
+				if ( $protected ) {
+					return true;
+				}
 			}
 			// make_block() also accepts block-level text/formats shorthand
 			// (they become the content field); judge both shapes.
@@ -810,10 +845,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 		 * Whether applying this intent would introduce markup its author may
 		 * not publish without `unfiltered_html`.
 		 *
-		 * Only two payload surfaces can carry markup: format_text (the span
-		 * format id, when turning a format ON) and insert_block (the block
-		 * spec's field formats). Plain text payloads are entity-encoded by
-		 * the serializer and are always safe.
+		 * Markup-bearing payload surfaces: format_text (the span format id,
+		 * when turning a format ON), insert_block (the block spec's field
+		 * formats, plus every attr's string leaves), and set_attr (string
+		 * leaves; blocks like core/html render an attr as raw markup).
+		 * Plain text payloads (field text) are entity-encoded by the
+		 * serializer and are always safe.
 		 *
 		 * @since 7.2.0
 		 *
@@ -829,11 +866,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				case 'insert_block':
 					return self::block_spec_requires_unfiltered_html( $payload['block'] );
 				case 'set_attr':
-					// The only attr materialize() renders as markup; the
-					// rest serialize into the block comment, which a
-					// kses-filtered save preserves anyway.
+					// _wrapper re-emits as raw markup on materialize; other
+					// attrs can be rendered raw by the block's own save()
+					// (core/html) — judge their string leaves.
 					return '_wrapper' === $payload['key']
-						&& self::wrapper_requires_unfiltered_html( $payload['value'] );
+						? self::wrapper_requires_unfiltered_html( $payload['value'] )
+						: self::attr_value_requires_unfiltered_html( $payload['value'] );
 				default:
 					return false;
 			}

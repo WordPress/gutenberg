@@ -255,11 +255,15 @@ whose payload would materialize markup its author may not publish (per
 markup-bearing surfaces are: `format_text` span format ids when turning a
 format ON (element formats are judged through the codec's own serializer;
 `obj|{"html":…}` object formats re-emit verbatim HTML and are judged
-directly), `insert_block` specs (field formats, recursively, plus the
-`_wrapper` internal attr, which materialize rebuilds as raw markup), and
-`set_attr` writes to `_wrapper`. Plain text payloads are entity-encoded by
-the serializer and always safe; other block attrs serialize into the block
-comment, which a kses-filtered save preserves anyway. The parked proposal
+directly), `insert_block` specs (field formats recursively, the `_wrapper`
+internal attr — which materialize rebuilds as raw markup — and every other
+attr's string leaves), and `set_attr` writes (`_wrapper` judged as a
+wrapper; other values by their string leaves). Attr strings matter because
+blocks without an html/rich-text-source attribute ride the ATTR lane, not
+the codec field lane, and their save() can re-emit the attr as raw markup
+client-side — core/html `content` is the canonical case. Plain text
+payloads (field text) are entity-encoded by the serializer and always
+safe. The parked proposal
 uses the ordinary proposal row shape, so replay, retention, resolution, and
 review UI apply unchanged — and a restore re-authors the content as new
 intents under the RESTORER's capability, which is what makes restore-by-a-

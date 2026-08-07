@@ -917,6 +917,73 @@ describe( 'intent-log manager', () => {
 		);
 	} );
 
+	it( 'restoreProposal re-inserts a parked block under fresh identity, then resolves', async () => {
+		const { manager, handlers, transport } = await loadManagedEntity();
+		handlers.onEscalation = jest.fn();
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'p1',
+					blockType: 'core/paragraph',
+					text: 'Existing text',
+				},
+			] )
+		);
+		// A requires-approval park of a raw-attr block (core/html shape).
+		transport.captured.session!.receiveUpdate( {
+			data: JSON.stringify( {
+				intent: {
+					intentId: 'parked-html',
+					txnId: null,
+					type: 'insert_block',
+					payload: {
+						block: {
+							syncId: 'nb-original',
+							blockType: 'core/html',
+							attrs: { content: '<script>x</script>' },
+						},
+						parentId: null,
+						afterSiblingId: 'gone-sibling',
+					},
+				},
+				actorId: 'u9c9',
+				reason: 'requires-approval',
+			} ),
+			type: INTENT_LOG_UPDATE_TYPES.PROPOSAL,
+		} );
+		await Promise.resolve();
+
+		manager.restoreProposal!( 'postType/post', '1', 'parked-html' );
+
+		const sentTypes = transport.captured.sent.map( ( update ) => ( {
+			type: update.type,
+			decoded: JSON.parse( update.data ),
+		} ) );
+		const authored = sentTypes.find(
+			( row ) =>
+				INTENT_LOG_UPDATE_TYPES.INTENT === row.type &&
+				'insert_block' === row.decoded.type
+		);
+		// Re-authored under a FRESH identity (the original never applied),
+		// same spec content, degraded anchor (vanished sibling → end).
+		expect( authored ).toBeDefined();
+		expect( authored!.decoded.payload.block.blockType ).toBe( 'core/html' );
+		expect( authored!.decoded.payload.block.attrs ).toEqual( {
+			content: '<script>x</script>',
+		} );
+		expect( authored!.decoded.payload.block.syncId ).not.toBe(
+			'nb-original'
+		);
+		expect( authored!.decoded.payload.afterSiblingId ).toBe( 'p1' );
+		const resolved = sentTypes.find(
+			( row ) => INTENT_LOG_UPDATE_TYPES.RESOLVED === row.type
+		);
+		expect( resolved!.decoded ).toEqual( {
+			proposalId: 'parked-html',
+			resolution: 'restored',
+		} );
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

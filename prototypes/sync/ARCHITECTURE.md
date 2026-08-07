@@ -611,10 +611,19 @@ inside intent payloads, not the transport.
   (obj formats judged on their verbatim HTML, element formats
   through the codec's own serializer — the exact emitted bytes are
   what kses sees), insert_block specs (field formats recursively,
-  block-level text/formats shorthand, and `attrs._wrapper` which
-  materialize re-emits raw), and set_attr on `_wrapper`. Plain text
-  is entity-encoded and always safe; other attrs land in the block
-  comment (kses-filtered saves preserve comments — same power).
+  block-level text/formats shorthand, `attrs._wrapper` which
+  materialize re-emits raw, and every attr's STRING LEAVES), and
+  set_attr (wrapper-judged for `_wrapper`, string-leaf-judged
+  otherwise). The attr surface matters: blocks whose content
+  attribute has no html/rich-text source (core/html!) ride the attr
+  lane, not the codec field lane, and their save() re-emits the
+  attr as raw markup in every collaborator's editor — the first
+  manual test of this lane (user2 + Custom HTML block) found
+  exactly that bypass. Plain field text is entity-encoded and
+  always safe. NOTE for manual testing: on single site, editors
+  and admins HAVE unfiltered_html — the lane only triggers for
+  filtered roles (author/contributor) or under a cap-revoking
+  filter; dev-env user2 is an editor.
   Approval needs NO new machinery: proposals use the ordinary row
   shape (replay/retention/resolution/review UI unchanged), and
   restore re-authors content under the RESTORER's capability — a

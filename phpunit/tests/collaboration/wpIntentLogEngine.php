@@ -1179,6 +1179,84 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( '<script>x</script>', (string) $engine->materialize( $this->room() ) );
 	}
 
+	public function test_raw_attr_markup_parks_for_approval_core_html_shape() {
+		$this->revoke_unfiltered_html();
+
+		// A Custom HTML block travels the ATTR lane, not the codec field
+		// lane (its content attribute has no html/rich-text source): the
+		// script rides insert_block attrs and would be re-emitted as raw
+		// markup by the block's save() in every collaborator's editor.
+		$response = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-raw1',
+						'baseSeq'  => 0,
+						'type'     => 'insert_block',
+						'payload'  => array(
+							'block'          => array(
+								'syncId'    => 'kses-raw-nb',
+								'blockType' => 'core/html',
+								'attrs'     => array(
+									'content' => '<script>alert(1)</script>',
+								),
+							),
+							'parentId'       => null,
+							'afterSiblingId' => self::paragraph_id(),
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'escalated', $response['dispositions'][0]['status'] );
+		$this->assertSame( 'requires-approval', $response['dispositions'][0]['reason'] );
+
+		// Editing an existing block's raw attr is gated the same way.
+		$set_attr = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-raw2',
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => self::paragraph_id(),
+							'key'             => 'content',
+							'value'           => '<script>alert(2)</script>',
+							'observedVersion' => 0,
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'escalated', $set_attr['dispositions'][0]['status'] );
+		$this->assertSame( 'requires-approval', $set_attr['dispositions'][0]['reason'] );
+
+		// Benign attr strings — including kses-allowed markup and nested
+		// values — still apply for filtered users.
+		$benign = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-raw3',
+						'baseSeq'  => 0,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => self::paragraph_id(),
+							'key'             => 'metadata',
+							'value'           => array(
+								'name'    => 'My block',
+								'caption' => '<em>fine</em>',
+							),
+							'observedVersion' => 0,
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'applied', $benign['dispositions'][0]['status'] );
+	}
+
 	public function test_block_names_outside_the_grammar_are_rejected_for_everyone() {
 		// Block names materialize into comment delimiters unescaped; a
 		// crafted name could close the comment and inject markup.
