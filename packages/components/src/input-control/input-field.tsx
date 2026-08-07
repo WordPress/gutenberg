@@ -8,12 +8,12 @@ import type {
 	ForwardedRef,
 } from 'react';
 import { forwardRef, useRef } from '@wordpress/element';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
