@@ -20,8 +20,18 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			placeholder: __( 'Type / to add a hidden block' ),
+		},
+	],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	example: {
 		attributes: {
 			summary: __( 'La Mancha' ),

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 0.4.0 (2026-07-29)
+
 ### Internal
 
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).

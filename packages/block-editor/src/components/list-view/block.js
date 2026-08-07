@@ -177,7 +177,6 @@ function ListViewBlock( {
 	const {
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expansionState,
 		updateExpansion,
 		setInsertedBlockClientId,
 		treeGridElementRef,
@@ -377,8 +376,7 @@ function ListViewBlock( {
 			const { firstBlockClientId } = getBlocksToUpdate();
 			const blockParents = getBlockParents( firstBlockClientId, false );
 			// Collapse all blocks and expand the block's parents.
-			updateExpansion( { type: 'clear' } );
-			updateExpansion( { type: 'expand', clientIds: blockParents } );
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
@@ -475,7 +473,7 @@ function ListViewBlock( {
 			}
 			updateExpansion( {
 				type: isExpanded ? 'collapse' : 'expand',
-				clientIds: clientId,
+				clientIds: [ clientId ],
 			} );
 		},
 		[ clientId, updateExpansion, isExpanded ]
@@ -664,10 +662,6 @@ function ListViewBlock( {
 							onToggleExpanded={
 								isDisabled ? undefined : toggleExpanded
 							}
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
@@ -745,7 +739,6 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expansionState={ expansionState }
 							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
 								setInsertedBlockClientId

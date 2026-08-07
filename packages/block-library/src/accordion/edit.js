@@ -58,10 +58,8 @@ export default function Edit( {
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: [ [ ACCORDION_BLOCK_NAME ] ],
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
-		templateInsertUpdatesSelection: true,
 	} );
 
 	const addAccordionItemBlock = () => {
