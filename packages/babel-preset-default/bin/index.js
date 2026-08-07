@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+const { writeFile } = require( 'fs' ).promises;
 const builder = require( 'core-js-builder' );
 const { minify } = require( 'terser' );
-const { writeFile } = require( 'fs' ).promises;
 const exclusions = require( '../polyfill-exclusions' );
 
 builder( {

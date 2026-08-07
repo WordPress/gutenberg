@@ -1,10 +1,6 @@
 'use strict';
 const util = require( 'util' );
 const { v2: dockerCompose } = require( 'docker-compose' );
-
-/**
- * Promisified dependencies
- */
 const copyDir = util.promisify( require( 'copy-dir' ) );
 const { readWordPressVersion } = require( '../../wordpress' );
 

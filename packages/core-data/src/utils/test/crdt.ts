@@ -1,6 +1,5 @@
 import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  * Also stub __unstableSerializeAndClean so we can assert how it's invoked

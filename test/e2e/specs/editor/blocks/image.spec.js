@@ -2,7 +2,6 @@ const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 

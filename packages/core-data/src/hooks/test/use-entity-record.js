@@ -1,6 +1,5 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
 jest.mock( '@wordpress/api-fetch' );
 import { act, render, waitFor } from '@testing-library/react';
 import { store as coreDataStore } from '../../index';

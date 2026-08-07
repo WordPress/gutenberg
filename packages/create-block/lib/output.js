@@ -1,7 +1,7 @@
 const { dirname, join } = require( 'path' );
+const { writeFile } = require( 'fs' ).promises;
 const makeDir = require( 'make-dir' );
 const { render } = require( 'mustache' );
-const { writeFile } = require( 'fs' ).promises;
 
 const writeOutputAsset = async ( inputFile, outputFile, view ) => {
 	const outputFilePath = join( view.rootDirectory, 'assets', outputFile );

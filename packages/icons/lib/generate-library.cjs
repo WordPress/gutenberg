@@ -298,10 +298,7 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/**
- * WordPress dependencies
- */
-import { ${ Array.from( usedPrimitives )
+	return `import { ${ Array.from( usedPrimitives )
 		.sort()
 		.join( ', ' ) } } from '@wordpress/primitives';
 

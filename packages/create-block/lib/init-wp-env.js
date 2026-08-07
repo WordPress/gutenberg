@@ -1,6 +1,6 @@
-const { command } = require( 'execa' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
+const { command } = require( 'execa' );
 const { info } = require( './log' );
 
 module.exports = async ( { rootDirectory } ) => {
