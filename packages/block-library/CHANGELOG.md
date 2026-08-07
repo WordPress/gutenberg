@@ -9,6 +9,12 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.19 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 8.19.0 (2023-09-20)
 
 ## 8.18.0 (2023-08-31)
