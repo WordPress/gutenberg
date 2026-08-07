@@ -16,6 +16,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import {
 	insert,
 	privateApis as richTextPrivateApis,
@@ -30,10 +31,9 @@ import FormatEdit from './format-edit';
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
 // required/validity treatment the sibling text controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
-const {
-	ValidatedContentEditableControl: RichTextControlShell,
-	withIgnoreIMEEvents,
-} = unlock( componentsPrivateApis );
+const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
+	componentsPrivateApis
+);
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
