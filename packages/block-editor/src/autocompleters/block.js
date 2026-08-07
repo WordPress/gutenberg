@@ -127,13 +127,22 @@ function createBlockCompleter() {
 				blocks,
 			} = inserterItem;
 
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = ( blocks ?? [] ).map( ( block ) =>
+				cloneBlock( block )
+			);
+
 			return {
 				action: 'replace',
 				value:
 					syncStatus === 'unsynced'
-						? ( blocks ?? [] ).map( ( block ) =>
-								cloneBlock( block )
-						  )
+						? unsyncedBlocks.length
+							? unsyncedBlocks
+							: unsyncedFallbackBlock
 						: createBlock(
 								name,
 								initialAttributes,

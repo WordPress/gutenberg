@@ -77,11 +77,20 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				return;
 			}
 
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = parse( content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+
 			const insertedBlock =
 				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-					  } )
+					? unsyncedBlocks.length
+						? unsyncedBlocks
+						: unsyncedFallbackBlock
 					: createBlock(
 							name,
 							initialAttributes,
