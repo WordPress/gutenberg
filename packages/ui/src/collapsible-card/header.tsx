@@ -53,7 +53,10 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				children: (
 					<HeaderDescriptionIdContext.Provider value={ contextValue }>
 						<Collapsible.Trigger
-							className={ styles.header }
+							className={ clsx(
+								styles.header,
+								focusStyles[ 'outset-ring-parent' ]
+							) }
 							render={ <Card.Header /> }
 							nativeButton={ false }
 							aria-describedby={ descriptionId }
