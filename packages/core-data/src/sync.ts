@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as syncPrivateApis,
 	type SyncManager,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 const {

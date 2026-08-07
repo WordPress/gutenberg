@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 // @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import type { Pattern } from '../types';
 

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
 import { store as editWidgetsStore } from '../../store';
 

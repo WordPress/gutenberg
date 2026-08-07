@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';

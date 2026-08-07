@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';

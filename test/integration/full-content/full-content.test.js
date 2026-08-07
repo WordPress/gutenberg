@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { format } from 'util';
 import glob from 'fast-glob';
-
-/**
- * WordPress dependencies
- */
 import prettierConfig from '@wordpress/prettier-config';
 import {
 	getBlockTypes,
@@ -19,10 +12,6 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,

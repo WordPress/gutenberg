@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const { realpathSync } = require( 'fs' );
 const { exec } = require( 'child_process' );
@@ -12,16 +9,8 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * WordPress dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
-
-/**
- * Internal dependencies
- */
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {

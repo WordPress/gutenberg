@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
@@ -20,10 +13,6 @@ import { useDispatch } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import MediaList from './media-list';
 import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';

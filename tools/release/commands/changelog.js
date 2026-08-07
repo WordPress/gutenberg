@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
-
-/**
- * Internal dependencies
- */
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getMilestoneByTitle,

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropZone,
@@ -49,10 +42,6 @@ import {
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';

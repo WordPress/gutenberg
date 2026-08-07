@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 

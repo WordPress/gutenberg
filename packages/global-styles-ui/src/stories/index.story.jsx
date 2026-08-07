@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesUI as GlobalStylesUIComponent } from '../global-styles-ui';
 
 export default { title: 'GlobalStylesUI/GlobalStylesUI' };

@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Button, Icon as WCIcon } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { Tooltip } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldValidity,
 	NormalizedField,

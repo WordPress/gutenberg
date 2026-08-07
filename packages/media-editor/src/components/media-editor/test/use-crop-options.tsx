@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useCropOptions } from '../use-crop-options';
 import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
 import { MediaEditorStateProvider } from '../../../state';

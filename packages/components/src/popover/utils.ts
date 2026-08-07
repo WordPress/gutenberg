@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { cubicBezier, type MotionProps } from 'framer-motion';
 import type { Placement, ReferenceType } from '@floating-ui/react-dom';
-
-/**
- * Internal dependencies
- */
 import { DROPDOWN_MOTION } from '../utils';
 import type {
 	PopoverProps,

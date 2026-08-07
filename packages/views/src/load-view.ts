@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { generatePreferenceKey } from './preference-keys';
 import { resolveView } from './resolve-view';
 import type { ViewConfig, ViewOverrides } from './types';

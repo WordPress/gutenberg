@@ -6,6 +6,10 @@
 
 -   `Breadcrumbs`: reset the list item margin that wp-admin's `common.css` applies, which left the trail misaligned with the rest of the page header ([#81134](https://github.com/WordPress/gutenberg/pull/81134)).
 
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
 ## 2.7.0 (2026-07-29)
 
 ## 2.6.0 (2026-07-14)

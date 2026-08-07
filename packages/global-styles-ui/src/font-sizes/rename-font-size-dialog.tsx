@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalInputControl as InputControl,
 	__experimentalVStack as VStack,

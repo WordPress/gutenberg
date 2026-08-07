@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	useCallback,
@@ -32,10 +25,6 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,

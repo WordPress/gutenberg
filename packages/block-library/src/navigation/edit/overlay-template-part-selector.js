@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -17,10 +14,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';

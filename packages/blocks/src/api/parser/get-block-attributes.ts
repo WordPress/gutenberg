@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { parse as hpqParse } from 'hpq';
 import type { MatcherObj } from 'hpq';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	attr,
 	html,

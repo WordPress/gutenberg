@@ -1,11 +1,4 @@
-/**
- * Node dependencies
- */
 import path from 'node:path';
-
-/**
- * External dependencies
- */
 import globPackage from 'glob';
 
 const { sync: glob } = globPackage;

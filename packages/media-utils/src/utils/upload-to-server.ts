@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { flattenFormData } from './flatten-form-data';
 import { transformAttachment } from './transform-attachment';
 import type { CreateRestAttachment, RestAttachment } from './types';

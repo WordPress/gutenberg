@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Key, MouseEventHandler } from 'react';
-
-/**
- * Internal dependencies
- */
 import type Popover from '../popover';
 import type { HeadingSize } from '../heading/types';
 
