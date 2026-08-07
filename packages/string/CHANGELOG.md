@@ -2,4 +2,4 @@
 
 ## Unreleased
 
-Initial release.
+- Add `kebabCase` utility. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
