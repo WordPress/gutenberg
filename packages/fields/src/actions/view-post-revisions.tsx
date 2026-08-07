@@ -30,6 +30,8 @@ const viewPostRevisions: Action< Post > = {
 	},
 	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
+		const lastRevisionId =
+			post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id;
 		const isSiteEditor = getPath( window.location.href )?.includes(
 			'site-editor.php'
 		);
@@ -37,10 +39,10 @@ const viewPostRevisions: Action< Post > = {
 			? addQueryArgs( 'site-editor.php', {
 					p: `/${ post.type }/${ post.id }`,
 					canvas: 'edit',
+					revision: lastRevisionId,
 			  } )
 			: addQueryArgs( 'revision.php', {
-					revision:
-						post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
+					revision: lastRevisionId,
 			  } );
 		document.location.href = href;
 		if ( onActionPerformed ) {
