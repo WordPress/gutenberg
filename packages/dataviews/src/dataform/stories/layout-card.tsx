@@ -1,10 +1,7 @@
 import { useMemo, useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -108,7 +105,7 @@ const LayoutCardComponent = ( {
 			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <WCBadge>Due on: { item.dueDate }</WCBadge>;
+				return <Badge>{ `Due on: ${ item.dueDate }` }</Badge>;
 			},
 		},
 		{
@@ -116,7 +113,7 @@ const LayoutCardComponent = ( {
 			type: 'text',
 			readOnly: true,
 			render: ( { item } ) => {
-				return <WCBadge>{ item.plan }</WCBadge>;
+				return <Badge>{ item.plan }</Badge>;
 			},
 		},
 	];
