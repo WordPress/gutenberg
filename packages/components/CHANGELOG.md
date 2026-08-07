@@ -35,6 +35,7 @@
 ### Internal
 
 -   Move `withIgnoreIMEEvents` to `@wordpress/keycodes`, where it is now a public API, and remove it from this package's private APIs ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+-   Extract the private `kebabCase` utility to the new `@wordpress/string` package and remove it from the private APIs; all consumers now use the package directly ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
@@ -66,10 +67,6 @@
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
 -   `ColorPicker`: Keep the visual picker in native HSVA so gradient/controlled HSLA echoes no longer jitter the saturation pointer, and preserve the black-edge saturation coordinate without leaving white at a chromatic position ([#80205](https://github.com/WordPress/gutenberg/pull/80205)).
-
-### Internal
-
--   Extract the private `kebabCase` utility to the new `@wordpress/string` package and remove it from the private APIs; all consumers now use the package directly ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
 
 ### TypeScript
 

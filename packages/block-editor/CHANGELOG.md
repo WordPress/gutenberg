@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Use the new `@wordpress/string` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
+-   Use the new `@wordpress/string` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 
 ### Enhancements
 
