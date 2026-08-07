@@ -1462,6 +1462,98 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_stylesheet_renders_breakpoints_set_on_a_top_level_element() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'color'   => array(
+								'text' => 'blue',
+							),
+							'@mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$link_selector = 'a:where(:not(.wp-element-button))';
+		$expected      = $link_selector . '{color: blue;}' .
+			'@media (width <= 480px){' . $link_selector . '{color: red;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_renders_breakpoints_set_on_a_block_element() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color'   => array(
+										'text' => 'blue',
+									),
+									'@mobile' => array(
+										'color' => array(
+											'text' => 'red',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$link_selector = ':root :where(.wp-block-group a:where(:not(.wp-element-button)))';
+		$expected      = $link_selector . '{color: blue;}' .
+			'@media (width <= 480px){' . $link_selector . '{color: red;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_renders_a_top_level_element_breakpoint_without_default_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'@tablet' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = '@media (480px < width <= 782px){a:where(:not(.wp-element-button)){color: red;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
 	public function test_get_stylesheet_renders_element_styles_defined_only_in_a_breakpoint() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

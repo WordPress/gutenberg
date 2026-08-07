@@ -3262,6 +3262,8 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
+			$responsive_media_queries = static::get_viewport_media_queries( $theme_json['settings']['viewport'] ?? null );
+
 			foreach ( self::ELEMENTS as $element => $selector ) {
 				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
 					continue;
@@ -3272,6 +3274,21 @@ class WP_Theme_JSON_Gutenberg {
 					'path'     => array( 'styles', 'elements', $element ),
 					'selector' => static::ELEMENTS[ $element ],
 				);
+
+				/*
+				 * Responsive element nodes: one node per breakpoint the element
+				 * sets styles for. Emitted after the default so the breakpoint
+				 * rule wins without needing extra specificity.
+				 */
+				foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+					if ( isset( $theme_json['styles']['elements'][ $element ][ $breakpoint ] ) ) {
+						$nodes[] = array(
+							'path'        => array( 'styles', 'elements', $element, $breakpoint ),
+							'selector'    => static::ELEMENTS[ $element ],
+							'media_query' => $responsive_media_queries[ $breakpoint ],
+						);
+					}
+				}
 
 				// Handle any pseudo selectors for the element.
 				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
@@ -3741,6 +3758,21 @@ class WP_Theme_JSON_Gutenberg {
 							'path'     => $element_path,
 							'selector' => $element_selector,
 						);
+
+						/*
+						 * Breakpoints set on the element itself, as opposed to
+						 * elements set inside a block's breakpoint, which are
+						 * handled below.
+						 */
+						foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+							if ( isset( $block_node['elements'][ $element ][ $breakpoint ] ) ) {
+								$nodes[] = array(
+									'path'        => array( 'styles', 'blocks', $name, 'elements', $element, $breakpoint ),
+									'selector'    => $element_selector,
+									'media_query' => $responsive_media_queries[ $breakpoint ],
+								);
+							}
+						}
 					}
 
 					// Responsive element nodes: one node per breakpoint that has
@@ -3984,7 +4016,21 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
 
-		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+		/*
+		 * An element's responsive node ends in the breakpoint rather than the
+		 * element, e.g. [ 'styles', 'elements', 'link', '@mobile' ], so step
+		 * back over it to find the element the node is for.
+		 */
+		$element_path_index = count( $block_metadata['path'] ) - 1;
+		if (
+			$is_processing_element &&
+			$element_path_index > 0 &&
+			str_starts_with( (string) $block_metadata['path'][ $element_path_index ], '@' )
+		) {
+			--$element_path_index;
+		}
+
+		$current_element = $is_processing_element ? $block_metadata['path'][ $element_path_index ] : null;
 
 		$element_pseudo_allowed = array();
 
