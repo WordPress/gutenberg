@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	CustomSelectControl,
@@ -13,10 +10,6 @@ import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	CUSTOM_VALUE_SETTINGS,
 	ICON_SIZE,

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { updateFootnotesFromMeta } from '../';
 
 // The real implementation logs once per distinct message, which would make

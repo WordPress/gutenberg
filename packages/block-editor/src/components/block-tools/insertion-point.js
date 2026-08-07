@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useRef,
@@ -15,10 +8,6 @@ import {
 } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';

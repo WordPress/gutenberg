@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 const mkdirp = require( 'mkdirp' ).mkdirp.sync;

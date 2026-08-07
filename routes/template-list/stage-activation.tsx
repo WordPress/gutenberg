@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -22,10 +19,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { published, commentAuthorAvatar } from '@wordpress/icons';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,

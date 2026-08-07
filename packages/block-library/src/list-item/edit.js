@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
@@ -19,10 +16,6 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import {
 	useEnter,
 	useSpace,

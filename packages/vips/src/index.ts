@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import Vips from 'wasm-vips';
 
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
@@ -8,10 +5,6 @@ import VipsModule from 'wasm-vips/vips.wasm';
 
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,

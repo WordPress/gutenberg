@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 // Load block support registration filters.
 import '@wordpress/block-editor';
 import {
@@ -9,10 +6,6 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import deprecated from '../deprecated';
 import metadata from '../block.json';
 

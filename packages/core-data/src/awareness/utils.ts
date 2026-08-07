@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { User } from '../entity-types';
 import type { CollaboratorInfo } from './types';
 

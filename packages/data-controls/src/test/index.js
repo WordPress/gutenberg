@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * Internal dependencies
- */
 import { controls } from '../index';
 
 describe( 'controls', () => {

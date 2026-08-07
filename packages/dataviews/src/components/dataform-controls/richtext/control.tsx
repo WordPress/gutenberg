@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
@@ -28,10 +21,6 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import type { EventListenersProps, RichTextValue } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';

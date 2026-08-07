@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getAppenderLabel } from '../get-appender-label';
 
 describe( 'getAppenderLabel', () => {

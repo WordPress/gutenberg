@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
 import {
@@ -20,10 +17,6 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
 

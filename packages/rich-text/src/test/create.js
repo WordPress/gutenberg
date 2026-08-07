@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { create, removeReservedCharacters, RichTextData } from '../create';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';

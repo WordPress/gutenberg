@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -101,15 +94,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 		},
 	],
 } ) );
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,

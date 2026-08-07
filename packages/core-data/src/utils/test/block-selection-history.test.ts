@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	createBlockSelectionHistory,
 	YSelectionType,

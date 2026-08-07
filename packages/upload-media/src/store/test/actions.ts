@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType } from '../types';
 import { unlock } from '../../lock-unlock';

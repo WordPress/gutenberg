@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Fragment, useMemo } from '@wordpress/element';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 

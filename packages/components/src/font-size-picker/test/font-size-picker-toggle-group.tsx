@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
 import type { FontSize } from '../types';
 

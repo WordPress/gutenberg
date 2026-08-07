@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
+import { forwardRef } from '@wordpress/element';
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
 import type { WordPressComponentProps } from '../context';
-
-/**
- * WordPress dependencies
- */
-import { forwardRef } from '@wordpress/element';
 
 export function UnforwardedSpinner(
 	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,

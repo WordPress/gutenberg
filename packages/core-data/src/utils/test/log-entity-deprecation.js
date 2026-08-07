@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import logEntityDeprecation from '../log-entity-deprecation';
 
 jest.useFakeTimers();

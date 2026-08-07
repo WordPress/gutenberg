@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, select as realSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { MetaBoxesSection } from '../meta-boxes-section';
 import { store as editPostStore } from '../../../store';
 

@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedFormTokenField } from '../form-token-field';
 import { formDecorator } from './story-utils';
 import type { TokenItem } from '../../../form-token-field/types';

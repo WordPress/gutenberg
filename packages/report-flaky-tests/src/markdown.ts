@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { formatResultsErrors } from 'jest-message-util';
-
-/**
- * Internal dependencies
- */
 import { stripAnsi } from './strip-ansi.ts';
 import type { FlakyTestResult, ReportedFlakyTest } from './types.ts';
 
