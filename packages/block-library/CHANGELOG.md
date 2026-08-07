@@ -7,6 +7,12 @@
 -   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets`
 	via `registerLegacyWidgetBlock()`.
 
+## 3.2.22 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 3.2.0 (2021-05-24)
 
 ### New Features
