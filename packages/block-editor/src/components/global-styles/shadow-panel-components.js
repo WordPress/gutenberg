@@ -25,13 +25,27 @@ const EMPTY_ARRAY = [];
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
+	const presets = useMemo( () => {
+		if ( ! shadows.length ) {
+			return shadows;
+		}
+		// The entry that clears the shadow is a display-only affordance with no
+		// counterpart in `theme.json`. It is added here rather than in
+		// `useShadowPresets` so that callers mapping a value back to a preset
+		// never mistake it for one and persist a reference to a CSS variable
+		// that is never output.
+		return [
+			{ name: __( 'Unset' ), slug: 'unset', shadow: 'none' },
+			...shadows,
+		];
+	}, [ shadows ] );
 
 	return (
 		<div className="block-editor-global-styles__shadow-popover-container">
 			<VStack spacing={ 4 }>
 				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
 				<ShadowPresets
-					presets={ shadows }
+					presets={ presets }
 					activeShadow={ shadow }
 					onSelect={ onShadowChange }
 				/>
@@ -209,6 +223,18 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 	};
 }
 
+/**
+ * Returns the available shadow presets, from every origin, in the order they
+ * are presented to the user.
+ *
+ * This is the single source of truth for which presets exist: it backs both the
+ * popover's preset list and the mapping of a chosen shadow back to the preset
+ * it came from, so what is shown and what is stored cannot drift apart.
+ *
+ * @param {Object} settings Theme.json settings for the current context.
+ *
+ * @return {Array} The shadow presets.
+ */
 export function useShadowPresets( settings ) {
 	return useMemo( () => {
 		if ( ! settings?.shadow ) {
@@ -221,21 +247,13 @@ export function useShadowPresets( settings ) {
 			theme: themeShadows,
 			custom: customShadows,
 		} = settings?.shadow?.presets ?? {};
-		const unsetShadow = {
-			name: __( 'Unset' ),
-			slug: 'unset',
-			shadow: 'none',
-		};
 
 		const shadowPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
 			...( customShadows || EMPTY_ARRAY ),
 		];
-		if ( shadowPresets.length ) {
-			shadowPresets.unshift( unsetShadow );
-		}
 
-		return shadowPresets;
+		return shadowPresets.length ? shadowPresets : EMPTY_ARRAY;
 	}, [ settings ] );
 }
