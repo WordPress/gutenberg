@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-### Bug Fix
-
--   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
-
-
 ## 8.20.0 (2023-10-05)
 
 ## 8.19.19 (2026-08-06)
@@ -14,6 +9,12 @@
 ### Bug Fixes
 
 -   Post Date: Escape date values and link URLs before rendering the block.
+
+## 8.19.4 (2023-10-09)
+
+### Bug Fixes
+
+-   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
 
 ## 8.19.0 (2023-09-20)
 
