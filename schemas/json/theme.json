@@ -2913,6 +2913,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2929,6 +2932,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements", "blocks" ]
@@ -2952,6 +2958,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2968,6 +2977,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements", "blocks" ]
