@@ -24,11 +24,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-inspector/edit-contents.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-inspector/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
