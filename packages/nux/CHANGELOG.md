@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ## 10.4.0 (2026-07-29)
 
 ### Internal

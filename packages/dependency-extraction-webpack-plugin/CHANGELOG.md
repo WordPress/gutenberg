@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ## 6.52.0 (2026-07-29)
 
 ### Bug Fixes

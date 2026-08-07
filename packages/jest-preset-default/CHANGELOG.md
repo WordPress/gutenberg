@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ## 13.0.0 (2026-07-29)
 
 ### Breaking Changes

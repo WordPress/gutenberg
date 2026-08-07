@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ## 0.20.0 (2026-07-29)
 
 ### Enhancements

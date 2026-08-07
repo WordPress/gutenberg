@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ## 1.19.0 (2026-07-29)
 
 ### Bug Fixes
