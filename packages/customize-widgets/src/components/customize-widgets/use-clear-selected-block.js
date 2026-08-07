@@ -15,10 +15,15 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * These cases are normally triggered by user interactions from the editor,
  * not by explicitly focusing outside the editor, hence no need for clearing.
  *
+ * @param {Object} api            The customizer API.
  * @param {Object} sidebarControl The sidebar control instance.
  * @param {Object} popoverRef     The ref object of the popover node container.
  */
-export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
+export default function useClearSelectedBlock(
+	api,
+	sidebarControl,
+	popoverRef
+) {
 	const { hasSelectedBlock, hasMultiSelection } =
 		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -57,8 +62,36 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 				handleClearSelectedBlock( ownerDocument.activeElement );
 			}
 
+			// The editor canvas is a frame of its own, so pressing the mouse
+			// in the preview neither reaches this document nor blurs this
+			// window: it only moves focus from one frame to another.
+			let previewDocument;
+			function handlePreviewMouseDown() {
+				if (
+					( hasSelectedBlock() || hasMultiSelection() ) &&
+					! inspector.expanded()
+				) {
+					clearSelectedBlock();
+				}
+			}
+			// The customizer replaces the preview frame whenever it refreshes.
+			function handlePreviewReady() {
+				previewDocument?.removeEventListener(
+					'mousedown',
+					handlePreviewMouseDown
+				);
+				previewDocument =
+					api.previewer.preview?.targetWindow()?.document;
+				previewDocument?.addEventListener(
+					'mousedown',
+					handlePreviewMouseDown
+				);
+			}
+
 			ownerDocument.addEventListener( 'mousedown', handleMouseDown );
 			ownerWindow.addEventListener( 'blur', handleBlur );
+			api.previewer.bind( 'ready', handlePreviewReady );
+			handlePreviewReady();
 
 			return () => {
 				ownerDocument.removeEventListener(
@@ -66,9 +99,15 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					handleMouseDown
 				);
 				ownerWindow.removeEventListener( 'blur', handleBlur );
+				api.previewer.unbind( 'ready', handlePreviewReady );
+				previewDocument?.removeEventListener(
+					'mousedown',
+					handlePreviewMouseDown
+				);
 			};
 		}
 	}, [
+		api,
 		popoverRef,
 		sidebarControl,
 		hasSelectedBlock,

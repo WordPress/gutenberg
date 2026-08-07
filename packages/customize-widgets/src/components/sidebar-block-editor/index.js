@@ -1,7 +1,7 @@
-import { useViewportMatch } from '@wordpress/compose';
+import { useRefEffect, useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, createPortal } from '@wordpress/element';
+import { useMemo, useState, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockToolbar,
@@ -27,6 +27,33 @@ const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
+// The canvas height follows its content, so the body has to contain the
+// margins of its children instead of letting them collapse out of it.
+const CANVAS_STYLES = [ { css: 'body{display:flow-root}' } ];
+
+/**
+ * The customizer pane scrolls as a whole, so the canvas has to grow with its
+ * content rather than scroll on its own. An iframe has no intrinsic height,
+ * so mirror the height of its body onto the canvas.
+ *
+ * @return {[Function, number]} Ref for the canvas content, and its height.
+ */
+function useCanvasHeight() {
+	const [ height, setHeight ] = useState( 0 );
+	const contentRef = useRefEffect( ( node ) => {
+		const { ResizeObserver } = node.ownerDocument.defaultView;
+		// The body's own box, so that overlays rendered on top of the blocks
+		// can't keep the canvas from shrinking again.
+		const observer = new ResizeObserver( ( [ { contentRect } ] ) =>
+			setHeight( contentRect.height )
+		);
+		observer.observe( node );
+		return () => observer.disconnect();
+	}, [] );
+
+	return [ contentRef, height ];
+}
+
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
 	sidebar,
@@ -35,6 +62,7 @@ export default function SidebarBlockEditor( {
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
 	const isMediumViewport = useViewportMatch( 'small' );
+	const [ contentRef, canvasHeight ] = useCanvasHeight();
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -92,6 +120,14 @@ export default function SidebarBlockEditor( {
 		setIsInserterOpened,
 	] );
 
+	const canvasStyles = useMemo(
+		() => [
+			...Object.values( settings.defaultEditorStyles ?? [] ),
+			...CANVAS_STYLES,
+		],
+		[ settings.defaultEditorStyles ]
+	);
+
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
 	}
@@ -121,9 +157,9 @@ export default function SidebarBlockEditor( {
 					<BlockToolbar hideDragHandle />
 				) }
 				<BlockCanvas
-					shouldIframe={ false }
-					styles={ settings.defaultEditorStyles }
-					height="100%"
+					contentRef={ contentRef }
+					styles={ canvasStyles }
+					height={ `${ canvasHeight }px` }
 				>
 					<BlockList renderAppender={ BlockAppender } />
 				</BlockCanvas>

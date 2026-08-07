@@ -5,14 +5,19 @@ import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
+// Rendered inside the provider because the focus control looks up block
+// elements through the block refs context.
+function BlocksFocusControl( { blocks } ) {
+	useBlocksFocusControl( blocks );
+	return null;
+}
+
 export default function SidebarEditorProvider( {
 	sidebar,
 	settings,
 	children,
 } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
-
-	useBlocksFocusControl( blocks );
 
 	return (
 		<ExperimentalBlockEditorProvider
@@ -22,6 +27,7 @@ export default function SidebarEditorProvider( {
 			settings={ settings }
 			useSubRegistry={ false }
 		>
+			<BlocksFocusControl blocks={ blocks } />
 			{ children }
 		</ExperimentalBlockEditorProvider>
 	);

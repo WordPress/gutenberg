@@ -41,6 +41,7 @@ test.describe( 'Widgets Customizer', () => {
 
 	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
 		const previewFrame = widgetsCustomizerPage.previewFrame;
+		const canvas = widgetsCustomizerPage.canvas;
 
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
@@ -71,7 +72,7 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeVisible();
 
 		// Click on the inline appender.
-		await page
+		await canvas
 			.locator( '.editor-styles-wrapper' )
 			.getByRole( 'button', { name: 'Add block' } )
 			.click();
@@ -86,7 +87,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.getByRole( 'option', { name: 'Search' } ).click();
 
-		await page
+		await canvas
 			.locator(
 				'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
 			)
@@ -129,7 +130,9 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		await page.getByText( 'First Paragraph' ).focus();
+		await widgetsCustomizerPage.canvas
+			.getByText( 'First Paragraph' )
+			.focus();
 		await editor.clickBlockToolbarButton( 'Options' );
 
 		await showMoreSettingsButton.click();
@@ -213,7 +216,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
-		await page
+		await widgetsCustomizerPage.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.focus();
 		await page.keyboard.type( ' ' );
@@ -271,7 +274,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 		await editParagraphWidget.click();
 
-		const firstParagraphBlock = page.locator(
+		const firstParagraphBlock = widgetsCustomizerPage.canvas.locator(
 			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect
@@ -296,7 +299,7 @@ test.describe( 'Widgets Customizer', () => {
 		await headingWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editHeadingWidget.click();
 
-		const headingBlock = page.locator(
+		const headingBlock = widgetsCustomizerPage.canvas.locator(
 			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
@@ -316,7 +319,9 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		const paragraphBlock = page.locator( 'text="First Paragraph"' );
+		const paragraphBlock = widgetsCustomizerPage.canvas.locator(
+			'text="First Paragraph"'
+		);
 		await paragraphBlock.focus();
 		await editor.showBlockToolbar();
 
@@ -369,9 +374,10 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
+		const canvas = widgetsCustomizerPage.canvas;
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
-		await page
+		await canvas
 			.locator( 'role=combobox[name="Legacy widget"i]' )
 			.selectOption( 'test_widget' );
 
@@ -391,7 +397,7 @@ test.describe( 'Widgets Customizer', () => {
 		await pageUtils.pressKeys( 'Tab' );
 
 		const previewFrame = widgetsCustomizerPage.previewFrame;
-		const legacyWidgetPreviewFrame = page.frameLocator(
+		const legacyWidgetPreviewFrame = canvas.frameLocator(
 			'iframe[title="Legacy Widget Preview"]'
 		);
 
@@ -464,7 +470,9 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		const paragraphBlock = page.locator( 'text="First Paragraph"' );
+		const paragraphBlock = widgetsCustomizerPage.canvas.locator(
+			'text="First Paragraph"'
+		);
 		await paragraphBlock.focus();
 		await editor.showBlockToolbar();
 
@@ -497,15 +505,17 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		await page.getByText( 'First Paragraph', { exact: true } ).focus();
+		const canvas = widgetsCustomizerPage.canvas;
+
+		await canvas.getByText( 'First Paragraph', { exact: true } ).focus();
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		// Refocus the paragraph block.
-		await page
+		await canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( {
-				has: page.getByText( 'First Paragraph', { exact: true } ),
+				has: canvas.getByText( 'First Paragraph', { exact: true } ),
 			} )
 			.focus();
 		await editor.clickBlockToolbarButton( 'Move to widget area' );
@@ -520,7 +530,7 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeVisible();
 
 		// The paragraph block should be moved to the new sidebar and have focus.
-		const movedParagraphBlock = page.locator(
+		const movedParagraphBlock = canvas.locator(
 			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
@@ -568,7 +578,7 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeDisabled();
 
 		// Select the paragraph block
-		await page
+		await widgetsCustomizerPage.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.focus();
 
@@ -613,7 +623,9 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await widgetsCustomizerPage.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
 		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( 'hello' );
 		await page
@@ -632,7 +644,7 @@ test.describe( 'Widgets Customizer', () => {
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
-		await page
+		await widgetsCustomizerPage.canvas
 			.locator( 'role=document[name="Block: Custom HTML"i]' )
 			.click();
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
@@ -662,6 +674,9 @@ class WidgetsCustomizerPage {
 			// There could be two preview frames at the same time while updating.
 			// We only care about the latest (last) one.
 			.last();
+
+		/** @type {FrameLocator} */
+		this.canvas = editor.canvas;
 	}
 
 	async visitCustomizerPage() {
@@ -710,7 +725,7 @@ class WidgetsCustomizerPage {
 			.getByRole( 'option', { name: blockName, exact: true } )
 			.click();
 
-		const addedBlock = this.page.locator(
+		const addedBlock = this.canvas.locator(
 			'role=document >> css=.is-selected[data-block]'
 		);
 		await addedBlock.focus();
@@ -718,6 +733,6 @@ class WidgetsCustomizerPage {
 		const blockId = await addedBlock.getAttribute( 'data-block' );
 		const stableSelector = `[data-block="${ blockId }"]`;
 
-		return this.page.locator( stableSelector );
+		return this.canvas.locator( stableSelector );
 	}
 }

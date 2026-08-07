@@ -26,7 +26,7 @@ export default function CustomizeWidgets( {
 	const popoverRef = useRef();
 	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
 
-	useClearSelectedBlock( activeSidebarControl, popoverRef );
+	useClearSelectedBlock( api, activeSidebarControl, popoverRef );
 
 	useEffect( () => {
 		const unsubscribers = sidebarControls.map( ( sidebarControl ) =>
