@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `input-control`: Use `outset-ring__focus` for focus styling.
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`.
 
 ## 12.0.0 (2026-07-29)
 

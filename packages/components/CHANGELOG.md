@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus rings with the design system.
+-   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system.
 
 ### Bug Fixes
 
