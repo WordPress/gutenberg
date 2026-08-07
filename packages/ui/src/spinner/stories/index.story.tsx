@@ -8,7 +8,6 @@ const meta: Meta< typeof Spinner > = {
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
-			whereUsed: 'global',
 		},
 	},
 };
@@ -18,7 +17,6 @@ type Story = StoryObj< typeof Spinner >;
 
 export const Default: Story = {};
 
-// The Spinner can be resized to any size, but the stroke width will remain unchanged.
 export const CustomSize: Story = {
 	args: {
 		style: {
