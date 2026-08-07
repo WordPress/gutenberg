@@ -959,11 +959,6 @@
 			"count": 5
 		}
 	},
-	"packages/content-types/src/components/layout/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/components/entities-saved-states/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
