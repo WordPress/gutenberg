@@ -13,6 +13,142 @@ fully integrated into WordPress + Gutenberg, under these constraints:
    aids clarity.
 5. Short-polling transport first.
 
+> **How to read this doc.** The section immediately below —
+> _Architecture at a glance (as built)_ — is the current, shipped picture.
+> Everything from _Three-plane model_ onward is the ORIGINAL PLAN
+> (interface sketches, phasing); it is kept for provenance, but where a
+> sketch disagrees with the as-built overview or the phase log (2d-i …
+> 2d-xxv near the end), the code and the phase log win.
+
+## Architecture at a glance (as built)
+
+Collaboration is a **three-plane** stack — bridge (capture) / engine
+(meaning) / transport (movement) — mirrored on client and server, with
+**two independent registries** (engines, transports) so either axis swaps
+without touching the other. Both are announced on the wire and negotiated;
+no match on either falls back to WordPress post locking.
+
+### Component map
+
+```mermaid
+flowchart TB
+  subgraph CLIENT["Client (packages/sync/src)"]
+    direction TB
+    ED["Editor block tree"]
+    BR["Bridge<br/>intent-log-bridge.ts"]
+    MG["Manager<br/>intent-log-manager.ts"]
+    SES["Session codec<br/>(EngineSessionCodec)"]
+    EAR["Engine adapter registry<br/>engines.ts"]
+    TR["Transport registry + negotiation<br/>providers/index.ts"]
+    CP1["http-polling"]
+    CP2["http-long-polling"]
+    CP3["websocket"]
+    ED <--> BR
+    BR <--> MG
+    MG <--> SES
+    EAR -.->|picks engine| MG
+    TR -.->|picks transport| SES
+    SES <--> CP1
+    SES <--> CP2
+    SES <--> CP3
+  end
+
+  subgraph SVR["Server (lib/experimental/collaboration)"]
+    direction TB
+    STR["Transport registry<br/>WP_Sync_Transport_Registry"]
+    RT1["/updates (polling)"]
+    RT2["/long-poll"]
+    RT3["WebSocket daemon<br/>(wp collaboration sync-server)"]
+    PRR["process_room_request()<br/>shared engine seam"]
+    SER["Engine registry<br/>WP_Sync_Engine_Registry"]
+    EIL["WP_Intent_Log_Engine"]
+    EYJ["WP_Yjs_Relay_Engine"]
+    STO[("postmeta log<br/>WP_Sync_Post_Meta_Storage")]
+    STR --> RT1
+    STR --> RT2
+    STR --> RT3
+    RT1 --> PRR
+    RT2 --> PRR
+    RT3 --> PRR
+    PRR --> SER
+    SER --> EIL
+    SER --> EYJ
+    EIL --> STO
+    EYJ --> STO
+  end
+
+  CP1 <-->|"opaque updates + awareness"| STR
+  CP2 <--> STR
+  CP3 <--> STR
+  CFG["Single config value<br/>WP_COLLABORATION_TRANSPORT"] -.->|selects| STR
+  OPT["wp_sync_engine option"] -.->|selects| SER
+```
+
+### An edit's round trip
+
+```mermaid
+sequenceDiagram
+  participant U as Editor
+  participant B as Bridge
+  participant S as Session codec
+  participant T as Transport
+  participant E as Engine
+  participant D as Storage
+  U->>B: block tree changed
+  B->>B: diff vs engine doc → typed intents
+  B->>S: author intents
+  S->>T: opaque updates (+ awareness)
+  T->>E: handle_updates(room, client, cursor, updates)
+  E->>E: plan / transform vs the log
+  E->>D: commit accepted rows
+  E-->>T: dispositions (applied / escalated / voided)
+  T-->>S: dispositions + peers' rows (get_updates_since)
+  S-->>B: apply remote → entity edits
+  B-->>U: reconciled block tree
+```
+
+### How a submitted intent settles
+
+The engine is server-authoritative: every intent settles into exactly one
+outcome, and nothing is silently dropped — conflicts go to review, benign
+collisions void idempotently.
+
+```mermaid
+flowchart TD
+  I["Submitted intent"] --> V{"valid payload?"}
+  V -->|no| IV["voided: invalid-payload"]
+  V -->|yes| K{"author may publish this markup?<br/>(unfiltered_html or benign)"}
+  K -->|"no - protected"| RA["proposal: requires-approval"]
+  K -->|yes| P{"plan against the log"}
+  P -->|clean| A["applied - materialized"]
+  P -->|"idempotent / stale"| VB["voided: benign<br/>(already-merged, stale-base)"]
+  P -->|conflict| ES["proposal:<br/>frame / attr / property conflict"]
+  RA --> R{"review (in-canvas card<br/>or sidebar panel)"}
+  ES --> R
+  R -->|"restore / approve"| RE["re-authored under<br/>the reviewer's capability"]
+  R -->|discard| DC["closed"]
+  RE --> A
+```
+
+Key files by plane:
+
+- **Bridge** (client): `packages/sync/src/engines/intent-log-bridge.ts`,
+  `-manager.ts`, `-session.ts`.
+- **Engine** (both languages): frozen JS core in
+  `packages/sync/src/engines/intent-log/` (rebase/document/rich-text/sync-id
+  + `test-vectors/`), PHP twins in
+  `lib/experimental/collaboration/class-wp-intent-log-*.php`.
+- **Transport**: client `packages/sync/src/providers/` (registry in
+  `index.ts`, one folder per transport); server
+  `lib/experimental/collaboration/transports/` (registry, interface, the
+  three transports; `websocket/` holds the daemon + token + CLI).
+- **Store + UI**: `packages/core-data/src/` (`sync.ts`, `resolvers.js`,
+  `syncReviewItems` store) and
+  `packages/editor/src/components/collaboration-review-panel/` (panel +
+  in-canvas markers + inline approval card).
+- **Tooling**: `packages/sync/src/debug/inspector.ts` (console inspector),
+  `test/php/sync-engine-benchmarks/` (seam-native engine benchmark).
+
 ## Current surface (trunk, this branch)
 
 Server — `lib/experimental/collaboration/`:
