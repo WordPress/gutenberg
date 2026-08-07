@@ -311,7 +311,7 @@
 	}
 
 	&:focus {
-		@include input-style__focus();
+		@include outset-ring__focus();
 	}
 
 	// Use opacity to work in various editor styles.

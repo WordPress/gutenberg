@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `SandBox`: Add `allowForms` prop to opt into `allow-forms` in the iframe's sandbox attribute ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).
+-   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`: Align focus rings with the design system.
 
 ### Bug Fixes
 

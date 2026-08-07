@@ -1,0 +1,7 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.textarea {
+	&:focus {
+		@include outset-ring__focus();
+	}
+}

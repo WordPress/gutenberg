@@ -15,16 +15,6 @@ const inputStyleNeutral = css`
 	}
 `;
 
-const inputStyleFocus = css`
-	border-color: ${ COLORS.theme.accent };
-	box-shadow: 0 0 0
-		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
-		${ COLORS.theme.accent };
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-`;
-
 export const StyledTextarea = styled.textarea`
 	width: 100%;
 	display: block;
@@ -49,10 +39,6 @@ export const StyledTextarea = styled.textarea`
 
 	${ breakpoint( 'small' ) } {
 		font-size: ${ font( 'default.fontSize' ) };
-	}
-
-	&:focus {
-		${ inputStyleFocus }
 	}
 
 	&:disabled {

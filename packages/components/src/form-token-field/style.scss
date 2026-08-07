@@ -17,7 +17,7 @@
 	}
 
 	&.is-active {
-		@include input-style__focus;
+		@include outset-ring__focus;
 	}
 
 	// Token input

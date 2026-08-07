@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `input-control`: Use `outset-ring__focus` for focus styling.
 
 ## 12.0.0 (2026-07-29)
 

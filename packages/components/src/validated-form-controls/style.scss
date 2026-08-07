@@ -2,6 +2,10 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
+%red-focus-ring {
+	--focus-color: #{ $alert-red };
+}
+
 .components-validated-control {
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
@@ -10,10 +14,10 @@
 		border-color: $alert-red;
 	}
 
-	// For TextControl, TextareaControl
-	:is(textarea, input[type="text"]):invalid[data-validity-visible] {
-		--wp-admin-theme-color: #{$alert-red};
-		--wp-components-color-accent: #{$alert-red};
+	// For TextareaControl
+	textarea:invalid[data-validity-visible] {
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
@@ -41,14 +45,16 @@
 
 	// For FormTokenField
 	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
-		--wp-admin-theme-color: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
 	.components-validated-control__content-editable [role="textbox"] {
-		--wp-admin-theme-color: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 }
