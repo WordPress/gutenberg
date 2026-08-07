@@ -30,7 +30,23 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 	 * @since 7.0.0
 	 * @access private
 	 */
-	class WP_HTTP_Polling_Sync_Server {
+	class WP_HTTP_Polling_Sync_Server implements WP_Sync_Transport {
+		/**
+		 * Transport slug (matches the client transport registration).
+		 *
+		 * @since 7.2.0
+		 * @var string
+		 */
+		const TRANSPORT_SLUG = 'http-polling';
+
+		/**
+		 * Transport protocol version.
+		 *
+		 * @since 7.2.0
+		 * @var int
+		 */
+		const TRANSPORT_PROTOCOL = 1;
+
 		/**
 		 * REST API namespace.
 		 *
@@ -127,14 +143,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @since 7.0.0
 		 */
-		private WP_Sync_Storage $storage;
+		protected WP_Sync_Storage $storage;
 
 		/**
 		 * Engine registry used to resolve the engine for each room.
 		 *
 		 * @since 7.2.0
 		 */
-		private WP_Sync_Engine_Registry $engines;
+		protected WP_Sync_Engine_Registry $engines;
 
 		/**
 		 * Constructor.
@@ -151,11 +167,56 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
+		 * The transport slug.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return string Slug.
+		 */
+		public function get_slug(): string {
+			return self::TRANSPORT_SLUG;
+		}
+
+		/**
+		 * The transport protocol version.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return int Protocol version.
+		 */
+		public function get_protocol_version(): int {
+			return self::TRANSPORT_PROTOCOL;
+		}
+
+		/**
 		 * Registers REST API routes.
 		 *
 		 * @since 7.0.0
 		 */
 		public function register_routes(): void {
+			register_rest_route(
+				self::REST_NAMESPACE,
+				'/updates',
+				array(
+					'methods'             => array( WP_REST_Server::CREATABLE ),
+					'callback'            => array( $this, 'handle_request' ),
+					'permission_callback' => array( $this, 'check_permissions' ),
+					'validate_callback'   => array( $this, 'validate_request' ),
+					'args'                => $this->get_route_args(),
+				)
+			);
+		}
+
+		/**
+		 * The shared route argument schema (the `rooms[]` payload). Extracted
+		 * so transport variants — e.g. the long-poll route — validate an
+		 * identical request shape.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return array Route args.
+		 */
+		protected function get_route_args(): array {
 			$typed_update_args = array(
 				'properties' => array(
 					'data' => array(
@@ -217,26 +278,16 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 			);
 
-			register_rest_route(
-				self::REST_NAMESPACE,
-				'/updates',
-				array(
-					'methods'             => array( WP_REST_Server::CREATABLE ),
-					'callback'            => array( $this, 'handle_request' ),
-					'permission_callback' => array( $this, 'check_permissions' ),
-					'validate_callback'   => array( $this, 'validate_request' ),
-					'args'                => array(
-						'rooms' => array(
-							'items'    => array(
-								'properties' => $room_args,
-								'type'       => 'object',
-							),
-							'maxItems' => self::MAX_ROOMS_PER_REQUEST,
-							'required' => true,
-							'type'     => 'array',
-						),
+			return array(
+				'rooms' => array(
+					'items'    => array(
+						'properties' => $room_args,
+						'type'       => 'object',
 					),
-				)
+					'maxItems' => self::MAX_ROOMS_PER_REQUEST,
+					'required' => true,
+					'type'     => 'array',
+				),
 			);
 		}
 

@@ -333,6 +333,28 @@ let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 let syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
 
+/*
+ * Long-poll mode: the server holds each request open until it has something
+ * to deliver, so on a successful response the client re-issues almost
+ * immediately rather than waiting out a fixed interval. Failure backoff is
+ * unchanged. Set once by the long-polling provider (a single site-wide
+ * transport). See providers/http-long-polling.
+ */
+let longPollMode = false;
+
+/**
+ * Enables long-poll cadence on the shared manager.
+ *
+ * @param enabled Whether the active transport holds requests open.
+ */
+export function setLongPollMode( enabled: boolean ): void {
+	longPollMode = enabled;
+}
+
+// Small delay between a released long-poll response and the next request, to
+// yield to the event loop without idling.
+const LONG_POLL_REISSUE_MS = 50;
+
 // When more rooms are registered than the server allows per request
 // (MAX_ROOMS_PER_REQUEST), the primary room is sent every poll and the
 // remaining "overflow" rooms are rotated across polls. This offset
@@ -740,8 +762,13 @@ function poll(): void {
 				}
 			} );
 
-			// Recalculate polling interval.
-			if ( isActiveBrowser && hasCollaborators ) {
+			// Recalculate polling interval. In long-poll mode the server
+			// already held the request until it had something (or the wait
+			// budget elapsed), so re-issue promptly; an active-tab
+			// background poll still needs its keepalive cadence.
+			if ( longPollMode && isActiveBrowser ) {
+				pollInterval = LONG_POLL_REISSUE_MS;
+			} else if ( isActiveBrowser && hasCollaborators ) {
 				pollInterval = POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS;
 			} else if ( isActiveBrowser ) {
 				pollInterval = POLLING_INTERVAL_IN_MS;

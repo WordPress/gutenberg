@@ -14,7 +14,33 @@ import {
 	type UpdateQueue,
 } from './types';
 
-const SYNC_API_PATH = '/wp-sync/v1/updates';
+const DEFAULT_SYNC_API_PATH = '/wp-sync/v1/updates';
+
+/*
+ * The REST path the shared manager posts to. HTTP short-polling uses the
+ * default; the long-polling transport points it at its own held-open route
+ * (see providers/http-long-polling). Site-wide, because a single config
+ * value selects one transport for the whole site.
+ */
+let syncApiPath = DEFAULT_SYNC_API_PATH;
+
+/**
+ * Sets the sync endpoint path the manager posts to.
+ *
+ * @param path REST path.
+ */
+export function setSyncApiPath( path: string ): void {
+	syncApiPath = path;
+}
+
+/**
+ * The current sync endpoint path.
+ *
+ * @return REST path.
+ */
+export function getSyncApiPath(): string {
+	return syncApiPath;
+}
 
 export function uint8ArrayToBase64( data: Uint8Array ): string {
 	let binary = '';
@@ -131,7 +157,7 @@ export function postSyncUpdate(
 ): Promise< SyncResponse > {
 	return apiFetch( {
 		method: 'POST',
-		path: SYNC_API_PATH,
+		path: syncApiPath,
 		data: payload,
 	} );
 }
@@ -149,7 +175,7 @@ export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
 
 	apiFetch( {
 		method: 'POST',
-		path: SYNC_API_PATH,
+		path: syncApiPath,
 		data: payload,
 		keepalive: true,
 	} ).catch( () => {} );

@@ -16,7 +16,10 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/class-wp-intent-log-rich-text.php';
 	require_once __DIR__ . '/class-wp-intent-log-engine.php';
 	require_once __DIR__ . '/class-wp-sync-engine-registry.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+	require_once __DIR__ . '/transports/interface-wp-sync-transport.php';
+	require_once __DIR__ . '/transports/class-wp-http-polling-sync-server.php';
+	require_once __DIR__ . '/transports/class-wp-http-long-polling-sync-server.php';
+	require_once __DIR__ . '/transports/class-wp-sync-transport-registry.php';
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
 
@@ -60,14 +63,67 @@ if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	add_action( 'init', 'gutenberg_register_sync_storage_post_type' );
 }
 
+if ( ! function_exists( 'wp_get_collaboration_transport' ) ) {
+	/**
+	 * The single config value that selects the active collaboration
+	 * transport. One source of truth: the `WP_COLLABORATION_TRANSPORT`
+	 * constant, else the environment variable of the same name, else the
+	 * `wp_collaboration_transport` filter, defaulting to HTTP polling. The
+	 * value must be a registered transport slug; an unknown value falls back
+	 * to the default in the registry.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return string Configured transport slug.
+	 */
+	function wp_get_collaboration_transport(): string {
+		$transport = WP_HTTP_Polling_Sync_Server::TRANSPORT_SLUG;
+		if ( defined( 'WP_COLLABORATION_TRANSPORT' ) && is_string( WP_COLLABORATION_TRANSPORT ) && '' !== WP_COLLABORATION_TRANSPORT ) {
+			$transport = WP_COLLABORATION_TRANSPORT;
+		} else {
+			$from_env = getenv( 'WP_COLLABORATION_TRANSPORT' );
+			if ( is_string( $from_env ) && '' !== $from_env ) {
+				$transport = $from_env;
+			}
+		}
+
+		/**
+		 * Filters the active collaboration transport slug.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $transport Transport slug.
+		 */
+		return (string) apply_filters( 'wp_collaboration_transport', $transport );
+	}
+}
+
+if ( ! function_exists( 'wp_get_collaboration_transport_registry' ) ) {
+	/**
+	 * Builds a transport registry over the default storage and engine
+	 * registry. Built fresh per call: the storage keeps per-request in-memory
+	 * caches (room cursors, storage post ids) that must not outlive a
+	 * request, so this is never memoized.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return WP_Sync_Transport_Registry Transport registry.
+	 */
+	function wp_get_collaboration_transport_registry(): WP_Sync_Transport_Registry {
+		$storage = new WP_Sync_Post_Meta_Storage();
+		$engines = new WP_Sync_Engine_Registry( $storage );
+		return new WP_Sync_Transport_Registry( $storage, $engines );
+	}
+}
+
 if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	/**
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-		$sync_server->register_routes();
+		// Every registered transport's routes are reachable; the client uses
+		// the one the server announces as active.
+		wp_get_collaboration_transport_registry()->register_all_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();
@@ -375,13 +431,17 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	 * server-side by the 409 mismatch check; this announcement covers the
 	 * site default.
 	 */
-	$registry = new WP_Sync_Engine_Registry( new WP_Sync_Post_Meta_Storage() );
-	$engine   = $registry->get_engine_for_room( '' );
-	$sync     = array(
+	$registry           = new WP_Sync_Engine_Registry( new WP_Sync_Post_Meta_Storage() );
+	$engine             = $registry->get_engine_for_room( '' );
+	$transport_registry = wp_get_collaboration_transport_registry();
+	$active_transport   = $transport_registry->get_transport( $transport_registry->get_active_slug() );
+	$sync               = array(
 		'engine'            => $engine->get_slug(),
 		'engineProtocol'    => $engine->get_protocol_version(),
-		'transports'        => array( 'http-polling' ),
-		'transportProtocol' => 1,
+		// Announced active FIRST; the client picks the first slug it can
+		// provide (see the single config value `wp_get_collaboration_transport`).
+		'transports'        => $transport_registry->get_announced_slugs(),
+		'transportProtocol' => $active_transport ? $active_transport->get_protocol_version() : 1,
 	);
 
 	wp_add_inline_script(

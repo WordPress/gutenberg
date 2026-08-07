@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Sync transports are now swappable. The client keeps a slug-keyed transport registry (filterable via `sync.transports`) and NEGOTIATES against the server's announced transport list — using the first announced slug it has registered whose protocol it implements — instead of assuming HTTP short-polling. Selection code is transport-agnostic; adding a transport is a sibling folder plus a registration.
+-   Add an HTTP long-polling transport (`http-long-polling`): the shared polling manager pointed at a held-open server route with an immediate re-issue cadence, so remote edits arrive promptly without tight polling.
+
 ### Bug Fixes
 
 -   Classic (core/freeform) content now syncs through the intent-log engine: the server previously DROPPED comment-less classic runs from the shared document entirely, erasing them from every collaborator's editor. Genesis now carries them as `core/freeform` specs with a content field, materialize emits them bare (no comment delimiters), and the client hydrates them back to the raw `content` attribute via the new `SyncConfig.hydrateRawContent` hook.
