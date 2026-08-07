@@ -8,6 +8,7 @@
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
+    -   `TextareaControl` ([#66806](https://github.com/WordPress/gutenberg/issues/66806))
 
 ### Enhancements
 
@@ -32,6 +33,7 @@
 
 ### Internal
 
+-   `TextareaControl`: Migrate styles from Emotion to an SCSS Module. ([#66806](https://github.com/WordPress/gutenberg/issues/66806)).
 -   Update `@ariakit/react` to 0.4.37 and `@ariakit/test` to 0.7.4 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Update `is-plain-object` to 5.1.0, which ships its own types, and drop the `@ts-expect-error` that the missing declaration required ([#81926](https://github.com/WordPress/gutenberg/pull/81926)).
@@ -95,6 +97,7 @@
 -   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
 -   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
 -   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
+-   `TextareaControl`: Migrate styles from Emotion to an SCSS Module. ([#66806](https://github.com/WordPress/gutenberg/issues/66806)).
 
 ## 38.0.0 (2026-07-29)
 
