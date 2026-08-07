@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { kebabCase } from '..';
 
 describe( 'kebabCase', () => {

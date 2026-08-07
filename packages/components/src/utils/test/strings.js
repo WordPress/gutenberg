@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { normalizeTextString } from '../strings';
 
 describe( 'normalizeTextString', () => {
