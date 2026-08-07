@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.8.18 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 9.8.0 (2024-09-19)
 
 ## 9.7.0 (2024-09-05)
