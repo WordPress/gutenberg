@@ -12,6 +12,7 @@ import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
@@ -22,7 +23,6 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const identity = ( value: string ) => value;
 

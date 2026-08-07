@@ -13,12 +13,12 @@ import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -27,8 +27,6 @@ import {
 	useLoaderCollector,
 	useRecentCommands,
 } from './use-recent-commands';
-
-const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 // Namespaces item ids to avoid collisions with other elements on the page.
 const ITEM_ID_PREFIX = 'command-palette-item-';
