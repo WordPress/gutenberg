@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Decode HTML entities when displaying attachment titles. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+
 ## 0.43.0 (2026-07-14)
 
 ### Enhancements
