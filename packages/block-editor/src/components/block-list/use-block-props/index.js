@@ -1,10 +1,12 @@
 import clsx from 'clsx';
-import { useContext } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
 import useMovingAnimation from '../../use-moving-animation';
+import { store as blockEditorStore } from '../../../store';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
@@ -64,6 +66,44 @@ import { useBlockVisibility } from '../../block-visibility/';
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
+/**
+ * Returns block props that insert a ghost block when the user enters it:
+ * the same block object the ghost has rendered from all along, so nothing
+ * about the element changes.
+ *
+ * @param {string}  rootClientId The block's root client ID.
+ * @param {?Object} ghostBlock   The ghost block object, while not inserted.
+ *
+ * @return {?Object} Props for the block element, while a ghost.
+ */
+export function useGhostMaterialize( rootClientId, ghostBlock ) {
+	const { insertBlocks } = useDispatch( blockEditorStore );
+	const materializedRef = useRef( false );
+
+	useEffect( () => {
+		materializedRef.current = false;
+	}, [ ghostBlock ] );
+
+	return useMemo( () => {
+		if ( ! ghostBlock ) {
+			return undefined;
+		}
+		function materialize() {
+			if ( materializedRef.current ) {
+				return;
+			}
+			materializedRef.current = true;
+			// Update the selection: the ghost is empty, so the caret can
+			// only be at its start, and the undo level records it.
+			insertBlocks( [ ghostBlock ], undefined, rootClientId, true, 0 );
+		}
+		return {
+			onPointerDownCapture: materialize,
+			onFocusCapture: materialize,
+		};
+	}, [ ghostBlock, rootClientId, insertBlocks ] );
+}
+
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const {
 		clientId,
@@ -97,8 +137,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		deviceType,
 		viewportSettings,
 		ariaLabel,
-		ghostProps,
+		ghostBlock,
+		rootClientId,
 	} = useContext( PrivateBlockContext );
+	const ghostProps = useGhostMaterialize( rootClientId, ghostBlock );
 
 	useRegisterBlockEventHandlers( clientId, wrapperProps );
 

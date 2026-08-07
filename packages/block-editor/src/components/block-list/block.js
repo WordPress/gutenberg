@@ -1,12 +1,5 @@
 import clsx from 'clsx';
-import {
-	memo,
-	RawHTML,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -22,7 +15,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
@@ -570,47 +563,8 @@ BlockListBlock = compose(
 // props are public API. To avoid adding to the public API, we use a private
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
-/**
- * Returns block props that insert a ghost block when the user enters it:
- * the same block object the ghost has rendered from all along, so nothing
- * about the element changes.
- *
- * @param {string}  rootClientId The block's root client ID.
- * @param {?Object} ghostBlock   The ghost block object, while not inserted.
- *
- * @return {?Object} Props for the block element, while a ghost.
- */
-function useGhostMaterialize( rootClientId, ghostBlock ) {
-	const { insertBlocks } = useDispatch( blockEditorStore );
-	const materializedRef = useRef( false );
-
-	useEffect( () => {
-		materializedRef.current = false;
-	}, [ ghostBlock ] );
-
-	return useMemo( () => {
-		if ( ! ghostBlock ) {
-			return undefined;
-		}
-		function materialize() {
-			if ( materializedRef.current ) {
-				return;
-			}
-			materializedRef.current = true;
-			// Update the selection: the ghost is empty, so the caret can
-			// only be at its start, and the undo level records it.
-			insertBlocks( [ ghostBlock ], undefined, rootClientId, true, 0 );
-		}
-		return {
-			onPointerDownCapture: materialize,
-			onFocusCapture: materialize,
-		};
-	}, [ ghostBlock, rootClientId, insertBlocks ] );
-}
-
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId, ghostBlock } = props;
-	const ghostProps = useGhostMaterialize( rootClientId, ghostBlock );
 	// Stable fallback so the selector returns referentially equal values.
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
@@ -902,7 +856,8 @@ function BlockListBlockProvider( props ) {
 
 	const privateContext = {
 		isPreviewMode,
-		ghostProps,
+		ghostBlock,
+		rootClientId,
 		ariaLabel:
 			ghostBlock && ghostBlock.clientId === clientId
 				? __( 'Add default block' )

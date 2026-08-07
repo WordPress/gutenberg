@@ -328,7 +328,7 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ shouldRenderAppender && (
+			{ shouldRenderAppender && ! showGhost && (
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }
