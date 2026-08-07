@@ -5,14 +5,6 @@ import styles from './style.module.css';
 
 /**
  * A component used to notify users that their action is being processed.
- *
- * ```jsx
- * import { Spinner } from '@wordpress/ui';
- *
- * function Example() {
- * 	return <Spinner />;
- * }
- * ```
  */
 export const Spinner = forwardRef< SVGSVGElement, SpinnerProps >(
 	function Spinner( { className, ...props }, ref ) {
