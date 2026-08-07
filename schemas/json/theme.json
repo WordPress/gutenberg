@@ -2165,21 +2165,6 @@
 				":visited"
 			]
 		},
-		"stylesElementsResponsiveSelectorsProperties": {
-			"description": "Responsive element states keyed by breakpoint name. Each breakpoint supports the same style properties as the default element state.",
-			"type": "object",
-			"properties": {
-				"@mobile": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				"@tablet": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				}
-			}
-		},
-		"stylesElementsResponsiveSelectorsPropertyNames": {
-			"enum": [ "@mobile", "@tablet" ]
-		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
@@ -2190,9 +2175,6 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
@@ -2201,9 +2183,6 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
@@ -2219,9 +2198,6 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
@@ -2230,9 +2206,6 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
@@ -2248,17 +2221,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2271,17 +2238,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2294,17 +2255,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2317,17 +2272,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2340,17 +2289,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2363,17 +2306,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2386,17 +2323,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2409,17 +2340,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2432,17 +2357,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2455,17 +2374,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2478,17 +2391,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
