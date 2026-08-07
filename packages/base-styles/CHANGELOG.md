@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead.
+
 ### Enhancements
 
 -   `input-control`: Use `outset-ring__focus` for focus styling.
