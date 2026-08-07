@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
@@ -23,6 +12,7 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	clearUnchangedEdits,
 	isNumericID,
 	normalizeQueryForResolution,
 	saveCRDTDoc,
@@ -212,12 +202,36 @@ export const getEntityRecord =
 								return;
 							}
 
+							const normalizedEdits = clearUnchangedEdits(
+								edits,
+								select.getRawEntityRecord( kind, name, key )
+							);
+							const currentEdits =
+								select.getEntityRecordEdits(
+									kind,
+									name,
+									key
+								) ?? {};
+							// An undefined normalized value is still meaningful when it
+							// clears an existing local edit.
+							const hasChangesToApply = Object.entries(
+								normalizedEdits
+							).some(
+								( [ property, value ] ) =>
+									undefined !== value ||
+									property in currentEdits
+							);
+
+							if ( ! hasChangesToApply ) {
+								return;
+							}
+
 							dispatch( {
 								type: 'EDIT_ENTITY_RECORD',
 								kind,
 								name,
 								recordId: key,
-								edits,
+								edits: normalizedEdits,
 								meta: {
 									undo: undefined,
 								},
