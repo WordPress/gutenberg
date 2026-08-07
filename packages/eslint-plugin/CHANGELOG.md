@@ -6,6 +6,8 @@
 
 -   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
 
+## 25.8.0 (2026-07-29)
+
 ## 25.7.0 (2026-07-14)
 
 ## 25.6.0 (2026-07-01)

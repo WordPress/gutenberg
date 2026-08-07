@@ -4,19 +4,30 @@
 
 ### Enhancements
 
--   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
 ### New Features
 
--   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
--   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu and the viewport state control in Global Styles when set to `false` ([#80814](https://github.com/WordPress/gutenberg/pull/80814)).
 -   Add a `blockStatesEditingEnabled` editor setting, defaulting to `true`, which hides state controls for blocks in the block inspector and Global Styles when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
 
 ### Bug Fixes
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
+
+## 14.52.0 (2026-07-29)
+
+### Enhancements
+
+-   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
+
+### New Features
+
+-   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
+-   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu and the viewport state control in Global Styles when set to `false` ([#80814](https://github.com/WordPress/gutenberg/pull/80814)).
+
+### Bug Fixes
+
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ### Internal
