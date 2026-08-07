@@ -34,12 +34,40 @@ transport rather than failing.
 | ------------------- | ------------------------------------ | ----------------------------------------------------------- |
 | `http-polling`      | `WP_HTTP_Polling_Sync_Server`        | `POST /wp-sync/v1/updates` on an interval. The default.     |
 | `http-long-polling` | `WP_HTTP_Long_Polling_Sync_Server`   | `POST /wp-sync/v1/long-poll`, held open until data is ready. |
+| `websocket`         | `WP_WebSocket_Sync_Transport` (+ daemon) | Push over a persistent socket. Lowest latency, needs a daemon. |
 
 Long-polling is short-polling with the request held open server-side until
 there is something to deliver (or a bounded wait budget elapses), so remote
 edits arrive promptly without tight client polling. Senders are never
 delayed. It costs one held PHP worker per active collaborator, so size worker
 pools accordingly (`wp_sync_long_poll_max_wait_ms` bounds the hold).
+
+### WebSocket
+
+The `websocket` transport is out of band: a long-running daemon
+(`WP_WebSocket_Sync_Server`) serves the socket, while the web process only
+registers a one-time token endpoint (`POST /wp-sync/v1/ws-token`) and
+announces the socket URL. Both the daemon and the REST transports drive
+rooms through the **same** engine seam
+(`WP_HTTP_Polling_Sync_Server::process_room_request`), so the engine
+comparison and behavior are identical across transports.
+
+Run the daemon (own supervisor, e.g. systemd):
+
+```bash
+wp collaboration sync-server --host=127.0.0.1 --port=8787
+```
+
+Auth per handshake: an allowed `Origin`, a valid `logged_in` cookie, and the
+one-time token (whose user must match the cookie). Configure the host/port
+with `WP_SYNC_WEBSOCKET_HOST` / `WP_SYNC_WEBSOCKET_PORT`. **Production must
+terminate TLS** and return a `wss://` URL via the `wp_sync_websocket_url`
+filter; the raw daemon speaks plain `ws://`.
+
+Live smoke (the daemon can't run in the wp-env e2e harness): start the
+daemon, set `WP_COLLABORATION_TRANSPORT=websocket`, ensure the socket URL is
+reachable from the browser, and open the same post in two windows — edits
+propagate over the socket.
 
 ## Adding a transport
 

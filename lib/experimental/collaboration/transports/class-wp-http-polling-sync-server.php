@@ -393,56 +393,137 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			);
 
 			foreach ( $rooms as $room_request ) {
-				$awareness = $room_request['awareness'];
-				$client_id = $room_request['client_id'];
-				$cursor    = $room_request['after'];
-				$room      = $room_request['room'];
-				$updates   = $room_request['updates'];
-
-				$engine = $this->engines->get_engine_for_room( $room );
-
-				$mismatch = $this->check_engine_mismatch( $engine, $room, $room_request, $updates );
-				if ( is_wp_error( $mismatch ) ) {
-					do_action( 'qm/debug', "wp-sync: engine mismatch for {$room} (client speaks another engine)" );
-					return $mismatch;
+				$room_response = $this->process_room_request( $room_request );
+				if ( is_wp_error( $room_response ) ) {
+					return $room_response;
 				}
-
-				// Merge awareness state.
-				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
-
-				$context = array(
-					'awareness' => $merged_awareness,
-					/*
-					 * Debug envelope opt-in: the client's inspector sets
-					 * `debug` per room; honored only when the site allows
-					 * it (room permission was already enforced by the
-					 * route). Engines that support it attach `_debug` to
-					 * their room response.
-					 */
-					'debug'     => ! empty( $room_request['debug'] ) && self::is_debug_allowed(),
-				);
-
-				// Engine ingests this client's updates.
-				$ingest = $engine->handle_updates( $room, $client_id, $cursor, $updates, $context );
-				if ( is_wp_error( $ingest ) ) {
-					return $ingest;
-				}
-
-				// Engine produces the catch-up payload for this client.
-				$room_response              = $engine->get_updates_since( $room, $client_id, $cursor, $context );
-				$room_response['awareness'] = $merged_awareness;
-
-				// Engines that produce per-update dispositions (e.g. an
-				// intent log's applied/escalated/voided outcomes) surface
-				// them; relay-style engines omit the key entirely.
-				if ( isset( $ingest['dispositions'] ) && null !== $ingest['dispositions'] ) {
-					$room_response['dispositions'] = $ingest['dispositions'];
-				}
-
 				$response['rooms'][] = $room_response;
 			}
 
 			return new WP_REST_Response( $response, 200 );
+		}
+
+		/**
+		 * Processes ONE room request through its engine and returns the room
+		 * response array (updates + awareness + optional dispositions). This
+		 * is the transport-agnostic core of a sync exchange: it decodes
+		 * nothing, delegating meaning to the engine. Both the REST transports
+		 * and the out-of-band WebSocket daemon drive rooms through here, so
+		 * every transport applies the same engine mismatch fencing, awareness
+		 * merge, ingest, and catch-up.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $room_request One room's request payload (after, awareness,
+		 *                            client_id, room, updates, and optional
+		 *                            engine/engine_protocol/debug).
+		 * @return array|WP_Error Room response, or WP_Error (engine mismatch / ingest error).
+		 */
+		public function process_room_request( array $room_request ) {
+			$awareness = $room_request['awareness'] ?? null;
+			$client_id = (int) $room_request['client_id'];
+			$cursor    = (int) $room_request['after'];
+			$room      = (string) $room_request['room'];
+			$updates   = $room_request['updates'] ?? array();
+
+			$engine = $this->engines->get_engine_for_room( $room );
+
+			$mismatch = $this->check_engine_mismatch( $engine, $room, $room_request, $updates );
+			if ( is_wp_error( $mismatch ) ) {
+				do_action( 'qm/debug', "wp-sync: engine mismatch for {$room} (client speaks another engine)" );
+				return $mismatch;
+			}
+
+			// Merge awareness state.
+			$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
+
+			$context = array(
+				'awareness' => $merged_awareness,
+				/*
+				 * Debug envelope opt-in: the client's inspector sets `debug`
+				 * per room; honored only when the site allows it (room
+				 * permission was already enforced by the transport). Engines
+				 * that support it attach `_debug` to their room response.
+				 */
+				'debug'     => ! empty( $room_request['debug'] ) && self::is_debug_allowed(),
+			);
+
+			// Engine ingests this client's updates.
+			$ingest = $engine->handle_updates( $room, $client_id, $cursor, $updates, $context );
+			if ( is_wp_error( $ingest ) ) {
+				return $ingest;
+			}
+
+			// Engine produces the catch-up payload for this client.
+			$room_response              = $engine->get_updates_since( $room, $client_id, $cursor, $context );
+			$room_response['awareness'] = $merged_awareness;
+
+			// Engines that produce per-update dispositions (an intent log's
+			// applied/escalated/voided outcomes) surface them; relay-style
+			// engines omit the key entirely.
+			if ( isset( $ingest['dispositions'] ) && null !== $ingest['dispositions'] ) {
+				$room_response['dispositions'] = $ingest['dispositions'];
+			}
+
+			return $room_response;
+		}
+
+		/**
+		 * The engine registry this transport drives rooms through (shared by
+		 * out-of-band transports such as the WebSocket daemon).
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return WP_Sync_Engine_Registry Engine registry.
+		 */
+		public function get_engine_registry(): WP_Sync_Engine_Registry {
+			return $this->engines;
+		}
+
+		/**
+		 * The storage backend (shared by out-of-band transports).
+		 *
+		 * @since 7.2.0
+		 *
+		 * @return WP_Sync_Storage Storage backend.
+		 */
+		public function get_storage(): WP_Sync_Storage {
+			return $this->storage;
+		}
+
+		/**
+		 * Per-room permission check for an array-shaped request (the REST
+		 * permission callback's engine-agnostic core), so out-of-band
+		 * transports enforce the same access rules.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return bool Whether the current user may sync the room.
+		 */
+		public function can_user_sync_room( string $room ): bool {
+			$parsed = WP_Sync_Config::parse_room( $room );
+			return null !== $parsed && WP_Sync_Config::can_user_sync_entity_type(
+				$parsed['entity_kind'],
+				$parsed['entity_name'],
+				$parsed['object_id']
+			);
+		}
+
+		/**
+		 * Merges (or, with a null update, removes) a client's awareness in a
+		 * room and returns the current awareness map. Exposed so out-of-band
+		 * transports can refresh presence and drop it on disconnect.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string     $room             Room identifier.
+		 * @param int        $client_id        Client identifier.
+		 * @param array|null $awareness_update Awareness state, or null to remove.
+		 * @return array Current awareness map.
+		 */
+		public function update_awareness( string $room, int $client_id, ?array $awareness_update ): array {
+			return $this->process_awareness_update( $room, $client_id, $awareness_update );
 		}
 
 		/**

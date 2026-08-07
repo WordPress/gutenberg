@@ -19,7 +19,14 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/transports/interface-wp-sync-transport.php';
 	require_once __DIR__ . '/transports/class-wp-http-polling-sync-server.php';
 	require_once __DIR__ . '/transports/class-wp-http-long-polling-sync-server.php';
+	require_once __DIR__ . '/transports/websocket/class-wp-websocket-token-controller.php';
+	require_once __DIR__ . '/transports/websocket/class-wp-websocket-connection.php';
+	require_once __DIR__ . '/transports/websocket/class-wp-websocket-sync-server.php';
+	require_once __DIR__ . '/transports/websocket/class-wp-websocket-sync-transport.php';
 	require_once __DIR__ . '/transports/class-wp-sync-transport-registry.php';
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		require_once __DIR__ . '/transports/websocket/class-wp-sync-server-cli-command.php';
+	}
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
 
@@ -452,6 +459,13 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		// Informational half of the intent-log actor id; the server stamps
 		// the authoritative value from the authenticated request.
 		'window._wpCollaborationUserId = ' . wp_json_encode( get_current_user_id() ) . ';' .
+		// The socket URL, so the websocket provider knows where to connect
+		// when it is the negotiated transport (empty otherwise).
+		'window._wpCollaborationWebSocketUrl = ' . wp_json_encode(
+			class_exists( 'WP_WebSocket_Sync_Transport' ) && in_array( 'websocket', $transport_registry->get_announced_slugs(), true )
+				? WP_WebSocket_Sync_Transport::get_socket_url()
+				: ''
+		) . ';' .
 		// UI hint only — restore/approval is enforced at ingest per the
 		// authoring user's capability regardless of what the client shows.
 		'window._wpCollaborationCanUnfilteredHtml = ' . wp_json_encode( current_user_can( 'unfiltered_html' ) ) . ';',

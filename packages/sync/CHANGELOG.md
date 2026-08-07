@@ -6,6 +6,7 @@
 
 -   Sync transports are now swappable. The client keeps a slug-keyed transport registry (filterable via `sync.transports`) and NEGOTIATES against the server's announced transport list — using the first announced slug it has registered whose protocol it implements — instead of assuming HTTP short-polling. Selection code is transport-agnostic; adding a transport is a sibling folder plus a registration.
 -   Add an HTTP long-polling transport (`http-long-polling`): the shared polling manager pointed at a held-open server route with an immediate re-issue cadence, so remote edits arrive promptly without tight polling.
+-   Add a WebSocket transport (`websocket`): a codec-driven push client (`providers/websocket/`) over a persistent socket served by a long-running PHP daemon (`WP_WebSocket_Sync_Server`, `wp collaboration sync-server`). Both the daemon and the REST transports drive rooms through the same `WP_Sync_Engine` seam, so engines stay swappable across transports.
 
 ### Bug Fixes
 

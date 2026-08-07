@@ -19,11 +19,15 @@ import {
 	YJS_RELAY_ENGINE_PROTOCOL,
 	YJS_RELAY_ENGINE_SLUG,
 } from '../engines';
-import { getProviderCreators } from '../providers';
+import {
+	getProviderCreators,
+	resetProviderCreatorsForTesting,
+} from '../providers';
 
 describe( 'sync engine adapters', () => {
 	afterEach( () => {
 		resetEngineAdaptersForTesting();
+		resetProviderCreatorsForTesting();
 		delete window._wpCollaborationSync;
 		delete window._wpCollaborationEnabled;
 	} );
@@ -126,15 +130,27 @@ describe( 'sync engine adapters', () => {
 	} );
 
 	describe( 'transport handshake in getProviderCreators', () => {
-		it( 'returns no providers when the announced transports exclude http-polling', () => {
+		it( 'returns no providers when no announced transport is registered', () => {
 			window._wpCollaborationEnabled = '1';
 			window._wpCollaborationSync = {
 				engine: YJS_RELAY_ENGINE_SLUG,
 				engineProtocol: YJS_RELAY_ENGINE_PROTOCOL,
-				transports: [ 'websocket' ],
+				// A transport this client has no provider for.
+				transports: [ 'carrier-pigeon' ],
 				transportProtocol: 1,
 			};
 			expect( getProviderCreators() ).toEqual( [] );
+		} );
+
+		it( 'negotiates a registered transport when one is announced', () => {
+			window._wpCollaborationEnabled = '1';
+			window._wpCollaborationSync = {
+				engine: YJS_RELAY_ENGINE_SLUG,
+				engineProtocol: YJS_RELAY_ENGINE_PROTOCOL,
+				transports: [ 'carrier-pigeon', 'http-polling' ],
+				transportProtocol: 1,
+			};
+			expect( getProviderCreators() ).toHaveLength( 1 );
 		} );
 	} );
 } );

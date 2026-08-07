@@ -747,6 +747,34 @@ inside intent payloads, not the transport.
   frame/txn state across request boundaries (1.3c), independent
   effect-model oracles (3.1), and the invasiveness cleanups (identity
   triplication, lockstep .d.ts, delayed re-push).
+- **Swappable transports — DONE (2d-xxv).** Transports (how updates move)
+  are now independently swappable from engines (what updates mean), selected
+  by ONE site config value (`wp_get_collaboration_transport()`:
+  `WP_COLLABORATION_TRANSPORT` constant / env / `wp_collaboration_transport`
+  filter, default `http-polling`) and organized as sibling classes under
+  `lib/experimental/collaboration/transports/` + sibling folders under
+  `packages/sync/src/providers/`. Server: `WP_Sync_Transport` interface +
+  `WP_Sync_Transport_Registry` (mirrors the engine registry), the bootstrap
+  registers every transport's routes and announces the available slugs
+  active-first. Client: a slug-keyed transport registry + real negotiation
+  (first announced slug it has registered whose protocol matches, else post
+  lock). Three transports: `http-polling` (default), `http-long-polling`
+  (the polling server held open on `/long-poll` until the engine has
+  something, peeked via `get_updates_since`; client reuses the polling
+  manager pointed at the held route — live-verified: config value flips the
+  announced list, client sends only to `/long-poll`), and `websocket` (a
+  ported PHP daemon `WP_WebSocket_Sync_Server` run via
+  `wp collaboration sync-server`, re-pointed off arch-decision's Yjs
+  `WP_Sync_Server_Core` onto OUR shared seam via a new
+  `WP_HTTP_Polling_Sync_Server::process_room_request` — so all transports
+  drive rooms through the same `WP_Sync_Engine`; the web process only
+  registers a one-time `/ws-token` route + announces the socket URL; a
+  codec-driven client provider replaces arch-decision's 800-line Yjs
+  manager). Daemon verified to bind live; full two-browser WS sync is a
+  documented live smoke (a daemon can't run in the wp-env e2e harness).
+  Tests: transport registry + config value, long-poll route/hold, WS
+  transport/token/url, client negotiation, ws manager (mock socket).
+
 - **Phase 3 — benchmark through the seam. STARTED (2d-xxiv).** A
   seam-native harness lives at `test/php/sync-engine-benchmarks/`: it drives
   the REAL `WP_Sync_Engine::handle_updates` / `get_updates_since` for both

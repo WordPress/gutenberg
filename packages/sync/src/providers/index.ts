@@ -11,6 +11,10 @@ import {
 	createHttpLongPollingProvider,
 	HTTP_LONG_POLLING_TRANSPORT_SLUG,
 } from './http-long-polling/http-long-polling-provider';
+import {
+	createWebSocketProvider,
+	WEBSOCKET_TRANSPORT_SLUG,
+} from './websocket/websocket-provider';
 import { getAnnouncedSync, HTTP_POLLING_TRANSPORT_SLUG } from '../engines';
 import type { ProviderCreator } from '../types';
 
@@ -48,6 +52,11 @@ function getDefaultTransports(): TransportRegistration[] {
 			slug: HTTP_LONG_POLLING_TRANSPORT_SLUG,
 			protocolVersion: 1,
 			create: createHttpLongPollingProvider,
+		},
+		{
+			slug: WEBSOCKET_TRANSPORT_SLUG,
+			protocolVersion: 1,
+			create: createWebSocketProvider,
 		},
 	];
 }

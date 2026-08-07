@@ -28,6 +28,7 @@ declare global {
 	interface Window {
 		_wpCollaborationEnabled?: string;
 		_wpCollaborationUserId?: number;
+		_wpCollaborationWebSocketUrl?: string;
 		_wpCollaborationSync?: {
 			engine?: string;
 			engineProtocol?: number;
