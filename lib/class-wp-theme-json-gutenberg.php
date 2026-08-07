@@ -3758,42 +3758,26 @@ class WP_Theme_JSON_Gutenberg {
 					// Handle any pseudo selectors for the element.
 					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-							// Create element pseudo node if default or any responsive breakpoint has the pseudo.
-							$has_element_pseudo = isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] );
-							if ( ! $has_element_pseudo ) {
-								foreach ( array_keys( $responsive_media_queries ) as $bp ) {
-									if ( isset( $theme_json['styles']['blocks'][ $name ][ $bp ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-										$has_element_pseudo = true;
-										break;
-									}
-								}
-							}
-
-							if ( $has_element_pseudo ) {
-								$element_pseudo_path = array( 'styles', 'blocks', $name, 'elements', $element );
-								if ( $include_node_paths_only ) {
-									$nodes[] = array(
-										'path' => $element_pseudo_path,
-									);
-									continue;
-								}
-
+							// Emit the default pseudo node only when the default state styles
+							// the pseudo. Otherwise get_styles_for_block() falls back to the
+							// element's base styles, outputting a rule the theme never defined.
+							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
 								$nodes[] = array(
-									'path'     => $element_pseudo_path,
+									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
 									'selector' => static::append_to_selector( $element_selector, $pseudo_selector ),
 								);
+							}
 
-								// Responsive element pseudo nodes: one node per breakpoint
-								// that has this pseudo state for this element.
-								// Cascade: a:hover{} → @media{a:hover{}}
-								foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
-									if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-										$nodes[] = array(
-											'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
-											'selector'    => static::append_to_selector( $element_selector, $pseudo_selector ),
-											'media_query' => $responsive_media_queries[ $breakpoint ],
-										);
-									}
+							// Responsive element pseudo nodes: one node per breakpoint
+							// that has this pseudo state for this element.
+							// Cascade: a:hover{} → @media{a:hover{}}
+							foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+									$nodes[] = array(
+										'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
+										'selector'    => static::append_to_selector( $element_selector, $pseudo_selector ),
+										'media_query' => $responsive_media_queries[ $breakpoint ],
+									);
 								}
 							}
 						}
