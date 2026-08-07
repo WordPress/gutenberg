@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
