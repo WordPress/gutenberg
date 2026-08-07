@@ -114,7 +114,6 @@ export function setSettings( dateSettings: DateSettings ) {
 				.longDateFormat( 'LTS' ) === null
 		) {
 			// Delete the misconfigured locale.
-			// @ts-ignore Type definitions are incorrect - null is permitted.
 			momentLib.defineLocale( dateSettings.l10n.locale, null );
 		} else {
 			// We have a properly configured locale, so no need to create one.

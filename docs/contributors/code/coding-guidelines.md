@@ -80,7 +80,7 @@ While the [staged process](https://tc39.es/process-document/) for introducing a 
 
 In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) to enable us to create modular code with clear separations between code of a specific feature, code shared across distinct WordPress features, and third-party dependencies.
 
-These separations are identified by multi-line comments at the top of a file which imports code from another file or source.
+Imports can reference third-party packages, WordPress packages, or local files.
 
 #### External dependencies
 
@@ -89,9 +89,6 @@ An external dependency is third-party code that is not maintained by WordPress c
 Example:
 
 ```js
-/**
- * External dependencies
- */
 import moment from 'moment';
 ```
 
@@ -102,9 +99,6 @@ To encourage reusability between features, our JavaScript is split into domain-s
 Example:
 
 ```js
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 ```
 
@@ -115,9 +109,6 @@ Within a specific feature, code is organized into separate files and folders. As
 Example:
 
 ```js
-/**
- * Internal dependencies
- */
 import VisualEditor from '../visual-editor';
 ```
 

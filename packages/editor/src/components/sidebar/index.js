@@ -6,12 +6,11 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useContext } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
+import { Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -34,23 +33,46 @@ import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { Tabs } = unlock( componentsPrivateApis );
-
 const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
-const SidebarContent = ( {
-	tabName,
-	keyboardShortcut,
-	onActionPerformed,
-	extraPanels,
-} ) => {
-	// Because `PluginSidebar` renders a `ComplementaryArea`, we
-	// need to forward the `Tabs` context so it can be passed through the
-	// underlying slot/fill.
-	const tabsContextValue = useContext( Tabs.Context );
-	const isRevisionsMode = useSelect( ( select ) => {
-		return unlock( select( editorStore ) ).isRevisionsMode();
-	} );
+function Sidebar( { extraPanels, onActionPerformed } ) {
+	useAutoSwitchEditorSidebars();
+
+	const { tabName, keyboardShortcut, isRevisionsMode } = useSelect(
+		( select ) => {
+			const shortcut = select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
+			const _isEditorSidebarOpened = [
+				sidebars.block,
+				sidebars.document,
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = select( blockEditorStore ).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document;
+			}
+
+			return {
+				tabName: _tabName,
+				keyboardShortcut: shortcut,
+				isRevisionsMode: unlock(
+					select( editorStore )
+				).isRevisionsMode(),
+			};
+		},
+		[]
+	);
+
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
+	function onTabSelect( newSelectedTabId ) {
+		enableComplementaryArea( 'core', newSelectedTabId );
+	}
 
 	let tabContent;
 	if ( isRevisionsMode ) {
@@ -82,15 +104,8 @@ const SidebarContent = ( {
 	return (
 		<PluginSidebar
 			identifier={ tabName }
-			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader />
-				</Tabs.Context.Provider>
-			}
+			header={ <SidebarHeader /> }
 			closeLabel={ __( 'Close Settings' ) }
-			// This classname is added so we can apply a corrective negative
-			// margin to the panel.
-			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 			className="editor-sidebar__panel"
 			headerClassName="editor-sidebar__panel-tabs"
 			title={
@@ -100,71 +115,21 @@ const SidebarContent = ( {
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			// Makes `Tabs.Root` the container, so the tab list passed as
+			// `header` and the panels below share a subtree across the fill.
+			render={
+				<Tabs.Root value={ tabName } onValueChange={ onTabSelect } />
+			}
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ tabContent }
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-					{ isRevisionsMode && <RevisionBlockDiffPanel /> }
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
+			<Tabs.Panel value={ sidebars.document } tabIndex={ -1 }>
+				{ tabContent }
+			</Tabs.Panel>
+			<Tabs.Panel value={ sidebars.block } tabIndex={ -1 }>
+				<BlockInspector />
+				{ isRevisionsMode && <RevisionBlockDiffPanel /> }
+			</Tabs.Panel>
 		</PluginSidebar>
 	);
-};
-
-const Sidebar = ( { extraPanels, onActionPerformed } ) => {
-	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut } = useSelect( ( select ) => {
-		const shortcut = select(
-			keyboardShortcutsStore
-		).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
-
-		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
-		const _isEditorSidebarOpened = [
-			sidebars.block,
-			sidebars.document,
-		].includes( sidebar );
-		let _tabName = sidebar;
-		if ( ! _isEditorSidebarOpened ) {
-			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? sidebars.block
-				: sidebars.document;
-		}
-
-		return {
-			tabName: _tabName,
-			keyboardShortcut: shortcut,
-		};
-	}, [] );
-
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	const onTabSelect = useCallback(
-		( newSelectedTabId ) => {
-			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( 'core', newSelectedTabId );
-			}
-		},
-		[ enableComplementaryArea ]
-	);
-
-	return (
-		<Tabs
-			selectedTabId={ tabName }
-			onSelect={ onTabSelect }
-			selectOnMove={ false }
-		>
-			<SidebarContent
-				tabName={ tabName }
-				keyboardShortcut={ keyboardShortcut }
-				onActionPerformed={ onActionPerformed }
-				extraPanels={ extraPanels }
-			/>
-		</Tabs>
-	);
-};
+}
 
 export default Sidebar;

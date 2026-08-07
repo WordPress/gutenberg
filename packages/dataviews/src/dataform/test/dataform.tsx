@@ -189,6 +189,98 @@ describe( 'DataForm component', () => {
 			expect( priceInput ).toHaveValue( 3.75 );
 		} );
 
+		it( 'should edit time fields with a time input', async () => {
+			const onChange = jest.fn();
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+				},
+			];
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime: '14:30' } }
+				/>
+			);
+
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveAttribute( 'type', 'time' );
+			expect( timeInput ).toHaveValue( '14:30' );
+
+			const user = userEvent.setup();
+			await user.clear( timeInput );
+			await user.type( timeInput, '18:45' );
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				startTime: '18:45',
+			} );
+		} );
+
+		it( 'should constrain the time input to the field min, max and format', () => {
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+					format: { time: 'H:i:s' },
+					isValid: { min: '09:00', max: '17:00' },
+				},
+			];
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime: '14:30' } }
+				/>
+			);
+
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveAttribute( 'min', '09:00' );
+			expect( timeInput ).toHaveAttribute( 'max', '17:00' );
+			// Seconds in the format make the input offer a seconds field.
+			expect( timeInput ).toHaveAttribute( 'step', '1' );
+		} );
+
+		it( 'should normalize tolerated time values for the time input', () => {
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+				},
+			];
+			const renderWithValue = ( startTime: string ) => (
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime } }
+				/>
+			);
+			const { rerender } = render( renderWithValue( '9:30' ) );
+
+			// `input[type=time]` accepts only zero-padded `HH:mm[:ss]`.
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveValue( '09:30' );
+
+			rerender( renderWithValue( '14:30Z' ) );
+			expect( timeInput ).toHaveValue( '14:30' );
+
+			// A value carrying seconds gets a seconds field even when the
+			// format does not ask for them.
+			rerender( renderWithValue( '14:30:45' ) );
+			expect( timeInput ).toHaveValue( '14:30:45' );
+			expect( timeInput ).toHaveAttribute( 'step', '1' );
+		} );
+
 		it( 'should render combined fields correctly', async () => {
 			const formWithCombinedFields = {
 				fields: [

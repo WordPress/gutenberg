@@ -302,6 +302,27 @@
 	}
 }
 
+// Only when the view configures `layout.aspectRatio` (the table then carries
+// the `has-media-aspect-ratio` modifier): the preview box takes a fixed
+// height while the configured ratio sets its width, keeping rows uniform.
+// Sized on the wrapper rather than the img so custom media field renders are
+// covered too; ratios wider than ~17/9 at this height are clipped by the base
+// rule's `max-width` rather than allowed to crowd out the title. Views
+// without `aspectRatio` keep the base sizing above, unchanged.
+.dataviews-view-table.has-media-aspect-ratio .dataviews-column-primary__media {
+	height: var(--wpds-dimension-size-md);
+	aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
+	// Release the base rule's `min-width`: it equals the fixed height, so for
+	// ratios narrower than 1/1 the ratio-derived width would fall below it
+	// and the minimum would win, forcing the box back to a square.
+	min-width: 0;
+
+	img {
+		width: 100%;
+		height: 100%;
+	}
+}
+
 .dataviews-view-table__cell-content-wrapper,
 .dataviews-view-table__primary-column-content {
 	&:not(.dataviews-column-primary__media) {

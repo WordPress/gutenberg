@@ -32,9 +32,9 @@ test.describe( 'Settings', () => {
 		);
 
 		await admin.visitAdminPage( 'options-general.php' );
-		await page
-			.getByRole( 'textbox', { name: 'Tagline' } )
-			.fill( 'Just another Gutenberg site' );
+		const taglineField = page.getByRole( 'textbox', { name: 'Tagline' } );
+		const originalTagline = await taglineField.inputValue();
+		await taglineField.fill( 'Just another Gutenberg site' );
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 
 		const optionsAfter = await getOptionsValues(
@@ -48,5 +48,11 @@ test.describe( 'Settings', () => {
 			const optionAfter = [ id, optionsAfter[ id ] ];
 			expect( optionAfter ).toStrictEqual( optionBefore );
 		} );
+
+		// Restore the tagline: other tests render it through the site
+		// tagline block, and the changed value would leak into them.
+		await admin.visitAdminPage( 'options-general.php' );
+		await taglineField.fill( originalTagline );
+		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 	} );
 } );

@@ -15,7 +15,6 @@ const {
 } = require( '../lib/milestone' );
 const { log, warn, formats } = require( '../lib/logger' );
 const config = require( '../config' );
-// @ts-ignore
 const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';

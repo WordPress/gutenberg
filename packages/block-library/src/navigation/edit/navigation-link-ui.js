@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,20 +18,35 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-submenu',
 ];
 
-export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
+export function NavigationLinkUI( {
+	insertedBlockClientId,
+	setInsertedBlockClientId,
+} ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-		insertedBlock?.name
+	const { insertedBlockName, insertedBlockAttributes } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+
+			return {
+				insertedBlockName: getBlockName( insertedBlockClientId ),
+				insertedBlockAttributes: getBlockAttributes(
+					insertedBlockClientId
+				),
+			};
+		},
+		[ insertedBlockClientId ]
 	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
-	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	const showLinkControls =
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
 
 	// Get binding utilities for the inserted block
 	const { createBinding, clearBinding } = useEntityBinding( {
-		clientId: insertedBlock?.clientId,
-		attributes: insertedBlock?.attributes || {},
+		clientId: insertedBlockClientId,
+		attributes: insertedBlockAttributes || {},
 	} );
 
 	if ( ! showLinkControls ) {
@@ -51,12 +66,12 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 
 		// Follows the exact same pattern as Navigation Link block's onClose handler
 		// If there is no URL then remove the auto-inserted block to avoid empty blocks
-		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+		if ( ! insertedBlockAttributes?.url && insertedBlockClientId ) {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-		setInsertedBlock( null );
+		setInsertedBlockClientId( null );
 	};
 
 	const setInsertedBlockAttributes =
@@ -75,16 +90,16 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 
 		// If we have an existing inserted block and a new block is being set,
 		// remove the original block to avoid duplicates
-		if ( insertedBlock?.clientId && newBlock ) {
-			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		if ( insertedBlockClientId && newBlock ) {
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-		setInsertedBlock( newBlock );
+		setInsertedBlockClientId( newBlock?.clientId ?? null );
 	};
 
 	return (
 		<LinkUI
-			clientId={ insertedBlock?.clientId }
-			link={ insertedBlock?.attributes }
+			clientId={ insertedBlockClientId }
+			link={ insertedBlockAttributes }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function
@@ -95,8 +110,8 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 				const { isEntityLink, attributes: updatedAttributes } =
 					updateAttributes(
 						updatedValue,
-						setInsertedBlockAttributes( insertedBlock?.clientId ),
-						insertedBlock?.attributes
+						setInsertedBlockAttributes( insertedBlockClientId ),
+						insertedBlockAttributes
 					);
 
 				// Handle URL binding based on the final computed state
@@ -108,7 +123,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 					clearBinding();
 				}
 
-				setInsertedBlock( null );
+				setInsertedBlockClientId( null );
 			} }
 		/>
 	);

@@ -4,7 +4,13 @@
 
 ### Enhancements
 
+-   Add the `inlineImage` icon. ([#81271](https://github.com/WordPress/gutenberg/pull/81271))
 -   Add the `playlistTrack` icon. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
+
+## 15.3.0 (2026-07-29)
+
+### Enhancements
+
 -   Normalize `keyboard-close`, `offline`, and `wordpress` to use the standard `viewBox="0 0 24 24"`. ([#80273](https://github.com/WordPress/gutenberg/pull/80273))
 
 ## 15.2.0 (2026-07-14)
