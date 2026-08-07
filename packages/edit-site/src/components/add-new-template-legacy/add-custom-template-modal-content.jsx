@@ -2,8 +2,6 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	Flex,
-	FlexItem,
 	SearchControl,
 	TextHighlight,
 	Composite,
@@ -94,7 +92,7 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 		// Update suggestions only when the query has resolved, so as to keep
 		// the previous results in the UI.
 		setSuggestions( newSuggestions );
-	}, [ searchResults, searchHasResolved ] );
+	}, [ searchResults, searchHasResolved, config.recordNamePath ] );
 	return suggestions;
 }
 
@@ -169,7 +167,7 @@ function AddCustomTemplateModalContent( {
 			);
 			firstFocusable?.focus();
 		}
-	}, [ showSearchEntities ] );
+	}, [ containerRef, showSearchEntities ] );
 
 	return (
 		<Stack
@@ -185,14 +183,13 @@ function AddCustomTemplateModalContent( {
 							'Select whether to create a single template for all items or a specific one.'
 						) }
 					</Text>
-					<Flex
+					<Stack
 						className="edit-site-custom-template-modal__contents"
-						gap="4"
-						align="initial"
+						direction="row"
+						gap="md"
 					>
-						<FlexItem
-							isBlock
-							as={ Button }
+						<Button
+							__next40pxDefaultSize
 							onClick={ () => {
 								const {
 									slug,
@@ -217,10 +214,9 @@ function AddCustomTemplateModalContent( {
 									__( 'For all items' )
 								}
 							</Text>
-						</FlexItem>
-						<FlexItem
-							isBlock
-							as={ Button }
+						</Button>
+						<Button
+							__next40pxDefaultSize
 							onClick={ () => {
 								setShowSearchEntities( true );
 							} }
@@ -234,9 +230,9 @@ function AddCustomTemplateModalContent( {
 									__( 'For a specific item' )
 								}
 							</Text>
-						</FlexItem>
-					</Flex>
-					<Flex justify="right">
+						</Button>
+					</Stack>
+					<Stack direction="row" justify="flex-end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -244,7 +240,7 @@ function AddCustomTemplateModalContent( {
 						>
 							{ __( 'Back' ) }
 						</Button>
-					</Flex>
+					</Stack>
 				</>
 			) }
 			{ showSearchEntities && (
@@ -258,7 +254,7 @@ function AddCustomTemplateModalContent( {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-					<Flex justify="right">
+					<Stack direction="row" justify="flex-end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -274,7 +270,7 @@ function AddCustomTemplateModalContent( {
 						>
 							{ __( 'Back' ) }
 						</Button>
-					</Flex>
+					</Stack>
 				</>
 			) }
 		</Stack>

@@ -1,16 +1,9 @@
 import clsx from 'clsx';
-import {
-	Button,
-	Modal,
-	__experimentalGrid as Grid,
-	Flex,
-	Icon as WCIcon,
-} from '@wordpress/components';
+import { Button, Modal, Icon as WCIcon } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useViewportMatch } from '@wordpress/compose';
 import {
 	archive,
 	blockMeta,
@@ -101,9 +94,9 @@ function TemplateListItem( {
 			label={ description }
 			showTooltip={ !! description }
 		>
-			<Flex
-				as="span"
-				spacing={ 2 }
+			<Stack
+				render={ <span /> }
+				gap="sm"
 				align="center"
 				justify="center"
 				style={ { width: '100%' } }
@@ -125,7 +118,7 @@ function TemplateListItem( {
 					</Text>
 					{ children }
 				</Stack>
-			</Flex>
+			</Stack>
 		</Button>
 	);
 }
@@ -153,7 +146,6 @@ function NewTemplateModal( { onClose } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const containerRef = useRef( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const homeUrl = useSelect( ( select ) => {
 		// Site index.
@@ -272,18 +264,12 @@ function NewTemplateModal( { onClose } ) {
 			ref={ containerRef }
 		>
 			{ modalContent === modalContentMap.templatesList && (
-				<Grid
-					columns={ isMobile ? 2 : 3 }
-					gap={ 4 }
-					align="flex-start"
-					justify="center"
-					className="edit-site-add-new-template__template-list__contents"
-				>
-					<Flex className="edit-site-add-new-template__template-list__prompt">
+				<div className="edit-site-add-new-template__template-list__contents">
+					<Stack className="edit-site-add-new-template__template-list__prompt">
 						{ __(
 							'Select what the new template should apply to:'
 						) }
-					</Flex>
+					</Stack>
 					{ missingTemplates.map( ( template ) => {
 						const { title, slug, onClick } = template;
 						return (
@@ -321,7 +307,7 @@ function NewTemplateModal( { onClose } ) {
 							) }
 						</Text>
 					</TemplateListItem>
-				</Grid>
+				</div>
 			) }
 			{ modalContent === modalContentMap.customTemplate && (
 				<AddCustomTemplateModalContent

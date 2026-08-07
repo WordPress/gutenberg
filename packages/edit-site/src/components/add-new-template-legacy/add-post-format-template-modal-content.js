@@ -1,16 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, __experimentalGrid as Grid } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { usePostFormatMenuItems } from './utils';
 
 function AddPostFormatTemplateModalContent( {
@@ -18,7 +10,6 @@ function AddPostFormatTemplateModalContent( {
 	onBack,
 	containerRef,
 } ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
 	const { availableFormats: postFormats } = usePostFormatMenuItems();
 
 	// Focus the first focusable element when the component mounts.
@@ -43,13 +34,7 @@ function AddPostFormatTemplateModalContent( {
 					'Select the post format to create an archive template for:'
 				) }
 			</Text>
-			<Grid
-				columns={ isMobile ? 2 : 3 }
-				gap={ 4 }
-				align="flex-start"
-				justify="center"
-				className="edit-site-custom-template-modal__contents"
-			>
+			<div className="edit-site-custom-template-modal__contents">
 				{ postFormats.map( ( format ) => (
 					<Button
 						__next40pxDefaultSize
@@ -64,7 +49,7 @@ function AddPostFormatTemplateModalContent( {
 						) }
 					</Button>
 				) ) }
-			</Grid>
+			</div>
 			<Stack direction="row" justify="flex-end">
 				<Button
 					__next40pxDefaultSize

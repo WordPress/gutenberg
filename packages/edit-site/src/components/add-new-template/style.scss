@@ -1,3 +1,4 @@
+/* This file intentionally covers both add-new-template and add-new-template-legacy. */
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -121,9 +122,13 @@
 	}
 
 	.edit-site-add-new-template__custom-template-button {
+		> span {
+			justify-content: flex-start !important;
+		}
+
 		.edit-site-add-new-template__template-name {
 			flex-grow: 1;
-			align-items: flex-start;
+			align-items: flex-start !important;
 		}
 	}
 
@@ -138,6 +143,15 @@
 
 .edit-site-custom-template-modal__contents,
 .edit-site-add-new-template__template-list__contents {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $grid-unit-20;
+	align-items: flex-start;
+
+	@include break-medium() {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
 	> .components-button {
 		padding: $grid-unit-40;
 		display: flex;
