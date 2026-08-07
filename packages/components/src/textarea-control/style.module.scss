@@ -1,11 +1,5 @@
 @use "@wordpress/base-styles/mixins" as *;
 
 .textarea {
-	&:focus {
-		@include outset-ring__focus();
-
-		// Neutralize wp-admin forms.css focus styles.
-		border-color: var(--wpds-color-stroke-interactive-neutral);
-		box-shadow: none;
-	}
+	@include input-control;
 }
