@@ -273,19 +273,9 @@ export default function BorderPanel( {
 		// the most specific origin when more than one defines the same shadow
 		// value — a newly added custom preset starts out identical to the
 		// `natural` default one, and it is the custom slug the user means.
-		const preset = shadowPresets.findLast(
+		const slug = shadowPresets.findLast(
 			( { shadow: shadowName } ) => shadowName === newValue
-		);
-		// Only the most specific definition of a slug becomes a CSS variable.
-		// When another origin redefines this one with a different value,
-		// referencing it would render a shadow the user did not pick, so the
-		// value is kept as it is.
-		const isRedefined =
-			preset &&
-			shadowPresets.findLast(
-				( { slug: presetSlug } ) => presetSlug === preset.slug
-			) !== preset;
-		const slug = isRedefined ? undefined : preset?.slug;
+		)?.slug;
 
 		onChange(
 			setImmutably(

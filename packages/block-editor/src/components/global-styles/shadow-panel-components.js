@@ -248,11 +248,22 @@ export function useShadowPresets( settings ) {
 			custom: customShadows,
 		} = settings?.shadow?.presets ?? {};
 
-		const shadowPresets = [
+		const allPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
 			...( customShadows || EMPTY_ARRAY ),
 		];
+
+		// More than one origin can define the same slug, but only the most
+		// specific definition is output as a CSS variable. Keeping the ones it
+		// overrides would offer swatches that apply a different shadow than
+		// the one they show.
+		const shadowPresets = allPresets.filter(
+			( preset, index ) =>
+				allPresets.findLastIndex(
+					( { slug } ) => slug === preset.slug
+				) === index
+		);
 
 		return shadowPresets.length ? shadowPresets : EMPTY_ARRAY;
 	}, [ settings ] );

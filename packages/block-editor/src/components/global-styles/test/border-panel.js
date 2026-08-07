@@ -589,7 +589,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 		} );
 	} );
 
-	it( 'keeps the value when another origin redefines the matching slug', async () => {
+	it( 'offers only the most specific preset when a slug is defined twice', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
@@ -618,17 +618,21 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 			/>
 		);
 
-		await selectShadowPreset( user, 'Theme shadow' );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Drop shadow' } )
+		);
 
 		// `--wp--preset--shadow--shadow-1` holds the custom preset's value, so
-		// referencing the slug would render the shadow the user did not click.
+		// offering the theme one would show a shadow it cannot apply.
+		expect(
+			screen.queryByRole( 'option', { name: 'Theme shadow' } )
+		).not.toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'option', { name: 'Shadow 1' } ) );
+
 		expect( onChange ).toHaveBeenCalledWith( {
-			shadow: themeShadowOne.shadow,
+			shadow: 'var:preset|shadow|shadow-1',
 		} );
-		// `ShadowPresets` keys the list on the slug, so rendering both
-		// definitions warns. That is a separate, pre-existing problem with
-		// showing two indistinguishable swatches.
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'references the most specific origin when two presets share a value', async () => {
