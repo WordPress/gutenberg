@@ -263,7 +263,13 @@ blocks without an html/rich-text-source attribute ride the ATTR lane, not
 the codec field lane, and their save() can re-emit the attr as raw markup
 client-side — core/html `content` is the canonical case. Plain text
 payloads (field text) are entity-encoded by the serializer and always
-safe. The parked proposal
+safe. The soundness of attr judgment RESTS on attrs being register
+writes: every `set_attr` carries the complete new value, so a protected
+value cannot be composed from individually-benign edits (a benign
+"[script]…" attr later bracket-swapped to "<script>…" is judged — and
+parked — on the swap's full bytes). If attr strings ever gain a delta
+lane, each delta must be judged against the RESULTING value, not the
+delta's own bytes. The parked proposal
 uses the ordinary proposal row shape, so replay, retention, resolution, and
 review UI apply unchanged — and a restore re-authors the content as new
 intents under the RESTORER's capability, which is what makes restore-by-a-

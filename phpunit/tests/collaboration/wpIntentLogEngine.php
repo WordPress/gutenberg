@@ -1257,6 +1257,91 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$this->assertSame( 'applied', $benign['dispositions'][0]['status'] );
 	}
 
+	public function test_attr_value_transitions_are_judged_whole_not_as_deltas() {
+		$this->revoke_unfiltered_html();
+
+		// A "near-script" is kses-clean text: it applies for anyone.
+		$near = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-t1',
+						'baseSeq'  => 0,
+						'type'     => 'insert_block',
+						'payload'  => array(
+							'block'          => array(
+								'syncId'    => 'kses-t-nb',
+								'blockType' => 'core/html',
+								'attrs'     => array(
+									'content' => '[script]alert(1);[/script]',
+								),
+							),
+							'parentId'       => null,
+							'afterSiblingId' => self::paragraph_id(),
+						),
+					)
+				),
+			)
+		);
+		$this->assertSame( 'applied', $near['dispositions'][0]['status'] );
+
+		/*
+		 * Another (filtered) user swaps the square brackets for angle
+		 * brackets. Attr writes are register writes carrying the COMPLETE
+		 * new value — there is no delta lane for attrs — so the edit is
+		 * judged on its full bytes and parks, even though every prior
+		 * state of the attr was benign.
+		 */
+		$swapped = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-t2',
+						'baseSeq'  => 1,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => 'kses-t-nb',
+							'key'             => 'content',
+							'value'           => '<script>alert(1);</script>',
+							'observedVersion' => 0,
+						),
+					)
+				),
+			),
+			array( 'client_id' => 202 )
+		);
+		$this->assertSame( 'escalated', $swapped['dispositions'][0]['status'] );
+		$this->assertSame( 'requires-approval', $swapped['dispositions'][0]['reason'] );
+
+		// The document still holds the benign value.
+		$engine  = new WP_Intent_Log_Engine( new WP_Sync_Post_Meta_Storage() );
+		$content = (string) $engine->materialize( $this->room() );
+		$this->assertStringContainsString( '[script]alert(1);[/script]', $content );
+		$this->assertStringNotContainsString( '<script>alert(1);</script>', $content );
+
+		// Even a PARTIAL bracket swap parks: kses alters incomplete
+		// tag-like fragments too, and any alteration means protected.
+		$partial = $this->poll(
+			array(
+				self::intent_update(
+					array(
+						'intentId' => 'kses-t3',
+						'baseSeq'  => 1,
+						'type'     => 'set_attr',
+						'payload'  => array(
+							'syncId'          => 'kses-t-nb',
+							'key'             => 'content',
+							'value'           => '<script]alert(1);[/script]',
+							'observedVersion' => 0,
+						),
+					)
+				),
+			),
+			array( 'client_id' => 303 )
+		);
+		$this->assertSame( 'escalated', $partial['dispositions'][0]['status'] );
+	}
+
 	public function test_block_names_outside_the_grammar_are_rejected_for_everyone() {
 		// Block names materialize into comment delimiters unescaped; a
 		// crafted name could close the comment and inject markup.
