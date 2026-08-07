@@ -760,6 +760,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showContentSizeControl && (
 				<InheritanceToolsPanelItem
+					stylePath="layout.contentSize"
 					{ ...inheritanceProps(
 						isContentSizePlaceholder,
 						hasUserSetContentSizeValue() &&
@@ -806,6 +807,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showWideSizeControl && (
 				<InheritanceToolsPanelItem
+					stylePath="layout.wideSize"
 					{ ...inheritanceProps(
 						isWideSizePlaceholder,
 						hasUserSetWideSizeValue() &&
@@ -849,6 +851,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showPaddingControl && (
 				<InheritanceToolsPanelItem
+					stylePath="spacing.padding"
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
@@ -903,6 +906,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showMarginControl && (
 				<InheritanceToolsPanelItem
+					stylePath="spacing.margin"
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
@@ -966,6 +970,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showGapControl && (
 				<InheritanceToolsPanelItem
+					stylePath="spacing.blockGap"
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
 					hasInlineEndToggle={ isAxialGap }
@@ -1042,6 +1047,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showMinHeightControl && (
 				<InheritanceToolsPanelItem
+					stylePath="dimensions.minHeight"
 					{ ...inheritanceProps(
 						isMinHeightPlaceholder,
 						hasMinHeightValue() &&
@@ -1077,6 +1083,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showMinWidthControl && (
 				<InheritanceToolsPanelItem
+					stylePath="dimensions.minWidth"
 					{ ...inheritanceProps(
 						isMinWidthPlaceholder,
 						hasMinWidthValue() &&
@@ -1111,6 +1118,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showHeightControl && (
 				<InheritanceToolsPanelItem
+					stylePath="dimensions.height"
 					{ ...inheritanceProps(
 						isHeightPlaceholder,
 						hasHeightValue() && inheritedHeightValue !== undefined
@@ -1138,6 +1146,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showWidthControl && (
 				<InheritanceToolsPanelItem
+					stylePath="dimensions.width"
 					{ ...inheritanceProps(
 						isWidthPlaceholder,
 						hasWidthValue() && inheritedWidthValue !== undefined

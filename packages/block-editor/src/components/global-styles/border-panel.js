@@ -391,6 +391,7 @@ export default function BorderPanel( {
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
 				<InheritanceToolsPanelItem
+					stylePath="border"
 					{ ...inheritanceProps(
 						isBorderPlaceholder,
 						isDefinedBorder( value?.border ) &&
@@ -440,6 +441,7 @@ export default function BorderPanel( {
 			) }
 			{ showBorderRadius && (
 				<InheritanceToolsPanelItem
+					stylePath="border.radius"
 					{ ...inheritanceProps(
 						isBorderRadiusPlaceholder,
 						hasBorderRadius() && inheritedBorderRadius !== undefined
@@ -462,6 +464,7 @@ export default function BorderPanel( {
 			) }
 			{ hasShadowControl && (
 				<InheritanceToolsPanelItem
+					stylePath="shadow"
 					{ ...inheritanceProps(
 						isShadowPlaceholder,
 						hasShadow() && inheritedShadow !== undefined

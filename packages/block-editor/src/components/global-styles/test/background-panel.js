@@ -252,7 +252,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			expect(
 				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} ).length
 			).toBeGreaterThanOrEqual( 1 );
 		} );
@@ -316,7 +316,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
+					name: /where does/i,
 				} )
 			).toBeInTheDocument();
 		} );

@@ -537,7 +537,10 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots blockName={ blockName } />
+						<StyleInspectorSlots
+							blockName={ blockName }
+							clientId={ renderedBlockClientId }
+						/>
 					) }
 				</>
 			) }

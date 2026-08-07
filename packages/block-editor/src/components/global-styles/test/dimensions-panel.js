@@ -147,7 +147,7 @@ function renderPanel( props ) {
 function expectLocalOverride() {
 	expect(
 		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
+			name: /where does/i,
 		} )
 	).toBeInTheDocument();
 }
@@ -198,7 +198,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				includeLayoutControls: true,
 			} );
 
-			const contentInput = screen.getByLabelText( /content width/i );
+			const contentInput = screen.getByRole( 'spinbutton', {
+				name: /content width/i,
+			} );
 			// The inherited value is rendered as the control value (so the
 			// unit parses from it) and marked at-rest, with only the numeric
 			// portion echoed as the placeholder; the raw unit must not leak in.
@@ -218,7 +220,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				includeLayoutControls: true,
 			} );
 
-			const contentInput = screen.getByLabelText( /content width/i );
+			const contentInput = screen.getByRole( 'spinbutton', {
+				name: /content width/i,
+			} );
 			expect( contentInput ).toHaveValue( 900 );
 			expect( contentInput ).not.toHaveAttribute( 'placeholder' );
 		} );
@@ -234,11 +238,15 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			} );
 
 			// contentSize: locally-set, no placeholder.
-			const contentInput = screen.getByLabelText( /content width/i );
+			const contentInput = screen.getByRole( 'spinbutton', {
+				name: /content width/i,
+			} );
 			expect( contentInput ).toHaveValue( 900 );
 
 			// wideSize: not locally set, rendered as the at-rest control value.
-			const wideInput = screen.getByLabelText( /wide width/i );
+			const wideInput = screen.getByRole( 'spinbutton', {
+				name: /wide width/i,
+			} );
 			expect( wideInput ).toHaveValue( 1280 );
 			expect( wideInput ).toHaveAttribute( 'placeholder', '1280' );
 			expect( wideInput ).not.toHaveAttribute( 'placeholder', '1280px' );
@@ -259,7 +267,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				includeLayoutControls: true,
 			} );
 
-			const contentInput = screen.getByLabelText( /content width/i );
+			const contentInput = screen.getByRole( 'spinbutton', {
+				name: /content width/i,
+			} );
 			await user.type( contentInput, '800px' );
 
 			expect( onChange ).toHaveBeenCalled();
@@ -282,7 +292,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				settings: baseSettings,
 			} );
 
-			const gapInput = screen.getByLabelText( /block spacing/i );
+			const gapInput = screen.getByRole( 'spinbutton', {
+				name: /block spacing/i,
+			} );
 			expect( gapInput ).toHaveValue( null );
 			expect( gapInput ).toHaveAttribute( 'placeholder', '1.5rem' );
 		} );
@@ -301,7 +313,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				settings: baseSettings,
 			} );
 
-			const gapInput = screen.getByLabelText( /block spacing/i );
+			const gapInput = screen.getByRole( 'spinbutton', {
+				name: /block spacing/i,
+			} );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
 		} );
 	} );
@@ -523,7 +537,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// A local override now gets the same local-override flag as
 			// every other control, so the inline reset button can attach.
 			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
+			// InheritanceOriginButton unit tests.
 			expectLocalOverride();
 		} );
 
@@ -744,7 +758,9 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				settings: baseSettings,
 			} );
 
-			const gapInput = screen.getByLabelText( /block spacing/i );
+			const gapInput = screen.getByRole( 'spinbutton', {
+				name: /block spacing/i,
+			} );
 			expect( gapInput ).toHaveValue( 0 );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
 			expectLocalOverride();

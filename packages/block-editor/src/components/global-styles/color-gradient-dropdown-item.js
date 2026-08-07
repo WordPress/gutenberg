@@ -28,7 +28,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
+	InheritanceOriginButton,
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
@@ -203,6 +203,7 @@ function ColorGradientTab( {
 // Typography panels for consistent color-style controls.
 export default function ColorGradientDropdownItem( {
 	label,
+	stylePath,
 	hasValue,
 	resetValue,
 	isShownByDefault,
@@ -263,14 +264,15 @@ export default function ColorGradientDropdownItem( {
 							</Button>
 							{ hasValue() &&
 								( hasLocalOverride ? (
-									<InheritanceResetButton
+									<InheritanceOriginButton
 										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
+										stylePath={ stylePath }
+										label={ label }
+										onReset={ () => {
 											resetValue();
 											if ( isOpen ) {
 												onToggle();
 											}
-											colorGradientDropdownButtonRef.current?.focus();
 										} }
 									/>
 								) : (

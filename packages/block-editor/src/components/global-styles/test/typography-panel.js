@@ -149,7 +149,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { inheritedValue } );
 
-		const lineHeightInput = screen.getByLabelText( /line height/i );
+		const lineHeightInput = screen.getByRole( 'spinbutton', {
+			name: /line height/i,
+		} );
 		expect( lineHeightInput ).toHaveValue( 1.7 );
 	} );
 
@@ -164,7 +166,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { inheritedValue } );
 
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		// No locally-set value; the rendered value is empty.
 		expect( columnsInput ).toHaveValue( null );
 		// The inherited value reaches the user via the native
@@ -185,7 +189,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { value, inheritedValue } );
 
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		expect( columnsInput ).toHaveValue( 5 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 	} );
@@ -196,7 +202,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// NumberControl.
 		renderPanel( { inheritedValue: {} } );
 
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		expect( columnsInput ).toHaveValue( null );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 	} );
@@ -212,7 +220,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { inheritedValue, onChange } );
 
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		await user.type( columnsInput, '2' );
 
 		// onChange must be called with the typed value at exactly the
@@ -248,10 +258,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		} );
 
 		// See locally-set value first.
-		expect( screen.getByLabelText( /columns/i ) ).toHaveValue( 5 );
-		expect( screen.getByLabelText( /columns/i ) ).not.toHaveAttribute(
-			'placeholder'
-		);
+		expect(
+			screen.getByRole( 'spinbutton', { name: /columns/i } )
+		).toHaveValue( 5 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: /columns/i } )
+		).not.toHaveAttribute( 'placeholder' );
 
 		// Reset: local value cleared.
 		rerender(
@@ -265,7 +277,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		);
 
 		// Placeholder is back; local value is gone.
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		expect( columnsInput ).toHaveValue( null );
 		expect( columnsInput ).toHaveAttribute( 'placeholder', '3' );
 	} );
@@ -282,7 +296,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { value, inheritedValue } );
 
-		const lineHeightInput = screen.getByLabelText( /line height/i );
+		const lineHeightInput = screen.getByRole( 'spinbutton', {
+			name: /line height/i,
+		} );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
 	} );
 
@@ -298,7 +314,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { inheritedValue } );
 
-		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
+		const letterSpacingInput = screen.getByRole( 'spinbutton', {
+			name: /letter spacing/i,
+		} );
 		expect( letterSpacingInput ).toHaveValue( 0.5 );
 		// The placeholder carries only the numeric portion of the inherited
 		// value; the unit selector reflects the inherited unit separately, so
@@ -320,7 +338,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { value, inheritedValue } );
 
-		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
+		const letterSpacingInput = screen.getByRole( 'spinbutton', {
+			name: /letter spacing/i,
+		} );
 		expect( letterSpacingInput ).toHaveValue( 2 );
 		expect( letterSpacingInput ).not.toHaveAttribute( 'placeholder' );
 	} );
@@ -340,11 +360,15 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		renderPanel( { value, inheritedValue } );
 
 		// lineHeight: locally-set, not at-rest.
-		const lineHeightInput = screen.getByLabelText( /line height/i );
+		const lineHeightInput = screen.getByRole( 'spinbutton', {
+			name: /line height/i,
+		} );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
 
 		// letterSpacing: not locally set, shows the inherited value at rest.
-		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
+		const letterSpacingInput = screen.getByRole( 'spinbutton', {
+			name: /letter spacing/i,
+		} );
 		expect( letterSpacingInput ).toHaveValue( 0.5 );
 	} );
 
@@ -354,7 +378,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// code path: no placeholder, no local-value regression.
 		renderPanel( { value: { typography: { lineHeight: '1.9' } } } );
 
-		expect( screen.getByLabelText( /line height/i ) ).toHaveValue( 1.9 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: /line height/i } )
+		).toHaveValue( 1.9 );
 	} );
 
 	it( 'renders nothing for a leaf when both `value` and `inheritedValue` omit it', () => {
@@ -362,7 +388,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		// An empty NumberControl input has no `value` attribute applied;
 		// RTL returns `null` (not `0`, not the empty string) for that case.
-		expect( screen.getByLabelText( /line height/i ) ).toHaveValue( null );
+		expect(
+			screen.getByRole( 'spinbutton', { name: /line height/i } )
+		).toHaveValue( null );
 	} );
 
 	it( 'accepts a `var:preset|font-size|…` leaf in `inheritedValue` without throwing', () => {
@@ -608,7 +636,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 				renderPanel( { inheritedValue } );
 
-				const lineHeightInput = screen.getByLabelText( /line height/i );
+				const lineHeightInput = screen.getByRole( 'spinbutton', {
+					name: /line height/i,
+				} );
 				expect( lineHeightInput ).toHaveValue( null );
 				// The explicit-empty inherited leaf is not surfaced as an
 				// inherited placeholder; `LineHeightControl` falls back to its
@@ -644,14 +674,18 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { value, inheritedValue } );
 
-		const lineHeightInput = screen.getByLabelText( /line height/i );
+		const lineHeightInput = screen.getByRole( 'spinbutton', {
+			name: /line height/i,
+		} );
 		expect( lineHeightInput ).toHaveValue( 0 );
 		// The inherited line height ('2') must not leak in as a placeholder;
 		// `LineHeightControl`'s own default (1.5) may remain, but the value is
 		// the local zero override.
 		expect( lineHeightInput ).not.toHaveAttribute( 'placeholder', '2' );
 
-		const columnsInput = screen.getByLabelText( /columns/i );
+		const columnsInput = screen.getByRole( 'spinbutton', {
+			name: /columns/i,
+		} );
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 
@@ -659,7 +693,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// accessible reset-to-inherited affordance.
 		expect(
 			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
+				name: /where does/i,
 			} )
 		).toHaveLength( 2 );
 	} );
@@ -753,8 +787,11 @@ const DUPLICATE_PALETTE_SETTINGS = {
 
 // Helper: open the text Color dropdown and return the rendered swatches.
 async function openTextColorDropdown() {
+	// Anchored to the start of the name: the override indicator's accessible
+	// name also contains the property ("Where does Color come from?"), so an
+	// unanchored /Color/ matches both buttons.
 	await click(
-		screen.getByRole( 'button', { name: /Color/, expanded: false } )
+		screen.getByRole( 'button', { name: /^Color/, expanded: false } )
 	);
 	// `findAllByRole` waits for the Popover/portal content to appear.
 	return screen.findAllByRole( 'option' );
@@ -982,7 +1019,10 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		);
 	} );
 
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', () => {
+	it( 'keeps the single-column layout class and adds no inherited treatment when indicators are on', () => {
+		// Inheritance is the unmarked default, so turning indicators on must
+		// not add a treatment class to an inheriting control — only the
+		// layout class survives.
 		renderPanel( {
 			showInheritanceLabelIndicators: true,
 			value: {},
@@ -993,11 +1033,12 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		const letterSpacingItem = getItem( /letter spacing/i );
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).toHaveClass(
+		expect( letterSpacingItem ).toHaveClass( 'single-column' );
+
+		expect( lineHeightItem ).not.toHaveClass(
 			'is-inherited-from-global-styles'
 		);
-		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-		expect( letterSpacingItem ).toHaveClass(
+		expect( letterSpacingItem ).not.toHaveClass(
 			'is-inherited-from-global-styles'
 		);
 	} );

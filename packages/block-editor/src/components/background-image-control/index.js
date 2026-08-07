@@ -40,7 +40,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import {
-	InheritanceResetButton,
+	InheritanceOriginButton,
 	isGlobalStylesInheritanceEnabled,
 } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
@@ -232,15 +232,16 @@ function BackgroundControlsPanel( {
 						/>
 						{ onReset &&
 							( hasLocalOverride ? (
-								<InheritanceResetButton
+								<InheritanceOriginButton
 									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
+									stylePath="background.backgroundImage"
+									label={ __( 'Background image' ) }
+									onReset={ () => {
 										onReset();
 										// Close the dropdown if open.
 										if ( isOpen ) {
 											onToggle();
 										}
-										// Focus the toggle button.
 										focusToggleButton( containerRef );
 									} }
 								/>

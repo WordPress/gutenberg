@@ -386,6 +386,7 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundColorControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Color' ) }
+					stylePath="color.background"
 					hasValue={ () => hasBackgroundColorValue( value ) }
 					resetValue={ resetBackgroundColor }
 					isShownByDefault={ defaultControls.backgroundColor }
@@ -433,6 +434,7 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
+					stylePath="background.backgroundGradient"
 					hasValue={ () => hasBackgroundGradientValue( value ) }
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
@@ -478,6 +480,7 @@ export default function BackgroundImagePanel( {
 			{ showLegacyColorGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
+					stylePath="color.gradient"
 					hasValue={ () => hasLegacyColorGradientValue( value ) }
 					resetValue={ resetLegacyColorGradient }
 					isShownByDefault={ defaultControls.gradient }

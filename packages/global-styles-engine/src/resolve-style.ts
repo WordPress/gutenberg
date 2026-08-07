@@ -15,11 +15,30 @@ interface SelectedState {
 
 interface SourceDescriptor {
 	layer: string;
+	// Structural metadata describing *which* root/element/block/variation the
+	// layer refers to. Deliberately not a pre-built human string: the engine is
+	// framework- and i18n-agnostic, so the UI composes the label (and looks up
+	// the block's registered title) from these fields.
+	blockName?: string | null;
+	element?: string | null;
+	variation?: string | null;
+}
+
+// One layer's contribution to a single leaf path. `cascade[ pathKey ]` holds
+// these ordered low-to-high precedence, so the last entry is the winner and the
+// preceding ones are the values it overrode.
+interface CascadeEntry extends SourceDescriptor {
+	value: unknown;
+	isWinner: boolean;
 }
 
 interface ResolvedStyle {
 	value: StyleTree;
 	sources: Record< string, SourceDescriptor >;
+	// Full per-path cascade. `sources` keeps only the winning layer; this keeps
+	// the layers it beat, which is what an origin/cascade view needs in order to
+	// explain *why* a value is what it is.
+	cascade: Record< string, CascadeEntry[] >;
 }
 
 // Query describing which slice of `globalStyles` to resolve. Kept separate from
@@ -77,6 +96,7 @@ const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
 const EMPTY_INHERITANCE: ResolvedStyle = Object.freeze( {
 	value: {},
 	sources: {},
+	cascade: {},
 } );
 
 // Source descriptors per inheritance layer. `layer` identifies which layer
@@ -88,12 +108,15 @@ const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
 	blockVariation: { layer: 'blockVariation' },
 };
 
-function createSourceDescriptor( type: string ): SourceDescriptor | null {
+function createSourceDescriptor(
+	type: string,
+	metadata?: Omit< SourceDescriptor, 'layer' >
+): SourceDescriptor | null {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
 		return null;
 	}
-	return { ...descriptor };
+	return { ...descriptor, ...metadata };
 }
 
 interface Contribution {
@@ -208,6 +231,7 @@ const ATOMIC_OBJECT_KEYS = new Set( [ 'backgroundImage' ] );
  * @param sourceMetadata
  * @param sources
  * @param path
+ * @param cascade
  * @return The mutated `target`.
  */
 function deepMergeDroppingEmpties(
@@ -216,7 +240,8 @@ function deepMergeDroppingEmpties(
 	globalStyles: StyleTree,
 	sourceMetadata?: SourceDescriptor,
 	sources?: Record< string, SourceDescriptor >,
-	path: string[] = []
+	path: string[] = [],
+	cascade?: Record< string, CascadeEntry[] >
 ): StyleTree {
 	if ( ! source || typeof source !== 'object' || Array.isArray( source ) ) {
 		return target;
@@ -263,7 +288,8 @@ function deepMergeDroppingEmpties(
 				globalStyles,
 				sourceMetadata,
 				sources,
-				nextPath
+				nextPath,
+				cascade
 			);
 		} else {
 			target[ key ] =
@@ -274,8 +300,21 @@ function deepMergeDroppingEmpties(
 					? { ...sourceValue }
 					: sourceValue;
 			if ( sourceMetadata && sources ) {
-				sources[ getPathKey( nextPath ) ] =
-					getSourceForPath( sourceMetadata );
+				const pathKey = getPathKey( nextPath );
+				sources[ pathKey ] = getSourceForPath( sourceMetadata );
+				if ( cascade ) {
+					// A later layer writing the same leaf demotes whatever came
+					// before it; only the final write stays the winner.
+					const entries = ( cascade[ pathKey ] ??= [] );
+					for ( const entry of entries ) {
+						entry.isWinner = false;
+					}
+					entries.push( {
+						...getSourceForPath( sourceMetadata ),
+						value: target[ key ],
+						isWinner: true,
+					} );
+				}
 			}
 		}
 	}
@@ -352,7 +391,8 @@ function deleteAtPath( target: StyleTree, pathSegments: string[] ) {
 // not actually reach the block. See `NON_CASCADING_ROOT_PREFIXES`.
 function dropNonCascadingRootLeaves(
 	value: StyleTree,
-	sources: Record< string, SourceDescriptor >
+	sources: Record< string, SourceDescriptor >,
+	cascade?: Record< string, CascadeEntry[] >
 ) {
 	for ( const pathKey of Object.keys( sources ) ) {
 		if (
@@ -362,6 +402,30 @@ function dropNonCascadingRootLeaves(
 			deleteAtPath( value, pathKey.split( '.' ) );
 			delete sources[ pathKey ];
 		}
+	}
+	if ( ! cascade ) {
+		return;
+	}
+	// A root contribution at a non-cascading path never reaches the block, so it
+	// must not appear as an overridden layer either — even when some higher
+	// layer won the path and kept it out of the `sources` sweep above.
+	for ( const pathKey of Object.keys( cascade ) ) {
+		if ( ! isNonCascadingRootPath( pathKey ) ) {
+			continue;
+		}
+		const kept = cascade[ pathKey ].filter(
+			( entry ) => entry.layer !== 'root'
+		);
+		if ( kept.length === 0 ) {
+			delete cascade[ pathKey ];
+			continue;
+		}
+		// Removing the winner (root won and was dropped) promotes the highest
+		// remaining layer, keeping exactly one winner per path.
+		if ( ! kept.some( ( entry ) => entry.isWinner ) ) {
+			kept[ kept.length - 1 ].isWinner = true;
+		}
+		cascade[ pathKey ] = kept;
 	}
 }
 
@@ -433,8 +497,14 @@ function computeResolvedStyle(
 	// block's own styles. `elements` is ordered low to high precedence, so a
 	// level-specific `h2` correctly wins over the generic `heading`.
 	const elementLayers = ( elements ?? [] )
-		.map( ( elementName ) => styles.elements?.[ elementName ] ?? null )
-		.filter( ( layer ): layer is StyleTree => !! layer );
+		.map( ( elementName ) => ( {
+			element: elementName,
+			layer: styles.elements?.[ elementName ] ?? null,
+		} ) )
+		.filter(
+			( entry ): entry is { element: string; layer: StyleTree } =>
+				!! entry.layer
+		);
 	// Resolve the active block style variation's styles (with `{ ref }`
 	// values resolved) against the Global Styles tree.
 	const variation = variationName
@@ -451,22 +521,25 @@ function computeResolvedStyle(
 			pickLayerRootContribution( root ),
 			createSourceDescriptor( 'root' )
 		),
-		...elementLayers.map( ( layer ) =>
+		...elementLayers.map( ( { element, layer } ) =>
 			createContribution(
 				pickLayerRootContribution( layer ),
-				createSourceDescriptor( 'element' )
+				createSourceDescriptor( 'element', { blockName, element } )
 			)
 		),
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
-					createSourceDescriptor( 'block' )
+					createSourceDescriptor( 'block', { blockName } )
 			  )
 			: null,
 		variation
 			? createContribution(
 					pickLayerRootContribution( variation ),
-					createSourceDescriptor( 'blockVariation' )
+					createSourceDescriptor( 'blockVariation', {
+						blockName,
+						variation: variationName,
+					} )
 			  )
 			: null,
 	];
@@ -484,12 +557,15 @@ function computeResolvedStyle(
 				),
 				createSourceDescriptor( 'root' )
 			),
-			...elementLayers.map( ( layer ) =>
+			...elementLayers.map( ( { element, layer } ) =>
 				createContribution(
 					pickLayerRootContribution(
 						getStateSlice( layer, selectedState )
 					),
-					createSourceDescriptor( 'element' )
+					createSourceDescriptor( 'element', {
+						blockName,
+						element,
+					} )
 				)
 			),
 			block
@@ -497,7 +573,7 @@ function computeResolvedStyle(
 						pickLayerRootContribution(
 							getStateSlice( block, selectedState )
 						),
-						createSourceDescriptor( 'block' )
+						createSourceDescriptor( 'block', { blockName } )
 				  )
 				: null,
 			variation
@@ -505,7 +581,10 @@ function computeResolvedStyle(
 						pickLayerRootContribution(
 							getStateSlice( variation, selectedState )
 						),
-						createSourceDescriptor( 'blockVariation' )
+						createSourceDescriptor( 'blockVariation', {
+							blockName,
+							variation: variationName,
+						} )
 				  )
 				: null
 		);
@@ -520,6 +599,7 @@ function computeResolvedStyle(
 	}
 
 	const sources: Record< string, SourceDescriptor > = {};
+	const cascade: Record< string, CascadeEntry[] > = {};
 	const value = filteredContributions.reduce(
 		( mergedValue, contribution ) =>
 			deepMergeDroppingEmpties(
@@ -527,22 +607,24 @@ function computeResolvedStyle(
 				contribution.styles,
 				globalStyles as StyleTree,
 				contribution.source,
-				sources
+				sources,
+				[],
+				cascade
 			),
 		{} as StyleTree
 	);
 
 	// Root-level non-cascading values do not reach the block; drop them from
-	// value and sources together. Then resolve theme-file image pointers so
-	// consumers receive fully-resolved values.
-	dropNonCascadingRootLeaves( value, sources );
+	// value, sources, and cascade together. Then resolve theme-file image
+	// pointers so consumers receive fully-resolved values.
+	dropNonCascadingRootLeaves( value, sources, cascade );
 	resolveThemeFileBackgroundImage(
 		value,
 		globalStyles as StyleTree,
 		( globalStyles._links as Record< string, any > ) ?? null
 	);
 
-	return { value, sources };
+	return { value, sources, cascade };
 }
 
 const NO_LINKS = {};

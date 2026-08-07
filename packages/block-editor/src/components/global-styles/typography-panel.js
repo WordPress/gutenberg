@@ -815,6 +815,7 @@ export default function TypographyPanel( {
 			{ hasTextColorEnabled && (
 				<ColorGradientDropdownItem
 					label={ __( 'Color' ) }
+					stylePath="color.text"
 					hasValue={ hasTextColorValue }
 					resetValue={ resetTextColor }
 					isShownByDefault={ defaultControls.textColor }
@@ -856,6 +857,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasFontFamilyEnabled && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.fontFamily"
 					{ ...inheritanceProps(
 						isFontFamilyPlaceholder,
 						hasFontFamily() && inheritedFontFamily !== undefined
@@ -875,6 +877,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasFontSizeEnabled && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.fontSize"
 					{ ...inheritanceProps(
 						isFontSizePlaceholder,
 						hasFontSize() && rawInheritedFontSize !== undefined
@@ -899,6 +902,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasAppearanceControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.fontWeight"
 					{ ...inheritanceProps(
 						isFontAppearancePlaceholder,
 						hasFontAppearance() &&
@@ -925,6 +929,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasLineHeightEnabled && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.lineHeight"
 					{ ...inheritanceProps(
 						isLineHeightPlaceholder,
 						hasLineHeight() && inheritedLineHeight !== undefined,
@@ -957,6 +962,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasLetterSpacingControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.letterSpacing"
 					{ ...inheritanceProps(
 						isLetterSpacingPlaceholder,
 						hasLetterSpacing() &&
@@ -992,6 +998,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasTextIndentControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.textIndent"
 					{ ...inheritanceProps(
 						isTextIndentPlaceholder,
 						hasTextIndent() && inheritedTextIndent !== undefined
@@ -1032,6 +1039,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasTextColumnsControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.textColumns"
 					{ ...inheritanceProps(
 						isTextColumnsPlaceholder,
 						hasTextColumns() && inheritedTextColumns !== undefined,
@@ -1061,6 +1069,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasTextDecorationControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.textDecoration"
 					{ ...inheritanceProps(
 						isTextDecorationPlaceholder,
 						hasTextDecoration() &&
@@ -1082,6 +1091,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasWritingModeControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.writingMode"
 					{ ...inheritanceProps(
 						isWritingModePlaceholder,
 						hasWritingMode() && inheritedWritingMode !== undefined,
@@ -1101,6 +1111,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasTextTransformControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.textTransform"
 					{ ...inheritanceProps(
 						isTextTransformPlaceholder,
 						hasTextTransform() &&
@@ -1122,6 +1133,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasTextAlignmentControl && (
 				<InheritanceToolsPanelItem
+					stylePath="typography.textAlign"
 					{ ...inheritanceProps(
 						isTextAlignPlaceholder,
 						hasTextAlign() && inheritedTextAlign !== undefined
