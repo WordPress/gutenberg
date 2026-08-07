@@ -5,6 +5,10 @@ import { check, plus } from '@wordpress/icons';
 import { Icon } from '../../../icon';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
+import {
+	getItemPopupSizeClassName,
+	normalizeItemPopupSize,
+} from '../../../utils/item-popup-size';
 import type { ComboboxItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
@@ -18,12 +22,14 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 		},
 		ref
 	) {
+		const normalizedSize = normalizeItemPopupSize( size );
+
 		return (
 			<_Combobox.Item
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
-					itemPopupStyles[ `is-size-${ size }` ],
+					getItemPopupSizeClassName( size, itemPopupStyles ),
 					className
 				) }
 				ref={ ref }
@@ -36,7 +42,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 						variant !== 'creatable' &&
 							itemPopupStyles[ 'item-indicator-icon' ]
 					) }
-					size={ 24 }
+					size={ normalizedSize === 'small' ? 20 : 24 }
 				/>
 				{ children }
 			</_Combobox.Item>

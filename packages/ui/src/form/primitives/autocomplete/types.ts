@@ -1,6 +1,7 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupSize } from '../../../utils/item-popup-size';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
 
@@ -47,6 +48,12 @@ export type AutocompleteItemProps = ComponentProps<
 	typeof _Autocomplete.Item
 > & {
 	children?: React.ReactNode;
+	/**
+	 * The size of the item.
+	 *
+	 * @default 'default'
+	 */
+	size?: ItemPopupSize;
 };
 
 export type AutocompleteListProps = ComponentProps<

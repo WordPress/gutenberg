@@ -1,6 +1,7 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupSize } from '../../../utils/item-popup-size';
 import type { InputLayoutProps } from '../input-layout/types';
 
 type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
@@ -65,7 +66,7 @@ export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	 *
 	 * @default 'default'
 	 */
-	size?: ComboboxSize;
+	size?: ItemPopupSize;
 	/**
 	 * The variant of the item.
 	 *

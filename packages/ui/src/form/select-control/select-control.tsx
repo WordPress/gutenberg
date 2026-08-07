@@ -26,6 +26,8 @@ export const SelectControl = forwardRef<
 	},
 	ref
 ) {
+	const itemSize = size === 'small' ? 'small' : undefined;
+
 	return (
 		<Field.Root className={ className }>
 			<Field.Label hideFromVision={ hideLabelFromVision }>
@@ -40,7 +42,7 @@ export const SelectControl = forwardRef<
 					{ triggerContent }
 				</Select.Trigger>
 				<Select.Popup>
-					<SelectControlSizeContext.Provider value={ size }>
+					<SelectControlSizeContext.Provider value={ itemSize }>
 						{ children !== undefined
 							? children
 							: items?.map( ( item ) => (

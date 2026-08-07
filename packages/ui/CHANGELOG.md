@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: default item size is now compact-sized (previously large). The old large size is removed. The item `size` prop now accepts `'default'` and `'small'` only; passing `'compact'` at runtime still renders as `'default'`.
+-   `SelectControl`: only a `small` trigger propagates to items. `default` and `compact` triggers both yield default-sized items.
+
 ### Enhancements
 
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).

@@ -3,15 +3,20 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
+import { getItemPopupSizeClassName } from '../../../utils/item-popup-size';
 import type { AutocompleteItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
-	function Item( { className, children, ...restProps }, ref ) {
+	function Item(
+		{ className, children, size = 'default', ...restProps },
+		ref
+	) {
 		return (
 			<_Autocomplete.Item
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
+					getItemPopupSizeClassName( size, itemPopupStyles ),
 					className
 				) }
 				ref={ ref }

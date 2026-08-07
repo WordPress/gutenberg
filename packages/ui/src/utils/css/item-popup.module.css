@@ -68,8 +68,8 @@
 		}
 
 		.item {
-			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
+			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
 			display: flex;
@@ -88,11 +88,6 @@
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
-			}
-
-			&.is-size-compact {
-				--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
-				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			}
 
 			&.is-size-small {
@@ -138,8 +133,8 @@
 		/* Only style when there is content, because otherwise the element would block clicks
 		on the .list beneath it (both share grid-area: main and overlap). */
 		.empty:not(:empty) {
-			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-lg);
-			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-md);
+			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-sm);
 
 			grid-area: main;
 			display: flex;

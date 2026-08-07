@@ -1,8 +1,9 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { SelectTriggerProps } from '../primitives/select/types';
+import type { ItemPopupSize } from '../../utils/item-popup-size';
 
-export const SelectControlSizeContext =
-	createContext< SelectTriggerProps[ 'size' ] >( undefined );
+export const SelectControlSizeContext = createContext<
+	ItemPopupSize | undefined
+>( undefined );
 
 export const useSelectControlSizeContext = () => {
 	return useContext( SelectControlSizeContext );
