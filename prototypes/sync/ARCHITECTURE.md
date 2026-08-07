@@ -747,11 +747,29 @@ inside intent payloads, not the transport.
   frame/txn state across request boundaries (1.3c), independent
   effect-model oracles (3.1), and the invasiveness cleanups (identity
   triplication, lockstep .d.ts, delayed re-push).
-- **Phase 3 — benchmark through the seam.** Point the cost/quality harness
-  (refreshed-de-rtc) at `WP_Sync_Engine` so engines are compared
-  head-to-head over identical transports and fixtures — the seam is what
-  makes the benchmark's "swap if needed" outcome cheap, which is the point
-  of constraint 1.
+- **Phase 3 — benchmark through the seam. STARTED (2d-xxiv).** A
+  seam-native harness lives at `test/php/sync-engine-benchmarks/`: it drives
+  the REAL `WP_Sync_Engine::handle_updates` / `get_updates_since` for both
+  registered engines (intent-log, yjs-relay) over identical seeded
+  workloads, swapping ONLY storage for an in-memory backend (isolates engine
+  CPU from DB I/O; measures storage growth exactly). Reports cost
+  (service-time percentiles, payload bytes, row/byte growth) and — for the
+  intent log — POLICY-CORRECT quality: applied / escalated-for-review /
+  voided dispositions, escalation rate (reported, not penalized), and a
+  never-lose-work assertion (0 in every scenario). This deliberately
+  INVERTS the old refreshed-de-rtc harness's silent-merge "retention" score,
+  which rewarded the last-write-wins behavior the project rejects (the flaw
+  flagged in [[rtc-sessions-audit]]). yjs quality is reported as
+  not-server-observable (client CRDT — no PHP oracle), honestly, not faked.
+  Head-to-head (mixed-newsroom, 600 requests): intent-log ~0.67ms/req mean,
+  296 storage rows (bounded via checkpointing), 480 applied / 114 to review
+  / 0 lost / converged; yjs-relay ~0.0004ms/req (dumb relay), 600 rows
+  (one per edit, unbounded — no server compaction), quality invisible.
+  Under contended-paragraph (4 editors on one block) intent-log escalates
+  ~74% and still loses nothing. Run via `wp eval-file benchmark.php` (see
+  README). 6 correctness PHPUnit tests (assert what's measured, not timing).
+  DEFERRED refinement: the DE-RTC multi-process request-queue model (tail
+  latency under worker saturation) can layer on top of these adapters.
 
 ## Open items
 
