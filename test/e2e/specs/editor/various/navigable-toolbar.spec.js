@@ -168,16 +168,11 @@ test.describe( 'Block Toolbar', () => {
 		// Inserting from the global inserter leaves focus in the inserter, so the
 		// canvas has never been focused and there is no last focused element to
 		// return to. See https://github.com/WordPress/gutenberg/pull/61472.
-		// Escape currently does nothing in that state, leaving no way back to
-		// the canvas, because the toolbar has no fallback for an unset last
-		// focus.
 		test( 'returns focus to the block when the canvas has never been focused', async ( {
 			editor,
 			page,
 			pageUtils,
 		} ) => {
-			test.fail();
-
 			// The contextual toolbar is only rendered once the canvas has been
 			// interacted with, so use the fixed toolbar to reach it.
 			await editor.setIsFixedToolbar( true );
