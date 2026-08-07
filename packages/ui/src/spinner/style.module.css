@@ -20,7 +20,7 @@
 		}
 
 		.track {
-			stroke: var(--wpds-color-stroke-surface-neutral);
+			stroke: var(--wpds-color-background-track-neutral);
 		}
 
 		.indicator {
