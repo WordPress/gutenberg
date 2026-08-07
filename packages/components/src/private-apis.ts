@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { useDrag } from '@use-gesture/react';
-
-/**
- * Internal dependencies
- */
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
@@ -14,7 +7,6 @@ import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,

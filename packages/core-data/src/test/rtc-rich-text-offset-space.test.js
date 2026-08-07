@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { act, render, waitFor } from '@testing-library/react';
 import {
 	afterEach,
@@ -10,10 +7,6 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -31,10 +24,6 @@ jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	LOCAL_EDITOR_ORIGIN: 'local-editor',
 } ) );
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../index';
 import { CRDT_RECORD_MAP_KEY, getSyncManager } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';

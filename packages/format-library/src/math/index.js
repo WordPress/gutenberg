@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
@@ -16,10 +13,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { ValidatedTextControl } = unlock( componentsPrivateApis );

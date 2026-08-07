@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { backup } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export default function SidebarNavigationScreenDetailsFooter( {

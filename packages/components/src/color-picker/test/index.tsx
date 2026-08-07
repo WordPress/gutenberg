@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { click } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ColorPicker } from '..';
 
 const hslaMatcher = expect.objectContaining( {

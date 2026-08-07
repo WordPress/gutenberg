@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-
-/**
- * Internal dependencies
- */
 import PostVisibilityCheck from '../check';
 
 function setupMockSelect( hasPublishAction ) {

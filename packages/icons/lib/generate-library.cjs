@@ -8,19 +8,11 @@
  *
  * Note that the generated files are ignored by Git.
  */
-
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { readdir, readFile, writeFile } = require( 'fs' ).promises;
 const { execFile } = require( 'child_process' );
 const { promisify } = require( 'util' );
 const { camelCase } = require( 'change-case' );
-
-/**
- * Internal dependencies
- */
 const { validateCollection } = require( './validate-collection.cjs' );
 
 const execFileAsync = promisify( execFile );

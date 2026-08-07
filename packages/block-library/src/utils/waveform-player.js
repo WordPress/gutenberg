@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { useEvent, useRefEffect } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	applyWaveformPlayerStyles,
 	initWaveformPlayer,

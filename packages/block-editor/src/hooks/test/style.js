@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,

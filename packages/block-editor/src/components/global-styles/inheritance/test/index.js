@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	getInheritanceProps,
 	InheritanceResetButton,

@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   Add `react` and `react-dom` to the package's dev dependencies, so the tests resolve them from the package rather than relying on a hoisted install. [#81139](https://github.com/WordPress/gutenberg/pull/81139)
 
 ## 1.19.0 (2026-07-29)

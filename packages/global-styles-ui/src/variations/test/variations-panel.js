@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 
@@ -17,10 +10,6 @@ jest.mock( '../../hooks', () => ( {
 jest.mock( '@wordpress/components', () => ( {
 	__experimentalItemGroup: jest.fn( ( { children } ) => children ),
 } ) );
-
-/**
- * Internal dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useBlockVariations } from '../variations-panel';
 

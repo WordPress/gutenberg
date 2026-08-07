@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { Page, Browser } from '@playwright/test';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useEnableLinkStatusValidation } from '../use-enable-link-status-validation';
 
 // Mock useSelect directly at the implementation level to avoid loading complex dependencies

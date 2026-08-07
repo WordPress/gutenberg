@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 /*
  * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
  * stopped treating whitespace as a token in `diffWords`, which coalesces
  * adjacent word changes into a single removed/added pair.
  */
 import { diffWordsWithSpace } from 'diff';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import RevisionDiffPanel from '../revision-diff-panel';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ColorPickerProps, LegacyColor, LegacyProps } from './types';
 
 function isLegacyProps( props: any ): props is LegacyProps {

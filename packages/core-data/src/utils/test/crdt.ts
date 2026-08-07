@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
@@ -54,16 +47,8 @@ jest.mock( '@wordpress/blocks', () => {
 		),
 	};
 } );
-
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import listReducer from '../list-reducer';
 import { deepFilterHTML } from '../utils';
 

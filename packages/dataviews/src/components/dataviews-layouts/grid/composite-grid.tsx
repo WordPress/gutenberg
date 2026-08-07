@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentProps,
@@ -8,10 +5,6 @@ import type {
 	HTMLAttributes,
 	CSSProperties,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	FlexItem,
@@ -27,10 +20,6 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';

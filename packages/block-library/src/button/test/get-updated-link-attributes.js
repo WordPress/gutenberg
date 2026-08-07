@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getUpdatedLinkAttributes } from '../get-updated-link-attributes';
 
 describe( 'getUpdatedLinkAttributes method', () => {

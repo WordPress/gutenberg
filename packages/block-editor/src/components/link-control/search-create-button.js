@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';

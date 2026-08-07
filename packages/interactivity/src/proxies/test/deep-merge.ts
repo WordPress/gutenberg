@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { effect } from '@preact/signals';
-/**
- * Internal dependencies
- */
 import { proxifyState, peek, deepMerge } from '../';
 import { hasPropSignal } from '../state';
 import { getProxyFromObject } from '../registry';

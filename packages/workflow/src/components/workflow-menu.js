@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Command, useCommandState } from 'cmdk';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -21,10 +14,6 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
-
-/**
- * Internal dependencies
- */
 import './workflow-menu.scss';
 import { unlock } from '../lock-unlock';
 

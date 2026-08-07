@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';

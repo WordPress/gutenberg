@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Stack, Tooltip } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -12,10 +9,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor } from './utils';
 
 export function NoteByline( { avatar, name, date, userId } ) {

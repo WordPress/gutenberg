@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
 
 /**
@@ -30,10 +23,6 @@ jest.mock( '@wordpress/blocks', () => {
 jest.mock( '../../../../sync/src/providers', () => ( {
 	getProviderCreators: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
 import { createSyncManager } from '../../../../sync/src/manager';
 import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';

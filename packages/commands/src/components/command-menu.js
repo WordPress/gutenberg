@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { Command, useCommandState } from 'cmdk';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useState,
@@ -27,10 +20,6 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 import {

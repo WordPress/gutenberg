@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalStyleProvider as StyleProvider,
 	__experimentalToolsPanelContext as ToolsPanelContext,
@@ -8,10 +5,6 @@ import {
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 import { useEffect, useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,

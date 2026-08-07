@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const engine = require( '../lib/engine' );
 const getExportEntries = require( '../lib/get-export-entries' );
 

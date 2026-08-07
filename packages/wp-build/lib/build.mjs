@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
@@ -41,10 +37,6 @@ try {
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
 }
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,

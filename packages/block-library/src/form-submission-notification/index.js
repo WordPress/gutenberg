@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { group as icon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';

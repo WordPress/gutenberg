@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { paramCase } from 'change-case';
 
 /**

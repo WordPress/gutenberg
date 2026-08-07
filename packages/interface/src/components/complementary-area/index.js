@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Panel,
@@ -32,10 +25,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { usePluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
 import ComplementaryAreaHeader from '../complementary-area-header';
 import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';

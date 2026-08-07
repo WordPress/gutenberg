@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import RangeControl from '..';
 
 const ICONS = { starEmpty, starFilled, styles, wordpress };

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useState } from '@wordpress/element';
 import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
 import {
@@ -14,10 +7,6 @@ import {
 	registerFormatType,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import RichTextControl from '../control';
 import { unlock } from '../../../../lock-unlock';
 

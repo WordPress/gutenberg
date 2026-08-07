@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -50,10 +47,6 @@ jest.mock( '../richtext/control', () => ( {
 		);
 	},
 } ) );
-
-/**
- * Internal dependencies
- */
 import RichText from '../richtext';
 
 type TestItem = { content: string };

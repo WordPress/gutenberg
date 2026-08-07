@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
@@ -10,14 +7,7 @@ import type {
 	FocusEvent,
 	ForwardedRef,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';

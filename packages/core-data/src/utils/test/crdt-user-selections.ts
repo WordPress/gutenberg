@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,

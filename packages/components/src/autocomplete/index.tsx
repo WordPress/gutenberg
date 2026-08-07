@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useEffect,
@@ -19,10 +16,6 @@ import {
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
