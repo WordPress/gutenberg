@@ -2000,6 +2000,41 @@
 				}
 			]
 		},
+		"stylesBlocksResponsiveStateWithPseudoPropertiesComplete": {
+			"description": "The styles a block that supports pseudo-selectors can set inside a single responsive breakpoint state: style properties, per-element styles, and the block's pseudo-selectors.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"elements": {
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+							}
+						]
+					}
+				}
+			]
+		},
 		"stylesBlocksResponsiveSelectorsProperties": {
 			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state, plus per-element styles.",
 			"type": "object",
@@ -2016,14 +2051,14 @@
 			"enum": [ "@mobile", "@tablet" ]
 		},
 		"stylesBlocksResponsiveSelectorsWithPseudoProperties": {
-			"description": "Responsive block states for blocks that support pseudo-selectors. Each breakpoint supports the same style properties as the default block state, plus the block's pseudo-selectors.",
+			"description": "Responsive block states for blocks that support pseudo-selectors. Each breakpoint supports the same style properties as the default block state, plus per-element styles and the block's pseudo-selectors.",
 			"type": "object",
 			"properties": {
 				"@mobile": {
-					"$ref": "#/definitions/stylesBlocksPropertiesAndPseudoComplete"
+					"$ref": "#/definitions/stylesBlocksResponsiveStateWithPseudoPropertiesComplete"
 				},
 				"@tablet": {
-					"$ref": "#/definitions/stylesBlocksPropertiesAndPseudoComplete"
+					"$ref": "#/definitions/stylesBlocksResponsiveStateWithPseudoPropertiesComplete"
 				}
 			}
 		},
