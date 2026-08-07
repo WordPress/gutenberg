@@ -28,6 +28,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
 	audio,
@@ -212,7 +213,7 @@ const archiveMimeTypes = [
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ attachment.title.rendered }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -356,9 +357,11 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											(
-												attachment as Attachment< 'view' >
-											 ).title.rendered
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
+											)
 									  )
 									: __( 'Replace' )
 							}
