@@ -53,6 +53,7 @@ const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 const DEFAULT_BLOCK = {
 	name: 'core/paragraph',
 	attributes: {
+		fontSize: 'large',
 		style: {
 			typography: {
 				textAlign: 'center',
