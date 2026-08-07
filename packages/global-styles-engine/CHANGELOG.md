@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Render block element styles defined only inside responsive viewport states.
 
 ## 1.19.0 (2026-07-29)
 
