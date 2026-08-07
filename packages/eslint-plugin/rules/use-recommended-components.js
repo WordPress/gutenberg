@@ -24,6 +24,7 @@ const ALLOWLIST = {
 			'Icon',
 			'Link',
 			'Skeleton',
+			'Spinner',
 			'Stack',
 			'Tabs',
 			'Text',
