@@ -1,26 +1,19 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useListViewContext } from './context';
+import { useListViewTreeState } from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
 	isClientIdSelected,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -30,14 +23,14 @@ import useBlockDisplayInformation from '../use-block-display-information';
  * implementation dragged blocks and their children are not counted.
  *
  * @param {Object}  block               block tree
- * @param {Object}  expandedState       state that notes which branches are collapsed
+ * @param {Object}  expansionState      state that notes which branches are collapsed
  * @param {Array}   draggedClientIds    a list of dragged client ids
  * @param {boolean} isExpandedByDefault flag to determine the default fallback expanded state.
  * @return {number} block count
  */
 function countBlocks(
 	block,
-	expandedState,
+	expansionState,
 	draggedClientIds,
 	isExpandedByDefault
 ) {
@@ -45,7 +38,7 @@ function countBlocks(
 	if ( isDragged ) {
 		return 0;
 	}
-	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
+	const isExpanded = expansionState[ block.clientId ] ?? isExpandedByDefault;
 	if ( ! isExpanded ) {
 		return 1;
 	}
@@ -54,7 +47,7 @@ function countBlocks(
 			count +
 			countBlocks(
 				innerBlock,
-				expandedState,
+				expansionState,
 				draggedClientIds,
 				isExpandedByDefault
 			),
@@ -77,32 +70,36 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
-		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const parentBlockInformation = useBlockDisplayInformation( parentId );
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
-
-	const canParentExpand = useSelect(
+	const { canParentExpand, isParentSynced } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return true;
+				return { canParentExpand: true, isParentSynced: false };
 			}
-			return select( blockEditorStore ).canEditBlock( parentId );
+			const { canEditBlock, isSyncedBlock } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				canParentExpand: canEditBlock( parentId ),
+				isParentSynced: isSyncedBlock( parentId ),
+			};
 		},
 		[ parentId ]
 	);
+
+	const syncedBranch = isSyncedBranch || isParentSynced;
 
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
 		firstDraggedBlockIndex,
 		blockIndexes,
-		expandedState,
+		expansionState,
 		draggedClientIds,
-	} = useListViewContext();
+	} = useListViewTreeState();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -150,7 +147,7 @@ function ListViewBranch( props ) {
 		const blockListPosition = nextPosition;
 		nextPosition += countBlocks(
 			block,
-			expandedState,
+			expansionState,
 			draggedClientIds,
 			isExpanded
 		);
@@ -165,10 +162,9 @@ function ListViewBranch( props ) {
 			path.length > 0 ? `${ path }_${ position }` : `${ position }`;
 		const hasNestedBlocks = !! innerBlocks?.length;
 
-		const shouldExpand =
-			hasNestedBlocks && shouldShowInnerBlocks
-				? expandedState[ clientId ] ?? isExpanded
-				: undefined;
+		const shouldExpand = hasNestedBlocks
+			? expansionState[ clientId ] ?? isExpanded
+			: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
 		// but asynchronous for any other block.
@@ -222,7 +218,7 @@ function ListViewBranch( props ) {
 			<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 				{ showBlock && (
 					<ListViewBlock
-						block={ block }
+						clientId={ clientId }
 						selectBlock={ selectBlock }
 						isSelected={ isSelected }
 						isBranchSelected={ isSelectedBranch }
@@ -234,7 +230,6 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						path={ updatedPath }
 						isExpanded={ isDragged ? false : shouldExpand }
-						listPosition={ blockListPosition }
 						selectedClientIds={ selectedClientIds }
 						isSyncedBranch={ syncedBranch }
 						displacement={ displacement }

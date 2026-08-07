@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNotices } from '../selectors';
 import { DEFAULT_CONTEXT } from '../constants';
 

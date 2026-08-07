@@ -4,8 +4,13 @@
 
 ### Breaking Changes
 
--   Require Jest v30 or newer and expose the Jest preset from the package root ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Add an `exports` field. Only the package root and `jest-preset` are exposed; deep imports of other files are no longer resolvable ([#80837](https://github.com/WordPress/gutenberg/pull/80837)).
+
+## 13.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Require Jest v30 or newer and expose the Jest preset from the package root ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 
 ## 12.51.0 (2026-07-14)
 

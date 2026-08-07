@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 10.4.0 (2026-07-29)
+
 ### Internal
 
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).

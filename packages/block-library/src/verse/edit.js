@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 export default function VerseEdit( props ) {

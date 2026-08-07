@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';

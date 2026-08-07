@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { stripFirstImage } from '../transforms';
 
 describe( 'stripFirstImage', () => {

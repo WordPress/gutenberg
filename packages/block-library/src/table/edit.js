@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	memo,
 	useCallback,
@@ -48,10 +41,6 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	createTable,
 	updateSelectedCell,

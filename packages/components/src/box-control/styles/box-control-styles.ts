@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import BoxControlIcon from '../icon';
 import Button from '../../button';
 import { HStack } from '../../h-stack';

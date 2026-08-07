@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	fireEvent,
 	render,
@@ -9,10 +6,6 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { BorderControl } from '../';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';

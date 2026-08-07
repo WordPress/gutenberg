@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useNavigate } from '@wordpress/route';
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );

@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 import { render, screen } from '@testing-library/react';
-
 import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 

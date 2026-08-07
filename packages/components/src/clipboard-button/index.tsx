@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import type { ClipboardButtonProps } from './types';
 import type { WordPressComponentProps } from '../context';

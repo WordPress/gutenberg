@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
 import {
 	BaseControl,
 	Flex,
@@ -17,10 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';

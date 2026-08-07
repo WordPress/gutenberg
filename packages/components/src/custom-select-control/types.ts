@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
 /**
