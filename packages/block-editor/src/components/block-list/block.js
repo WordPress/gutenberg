@@ -32,7 +32,6 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
-import { useBlockElement } from './use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
@@ -572,25 +571,26 @@ BlockListBlock = compose(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 /**
- * Inserts a ghost block when the user enters it: the same block object the
- * ghost has rendered from all along, so nothing about the element changes.
+ * Returns block props that insert a ghost block when the user enters it:
+ * the same block object the ghost has rendered from all along, so nothing
+ * about the element changes.
  *
- * @param {string}  clientId     The block client ID.
  * @param {string}  rootClientId The block's root client ID.
  * @param {?Object} ghostBlock   The ghost block object, while not inserted.
+ *
+ * @return {?Object} Props for the block element, while a ghost.
  */
-function useGhostMaterialize( clientId, rootClientId, ghostBlock ) {
+function useGhostMaterialize( rootClientId, ghostBlock ) {
 	const { insertBlocks } = useDispatch( blockEditorStore );
-	const element = useBlockElement( clientId );
 	const materializedRef = useRef( false );
 
 	useEffect( () => {
 		materializedRef.current = false;
 	}, [ ghostBlock ] );
 
-	useEffect( () => {
-		if ( ! element || ! ghostBlock ) {
-			return;
+	return useMemo( () => {
+		if ( ! ghostBlock ) {
+			return undefined;
 		}
 		function materialize() {
 			if ( materializedRef.current ) {
@@ -601,18 +601,16 @@ function useGhostMaterialize( clientId, rootClientId, ghostBlock ) {
 			// only be at its start, and the undo level records it.
 			insertBlocks( [ ghostBlock ], undefined, rootClientId, true, 0 );
 		}
-		element.addEventListener( 'pointerdown', materialize, true );
-		element.addEventListener( 'focusin', materialize, true );
-		return () => {
-			element.removeEventListener( 'pointerdown', materialize, true );
-			element.removeEventListener( 'focusin', materialize, true );
+		return {
+			onPointerDownCapture: materialize,
+			onFocusCapture: materialize,
 		};
-	}, [ element, ghostBlock, rootClientId, insertBlocks ] );
+	}, [ ghostBlock, rootClientId, insertBlocks ] );
 }
 
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId, ghostBlock } = props;
-	useGhostMaterialize( clientId, rootClientId, ghostBlock );
+	const ghostProps = useGhostMaterialize( rootClientId, ghostBlock );
 	// Stable fallback so the selector returns referentially equal values.
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
@@ -904,6 +902,7 @@ function BlockListBlockProvider( props ) {
 
 	const privateContext = {
 		isPreviewMode,
+		ghostProps,
 		ariaLabel:
 			ghostBlock && ghostBlock.clientId === clientId
 				? __( 'Add default block' )

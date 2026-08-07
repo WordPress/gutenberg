@@ -97,6 +97,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		deviceType,
 		viewportSettings,
 		ariaLabel,
+		ghostProps,
 	} = useContext( PrivateBlockContext );
 
 	useRegisterBlockEventHandlers( clientId, wrapperProps );
@@ -177,6 +178,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
 		'aria-label': ariaLabel ?? blockLabel,
+		...ghostProps,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
