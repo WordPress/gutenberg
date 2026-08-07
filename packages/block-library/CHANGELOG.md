@@ -12,6 +12,7 @@
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Playlist: Improve handling of declarative waveform player configuration.
 
 ## 10.3.0 (2026-07-29)
 
