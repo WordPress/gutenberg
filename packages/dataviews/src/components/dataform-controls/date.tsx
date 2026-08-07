@@ -12,7 +12,6 @@ import {
 	BaseControl,
 	Button,
 	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
@@ -26,7 +25,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { Calendar, RangeCalendar, Stack } from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -34,7 +33,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import type {
 	DataFormControlProps,
 	FieldValidity,
@@ -42,8 +40,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
 type DateRange = [ string, string ] | undefined;
 
@@ -443,7 +439,7 @@ function CalendarDateControl< Item >( {
 					/>
 
 					{ /* Calendar widget */ }
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
 						selected={
 							value ? parseDate( value ) || undefined : undefined
@@ -699,7 +695,7 @@ function CalendarDateRangeControl< Item >( {
 						/>
 					</Stack>
 
-					<DateRangeCalendar
+					<RangeCalendar
 						style={ { width: '100%' } }
 						selected={ selectedRange }
 						onSelect={ onSelectCalendarRange }

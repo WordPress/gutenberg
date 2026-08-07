@@ -5,7 +5,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Stack } from '@wordpress/ui';
+import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
@@ -14,7 +14,7 @@ import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
 
-const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
@@ -190,7 +190,7 @@ function CalendarDateTimeControl< Item >( {
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
 						selected={
 							value

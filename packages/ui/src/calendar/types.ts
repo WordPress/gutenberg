@@ -1,5 +1,6 @@
 import type { Locale } from 'date-fns';
 import type * as React from 'react';
+import type { ComponentProps } from '../utils/types';
 
 /**
  * Represents the modifiers that match a specific day in the calendar.
@@ -158,10 +159,7 @@ export type OnSelectHandler< T > = (
 ) => void;
 
 export interface BaseProps
-	extends Omit<
-		React.HTMLAttributes< HTMLDivElement >,
-		'onSelect' | 'defaultValue'
-	> {
+	extends Omit< ComponentProps< 'div' >, 'onSelect' | 'defaultValue' > {
 	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
@@ -265,12 +263,12 @@ export interface BaseProps
 
 	/**
 	 * The locale object used to localize dates. Pass a locale from
-	 * `@date-fns/locale` to localize the calendar.
+	 * `date-fns/locale` to localize the calendar.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
 	 * used for the translated labels and `locale` prop are consistent.
 	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
-	 * @default The `enUS` locale from `@date-fns/locale`
+	 * @default The `enUS` locale from `date-fns/locale`
 	 */
 	locale?: Locale;
 	/**
@@ -290,10 +288,12 @@ export interface BaseProps
 	 * [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 	 * for the possible values.
 	 *
-	 * When working with time zones, use the `TZDate` object exported by this
-	 * package instead of the native `Date` object.
+	 * When working with time zones, use the `TZDate` object from the
+	 * [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz) package
+	 * instead of the native `Date` object.
 	 * @example
-	 *   import { DateCalendar, TZDate } from "@wordpress/components";
+	 *   import { TZDate } from "@date-fns/tz";
+	 *   import { Calendar } from "@wordpress/ui";
 	 *
 	 *   export function WithTimeZone() {
 	 *     const timeZone = "America/New_York";
@@ -301,7 +301,7 @@ export interface BaseProps
 	 *       new TZDate( 2024, 12, 10, timeZone ) // Use `TZDate` instead of `Date`
 	 *     );
 	 *     return (
-	 *       <DateCalendar
+	 *       <Calendar
 	 *         timeZone={ timeZone }
 	 *         selected={ selected }
 	 *         onSelect={ setSelected }
@@ -317,7 +317,7 @@ export interface BaseProps
 	role?: 'application' | 'dialog' | undefined;
 }
 
-interface SingleProps {
+export interface SingleProps {
 	/** The selected date. */
 	selected?: Date | undefined | null;
 	/** Event handler when a day is selected. */
@@ -326,7 +326,7 @@ interface SingleProps {
 	defaultSelected?: Date;
 }
 
-interface RangeProps {
+export interface RangeProps {
 	/**
 	 * When `true`, the range will reset when including a disabled day.
 	 */
@@ -347,5 +347,5 @@ interface RangeProps {
 	defaultSelected?: DateRange;
 }
 
-export type DateCalendarProps = BaseProps & SingleProps;
-export type DateRangeCalendarProps = BaseProps & RangeProps;
+export type CalendarProps = BaseProps & SingleProps;
+export type RangeCalendarProps = BaseProps & RangeProps;

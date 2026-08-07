@@ -1,16 +1,13 @@
 import { differenceInCalendarDays } from 'date-fns';
 import { DayPicker, rangeContainsModifiers } from 'react-day-picker';
 import { enUS } from 'react-day-picker/locale';
-import { useMemo, useState, useCallback } from '@wordpress/element';
-import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
-import { clampNumberOfMonths } from '../utils/misc';
-import { useControlledValue } from '../../utils/hooks';
-import { useLocalizationProps } from '../utils/use-localization-props';
-import type {
-	DateRangeCalendarProps,
-	DateRange,
-	OnSelectHandler,
-} from '../types';
+import { forwardRef, useMemo, useState, useCallback } from '@wordpress/element';
+import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
+import { clampNumberOfMonths } from './utils/misc';
+import { useControlledValue } from './utils/use-controlled-value';
+import { useLocalizationProps } from './utils/use-localization-props';
+import { RootContext } from './utils/root-context';
+import type { RangeCalendarProps, DateRange, OnSelectHandler } from './types';
 
 export function usePreviewRange( {
 	selected,
@@ -20,7 +17,7 @@ export function usePreviewRange( {
 	max,
 	disabled,
 }: Pick<
-	DateRangeCalendarProps,
+	RangeCalendarProps,
 	'selected' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
 > & {
 	hoveredDate: Date | undefined;
@@ -120,87 +117,100 @@ export function usePreviewRange( {
 }
 
 /**
- * `DateRangeCalendar` is a React component that provides a customizable calendar
- * interface for **date range** selection.
+ * `RangeCalendar` provides a customizable calendar interface for **date range**
+ * selection.
  *
  * The component is built with accessibility in mind and follows ARIA best
  * practices for calendar widgets. It provides keyboard navigation, screen reader
  * support, and customizable labels for internationalization.
  */
-export const DateRangeCalendar = ( {
-	defaultSelected,
-	selected: selectedProp,
-	onSelect,
-	numberOfMonths = 1,
-	excludeDisabled,
-	min,
-	max,
-	disabled,
-	locale = enUS,
-	timeZone,
-	...props
-}: DateRangeCalendarProps ) => {
-	const localizationProps = useLocalizationProps( {
-		locale,
-		timeZone,
-		mode: 'range',
-	} );
-
-	const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
-		( selected, triggerDate, modifiers, e ) => {
-			// Convert internal `null` to `undefined` for the public event handler.
-			onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
-		},
-		[ onSelect ]
-	);
-
-	const [ selected, setSelected ] = useControlledValue< typeof selectedProp >(
+export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
+	function RangeCalendar(
 		{
+			defaultSelected,
+			selected: selectedProp,
+			onSelect,
+			numberOfMonths = 1,
+			excludeDisabled,
+			min,
+			max,
+			disabled,
+			locale = enUS,
+			timeZone,
+			render,
+			...props
+		},
+		ref
+	) {
+		const localizationProps = useLocalizationProps( {
+			locale,
+			timeZone,
+			mode: 'range',
+		} );
+
+		const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
+			( selected, triggerDate, modifiers, e ) => {
+				// Convert internal `null` to `undefined` for the public event handler.
+				onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
+			},
+			[ onSelect ]
+		);
+
+		const [ selected, setSelected ] = useControlledValue<
+			typeof selectedProp
+		>( {
 			defaultValue: defaultSelected,
 			value: selectedProp,
 			onChange,
-		}
-	);
+		} );
 
-	const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
-		undefined
-	);
+		const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
+			undefined
+		);
 
-	// Compute the preview range for hover effect
-	const previewRange = usePreviewRange( {
-		selected,
-		hoveredDate,
-		excludeDisabled,
-		min,
-		max,
-		disabled,
-	} );
+		// Compute the preview range for hover effect
+		const previewRange = usePreviewRange( {
+			selected,
+			hoveredDate,
+			excludeDisabled,
+			min,
+			max,
+			disabled,
+		} );
 
-	const modifiers = useMemo( () => {
-		return {
-			preview: previewRange,
-			preview_start: previewRange?.from,
-			preview_end: previewRange?.to,
-		};
-	}, [ previewRange ] );
+		const modifiers = useMemo( () => {
+			return {
+				preview: previewRange,
+				preview_start: previewRange?.from,
+				preview_end: previewRange?.to,
+			};
+		}, [ previewRange ] );
 
-	return (
-		<DayPicker
-			{ ...COMMON_PROPS }
-			{ ...localizationProps }
-			{ ...props }
-			mode="range"
-			numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
-			disabled={ disabled }
-			excludeDisabled={ excludeDisabled }
-			min={ min }
-			max={ max }
-			selected={ selected ?? undefined }
-			onSelect={ setSelected }
-			onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
-			onDayMouseLeave={ () => setHoveredDate( undefined ) }
-			modifiers={ modifiers }
-			modifiersClassNames={ MODIFIER_CLASSNAMES }
-		/>
-	);
-};
+		const rootContextValue = useMemo(
+			() => ( { render, ref } ),
+			[ render, ref ]
+		);
+
+		return (
+			<RootContext.Provider value={ rootContextValue }>
+				<DayPicker
+					{ ...COMMON_PROPS }
+					{ ...localizationProps }
+					{ ...props }
+					mode="range"
+					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
+					disabled={ disabled }
+					excludeDisabled={ excludeDisabled }
+					min={ min }
+					max={ max }
+					selected={ selected ?? undefined }
+					onSelect={ setSelected }
+					onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
+					onDayMouseLeave={ () => setHoveredDate( undefined ) }
+					modifiers={ modifiers }
+					modifiersClassNames={ MODIFIER_CLASSNAMES }
+				/>
+			</RootContext.Provider>
+		);
+	}
+);

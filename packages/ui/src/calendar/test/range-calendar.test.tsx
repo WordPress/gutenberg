@@ -15,19 +15,19 @@ import {
 } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useState } from '@wordpress/element';
-import { usePreviewRange, DateRangeCalendar } from '../date-range-calendar';
-import { TZDate } from '../';
+import { TZDate } from 'react-day-picker';
+import { usePreviewRange, RangeCalendar } from '../range-calendar';
 import { getDateButton, getDateCell, monthNameFormatter } from './__utils__';
-import type { DateRange, DateRangeCalendarProps } from '../types';
+import type { DateRange, RangeCalendarProps } from '../types';
 
-const UncontrolledDateRangeCalendar = (
-	props: DateRangeCalendarProps & {
+const UncontrolledRangeCalendar = (
+	props: RangeCalendarProps & {
 		initialSelected?: DateRange | undefined | null;
 		initialMonth?: Date | undefined;
 	}
 ) => {
 	return (
-		<DateRangeCalendar
+		<RangeCalendar
 			{ ...props }
 			defaultSelected={ props.initialSelected ?? undefined }
 			defaultMonth={ props.initialMonth }
@@ -35,8 +35,8 @@ const UncontrolledDateRangeCalendar = (
 	);
 };
 
-const ControlledDateRangeCalendar = (
-	props: DateRangeCalendarProps & {
+const ControlledRangeCalendar = (
+	props: RangeCalendarProps & {
 		initialSelected?: DateRange | undefined | null;
 		initialMonth?: Date | undefined;
 	}
@@ -48,7 +48,7 @@ const ControlledDateRangeCalendar = (
 		props.initialMonth
 	);
 	return (
-		<DateRangeCalendar
+		<RangeCalendar
 			{ ...props }
 			selected={ selected ?? null }
 			onSelect={ ( ...args ) => {
@@ -71,7 +71,7 @@ function setupUserEvent() {
 	return user;
 }
 
-describe( 'DateRangeCalendar', () => {
+describe( 'RangeCalendar', () => {
 	let today: Date;
 	let tomorrow: Date;
 	let yesterday: Date;
@@ -103,7 +103,7 @@ describe( 'DateRangeCalendar', () => {
 
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
-			render( <DateRangeCalendar /> );
+			render( <RangeCalendar /> );
 
 			expect(
 				screen.getByRole( 'application', {
@@ -126,7 +126,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
-			render( <DateRangeCalendar numberOfMonths={ 2 } /> );
+			render( <RangeCalendar numberOfMonths={ 2 } /> );
 
 			const grids = screen.getAllByRole( 'grid' );
 			expect( grids ).toHaveLength( 2 );
@@ -142,7 +142,7 @@ describe( 'DateRangeCalendar', () => {
 	describe( 'Date selection', () => {
 		it( 'should select an initial date range in uncontrolled mode via the `defaultSelected` prop', () => {
 			const dateRange = { from: today, to: tomorrow };
-			render( <DateRangeCalendar defaultSelected={ dateRange } /> );
+			render( <RangeCalendar defaultSelected={ dateRange } /> );
 
 			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
 			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
@@ -161,7 +161,7 @@ describe( 'DateRangeCalendar', () => {
 
 			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					defaultSelected={ defaultRange }
 					selected={ controlledRange }
 				/>
@@ -179,7 +179,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should have no date selected in uncontrolled mode when the `selected` prop is set to `undefined`', () => {
-			render( <DateRangeCalendar /> );
+			render( <RangeCalendar /> );
 
 			expect(
 				screen.queryByRole( 'gridcell', { selected: true } )
@@ -194,7 +194,7 @@ describe( 'DateRangeCalendar', () => {
 
 			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					defaultSelected={ defaultRange }
 					selected={ null }
 				/>
@@ -212,7 +212,7 @@ describe( 'DateRangeCalendar', () => {
 			const defaultRange = { from: today, to: tomorrow };
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					defaultSelected={ defaultRange }
 					disabled={ defaultRange }
 				/>
@@ -235,7 +235,7 @@ describe( 'DateRangeCalendar', () => {
 			const defaultRange = { from: today, to: tomorrow };
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					selected={ defaultRange }
 					disabled={ defaultRange }
 				/>
@@ -255,8 +255,8 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
-			[ 'Controlled', ControlledDateRangeCalendar ],
+			[ 'Uncontrolled', UncontrolledRangeCalendar ],
+			[ 'Controlled', ControlledRangeCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should start selecting a range when a date button is clicked', async () => {
 				const user = setupUserEvent();
@@ -862,7 +862,7 @@ describe( 'DateRangeCalendar', () => {
 
 	describe( 'Month navigation', () => {
 		it( 'should select an initial month in uncontrolled mode via the `defaultMonth` prop', () => {
-			render( <DateRangeCalendar defaultMonth={ nextMonth } /> );
+			render( <RangeCalendar defaultMonth={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -874,7 +874,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should select an initial month in controlled mode via the `month` prop', () => {
-			render( <DateRangeCalendar month={ nextMonth } /> );
+			render( <RangeCalendar month={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -886,8 +886,8 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
-			[ 'Controlled', ControlledDateRangeCalendar ],
+			[ 'Uncontrolled', UncontrolledRangeCalendar ],
+			[ 'Controlled', ControlledRangeCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
 				const user = setupUserEvent();
@@ -990,7 +990,10 @@ describe( 'DateRangeCalendar', () => {
 				expect( getDateCell( nextNextMonth ) ).toBeVisible();
 				expect( getDateButton( nextNextMonth ) ).toBeVisible();
 
-				expect( prevButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( prevButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 
 			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
@@ -1040,7 +1043,10 @@ describe( 'DateRangeCalendar', () => {
 				expect( getDateCell( prevPrevMonth ) ).toBeVisible();
 				expect( getDateButton( prevPrevMonth ) ).toBeVisible();
 
-				expect( nextButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( nextButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 		} );
 	} );
@@ -1048,7 +1054,7 @@ describe( 'DateRangeCalendar', () => {
 	describe( 'Keyboard focus and navigation', () => {
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					// eslint-disable-next-line jsx-a11y/no-autofocus
 					autoFocus
 					defaultSelected={ { from: today, to: tomorrow } }
@@ -1059,13 +1065,13 @@ describe( 'DateRangeCalendar', () => {
 
 		it( "should auto-focus today's date if there is not selected date when the `autoFocus` prop is set to `true`", async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
-			render( <DateRangeCalendar autoFocus /> );
+			render( <RangeCalendar autoFocus /> );
 			expect( getDateButton( today ) ).toHaveFocus();
 		} );
 
 		it( 'should focus each arrow as a tab stop, but treat the grid as a 2d composite widget', async () => {
 			const user = setupUserEvent();
-			render( <DateRangeCalendar /> );
+			render( <RangeCalendar /> );
 
 			// Focus previous month button
 			await user.tab();
@@ -1165,7 +1171,7 @@ describe( 'DateRangeCalendar', () => {
 			const user = setupUserEvent();
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ [
 						tomorrow,
 						addWeeks( addDays( tomorrow, 1 ), 1 ),
@@ -1198,7 +1204,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should focus the selected date when tabbing into the calendar', async () => {
 			const user = setupUserEvent();
 			render(
-				<DateRangeCalendar selected={ { from: today, to: tomorrow } } />
+				<RangeCalendar selected={ { from: today, to: tomorrow } } />
 			);
 
 			// Tab to the calendar grid
@@ -1214,7 +1220,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should support disabling all dates via the `disabled` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar disabled /> );
+			render( <RangeCalendar disabled /> );
 
 			within( screen.getByRole( 'grid' ) )
 				.getAllByRole( 'button' )
@@ -1243,7 +1249,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling single dates via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ tomorrow } /> );
+			render( <RangeCalendar disabled={ tomorrow } /> );
 
 			expect( getDateButton( tomorrow ) ).toBeDisabled();
 		} );
@@ -1251,7 +1257,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should support passing a custom function via the `disabled` prop', async () => {
 			const primeNumbers = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ];
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ ( date ) =>
 						primeNumbers.includes( date.getDate() )
 					}
@@ -1268,7 +1274,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates before a certain date via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ { before: today } } /> );
+			render( <RangeCalendar disabled={ { before: today } } /> );
 
 			for ( let date = 1; date < today.getDate(); date++ ) {
 				expect(
@@ -1281,7 +1287,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates after a certain date via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ { after: today } } /> );
+			render( <RangeCalendar disabled={ { after: today } } /> );
 
 			for ( let date = today.getDate() + 1; date < 32; date++ ) {
 				expect(
@@ -1295,7 +1301,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling all dates before a certain date and after a certain date via the `disabled` prop', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ {
 						before: yesterday,
 						after: addDays( today, 1 ),
@@ -1327,7 +1333,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling all dates within a certain date range via the `disabled` prop', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ { from: yesterday, to: addDays( today, 1 ) } }
 				/>
 			);
@@ -1356,9 +1362,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling specific days of the week via the `disabled` prop', async () => {
 			const weekendsInMay = [ 3, 4, 10, 11, 17, 18, 24, 25, 31 ];
-			render(
-				<DateRangeCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } />
-			);
+			render( <RangeCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } /> );
 
 			for ( const date of weekendsInMay ) {
 				expect(
@@ -1372,7 +1376,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should disable the previous and next months buttons if the `disableNavigation` is set to `true`', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar disableNavigation /> );
+			render( <RangeCalendar disableNavigation /> );
 
 			expect(
 				screen.getByRole( 'button', { name: /previous month/i } )
@@ -1394,7 +1398,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should localize the calendar based on the `locale` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar locale={ ar } /> );
+			render( <RangeCalendar locale={ ar } /> );
 
 			// Check computed writing direction
 			expect(
@@ -1430,10 +1434,7 @@ describe( 'DateRangeCalendar', () => {
 			const onSelect = jest.fn();
 
 			render(
-				<DateRangeCalendar
-					timeZone="Asia/Tokyo"
-					onSelect={ onSelect }
-				/>
+				<RangeCalendar timeZone="Asia/Tokyo" onSelect={ onSelect } />
 			);
 
 			// For someone in Tokyo, the current time simulated in the test
@@ -1482,7 +1483,7 @@ describe( 'DateRangeCalendar', () => {
 			};
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					defaultSelected={ timezoneRange }
 					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
 					timeZone="Etc/GMT+2"
