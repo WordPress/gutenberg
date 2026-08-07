@@ -281,6 +281,13 @@ comment delimiters unescaped, so `is_valid_payload` rejects names outside
 the block-name grammar (`namespace/name`, lowercase alphanumeric-dash) for
 every user — a crafted name could close the comment and inject markup.
 
+Invalid rows settle PER-INTENT: an intent failing envelope or payload
+validation voids with reason `invalid-payload` (rows without even a
+recoverable intentId are dropped), never a request-level 400 — one bad row
+(a client bug or a hostile crafted row) must not starve the batch's valid
+edits or wedge the author's outbox in a permanent retry loop. Malformed
+resolutions and server-emitted update types from clients remain 400s.
+
 ## Validation oracles
 
 Checked by the deterministic simulator after every seeded schedule

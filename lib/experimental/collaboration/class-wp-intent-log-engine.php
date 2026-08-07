@@ -335,11 +335,13 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 				return $state;
 			}
 
-			$actor_id    = self::actor_id( $client_id );
-			$base_seq    = (int) ( $state['base_seq'] ?? 0 );
-			$head_seq    = $base_seq + count( $state['log'] );
-			$intents     = array();
-			$resolutions = array();
+			$actor_id      = self::actor_id( $client_id );
+			$base_seq      = (int) ( $state['base_seq'] ?? 0 );
+			$head_seq      = $base_seq + count( $state['log'] );
+			$intents       = array();
+			$resolutions   = array();
+			$invalid       = array();
+			$submitted_ids = array();
 			foreach ( $updates as $update ) {
 				if ( self::UPDATE_TYPE_RESOLVED === $update['type'] ) {
 					$resolution = json_decode( $update['data'], true );
@@ -364,36 +366,46 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 						array( 'status' => 400 )
 					);
 				}
-				$intent = json_decode( $update['data'], true );
-				if (
-					! is_array( $intent ) ||
-					! is_string( $intent['intentId'] ?? null ) || '' === $intent['intentId'] ||
-					! is_int( $intent['baseSeq'] ?? null ) || $intent['baseSeq'] < 0 ||
-					$intent['baseSeq'] > $head_seq ||
-					! is_string( $intent['type'] ?? null ) ||
-					! is_array( $intent['payload'] ?? null ) ||
-					! ( null === ( $intent['txnId'] ?? null ) || is_string( $intent['txnId'] ) )
-				) {
-					return new WP_Error(
-						'rest_sync_invalid_intent',
-						__( 'Malformed intent envelope.', 'gutenberg' ),
-						array( 'status' => 400 )
-					);
-				}
+				$intent    = json_decode( $update['data'], true );
+				$intent_id = is_array( $intent ) && is_string( $intent['intentId'] ?? null ) && '' !== $intent['intentId']
+					? $intent['intentId']
+					: null;
+				/*
+				 * Malformed rows settle PER-INTENT as `invalid-payload`
+				 * voids instead of failing the whole request: a request-
+				 * level 400 would let one bad row (a client bug, or a
+				 * hostile crafted row) starve every valid edit in the batch
+				 * and wedge the author's outbox in a permanent retry loop.
+				 * Rows without even a recoverable intentId are dropped —
+				 * nothing could correlate their disposition anyway.
+				 */
+				$envelope_ok = null !== $intent_id &&
+					is_int( $intent['baseSeq'] ?? null ) && $intent['baseSeq'] >= 0 &&
+					$intent['baseSeq'] <= $head_seq &&
+					is_string( $intent['type'] ?? null ) &&
+					is_array( $intent['payload'] ?? null ) &&
+					( null === ( $intent['txnId'] ?? null ) || is_string( $intent['txnId'] ) );
 				// Payloads reach typed planner/document code: validate the
-				// full vocabulary schema up front so a malformed intent is a
-				// clean 400 instead of a fatal mid-plan.
-				if ( ! WP_Intent_Log_Planner::is_valid_payload( $intent['type'], $intent['payload'] ) ) {
-					return new WP_Error(
-						'rest_sync_invalid_intent',
-						__( 'Unknown intent type or malformed payload.', 'gutenberg' ),
-						array( 'status' => 400 )
-					);
+				// full vocabulary schema up front so a malformed intent
+				// voids cleanly instead of fataling mid-plan.
+				if ( ! $envelope_ok || ! WP_Intent_Log_Planner::is_valid_payload( $intent['type'], $intent['payload'] ) ) {
+					if ( null !== $intent_id ) {
+						$submitted_ids[]       = $intent_id;
+						$invalid[ $intent_id ] = array(
+							'status' => 'voided',
+							'reason' => 'invalid-payload',
+						);
+					}
+					continue;
 				}
 				// Attribution is a server-side fact: stamp, never trust.
 				$intent['actorId'] = $actor_id;
 				$intent['txnId']   = $intent['txnId'] ?? null;
 				$intents[]         = $intent;
+				$submitted_ids[]   = $intent_id;
+			}
+			if ( count( $invalid ) > 0 ) {
+				do_action( 'qm/debug', 'wp-sync: ' . count( $invalid ) . " invalid intent(s) voided in {$room}" );
 			}
 
 			// Group first, then drop already-settled intents within units, so
@@ -655,11 +667,12 @@ if ( ! class_exists( 'WP_Intent_Log_Engine' ) ) {
 			$this->room_state[ $room ] = null; // Invalidate: rows changed.
 
 			$dispositions = array();
-			foreach ( $intents as $intent ) {
+			foreach ( $submitted_ids as $intent_id ) {
 				$dispositions[] = array_merge(
-					array( 'intentId' => $intent['intentId'] ),
-					$state['settled'][ $intent['intentId'] ]
-						?? $stale[ $intent['intentId'] ]
+					array( 'intentId' => $intent_id ),
+					$state['settled'][ $intent_id ]
+						?? $stale[ $intent_id ]
+						?? $invalid[ $intent_id ]
 						?? array( 'status' => 'unknown' )
 				);
 			}

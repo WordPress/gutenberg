@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   The intent-log capture bridge no longer authors `set_attr` intents for editor attributes that surface as explicitly `undefined` (a `role: "local"` normalization artifact — core/html `content`). Such a write is not expressible on the wire (`JSON.stringify` drops the key), and the resulting schema-invalid intent poisoned the whole batch: the server rejected it and the room's outbox wedged in a permanent retry loop, silently blocking ALL sync for blocks like Custom HTML. Undefined attrs now carry the document's current value through diffing and verification (absence is not testimony).
+
 ### Internal
 
 -   Extract the Yjs relay engine logic out of the HTTP polling transport into an engine session codec (`src/engines/yjs-relay/`). Transport providers now receive an engine-generic session codec via `ProviderCreatorOptions.session` instead of `ydoc`/`awareness`, so transports no longer depend on Yjs. No wire-format or behavior change.

@@ -784,6 +784,45 @@ export function deriveIntents(
 		}
 	}
 	adoptExistingIds( specs, doc.root, claimed, eligible );
+	/*
+	 * An explicitly-undefined attr value in the editor tree is a
+	 * normalization artifact (role:"local" attributes surface as undefined
+	 * on some passes — core/html content), not testimony: carry the
+	 * document's current value so the diff derives nothing and
+	 * verification does not read the artifact as a change. For ids the
+	 * document does not know (fresh inserts) the key is dropped — an
+	 * undefined attr is not expressible on the wire anyway.
+	 */
+	const docBlocksById = new Map< string, EngineBlock >();
+	const indexDocBlocks = ( docBlocks: EngineBlock[] ) => {
+		for ( const docBlock of docBlocks ) {
+			docBlocksById.set( docBlock.syncId, docBlock );
+			indexDocBlocks( docBlock.children );
+		}
+	};
+	indexDocBlocks( doc.root );
+	const fillUndefinedAttrs = (
+		specList: Array< Record< string, unknown > >
+	) => {
+		for ( const spec of specList ) {
+			const attrs = spec.attrs as Record< string, unknown >;
+			const docBlock = docBlocksById.get( spec.syncId as string );
+			for ( const key of Object.keys( attrs ) ) {
+				if ( undefined !== attrs[ key ] ) {
+					continue;
+				}
+				if ( docBlock && key in docBlock.attrs ) {
+					attrs[ key ] = docBlock.attrs[ key ];
+				} else {
+					delete attrs[ key ];
+				}
+			}
+			fillUndefinedAttrs(
+				spec.children as Array< Record< string, unknown > >
+			);
+		}
+	};
+	fillUndefinedAttrs( specs );
 	if ( options.excludeIds && options.excludeIds.size > 0 ) {
 		specs = filterExcludedSpecs( specs, options.excludeIds );
 	}
@@ -900,6 +939,20 @@ export function deriveIntents(
 
 		const newAttrs = entry.spec.attrs as Record< string, unknown >;
 		for ( const [ key, value ] of Object.entries( newAttrs ) ) {
+			/*
+			 * An explicitly-undefined editor value is a normalization
+			 * artifact (role:"local" attributes surface as undefined on
+			 * some passes — core/html content), not an authored edit, and
+			 * it is not even expressible on the wire: JSON.stringify drops
+			 * the key, producing a schema-invalid set_attr that poisons
+			 * the whole batch. Absence is only intent if the editor
+			 * testified otherwise — skip. (The presence of the KEY also
+			 * keeps the remove_attr pass below from reading it as a
+			 * removal.)
+			 */
+			if ( undefined === value ) {
+				continue;
+			}
 			if (
 				JSON.stringify( oldBlock.attrs[ key ] ) !==
 				JSON.stringify( value )

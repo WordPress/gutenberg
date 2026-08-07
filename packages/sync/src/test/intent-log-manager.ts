@@ -984,6 +984,100 @@ describe( 'intent-log manager', () => {
 		} );
 	} );
 
+	it( 'attr-lane blocks (core/html) never author a wire-inexpressible undefined set_attr', async () => {
+		const transport = makeFakeTransport();
+		window._wpCollaborationEnabled = '1';
+		addFilter( FILTER, HOOK, () => [ transport.creator ] );
+		const manager = createIntentLogManager();
+		const handlers = makeHandlers();
+		// Live resolver shape: core/html has no html/rich-text-source
+		// attributes, so its content rides the ATTR lane.
+		await manager.load(
+			{
+				richTextFields: ( name: string ) =>
+					'core/html' === name ? [] : [ 'content' ],
+			} as never,
+			'postType/post',
+			'1',
+			{},
+			handlers
+		);
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'p1',
+					blockType: 'core/paragraph',
+					text: 'Shared',
+				},
+			] )
+		);
+		const pushed = ( handlers.edits.at( -1 ) as { blocks: unknown[] } )
+			.blocks;
+
+		// The user adds a Custom HTML block carrying a script tag.
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					...pushed,
+					{
+						name: 'core/html',
+						attributes: { content: '<script>alert(1)</script>' },
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		/*
+		 * REGRESSION: a later capture pass presents the block with content
+		 * normalized to an explicit undefined (role:"local" attribute
+		 * artifact) and no id write-back yet. This used to derive
+		 * `set_attr { value: undefined }` — JSON.stringify drops the key,
+		 * the server 400s the batch, and the room's outbox wedges forever.
+		 */
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					...pushed,
+					{
+						name: 'core/html',
+						attributes: { content: undefined },
+						innerBlocks: [],
+					},
+				],
+			},
+			'gutenberg'
+		);
+
+		const decoded = transport.captured.sent
+			.filter(
+				( update ) => INTENT_LOG_UPDATE_TYPES.INTENT === update.type
+			)
+			.map( ( update ) => JSON.parse( update.data ) );
+		const insert = decoded.find(
+			( intent ) => 'insert_block' === intent.type
+		);
+		expect( insert.payload.block.blockType ).toBe( 'core/html' );
+		expect( insert.payload.block.attrs.content ).toBe(
+			'<script>alert(1)</script>'
+		);
+		// Every attr write must be expressible on the wire, and the
+		// undefined artifact must not read as a removal either.
+		const setAttrsMissingValue = decoded.filter(
+			( intent ) =>
+				'set_attr' === intent.type && ! ( 'value' in intent.payload )
+		);
+		expect( setAttrsMissingValue ).toEqual( [] );
+		expect(
+			decoded.filter( ( intent ) => 'remove_attr' === intent.type )
+		).toEqual( [] );
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

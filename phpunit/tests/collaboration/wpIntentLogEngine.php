@@ -300,6 +300,9 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		);
 		$this->assertErrorResponse( 'rest_invalid_update_type', $bad_type, 400 );
 
+		// A malformed envelope voids PER-INTENT (a request-level 400 would
+		// let one bad row starve every valid edit in the batch and wedge
+		// the author's outbox in a permanent retry loop).
 		$malformed = $this->poll(
 			array(
 				array(
@@ -308,7 +311,14 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $malformed, 400 );
+		$this->assertSame(
+			array(
+				'intentId' => 'x',
+				'status'   => 'voided',
+				'reason'   => 'invalid-payload',
+			),
+			$malformed['dispositions'][0]
+		);
 
 		// baseSeq beyond the log head is malformed, not a crash.
 		$future = $this->poll(
@@ -323,10 +333,36 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $future, 400 );
+		$this->assertSame( 'invalid-payload', $future['dispositions'][0]['reason'] );
+
+		// A valid intent in the SAME batch as a malformed one still lands.
+		$mixed    = $this->poll(
+			array(
+				array(
+					'type' => WP_Intent_Log_Engine::UPDATE_TYPE_INTENT,
+					'data' => wp_json_encode( array( 'intentId' => 'bad-1' ) ),
+				),
+				self::intent_update(
+					array(
+						'intentId' => 'good-1',
+						'baseSeq'  => 0,
+						'type'     => 'insert_text',
+						'payload'  => array(
+							'syncId' => self::paragraph_id(),
+							'field'  => 'content',
+							'offset' => 0,
+							'text'   => 'still lands ',
+						),
+					)
+				),
+			)
+		);
+		$statuses = array_column( $mixed['dispositions'], 'status', 'intentId' );
+		$this->assertSame( 'voided', $statuses['bad-1'] );
+		$this->assertSame( 'applied', $statuses['good-1'] );
 	}
 
-	public function test_payload_schema_violations_are_rejected_with_400_not_500() {
+	public function test_payload_schema_violations_void_per_intent_not_500() {
 		// Unknown vocabulary type.
 		$unknown = $this->poll(
 			array(
@@ -340,7 +376,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $unknown, 400 );
+		$this->assertSame( 'invalid-payload', $unknown['dispositions'][0]['reason'] );
 
 		// Known type, wrong-typed field (offset must be a non-negative int).
 		// Pre-validation this fataled inside typed planner code.
@@ -361,7 +397,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $wrong_type, 400 );
+		$this->assertSame( 'invalid-payload', $wrong_type['dispositions'][0]['reason'] );
 
 		// Missing required field.
 		$missing = $this->poll(
@@ -381,7 +417,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $missing, 400 );
+		$this->assertSame( 'invalid-payload', $missing['dispositions'][0]['reason'] );
 
 		// A syncId containing `::` would silently break the frame-key
 		// algebra (frame keys are `syncId::field`).
@@ -404,7 +440,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $frame_breaker, 400 );
+		$this->assertSame( 'invalid-payload', $frame_breaker['dispositions'][0]['reason'] );
 
 		// Extraneous payload fields are rejected (closed vocabulary).
 		$extraneous = $this->poll(
@@ -422,7 +458,10 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $extraneous, 400 );
+		$this->assertSame(
+			'invalid-payload',
+			$extraneous['dispositions'][0]['reason']
+		);
 	}
 
 	/**
@@ -1342,7 +1381,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 		$this->assertSame( 'escalated', $partial['dispositions'][0]['status'] );
 	}
 
-	public function test_block_names_outside_the_grammar_are_rejected_for_everyone() {
+	public function test_block_names_outside_the_grammar_are_voided_for_everyone() {
 		// Block names materialize into comment delimiters unescaped; a
 		// crafted name could close the comment and inject markup.
 		$insert = $this->poll(
@@ -1364,7 +1403,7 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $insert, 400 );
+		$this->assertSame( 'invalid-payload', $insert['dispositions'][0]['reason'] );
 
 		$transform = $this->poll(
 			array(
@@ -1381,6 +1420,6 @@ class Tests_Collaboration_WpIntentLogEngine extends WP_Test_REST_TestCase {
 				),
 			)
 		);
-		$this->assertErrorResponse( 'rest_sync_invalid_intent', $transform, 400 );
+		$this->assertSame( 'invalid-payload', $transform['dispositions'][0]['reason'] );
 	}
 }

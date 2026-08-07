@@ -623,7 +623,31 @@ inside intent payloads, not the transport.
   always safe. NOTE for manual testing: on single site, editors
   and admins HAVE unfiltered_html — the lane only triggers for
   filtered roles (author/contributor) or under a cap-revoking
-  filter; dev-env user2 is an editor.
+  filter; and the test post must be EDITABLE by the filtered user
+  (authors can't open others' posts — use a post they own).
+
+  **2d-xxi follow-up 2 (the Custom HTML block never synced AT
+  ALL).** Chris's repro attempt exposed a pre-existing capture bug
+  masking everything: on some passes the editor presents
+  role:"local" attributes (core/html content) as explicitly
+  undefined; the bridge derived `set_attr { value: undefined }`,
+  JSON.stringify DROPPED the value key, the server 400'd the
+  batch, and the transport retried the poisoned batch forever —
+  wedging the room's whole outbox, so not even the valid
+  insert_block ever landed (for ANY user, kses aside). Two-layer
+  fix: (1) bridge — undefined attr values are normalization
+  artifacts, not testimony; they now carry the document's current
+  value through diffing AND verification (and never read as
+  removals); (2) engine — malformed rows settle per-intent as
+  `invalid-payload` voids instead of a request-level 400, so one
+  bad row can't starve a batch or wedge an outbox (unrecoverable
+  rows are dropped; wrong update TYPES and malformed resolutions
+  stay 400). Live-verified on the dev env: author-owned post,
+  user2 inserts Custom HTML + script → parks; admin's panel shows
+  'requires-approval' with the full lost markup; script never
+  reaches admin's canvas. Debugging method that found it: two-user
+  Playwright probe capturing 400 response AND request bodies — the
+  wire, not the code, told the story.
   Approval needs NO new machinery: proposals use the ordinary row
   shape (replay/retention/resolution/review UI unchanged), and
   restore re-authors content under the RESTORER's capability — a
