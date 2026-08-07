@@ -234,6 +234,23 @@ export interface SyncConfig {
 	 * the conventional `content` attribute is captured.
 	 */
 	richTextFields?: ( blockName: string ) => string[];
+	/**
+	 * Whether a block type keeps its markup in innerContent fragments
+	 * rather than any attribute (core/html). Such blocks sync their full
+	 * inner HTML as the engine's content field.
+	 */
+	isRawContentBlock?: ( blockName: string ) => boolean;
+	/**
+	 * The full inner HTML of a raw-content block (static fragments plus
+	 * serialized inner blocks) — typically backed by the block
+	 * serializer's getBlockContent.
+	 */
+	serializeRawContent?: ( block: {
+		name: string;
+		attributes: Record< string, unknown >;
+		innerBlocks: unknown[];
+		innerContent?: Array< string | null >;
+	} ) => string;
 }
 
 export interface SyncManager {

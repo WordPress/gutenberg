@@ -648,6 +648,35 @@ inside intent payloads, not the transport.
   reaches admin's canvas. Debugging method that found it: two-user
   Playwright probe capturing 400 response AND request bodies — the
   wire, not the code, told the story.
+
+  **2d-xxi follow-up 3 (raw-content blocks: the REAL Custom HTML
+  model).** Still not syncing after the wedge fix — because the
+  Custom HTML block was REDESIGNED (7.1): its markup lives in
+  `innerContent` fragments + inner blocks, NOT the deprecated
+  `content` attribute (edit.js migrates the attr to undefined —
+  the source of the earlier artifact). The bridge's BridgeBlock
+  model ignored innerContent entirely, so there was nothing to
+  capture. Fix: raw-content blocks sync their full inner HTML as
+  the engine's content FIELD through the codec — exactly the form
+  server genesis/materialize already uses for innerHTML, so the
+  two sides finally agree. Seam: `SyncConfig.isRawContentBlock`
+  (core-data: name === 'core/html', mirroring the block
+  serializer's own special case) + `serializeRawContent`
+  (getBlockContent — fragments + serialized inner blocks
+  flattened); bridge `RawContentAdapter` threads through spec
+  building (fields.content = htmlToField(serialize), children
+  flattened), reconstruction (field → innerContent: [html]),
+  diffing, and bridgeCanonical/verification via fieldNamesFor
+  (raw blocks always carry ['content']). Content edits derive
+  format_text with obj-format ids → the kses lane judges them
+  (insert_block field spans already covered). Peer receives
+  innerContent-form blocks; nested blocks inside custom HTML
+  degrade to static fragments on the peer (edit re-parses).
+  Live-probed: benign div syncs to admin's canvas; script parks;
+  new e2e spec pins sync + save persistence. LESSON (twice now):
+  capture surfaces must be enumerated from the BLOCK'S OWN
+  content model (save/serializer behavior), not from attribute
+  schemas alone.
   Approval needs NO new machinery: proposals use the ordinary row
   shape (replay/retention/resolution/review UI unchanged), and
   restore re-authors content under the RESTORER's capability — a

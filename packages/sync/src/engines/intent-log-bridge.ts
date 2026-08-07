@@ -47,6 +47,12 @@ export interface BridgeBlock {
 	name: string;
 	attributes: Record< string, unknown >;
 	innerBlocks: BridgeBlock[];
+	/**
+	 * Static HTML fragments interleaved with inner-block slots (null
+	 * entries) — the content model of raw-content blocks (core/html),
+	 * whose markup lives OUTSIDE attributes.
+	 */
+	innerContent?: Array< string | null >;
 }
 
 /**
@@ -57,6 +63,40 @@ export interface BridgeBlock {
 export type RichTextFieldsResolver = ( blockName: string ) => string[];
 
 const defaultRichTextFields: RichTextFieldsResolver = () => [ 'content' ];
+
+/**
+ * Adapter for raw-content block types (core/html): blocks whose markup
+ * lives in innerContent fragments rather than any attribute. Their content
+ * becomes the engine's `content` FIELD through the codec (matching the
+ * server's genesis/materialize treatment of innerHTML), with inner blocks
+ * flattened into the serialized string.
+ */
+export interface RawContentAdapter {
+	/** Whether the named block type is a raw-content block. */
+	is: ( blockName: string ) => boolean;
+	/** The block's full inner HTML (fragments + serialized inner blocks). */
+	serialize: ( block: BridgeBlock ) => string;
+}
+
+/** The engine field a raw-content block's markup lives in. */
+const RAW_CONTENT_FIELDS = [ 'content' ];
+
+/**
+ * The field names carried for a block type: raw-content blocks always use
+ * the `content` field; others come from the rich-text resolver.
+ *
+ * @param blockName Block type name.
+ * @param resolver  Rich-text attribute names per block type.
+ * @param raw       Raw-content adapter.
+ * @return Field names.
+ */
+function fieldNamesFor(
+	blockName: string,
+	resolver: RichTextFieldsResolver,
+	raw?: RawContentAdapter
+): string[] {
+	return raw?.is( blockName ) ? RAW_CONTENT_FIELDS : resolver( blockName );
+}
 
 /**
  * A derived batch: the intents to author, in order, plus how many fields
@@ -95,6 +135,9 @@ export interface DeriveOptions {
 
 	/** Rich-text attribute names per block type (default: content only). */
 	richTextFields?: RichTextFieldsResolver;
+
+	/** Raw-content block handling (core/html-style innerContent markup). */
+	rawContent?: RawContentAdapter;
 }
 
 /**
@@ -135,13 +178,15 @@ function serializeAttribute( value: unknown ): unknown {
  *                 can distinguish minted ids from editor-authored ones).
  * @param seenIds  Optional set of ids already used in this tree; later
  *                 duplicates re-mint (the first occurrence keeps identity).
+ * @param raw      Raw-content block handling (core/html-style markup).
  * @return Engine block spec (makeBlock input shape).
  */
 export function blockToEngineSpec(
 	block: BridgeBlock,
 	resolver: RichTextFieldsResolver = defaultRichTextFields,
 	minted?: Set< string >,
-	seenIds?: Set< string >
+	seenIds?: Set< string >,
+	raw?: RawContentAdapter
 ): Record< string, unknown > {
 	const attributes = { ...block.attributes };
 	const metadata = {
@@ -171,10 +216,30 @@ export function blockToEngineSpec(
 	}
 
 	const fields: Record< string, EngineField > = {};
-	for ( const name of resolver( block.name ) ) {
-		const raw = serializeAttribute( attributes[ name ] );
-		delete attributes[ name ];
-		fields[ name ] = htmlToField( 'string' === typeof raw ? raw : '' );
+	let children: Array< Record< string, unknown > >;
+	if ( raw?.is( block.name ) ) {
+		/*
+		 * Raw-content block: the markup lives in innerContent, not any
+		 * attribute — serialize it (inner blocks flattened in) into the
+		 * content FIELD through the codec, matching the server's
+		 * genesis/materialize treatment of innerHTML. A stale content
+		 * attribute (the deprecated createBlock path) is dropped; the
+		 * field is the single source of truth.
+		 */
+		fields.content = htmlToField( raw.serialize( block ) );
+		delete attributes.content;
+		children = [];
+	} else {
+		for ( const name of resolver( block.name ) ) {
+			const value = serializeAttribute( attributes[ name ] );
+			delete attributes[ name ];
+			fields[ name ] = htmlToField(
+				'string' === typeof value ? value : ''
+			);
+		}
+		children = block.innerBlocks.map( ( child ) =>
+			blockToEngineSpec( child, resolver, minted, seenIds, raw )
+		);
 	}
 
 	const attrs: Record< string, unknown > = {};
@@ -187,9 +252,7 @@ export function blockToEngineSpec(
 		blockType: block.name,
 		attrs,
 		fields,
-		children: block.innerBlocks.map( ( child ) =>
-			blockToEngineSpec( child, resolver, minted, seenIds )
-		),
+		children,
 	};
 }
 
@@ -202,11 +265,13 @@ export function blockToEngineSpec(
  *
  * @param block    Engine block.
  * @param resolver Rich-text attribute names per block type.
+ * @param raw      Raw-content block handling (core/html-style markup).
  * @return Bridge block.
  */
 export function engineBlockToBlock(
 	block: EngineBlock,
-	resolver: RichTextFieldsResolver = defaultRichTextFields
+	resolver: RichTextFieldsResolver = defaultRichTextFields,
+	raw?: RawContentAdapter
 ): BridgeBlock {
 	const attributes: Record< string, unknown > = {};
 	for ( const [ key, value ] of Object.entries( block.attrs ) ) {
@@ -221,6 +286,19 @@ export function engineBlockToBlock(
 		syncId: block.syncId,
 	};
 	attributes.metadata = metadata;
+	if ( raw?.is( block.blockType ) ) {
+		// Raw-content block: the content field's HTML becomes innerContent
+		// (the editor's own content model for these blocks — any nested
+		// block markup stays inline as static fragments).
+		const field = block.fields.content;
+		const html = field ? fieldToHtml( field ) : '';
+		return {
+			name: block.blockType,
+			attributes,
+			innerBlocks: [],
+			innerContent: '' === html ? [] : [ html ],
+		};
+	}
 	for ( const name of resolver( block.blockType ) ) {
 		const field = block.fields[ name ];
 		if (
@@ -235,7 +313,7 @@ export function engineBlockToBlock(
 		name: block.blockType,
 		attributes,
 		innerBlocks: block.children.map( ( child ) =>
-			engineBlockToBlock( child, resolver )
+			engineBlockToBlock( child, resolver, raw )
 		),
 	};
 }
@@ -245,13 +323,17 @@ export function engineBlockToBlock(
  *
  * @param doc      Engine document.
  * @param resolver Rich-text attribute names per block type.
+ * @param raw      Raw-content block handling (core/html-style markup).
  * @return Bridge blocks.
  */
 export function engineDocumentToBlocks(
 	doc: EngineDocument,
-	resolver: RichTextFieldsResolver = defaultRichTextFields
+	resolver: RichTextFieldsResolver = defaultRichTextFields,
+	raw?: RawContentAdapter
 ): BridgeBlock[] {
-	return doc.root.map( ( block ) => engineBlockToBlock( block, resolver ) );
+	return doc.root.map( ( block ) =>
+		engineBlockToBlock( block, resolver, raw )
+	);
 }
 
 interface FlatEntry {
@@ -754,10 +836,11 @@ export function deriveIntents(
 	options: DeriveOptions = {}
 ): ( DerivedIntents & { specs: Array< Record< string, unknown > > } ) | null {
 	const resolver = options.richTextFields ?? defaultRichTextFields;
+	const raw = options.rawContent;
 	const minted = new Set< string >();
 	const seenIds = new Set< string >();
 	let specs = blocks.map( ( block ) =>
-		blockToEngineSpec( block, resolver, minted, seenIds )
+		blockToEngineSpec( block, resolver, minted, seenIds, raw )
 	);
 	/*
 	 * Adoption eligibility: a spec may take over a document identity when
@@ -828,8 +911,10 @@ export function deriveIntents(
 	}
 	const target = specsToDocument( specs );
 	const targetIds = collectSpecIds( specs, new Set() );
-	const targetJson = bridgeCanonical( target, resolver );
-	if ( targetJson === bridgeCanonical( doc, resolver, targetIds ) ) {
+	const fieldNames: RichTextFieldsResolver = ( name ) =>
+		fieldNamesFor( name, resolver, raw );
+	const targetJson = bridgeCanonical( target, fieldNames );
+	if ( targetJson === bridgeCanonical( doc, fieldNames, targetIds ) ) {
 		/*
 		 * Equal up to blocks absent from the tree. Absent-but-REMOVABLE
 		 * blocks are deletions and need full derivation; when every absent
@@ -983,7 +1068,7 @@ export function deriveIntents(
 			}
 		}
 
-		for ( const field of resolver( newType ) ) {
+		for ( const field of fieldNames( newType ) ) {
 			const textIntent = diffText(
 				blockField( oldBlock, field ).text,
 				specField( entry.spec, field ).text,
@@ -1011,7 +1096,7 @@ export function deriveIntents(
 		if ( ! scratchEntry ) {
 			continue;
 		}
-		for ( const field of resolver( entry.spec.blockType as string ) ) {
+		for ( const field of fieldNames( entry.spec.blockType as string ) ) {
 			intents.push(
 				...diffFormats(
 					blockField( scratchEntry.block, field ),
@@ -1025,7 +1110,7 @@ export function deriveIntents(
 
 	// Verify: the derived intents must reproduce the target tree (retained
 	// blocks excluded from the comparison — they are staleness, not target).
-	if ( verifiesTo( doc, intents, targetJson, resolver, targetIds ) ) {
+	if ( verifiesTo( doc, intents, targetJson, fieldNames, targetIds ) ) {
 		return { intents, coarseBlockCount: 0, retainedIds, specs };
 	}
 
@@ -1052,7 +1137,7 @@ export function deriveIntents(
 		if ( ! old ) {
 			continue;
 		}
-		for ( const field of resolver( entry.spec.blockType as string ) ) {
+		for ( const field of fieldNames( entry.spec.blockType as string ) ) {
 			const targetField = specField( entry.spec, field );
 			const docField = blockField( old.block, field );
 			if (
@@ -1089,7 +1174,7 @@ export function deriveIntents(
 			}
 		}
 	}
-	if ( ! verifiesTo( doc, coarse, targetJson, resolver, targetIds ) ) {
+	if ( ! verifiesTo( doc, coarse, targetJson, fieldNames, targetIds ) ) {
 		throw new Error(
 			'Intent capture failed verification even after degrading to coarse replacement.'
 		);

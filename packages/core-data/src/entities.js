@@ -9,6 +9,7 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	__unstableSerializeAndClean,
+	getBlockContent,
 	getBlockType,
 	parse,
 } from '@wordpress/blocks';
@@ -506,6 +507,35 @@ async function loadPostTypeEntities() {
 							'rich-text' === schema?.source
 					)
 					.map( ( [ key ] ) => key );
+			},
+
+			/**
+			 * Blocks whose markup lives in innerContent fragments rather
+			 * than any attribute. The block serializer special-cases
+			 * core/html the same way.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @return {boolean} Whether the block is a raw-content block.
+			 */
+			isRawContentBlock: ( blockName ) => 'core/html' === blockName,
+
+			/**
+			 * The full inner HTML of a raw-content block: static fragments
+			 * plus serialized inner blocks. Falls back to the deprecated
+			 * `content` attribute for blocks created via
+			 * `createBlock( 'core/html', { content } )` that have not been
+			 * migrated yet.
+			 *
+			 * @param {Object} block The block.
+			 * @return {string} Inner HTML.
+			 */
+			serializeRawContent: ( block ) => {
+				if ( block.innerContent ) {
+					return getBlockContent( block );
+				}
+				return 'string' === typeof block.attributes?.content
+					? block.attributes.content
+					: '';
 			},
 		};
 

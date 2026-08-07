@@ -13,6 +13,7 @@ import { createAwarenessDoc } from './awareness-sync';
 import {
 	deriveIntents,
 	engineDocumentToBlocks,
+	type RawContentAdapter,
 	type RichTextFieldsResolver,
 	type BridgeBlock,
 } from './intent-log-bridge';
@@ -109,6 +110,7 @@ interface EntityState {
 	 * captures and the fields it serializes back into attributes.
 	 */
 	fieldsResolver: RichTextFieldsResolver;
+	rawContent?: RawContentAdapter;
 }
 
 /**
@@ -310,6 +312,13 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			lastPushedProps: initialProps,
 			fieldsResolver:
 				syncConfig.richTextFields ?? ( () => [ 'content' ] ),
+			rawContent:
+				syncConfig.isRawContentBlock && syncConfig.serializeRawContent
+					? {
+							is: syncConfig.isRawContentBlock,
+							serialize: syncConfig.serializeRawContent,
+					  }
+					: undefined,
 		};
 		entityStates.set( key, state );
 
@@ -344,7 +353,8 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			}
 			const blocks = engineDocumentToBlocks(
 				session.getDocument()!,
-				state.fieldsResolver
+				state.fieldsResolver,
+				state.rawContent
 			);
 			const docIds = collectBlockIds( blocks );
 			/*
@@ -619,6 +629,7 @@ export function createIntentLogManager( debug = false ): SyncManager {
 					// resurrected.
 					excludeIds: state.docTombstones,
 					richTextFields: state.fieldsResolver,
+					rawContent: state.rawContent,
 				}
 			);
 			if ( ! derived ) {
@@ -652,7 +663,8 @@ export function createIntentLogManager( debug = false ): SyncManager {
 			// not bounce it back into the editor.
 			const captured = engineDocumentToBlocks(
 				state.session.getDocument()!,
-				state.fieldsResolver
+				state.fieldsResolver,
+				state.rawContent
 			);
 			const capturedJson = canonicalBlocksJson( captured );
 			state.prevDocIds = collectBlockIds( captured );

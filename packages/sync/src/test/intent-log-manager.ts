@@ -1078,6 +1078,103 @@ describe( 'intent-log manager', () => {
 		).toEqual( [] );
 	} );
 
+	it( 'raw-content blocks (core/html) sync through the content field in both directions', async () => {
+		const transport = makeFakeTransport();
+		window._wpCollaborationEnabled = '1';
+		addFilter( FILTER, HOOK, () => [ transport.creator ] );
+		const manager = createIntentLogManager();
+		const handlers = makeHandlers();
+		await manager.load(
+			{
+				richTextFields: ( name: string ) =>
+					'core/html' === name ? [] : [ 'content' ],
+				isRawContentBlock: ( name: string ) => 'core/html' === name,
+				serializeRawContent: ( block: {
+					innerContent?: Array< string | null >;
+				} ) =>
+					( block.innerContent ?? [] )
+						.filter( ( f ): f is string => 'string' === typeof f )
+						.join( '' ),
+			} as never,
+			'postType/post',
+			'1',
+			{},
+			handlers
+		);
+
+		// INBOUND: a server-genesis-form core/html block (innerHTML in the
+		// content field, the codec's obj-span form) reaches the editor as
+		// innerContent.
+		transport.captured.session!.receiveUpdate(
+			snapshotRow( [
+				{
+					syncId: 'p1',
+					blockType: 'core/paragraph',
+					text: 'Shared',
+				},
+				{
+					syncId: 'h1',
+					blockType: 'core/html',
+					fields: {
+						content: {
+							text: '￼',
+							formats: [
+								{
+									start: 0,
+									end: 1,
+									format: 'obj|{"html":"<marquee>hi</marquee>"}',
+								},
+							],
+						},
+					},
+				},
+			] )
+		);
+		const pushed = ( handlers.edits.at( -1 ) as { blocks: unknown[] } )
+			.blocks as Array< {
+			name: string;
+			attributes: Record< string, unknown >;
+			innerContent?: Array< string | null >;
+		} >;
+		expect( pushed[ 1 ].name ).toBe( 'core/html' );
+		expect( pushed[ 1 ].innerContent ).toEqual( [
+			'<marquee>hi</marquee>',
+		] );
+
+		// OUTBOUND: the user adds a new Custom HTML block; its innerContent
+		// derives an insert_block whose spec carries the content FIELD
+		// (obj-span form — the kses lane judges these spans).
+		manager.update(
+			'postType/post',
+			'1',
+			{
+				blocks: [
+					...pushed,
+					{
+						name: 'core/html',
+						attributes: {},
+						innerBlocks: [],
+						innerContent: [ '<div class="note">new</div>' ],
+					},
+				],
+			},
+			'gutenberg'
+		);
+		const decoded = transport.captured.sent
+			.filter(
+				( update ) => INTENT_LOG_UPDATE_TYPES.INTENT === update.type
+			)
+			.map( ( update ) => JSON.parse( update.data ) );
+		const insert = decoded.find(
+			( intent ) => 'insert_block' === intent.type
+		);
+		expect( insert ).toBeDefined();
+		expect( insert.payload.block.blockType ).toBe( 'core/html' );
+		expect( insert.payload.block.fields.content.formats[ 0 ].format ).toBe(
+			'obj|{"html":"<div class=\\"note\\">new</div>"}'
+		);
+	} );
+
 	it( 'unload destroys providers and the session', async () => {
 		const { manager, transport } = await loadManagedEntity();
 		manager.unload( 'postType/post', '1' );

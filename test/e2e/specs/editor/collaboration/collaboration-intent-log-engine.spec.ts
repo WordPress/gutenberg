@@ -794,6 +794,68 @@ test.describe( 'Collaboration - intent-log engine', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'custom HTML blocks sync between users and persist through save', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Intent Log Custom HTML Test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before the raw block</p>\n<!-- /wp:paragraph -->',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { page2 } = collaborationUtils;
+		const page1 = editor.page;
+
+		/*
+		 * REGRESSION: Custom HTML keeps its markup in innerContent
+		 * fragments (no content attribute), which the capture bridge used
+		 * to ignore entirely — the block never synced at all. It now rides
+		 * the engine's content field through the codec.
+		 */
+		await page1.evaluate( ( html ) => {
+			const block = ( window as any ).wp.blocks.createBlock(
+				'core/html',
+				{}
+			);
+			block.innerContent = [ html ];
+			( window as any ).wp.data
+				.dispatch( 'core/block-editor' )
+				.insertBlocks( block );
+		}, '<div class="synced-raw">custom markup</div>' );
+
+		// The peer receives the block with its markup.
+		await expect( async () => {
+			const peerHtml = await page2.evaluate( () =>
+				( window as any ).wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.filter( ( b: { name: string } ) => 'core/html' === b.name )
+					.map( ( b: { innerContent?: Array< string | null > } ) =>
+						( b.innerContent ?? [] ).join( '' )
+					)
+			);
+			expect( peerHtml ).toEqual( [
+				'<div class="synced-raw">custom markup</div>',
+			] );
+		} ).toPass( { timeout: 15000 } );
+
+		// The markup persists through the author's save.
+		await editor.saveDraft();
+		const saved = await requestUtils.rest< { content: { raw: string } } >( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.content.raw ).toContain(
+			'<div class="synced-raw">custom markup</div>'
+		);
+		expect( saved.content.raw ).toContain( 'wp:html' );
+	} );
+
 	test( 'legacy blocks get DETERMINISTIC genesis ids: both tabs and the server mint identical identities with no adoption round-trip', async ( {
 		collaborationUtils,
 		requestUtils,
