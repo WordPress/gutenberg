@@ -8,7 +8,11 @@ import clsx from 'clsx';
  */
 import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
-import { ResizableBox } from '@wordpress/components';
+import {
+	ResizableBox,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -52,6 +56,7 @@ function ResizableEditor( {
 	children,
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
+	const disableMotion = useReducedMotion();
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
 
 	const resizableRef = useRef();
@@ -88,6 +93,14 @@ function ResizableEditor( {
 
 	return (
 		<ResizableBox
+			as={ motion.div }
+			initial={ false }
+			animate={ { height } }
+			transition={ {
+				type: 'tween',
+				duration: isResizing || disableMotion ? 0 : 0.2,
+				ease: 'easeOut',
+			} }
 			className={ clsx( 'editor-resizable-editor', className, {
 				'is-resizable': enableResizing,
 				'is-resizing': isResizing,
