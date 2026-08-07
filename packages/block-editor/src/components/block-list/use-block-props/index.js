@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
@@ -37,22 +37,19 @@ import { useBlockVisibility } from '../../block-visibility/';
  */
 function useGhostMaterialize( rootClientId, ghostBlock ) {
 	const { insertBlocks } = useDispatch( blockEditorStore );
-	const materializedRef = useRef( false );
-
-	useEffect( () => {
-		materializedRef.current = false;
-	}, [ ghostBlock ] );
 
 	return useRefEffect(
 		( element ) => {
 			if ( ! ghostBlock ) {
 				return;
 			}
+			function remove() {
+				element.removeEventListener( 'pointerdown', materialize, true );
+				element.removeEventListener( 'focusin', materialize, true );
+			}
 			function materialize() {
-				if ( materializedRef.current ) {
-					return;
-				}
-				materializedRef.current = true;
+				// One gesture fires both events; insert once.
+				remove();
 				// Update the selection: the ghost is empty, so the caret
 				// can only be at its start, and the undo level records it.
 				insertBlocks(
@@ -65,10 +62,7 @@ function useGhostMaterialize( rootClientId, ghostBlock ) {
 			}
 			element.addEventListener( 'pointerdown', materialize, true );
 			element.addEventListener( 'focusin', materialize, true );
-			return () => {
-				element.removeEventListener( 'pointerdown', materialize, true );
-				element.removeEventListener( 'focusin', materialize, true );
-			};
+			return remove;
 		},
 		[ ghostBlock, rootClientId, insertBlocks ]
 	);
