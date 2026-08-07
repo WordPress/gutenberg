@@ -14,8 +14,8 @@
 		border-color: $alert-red;
 	}
 
-	// For TextareaControl
-	textarea:invalid[data-validity-visible] {
+	// For TextControl and TextareaControl
+	:is(textarea, input[type="text"]):invalid[data-validity-visible] {
 		@extend %red-focus-ring;
 
 		border-color: $alert-red;
