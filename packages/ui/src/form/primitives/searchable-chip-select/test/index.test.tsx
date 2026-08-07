@@ -167,7 +167,7 @@ describe( 'SearchableChipSelect', () => {
 
 	describe( 'creatable item', () => {
 		const creatableItem = {
-			value: 'create',
+			value: '__create__',
 			label: 'Create new item',
 		};
 
@@ -206,7 +206,7 @@ describe( 'SearchableChipSelect', () => {
 			const user = userEvent.setup();
 			const onValueChange = jest.fn();
 			const groupedCreatableItem = {
-				value: 'create',
+				value: '__create__',
 				label: 'Create new item: zzzzz',
 			};
 			const items = [
@@ -266,7 +266,7 @@ describe( 'SearchableChipSelect', () => {
 
 			expect( onValueChange ).toHaveBeenCalledWith(
 				expect.arrayContaining( [
-					expect.objectContaining( { value: 'create' } ),
+					expect.objectContaining( { value: '__create__' } ),
 				] ),
 				expect.anything()
 			);

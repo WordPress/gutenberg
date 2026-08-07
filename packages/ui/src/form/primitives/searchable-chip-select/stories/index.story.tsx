@@ -59,7 +59,7 @@ export const Creatable: Story = {
 			ITEMS[ 1 ],
 		] );
 		const creatableItem = {
-			value: 'create',
+			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
 		};
@@ -73,11 +73,17 @@ export const Creatable: Story = {
 				onInputValueChange={ setInputValue }
 				value={ value }
 				onValueChange={ ( values: typeof ITEMS, event ) => {
-					if ( values.some( ( item ) => item.value === 'create' ) ) {
+					if (
+						values.some(
+							( item ) => item.value === creatableItem.value
+						)
+					) {
 						// eslint-disable-next-line no-alert
 						alert( `Create new item: '${ inputValue }'` );
 						setValue(
-							values.filter( ( item ) => item.value !== 'create' )
+							values.filter(
+								( item ) => item.value !== creatableItem.value
+							)
 						);
 					} else {
 						setValue( values );
@@ -188,7 +194,7 @@ export const GroupedCreatable: Story = {
 			GROUPED_ITEMS[ 1 ].items[ 0 ],
 		] );
 		const creatableItem = {
-			value: 'create',
+			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
 		};
@@ -206,11 +212,17 @@ export const GroupedCreatable: Story = {
 				onInputValueChange={ setInputValue }
 				value={ value }
 				onValueChange={ ( values: FixtureItem[], event ) => {
-					if ( values.some( ( item ) => item.value === 'create' ) ) {
+					if (
+						values.some(
+							( item ) => item.value === creatableItem.value
+						)
+					) {
 						// eslint-disable-next-line no-alert
 						alert( `Create new item: '${ inputValue }'` );
 						setValue(
-							values.filter( ( item ) => item.value !== 'create' )
+							values.filter(
+								( item ) => item.value !== creatableItem.value
+							)
 						);
 					} else {
 						setValue( values );
