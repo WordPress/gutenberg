@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.52.0 (2026-07-29)
+
 ### Enhancements
 
 -   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
@@ -18,6 +20,7 @@
 ### Internal
 
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
+
 ## 14.51.0 (2026-07-14)
 
 ### New Features

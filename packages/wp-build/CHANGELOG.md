@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.20.0 (2026-07-29)
+
 ### Enhancements
 
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into

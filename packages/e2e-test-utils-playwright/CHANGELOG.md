@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.52.0 (2026-07-29)
+
 ### Bug Fixes
 
 -   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
