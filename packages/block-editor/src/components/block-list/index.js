@@ -245,23 +245,28 @@ function Items( {
 
 			const templateLock = getTemplateLock( rootClientId );
 
+			const appenderAllowed =
+				( ! isSectionBlock( rootClientId ) ||
+					isContainerInsertableToInContentOnlyMode(
+						getBlockName( selectedBlockClientId ),
+						rootClientId
+					) ) &&
+				getBlockEditingMode( rootClientId ) !== 'disabled' &&
+				( ! templateLock || templateLock === 'contentOnly' ) &&
+				hasAppender &&
+				! _isZoomOut();
+
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
-				ghostBlockName: _ghostBlockName,
+				// The ghost is the block list's empty state: it renders
+				// whether or not the block is selected.
+				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
 				ghostBlockAttributes: _ghostBlockAttributes,
 				shouldRenderAppender:
-					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInContentOnlyMode(
-							getBlockName( selectedBlockClientId ),
-							rootClientId
-						) ) &&
-					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					( ! templateLock || templateLock === 'contentOnly' ) &&
-					hasAppender &&
-					! _isZoomOut() &&
+					appenderAllowed &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
@@ -280,7 +285,7 @@ function Items( {
 				: null,
 		[ ghostBlockName, ghostBlockAttributes ]
 	);
-	const showGhost = !! ghostBlock && shouldRenderAppender;
+	const showGhost = !! ghostBlock;
 
 	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
 
@@ -323,7 +328,7 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ shouldRenderAppender && ! showGhost && (
+			{ shouldRenderAppender && (
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }

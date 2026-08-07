@@ -597,7 +597,9 @@ function useGhostMaterialize( clientId, rootClientId, ghostBlock ) {
 				return;
 			}
 			materializedRef.current = true;
-			insertBlocks( [ ghostBlock ], undefined, rootClientId, false );
+			// Update the selection: the ghost is empty, so the caret can
+			// only be at its start, and the undo level records it.
+			insertBlocks( [ ghostBlock ], undefined, rootClientId, true, 0 );
 		}
 		element.addEventListener( 'pointerdown', materialize, true );
 		element.addEventListener( 'focusin', materialize, true );
@@ -611,6 +613,18 @@ function useGhostMaterialize( clientId, rootClientId, ghostBlock ) {
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId, ghostBlock } = props;
 	useGhostMaterialize( clientId, rootClientId, ghostBlock );
+	// Stable fallback so the selector returns referentially equal values.
+	const ghostBlockWithoutAttributes = useMemo(
+		() =>
+			ghostBlock
+				? {
+						clientId: ghostBlock.clientId,
+						name: ghostBlock.name,
+						isValid: true,
+				  }
+				: undefined,
+		[ ghostBlock ]
+	);
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -649,12 +663,8 @@ function BlockListBlockProvider( props ) {
 				getBlockWithoutAttributes( clientId ) ??
 				// An appender ghost renders from its block object until it
 				// is inserted on entry; it is never selected before that.
-				( ghostBlock && clientId === ghostBlock.clientId
-					? {
-							clientId,
-							name: ghostBlock.name,
-							isValid: true,
-					  }
+				( clientId === ghostBlockWithoutAttributes?.clientId
+					? ghostBlockWithoutAttributes
 					: undefined );
 
 			// This is a temporary fix.
@@ -809,7 +819,7 @@ function BlockListBlockProvider( props ) {
 				viewportSettings,
 			};
 		},
-		[ clientId, rootClientId, ghostBlock ]
+		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
 	);
 
 	const defaultViewRef = useRefEffect( ( element ) => {
