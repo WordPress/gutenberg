@@ -1149,31 +1149,6 @@ A breakpoint can also carry styles for a block's elements, including their pseud
 @media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button)):hover) { color: darkred; } }
 ```
 
-An element does not need styles outside the breakpoint. Styling it only inside one is valid, and outputs a single rule inside the media query:
-
-```json
-{
-	"version": 3,
-	"styles": {
-		"blocks": {
-			"core/group": {
-				"@mobile": {
-					"elements": {
-						"link": {
-							"color": { "text": "red" }
-						}
-					}
-				}
-			}
-		}
-	}
-}
-```
-
-```css
-@media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button))) { color: red; } }
-```
-
 Responsive overrides are always output after the default styles they override, so the cascade order is preserved without needing to increase specificity.
 
 #### Variations
