@@ -3703,22 +3703,45 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 			}
-			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
-				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+			/*
+			 * Elements can be styled outside any breakpoint, inside one, or both,
+			 * so collect the names from all of those places before looping. An
+			 * element styled only inside a breakpoint still needs a node.
+			 */
+			$block_node    = $theme_json['styles']['blocks'][ $name ] ?? array();
+			$element_names = array_keys( $block_node['elements'] ?? array() );
+			foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+				$element_names = array_merge(
+					$element_names,
+					array_keys( $block_node[ $breakpoint ]['elements'] ?? array() )
+				);
+			}
+			$element_names = array_unique( $element_names );
+
+			if ( ! empty( $element_names ) ) {
+				foreach ( $element_names as $element ) {
 					$element_path = array( 'styles', 'blocks', $name, 'elements', $element );
 					if ( $include_node_paths_only ) {
-						$nodes[] = array(
-							'path' => $element_path,
-						);
+						if ( isset( $block_node['elements'][ $element ] ) ) {
+							$nodes[] = array(
+								'path' => $element_path,
+							);
+						}
+						continue;
+					}
+
+					if ( ! isset( $selectors[ $name ]['elements'][ $element ] ) ) {
 						continue;
 					}
 
 					$element_selector = $selectors[ $name ]['elements'][ $element ];
 
-					$nodes[] = array(
-						'path'     => $element_path,
-						'selector' => $element_selector,
-					);
+					if ( isset( $block_node['elements'][ $element ] ) ) {
+						$nodes[] = array(
+							'path'     => $element_path,
+							'selector' => $element_selector,
+						);
+					}
 
 					// Responsive element nodes: one node per breakpoint that has
 					// styles for this element. Cascade: a{} → @media{a{}}
