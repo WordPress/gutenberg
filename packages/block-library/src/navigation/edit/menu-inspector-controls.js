@@ -6,7 +6,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner } from '@wordpress/components';
+import { Notice, PanelBody, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -38,6 +38,10 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 	expandRevision,
+	canUserCreateNavigationMenus,
+	canUserUpdateNavigationMenu,
+	hasResolvedCanUserCreateNavigationMenus,
+	hasResolvedCanUserUpdateNavigationMenu,
 } ) => {
 	const hasChildren = useSelect(
 		( select ) => {
@@ -54,12 +58,44 @@ const MainContent = ( {
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
-			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
+			<DeletedNavigationWarning
+				onCreateNew={ onCreateNew }
+				canCreate={ canUserCreateNavigationMenus }
+				isNotice
+			/>
 		);
 	}
 
 	if ( isLoading ) {
 		return <Spinner />;
+	}
+
+	if (
+		currentMenuId &&
+		hasResolvedCanUserUpdateNavigationMenu &&
+		! canUserUpdateNavigationMenu
+	) {
+		return (
+			<Notice status="info" isDismissible={ false }>
+				{ __(
+					'You can view this Menu, but you do not have permission to edit it.'
+				) }
+			</Notice>
+		);
+	}
+
+	if (
+		! currentMenuId &&
+		hasResolvedCanUserCreateNavigationMenus &&
+		! canUserCreateNavigationMenus
+	) {
+		return (
+			<Notice status="info" isDismissible={ false }>
+				{ __(
+					'You do not have permission to create Navigation Menus.'
+				) }
+			</Notice>
+		);
 	}
 
 	const description = navigationMenu

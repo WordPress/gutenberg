@@ -111,7 +111,7 @@ describe( 'NavigationMenuSelector', () => {
 	} );
 
 	describe( 'Dropdown', () => {
-		it( 'should show in loading state with no options when menus have not resolved and user cannot create menus', async () => {
+		it( 'should show a disabled create option while menus and permissions are unresolved', async () => {
 			const user = userEvent.setup();
 
 			useNavigationMenu.mockReturnValue( {
@@ -133,7 +133,7 @@ describe( 'NavigationMenuSelector', () => {
 				} )
 			).toBeInTheDocument();
 
-			// Check that all the option groups are *not* present.
+			// Menu choices and Classic Menu imports are not available yet.
 			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
 			expect( menusGroup ).not.toBeInTheDocument();
 
@@ -145,7 +145,10 @@ describe( 'NavigationMenuSelector', () => {
 			const toolsGroup = screen.queryByRole( 'group', {
 				name: 'Tools',
 			} );
-			expect( toolsGroup ).not.toBeInTheDocument();
+			expect( toolsGroup ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Create new Menu' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		describe( 'Creating new menus', () => {
@@ -200,8 +203,9 @@ describe( 'NavigationMenuSelector', () => {
 				expect( createMenuButton ).toBeInTheDocument();
 			} );
 
-			it( 'should not show option to create a menu when user does not have permission to create menus', async () => {
+			it( 'should show a disabled create option when the user cannot create menus', async () => {
 				const user = userEvent.setup();
+				const handler = jest.fn();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
@@ -210,16 +214,26 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationMenuSelector onCreateNew={ handler } /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
 
-				// Check the Tools Group and Create Menu Button are present.
+				// Keep the Tools group discoverable, but prevent creation.
 				const toolsGroup = screen.queryByRole( 'group', {
 					name: 'Tools',
 				} );
-				expect( toolsGroup ).not.toBeInTheDocument();
+				expect( toolsGroup ).toBeInTheDocument();
+				const createMenuButton = screen.getByRole( 'menuitem', {
+					name: 'Create new Menu',
+				} );
+				expect( createMenuButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
+
+				await user.click( createMenuButton );
+				expect( handler ).not.toHaveBeenCalled();
 			} );
 
 			it( 'should call handler callback and close popover when create menu button is clicked', async () => {
@@ -448,7 +462,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuItem ).toBeChecked();
 			} );
 
-			it( 'should call the handler when the Navigation Menu is selected', async () => {
+			it( 'should let a user without create permission switch the Navigation Menu', async () => {
 				const user = userEvent.setup();
 
 				const handler = jest.fn();
@@ -456,7 +470,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenus: true,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 

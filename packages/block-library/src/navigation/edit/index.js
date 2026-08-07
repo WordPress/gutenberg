@@ -53,6 +53,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
+import ReadOnlyNavigationInnerBlocks from './read-only-inner-blocks';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
@@ -331,13 +332,6 @@ function Navigation( {
 
 	const blockEditingMode = useBlockEditingMode();
 
-	// Preload classic menus, so that they don't suddenly pop-in when viewing
-	// the Select Menu dropdown.
-	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
-		per_page: -1,
-		context: 'view',
-	} );
-
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/status',
@@ -347,13 +341,6 @@ function Navigation( {
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
 		} );
-
-	const [
-		showNavigationMenuPermissionsNotice,
-		hideNavigationMenuPermissionsNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/permissions/update',
-	} );
 
 	const {
 		create: createNavigationMenu,
@@ -464,6 +451,9 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
+		navigationMenu,
+		publishedNavigationMenus,
+		hasResolvedPublishedNavigationMenus,
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
@@ -476,8 +466,16 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
 
-	const navMenuResolvedButMissing =
-		hasResolvedNavigationMenus && isNavigationMenuMissing;
+	// Preload classic menus only when the user can import one.
+	const { records: classicMenus } = useEntityRecords(
+		'root',
+		'menu',
+		{
+			per_page: -1,
+			context: 'view',
+		},
+		{ enabled: canUserCreateNavigationMenus }
+	);
 
 	const {
 		convert: convertClassicMenu,
@@ -510,11 +508,35 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+	const navigationFallbackId = useSelect(
+		( select ) => {
+			if ( ref || hasUnsavedBlocks ) {
+				return null;
+			}
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
-		? getNavigationFallbackId()
-		: null;
+			const publishedFallbackId = publishedNavigationMenus?.[ 0 ]?.id;
+			if ( publishedFallbackId ) {
+				return publishedFallbackId;
+			}
+
+			if (
+				! hasResolvedPublishedNavigationMenus ||
+				! canUserCreateNavigationMenus
+			) {
+				return null;
+			}
+
+			const { getNavigationFallbackId } = unlock( select( coreStore ) );
+			return getNavigationFallbackId();
+		},
+		[
+			ref,
+			hasUnsavedBlocks,
+			publishedNavigationMenus,
+			hasResolvedPublishedNavigationMenus,
+			canUserCreateNavigationMenus,
+		]
+	);
 
 	useEffect( () => {
 		// If:
@@ -560,7 +582,7 @@ function Navigation( {
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
-		classicMenus?.length === 0 &&
+		( ! canUserCreateNavigationMenus || classicMenus?.length === 0 ) &&
 		! hasUncontrolledInnerBlocks;
 
 	// "loading" state:
@@ -721,50 +743,6 @@ function Navigation( {
 		showClassicMenuConversionNotice,
 		createNavigationMenuPost?.id,
 		handleUpdateMenu,
-	] );
-
-	useEffect( () => {
-		if ( ! isSelected && ! isInnerBlockSelected ) {
-			hideNavigationMenuPermissionsNotice();
-		}
-
-		if ( isSelected || isInnerBlockSelected ) {
-			if (
-				ref &&
-				! navMenuResolvedButMissing &&
-				hasResolvedCanUserUpdateNavigationMenu &&
-				! canUserUpdateNavigationMenu
-			) {
-				showNavigationMenuPermissionsNotice(
-					__(
-						'You do not have permission to edit this Menu. Any changes made will not be saved.'
-					)
-				);
-			}
-
-			if (
-				! ref &&
-				hasResolvedCanUserCreateNavigationMenus &&
-				! canUserCreateNavigationMenus
-			) {
-				showNavigationMenuPermissionsNotice(
-					__(
-						'You do not have permission to create Navigation Menus.'
-					)
-				);
-			}
-		}
-	}, [
-		isSelected,
-		isInnerBlockSelected,
-		canUserUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu,
-		canUserCreateNavigationMenus,
-		hasResolvedCanUserCreateNavigationMenus,
-		ref,
-		hideNavigationMenuPermissionsNotice,
-		showNavigationMenuPermissionsNotice,
-		navMenuResolvedButMissing,
 	] );
 
 	const hasManagePermissions =
@@ -985,6 +963,16 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
+					canUserCreateNavigationMenus={
+						canUserCreateNavigationMenus
+					}
+					hasResolvedCanUserCreateNavigationMenus={
+						hasResolvedCanUserCreateNavigationMenus
+					}
+					canUserUpdateNavigationMenu={ canUserUpdateNavigationMenu }
+					hasResolvedCanUserUpdateNavigationMenu={
+						hasResolvedCanUserUpdateNavigationMenu
+					}
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				<TagName
@@ -1039,10 +1027,21 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
+					canUserCreateNavigationMenus={
+						canUserCreateNavigationMenus
+					}
+					hasResolvedCanUserCreateNavigationMenus={
+						hasResolvedCanUserCreateNavigationMenus
+					}
+					canUserUpdateNavigationMenu={ canUserUpdateNavigationMenu }
+					hasResolvedCanUserUpdateNavigationMenu={
+						hasResolvedCanUserUpdateNavigationMenu
+					}
 				/>
 				<TagName { ...blockProps }>
 					<DeletedNavigationWarning
 						onCreateNew={ createUntitledEmptyNavigationMenu }
+						canCreate={ canUserCreateNavigationMenus }
 					/>
 				</TagName>
 			</>
@@ -1108,11 +1107,20 @@ function Navigation( {
 				onSelectNavigationMenu={ onSelectNavigationMenu }
 				isLoading={ isLoading }
 				blockEditingMode={ blockEditingMode }
+				canUserCreateNavigationMenus={ canUserCreateNavigationMenus }
+				hasResolvedCanUserCreateNavigationMenus={
+					hasResolvedCanUserCreateNavigationMenus
+				}
+				canUserUpdateNavigationMenu={ canUserUpdateNavigationMenu }
+				hasResolvedCanUserUpdateNavigationMenu={
+					hasResolvedCanUserUpdateNavigationMenu
+				}
 			/>
 			{ blockEditingMode === 'default' && stylingInspectorControls }
 			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 				<RecursionProvider uniqueId={ recursionId }>
 					{ blockEditingMode === 'contentOnly' &&
+						canUserUpdateNavigationMenu &&
 						isEntityAvailable && (
 							<NavigationAddPageButton clientId={ clientId } />
 						) }
@@ -1160,6 +1168,7 @@ function Navigation( {
 							<>
 								<AccessibleMenuDescription
 									id={ accessibleDescriptionId }
+									menuTitle={ navigationMenu?.title }
 								/>
 								<ResponsiveWrapper
 									id={ clientId }
@@ -1178,16 +1187,25 @@ function Navigation( {
 										onNavigateToEntityRecord
 									}
 								>
-									{ isEntityAvailable && (
-										<NavigationInnerBlocks
-											clientId={ clientId }
-											hasCustomPlaceholder={
-												!! CustomPlaceholder
-											}
-											templateLock={ templateLock }
-											orientation={ orientation }
-										/>
-									) }
+									{ isEntityAvailable &&
+										canUserUpdateNavigationMenu && (
+											<NavigationInnerBlocks
+												clientId={ clientId }
+												hasCustomPlaceholder={
+													!! CustomPlaceholder
+												}
+												templateLock={ templateLock }
+												orientation={ orientation }
+											/>
+										) }
+									{ isEntityAvailable &&
+										! canUserUpdateNavigationMenu && (
+											<ReadOnlyNavigationInnerBlocks
+												content={
+													navigationMenu?.content
+												}
+											/>
+										) }
 								</ResponsiveWrapper>
 							</>
 						) }

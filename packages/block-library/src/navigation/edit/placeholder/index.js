@@ -25,7 +25,12 @@ export default function NavigationPlaceholder( {
 	onCreateEmpty,
 } ) {
 	const { isResolving: isResolvingMenus, hasResolved: hasResolvedMenus } =
-		useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
+		useEntityRecords(
+			'root',
+			'menu',
+			{ per_page: -1, context: 'view' },
+			{ enabled: canUserCreateNavigationMenus }
+		);
 
 	useEffect( () => {
 		if ( ! isSelected ) {
