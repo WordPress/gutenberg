@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add editor content styles that draw markers for non-printing characters. Characters that occupy space are marked with a background so that turning the preference on never reflows the text ([#72232](https://github.com/WordPress/gutenberg/issues/72232)).
+
 ### Enhancements
 
 -   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.

@@ -278,6 +278,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="showNonPrintingCharacters"
+								help={ __(
+									'Marks spaces, tabs, line breaks, and invisible characters while you edit. The markers never appear on your site.'
+								) }
+								label={ __( 'Show non-printing characters' ) }
+							/>
 							{ extraSections?.appearance }
 						</PreferencesModalSection>
 					),
