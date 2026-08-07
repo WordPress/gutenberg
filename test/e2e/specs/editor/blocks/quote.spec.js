@@ -73,7 +73,6 @@ test.describe( 'Quote', () => {
 			} )
 		).toBeVisible();
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( 'refilled' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
