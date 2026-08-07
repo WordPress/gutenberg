@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, lockSmall } from '@wordpress/icons';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 

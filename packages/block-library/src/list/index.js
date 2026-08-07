@@ -18,6 +18,8 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/list-item' ] ];
+
 const settings = {
 	icon,
 	example: {
@@ -45,6 +47,8 @@ const settings = {
 		],
 	},
 	transforms,
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 	deprecated,

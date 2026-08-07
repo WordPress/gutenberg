@@ -2,6 +2,7 @@ import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import type {
 	CoreDataPrivateApis,
 	ResolvedSelection,
+	SelectionEndpoint,
 	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -16,6 +17,7 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
+import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
@@ -32,9 +34,11 @@ export interface CursorData {
 	clientId: number;
 	color: string;
 	avatarUrl?: string;
-	x: number;
-	y: number;
-	height: number;
+	// x/y/height absent for multi-block selections — avatar comes from
+	// use-block-highlighting; only selectionRects are rendered here.
+	x?: number;
+	y?: number;
+	height?: number;
 	isMe?: boolean;
 	selectionRects?: SelectionRect[];
 }
@@ -130,16 +134,12 @@ export function useRenderCursors(
 					// Selection may reference a stale Yjs position.
 					return;
 				}
-			} else if (
-				selection.type === SelectionType.SelectionInOneBlock ||
-				selection.type === SelectionType.SelectionInMultipleBlocks
-			) {
+			} else if ( selection.type === SelectionType.SelectionInOneBlock ) {
 				try {
 					start = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorStartPosition,
 					} );
-
 					end = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorEndPosition,
@@ -147,6 +147,54 @@ export function useRenderCursors(
 				} catch {
 					// Selection may reference a stale Yjs position.
 					return;
+				}
+			} else if (
+				selection.type === SelectionType.SelectionInMultipleBlocks
+			) {
+				// Each endpoint is either a CursorEndpoint (character offset
+				// inside a RichText field) or a WholeBlockEndpoint (block selected
+				// as a unit, no character offset). Resolve independently so each
+				// end uses the right Yjs anchor regardless of block type.
+				const resolveEndpoint = (
+					endpoint: SelectionEndpoint
+				): ResolvedSelection => resolveSelection( endpoint );
+				try {
+					start = resolveEndpoint( selection.startEndpoint );
+					end = resolveEndpoint( selection.endEndpoint );
+				} catch {
+					// Selection may reference a stale Yjs position.
+					return;
+				}
+
+				// Promote inner-block endpoints (e.g. list-items → list) to
+				// their direct [data-block] parent before passing to
+				// computeSelectionVisual, so that function receives
+				// container-level IDs and needs no promotion logic of its own.
+				const promote = ( r: ResolvedSelection ): ResolvedSelection => {
+					if ( ! r.localClientId ) {
+						return r;
+					}
+					const el = blockEditorDocument.querySelector< HTMLElement >(
+						`[data-block="${ r.localClientId }"]`
+					);
+					if ( ! el ) {
+						return r;
+					}
+					const container = blockContainerOf( el );
+					const containerId = container.getAttribute( 'data-block' );
+					if ( ! containerId || containerId === r.localClientId ) {
+						return r;
+					}
+					return {
+						...r,
+						localClientId: containerId,
+						richTextOffset: null,
+						attributeKey: null,
+					};
+				};
+				start = promote( start );
+				if ( end ) {
+					end = promote( end );
 				}
 			}
 
@@ -164,20 +212,21 @@ export function useRenderCursors(
 				overlayContext
 			);
 
-			if ( selectionVisual.coords ) {
+			const hasCoords = Boolean( selectionVisual.coords );
+			const hasRects =
+				( selectionVisual.selectionRects?.length ?? 0 ) > 0;
+			if ( hasCoords || hasRects ) {
 				const cursorData: CursorData = {
 					userName,
 					clientId,
 					color,
 					avatarUrl,
 					isMe: user.isMe,
-					...selectionVisual.coords,
+					...( selectionVisual.coords ?? {} ),
 				};
-
 				if ( selectionVisual.selectionRects ) {
 					cursorData.selectionRects = selectionVisual.selectionRects;
 				}
-
 				results.push( cursorData );
 			}
 		} );

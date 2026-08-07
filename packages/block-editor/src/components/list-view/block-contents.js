@@ -8,7 +8,32 @@ import { forwardRef } from '@wordpress/element';
  */
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
-import { useListViewContext } from './context';
+import { useInsertedBlockClientId, useListViewContext } from './context';
+
+/**
+ * Renders the additional block content for the row of the block that was just
+ * inserted. Reading the inserted block from its own context keeps an insert
+ * from re-rendering the contents of every other row.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId The client ID of the block for this row.
+ */
+function InsertedBlockContent( { clientId } ) {
+	const { AdditionalBlockContent, setInsertedBlockClientId } =
+		useListViewContext();
+	const insertedBlockClientId = useInsertedBlockClientId();
+
+	if ( ! AdditionalBlockContent || insertedBlockClientId !== clientId ) {
+		return null;
+	}
+
+	return (
+		<AdditionalBlockContent
+			insertedBlockClientId={ insertedBlockClientId }
+			setInsertedBlockClientId={ setInsertedBlockClientId }
+		/>
+	);
+}
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -16,22 +41,12 @@ const ListViewBlockContents = forwardRef(
 			onClick,
 			onToggleExpanded,
 			clientId,
-			isSelected,
-			position,
-			siblingBlockCount,
-			level,
 			isExpanded,
 			selectedClientIds,
 			...props
 		},
 		ref
 	) => {
-		const {
-			AdditionalBlockContent,
-			insertedBlockClientId,
-			setInsertedBlockClientId,
-		} = useListViewContext();
-
 		// Only include all selected blocks if the currently clicked on block
 		// is one of the selected blocks. This ensures that if a user attempts
 		// to drag a block that isn't part of the selection, they're still able
@@ -40,19 +55,9 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
-		// The additional content is only relevant to the row of the block that
-		// was just inserted, so the other rows skip mounting it entirely.
-		const showAdditionalBlockContent =
-			!! AdditionalBlockContent && insertedBlockClientId === clientId;
-
 		return (
 			<>
-				{ showAdditionalBlockContent && (
-					<AdditionalBlockContent
-						insertedBlockClientId={ insertedBlockClientId }
-						setInsertedBlockClientId={ setInsertedBlockClientId }
-					/>
-				) }
+				<InsertedBlockContent clientId={ clientId } />
 				<BlockDraggable
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
@@ -65,10 +70,6 @@ const ListViewBlockContents = forwardRef(
 							clientId={ clientId }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							draggable={ draggable }
 							onDragStart={ onDragStart }
 							onDragEnd={ onDragEnd }

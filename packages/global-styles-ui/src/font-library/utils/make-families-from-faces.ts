@@ -24,7 +24,7 @@ export default function makeFamiliesFromFaces(
 					fontFace: [],
 				};
 			}
-			// @ts-expect-error
+			// @ts-expect-error `acc[ item.fontFamily ]` is possibly `undefined`.
 			acc[ item.fontFamily ].fontFace.push( item );
 			return acc;
 		},

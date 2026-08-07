@@ -159,7 +159,7 @@ export function QueryControls( {
 									// Keeping the fallback to `item.value` for legacy reasons,
 									// even if items of `selectedCategories` should not have a
 									// `value` property.
-									// @ts-expect-error
+									// @ts-expect-error `value` does not exist on `Category`.
 									value: item.name || item.value,
 								} ) )
 							}

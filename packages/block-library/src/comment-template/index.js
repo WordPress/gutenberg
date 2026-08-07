@@ -14,8 +14,18 @@ import save from './save';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[ 'core/avatar' ],
+	[ 'core/comment-author-name' ],
+	[ 'core/comment-date' ],
+	[ 'core/comment-content' ],
+	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 };

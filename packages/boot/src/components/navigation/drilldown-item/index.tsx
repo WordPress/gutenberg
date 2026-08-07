@@ -10,7 +10,6 @@ import type { ReactNode } from 'react';
 import {
 	FlexBlock,
 	__experimentalItem as Item,
-	// @ts-ignore
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 } from '@wordpress/components';

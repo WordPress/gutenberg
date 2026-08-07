@@ -16,6 +16,8 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
+
 export const settings = {
 	icon,
 	example: {
@@ -55,6 +57,8 @@ export const settings = {
 			},
 		],
 	},
+	// Initial tab/panel creation is delegated to the tab-panels template, applied when its inner blocks are empty.
+	template: TEMPLATE,
 	edit,
 	save,
 };

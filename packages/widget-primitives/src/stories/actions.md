@@ -26,11 +26,7 @@ The fulfillment is named by the key that carries it, not by a separate discrimin
 }
 ```
 
-`href`: absolute URL, admin `.php` entry point, root-relative path, or a file
-next to the widget (resolved to a plugin URL on the server). `data:` and
-`javascript:` hrefs are rejected at registration. Use `downloadBlob` for client-generated
-files. Query strings on local filenames (e.g. `report.csv?v=2`) are not
-resolved as widget files.
+`href`: an absolute URL, an admin `.php` entry point, a root-relative path, or a file next to the widget, resolved to a plugin URL on the server. `data:` and `javascript:` hrefs are rejected at registration.
 
 Two more keys belong to the link, not to the envelope, so they only mean something alongside an `href`:
 
@@ -41,8 +37,8 @@ Two more keys belong to the link, not to the envelope, so they only mean somethi
 {
 	id: 'export',
 	label: __( 'Export CSV' ),
-	href: 'report.csv', // widgets/{name}/report.csv
-	download: 'report.csv',
+	href: 'https://example.com/reports/monthly.csv',
+	download: 'monthly-report.csv',
 }
 ```
 

@@ -1,20 +1,20 @@
 /**
  * @jest-environment node
  */
-import plugin from '../../../stylelint-plugins/no-token-fallback-values.mjs';
+import plugin from '../no-unknown-ds-tokens.mjs';
 import { getStylelintResult } from './utils';
 
 const CONFIG = {
 	plugins: [ plugin ],
-	rules: { 'plugin-wpds/no-token-fallback-values': true },
+	rules: { 'plugin-wpds/no-unknown-ds-tokens': true },
 };
 
-describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
+describe( 'flags no warnings with valid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-token-fallback-values-valid.css',
+			'./fixtures/no-unknown-ds-tokens-valid.css',
 			CONFIG
 		);
 	} );
@@ -30,12 +30,12 @@ describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
+describe( 'flags warnings with invalid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-token-fallback-values-invalid.css',
+			'./fixtures/no-unknown-ds-tokens-invalid.css',
 			CONFIG
 		);
 	} );
@@ -46,7 +46,7 @@ describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 6 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 2 )
 		);
 	} );
 

@@ -11,7 +11,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import type { NormalizedField } from '../../../types';
+import type { MediaAspectRatio, NormalizedField } from '../../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 
 function ColumnPrimary< Item >( {
@@ -19,6 +19,7 @@ function ColumnPrimary< Item >( {
 	level,
 	titleField,
 	mediaField,
+	mediaAspectRatio,
 	descriptionField,
 	onClickItem,
 	renderItemLink,
@@ -28,6 +29,7 @@ function ColumnPrimary< Item >( {
 	level?: number;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
+	mediaAspectRatio?: MediaAspectRatio;
 	descriptionField?: NormalizedField< Item >;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -37,6 +39,21 @@ function ColumnPrimary< Item >( {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 } ) {
+	// Srcset/size hint for the media render. The preview box is 32px square
+	// by default; when the view configures `layout.aspectRatio`, the box
+	// keeps the 32px height while the ratio derives its width, clamped by
+	// the stylesheet's 60px `max-width`, so widen the hint to match the
+	// rendered size and avoid picking an undersized (blurry) source.
+	let mediaSizes = '32px';
+	if ( mediaAspectRatio ) {
+		const [ ratioWidth, ratioHeight ] = mediaAspectRatio
+			.split( '/' )
+			.map( Number );
+		mediaSizes = `${ Math.min(
+			60,
+			Math.round( ( 32 * ratioWidth ) / ratioHeight )
+		) }px`;
+	}
 	return (
 		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
 			{ mediaField && (
@@ -57,7 +74,7 @@ function ColumnPrimary< Item >( {
 					<mediaField.render
 						item={ item }
 						field={ mediaField }
-						config={ { sizes: '32px' } }
+						config={ { sizes: mediaSizes } }
 					/>
 				</ItemClickWrapper>
 			) }
