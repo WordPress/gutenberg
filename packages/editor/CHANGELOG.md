@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
+-   Collaboration: When a collaborator's cursor or selection is inside content hidden by a collapsed container (e.g. a closed `core/details` panel or an inactive `core/accordion` panel), show an avatar/outline on the container itself instead of no presence indicator at all. Clicking that collaborator in the presence list now selects their actual block first — which expands any collapsed container it's inside, as those blocks already do when a descendant is selected — before scrolling to it ([#79641](https://github.com/WordPress/gutenberg/issues/79641)).
 
 ### New Features
 

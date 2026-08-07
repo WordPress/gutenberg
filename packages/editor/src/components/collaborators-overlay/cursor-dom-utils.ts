@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { isElementVisible } = unlock( blockEditorPrivateApis );
@@ -22,6 +15,36 @@ export interface CursorCoords {
 	y: number;
 	height: number;
 }
+
+/**
+ * Walk up from a hidden element (e.g. text inside a collapsed core/details
+ * or an inactive core/accordion panel) to the nearest [data-block] ancestor
+ * that's actually visible — always the collapsed container's own wrapper,
+ * since only its *inner* content collapses, never the wrapper itself.
+ *
+ * Used to give collaborators a visible presence indicator (avatar/outline)
+ * on the container when their cursor/selection is inside hidden content, in
+ * place of a cursor that would otherwise have nowhere valid to render.
+ *
+ * @param element - The hidden element to walk up from.
+ * @return The nearest visible [data-block] ancestor, or null if none found.
+ */
+export const getNearestVisibleBlockAncestor = (
+	element: HTMLElement
+): HTMLElement | null => {
+	let current = element.closest< HTMLElement >( '[data-block]' );
+
+	while ( current ) {
+		if ( isElementVisible( current ) ) {
+			return current;
+		}
+		current =
+			current.parentElement?.closest< HTMLElement >( '[data-block]' ) ??
+			null;
+	}
+
+	return null;
+};
 
 const MAX_NODE_OFFSET_COUNT = 500;
 

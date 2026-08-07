@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/core-data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
@@ -20,7 +13,12 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
-import { getOrderedBlockRange } from './cursor-dom-utils';
+import {
+	getNearestVisibleBlockAncestor,
+	getOrderedBlockRange,
+} from './cursor-dom-utils';
+import { resolveTargetElement } from './compute-selection';
+import { resolvePrimaryPosition } from './resolve-primary-position';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -118,7 +116,9 @@ export function useBlockHighlighting(
 				const selType = userState.editorState?.selection?.type;
 				return (
 					selType === SelectionType.WholeBlock ||
-					selType === SelectionType.SelectionInMultipleBlocks
+					selType === SelectionType.SelectionInMultipleBlocks ||
+					selType === SelectionType.Cursor ||
+					selType === SelectionType.SelectionInOneBlock
 				);
 			} )
 			.flatMap< BlockEntry >( ( userState ) => {
@@ -139,6 +139,59 @@ export function useBlockHighlighting(
 					return [
 						{
 							blockId: localClientId,
+							clientId: userState.clientId,
+							userId: userState.collaboratorInfo.id,
+							color: getAvatarBorderColor(
+								userState.collaboratorInfo.id
+							),
+							userName: userState.collaboratorInfo.name,
+							avatarUrl: getAvatarUrl(
+								userState.collaboratorInfo.avatar_urls
+							),
+							alwaysOutline: true,
+						},
+					];
+				}
+
+				if (
+					selection.type === SelectionType.Cursor ||
+					selection.type === SelectionType.SelectionInOneBlock
+				) {
+					// These normally render as a real cursor/selection via
+					// use-render-cursors — this hook only needs to step in
+					// when the target is hidden inside collapsed content
+					// (e.g. a closed core/details or an inactive
+					// core/accordion panel), where a real cursor has nowhere
+					// valid to draw. In that case, fall back to outlining
+					// and placing an avatar on the nearest *visible*
+					// ancestor block, so collaborators still have a
+					// findable presence indicator.
+					const resolved = resolvePrimaryPosition(
+						selection,
+						resolveSelection
+					);
+					if ( ! resolved?.localClientId ) {
+						return [];
+					}
+					const targetElement = resolveTargetElement(
+						blockEditorDocument,
+						resolved
+					);
+					if (
+						! targetElement ||
+						isElementVisible( targetElement )
+					) {
+						return [];
+					}
+					const container =
+						getNearestVisibleBlockAncestor( targetElement );
+					const containerId = container?.getAttribute( 'data-block' );
+					if ( ! containerId ) {
+						return [];
+					}
+					return [
+						{
+							blockId: containerId,
 							clientId: userState.clientId,
 							userId: userState.collaboratorInfo.id,
 							color: getAvatarBorderColor(

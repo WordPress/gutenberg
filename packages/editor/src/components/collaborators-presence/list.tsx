@@ -1,19 +1,29 @@
 import { __ } from '@wordpress/i18n';
 import { Popover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
-import { type PostEditorAwarenessState } from '@wordpress/core-data';
+import {
+	privateApis as coreDataPrivateApis,
+	type PostEditorAwarenessState,
+} from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
-
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
+import { resolvePrimaryPosition } from '../collaborators-overlay/resolve-primary-position';
+import { unlock } from '../../lock-unlock';
+
+const { useResolvedSelection } = unlock( coreDataPrivateApis );
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
 	popoverAnchor?: HTMLElement | null;
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
 	cursorRegistry: CursorRegistry;
+	postId: number | null;
+	postType: string | null;
 }
 
 /**
@@ -25,25 +35,57 @@ interface CollaboratorsListProps {
  * @param props.popoverAnchor       Anchor element for the popover
  * @param props.setIsPopoverVisible Callback to set the visibility of the popover
  * @param props.cursorRegistry      Shared registry for scroll-to-cursor support
+ * @param props.postId              ID of the post
+ * @param props.postType            Type of the post
  */
 export function CollaboratorsList( {
 	activeCollaborators,
 	popoverAnchor,
 	setIsPopoverVisible,
 	cursorRegistry,
+	postId,
+	postType,
 }: CollaboratorsListProps ) {
-	const handleCollaboratorClick = ( clientId: number ) => {
-		const success = cursorRegistry.scrollToCursor( clientId, {
-			behavior: 'smooth',
-			block: 'center',
-			highlightDuration: 2000,
+	const resolveSelection = useResolvedSelection( postId, postType );
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const handleCollaboratorClick = (
+		collaboratorState: PostEditorAwarenessState
+	) => {
+		// Select the collaborator's actual block first, even if it's nested
+		// inside collapsed content (e.g. a closed core/details or an
+		// inactive core/accordion panel). Both of those blocks — and any
+		// future block following the same convention — already auto-expand
+		// whenever one of their inner blocks is selected, so this reveals
+		// hidden content as a side effect without any block-specific
+		// "expand" logic here.
+		const resolved = resolvePrimaryPosition(
+			collaboratorState.editorState?.selection,
+			resolveSelection
+		);
+		if ( resolved?.localClientId ) {
+			selectBlock( resolved.localClientId );
+		}
+
+		// Defer the scroll by a frame so the selection above has a chance
+		// to expand any collapsed container and update layout first —
+		// otherwise we'd scroll to the pre-expansion position.
+		requestAnimationFrame( () => {
+			const success = cursorRegistry.scrollToCursor(
+				collaboratorState.clientId,
+				{
+					behavior: 'smooth',
+					block: 'center',
+					highlightDuration: 2000,
+				}
+			);
+
+			if ( success ) {
+				speak( __( 'Scrolled to cursor' ), 'polite' );
+			}
 		} );
 
-		if ( success ) {
-			speak( __( 'Scrolled to cursor' ), 'polite' );
-
-			setIsPopoverVisible( false );
-		}
+		setIsPopoverVisible( false );
 	};
 
 	return (
@@ -79,9 +121,7 @@ export function CollaboratorsList( {
 								className="editor-collaborators-presence__list-item"
 								disabled={ isCurrentUser }
 								onClick={ () =>
-									handleCollaboratorClick(
-										collaboratorState.clientId
-									)
+									handleCollaboratorClick( collaboratorState )
 								}
 							>
 								<Avatar

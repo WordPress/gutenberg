@@ -5,7 +5,6 @@ import {
 	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
 import Avatar from './avatar';
 import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
@@ -125,6 +124,8 @@ export function CollaboratorsPresence( {
 						popoverAnchor={ popoverAnchor }
 						setIsPopoverVisible={ setIsPopoverVisible }
 						cursorRegistry={ cursorRegistry }
+						postId={ postId }
+						postType={ postType }
 					/>
 				) }
 			</div>
