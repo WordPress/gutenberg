@@ -302,6 +302,7 @@
 		line-height: normal;
 	}
 
+	// TODO: Align `checkbox-control` hover styles with the design system, then drop `[type="checkbox"]` exclusion.
 	&:hover:not(:disabled, [aria-disabled="true"], [type="checkbox"]) {
 		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
 	}

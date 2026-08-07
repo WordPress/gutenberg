@@ -15,6 +15,8 @@
 		border-color: $components-color-gray-400;
 		cursor: default;
 
+		// TODO: Use WPDS disabled border tokens once this container is aligned with the design system.
+		// Until then, cancel `input-control` hover styles (the wrapper uses `.is-disabled`, not `:disabled`).
 		&:hover {
 			border-color: $components-color-gray-400;
 		}
