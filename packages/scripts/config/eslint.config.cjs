@@ -5,7 +5,6 @@
  * eslint.config.* will use this config automatically.
  */
 const { hasBabelConfig } = require( '../utils' );
-
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
 const config = [
