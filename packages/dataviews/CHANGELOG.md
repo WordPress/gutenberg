@@ -27,6 +27,7 @@
 
 ### Internal
 
+-   DataViews: Move the private `DateCalendar` and `DateRangeCalendar` components from `@wordpress/components` into the package as internal components, instead of unlocking them via private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `react-day-picker` dependency; the calendar CSS class prefix changes from `components-calendar` to `dataviews-calendar`; no behavior change. ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX))
 -   DataViews: Inline a verbatim copy of the `kebabCase` utility instead of unlocking the private one from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `change-case` dependency; no behavior change. ([#81284](https://github.com/WordPress/gutenberg/pull/81284))
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).

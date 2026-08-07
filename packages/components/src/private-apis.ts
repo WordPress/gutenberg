@@ -15,7 +15,6 @@ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
 
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
@@ -43,9 +42,6 @@ lock( privateApis, {
 	withIgnoreIMEEvents,
 	Badge,
 	normalizeTextString,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,

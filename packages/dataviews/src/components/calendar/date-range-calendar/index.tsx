@@ -13,7 +13,7 @@ import { useMemo, useState, useCallback } from '@wordpress/element';
  */
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
 import { clampNumberOfMonths } from '../utils/misc';
-import { useControlledValue } from '../../utils/hooks';
+import { useControlledValue } from '../utils/use-controlled-value';
 import { useLocalizationProps } from '../utils/use-localization-props';
 import type {
 	DateRangeCalendarProps,

@@ -4,7 +4,6 @@
 @use "./badge/styles.scss" as *;
 @use "./button-group/style.scss" as *;
 @use "./button/style.scss" as *;
-@use "./calendar/style.scss" as *;
 @use "./checkbox-control/style.scss" as *;
 @use "./circular-option-picker/style.scss" as *;
 @use "./palette-edit/style.scss" as *;
@@ -50,5 +49,5 @@
 // Include the default WP Components color variables.
 // TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
 :root {
-	@include admin-scheme( #3858e9 );
+	@include admin-scheme(#3858e9);
 }

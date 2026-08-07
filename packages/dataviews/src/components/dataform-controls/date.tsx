@@ -19,7 +19,6 @@ import {
 	BaseControl,
 	Button,
 	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
@@ -45,7 +44,7 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../../constants';
-import { unlock } from '../../lock-unlock';
+import { DateCalendar, DateRangeCalendar } from '../calendar';
 import type {
 	DataFormControlProps,
 	FieldValidity,
@@ -53,8 +52,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
 type DateRange = [ string, string ] | undefined;
 

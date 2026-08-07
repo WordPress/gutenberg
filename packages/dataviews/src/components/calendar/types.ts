@@ -294,9 +294,9 @@ export interface BaseProps
 	 * for the possible values.
 	 *
 	 * When working with time zones, use the `TZDate` object exported by this
-	 * package instead of the native `Date` object.
+	 * component's module instead of the native `Date` object.
 	 * @example
-	 *   import { DateCalendar, TZDate } from "@wordpress/components";
+	 *   import { DateCalendar, TZDate } from '../calendar';
 	 *
 	 *   export function WithTimeZone() {
 	 *     const timeZone = "America/New_York";

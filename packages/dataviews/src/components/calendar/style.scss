@@ -1,25 +1,47 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
+
+// Color tokens, mapped from the theme variables internal to the
+// `@wordpress/components` package (where this component previously lived) to
+// the design-system tokens those variables resolve to outside of a themed
+// components subtree, so the calendar keeps the same appearance it had there.
+$calendar-color-accent: var(--wp-admin-theme-color, #3858e9);
+$calendar-color-background: var(--wpds-color-background-surface-neutral-strong);
+$calendar-color-foreground: var(--wpds-color-foreground-content-neutral);
+$calendar-color-foreground-inverted: var(
+	--wpds-color-background-surface-neutral
+);
+$calendar-color-gray-400: var(--wpds-color-stroke-interactive-neutral);
+$calendar-color-gray-600: var(--wpds-color-stroke-interactive-neutral);
+$calendar-color-gray-700: var(--wpds-color-foreground-content-neutral-weak);
+$calendar-color-gray-800: var(--wpds-color-foreground-content-neutral);
+$calendar-color-disabled: $calendar-color-gray-600;
 
 /* Root of the component. */
 // Internal variables
-$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus)
-	solid $components-color-accent;
-$wp-components-calendar-button-height: $grid-unit-40;
-$wp-components-calendar-button-width: $grid-unit-40;
-$wp-components-calendar-nav-height: $grid-unit-40;
-$wp-components-calendar-range-middle-background-color: color-mix(in srgb, $components-color-accent 4%, transparent);
-$wp-components-calendar-preview-border-color: color-mix(in srgb, $components-color-accent 16%, transparent);
+$wp-dataviews-calendar-outline-focus: var(--wp-admin-border-width-focus) solid
+	$calendar-color-accent;
+$wp-dataviews-calendar-button-height: $grid-unit-40;
+$wp-dataviews-calendar-button-width: $grid-unit-40;
+$wp-dataviews-calendar-nav-height: $grid-unit-40;
+$wp-dataviews-calendar-range-middle-background-color: color-mix(
+	in srgb,
+	$calendar-color-accent 4%,
+	transparent
+);
+$wp-dataviews-calendar-preview-border-color: color-mix(
+	in srgb,
+	$calendar-color-accent 16%,
+	transparent
+);
 
-.components-calendar {
+.dataviews-calendar {
 	// TODO: add font family rule when Theme is ready
 
 	position: relative; /* Required to position the navigation toolbar. */
 	box-sizing: border-box;
 	display: inline flow-root;
-	color: $components-color-foreground;
-	background-color: $components-color-background;
+	color: $calendar-color-foreground;
+	background-color: $calendar-color-background;
 	font-size: $font-size-medium;
 	font-weight: var(--wpds-typography-font-weight-default);
 	z-index: 0; // Create a stacking context and render on top of the background.
@@ -31,7 +53,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	}
 }
 
-.components-calendar__day {
+.dataviews-calendar__day {
 	padding: 0;
 	position: relative;
 
@@ -39,17 +61,17 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	// day button to ensure that the color of the dot used to indicate today's
 	// date follows the same color as the button's text, since the button
 	// inherits its text color.
-	&:has(.components-calendar__day-button:disabled) {
+	&:has(.dataviews-calendar__day-button:disabled) {
 		// Use a lighter shade of gray for less visual prominence.
-		color: $components-color-gray-400;
+		color: $calendar-color-gray-400;
 	}
-	&:has(.components-calendar__day-button:hover:not(:disabled)),
-	&:has(.components-calendar__day-button:focus-visible) {
-		color: $components-color-accent;
+	&:has(.dataviews-calendar__day-button:hover:not(:disabled)),
+	&:has(.dataviews-calendar__day-button:focus-visible) {
+		color: $calendar-color-accent;
 	}
 }
 
-.components-calendar__day-button {
+.dataviews-calendar__day-button {
 	background: none;
 	padding: 0;
 	margin: 0;
@@ -59,8 +81,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	display: flex;
 	position: relative;
 
-	width: $wp-components-calendar-button-width;
-	height: $wp-components-calendar-button-height;
+	width: $wp-dataviews-calendar-button-width;
+	height: $wp-dataviews-calendar-button-height;
 
 	border: none;
 	border-radius: $radius-small;
@@ -94,7 +116,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	&:disabled {
 		cursor: revert;
 
-		@media ( forced-colors: active ) {
+		@media (forced-colors: active) {
 			// As an extra visual cue, show a line-through on disabled days
 			// in forced-colors (high-contrast) mode.
 			text-decoration: line-through;
@@ -102,12 +124,12 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	}
 
 	&:focus-visible {
-		outline: $wp-components-calendar-outline-focus;
+		outline: $wp-dataviews-calendar-outline-focus;
 		outline-offset: 1px;
 	}
 }
 
-.components-calendar__caption-label {
+.dataviews-calendar__caption-label {
 	z-index: 1;
 
 	position: relative;
@@ -120,8 +142,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	text-transform: capitalize;
 }
 
-.components-calendar__button-next,
-.components-calendar__button-previous {
+.dataviews-calendar__button-next,
+.dataviews-calendar__button-previous {
 	border: none;
 	border-radius: $radius-small;
 	background: none;
@@ -134,8 +156,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	justify-content: center;
 	position: relative;
 
-	width: $wp-components-calendar-button-width;
-	height: $wp-components-calendar-button-height;
+	width: $wp-dataviews-calendar-button-width;
+	height: $wp-dataviews-calendar-button-height;
 
 	color: inherit;
 
@@ -143,38 +165,38 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	&[aria-disabled="true"] {
 		cursor: revert;
 
-		color: $components-color-disabled;
+		color: $calendar-color-disabled;
 	}
 
 	&:focus-visible {
-		outline: $wp-components-calendar-outline-focus;
+		outline: $wp-dataviews-calendar-outline-focus;
 	}
 }
 
-.components-calendar__chevron {
+.dataviews-calendar__chevron {
 	display: inline-block;
 	fill: currentColor;
 	width: $grid-unit-20;
 	height: $grid-unit-20;
 }
 
-.components-calendar[dir="rtl"]
-.components-calendar__nav
-.components-calendar__chevron {
+.dataviews-calendar[dir="rtl"]
+	.dataviews-calendar__nav
+	.dataviews-calendar__chevron {
 	transform: rotate(180deg);
 	transform-origin: 50%;
 }
 
-.components-calendar__month-caption {
+.dataviews-calendar__month-caption {
 	display: flex;
 	justify-content: center;
 	align-content: center;
 
-	height: $wp-components-calendar-nav-height;
+	height: $wp-dataviews-calendar-nav-height;
 	margin-bottom: $grid-unit-15;
 }
 
-.components-calendar__months {
+.dataviews-calendar__months {
 	position: relative;
 	display: flex;
 	justify-content: center;
@@ -183,12 +205,12 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	max-width: fit-content;
 }
 
-.components-calendar__month-grid {
+.dataviews-calendar__month-grid {
 	border-collapse: separate;
 	border-spacing: 0 $grid-unit-05;
 }
 
-.components-calendar__nav {
+.dataviews-calendar__nav {
 	position: absolute;
 	inset-block-start: 0;
 	inset-inline-start: 0;
@@ -198,22 +220,22 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	align-items: center;
 	justify-content: space-between;
 
-	height: $wp-components-calendar-nav-height;
+	height: $wp-dataviews-calendar-nav-height;
 }
 
-.components-calendar__weekday {
-	width: $wp-components-calendar-button-width;
-	height: $wp-components-calendar-button-height;
+.dataviews-calendar__weekday {
+	width: $wp-dataviews-calendar-button-width;
+	height: $wp-dataviews-calendar-button-height;
 	padding: 0;
 
-	color: $components-color-gray-700;
+	color: $calendar-color-gray-700;
 	text-align: center;
 	text-transform: uppercase;
 }
 
 /* DAY MODIFIERS */
 // Today's date: show a dot in the top-right corner of the button
-.components-calendar__day--today::after {
+.dataviews-calendar__day--today::after {
 	content: "";
 	position: absolute;
 	z-index: 1;
@@ -226,17 +248,17 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 }
 
 // Selected date button (individual date, range start, and range end)
-.components-calendar__day--selected:not(.components-calendar__range-middle) {
+.dataviews-calendar__day--selected:not(.dataviews-calendar__range-middle) {
 	&:has(
-	.components-calendar__day-button,
-	.components-calendar__day-button:hover:not(:disabled)
-) {
-		color: $components-color-foreground-inverted;
+			.dataviews-calendar__day-button,
+			.dataviews-calendar__day-button:hover:not(:disabled)
+		) {
+		color: $calendar-color-foreground-inverted;
 	}
 
-	.components-calendar__day-button {
+	.dataviews-calendar__day-button {
 		&::before {
-			background-color: $components-color-foreground;
+			background-color: $calendar-color-foreground;
 			// Render a transparent border to highlight the selected day in
 			// forced-colors (high-contrast) mode, since the background is not
 			// visible.
@@ -244,28 +266,28 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 		}
 
 		&:disabled::before {
-			background-color: $components-color-gray-400;
+			background-color: $calendar-color-gray-400;
 		}
 
 		&:hover:not(:disabled)::before {
-			background-color: $components-color-gray-800;
+			background-color: $calendar-color-gray-800;
 		}
 	}
 }
 
 // Outside month days (visible when showOutsideDays is true): use a lighter text color.
-.components-calendar__day--outside {
-	color: $components-color-gray-600;
+.dataviews-calendar__day--outside {
+	color: $calendar-color-gray-600;
 }
 
 // Hidden button (ie. outside current month but still rendered)
-.components-calendar__day--hidden {
+.dataviews-calendar__day--hidden {
 	visibility: hidden;
 }
 
 // Range start button, but not when start and end are the same day.
-.components-calendar__range-start:not(.components-calendar__range-end)
-.components-calendar__day-button {
+.dataviews-calendar__range-start:not(.dataviews-calendar__range-end)
+	.dataviews-calendar__day-button {
 	// Apply border-radius changes to the button itself too, so that the focus
 	// ring follows the same shape as the button's background.
 	&,
@@ -276,9 +298,9 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 }
 
 // Middle of date range
-.components-calendar__range-middle .components-calendar__day-button {
+.dataviews-calendar__range-middle .dataviews-calendar__day-button {
 	&::before {
-		background-color: $wp-components-calendar-range-middle-background-color;
+		background-color: $wp-dataviews-calendar-range-middle-background-color;
 		border-radius: 0;
 
 		// Render a top and bottom transparent border to highlight the selected
@@ -291,8 +313,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 }
 
 // Range end button, but not when start and end are the same day.
-.components-calendar__range-end:not(.components-calendar__range-start)
-.components-calendar__day-button {
+.dataviews-calendar__range-end:not(.dataviews-calendar__range-start)
+	.dataviews-calendar__day-button {
 	// Apply border-radius changes to the button itself too, so that the focus
 	// ring follows the same shape as the button's background.
 	&,
@@ -314,23 +336,23 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
  * CSS variables, we're using the SVGs as masks, and using `background-color`
  * to consume the accent color variable.
  */
-.components-calendar__day--preview svg {
+.dataviews-calendar__day--preview svg {
 	position: absolute;
 	inset: 0;
 	pointer-events: none;
-	color: $wp-components-calendar-preview-border-color;
+	color: $wp-dataviews-calendar-preview-border-color;
 
-	@media ( forced-colors: active ) {
+	@media (forced-colors: active) {
 		color: inherit;
 	}
 
-	.components-calendar[dir="rtl"] & {
+	.dataviews-calendar[dir="rtl"] & {
 		transform: scaleX(-1);
 	}
 }
 
-.components-calendar__day--preview.components-calendar__range-middle
-.components-calendar__day-button::before {
+.dataviews-calendar__day--preview.dataviews-calendar__range-middle
+	.dataviews-calendar__day-button::before {
 	// Remove the transparent border shown on the middle of the range
 	// in forced-colors (high-contrast) mode, to allow for the dashed border
 	// to be visible.
@@ -392,49 +414,49 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	}
 }
 
-.components-calendar__weeks-before-enter,
-.components-calendar__weeks-before-exit,
-.components-calendar__weeks-after-enter,
-.components-calendar__weeks-after-exit,
-.components-calendar__caption-after-enter,
-.components-calendar__caption-after-exit,
-.components-calendar__caption-before-enter,
-.components-calendar__caption-before-exit {
+.dataviews-calendar__weeks-before-enter,
+.dataviews-calendar__weeks-before-exit,
+.dataviews-calendar__weeks-after-enter,
+.dataviews-calendar__weeks-after-exit,
+.dataviews-calendar__caption-after-enter,
+.dataviews-calendar__caption-after-exit,
+.dataviews-calendar__caption-before-enter,
+.dataviews-calendar__caption-before-exit {
 	animation-duration: 0s;
 	animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	animation-fill-mode: forwards;
 
-	@media not ( prefers-reduced-motion ) {
+	@media not (prefers-reduced-motion) {
 		animation-duration: 0.3s;
 	}
 }
 
-.components-calendar__weeks-before-enter,
-.components-calendar[dir="rtl"] .components-calendar__weeks-after-enter {
+.dataviews-calendar__weeks-before-enter,
+.dataviews-calendar[dir="rtl"] .dataviews-calendar__weeks-after-enter {
 	animation-name: slide-in-left;
 }
-.components-calendar__weeks-before-exit,
-.components-calendar[dir="rtl"] .components-calendar__weeks-after-exit {
+.dataviews-calendar__weeks-before-exit,
+.dataviews-calendar[dir="rtl"] .dataviews-calendar__weeks-after-exit {
 	animation-name: slide-out-left;
 }
-.components-calendar__weeks-after-enter,
-.components-calendar[dir="rtl"] .components-calendar__weeks-before-enter {
+.dataviews-calendar__weeks-after-enter,
+.dataviews-calendar[dir="rtl"] .dataviews-calendar__weeks-before-enter {
 	animation-name: slide-in-right;
 }
-.components-calendar__weeks-after-exit,
-.components-calendar[dir="rtl"] .components-calendar__weeks-before-exit {
+.dataviews-calendar__weeks-after-exit,
+.dataviews-calendar[dir="rtl"] .dataviews-calendar__weeks-before-exit {
 	animation-name: slide-out-right;
 }
 
-.components-calendar__caption-after-enter {
+.dataviews-calendar__caption-after-enter {
 	animation-name: fade-in;
 }
-.components-calendar__caption-after-exit {
+.dataviews-calendar__caption-after-exit {
 	animation-name: fade-out;
 }
-.components-calendar__caption-before-enter {
+.dataviews-calendar__caption-before-enter {
 	animation-name: fade-in;
 }
-.components-calendar__caption-before-exit {
+.dataviews-calendar__caption-before-exit {
 	animation-name: fade-out;
 }

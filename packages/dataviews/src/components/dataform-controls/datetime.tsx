@@ -19,9 +19,10 @@ import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
+import { DateCalendar } from '../calendar';
 import { unlock } from '../../lock-unlock';
 
-const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
