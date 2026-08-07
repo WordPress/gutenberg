@@ -4,11 +4,11 @@
 
 ### Breaking Changes
 
--   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead.
+-   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Enhancements
 
--   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`.
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ## 12.0.0 (2026-07-29)
 

@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system.
+-   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Bug Fixes
 

@@ -146,7 +146,6 @@
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
-	box-shadow: none;
 	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
 	border-radius: wpds.var("--wpds-border-radius-sm");
 }
