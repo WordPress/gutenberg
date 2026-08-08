@@ -3,7 +3,7 @@ const { writeFile, mkdir } = require( 'fs' ).promises;
 const { info } = require( './log' );
 const { writeOutputTemplate } = require( './output' );
 
-async function initBlockJSrON( {
+async function initBlockJSON( {
 	$schema,
 	apiVersion,
 	plugin,

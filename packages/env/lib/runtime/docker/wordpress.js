@@ -1,5 +1,6 @@
 'use strict';
 const fs = require( 'fs' );
+const path = require( 'path' );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { readWordPressVersion } = require( '../../wordpress' );
 
