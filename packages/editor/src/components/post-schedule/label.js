@@ -17,12 +17,16 @@ export default function PostScheduleLabel( props ) {
 /**
  * Custom hook to get the label for post schedule.
  *
- * @param {Object}  options      Options for the hook.
- * @param {boolean} options.full Whether to get the full label or not. Default is false.
+ * @param {Object}  options                Options for the hook.
+ * @param {boolean} options.full           Whether to get the full label or not. Default is false.
+ * @param {boolean} options.forPostPublish Whether to return a full sentence for post publish panel or not. Default is false.
  *
  * @return {string} The label for post schedule.
  */
-export function usePostScheduleLabel( { full = false } = {} ) {
+export function usePostScheduleLabel( {
+	full = false,
+	forPostPublish = false,
+} = {} ) {
 	const { date, isFloating } = useSelect(
 		( select ) => ( {
 			date: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -31,9 +35,18 @@ export function usePostScheduleLabel( { full = false } = {} ) {
 		[]
 	);
 
-	return full
-		? getFullPostScheduleLabel( date )
-		: getPostScheduleLabel( date, { isFloating } );
+	if ( full ) {
+		return getFullPostScheduleLabel( date );
+	}
+	if ( forPostPublish ) {
+		return sprintf(
+			// translators: %s: It will be a post schedule label like "Today at 5:00 PM".
+			__( 'It will go live on %s.' ),
+			getPostScheduleLabel( date, { isFloating, forPostPublish } )
+		);
+	}
+
+	return getPostScheduleLabel( date, { isFloating, forPostPublish } );
 }
 
 export function getFullPostScheduleLabel( dateAttribute ) {

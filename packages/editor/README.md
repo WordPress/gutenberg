@@ -1709,6 +1709,7 @@ _Parameters_
 
 -   _options_ `Object`: Options for the hook.
 -   _options.full_ `boolean`: Whether to get the full label or not. Default is false.
+-   _options.forPostPublish_ `boolean`: Whether to return a full sentence for post publish panel or not. Default is false.
 
 _Returns_
 
