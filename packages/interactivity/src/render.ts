@@ -200,7 +200,7 @@ const rebuildPathNode = (
  * @param position  Insert position.
  * @param newVdoms  The vnodes to insert.
  * @param atIndex   For `position: 'at'` — the child index to insert at
- *                  (used by `renderElement`).
+ *                  (used by `hydrateInsertedElement`).
  */
 const spliceIntoTree = (
 	island: Element,
@@ -433,19 +433,23 @@ export function renderHTML(
 }
 
 /**
- * Renders HTML elements that have been inserted into the live DOM after the
- * initial page load, processing all Interactivity API directives on them.
+ * Renders HTML elements that have been inserted into the live DOM outside of
+ * Preact (e.g. raw HTML added by a plugin), processing all Interactivity API
+ * directives on them.
  *
- * This is a compatibility shim over the tree-first `renderHTML()`: the
- * element's markup is re-created through the island tree at the element's
- * position, and the raw element is removed. As a consequence the element
- * IDENTITY is not preserved — plugin code holding a reference to the raw node
- * (or listeners attached directly to it) will see it replaced. Prefer
- * `renderHTML( container, html )` for new code.
+ * INTERNAL — not part of the public API. This is the mechanism the
+ * MutationObserver will use to route raw DOM insertions through Preact.
+ *
+ * The element's markup is re-created through the island tree at the element's
+ * position (cut-and-reinsert): the tree stays the single source of truth, and
+ * the raw element is removed. As a consequence the element IDENTITY is not
+ * preserved — code holding a reference to the raw node (or listeners attached
+ * directly to it) will see it replaced. Prefer `renderHTML( container, html )`
+ * for new code.
  *
  * @param element Element (or elements) to render.
  */
-export function renderElement(
+export function hydrateInsertedElement(
 	element: Element | Text | Array< Element | Text >
 ): void {
 	const nodes = Array.isArray( element ) ? element : [ element ];
@@ -455,7 +459,7 @@ export function renderElement(
 	for ( const node of nodes ) {
 		if ( ! node.parentNode || ! node.isConnected ) {
 			throw new Error(
-				'renderElement(): the element must be attached to the DOM first.'
+				'hydrateInsertedElement(): the element must be attached to the DOM first.'
 			);
 		}
 		const parent = node.parentElement;
@@ -465,7 +469,7 @@ export function renderElement(
 		const island = getTreeIsland( node instanceof Element ? node : parent );
 		if ( ! island ) {
 			warn(
-				'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
+				'hydrateInsertedElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
 			);
 			continue;
 		}

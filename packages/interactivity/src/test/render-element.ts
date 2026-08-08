@@ -8,7 +8,7 @@ import { getContext } from '../scopes';
  * Internal dependencies
  */
 import '../directives'; // Registers all the core directives.
-import { renderElement, renderHTML } from '../render';
+import { hydrateInsertedElement, renderHTML } from '../render';
 
 function el( html: string ): HTMLElement {
 	const host = document.createElement( 'div' );
@@ -16,7 +16,7 @@ function el( html: string ): HTMLElement {
 	return host.firstElementChild as HTMLElement;
 }
 
-describe( 'renderElement', () => {
+describe( 'hydrateInsertedElement', () => {
 	/* eslint-disable @wordpress/wp-global-usage */
 	const testGlobalThis = globalThis as typeof globalThis & {
 		IS_GUTENBERG_PLUGIN?: boolean;
@@ -39,7 +39,7 @@ describe( 'renderElement', () => {
 			'<div data-wp-interactive="test/render-element"></div>'
 		);
 		node.remove();
-		expect( () => renderElement( node ) ).toThrow( /attached to the DOM/ );
+		expect( () => hydrateInsertedElement( node ) ).toThrow( /attached to the DOM/ );
 	} );
 
 	it( 'hydrates directives on an inserted element', () => {
@@ -51,7 +51,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
 			'hello'
@@ -74,7 +74,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 		const btn = node.querySelector(
 			'[data-testid="btn"]'
 		) as HTMLButtonElement;
@@ -84,7 +84,7 @@ describe( 'renderElement', () => {
 		expect( state.count ).toBe( 2 );
 
 		// Re-render the SAME node: diff in place, must NOT double-bind.
-		renderElement( node );
+		hydrateInsertedElement( node );
 		btn.click();
 		expect( state.count ).toBe( 3 );
 	} );
@@ -102,7 +102,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		expect(
 			node.querySelector( '[data-testid="outer"]' )?.textContent
@@ -127,7 +127,7 @@ describe( 'renderElement', () => {
 		document.body.appendChild( list );
 		list.append( card, sibling );
 
-		renderElement( card );
+		hydrateInsertedElement( card );
 
 		// Sibling was NOT processed: directive untouched, server text intact.
 		expect( sibling.querySelector( 'span' )?.textContent ).toBe(
@@ -147,7 +147,7 @@ describe( 'renderElement', () => {
 		document.body.appendChild( host );
 		host.append( a, b );
 
-		renderElement( [ a, b ] );
+		hydrateInsertedElement( [ a, b ] );
 
 		// @ts-expect-error jest-dom matcher is added by the test setup.
 		expect( a ).toHaveTextContent( 'hello' );
@@ -166,7 +166,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		expect(
 			node.querySelector( '[data-wp-ignore] span' )?.textContent
@@ -190,7 +190,7 @@ describe( 'renderElement', () => {
 
 		// The block's directives must be hydrated for the registry to have an
 		// entry at the insertion point. Render the island itself first.
-		renderElement( island );
+		hydrateInsertedElement( island );
 
 		// Plain fragment WITHOUT data-wp-interactive, inserted inside.
 		const node = el(
@@ -198,7 +198,7 @@ describe( 'renderElement', () => {
 		);
 		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		// @ts-expect-error jest-dom matcher is added by the test setup.
 		expect( node ).toHaveTextContent( 'hello' );
@@ -210,7 +210,7 @@ describe( 'renderElement', () => {
 		island
 			.querySelector( '[data-testid="target"]' )!
 			.appendChild( ctxNode );
-		renderElement( ctxNode );
+		hydrateInsertedElement( ctxNode );
 
 		// @ts-expect-error jest-dom matcher is added by the test setup.
 		expect( ctxNode ).toHaveTextContent( 'ctx' );
@@ -223,7 +223,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		// Directive unprocessed — server text intact.
 		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
@@ -231,7 +231,7 @@ describe( 'renderElement', () => {
 		);
 		// @ts-expect-error jest-console matcher is added by the test setup.
 		expect( console ).toHaveWarnedWith(
-			'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
+			'hydrateInsertedElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
 		);
 	} );
 
@@ -244,7 +244,7 @@ describe( 'renderElement', () => {
 		);
 		document.body.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
 			'hello'
@@ -270,13 +270,13 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( island );
-		renderElement( island );
+		hydrateInsertedElement( island );
 
 		const node = el(
 			'<button data-testid="btn" data-wp-on--click="actions.increment"></button>'
 		);
 		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		const btn = node as HTMLButtonElement;
 		btn.click();
@@ -310,7 +310,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( island );
-		renderElement( island );
+		hydrateInsertedElement( island );
 
 		// Plain fragment (no data-wp-interactive) WITH its own context.
 		const node = el(
@@ -319,7 +319,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		island.querySelector( '[data-testid="target"]' )!.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		// The fragment's own context starts at 10.
 		const btn = node.querySelector(
@@ -347,7 +347,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
 			'hello'
 		);
@@ -355,7 +355,7 @@ describe( 'renderElement', () => {
 		// Change the state and re-render the SAME node: the directive must
 		// re-evaluate against the new state, updating in place.
 		store( 'test/render-element', { state: { message: 'updated' } } );
-		renderElement( node );
+		hydrateInsertedElement( node );
 		expect( node.querySelector( '[data-testid="out"]' )?.textContent ).toBe(
 			'updated'
 		);
@@ -384,7 +384,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		const items = node.querySelectorAll( '[data-testid="item"]' );
 		expect( items.length ).toBe( 3 );
@@ -421,7 +421,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		// `data-wp-init` uses `useEffect` (async): wait for it to fire and
 		// the reactive text update to flush.
@@ -459,7 +459,7 @@ describe( 'renderElement', () => {
 				'</div>'
 		);
 		document.body.appendChild( node );
-		renderElement( node );
+		hydrateInsertedElement( node );
 
 		const watch = node.querySelector( '[data-testid="watch"]' )!;
 		// Runs on insertion.
@@ -506,7 +506,7 @@ describe( 'renderHTML', () => {
 		);
 		document.body.appendChild( container );
 		// Hydrate the island so the registry has an entry at the target.
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -529,7 +529,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -552,7 +552,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -574,7 +574,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -597,7 +597,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -621,7 +621,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -645,7 +645,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -671,7 +671,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
@@ -694,7 +694,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		renderHTML(
 			'[data-testid="target"]',
@@ -723,7 +723,7 @@ describe( 'renderHTML', () => {
 				'</div>'
 		);
 		document.body.appendChild( container );
-		renderElement( container );
+		hydrateInsertedElement( container );
 
 		const target = container.querySelector(
 			'[data-testid="target"]'
