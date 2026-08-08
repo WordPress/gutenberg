@@ -93,6 +93,7 @@ export default function ListItemEdit( {
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
 					onMerge={ onMerge }
+					style={ { display: 'inline-block' } }
 				/>
 				{ innerBlocksProps.children }
 			</li>
