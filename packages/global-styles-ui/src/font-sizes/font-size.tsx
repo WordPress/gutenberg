@@ -40,6 +40,8 @@ function FontSize() {
 	const [ isDeleteOpen, setIsDeleteOpen ] = useState( false );
 	const [ isRenameOpen, setIsRenameOpen ] = useState( false );
 
+	// The preset can disappear while its screen is open, e.g. when presets are
+	// reset globally. Navigate back to the font sizes list in that case.
 	useEffect( () => {
 		if ( !! slug && ! fontSize ) {
 			goBack();
