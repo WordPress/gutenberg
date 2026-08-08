@@ -130,6 +130,30 @@ function BlockPatternSlide( { active, className, pattern, minHeight } ) {
 	);
 }
 
+/**
+ * BlockPatternSetup component displays a list of block patterns in a carousel or grid view.
+ *
+ * @param {Object}   props                      Component props.
+ * @param {string}   props.clientId             The client ID of the block being edited.
+ * @param {string}   props.blockName            The name of the block being edited.
+ * @param {Function} props.filterPatternsFn     Function to filter patterns.
+ * @param {Function} props.onBlockPatternSelect Function to call when a pattern is selected.
+ * @param {string}   props.initialViewMode      The initial view mode for the block pattern setup.
+ * @param {boolean}  props.showTitles           Whether to show pattern titles.
+ *
+ * @return {Element} The block pattern setup component.
+ *
+ * @example
+ * ```jsx
+ * <BlockPatternSetup
+ * 	clientId="clientId"
+ * 	blockName="core/paragraph"
+ * 	filterPatternsFn={ ( pattern ) => pattern.name === 'pattern-name' }
+ * 	onBlockPatternSelect={ ( ) => { } }
+ * 	initialViewMode="carousel"
+ * 	showTitles={ false }
+ * />
+ */
 const BlockPatternSetup = ( {
 	clientId,
 	blockName,
