@@ -199,8 +199,7 @@ const rebuildPathNode = (
  * @param container The element the position is relative to.
  * @param position  Insert position.
  * @param newVdoms  The vnodes to insert.
- * @param atIndex   For `position: 'at'` — the child index to insert at
- *                  (used by `hydrateInsertedElement`).
+ * @param atIndex   For `position: 'at'` — the child index to insert at.
  */
 const spliceIntoTree = (
 	island: Element,
@@ -249,8 +248,8 @@ const spliceIntoTree = (
 		position === 'at'
 	) {
 		// Splice into the container's own children. `at` inserts at a specific
-		// index (used by `hydrateInsertedElement` to replace a raw node at its
-		// exact position within its parent).
+		// child index (used by the future MutationObserver's cut-and-reinsert,
+		// §7).
 		const target = path[ path.length - 1 ];
 		const oldChildren = vdomChildren( target );
 		let newChildren: ComponentChild[];
