@@ -54,6 +54,7 @@ import {
 } from './state';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { registerCustomFormatTypes } from './format.js';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -88,6 +89,9 @@ function TSection( { name, ...props } ) {
 	const TagName = `t${ name }`;
 	return <TagName { ...props } />;
 }
+
+// Register the custom format types.
+registerCustomFormatTypes();
 
 function TableEdit( {
 	attributes,
