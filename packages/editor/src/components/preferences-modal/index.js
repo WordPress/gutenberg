@@ -163,7 +163,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
 								description={ __(
-									'Select what settings are shown in the document panel.'
+									'Select what settings are shown in the settings panel.'
 								) }
 							>
 								<EnablePluginDocumentSettingPanelOption.Slot />
