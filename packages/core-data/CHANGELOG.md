@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+<<<<<<< HEAD
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
 
 ### Bug Fixes
@@ -16,6 +17,9 @@
 -   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
 
 ## 7.52.0 (2026-07-29)
+=======
+-   `getEntityRecords`: When the REST API rejects an out-of-bounds page (`rest_post_invalid_page_number`), recover total item/page counts from page 1 and return an empty result set so paginated UIs can still show navigation. [#80982](https://github.com/WordPress/gutenberg/pull/80982)
+>>>>>>> bc41db7b380 (Updated Changelog entry)
 
 ### Internal
 
