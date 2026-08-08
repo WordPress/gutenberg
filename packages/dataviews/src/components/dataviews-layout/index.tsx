@@ -145,8 +145,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	} = useContext( DataViewsContext );
 
 	const resolvedEmpty =
-		empty ??
-		(
+		empty ?? (
 			<DefaultEmpty
 				page={ view.page }
 				totalItems={ paginationInfo.totalItems }
