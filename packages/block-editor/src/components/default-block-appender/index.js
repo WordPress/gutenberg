@@ -12,6 +12,21 @@ import { store as blockEditorStore } from '../../store';
  */
 export const ZWNBSP = '\ufeff';
 
+/**
+ * DefaultBlockAppender component used to add a new block to the editor when the editor is empty.
+ *
+ * @param {Object} props              Component props.
+ * @param {string} props.rootClientId The client ID of the root block of the editor.
+ *
+ * @return {WPElement} The DefaultBlockAppender component.
+ *
+ * @example
+ * ```jsx
+ * function MyComponent() {
+ * 	return <DefaultBlockAppender rootClientId="root-block-id" />;
+ * }
+ * ```
+ */
 export default function DefaultBlockAppender( { rootClientId } ) {
 	const { showPrompt, isLocked, placeholder, isManualGrid } = useSelect(
 		( select ) => {
