@@ -98,6 +98,7 @@ export function ImageEdit( {
 	} = attributes;
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const [ isShrinkWrapped, setIsShrinkWrapped ] = useState( false );
 
 	const containerRef = useRef();
 	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
@@ -130,6 +131,28 @@ export function ImageEdit( {
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
+
+	useEffect( () => {
+		if ( ! containerRef.current ) {
+			return;
+		}
+		const parent = containerRef?.current?.parentElement;
+		const grandParent = parent?.parentElement;
+
+		if ( ! parent || ! grandParent ) {
+			return;
+		}
+
+		const grandParentDisplay =
+			window.getComputedStyle( grandParent ).display;
+		const isFlexChild =
+			grandParentDisplay === 'flex' ||
+			grandParentDisplay === 'inline-flex';
+		const flexGrow = parseFloat(
+			window.getComputedStyle( parent ).flexGrow
+		);
+		setIsShrinkWrapped( isFlexChild && flexGrow === 0 );
+	}, [ containerRef ] );
 
 	const {
 		getSettings,
@@ -476,7 +499,7 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
-					maxContentWidth={ maxContentWidth }
+					maxContentWidth={ isShrinkWrapped ? null : maxContentWidth }
 				/>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
