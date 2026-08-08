@@ -44,6 +44,23 @@ export function useBlockSelectionClearer() {
 	);
 }
 
+/**
+ * The BlockSelectionClearer component clears block selection when clicked.
+ *
+ * @example
+ * ```jsx
+ * function Example() {
+ * return(
+ *    <BlockSelectionClearer { ...args }>
+ * 	  <BlockSelectionClearer/>
+ * );
+ * }
+ * ```
+ *
+ * @param {Object} props The props for the component.
+ * @return {Element} The block type item element.
+ * 
+ */
 export default function BlockSelectionClearer( props ) {
 	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }
