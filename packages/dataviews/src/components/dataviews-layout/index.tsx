@@ -145,17 +145,17 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	} = useContext( DataViewsContext );
 
 	const resolvedEmpty =
-		empty ?? (
-			<DefaultEmpty
-				page={ view.page }
-				totalItems={ paginationInfo.totalItems }
-				totalPages={ paginationInfo.totalPages }
-				isLoading={ isLoading }
-				hasData={ data.length > 0 }
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
-		);
+	empty ?? (
+		<DefaultEmpty
+			page={ view.page }
+			totalItems={ paginationInfo.totalItems }
+			totalPages={ paginationInfo.totalPages }
+			isLoading={ isLoading }
+			hasData={ data.length > 0 }
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	);
 
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
