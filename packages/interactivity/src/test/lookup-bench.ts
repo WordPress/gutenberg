@@ -32,14 +32,12 @@ import { hydrateRegions } from '../hydration';
 
 const NS = 'bench/lookup';
 
-// Preact internal property accessors — dual-read for source (`_dom`/`_parent`)
-// vs mangled dist (`__e`/`__`) builds, same as render.ts. (All published
-// preact builds are mangled; the source names are kept for upstream parity.)
-const vdomDom = ( vnode: any ): Node | null =>
-	vnode?._dom ?? vnode?.__e ?? null;
-const vdomChildren = ( vnode: any ): any[] =>
-	vnode?._children ?? vnode?.__k ?? [];
-const vdomParent = ( vnode: any ): any => vnode?._parent ?? vnode?.__ ?? null;
+// Preact internal property accessors — the mangled dist names (`__e`/`__k`/`__`),
+// same as render.ts. (Preact's published builds mangle vnode internals per
+// mangle.json: `_dom`→`__e`, `_children`→`__k`, `_parent`→`__`.)
+const vdomDom = ( vnode: any ): Node | null => vnode?.__e ?? null;
+const vdomChildren = ( vnode: any ): any[] => vnode?.__k ?? [];
+const vdomParent = ( vnode: any ): any => vnode?.__ ?? null;
 
 // OLD lookup — recursive depth-first search over the WHOLE island (verbatim
 // from render.ts @-).
@@ -67,12 +65,8 @@ const getPathTo = ( root: any, target: Element ): any[] | null => {
 	}
 	const reversed: any[] = [];
 	while ( vnode && vnode !== root ) {
-		const parent = vdomParent( vnode );
-		if ( ! parent || vdomChildren( parent ).indexOf( vnode ) === -1 ) {
-			return null;
-		}
 		reversed.push( vnode );
-		vnode = parent;
+		vnode = vdomParent( vnode );
 	}
 	if ( vnode !== root ) {
 		return null;
