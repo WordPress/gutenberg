@@ -1,10 +1,7 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
+const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 const mkdirp = require( 'mkdirp' ).mkdirp.sync;
-const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { View } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { getUserModifications, resolveView } from '../resolve-view';
 
 const LOCKED = {

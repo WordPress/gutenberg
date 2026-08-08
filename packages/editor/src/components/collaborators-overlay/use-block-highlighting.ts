@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
@@ -8,10 +5,6 @@ import {
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';

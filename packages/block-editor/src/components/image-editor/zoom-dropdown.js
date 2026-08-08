@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToolbarButton,
 	RangeControl,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { MIN_ZOOM, MAX_ZOOM, POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
@@ -16,10 +13,6 @@ import type {
 	FluidTypographyConfig,
 } from '@wordpress/global-styles-engine';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import FontSizePreview from './font-size-preview';
 import { SizeControl } from '../size-control';
 import { usePresets } from '../presets/use-presets';

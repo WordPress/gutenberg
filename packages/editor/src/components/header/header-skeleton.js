@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __unstableMotion as motion } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BackButton, { useHasBackButton } from './back-button';
 
 const toolbarVariations = {

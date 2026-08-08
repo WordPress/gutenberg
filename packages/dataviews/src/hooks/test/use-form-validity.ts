@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useFormValidity } from '../use-form-validity';
 import type { Field } from '../../types';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
@@ -14,17 +11,8 @@ import {
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { InheritanceResetButton } from './inheritance';
 
 /**

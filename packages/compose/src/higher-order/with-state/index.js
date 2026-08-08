@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**

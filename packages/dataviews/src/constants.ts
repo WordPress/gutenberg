@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { arrowDown, arrowUp } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { DayNumber } from './types';
 
 // Filter operators.

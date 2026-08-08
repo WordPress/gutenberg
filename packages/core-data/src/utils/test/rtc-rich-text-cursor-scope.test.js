@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
 /**
  * Mock block schemas and sync providers.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' );
-
 	return {
 		...actual,
 		getBlockTypes: () => [
@@ -27,14 +18,9 @@ jest.mock( '@wordpress/blocks', () => {
 		],
 	};
 } );
-
 jest.mock( '../../../../sync/src/providers', () => ( {
 	getProviderCreators: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
 import { createSyncManager } from '../../../../sync/src/manager';
 import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';

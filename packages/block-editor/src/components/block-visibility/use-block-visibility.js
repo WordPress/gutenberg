@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMediaQuery } from '@wordpress/compose';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { unlock } from '../../lock-unlock';
 

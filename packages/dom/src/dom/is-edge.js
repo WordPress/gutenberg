@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isRTL from './is-rtl';
 import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';

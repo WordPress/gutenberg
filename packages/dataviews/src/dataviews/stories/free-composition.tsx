@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
 import { Card, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';

@@ -839,11 +839,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/spinner/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/style-provider/index.tsx": {
 		"no-restricted-imports": {
 			"count": 2

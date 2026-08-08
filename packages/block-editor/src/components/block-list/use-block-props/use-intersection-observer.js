@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { IntersectionObserver } from '../';
 
 export function useIntersectionObserver() {

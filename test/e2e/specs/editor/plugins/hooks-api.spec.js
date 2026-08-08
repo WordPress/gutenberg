@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Using Hooks API', () => {

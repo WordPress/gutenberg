@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType, MutableRefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 

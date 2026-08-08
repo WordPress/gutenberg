@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
@@ -12,10 +9,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import BlockManagerCategory from './category';
 
 /**

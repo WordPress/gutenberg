@@ -11,6 +11,10 @@
 -   `ComplementaryArea`: Remove incorrect `aria-expanded` attribute from the "Pin to toolbar" toggle button, which already exposes its state via `aria-pressed` ([#79874](https://github.com/WordPress/gutenberg/pull/79874)).
 -   `InterfaceSkeleton`: Increase the footer height from 24px to 32px to prevent the focus ring from being clipped ([#81145](https://github.com/WordPress/gutenberg/pull/81145)).
 
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
 ## 9.37.0 (2026-07-29)
 
 ### Internal

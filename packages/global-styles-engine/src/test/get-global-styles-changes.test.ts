@@ -1,18 +1,11 @@
-/**
- * Internal dependencies
- */
-import getGlobalStylesChanges, {
-	getGlobalStylesChangelist,
-} from '../utils/get-global-styles-changes';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import getGlobalStylesChanges, {
+	getGlobalStylesChangelist,
+} from '../utils/get-global-styles-changes';
 
 describe( 'getGlobalStylesChanges and utils', () => {
 	const next = {

@@ -19,7 +19,10 @@
 
 ### Internal
 
+-   DataForms: Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   DataViews: Inline a verbatim copy of the `kebabCase` utility instead of unlocking the private one from `@wordpress/components`, as part of removing the package's reliance on private cross-package APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)). Adds a direct `change-case` dependency; no behavior change. ([#81284](https://github.com/WordPress/gutenberg/pull/81284))
+-   DataViews: Use the public `Badge` from `@wordpress/ui` in the `grid` and `picker-grid` layouts instead of the private one from `@wordpress/components`, removing the last `unlock()` call from those files. Badges pick up the `@wordpress/ui` neutral tokens, so they gain a border and a slightly different background ([#81236](https://github.com/WordPress/gutenberg/pull/81236)).
 -   Update `@ariakit/react` to 0.4.35 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
 
 ## 17.3.0 (2026-07-29)

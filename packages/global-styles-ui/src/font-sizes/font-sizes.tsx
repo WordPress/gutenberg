@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import type { FontSize } from '@wordpress/global-styles-engine';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from '../screen-header';
 import PresetGroup from '../presets/preset-group';
 import { usePresets } from '../presets/use-presets';

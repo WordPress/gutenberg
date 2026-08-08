@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import patternOverridesBindings from '../pattern-overrides';
 
 describe( 'pattern-overrides bindings', () => {

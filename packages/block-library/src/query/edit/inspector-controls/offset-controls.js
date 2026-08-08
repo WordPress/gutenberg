@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 

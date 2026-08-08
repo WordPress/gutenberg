@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
@@ -13,10 +6,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';

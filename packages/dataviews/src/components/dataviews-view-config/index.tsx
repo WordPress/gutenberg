@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -23,10 +16,6 @@ import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
