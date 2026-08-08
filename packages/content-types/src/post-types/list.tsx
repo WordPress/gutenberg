@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -8,10 +5,6 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useNavigate, useSearch } from '@wordpress/route';
 import { useView } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import activateAction from './actions/activate';
 import deactivateAction from './actions/deactivate';
 import deletePostTypeAction from './actions/delete';

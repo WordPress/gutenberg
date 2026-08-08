@@ -683,9 +683,14 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.0.0
 	 *
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
-	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay   Whether a custom overlay is used.
+	 * @param array $colors               The colors array.
 	 * @return array Returns the responsive container classes.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_css_classes: list<string>,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
@@ -710,8 +715,14 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors             The colors array.
 	 * @return string Returns the overlay inline styles.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_inline_styles: string,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
 		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );

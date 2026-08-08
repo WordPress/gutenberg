@@ -1,9 +1,6 @@
-/**
- * External dependencies
- */
 const { dirname, join } = require( 'path' );
-const { render } = require( 'mustache' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
+const { render } = require( 'mustache' );
 
 const writeOutputAsset = async ( inputFile, outputFile, view ) => {
 	const outputFilePath = join( view.rootDirectory, 'assets', outputFile );

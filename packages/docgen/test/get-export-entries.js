@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const engine = require( '../lib/engine' );
 const getExportEntries = require( '../lib/get-export-entries' );
 
@@ -114,9 +111,6 @@ describe( 'Export entries', () => {
 	it( 'default import (named)', () => {
 		const testCode = firstExport(
 			`
-			/**
-			 * Internal dependencies
-			 */
 			import { functionDeclaration as fnDeclaration } from './module-code';
 
 			export default fnDeclaration;
@@ -143,9 +137,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import fnDeclaration from './module-code';
 
 				export default fnDeclaration;
@@ -406,9 +397,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import * as variables from './module-code';
 
 				export { variables };

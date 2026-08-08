@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import ComboboxControl from '../../combobox-control';

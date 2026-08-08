@@ -60,7 +60,7 @@ The `save.js` exports the function that returns the static HTML markup that gets
 A `style` file with extensions `.css`, `.scss`, or `.sass` contains the styles of the block that will be loaded in both the Block Editor and on the front end. In the build process, this file is converted into `style-index.css`, which is usually defined using the [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) property in `block.json`
 
 <div class="callout callout-info">
-    The webpack configuration used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a herf="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
+    The webpack configuration used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a href="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
 </div>
 
 ### `editor.(css|scss|sass)`

@@ -1,6 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement } from 'react';
-
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 

@@ -26,7 +26,7 @@ widgets/hello-world/
 ├── widget.ts          metadata module: default-exports attributes, example
 ├── render.tsx         render module: default-exports the React component
 ├── style.module.css   optional, injected at runtime by the build
-└── report.csv         optional static asset linked from an action `href`
+└── report.csv         optional static asset; action `href`s resolve it only where `widgets/` ships
 ```
 
 The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`.

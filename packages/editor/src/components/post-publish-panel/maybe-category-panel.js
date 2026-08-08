@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import HierarchicalTermSelector from '../post-taxonomies/hierarchical-term-selector';
 import { store as editorStore } from '../../store';
 

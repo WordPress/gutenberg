@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import type { Action } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useNavigate } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import type { TaxonomyFormData } from '../types';
 import { TAXONOMIES_PATH } from '../../constants';
 

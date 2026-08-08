@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,

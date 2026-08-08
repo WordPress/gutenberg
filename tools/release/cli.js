@@ -1,13 +1,5 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 const program = require( 'commander' );
-
-/**
- * Internal dependencies
- */
 const {
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,

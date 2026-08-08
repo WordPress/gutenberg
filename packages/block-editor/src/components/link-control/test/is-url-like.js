@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isURLLike, { isHashLink, isRelativePath } from '../is-url-like';
 
 describe( 'isURLLike', () => {

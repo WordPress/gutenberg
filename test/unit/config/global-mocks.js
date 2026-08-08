@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';

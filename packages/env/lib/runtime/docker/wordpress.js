@@ -1,14 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
-const path = require( 'path' );
 const { v2: dockerCompose } = require( 'docker-compose' );
-
-/**
- * Internal dependencies
- */
 const { readWordPressVersion } = require( '../../wordpress' );
 
 /**

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, Composite } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 

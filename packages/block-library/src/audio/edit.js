@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	SelectControl,
@@ -28,10 +21,6 @@ import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,

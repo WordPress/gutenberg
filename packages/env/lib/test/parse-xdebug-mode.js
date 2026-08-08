@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const parseXdebugMode = require( '../parse-xdebug-mode' );
 
 describe( 'parseXdebugMode', () => {

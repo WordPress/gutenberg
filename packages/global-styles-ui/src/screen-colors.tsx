@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 // @ts-expect-error: Not typed yet.
@@ -9,10 +6,6 @@ import type {
 	GlobalStylesStyles,
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import Palette from './palette';
