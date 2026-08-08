@@ -48,6 +48,7 @@
 
 ### Bug Fixes
 
+-   Flow and constrained layouts now fall back to the Global Styles block gap when a block does not define its own, so inner blocks of containers such as Group inherit the site's spacing instead of the browser's default margin. Container blocks that wrap arbitrary content (Quote, Details) follow the site-wide block spacing rather than a theme's per-block blockGap, so the Global Styles > Layout > Block spacing setting is reflected inside them ([#49777](https://github.com/WordPress/gutenberg/issues/49777)).
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
 

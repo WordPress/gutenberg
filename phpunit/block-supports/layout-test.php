@@ -73,6 +73,32 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_blocks_using_site_block_gap
+	 */
+	public function test_blocks_using_site_block_gap_defaults() {
+		$this->assertSame(
+			array( 'core/quote', 'core/details' ),
+			gutenberg_blocks_using_site_block_gap()
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_blocks_using_site_block_gap
+	 */
+	public function test_blocks_using_site_block_gap_is_filterable() {
+		$callback = static function ( $blocks ) {
+			$blocks[] = 'core/group';
+			return $blocks;
+		};
+		add_filter( 'gutenberg_blocks_using_site_block_gap', $callback );
+		$blocks = gutenberg_blocks_using_site_block_gap();
+		remove_filter( 'gutenberg_blocks_using_site_block_gap', $callback );
+
+		$this->assertContains( 'core/group', $blocks );
+		$this->assertContains( 'core/quote', $blocks );
+	}
+
+	/**
 	 * @covers ::gutenberg_sanitize_block_gap_value
 	 */
 	public function test_sanitize_block_gap_value_rejects_nested_array_values() {
@@ -237,6 +263,66 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					'has_block_gap_support'         => true,
 					'gap_value'                     => '1em',
 					'should_skip_gap_serialization' => true,
+				),
+				'expected_output' => '',
+			),
+			'default layout falls back to global block gap when no block gap value is set' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'has_block_gap_support' => true,
+					'gap_value'             => null,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--30)',
+					'options'               => array(
+						'apply_fallback_gap' => true,
+					),
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout > * + *{margin-block-start:var(--wp--preset--spacing--30);margin-block-end:0;}',
+			),
+			'default layout prefers explicit block gap over the global fallback' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'has_block_gap_support' => true,
+					'gap_value'             => '1em',
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--30)',
+					'options'               => array(
+						'apply_fallback_gap' => true,
+					),
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout > * + *{margin-block-start:1em;margin-block-end:0;}',
+			),
+			'default layout does not fall back when apply_fallback_gap is not set' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'has_block_gap_support' => true,
+					'gap_value'             => null,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--30)',
+				),
+				'expected_output' => '',
+			),
+			'constrained layout falls back to global block gap when no block gap value is set' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array( 'type' => 'constrained' ),
+					'has_block_gap_support' => true,
+					'gap_value'             => null,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--30)',
+					'options'               => array(
+						'apply_fallback_gap' => true,
+					),
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout > * + *{margin-block-start:var(--wp--preset--spacing--30);margin-block-end:0;}',
+			),
+			'default layout does not apply the global fallback to viewport overrides' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'has_block_gap_support' => true,
+					'gap_value'             => null,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--30)',
+					'options'               => array(
+						'apply_fallback_gap'     => true,
+						'viewport_overrides'     => array(),
+						'has_block_gap_override' => true,
+					),
 				),
 				'expected_output' => '',
 			),
