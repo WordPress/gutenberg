@@ -36,17 +36,17 @@ import { warn } from './utils';
 
 type Position = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
 
-// Preact internal property accessors. The source uses `_children`/`_parent`;
-// the dist build mangles them to `__k`/`__`. Read both so this works with
-// either.
-const vdomChildren = ( vnode: any ): any[] =>
-	vnode?._children ?? vnode?.__k ?? [];
-const vdomParent = ( vnode: any ): any => vnode?._parent ?? vnode?.__ ?? null;
+// Preact internal property accessors. Preact's published builds mangle vnode
+// internals (see preact's `mangle.json`): `_children` → `__k`, `_parent` → `__`.
+// The mangled names are what exist at runtime — the source names (`_children`,
+// `_parent`, `_dom`) appear only in preact's `src/` code and are noted here
+// for reference when reading it.
+const vdomChildren = ( vnode: any ): any[] => vnode?.__k ?? [];
+const vdomParent = ( vnode: any ): any => vnode?.__ ?? null;
 
 // A rendered container (fragment) stores its tree as a single Fragment vnode
 // on the same property names — NOT as an array.
-const getFragmentRoot = ( fragment: any ): any =>
-	fragment?._children ?? fragment?.__k ?? null;
+const getFragmentRoot = ( fragment: any ): any => fragment?.__k ?? null;
 
 /**
  * Returns the island whose TREE owns the given element's subtree — the
@@ -127,11 +127,12 @@ const getIslandNamespace = ( island: Element ): string | null => {
  * root to the container (inclusive). The cost is O(depth), independent of
  * the island's size.
  *
- * The walk doubles as a validity check: only vnodes currently in this
- * island's tree connect to `root` through their `_parent` pointers. A stale
- * map entry — an element removed by a previous splice and re-inserted, or an
- * element from another island's tree — fails the walk and is rejected
- * instead of corrupting the rebuild.
+ * No per-step connectivity check is needed: every splice rebuilds the tree
+ * root as a NEW vnode object, so a stale map entry (an element removed by a
+ * previous splice and re-inserted) still chains to an old root object and is
+ * rejected by the final `vnode !== root` comparison. A vnode that IS in the
+ * current tree always chains to the current root, and the chain terminates
+ * (the topmost vnode's `_parent` is null), so the walk cannot loop.
  *
  * @param root   The tree root vnode (the island vnode).
  * @param target The container element.
@@ -142,18 +143,10 @@ const getPathTo = ( root: any, target: Element ): any[] | null => {
 	if ( ! vnode ) {
 		return null;
 	}
-	// Climb the `_parent` chain, verifying at each step that the child is
-	// still a rendered child of its parent. The splice rebuilds only the
-	// path — off-path subtrees keep their children arrays — so a stale vnode
-	// (whose old parent no longer lists it) is rejected here.
 	const reversed: any[] = [];
 	while ( vnode && vnode !== root ) {
-		const parent = vdomParent( vnode );
-		if ( ! parent || vdomChildren( parent ).indexOf( vnode ) === -1 ) {
-			return null;
-		}
 		reversed.push( vnode );
-		vnode = parent;
+		vnode = vdomParent( vnode );
 	}
 	if ( vnode !== root ) {
 		return null;
