@@ -166,8 +166,70 @@ jest.mock( '@wordpress/compose', () => {
 
 describe( 'DataViews component', () => {
 	it( 'should show "No results" if data is empty', () => {
-		render( <DataViewWrapper data={ [] } /> );
+		render(
+			<DataViewWrapper
+				data={ [] }
+				paginationInfo={ { totalItems: 0, totalPages: 0 } }
+			/>
+		);
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+	} );
+
+	it( 'should show "No results on this page" when the page is out of bounds', async () => {
+		const user = userEvent.setup();
+		// 3 items at 1 per page → 3 pages; page 5 is out of bounds.
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, page: 5, perPage: 1 } }
+			/>
+		);
+		expect(
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Go to first page' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'combobox', { name: 'Current page' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Go to first page' } )
+		);
+		await waitFor( () => {
+			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+		} );
+	} );
+
+	it( 'should offer "Go to first page" when totals are unavailable on page > 1', async () => {
+		const user = userEvent.setup();
+		render(
+			<DataViewWrapper
+				data={ [] }
+				view={ { ...DEFAULT_VIEW, page: 5, perPage: 1 } }
+				paginationInfo={ { totalItems: 0, totalPages: 0 } }
+			/>
+		);
+		expect(
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'combobox', { name: 'Current page' } )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Go to first page' } )
+		);
+		// Forced empty data remains empty; after navigation settles, show generic copy.
+		await waitFor( () => {
+			expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+		} );
+		expect(
+			screen.queryByText( 'No results on this page' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Go to first page' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
@@ -340,7 +402,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
+							// @ts-expect-error
 							onClick={ ( event ) => {
 								event.preventDefault();
 								onClickItemCallback( item );
@@ -727,7 +789,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
+							// @ts-expect-error
 							onClick={ ( event ) => {
 								event.preventDefault();
 								mediaClickItemCallback( item );

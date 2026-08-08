@@ -27,6 +27,7 @@ export function DataViewsPagination() {
 
 	const { totalPages } = paginationInfo;
 	const currentPage = view.page ?? 1;
+	const isCurrentPageOutOfBounds = currentPage > totalPages;
 	const pageSelectOptions = Array.from( Array( totalPages ) ).map(
 		( _, i ) => {
 			const page = i + 1;
@@ -45,6 +46,20 @@ export function DataViewsPagination() {
 			};
 		}
 	);
+
+	// Keep the select usable when the URL/view points past the last page.
+	if ( isCurrentPageOutOfBounds ) {
+		pageSelectOptions.push( {
+			value: currentPage.toString(),
+			label: currentPage.toString(),
+			'aria-label': sprintf(
+				// translators: 1: current page number. 2: total number of pages.
+				__( 'Page %1$d of %2$d' ),
+				currentPage,
+				totalPages
+			),
+		} );
+	}
 
 	return (
 		<Stack
@@ -94,7 +109,10 @@ export function DataViewsPagination() {
 					onClick={ () =>
 						onChangeView( {
 							...view,
-							page: currentPage - 1,
+							// back into range when the current page is past the end.
+							page: isCurrentPageOutOfBounds
+								? totalPages
+								: currentPage - 1,
 						} )
 					}
 					disabled={ currentPage === 1 }
