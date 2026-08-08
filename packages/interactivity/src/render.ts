@@ -49,19 +49,44 @@ const getFragmentRoot = ( fragment: any ): any =>
 	fragment?._children ?? fragment?.__k ?? null;
 
 /**
- * Returns the island whose tree owns the given element's subtree: the element
- * itself if it has its own `data-wp-interactive` and is standalone, otherwise
- * the nearest ancestor island (nested islands are part of the ancestor's
- * tree). Returns `null` if there is no island at all.
+ * Returns the island whose TREE owns the given element's subtree — the
+ * OUTERMOST `data-wp-interactive` boundary. Nested islands are part of the
+ * outer island's tree (the outer island's `toVdom` walk descends into them
+ * and claims them via `hydratedIslands`), so any dynamic content spliced in
+ * must go through the outermost tree. Returns `null` if there is no island
+ * at all.
  *
  * @param element The element to locate.
- * @return The owning island element, or `null`.
+ * @return The outermost island element, or `null`.
  */
-const findIsland = ( element: Element ): Element | null => {
+const getTreeIsland = ( element: Element ): Element | null => {
+	let island: Element | null = element.hasAttribute( 'data-wp-interactive' )
+		? element
+		: element.closest( '[data-wp-interactive]' );
+	while ( island ) {
+		const outer =
+			island.parentElement?.closest( '[data-wp-interactive]' ) ?? null;
+		if ( ! outer ) {
+			return island;
+		}
+		island = outer;
+	}
+	return null;
+};
+
+/**
+ * Returns the NEAREST `data-wp-interactive` boundary (the element itself if
+ * it is one, otherwise the closest ancestor) — the namespace that content
+ * spliced at the element's position inherits (matching how the tree's walk
+ * pushes the nested island's namespace when it descends into it). Returns
+ * `null` if there is no island at all.
+ *
+ * @param element The element to locate.
+ * @return The nearest island boundary element, or `null`.
+ */
+const getNearestIsland = ( element: Element ): Element | null => {
 	if ( element.hasAttribute( 'data-wp-interactive' ) ) {
-		return (
-			element.parentElement?.closest( '[data-wp-interactive]' ) ?? element
-		);
+		return element;
 	}
 	return element.closest( '[data-wp-interactive]' );
 };
@@ -132,6 +157,8 @@ const findPath = ( vnode: any, target: Element ): any[] | null => {
  *
  * @param pathNode     The vnode to rebuild.
  * @param child        The rebuilt vnode occupying this node's child slot.
+ * @param childVNode   The ORIGINAL vnode at that slot (to locate its index in
+ *                     the parent's children array — siblings must survive).
  * @param chainElement The rebuild of the deepest string vnode in this node's
  *                     rendered chain (the `element` prop for Directives).
  * @return The rebuilt vnode.
@@ -373,7 +400,7 @@ export function renderHTML(
 		);
 	}
 
-	const island = findIsland( containerElement );
+	const island = getTreeIsland( containerElement );
 	if ( ! island ) {
 		warn(
 			'renderHTML(): no interactive island found for the container. The container must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
@@ -394,9 +421,12 @@ export function renderHTML(
 		return;
 	}
 
-	// Build the vdom DETACHED, inheriting the island's namespace so directives
-	// on the new content resolve against the right store.
-	const namespace = getIslandNamespace( island );
+	// Build the vdom DETACHED, inheriting the NEAREST island's namespace so
+	// directives on the new content resolve against the right store (a
+	// container inside a nested island resolves the nested namespace, even
+	// though the content is spliced into the OUTER island's tree).
+	const namespaceIsland = getNearestIsland( containerElement ) ?? island;
+	const namespace = getIslandNamespace( namespaceIsland );
 	const vdoms = nodes.map( ( node ) => toVdom( node, namespace ) );
 
 	spliceIntoTree( island, containerElement, position, vdoms );
@@ -432,7 +462,7 @@ export function renderElement(
 		if ( ! parent ) {
 			continue; // Text node with no element parent — nothing to splice into.
 		}
-		const island = findIsland( node instanceof Element ? node : parent );
+		const island = getTreeIsland( node instanceof Element ? node : parent );
 		if ( ! island ) {
 			warn(
 				'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
@@ -465,7 +495,10 @@ export function renderElement(
 		if ( ! parsedNodes.length ) {
 			continue;
 		}
-		const namespace = getIslandNamespace( island );
+		const namespaceIsland = getNearestIsland(
+			node instanceof Element ? node : parent
+		);
+		const namespace = getIslandNamespace( namespaceIsland ?? island );
 		const vdoms = parsedNodes.map( ( n ) => toVdom( n, namespace ) );
 		const index = Array.from( parent.childNodes ).indexOf( node );
 		spliceIntoTree( island, parent, 'at', vdoms, index );
