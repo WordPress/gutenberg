@@ -125,9 +125,12 @@ export default function ShadowsEditPanel() {
 					) }
 					isOpen={ isDeleteOpen }
 					toggleOpen={ () => setIsDeleteOpen( false ) }
-					onConfirm={ () =>
-						setPresets( presets.filter( ( p ) => p.slug !== slug ) )
-					}
+					onConfirm={ () => {
+						setPresets(
+							presets.filter( ( p ) => p.slug !== slug )
+						);
+						goBack();
+					} }
 				/>
 			) }
 			{ isRenameOpen && (
