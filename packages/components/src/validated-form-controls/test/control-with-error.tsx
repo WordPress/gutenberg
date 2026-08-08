@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useId, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ValidatedInputControl, ValidatedRangeControl } from '../components';
 
 describe( 'ControlWithError', () => {

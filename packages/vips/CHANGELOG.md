@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 3.0.0 (2026-07-29)
+
 ### Breaking Changes
 
 - `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).

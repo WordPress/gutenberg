@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { hasTransparency } from '../';
 
 const mockHasAlpha = jest.fn();

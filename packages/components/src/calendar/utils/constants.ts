@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { Day } from './day-cell';
 
 const CLASSNAMES = {

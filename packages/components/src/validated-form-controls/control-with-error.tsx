@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
@@ -9,10 +6,6 @@ import {
 	useId,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ValidatedControlProps } from './components/types';
 import { ValidityIndicator } from './validity-indicator';
 

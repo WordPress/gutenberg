@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 

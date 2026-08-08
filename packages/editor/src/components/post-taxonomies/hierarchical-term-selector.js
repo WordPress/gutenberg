@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -24,10 +21,6 @@ import {
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

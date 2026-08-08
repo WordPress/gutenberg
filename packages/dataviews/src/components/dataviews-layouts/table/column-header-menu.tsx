@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
@@ -14,10 +7,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {

@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -68,15 +61,17 @@ test.describe( 'Gallery', () => {
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->` );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Redo' } )
+			.click();
 
 		await expect
 			.poll( editor.getEditedPostContent )

@@ -1446,6 +1446,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "View Configuration Reference",
+		"slug": "view-config-reference",
+		"markdown_source": "../docs/reference-guides/view-config-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",

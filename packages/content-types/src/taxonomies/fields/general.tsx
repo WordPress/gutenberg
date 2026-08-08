@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -9,10 +6,6 @@ import type { Field, Form } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
 import { Link, Notice, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { TAXONOMY_ENTITY } from '../../constants';
 import {
 	createBooleanField,

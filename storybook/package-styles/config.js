@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?inline';
 import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?inline';
 import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inline';
