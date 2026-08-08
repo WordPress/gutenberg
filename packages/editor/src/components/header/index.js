@@ -9,7 +9,7 @@ import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import HeaderSkeleton from './header-skeleton';
 import MoreMenu from '../more-menu';
-import PostPreviewButton from '../post-preview-button';
+import PostPreviewModalButton from '../post-preview-modal-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
@@ -134,7 +134,7 @@ function Header( {
 						disabled={ isStylesCanvasActive }
 					/>
 
-					<PostPreviewButton
+					<PostPreviewModalButton
 						className="editor-header__post-preview-button"
 						forceIsAutosaveable={ forceIsDirty }
 					/>

@@ -1,0 +1,82 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-modal__frame.editor-post-preview-modal {
+	height: calc(100% - #{ $grid-unit-50 * 2 });
+	max-height: none;
+	max-width: none;
+	width: calc(100% - #{ $grid-unit-50 * 2 });
+}
+
+.editor-post-preview-modal {
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		padding: 0;
+	}
+
+	.components-modal__children-container {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
+	}
+}
+
+.editor-post-preview-modal__toolbar {
+	align-items: center;
+	display: flex;
+	gap: $grid-unit-05;
+	justify-content: center;
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.editor-post-preview-modal__frame-wrapper {
+	align-items: flex-start;
+	background: $gray-100;
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	min-height: 0;
+	overflow: auto;
+	padding: $grid-unit-30;
+}
+
+.editor-post-preview-modal__iframe {
+	background: $white;
+	border: $border-width solid $gray-300;
+	border-radius: $radius-block-ui;
+	box-shadow: 0 $grid-unit-05 $grid-unit-30 rgba($black, 0.12);
+	box-sizing: border-box;
+	height: 100%;
+	max-width: 100%;
+}
+
+.editor-post-preview-modal__iframe.is-desktop-preview {
+	width: min(100%, 1200px);
+}
+
+.editor-post-preview-modal__iframe.is-tablet-preview {
+	width: 781px;
+}
+
+.editor-post-preview-modal__iframe.is-mobile-preview {
+	width: 479px;
+}
+
+.editor-post-preview-modal__loading,
+.editor-post-preview-modal__error {
+	align-items: center;
+	align-self: stretch;
+	color: $gray-700;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	justify-content: center;
+	text-align: center;
+}
