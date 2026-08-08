@@ -49,7 +49,7 @@ export {
 
 export { useState, useRef } from 'preact/hooks';
 
-export { renderElement, renderHTML } from './render';
+export { renderHTML, hydrateInsertedElement } from './render';
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';

@@ -18,7 +18,7 @@ import { getContext } from '../scopes';
  * Internal dependencies
  */
 import '../directives'; // Registers all the core directives.
-import { renderHTML, renderElement } from '../render';
+import { renderHTML, hydrateInsertedElement } from '../render';
 import { hydrateRegions } from '../hydration';
 
 const NS = 'test/tree-first';
@@ -425,7 +425,7 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 } );
 
-describe( 'renderElement (tree-first)', () => {
+describe( 'hydrateInsertedElement (tree-first)', () => {
 	it( 'renders an element that was already inserted into the DOM', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		const feed = document.querySelector( '[data-testid="feed"]' )!;
@@ -435,7 +435,7 @@ describe( 'renderElement (tree-first)', () => {
 		node.textContent = 'shim';
 		feed.appendChild( node );
 
-		renderElement( node );
+		hydrateInsertedElement( node );
 		await flush();
 		const btn = document.querySelector(
 			'[data-testid="shim"]'
@@ -447,7 +447,7 @@ describe( 'renderElement (tree-first)', () => {
 
 	it( 'throws when the element is not attached to the DOM', () => {
 		const node = document.createElement( 'div' );
-		expect( () => renderElement( node ) ).toThrow();
+		expect( () => hydrateInsertedElement( node ) ).toThrow();
 	} );
 } );
 
