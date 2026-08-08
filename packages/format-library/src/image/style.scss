@@ -5,7 +5,9 @@
 	z-index: z-index(".block-editor-format-toolbar__image-popover");
 
 	.block-editor-format-toolbar__image-container-content {
-		width: 260px;
+		width: 320px;
 		padding: $grid-unit-20;
+		max-height: 410px;
+		overflow-y: auto;
 	}
 }

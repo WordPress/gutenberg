@@ -2,11 +2,18 @@ import {
 	Popover,
 	Button,
 	__experimentalNumberControl as NumberControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	TextareaControl,
 } from '@wordpress/components';
 import { inlineImage } from '@wordpress/icons';
 import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import {
+	justifyTop,
+	justifyCenterVertical,
+	justifyBottom,
+} from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
@@ -19,6 +26,24 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
+
+/**
+ * Extracts vertical alignment from the style attribute.
+ *
+ * @param {string} style The style attribute string.
+ * @return {string} The vertical alignment value or 'center' as default.
+ */
+function getVerticalAlignment( style ) {
+	if ( ! style ) {
+		return 'center';
+	}
+
+	const match = style.match( /vertical-align:\s*([^;]+)/ );
+	const alignment = match ? match[ 1 ].trim() : 'center';
+
+	// Convert 'middle' to 'center' for consistency with BlockVerticalAlignmentControl
+	return alignment === 'middle' ? 'center' : alignment;
+}
 
 /**
  * Extracts the image ID from the className attribute.
@@ -56,9 +81,16 @@ export const image = {
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style, alt } = activeObjectAttributes;
 	const width = style?.replace( /\D/g, '' );
+	const verticalAlign = getVerticalAlignment( style );
+
 	const [ editedWidth, setEditedWidth ] = useState( width );
 	const [ editedAlt, setEditedAlt ] = useState( alt );
-	const hasChanged = editedWidth !== width || editedAlt !== alt;
+	const [ editedAlignment, setEditedAlignment ] = useState( verticalAlign );
+
+	const hasChanged =
+		editedWidth !== width ||
+		editedAlt !== alt ||
+		editedAlignment !== verticalAlign;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: image,
@@ -75,13 +107,25 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 				onSubmit={ ( event ) => {
 					const newReplacements = value.replacements.slice();
 
+					// Build style string with width and vertical alignment
+					let newStyle = '';
+					if ( editedWidth ) {
+						newStyle += `width: ${ editedWidth }px;`;
+					}
+					if ( editedAlignment ) {
+						// Convert 'center' back to 'middle' for CSS compatibility
+						const cssAlignment =
+							editedAlignment === 'center'
+								? 'middle'
+								: editedAlignment;
+						newStyle += ` vertical-align: ${ cssAlignment };`;
+					}
+
 					newReplacements[ value.start ] = {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: editedWidth
-								? `width: ${ editedWidth }px;`
-								: '',
+							style: newStyle,
 							alt: editedAlt,
 						},
 					};
@@ -103,6 +147,32 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 							setEditedWidth( newWidth );
 						} }
 					/>
+					<ToggleGroupControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						isBlock
+						label="Vertical Alignment"
+						value={ editedAlignment }
+						onChange={ ( newAlignment ) => {
+							setEditedAlignment( newAlignment );
+						} }
+					>
+						<ToggleGroupControlOptionIcon
+							icon={ justifyTop }
+							label={ __( 'Align top' ) }
+							value="top"
+						/>
+						<ToggleGroupControlOptionIcon
+							icon={ justifyCenterVertical }
+							label={ __( 'Align center' ) }
+							value="center"
+						/>
+						<ToggleGroupControlOptionIcon
+							icon={ justifyBottom }
+							label={ __( 'Align bottom' ) }
+							value="bottom"
+						/>
+					</ToggleGroupControl>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
 						value={ editedAlt }
@@ -168,7 +238,7 @@ function Edit( {
 								style: `width: ${ Math.min(
 									imgWidth,
 									150
-								) }px;`,
+								) }px; vertical-align: middle;`,
 								url,
 								alt,
 							},
