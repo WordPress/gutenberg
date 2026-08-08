@@ -48,6 +48,28 @@
 		overflow-wrap: break-word;
 	}
 
+	.wp-block-post-comments-form-elements {
+		display: flex;
+		flex-direction: column;
+		gap: var(--wp--style--block-gap);
+
+		> p {
+			margin: 0;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 0.5em;
+		}
+
+		textarea,
+		input[type="text"],
+		input[type="email"],
+		input[type="url"] {
+			width: 100%;
+		}
+	}
+
 	.comment-form {
 		textarea,
 		// Make sure to not set display block on hidden input fields, to prevent

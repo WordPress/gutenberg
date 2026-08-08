@@ -79,6 +79,12 @@ add_action( 'init', 'register_block_core_post_comments_form' );
  * @return array Returns the modified fields.
  */
 function post_comments_form_block_form_defaults( $fields ) {
+	// Wrap form elements in a container that uses block gap
+	$fields['comment_field'] = '<div class="wp-block-post-comments-form-elements"><p class="comment-form-comment">' .
+		'<label for="comment">' . _x( 'Comment', 'noun' ) . '</label>' .
+		'<textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea>' .
+		'</p></div>';
+
 	if ( wp_is_block_theme() ) {
 		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';

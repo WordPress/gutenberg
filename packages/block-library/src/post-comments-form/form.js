@@ -21,31 +21,33 @@ const CommentsFormPlaceholder = () => {
 				className="comment-form"
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
-				<p>
-					<label htmlFor={ `comment-${ instanceId }` }>
-						{ __( 'Comment' ) }
-					</label>
-					<textarea
-						id={ `comment-${ instanceId }` }
-						name="comment"
-						cols="45"
-						rows="8"
-						readOnly
-					/>
-				</p>
-				<p className="form-submit wp-block-button">
-					<input
-						name="submit"
-						type="submit"
-						className={ clsx(
-							'wp-block-button__link',
-							__experimentalGetElementClassName( 'button' )
-						) }
-						label={ __( 'Post Comment' ) }
-						value={ __( 'Post Comment' ) }
-						aria-disabled="true"
-					/>
-				</p>
+				<div className="wp-block-post-comments-form-elements">
+					<p>
+						<label htmlFor={ `comment-${ instanceId }` }>
+							{ __( 'Comment' ) }
+						</label>
+						<textarea
+							id={ `comment-${ instanceId }` }
+							name="comment"
+							cols="45"
+							rows="8"
+							readOnly
+						/>
+					</p>
+					<p className="form-submit wp-block-button">
+						<input
+							name="submit"
+							type="submit"
+							className={ clsx(
+								'wp-block-button__link',
+								__experimentalGetElementClassName( 'button' )
+							) }
+							label={ __( 'Post Comment' ) }
+							value={ __( 'Post Comment' ) }
+							aria-disabled="true"
+						/>
+					</p>
+				</div>
 			</form>
 		</div>
 	);
