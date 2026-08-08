@@ -304,7 +304,13 @@ const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 };
 
 // Component that wraps each priority level of directives of an element.
-const Directives = ( {
+/**
+ * Component that wraps each priority level of directives of an element.
+ * Exported so `render.ts` can rebuild vnodes on the path to a splice target
+ * (a Directives wrapper re-renders its `element` prop through its directive
+ * chain when the element vnode is replaced).
+ */
+export const Directives = ( {
 	directives,
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
