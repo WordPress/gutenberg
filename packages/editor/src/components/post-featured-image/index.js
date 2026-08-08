@@ -159,6 +159,9 @@ function PostFeaturedImage( {
 
 	return (
 		<PostFeaturedImageCheck>
+			{ featuredImageId !== 0 && (
+				<span>{ DEFAULT_FEATURE_IMAGE_LABEL }</span>
+			) }
 			{ noticeUI }
 			<div className="editor-post-featured-image">
 				{ media && (
