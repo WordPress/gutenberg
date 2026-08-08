@@ -48,6 +48,10 @@ const vdomParent = ( vnode: any ): any => vnode?.__ ?? null;
 // on the same property names — NOT as an array.
 const getFragmentRoot = ( fragment: any ): any => fragment?.__k ?? null;
 
+// The attribute that marks an interactive island boundary.
+const islandAttribute = 'data-wp-interactive';
+const islandSelector = `[${ islandAttribute }]`;
+
 /**
  * Returns the island whose TREE owns the given element's subtree — the
  * OUTERMOST `data-wp-interactive` boundary. Nested islands are part of the
@@ -60,35 +64,18 @@ const getFragmentRoot = ( fragment: any ): any => fragment?.__k ?? null;
  * @return The outermost island element, or `null`.
  */
 const getTreeIsland = ( element: Element ): Element | null => {
-	let island: Element | null = element.hasAttribute( 'data-wp-interactive' )
-		? element
-		: element.closest( '[data-wp-interactive]' );
+	let island = element.closest( islandSelector );
 	while ( island ) {
-		const outer =
-			island.parentElement?.closest( '[data-wp-interactive]' ) ?? null;
+		// Search ABOVE the island: `closest()` includes the element it
+		// starts at, so starting from the parent finds the nearest island
+		// strictly outside this one.
+		const outer = island.parentElement?.closest( islandSelector ) ?? null;
 		if ( ! outer ) {
 			return island;
 		}
 		island = outer;
 	}
 	return null;
-};
-
-/**
- * Returns the NEAREST `data-wp-interactive` boundary (the element itself if
- * it is one, otherwise the closest ancestor) — the namespace that content
- * spliced at the element's position inherits (matching how the tree's walk
- * pushes the nested island's namespace when it descends into it). Returns
- * `null` if there is no island at all.
- *
- * @param element The element to locate.
- * @return The nearest island boundary element, or `null`.
- */
-const getNearestIsland = ( element: Element ): Element | null => {
-	if ( element.hasAttribute( 'data-wp-interactive' ) ) {
-		return element;
-	}
-	return element.closest( '[data-wp-interactive]' );
 };
 
 /**
@@ -100,7 +87,7 @@ const getNearestIsland = ( element: Element ): Element | null => {
  * @return The island's namespace, or `null`.
  */
 const getIslandNamespace = ( island: Element ): string | null => {
-	const value = island.getAttribute( 'data-wp-interactive' );
+	const value = island.getAttribute( islandAttribute );
 	if ( value === null ) {
 		return null;
 	}
@@ -441,7 +428,9 @@ export function renderHTML(
 	// directives on the new content resolve against the right store (a
 	// container inside a nested island resolves the nested namespace, even
 	// though the content is spliced into the OUTER island's tree).
-	const namespaceIsland = getNearestIsland( containerElement ) ?? island;
+	// `getTreeIsland` starts with the same closest() call, so after the
+	// island check above the nearest island is guaranteed to exist.
+	const namespaceIsland = containerElement.closest( islandSelector )!;
 	const namespace = getIslandNamespace( namespaceIsland );
 	const vdoms = nodes.map( ( node ) => toVdom( node, namespace ) );
 
