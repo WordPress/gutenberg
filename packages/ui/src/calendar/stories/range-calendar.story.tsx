@@ -17,9 +17,8 @@ const meta: Meta< typeof RangeCalendar > = {
 	component: RangeCalendar,
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Recently promoted from a private API. The visual design and the prop surface may still change in a minor release.',
 		},
 	},
 	render: ( { endMonth, ...args } ) => (

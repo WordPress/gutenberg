@@ -1,5 +1,4 @@
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import { Calendar, RangeCalendar } from '..';
 
@@ -41,28 +40,16 @@ describe.each( [
 			expect( root ).toHaveClass( 'from-render' );
 		} );
 
-		it( 'should not remount the calendar when an inline `render` element is re-created', async () => {
-			const user = userEvent.setup();
-
-			function Wrapper() {
-				return (
-					<>
-						{ /* Forces a re-render of the calendar with a brand new
-						     `render` element object. */ }
-						<button type="button">Re-render</button>
-						<Component
-							aria-label="Test calendar"
-							render={ <section /> }
-						/>
-					</>
-				);
-			}
-
-			render( <Wrapper /> );
+		it( 'should not remount the calendar when an inline `render` element is re-created', () => {
+			const { rerender } = render(
+				<Component aria-label="Test calendar" render={ <section /> } />
+			);
 
 			const rootBefore = screen.getByLabelText( 'Test calendar' );
-			await user.click(
-				screen.getByRole( 'button', { name: 'Re-render' } )
+
+			// Re-render with a brand new `render` element object.
+			rerender(
+				<Component aria-label="Test calendar" render={ <section /> } />
 			);
 
 			expect( screen.getByLabelText( 'Test calendar' ) ).toBe(

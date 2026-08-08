@@ -131,10 +131,3 @@ const MyCalendarWithTimeZone = () => (
 	/>
 );
 ```
-
-## Accessibility
-
--   The calendar renders with `role="application"` by default. Set `role="dialog"` when it is presented inside a dialog.
--   Use `autoFocus` to move focus to the selected day (or today) after a user action, such as opening a popover that contains the calendar.
--   Days disabled through `disabled` render as natively disabled buttons: they are skipped by both the tab order and the calendar's own arrow-key navigation. In forced-colors mode they are additionally struck through, since the dimmed color alone is not a reliable cue there.
--   When `startMonth` or `endMonth` leaves no month to navigate to, the corresponding navigation button is marked `aria-disabled` rather than natively `disabled`, so it keeps its accessible name and stays announced as a disabled control.
