@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-warning-comments
 /**
  * @jest-environment jsdom
  */
@@ -18,7 +19,7 @@ import { getContext } from '../scopes';
  * Internal dependencies
  */
 import '../directives'; // Registers all the core directives.
-import { renderHTML, renderElement } from '../render';
+import { renderHTML } from '../render';
 import { hydrateRegions } from '../hydration';
 
 const NS = 'test/tree-first';
@@ -134,7 +135,9 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'inserts before the container when position is "before"', async () => {
-		await setup( '<div data-testid="target"></div><p data-testid="after">after</p>' );
+		await setup(
+			'<div data-testid="target"></div><p data-testid="after">after</p>'
+		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>before</p>',
@@ -151,7 +154,9 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'inserts after the container when position is "after"', async () => {
-		await setup( '<p data-testid="before">before</p><div data-testid="target"></div>' );
+		await setup(
+			'<p data-testid="before">before</p><div data-testid="target"></div>'
+		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>after</p>',
@@ -168,7 +173,9 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'replaces the container itself when position is "outer"', async () => {
-		await setup( '<div data-testid="wrap"><div data-testid="target">old</div></div>' );
+		await setup(
+			'<div data-testid="wrap"><div data-testid="target">old</div></div>'
+		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>new</p>',
@@ -205,9 +212,12 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'warns and does nothing when there is no island', async () => {
+		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
 		document.body.innerHTML = '<div data-testid="feed"></div>';
-		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
+		const warnSpy = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<p>hi</p>'
@@ -227,7 +237,11 @@ describe( 'renderHTML (tree-first)', () => {
 			'<button data-testid="wbtn" data-wp-on--click="actions.inc">0</button>'
 		);
 		await flush();
-		( document.querySelector( '[data-testid="wbtn"]' ) as HTMLButtonElement ).click();
+		(
+			document.querySelector(
+				'[data-testid="wbtn"]'
+			) as HTMLButtonElement
+		 ).click();
 		expect( state.count ).toBe( 1 );
 	} );
 
@@ -250,14 +264,18 @@ describe( 'renderHTML (tree-first)', () => {
 			'<div data-wp-context=\'{ "n": 1 }\'>' +
 				'<div data-testid="feed"></div>' +
 				'<span data-testid="display" data-wp-text="context.n"></span>' +
-			'</div>'
+				'</div>'
 		);
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<button data-testid="bump" data-wp-on--click="actions.bump">bump</button>'
 		);
 		await flush();
-		( document.querySelector( '[data-testid="bump"]' ) as HTMLButtonElement ).click();
+		(
+			document.querySelector(
+				'[data-testid="bump"]'
+			) as HTMLButtonElement
+		 ).click();
 		await flush();
 		expect(
 			document.querySelector( '[data-testid="display"]' )?.textContent
@@ -271,12 +289,15 @@ describe( 'renderHTML (tree-first)', () => {
 		renderHTML( document.querySelector( '[data-testid="feed"]' ), html );
 		await flush();
 		const counter = () =>
-			document.querySelector( '[data-testid="counter"]' ) as HTMLButtonElement;
+			document.querySelector(
+				'[data-testid="counter"]'
+			) as HTMLButtonElement;
 
 		counter().click();
 		counter().click();
 		await flush();
-		expect( counter().textContent ).toBe( '2' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( counter() ).toHaveTextContent( '2' );
 
 		// Re-render the same container with the same markup: the button must
 		// NOT be re-initialized (its component instance is matched by
@@ -285,7 +306,8 @@ describe( 'renderHTML (tree-first)', () => {
 		await flush();
 		counter().click();
 		await flush();
-		expect( counter().textContent ).toBe( '3' );
+		// @ts-expect-error jest-dom matcher is added by the test setup.
+		expect( counter() ).toHaveTextContent( '3' );
 	} );
 
 	it( 'repeated appends do not duplicate nodes or leak listeners', async () => {
@@ -381,7 +403,7 @@ describe( 'renderHTML (tree-first)', () => {
 			'<div data-wp-context=\'{ "n": 1 }\'>' +
 				'<div data-testid="feed"></div>' +
 				'<span data-testid="display" data-wp-text="context.n"></span>' +
-			'</div>'
+				'</div>'
 		);
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
@@ -395,7 +417,9 @@ describe( 'renderHTML (tree-first)', () => {
 			document.querySelector( '[data-testid="local"]' )?.textContent
 		).toBe( '100' );
 		(
-			document.querySelector( '[data-testid="bump"]' ) as HTMLButtonElement
+			document.querySelector(
+				'[data-testid="bump"]'
+			) as HTMLButtonElement
 		 ).click();
 		await flush();
 		expect(
@@ -409,7 +433,7 @@ describe( 'renderHTML (tree-first)', () => {
 
 	it( 'hydrates nested islands inside inserted content', async () => {
 		await setup( '<div data-testid="feed"></div>' );
-		const { state: nestedState } = store( 'test/tree-first-nested', {
+		store( 'test/tree-first-nested', {
 			state: { n: 5 },
 		} );
 		renderHTML(
@@ -466,13 +490,15 @@ describe( 'nested islands (targeting a container inside one)', () => {
 
 		// The inserted button is interactive.
 		(
-			document.querySelector( '[data-testid="nested-btn"]' ) as HTMLButtonElement
+			document.querySelector(
+				'[data-testid="nested-btn"]'
+			) as HTMLButtonElement
 		 ).click();
 		expect( nestedState.count ).toBe( 1 );
 	} );
 
 	it( 'content inside a nested island resolves the nested namespace', async () => {
-		const { state: nestedState } = store( 'test/tree-first-nested-ns', {
+		store( 'test/tree-first-nested-ns', {
 			state: { label: 'nested' },
 		} );
 		document.body.innerHTML = `
