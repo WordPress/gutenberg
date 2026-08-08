@@ -108,10 +108,14 @@ export function ImageEdit( {
 		! layoutType || ( layoutType !== 'flex' && layoutType !== 'grid' );
 	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
 
-	const [ placeholderResizeListener, { width: placeholderWidth } ] =
-		useResizeObserver();
+	const [
+		placeholderResizeListener,
+		{ width: placeholderWidth, height: placeholderHeight },
+	] = useResizeObserver();
 
-	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
+	const isSmallContainer =
+		( placeholderWidth && placeholderWidth < 160 ) ||
+		( placeholderHeight && placeholderHeight < 230 );
 
 	const captionRef = useRef();
 	useEffect( () => {
