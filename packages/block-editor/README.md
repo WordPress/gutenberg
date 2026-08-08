@@ -801,7 +801,80 @@ _Related_
 
 ### PanelColorSettings
 
-Undocumented declaration.
+`PanelColorSettings` is a React component that renders a UI for managing various color settings. It is essentially a wrapper around the `PanelColorGradientSettings` component, but specifically disables the gradient features.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/panel-color-settings/README.md>
+
+_Usage_
+
+```jsx
+import { useState } from 'react';
+import { PanelColorSettings } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+
+const MyPanelColorSettings = () => {
+	const [ textColor, setTextColor ] = useState( { color: '#000' } );
+	const [ backgroundColor, setBackgroundColor ] = useState( {
+		color: '#fff',
+	} );
+	const [ overlayTextColor, setOverlayTextColor ] = useState( {
+		color: '#000',
+	} );
+	const [ overlayBackgroundColor, setOverlayBackgroundColor ] = useState( {
+		color: '#eee',
+	} );
+
+	return (
+		<PanelColorSettings
+			__experimentalIsRenderedInSidebar
+			title={ __( 'Color' ) }
+			colorSettings={ [
+				{
+					value: textColor.color,
+					onChange: setTextColor,
+					label: __( 'Text' ),
+				},
+				{
+					value: backgroundColor.color,
+					onChange: setBackgroundColor,
+					label: __( 'Background' ),
+				},
+				{
+					value: overlayTextColor.color,
+					onChange: setOverlayTextColor,
+					label: __( 'Submenu & overlay text' ),
+				},
+				{
+					value: overlayBackgroundColor.color,
+					onChange: setOverlayBackgroundColor,
+					label: __( 'Submenu & overlay background' ),
+				},
+			] }
+		/>
+	);
+};
+
+<MyPanelColorSettings />;
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.colorSettings_ `[Array]`: A user-provided array of color settings. Colors settings are provided as an array of objects with the following schema: - `value` (string): The current color of the setting. - `onChange` (Function): Callback on change of the setting. - `label` (string): Label of the setting.
+-   _props.className_ `[string]`: Additional class names added to the underlying `ToolsPanel` instance.
+-   _props.colors_ `[Array]`: An array of predefined colors to be displayed in the color palette.
+-   _props.disableCustomColors_ `[boolean]`: Whether to disable the option for users to add custom colors.
+-   _props.children_ `[JSX.Element]`: Displayed below the underlying `PanelColorGradientSettings` instance.
+-   _props.title_ `[string]`: The title of the underlying `ToolsPanel`.
+-   _props.showTitle_ `[boolean]`: Whether to show the title of the `ToolsPanel`.
+-   _props.\_\_experimentalIsRenderedInSidebar_ `[boolean]`: Whether this is rendered in the sidebar.
+-   _props.enableAlpha_ `[boolean]`: Whether to enable the alpha (opacity) slider in the color picker.
+
+_Returns_
+
+-   `JSX.Element`: The PanelColorSettings component.
 
 ### PlainText
 

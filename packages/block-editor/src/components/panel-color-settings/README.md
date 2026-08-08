@@ -80,16 +80,16 @@ Colors settings are provided as an array of objects with the following schema:
 
 Additionally, the following `PanelColorGradientSettings` props are supported and directly passed down to the underlying `PanelColorGradientSettings` instance:
 
-- `className` - added to the underlying `ToolsPanel` instance.
-- `colors` - array of colors to be used.
+- `className` - additional class names added to the underlying `ToolsPanel` instance.
+- `colors` - an array of predefined colors to be displayed in the color palette.
 - `gradients` - not recommended to be used since `PanelColorSettings` resets it.
-- `disableCustomColors` - whether addition of custom colors is enabled
+- `disableCustomColors` - whether to disable the option for users to add custom colors.
 - `disableCustomGradients` - not recommended to be used since `PanelColorSettings` sets it.
 - `children` - displayed below the underlying `PanelColorGradientSettings` instance.
 - `settings` - not recommended to be used, since `PanelColorSettings` builds it from the `colorSettings` prop.
-- `title` - title of the underlying `ToolsPanel`.
+- `title` - the title of the underlying `ToolsPanel`.
 - `showTitle` - whether to show the title of the `ToolsPanel`.
-- `__experimentalIsRenderedInSidebar`
+- `__experimentalIsRenderedInSidebar` - whether this is rendered in the sidebar.
 - `enableAlpha` - whether to enable setting opacity when specifying a color.
 
 Please refer to the `PanelColorGradientSettings` component for more information.
