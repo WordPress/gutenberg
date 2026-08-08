@@ -167,7 +167,9 @@ function ParagraphBlock( {
 						: __( 'Block: Paragraph' ) )
 				}
 				data-empty={ RichText.isEmpty( content ) }
-				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				placeholder={
+					placeholder || __( `Type ' / ' to choose a block` )
+				}
 				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
