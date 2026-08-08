@@ -40,7 +40,8 @@ type Position = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
 // dist build mangles them to `__e`/`__k`. Read both so this works with either.
 const vdomDom = ( vnode: any ): Node | null =>
 	vnode?._dom ?? vnode?.__e ?? null;
-const vdomChildren = ( vnode: any ): any[] => vnode?._children ?? vnode?.__k ?? [];
+const vdomChildren = ( vnode: any ): any[] =>
+	vnode?._children ?? vnode?.__k ?? [];
 
 // A rendered container (fragment) stores its tree as a single Fragment vnode
 // on the same property names — NOT as an array.
@@ -85,11 +86,13 @@ const getIslandNamespace = ( island: Element ): string | null => {
 			parsed = json;
 		}
 	} catch {}
-	return typeof parsed === 'string'
-		? parsed
-		: typeof parsed?.namespace === 'string'
-			? parsed.namespace
-			: null;
+	if ( typeof parsed === 'string' ) {
+		return parsed;
+	}
+	if ( typeof parsed?.namespace === 'string' ) {
+		return parsed.namespace;
+	}
+	return null;
 };
 
 /**
@@ -136,10 +139,23 @@ const findPath = ( vnode: any, target: Element ): any[] | null => {
 const rebuildPathNode = (
 	pathNode: any,
 	child: any,
+	childVNode: any,
 	chainElement: any
 ): any => {
 	if ( typeof pathNode.type === 'string' ) {
-		return h( pathNode.type, { ...pathNode.props, children: child } );
+		const oldChildren = vdomChildren( pathNode );
+		const idx = oldChildren.indexOf( childVNode );
+		const newChildren = [ ...oldChildren ];
+		if ( idx !== -1 ) {
+			// Replace only the child slot occupied by the rebuilt vnode —
+			// the node's siblings must survive the rebuild.
+			newChildren[ idx ] = child;
+		} else {
+			// Should not happen (the path child is always a rendered child);
+			// fall back to appending.
+			newChildren.push( child );
+		}
+		return h( pathNode.type, { ...pathNode.props, children: newChildren } );
 	}
 	if ( pathNode.type === Directives ) {
 		return h( Directives, { ...pathNode.props, element: chainElement } );
@@ -181,7 +197,13 @@ const spliceIntoTree = (
 		return;
 	}
 
-	const path = findPath( root, container );
+	// The fragment's root is Preact's artificial Fragment wrapper (created by
+	// `render()`/`hydrate()`); the island's vnode is its only child. Search
+	// from the island vnode so the path is [island, ..., container] — never
+	// includes the wrapper (a rebuilt wrapper would nest a Fragment that
+	// cannot type-match the island element, remounting the whole tree).
+	const treeRoot = vdomChildren( root )[ 0 ] ?? root;
+	const path = findPath( treeRoot, container );
 	if ( ! path || path.length === 0 ) {
 		warn(
 			'renderHTML(): the container could not be located in the island tree. Is it inside a router region, a data-wp-each list, a data-wp-ignore subtree, or a template?'
@@ -193,7 +215,11 @@ const spliceIntoTree = (
 	let chainElement: any;
 	let startIdx: number;
 
-	if ( position === 'inner' || position === 'append' || position === 'prepend' ) {
+	if (
+		position === 'inner' ||
+		position === 'append' ||
+		position === 'prepend'
+	) {
 		// Splice into the container's own children.
 		const target = path[ path.length - 1 ];
 		const oldChildren = vdomChildren( target );
@@ -275,7 +301,12 @@ const spliceIntoTree = (
 
 	// Rebuild the path from the insertion point up to the root.
 	for ( let i = startIdx; i >= 0; i-- ) {
-		current = rebuildPathNode( path[ i ], current, chainElement );
+		current = rebuildPathNode(
+			path[ i ],
+			current,
+			path[ i + 1 ],
+			chainElement
+		);
 		if ( typeof path[ i ].type === 'string' ) {
 			chainElement = current;
 		}
@@ -406,6 +437,21 @@ export function renderElement(
 			warn(
 				'renderElement(): no interactive island found for the inserted element. The element must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
 			);
+			continue;
+		}
+
+		/*
+		 * The node IS the island (its own `data-wp-interactive` with no
+		 * ancestor island): there is no parent vnode to splice into — the node
+		 * is the tree root. Ensure the island's tree exists (adopting the
+		 * existing DOM via the sanctioned first-render hydrate path) and leave
+		 * the node in place. The node is never removed in this case.
+		 */
+		if ( node instanceof Element && island === node ) {
+			const fragment = getRegionRootFragment( [ island ] ) as any;
+			if ( ! getFragmentRoot( fragment ) ) {
+				hydrate( toVdom( island ) as VNode, fragment as ContainerNode );
+			}
 			continue;
 		}
 
