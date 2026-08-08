@@ -77,11 +77,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	);
 
 	/* translators: button label text should, if possible, be under 16 characters. */
-	const longLabel = _x(
-		'Block Inserter',
-		'Generic label for block inserter button'
-	);
-	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+	const longLabel = _x( 'Add', 'Generic label for block inserter button' );
+	const shortLabel = __( 'Add' );
 
 	return (
 		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
