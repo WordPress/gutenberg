@@ -242,11 +242,29 @@ export function useTypingObserver() {
 	return useMergeRefs( [ ref1, ref2 ] );
 }
 
+/**
+ * ObserveTyping component sets and removes the `isTyping` flag based on user actions.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md
+ *
+ * @example
+ * ```jsx
+ * function Example(){
+ *  return (
+ *   <ObserveTyping>
+ *     <MyInput/>
+ *   <ObserveTyping/>
+ *  );
+ * }
+ * ```
+ *
+ * @param {Object}      props
+ * @param {JSX.Element} props.children The children to observe typing on.
+ *
+ * @return {Element} The ObserveTyping component.
+ */
 function ObserveTyping( { children } ) {
 	return <div ref={ useTypingObserver() }>{ children }</div>;
 }
 
-/**
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md
- */
 export default ObserveTyping;

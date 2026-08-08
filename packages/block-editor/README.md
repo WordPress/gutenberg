@@ -795,9 +795,32 @@ Undocumented declaration.
 
 ### ObserveTyping
 
+ObserveTyping component sets and removes the `isTyping` flag based on user actions.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
+
+_Usage_
+
+```jsx
+function Example(){
+ return (
+  <ObserveTyping>
+    <MyInput/>
+  <ObserveTyping/>
+ );
+}
+```
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.children_ `JSX.Element`: The children to observe typing on.
+
+_Returns_
+
+-   `Element`: The ObserveTyping component.
 
 ### PanelColorSettings
 
