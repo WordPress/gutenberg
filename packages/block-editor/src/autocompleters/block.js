@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	cloneBlock,
@@ -9,10 +6,6 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';

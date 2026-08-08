@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToolbarButton,
 	Dropdown,
@@ -12,10 +9,6 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import PatternSelection, { useBlockPatterns } from './pattern-selection';
 import { unlock } from '../../lock-unlock';
 

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import timezoneMock from 'timezone-mock';
-
-/**
- * WordPress dependencies
- */
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import TimePicker from '..';
 
 describe( 'TimePicker', () => {

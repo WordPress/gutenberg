@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { join } = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
 const { info } = require( './log' );
 const { writeOutputTemplate } = require( './output' );
 

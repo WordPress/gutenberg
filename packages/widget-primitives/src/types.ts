@@ -8,15 +8,7 @@
  * widget binds its attribute shape once and gets typed `attributes`,
  * `example`, and `setAttributes`.
  */
-
-/**
- * External dependencies
- */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ResolvableField } from './field-types';
 
 /**
@@ -30,6 +22,12 @@ export type WidgetName = `${ string }/${ string }`;
  * `@wordpress/icons`.
  */
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
+
+/**
+ * Registered icon name (`collection/icon-name`), resolved into a
+ * `WidgetIcon` by the application's resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
 
 /**
  * A link in a widget's help note.
@@ -71,10 +69,15 @@ export interface WidgetHelp {
 type WidgetAttributeRelevance = 'high' | 'low';
 
 /**
- * A user-triggerable action a widget type declares. The declaration is
- * serializable data; the host materializes it as an affordance and owns
- * placement. The action points at a `link` target the host renders as an
- * anchor; `download` turns it into a file download.
+ * A user-triggerable verb a widget type declares. The declaration is
+ * serializable data: an envelope (`id`, `label`) plus exactly one
+ * fulfillment, named by the key carrying it. Today the only key is `href`,
+ * so the only fulfillment is a link.
+ *
+ * The host owns what follows: which primitive materializes the fulfillment,
+ * and where the affordance is placed. For a link that means mounting a real
+ * link primitive wherever the surface allows one, so middle-click, copy
+ * address, and the anchor role survive.
  */
 export interface WidgetAction {
 	/**
@@ -88,18 +91,19 @@ export interface WidgetAction {
 	label: string;
 
 	/**
-	 * Destination: URL, admin path, or widget-local file.
+	 * Link fulfillment: the destination. A URL, an admin path, or a
+	 * widget-local file.
 	 */
 	href: string;
 
 	/**
-	 * When set, the browser downloads the destination instead of navigating.
+	 * Link only. When set, the destination downloads instead of navigating.
 	 * A string supplies the suggested filename.
 	 */
 	download?: string | boolean;
 
 	/**
-	 * Whether the destination opens in a new browser tab.
+	 * Link only. Whether the destination opens in a new browser tab.
 	 */
 	openInNewTab?: boolean;
 }
@@ -317,4 +321,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
+
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 * `null`/absent means the module's icon stands.
+	 */
+	icon?: WidgetIconReference | null;
 }

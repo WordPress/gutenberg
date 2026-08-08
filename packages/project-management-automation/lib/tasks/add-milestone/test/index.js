@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import addMilestone from '../';
 
 describe( 'addMilestone', () => {

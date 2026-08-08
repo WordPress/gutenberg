@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, BrowserContext } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import {
 	Editor,
 	type Admin,

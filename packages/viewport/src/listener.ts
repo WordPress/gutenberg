@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { debounce } from '@wordpress/compose';
 import { dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from './store';
 import type { Breakpoints, Operators } from './types';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
 import { getRectangleFromRange } from '@wordpress/dom';

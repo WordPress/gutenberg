@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -17,10 +14,6 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import PostExcerptForm from './index';
 import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';

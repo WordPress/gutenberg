@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useDisabled from '../';
 
 describe( 'useDisabled', () => {

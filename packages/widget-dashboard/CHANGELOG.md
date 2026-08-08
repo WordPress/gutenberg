@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widget chrome and picker preview chrome: preserve their flex-column layout
+    when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
+
+### Documentation
+
+-   Describe what the "More" menu mounts for a link fulfillment ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
 ### New Features
 
 -   Surface a widget's declared `actions` in the tile chrome as a "More"
@@ -24,6 +39,7 @@
 
 ### Internal
 
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Add a Storybook story reproducing the tile header with multiple
     high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Mark the default runtime module `import()` with `@vite-ignore` alongside

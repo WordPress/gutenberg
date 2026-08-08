@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	Button,
@@ -18,10 +15,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_POST_TYPE,

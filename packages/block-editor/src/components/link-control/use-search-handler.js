@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import isURLLike from './is-url-like';
 import normalizeUrl from './normalize-url';
 import { CREATE_TYPE } from './constants';

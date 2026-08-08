@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { x } = require( 'tinyexec' );
 const npmPackageArg = require( 'npm-package-arg' );
 const writePkg = require( 'write-pkg' );
-
-/**
- * Internal dependencies
- */
 const { info, error } = require( './log' );
 
 module.exports = async ( {

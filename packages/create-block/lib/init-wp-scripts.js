@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { x } = require( 'tinyexec' );
-
-/**
- * Internal dependencies
- */
 const { info } = require( './log' );
 
 module.exports = async ( { rootDirectory } ) => {

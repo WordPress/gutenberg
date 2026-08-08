@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BaseDefaultBlockAppender from '../default-block-appender';
 import { useBlockEditContext } from '../block-edit/context';
 

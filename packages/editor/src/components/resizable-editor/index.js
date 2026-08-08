@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

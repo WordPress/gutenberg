@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import TokenList from '../';
 
 describe( 'token-list', () => {

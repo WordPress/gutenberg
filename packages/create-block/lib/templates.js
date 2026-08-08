@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { existsSync, rmSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
@@ -9,10 +6,6 @@ const inquirer = require( '@inquirer/prompts' );
 const { x } = require( 'tinyexec' );
 const { glob } = require( 'tinyglobby' );
 const npmPackageArg = require( 'npm-package-arg' );
-
-/**
- * Internal dependencies
- */
 const CLIError = require( './cli-error' );
 const { info } = require( './log' );
 const prompts = require( './prompts' );

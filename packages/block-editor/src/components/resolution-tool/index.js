@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,

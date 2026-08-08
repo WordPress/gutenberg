@@ -1,8 +1,4 @@
 /* eslint-disable no-console */
-
-/**
- * Internal dependencies
- */
 import '../matchers';
 
 describe( 'jest-console', () => {

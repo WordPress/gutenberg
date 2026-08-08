@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isTextField from './is-text-field';
 import isHTMLInputElement from './is-html-input-element';
 import documentHasTextSelection from './document-has-text-selection';

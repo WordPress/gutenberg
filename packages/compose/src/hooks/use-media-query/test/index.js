@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { act, render } from '@testing-library/react';
 import { matchMedia, setMedia } from 'mock-match-media';
-
-/**
- * Internal dependencies
- */
 import useMediaQuery from '../';
 
 const TestComponent = ( { query } ) => {
