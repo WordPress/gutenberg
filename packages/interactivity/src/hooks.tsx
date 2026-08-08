@@ -397,3 +397,33 @@ options.vnode = ( vnode: VNode< any > ) => {
 		old( vnode );
 	}
 };
+
+/**
+ * Maps each rendered DOM element to its vnode. Populated by the
+ * `options.diffed` hook below — Preact calls it after every vnode is
+ * diffed into the DOM, when string-type (element) vnodes already have
+ * their DOM node assigned (`_dom` IS the element).
+ *
+ * `renderHTML` uses the map for the O(1) container lookup, then walks up
+ * each vnode's `_parent` pointer to the tree root — replacing a
+ * depth-first search over the whole island. Removed elements keep their
+ * entry until GC (a WeakMap); the walk in `render.ts` rejects stale
+ * entries, because they no longer connect to the tree root.
+ */
+export const elementToVnode = new WeakMap< Element, VNode< any > >();
+
+// Preact Options Hook called after each vnode is diffed into the DOM:
+// register the element → vnode mapping. Chained so previously registered
+// hooks keep running. The dist build mangles `_dom` to `__e`; read both so
+// this works with either (same pattern as `render.ts`).
+const oldDiffed = options.diffed;
+options.diffed = ( vnode: any ) => {
+	const dom = vnode?._dom ?? vnode?.__e;
+	if ( typeof vnode?.type === 'string' && dom ) {
+		elementToVnode.set( dom, vnode );
+	}
+
+	if ( oldDiffed ) {
+		oldDiffed( vnode );
+	}
+};

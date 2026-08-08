@@ -15,7 +15,7 @@ import {
  * Internal dependencies
  */
 import { toVdom } from './vdom';
-import { Directives } from './hooks';
+import { Directives, elementToVnode } from './hooks';
 import { getRegionRootFragment } from './hydration';
 import { warn } from './utils';
 
@@ -36,12 +36,12 @@ import { warn } from './utils';
 
 type Position = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
 
-// Preact internal property accessors. The source uses `_dom`/`_children`; the
-// dist build mangles them to `__e`/`__k`. Read both so this works with either.
-const vdomDom = ( vnode: any ): Node | null =>
-	vnode?._dom ?? vnode?.__e ?? null;
+// Preact internal property accessors. The source uses `_children`/`_parent`;
+// the dist build mangles them to `__k`/`__`. Read both so this works with
+// either.
 const vdomChildren = ( vnode: any ): any[] =>
 	vnode?._children ?? vnode?.__k ?? [];
+const vdomParent = ( vnode: any ): any => vnode?._parent ?? vnode?.__ ?? null;
 
 // A rendered container (fragment) stores its tree as a single Fragment vnode
 // on the same property names — NOT as an array.
@@ -121,28 +121,45 @@ const getIslandNamespace = ( island: Element ): string | null => {
 };
 
 /**
- * Depth-first search for the element vnode (`type` is a string tag) whose DOM
- * node is `target`. Returns the path of vnodes from the root to it
- * (inclusive), or `null` if not found.
+ * Locates the container's vnode via the element→vnode map (O(1) — populated
+ * by the `options.diffed` hook in `hooks.tsx`) and walks up each vnode's
+ * `_parent` pointer to the tree root, collecting the path of vnodes from the
+ * root to the container (inclusive). The cost is O(depth), independent of
+ * the island's size.
  *
- * @param vnode  The vnode to search from.
- * @param target The DOM element to locate.
- * @return The path of vnodes, or `null`.
+ * The walk doubles as a validity check: only vnodes currently in this
+ * island's tree connect to `root` through their `_parent` pointers. A stale
+ * map entry — an element removed by a previous splice and re-inserted, or an
+ * element from another island's tree — fails the walk and is rejected
+ * instead of corrupting the rebuild.
+ *
+ * @param root   The tree root vnode (the island vnode).
+ * @param target The container element.
+ * @return The path of vnodes from the root to the container, or `null`.
  */
-const findPath = ( vnode: any, target: Element ): any[] | null => {
-	if ( typeof vnode?.type === 'string' && vdomDom( vnode ) === target ) {
-		return [ vnode ];
+const getPathTo = ( root: any, target: Element ): any[] | null => {
+	let vnode = elementToVnode.get( target );
+	if ( ! vnode ) {
+		return null;
 	}
-	for ( const child of vdomChildren( vnode ) ) {
-		if ( ! child || typeof child !== 'object' ) {
-			continue;
+	// Climb the `_parent` chain, verifying at each step that the child is
+	// still a rendered child of its parent. The splice rebuilds only the
+	// path — off-path subtrees keep their children arrays — so a stale vnode
+	// (whose old parent no longer lists it) is rejected here.
+	const reversed: any[] = [];
+	while ( vnode && vnode !== root ) {
+		const parent = vdomParent( vnode );
+		if ( ! parent || vdomChildren( parent ).indexOf( vnode ) === -1 ) {
+			return null;
 		}
-		const path = findPath( child, target );
-		if ( path ) {
-			return [ vnode, ...path ];
-		}
+		reversed.push( vnode );
+		vnode = parent;
 	}
-	return null;
+	if ( vnode !== root ) {
+		return null;
+	}
+	reversed.push( root );
+	return reversed.reverse();
 };
 
 /**
@@ -224,12 +241,13 @@ const spliceIntoTree = (
 	}
 
 	// The fragment's root is Preact's artificial Fragment wrapper (created by
-	// `render()`/`hydrate()`); the island's vnode is its only child. Search
-	// from the island vnode so the path is [island, ..., container] — never
-	// includes the wrapper (a rebuilt wrapper would nest a Fragment that
-	// cannot type-match the island element, remounting the whole tree).
+	// `render()`/`hydrate()`); the island's vnode is its only child. Locate
+	// the container through the element→vnode map and the `_parent` pointers
+	// so the path is [island, ..., container] — never includes the wrapper (a
+	// rebuilt wrapper would nest a Fragment that cannot type-match the island
+	// element, remounting the whole tree).
 	const treeRoot = vdomChildren( root )[ 0 ] ?? root;
-	const path = findPath( treeRoot, container );
+	const path = getPathTo( treeRoot, container );
 	if ( ! path || path.length === 0 ) {
 		warn(
 			'renderHTML(): the container could not be located in the island tree. Is it inside a router region, a data-wp-each list, a data-wp-ignore subtree, or a template?'
