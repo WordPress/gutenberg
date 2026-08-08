@@ -21,6 +21,7 @@
 		{ "path": "../keycodes" },
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices" },
+		{ "path": "../plugins" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
