@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { readFileSync } from 'fs';
 import { transform } from '@babel/core';
-
-/**
- * Internal dependencies
- */
 import babelPresetDefault from '../';
 
 describe( 'Babel preset default', () => {

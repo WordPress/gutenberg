@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarButton,
@@ -26,10 +19,6 @@ import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
 import { unlock } from '../lock-unlock';

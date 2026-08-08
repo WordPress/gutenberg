@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { ContentType, CoreDataError } from '../types';
 
 export interface StatusActionConfig {

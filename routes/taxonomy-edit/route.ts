@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	NEW_ID,
 	TAXONOMIES_PATH,

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'node:path' );
 const { existsSync, readFileSync } = require( 'node:fs' );
 const resolverNode = require( 'eslint-import-resolver-typescript' );

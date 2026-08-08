@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import type { DataFormControlProps, Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ContentType } from '../types';
 
 export const LABELS_ACTIONS_FIELD_ID = '__labels_actions';

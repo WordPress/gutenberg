@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -17,10 +14,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useNavigate, useParams } from '@wordpress/route';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import {
 	addNewItemLabelField,
 	addOrRemoveItemsField,

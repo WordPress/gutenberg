@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';

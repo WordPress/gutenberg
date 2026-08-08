@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import PresetGroup from './presets/preset-group';

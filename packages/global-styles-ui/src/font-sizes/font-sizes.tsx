@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -21,10 +18,6 @@ import {
 } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import type { FontSize } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
 import { getNewIndexFromPresets } from '../utils';

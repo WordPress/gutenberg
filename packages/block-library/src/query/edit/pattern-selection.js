@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Modal, SearchControl } from '@wordpress/components';
@@ -10,10 +7,6 @@ import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	useBlockNameForPatterns,
 	getTransformedBlocksFromPattern,

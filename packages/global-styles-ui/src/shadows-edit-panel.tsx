@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
@@ -24,10 +17,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { plus, shadow as shadowIcon, reset } from '@wordpress/icons';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { ScreenBody } from './screen-body';
 import { defaultShadow } from './shadows-panel';

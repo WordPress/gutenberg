@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,10 +12,6 @@ import {
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
 import type { StyleVariation, Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
 

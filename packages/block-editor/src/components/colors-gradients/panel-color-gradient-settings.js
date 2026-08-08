@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import ColorGradientSettingsDropdown from './dropdown';
 import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
 
@@ -65,6 +54,7 @@ export const PanelColorGradientSettingsInner = ( {
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
+			hasInnerWrapper
 			label={ showTitle ? title : undefined }
 			resetAll={ () => {
 				batch( () => {
@@ -88,23 +78,26 @@ export const PanelColorGradientSettingsInner = ( {
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 		>
-			<ColorGradientSettingsDropdown
-				settings={ settings }
-				panelId={ panelId }
-				{ ...{
-					colors,
-					gradients,
-					disableCustomColors,
-					disableCustomGradients,
-					__experimentalIsRenderedInSidebar,
-					enableAlpha,
-				} }
-			/>
-			{ !! children && (
-				<>
-					<Spacer marginY={ 4 } /> { children }
-				</>
-			) }
+			<div className="block-editor-panel-color-gradient-settings__inner-wrapper">
+				<ColorGradientSettingsDropdown
+					settings={ settings }
+					panelId={ panelId }
+					{ ...{
+						colors,
+						gradients,
+						disableCustomColors,
+						disableCustomGradients,
+						__experimentalIsRenderedInSidebar,
+						enableAlpha,
+					} }
+				/>
+				{ !! children && (
+					<>
+						<Spacer marginTop={ 4 } marginBottom={ 0 } />
+						{ children }
+					</>
+				) }
+			</div>
 		</ToolsPanel>
 	);
 };

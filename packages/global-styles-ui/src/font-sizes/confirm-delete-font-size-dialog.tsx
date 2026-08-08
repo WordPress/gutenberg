@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import type { FontSize } from '@wordpress/global-styles-engine';

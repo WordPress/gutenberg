@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 

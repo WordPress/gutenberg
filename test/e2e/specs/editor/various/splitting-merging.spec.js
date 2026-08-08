@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
@@ -273,6 +270,62 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: '|last' },
+			},
+		] );
+	} );
+
+	test( 'should forward delete an empty paragraph without breaking apart the next block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'one' } },
+				{ name: 'core/list-item', attributes: { content: 'two' } },
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '|' );
+
+		// The empty paragraph is removed and the list is left intact, with
+		// the caret at the start of its first item.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '|one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
 			},
 		] );
 	} );

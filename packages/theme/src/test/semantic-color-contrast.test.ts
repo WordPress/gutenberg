@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { getContrast } from '../color-ramps/lib/color-utils';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
+import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 const MINIMUM_TEXT_CONTRAST = 4.5;
 const CUSTOM_PRIMARY = '#0057b8';
@@ -9,7 +10,12 @@ const CUSTOM_BACKGROUND = '#f6f3ef';
 const THEME_PROVIDER_STYLE_CASES = [
 	{
 		name: 'default seed colors',
-		settings: undefined,
+		settings: {
+			color: {
+				primary: DEFAULT_SEED_COLORS.primary,
+				background: DEFAULT_SEED_COLORS.background,
+			},
+		},
 	},
 	{
 		name: 'custom seed colors',

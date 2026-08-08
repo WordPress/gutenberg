@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
@@ -21,6 +14,10 @@ export default ( props ) => ( element ) => {
 		const { record, handleChange } = props.current;
 		const { ownerDocument } = element;
 		if (
+			// Another handler may have already claimed the clipboard, e.g.
+			// the block editor copying the whole block when its entire
+			// text is selected.
+			event.defaultPrevented ||
 			isCollapsed( record.current ) ||
 			( ! element.contains( ownerDocument.activeElement ) &&
 				! ownsSelection( element ) )

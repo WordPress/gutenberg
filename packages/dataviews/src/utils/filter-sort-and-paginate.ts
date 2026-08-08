@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_IS_NOT_ALL } from '../constants';
 import normalizeFields from '../field-types';
 import type { Field, Operator, View } from '../types';
