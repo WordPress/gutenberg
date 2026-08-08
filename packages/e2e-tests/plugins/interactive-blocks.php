@@ -36,3 +36,125 @@ add_action(
 		}
 	}
 );
+
+add_action(
+	'rest_api_init',
+	function () {
+		/*
+		 * REST routes that return server-rendered fragments for the
+		 * `test/render-element` block to fetch and hydrate with
+		 * `renderElement()`.
+		 *
+		 * The base fragment is intentionally a PLAIN fragment — it has no
+		 * `data-wp-interactive` and no `data-wp-context`. It is inserted into
+		 * the block's existing island, so it must inherit the island's
+		 * namespace and live context.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					// `?v=2` returns different markup to test re-fetching
+					// with fresh server content.
+					if ( isset( $_GET['v'] ) && '2' === $_GET['v'] ) {
+						return rest_ensure_response(
+							'<p data-testid="version">version 2</p>'
+						);
+					}
+					return rest_ensure_response(
+						'<button data-testid="counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>' .
+						'<p data-testid="version">version 1</p>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A fragment carrying `data-wp-router-region`. Once inserted and
+		 * rendered, it registers as a swappable router region, so navigating
+		 * to a page with the same region ID replaces its content. The empty
+		 * `content` div is where a test inserts a separate
+		 * `renderHTML`-rendered node (with a window listener) to verify that
+		 * navigating away cleans up that node's per-node fragment.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/region',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<div data-wp-interactive="test/render-element" data-wp-router-region="test/region">' .
+						'<p data-testid="region-fragment">fragment content</p>' .
+						'<div data-testid="region-content"></div>' .
+						'</div>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A fragment with a `data-wp-on-window--resize` node, used to test
+		 * that removing the node (e.g. via `renderHTML(..., { position:
+		 * 'inner' })`) cleans up its window listener.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/listener',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<span data-testid="listener" data-wp-on-window--resize="actions.incResize"></span>' .
+						'<p data-testid="version">version 1</p>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A SELF-CONTAINED island fragment — it carries its own
+		 * `data-wp-interactive` and `data-wp-context`, so it does not depend
+		 * on an enclosing island. This is the other supported shape for
+		 * `renderElement()`.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/island',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<div data-wp-interactive="test/render-element" data-wp-context=\'{ "count": 0 }\'>' .
+						'<button data-testid="island-counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>' .
+						'</div>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A fragment with MIXED element and text content, to test that
+		 * `renderHTML()` preserves text nodes instead of dropping them.
+		 */
+		register_rest_route(
+			'test/render-element/v1',
+			'/fragment/mixed',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<span data-testid="mixed-span">a</span> and text'
+					);
+				},
+			)
+		);
+	}
+);
