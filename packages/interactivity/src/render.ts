@@ -245,9 +245,12 @@ const spliceIntoTree = (
 	if (
 		position === 'inner' ||
 		position === 'append' ||
-		position === 'prepend'
+		position === 'prepend' ||
+		position === 'at'
 	) {
-		// Splice into the container's own children.
+		// Splice into the container's own children. `at` inserts at a specific
+		// index (used by `hydrateInsertedElement` to replace a raw node at its
+		// exact position within its parent).
 		const target = path[ path.length - 1 ];
 		const oldChildren = vdomChildren( target );
 		let newChildren: ComponentChild[];
@@ -255,8 +258,16 @@ const spliceIntoTree = (
 			newChildren = newVdoms;
 		} else if ( position === 'append' ) {
 			newChildren = [ ...oldChildren, ...newVdoms ];
-		} else {
+		} else if ( position === 'prepend' ) {
 			newChildren = [ ...newVdoms, ...oldChildren ];
+		} else {
+			// 'at'
+			const idx = atIndex ?? oldChildren.length;
+			newChildren = [
+				...oldChildren.slice( 0, idx ),
+				...newVdoms,
+				...oldChildren.slice( idx ),
+			];
 		}
 		startIdx = path.length - 2;
 		current = h( target.type, { ...target.props, children: newChildren } );
@@ -275,7 +286,7 @@ const spliceIntoTree = (
 		const parent = path[ i - 1 ];
 		if ( ! parent || typeof parent.type !== 'string' ) {
 			// The container is the tree root: only `outer` is supported.
-			if ( position === 'outer' || position === 'at' ) {
+			if ( position === 'outer' ) {
 				const newRoot =
 					newVdoms.length === 1
 						? newVdoms[ 0 ]
@@ -288,20 +299,15 @@ const spliceIntoTree = (
 		}
 
 		const parentChildren = vdomChildren( parent );
-		let idx: number;
-		if ( position === 'at' ) {
-			idx = atIndex ?? parentChildren.length;
-		} else {
-			idx = parentChildren.indexOf( anchor );
-			if ( idx === -1 ) {
-				warn(
-					'renderHTML(): could not locate the container among its siblings.'
-				);
-				return;
-			}
+		const idx = parentChildren.indexOf( anchor );
+		if ( idx === -1 ) {
+			warn(
+				'renderHTML(): could not locate the container among its siblings.'
+			);
+			return;
 		}
 		let newChildren: ComponentChild[];
-		if ( position === 'before' || position === 'at' ) {
+		if ( position === 'before' ) {
 			newChildren = [
 				...parentChildren.slice( 0, idx ),
 				...newVdoms,
