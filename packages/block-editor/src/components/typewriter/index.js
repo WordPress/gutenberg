@@ -261,6 +261,25 @@ export function useTypewriter() {
 	}, [] );
 }
 
+/**
+ * Typewriter component displays its children with a typewriter effect.
+ *
+ * @example
+ * ```jsx
+ * function Example(){
+ *   return (
+ *     <Typewriter>
+ *       Hello World
+ *     </Typewriter>
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}               props
+ * @param {JSX.Element | string} props.children The children to display with a typewriter effect.
+ *
+ * @return {JSX.Element} The rendered Typewriter component.
+ */
 function Typewriter( { children } ) {
 	return (
 		<div ref={ useTypewriter() } className="block-editor__typewriter">
