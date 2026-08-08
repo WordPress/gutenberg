@@ -142,6 +142,12 @@ export default function PostList( { postType } ) {
 					filters.after = filter.value;
 				}
 			}
+			if ( filter.field === 'discussion' ) {
+				if ( filter.value === undefined ) {
+					return;
+				}
+				filters.comment_status = filter.value;
+			}
 		} );
 
 		// We want to provide a different default item for the status filter
@@ -180,9 +186,19 @@ export default function PostList( { postType } ) {
 	const data = useMemo( () => {
 		let processedRecords = records;
 
+		const discussionFilter = view.filters?.find(
+			( filter ) => filter.field === 'discussion'
+		);
+
+		if ( discussionFilter?.value ) {
+			processedRecords = processedRecords?.filter(
+				( record ) => record.comment_status === discussionFilter.value
+			);
+		}
+
 		if ( view?.sort?.field === 'author' ) {
 			processedRecords = filterSortAndPaginate(
-				records,
+				processedRecords,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
@@ -196,7 +212,7 @@ export default function PostList( { postType } ) {
 		}
 
 		return processedRecords;
-	}, [ records, fields, view?.sort, notesCount ] );
+	}, [ records, fields, view.filters, view?.sort, notesCount ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
