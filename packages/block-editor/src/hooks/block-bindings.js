@@ -12,6 +12,7 @@ import {
 	BlockBindingsAttributeControl,
 	useBlockBindingsUtils,
 } from '../components/block-bindings';
+import { BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS } from '../components/block-bindings/excluded-blocks';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
@@ -73,7 +74,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	}
 
 	return (
-		<InspectorControls group="bindings">
+		<InspectorControls
+			group={
+				window?.__experimentalContentOnlyInspectorFields
+					? 'content'
+					: 'bindings'
+			}
+		>
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
@@ -112,10 +119,6 @@ export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
 	hasSupport( name ) {
-		return ! [
-			'core/post-date',
-			'core/navigation-link',
-			'core/navigation-submenu',
-		].includes( name );
+		return ! BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS.includes( name );
 	},
 };
