@@ -18,7 +18,7 @@ import { getContext } from '../scopes';
  * Internal dependencies
  */
 import '../directives'; // Registers all the core directives.
-import { renderHTML, hydrateInsertedElement } from '../render';
+import { renderHTML, renderElement } from '../render';
 import { hydrateRegions } from '../hydration';
 
 const NS = 'test/tree-first';
@@ -422,32 +422,6 @@ describe( 'renderHTML (tree-first)', () => {
 		expect(
 			document.querySelector( '[data-testid="nested"]' )?.textContent
 		).toBe( '5' );
-	} );
-} );
-
-describe( 'hydrateInsertedElement (tree-first)', () => {
-	it( 'renders an element that was already inserted into the DOM', async () => {
-		await setup( '<div data-testid="feed"></div>' );
-		const feed = document.querySelector( '[data-testid="feed"]' )!;
-		const node = document.createElement( 'button' );
-		node.setAttribute( 'data-testid', 'shim' );
-		node.setAttribute( 'data-wp-on--click', 'actions.inc' );
-		node.textContent = 'shim';
-		feed.appendChild( node );
-
-		hydrateInsertedElement( node );
-		await flush();
-		const btn = document.querySelector(
-			'[data-testid="shim"]'
-		) as HTMLButtonElement;
-		expect( btn ).not.toBeNull();
-		btn.click();
-		expect( state.count ).toBe( 1 );
-	} );
-
-	it( 'throws when the element is not attached to the DOM', () => {
-		const node = document.createElement( 'div' );
-		expect( () => hydrateInsertedElement( node ) ).toThrow();
 	} );
 } );
 
