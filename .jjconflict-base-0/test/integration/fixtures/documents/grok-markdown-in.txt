@@ -1,7 +1,0 @@
-# Heading
-
-This is a paragraph with **bold text** and *italic text*.
-
-## Subheading
-
-Another paragraph with a [link](https://example.com).

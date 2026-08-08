@@ -125,6 +125,22 @@ export const hydrateRegions = async () => {
 		( node ) => ! node.parentElement?.closest( '[data-wp-interactive]' )
 	);
 
+	// No IntersectionObserver (jsdom unit tests, very old browsers): hydrate
+	// every unhydrated top-level island immediately and resolve, mirroring the
+	// original upstream behavior. Without this, `await hydrateRegions()` would
+	// never complete in those environments — the observer callbacks never fire
+	// and the idle sweep may not run within the caller's wait. `initialVdom`
+	// records each hydrated island, keeping repeated calls idempotent.
+	if ( typeof window.IntersectionObserver !== 'function' ) {
+		for ( const node of nodes ) {
+			if ( ! initialVdom.has( node as Element ) ) {
+				await hydrateNode( node as Element );
+			}
+		}
+		resolveInitialVdom( initialVdom );
+		return;
+	}
+
 	const intersectionObserverInstance = new window.IntersectionObserver(
 		async ( entries ) => {
 			for ( const entry of entries ) {

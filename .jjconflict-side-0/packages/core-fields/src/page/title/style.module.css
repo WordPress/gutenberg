@@ -1,6 +1,0 @@
-/* Keep the badge on one line; it truncates alongside the title. */
-.badge {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}

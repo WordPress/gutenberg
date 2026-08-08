@@ -1,7 +1,0 @@
-@use "@wordpress/base-styles/variables" as *;
-
-.preference-base-option {
-	& + & {
-		margin-top: $grid-unit-20;
-	}
-}
