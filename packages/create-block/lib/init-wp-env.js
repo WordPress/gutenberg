@@ -1,7 +1,6 @@
-const { x } = require( 'tinyexec' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
-const { command } = require( 'execa' );
+const { x } = require( 'tinyexec' );
 const { info } = require( './log' );
 
 module.exports = async ( { rootDirectory } ) => {

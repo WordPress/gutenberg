@@ -129,8 +129,8 @@ module.exports = async ( {
 				await x( 'npm', [ 'install' ], {
 					throwOnError: true,
 					nodeOptions: {
-						cwd: rootDirectory
-					}
+						cwd: rootDirectory,
+					},
 				} );
 
 				info( '' );

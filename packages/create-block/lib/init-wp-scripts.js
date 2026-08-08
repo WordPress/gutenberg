@@ -9,7 +9,6 @@ module.exports = async ( { rootDirectory } ) => {
 	await x( 'npm', [ 'install', '@wordpress/scripts', '--save-dev' ], {
 		throwOnError: true,
 		nodeOptions: { cwd: rootDirectory },
-
 	} );
 
 	info( '' );
@@ -17,7 +16,6 @@ module.exports = async ( { rootDirectory } ) => {
 	await x( 'npm', [ 'run', 'format' ], {
 		throwOnError: true,
 		nodeOptions: { cwd: rootDirectory },
-
 	} );
 
 	info( '' );
@@ -25,6 +23,5 @@ module.exports = async ( { rootDirectory } ) => {
 	await x( 'npm', [ 'run', 'build' ], {
 		throwOnError: true,
 		nodeOptions: { cwd: rootDirectory },
-
 	} );
 };

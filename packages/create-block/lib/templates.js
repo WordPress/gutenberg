@@ -72,7 +72,7 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 	const outputTemplatesFiles = await glob( '**/*.mustache', {
 		cwd: outputTemplatesPath,
 		dot: true,
-  		expandDirectories: false
+		expandDirectories: false,
 	} );
 	return Object.fromEntries(
 		await Promise.all(
@@ -244,7 +244,7 @@ const getProjectTemplate = async ( templateName ) => {
 			throwOnError: true,
 			nodeOpions: {
 				cwd: tempCwd,
-			}
+			},
 		} );
 
 		const { name } = npmPackageArg( templateName );
