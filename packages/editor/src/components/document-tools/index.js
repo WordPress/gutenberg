@@ -5,7 +5,7 @@ import { __, _x } from '@wordpress/i18n';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
@@ -82,6 +82,14 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+
+	useEffect( () => {
+		if ( inserterSidebarToggleRef.current ) {
+			inserterSidebarToggleRef.current.tabIndex = isDistractionFree
+				? -1
+				: 0;
+		}
+	}, [ isDistractionFree ] );
 
 	return (
 		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
