@@ -24,20 +24,20 @@ import { hydrateRegions } from '../hydration';
 const NS = 'test/tree-first';
 
 const { state } = store( NS, {
-	state: { text: 'initial', count: 0 },
+	state: { text: 'initial', count: 0, items: [ 'x', 'y' ] },
 	actions: {
 		inc() {
 			state.count += 1;
 		},
-			set7() {
-				state.count = 7;
-			},
-			bump() {
-				getContext< { n: number } >().n += 1;
-			},
-			watchText() {
-				state.count = state.text.length;
-			},
+		set7() {
+			state.count = 7;
+		},
+		bump() {
+			getContext< { n: number } >().n += 1;
+		},
+		watchText() {
+			state.count = state.text.length;
+		},
 	},
 } );
 
@@ -205,6 +205,7 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'warns and does nothing when there is no island', async () => {
+		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
 		document.body.innerHTML = '<div data-testid="feed"></div>';
 		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
 		renderHTML(
@@ -357,17 +358,14 @@ describe( 'renderHTML (tree-first)', () => {
 			'<span data-testid="watched" data-wp-watch="actions.watchText"></span>'
 		);
 		await flush();
-		expect( state.count ).toBe( 1 );
+		expect( state.count ).toBe( 7 );
 		state.text = 'x';
 		await flush();
-		expect( state.count ).toBe( 2 );
+		expect( state.count ).toBe( 1 );
 	} );
 
 	it( 'renders a data-wp-each list inside inserted content', async () => {
 		await setup( '<div data-testid="feed"></div>' );
-		const { state: eachState } = store( 'test/tree-first-each', {
-			state: { items: [ 'x', 'y' ] },
-		} );
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<template data-wp-each="state.items"><li data-wp-text="context.item"></li></template>'
@@ -450,5 +448,74 @@ describe( 'renderElement (tree-first)', () => {
 	it( 'throws when the element is not attached to the DOM', () => {
 		const node = document.createElement( 'div' );
 		expect( () => renderElement( node ) ).toThrow();
+	} );
+} );
+
+describe( 'nested islands (targeting a container inside one)', () => {
+	it( 'does not create a second tree for the nested island (no re-init of its SSR content)', async () => {
+		const { state: nestedState } = store( 'test/tree-first-nested-dup', {
+			state: { count: 0, initCount: 0 },
+			actions: {
+				inc() {
+					nestedState.count += 1;
+				},
+				initOnce() {
+					nestedState.initCount += 1;
+				},
+			},
+		} );
+		document.body.innerHTML = `
+			<div data-wp-interactive="test/tree-first-outer">
+				<div data-wp-interactive="test/tree-first-nested-dup">
+					<span data-testid="ssr-init" data-wp-init="actions.initOnce"></span>
+					<div data-testid="container"></div>
+				</div>
+			</div>
+		`;
+		await hydrateRegions();
+		await flush();
+
+		// The nested island's SSR content initialized exactly once: the outer
+		// island's tree descends into the nested island and owns it.
+		expect( nestedState.initCount ).toBe( 1 );
+
+		renderHTML(
+			document.querySelector( '[data-testid="container"]' ),
+			'<button data-testid="nested-btn" data-wp-on--click="actions.inc">inc</button>'
+		);
+		await flush();
+
+		// RED pre-fix: spliceIntoTree uses the NEAREST island (the nested one)
+		// as the tree owner, creating a SECOND fragment and hydrating the
+		// nested island again — re-running its data-wp-init.
+		expect( nestedState.initCount ).toBe( 1 );
+
+		// The inserted button is interactive.
+		(
+			document.querySelector( '[data-testid="nested-btn"]' ) as HTMLButtonElement
+		 ).click();
+		expect( nestedState.count ).toBe( 1 );
+	} );
+
+	it( 'content inside a nested island resolves the nested namespace', async () => {
+		const { state: nestedState } = store( 'test/tree-first-nested-ns', {
+			state: { label: 'nested' },
+		} );
+		document.body.innerHTML = `
+			<div data-wp-interactive="test/tree-first-outer">
+				<div data-wp-interactive="test/tree-first-nested-ns">
+					<div data-testid="container"></div>
+				</div>
+			</div>
+		`;
+		await hydrateRegions();
+		renderHTML(
+			document.querySelector( '[data-testid="container"]' ),
+			'<span data-testid="ns" data-wp-text="state.label"></span>'
+		);
+		await flush();
+		expect(
+			document.querySelector( '[data-testid="ns"]' )?.textContent
+		).toBe( 'nested' );
 	} );
 } );
