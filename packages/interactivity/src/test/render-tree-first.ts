@@ -352,6 +352,14 @@ describe( 'renderHTML (tree-first)', () => {
 	} );
 
 	it( 'keeps data-wp-ignore subtrees inert', async () => {
+		// `data-wp-ignore` is deprecated (removal planned for 7.0), so its
+		// deprecation warning firing here is EXPECTED — asserted below, not
+		// accidental noise. SCRIPT_DEBUG gates the warning.
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
+		const warnSpy = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
@@ -361,6 +369,16 @@ describe( 'renderHTML (tree-first)', () => {
 		expect(
 			document.querySelector( '[data-testid="inner"]' )?.textContent
 		).toBe( 'raw' );
+		// The subtree is inert BECAUSE the directive ran — and the directive
+		// is deprecated, so it must have warned.
+		expect( warnSpy ).toHaveBeenCalledWith(
+			expect.stringContaining(
+				'The data-wp-ignore directive is deprecated'
+			)
+		);
+		warnSpy.mockRestore();
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 	} );
 
 	it( 'runs data-wp-init on inserted content', async () => {
