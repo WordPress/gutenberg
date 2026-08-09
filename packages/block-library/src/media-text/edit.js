@@ -9,7 +9,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	getDimensionsClassesAndStyles,
 	store as blockEditorStore,
 	useBlockEditingMode,
 	privateApis as blockEditorPrivateApis,

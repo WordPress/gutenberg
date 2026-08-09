@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import {
 	useInnerBlocksProps,
 	useBlockProps,
-	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	getDimensionsClassesAndStyles,
 } from '@wordpress/block-editor';
 import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
