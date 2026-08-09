@@ -3,6 +3,7 @@ import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
 const DEFAULT_STATE_VALUE = 'default';
+const VIEWPORT_STYLE_STATES = [ '@tablet', '@mobile' ];
 
 export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: DEFAULT_STATE_VALUE,
@@ -77,6 +78,27 @@ export function getStyleForState( style, selectedState ) {
 		return style;
 	}
 	return getValueFromObjectPath( style, path );
+}
+
+/**
+ * Returns the viewport style states that contain block-level style overrides.
+ *
+ * @param {Object} style Block style attribute.
+ * @return {string[]} Populated viewport style state names.
+ */
+export function getPopulatedViewportStyleStates( style ) {
+	return VIEWPORT_STYLE_STATES.filter( ( viewport ) => {
+		const viewportStyle = style?.[ viewport ];
+		if (
+			! viewportStyle ||
+			typeof viewportStyle !== 'object' ||
+			Array.isArray( viewportStyle )
+		) {
+			return false;
+		}
+
+		return cleanEmptyObject( viewportStyle ) !== undefined;
+	} );
 }
 
 export function setStyleForState( style, selectedState, newStyle ) {
