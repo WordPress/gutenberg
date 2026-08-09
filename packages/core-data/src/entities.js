@@ -3,7 +3,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
@@ -278,14 +277,12 @@ export const additionalEntityConfigLoaders = [
  *
  * @param {Object}  persistedRecord Already persisted Post
  * @param {Object}  edits           Edits.
- * @param {string}  name            Post type name.
  * @param {boolean} isTemplate      Whether the post type is a template.
  * @return {Promise< Object >} Updated edits.
  */
 export const prePersistPostType = async (
 	persistedRecord,
 	edits,
-	name,
 	isTemplate
 ) => {
 	const newEdits = {};
@@ -304,26 +301,6 @@ export const prePersistPostType = async (
 				persistedRecord?.title === 'Auto Draft' )
 		) {
 			newEdits.title = '';
-		}
-	}
-
-	// Add meta for the persisted CRDT document during real post saves so the
-	// saved post and CRDT snapshot are committed in the same request. We don't
-	// want a post save to fail but a CRDT update to succeed or vice versa.
-	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( persistedRecord ) {
-		const objectType = `postType/${ name }`;
-		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
-			objectType,
-			objectId
-		);
-
-		if ( serializedDoc ) {
-			newEdits.meta = {
-				...edits.meta,
-				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
-			};
 		}
 	}
 
@@ -391,7 +368,7 @@ async function loadPostTypeEntities() {
 					? capitalCase( record.slug ?? '' )
 					: String( record.id ) ),
 			__unstablePrePersist: ( persistedRecord, edits ) =>
-				prePersistPostType( persistedRecord, edits, name, isTemplate ),
+				prePersistPostType( persistedRecord, edits, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>

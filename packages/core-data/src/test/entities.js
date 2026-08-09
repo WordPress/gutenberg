@@ -14,11 +14,7 @@ import {
 	prePersistPostType,
 	additionalEntityConfigLoaders,
 } from '../entities';
-import { getSyncManager } from '../sync';
-import {
-	applyPostChangesToCRDTDoc,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../utils/crdt';
+import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
@@ -55,9 +51,7 @@ describe( 'prePersistPostType', () => {
 			status: 'auto-draft',
 		};
 		const edits = {};
-		expect(
-			await prePersistPostType( record, edits, 'post', false )
-		).toEqual( {
+		expect( await prePersistPostType( record, edits, false ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -65,17 +59,15 @@ describe( 'prePersistPostType', () => {
 		record = {
 			status: 'publish',
 		};
-		expect(
-			await prePersistPostType( record, edits, 'post', false )
-		).toEqual( {} );
+		expect( await prePersistPostType( record, edits, false ) ).toEqual(
+			{}
+		);
 
 		record = {
 			status: 'auto-draft',
 			title: 'Auto Draft',
 		};
-		expect(
-			await prePersistPostType( record, edits, 'post', false )
-		).toEqual( {
+		expect( await prePersistPostType( record, edits, false ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -84,9 +76,9 @@ describe( 'prePersistPostType', () => {
 			status: 'publish',
 			title: 'My Title',
 		};
-		expect(
-			await prePersistPostType( record, edits, 'post', false )
-		).toEqual( {} );
+		expect( await prePersistPostType( record, edits, false ) ).toEqual(
+			{}
+		);
 	} );
 
 	it( 'does not set the status to draft and empty the title when saving templates', async () => {
@@ -95,34 +87,7 @@ describe( 'prePersistPostType', () => {
 			title: 'Auto Draft',
 		};
 		const edits = {};
-		expect(
-			await prePersistPostType( record, edits, 'post', true )
-		).toEqual( {} );
-	} );
-
-	it( 'adds meta with serialized CRDT doc when createPersistedCRDTDoc returns a value', async () => {
-		const mockSerializedDoc = 'serialized-crdt-doc-data';
-		getSyncManager.mockReturnValue( {
-			createPersistedCRDTDoc: jest
-				.fn()
-				.mockReturnValue( mockSerializedDoc ),
-		} );
-
-		const record = { id: 123, status: 'publish' };
-		const edits = {};
-		const result = await prePersistPostType( record, edits, 'post', false );
-
-		expect( result.meta ).toEqual( {
-			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: mockSerializedDoc,
-		} );
-
-		expect( getSyncManager ).toHaveBeenCalled();
-		expect( getSyncManager().createPersistedCRDTDoc ).toHaveBeenCalledWith(
-			'postType/post',
-			123
-		);
-
-		getSyncManager.mockReset();
+		expect( await prePersistPostType( record, edits, true ) ).toEqual( {} );
 	} );
 } );
 

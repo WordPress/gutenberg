@@ -1,10 +1,18 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
+import { prePersistPostType } from '../entities';
+import { getSyncManager } from '../sync';
+import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from '../utils/crdt';
 
 jest.mock( '@wordpress/api-fetch' );
 
-function createTestRegistry() {
+jest.mock( '../sync', () => ( {
+	...jest.requireActual( '../sync' ),
+	getSyncManager: jest.fn(),
+} ) );
+
+function createTestRegistry( entityConfigOverrides = {} ) {
 	const registry = createRegistry();
 
 	// Register the core-data store
@@ -33,6 +41,7 @@ function createTestRegistry() {
 			`/wp/v2/posts/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
 			}`,
+		...entityConfigOverrides,
 	};
 
 	// Add the post entity to the store
@@ -253,6 +262,76 @@ describe( 'clearEntityRecordEdits', () => {
 		expect(
 			select.getEditedEntityRecord( 'postType', 'post', post.id )
 		).toEqual( select.getRawEntityRecord( 'postType', 'post', post.id ) );
+	} );
+} );
+
+describe( 'saveEditedEntityRecord with a persisted CRDT document', () => {
+	let registry;
+
+	beforeEach( () => {
+		// Mirror the real post type entity, which persists its CRDT document
+		// into post meta on every save.
+		registry = createTestRegistry( {
+			syncConfig: { supportsPersistence: true },
+			__unstablePrePersist: ( persistedRecord, edits ) =>
+				prePersistPostType( persistedRecord, edits, false ),
+		} );
+		triggerFetch.mockReset();
+		getSyncManager.mockReturnValue( {
+			update: jest.fn(),
+			createPersistedCRDTDoc: jest.fn( async () => 'fresh-doc' ),
+		} );
+	} );
+
+	afterEach( () => {
+		getSyncManager.mockReset();
+	} );
+
+	it( 'clears the meta edits once the save succeeds', async () => {
+		// Regression test for https://github.com/WordPress/gutenberg/issues/77610.
+		// Each save writes a new CRDT snapshot, so the snapshot the store holds
+		// is always one save behind. If that mismatch is allowed to count as an
+		// unsaved change, no amount of saving ever clears it.
+		const post = {
+			...createTestPost( 1 ),
+			meta: {
+				footnotes: '[]',
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'stale-doc',
+			},
+		};
+		const footnotes = '[{"id":"a-footnote","content":"A footnote"}]';
+		const dispatch = registry.dispatch( coreDataStore );
+		const select = registry.select( coreDataStore );
+
+		dispatch.receiveEntityRecords( 'postType', 'post', post );
+		await dispatch.editEntityRecord( 'postType', 'post', post.id, {
+			meta: { footnotes },
+		} );
+
+		expect(
+			select.hasEditsForEntityRecord( 'postType', 'post', post.id )
+		).toBe( true );
+
+		// The save response carries the snapshot the request just wrote.
+		triggerFetch.mockResolvedValue( {
+			...post,
+			meta: {
+				footnotes,
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
+			},
+		} );
+
+		await dispatch.saveEditedEntityRecord( 'postType', 'post', post.id );
+
+		expect(
+			select.hasEditsForEntityRecord( 'postType', 'post', post.id )
+		).toBe( false );
+		expect(
+			select.getEditedEntityRecord( 'postType', 'post', post.id ).meta
+		).toEqual( {
+			footnotes,
+			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
+		} );
 	} );
 } );
 

@@ -857,10 +857,46 @@ export const saveEntityRecord =
 							) ),
 						};
 					}
+
+					// Commit the persisted CRDT document in the same request as
+					// the record, so a post save cannot succeed while its CRDT
+					// update fails, or vice versa. (CRDT repair goes through
+					// /wp-sync/v1/save instead, to avoid post-save side effects.)
+					//
+					// Like the autosave snapshot above, this belongs to the
+					// request payload only. `edits` is replayed below as
+					// `persistedEdits`, which the reducer compares against the
+					// edits held in the store to decide whether the save cleared
+					// them. A value the store never staged can never match, so
+					// the record would stay dirty after every successful save.
+					let data = edits;
+					if (
+						entityConfig.syncConfig?.supportsPersistence &&
+						! isNewRecord &&
+						persistedRecord
+					) {
+						const serializedDoc =
+							await getSyncManager()?.createPersistedCRDTDoc(
+								`${ kind }/${ name }`,
+								recordId
+							);
+
+						if ( serializedDoc ) {
+							data = {
+								...data,
+								meta: {
+									...data.meta,
+									[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
+										serializedDoc,
+								},
+							};
+						}
+					}
+
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
-						data: edits,
+						data,
 					} );
 					dispatch.receiveEntityRecords(
 						kind,

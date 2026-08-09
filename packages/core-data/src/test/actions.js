@@ -12,6 +12,7 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getSyncManager } from '../sync';
+import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from '../utils/crdt';
 
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
@@ -1247,6 +1248,178 @@ describe( 'saveEntityRecord', () => {
 		);
 		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
 		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'sends the persisted CRDT document with the save without staging it as an edit', async () => {
+		// The snapshot is request payload, not something the user edited.
+		// Replaying it as `persistedEdits` leaves the record permanently dirty:
+		// the reducer compares the staged edits against it to decide whether the
+		// save cleared them, and a value the store never staged never matches.
+		// See https://github.com/WordPress/gutenberg/issues/77610.
+		const persistedRecord = {
+			id: 10,
+			meta: {
+				my_meta: 'persisted',
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'stale-doc',
+			},
+		};
+		// `meta` is a merged edit, so the staged value carries every meta key,
+		// including the snapshot written by the previous save.
+		const edits = {
+			id: 10,
+			meta: {
+				my_meta: 'edited',
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'stale-doc',
+			},
+		};
+		const syncManager = {
+			update: jest.fn(),
+			createPersistedCRDTDoc: jest.fn( async () => 'fresh-doc' ),
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				mergedEdits: { meta: true },
+				syncConfig: { supportsPersistence: true },
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			id: 10,
+			meta: {
+				my_meta: 'edited',
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
+			},
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( {
+			select,
+			dispatch,
+			resolveSelect,
+		} );
+
+		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledWith(
+			'postType/post',
+			10
+		);
+
+		// The request carries the fresh snapshot...
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: {
+				id: 10,
+				meta: {
+					my_meta: 'edited',
+					[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
+				},
+			},
+		} );
+
+		// ...while the edits replayed to the reducer stay exactly what the
+		// store staged, so the successful save clears them.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			edits
+		);
+	} );
+
+	it( 'does not send a persisted CRDT document for entities that do not persist one', async () => {
+		const persistedRecord = { id: 10, meta: { my_meta: 'persisted' } };
+		const edits = { id: 10, meta: { my_meta: 'edited' } };
+		const syncManager = {
+			update: jest.fn(),
+			createPersistedCRDTDoc: jest.fn( async () => 'fresh-doc' ),
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		apiFetch.mockImplementation( () => ( {
+			...persistedRecord,
+			...edits,
+		} ) );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( {
+			select,
+			dispatch,
+			resolveSelect,
+		} );
+
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: edits,
+		} );
+	} );
+
+	it( 'does not send a persisted CRDT document when creating a record', async () => {
+		// There is no CRDT document for a record the server has not seen yet.
+		const post = { title: 'new post', meta: { my_meta: 'edited' } };
+		const syncManager = {
+			update: jest.fn(),
+			createPersistedCRDTDoc: jest.fn( async () => 'fresh-doc' ),
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: { supportsPersistence: true },
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		apiFetch.mockImplementation( () => ( { ...post, id: 10 } ) );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( {
+			select,
+			dispatch,
+			resolveSelect,
+		} );
+
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts',
+			method: 'POST',
+			data: post,
+		} );
 	} );
 
 	it( 'does not mark pre-synced direct save changes as saved when the request fails', async () => {
