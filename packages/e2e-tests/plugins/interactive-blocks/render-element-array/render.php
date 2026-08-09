@@ -1,7 +1,7 @@
 <?php
 /**
- * Block for testing `renderElement()` re-called with overlapping element
- * sets — a subset or a superset of a previous call.
+ * Block for testing overlapping `renderHTML()` re-renders — a subset or a
+ * superset of a previous call, across sibling containers.
  *
  * @package gutenberg-test-interactive-blocks
  *
@@ -22,7 +22,7 @@
 		data-wp-on--click="actions.shrink"
 		data-testid="shrink"
 	>
-		Shrink to one
+		Re-render slot A
 	</button>
 	<button
 		data-wp-on--click="actions.loadOne"
@@ -36,5 +36,8 @@
 	>
 		Grow to two
 	</button>
-	<div data-testid="array-target"></div>
+	<div data-testid="array-target">
+		<div data-testid="slot-a"></div>
+		<div data-testid="slot-b"></div>
+	</div>
 </div>

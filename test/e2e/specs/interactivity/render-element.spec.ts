@@ -132,7 +132,9 @@ test.describe( 'renderElement', () => {
 		await expect( page.getByTestId( 'listener' ) ).toHaveCount( 0 );
 
 		// Dispatching resize must NOT fire the removed node's listener.
-		await page.evaluate( () => window.dispatchEvent( new Event( 'resize' ) ) );
+		await page.evaluate( () =>
+			window.dispatchEvent( new Event( 'resize' ) )
+		);
 		await expect( page.getByTestId( 'resize-count' ) ).toHaveText( '0' );
 	} );
 
@@ -147,7 +149,7 @@ test.describe( 'renderElement', () => {
 
 		// Insert a window-listener node into the region's content as a
 		// SEPARATE renderHTML fragment — the scenario where navigating away
-		// must clean up that node's own per-node fragment.
+		// must clean up that node's listeners.
 		await page.getByTestId( 'load-listener-region' ).click();
 		await expect( page.getByTestId( 'listener' ) ).toHaveCount( 1 );
 		await expect( page.getByTestId( 'resize-count' ) ).toHaveText( '0' );
@@ -161,12 +163,93 @@ test.describe( 'renderElement', () => {
 		);
 		await expect( page.getByTestId( 'listener' ) ).toHaveCount( 0 );
 
-		await page.evaluate( () => window.dispatchEvent( new Event( 'resize' ) ) );
+		await page.evaluate( () =>
+			window.dispatchEvent( new Event( 'resize' ) )
+		);
 		await expect( page.getByTestId( 'resize-count' ) ).toHaveText( '0' );
+	} );
+
+	test( 'prepends new content before the existing children', async ( {
+		page,
+	} ) => {
+		// Load one fragment (appended), then prepend another: the new
+		// content must land BEFORE the existing children.
+		await page.getByTestId( 'load' ).click();
+		await expect( page.getByTestId( 'counter' ) ).toBeVisible();
+
+		await page.getByTestId( 'load-prepend' ).click();
+		await expect( page.getByTestId( 'mixed-span' ) ).toBeVisible();
+
+		const firstChild = page
+			.getByTestId( 'target' )
+			.locator( ':scope > *' )
+			.first();
+		await expect( firstChild ).toHaveAttribute(
+			'data-testid',
+			'mixed-span'
+		);
+	} );
+
+	test( 'inserts content before the container', async ( { page } ) => {
+		await page.getByTestId( 'load-before' ).click();
+		await expect( page.getByTestId( 'mixed-span' ) ).toBeVisible();
+
+		// The new content is a sibling immediately before the target.
+		const isBefore = await page
+			.getByTestId( 'mixed-span' )
+			.evaluate(
+				( el ) =>
+					el.nextElementSibling?.getAttribute( 'data-testid' ) ===
+					'target'
+			);
+		expect( isBefore ).toBe( true );
+	} );
+
+	test( 'inserts content after the container', async ( { page } ) => {
+		await page.getByTestId( 'load-after' ).click();
+		await expect( page.getByTestId( 'mixed-span' ) ).toBeVisible();
+
+		// The new content is a sibling immediately after the target.
+		const isAfter = await page
+			.getByTestId( 'mixed-span' )
+			.evaluate(
+				( el ) =>
+					el.previousElementSibling?.getAttribute( 'data-testid' ) ===
+					'target'
+			);
+		expect( isAfter ).toBe( true );
+	} );
+
+	test( 'replaces the container itself with the new content', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'load-outer' ).click();
+		await expect( page.getByTestId( 'mixed-span' ) ).toBeVisible();
+		await expect( page.getByTestId( 'target' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'splicing into a container inside a nested island keeps a single tree', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'load-nested' ).click();
+		await expect( page.getByTestId( 'nested-island' ) ).toBeVisible();
+
+		// The nested island's SSR content initialized exactly once.
+		await expect( page.getByTestId( 'nested-count' ) ).toHaveText( '1' );
+
+		// Splicing into a container inside the nested island must NOT create
+		// a second tree (which would re-run the nested island's init).
+		await page.getByTestId( 'render-into-nested' ).click();
+		await expect( page.getByTestId( 'nested-btn' ) ).toBeVisible();
+		await expect( page.getByTestId( 'nested-count' ) ).toHaveText( '1' );
+
+		// The inserted button resolves the NESTED namespace's store.
+		await page.getByTestId( 'nested-btn' ).click();
+		await expect( page.getByTestId( 'nested-btn' ) ).toHaveText( '1' );
 	} );
 } );
 
-test.describe( 'renderElement overlapping re-renders', () => {
+test.describe( 'renderHTML overlapping re-renders', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/render-element-array', {
@@ -190,8 +273,8 @@ test.describe( 'renderElement overlapping re-renders', () => {
 		await expect( page.getByTestId( 'item-a' ) ).toBeVisible();
 		await expect( page.getByTestId( 'item-b' ) ).toBeVisible();
 
-		// Shrink to only [item-a]. The other sibling must stay in the DOM —
-		// only the passed element(s) are processed.
+		// Re-render only slot A with fresh markup. Slot B must stay in the
+		// DOM — a splice targets a single container.
 		await page.getByTestId( 'shrink' ).click();
 		await expect( page.getByTestId( 'item-b' ) ).toBeVisible();
 		await expect( page.getByTestId( 'item-b' ) ).toHaveText( '0' );
@@ -214,8 +297,9 @@ test.describe( 'renderElement overlapping re-renders', () => {
 		await expect( page.getByTestId( 'item-a' ) ).toBeVisible();
 		await expect( page.getByTestId( 'item-b' ) ).toHaveCount( 0 );
 
-		// Grow to [item-a, item-b]. The new element must be hydrated in
-		// place — exactly one instance, fully interactive.
+		// Grow to [item-a, item-b]: slot B gets its item. The new element
+		// must be hydrated in place — exactly one instance, fully
+		// interactive.
 		await page.getByTestId( 'grow' ).click();
 		await expect( page.getByTestId( 'item-b' ) ).toHaveCount( 1 );
 		await expect( page.getByTestId( 'item-b' ) ).toHaveText( '0' );

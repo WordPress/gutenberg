@@ -43,7 +43,7 @@ add_action(
 		/*
 		 * REST routes that return server-rendered fragments for the
 		 * `test/render-element` block to fetch and hydrate with
-		 * `renderElement()`.
+		 * `renderHTML()`.
 		 *
 		 * The base fragment is intentionally a PLAIN fragment — it has no
 		 * `data-wp-interactive` and no `data-wp-context`. It is inserted into
@@ -51,7 +51,7 @@ add_action(
 		 * namespace and live context.
 		 */
 		register_rest_route(
-			'test/render-element/v1',
+			'test/render-html/v1',
 			'/fragment',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -78,10 +78,10 @@ add_action(
 		 * to a page with the same region ID replaces its content. The empty
 		 * `content` div is where a test inserts a separate
 		 * `renderHTML`-rendered node (with a window listener) to verify that
-		 * navigating away cleans up that node's per-node fragment.
+		 * navigating away cleans up that node's listeners.
 		 */
 		register_rest_route(
-			'test/render-element/v1',
+			'test/render-html/v1',
 			'/fragment/region',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -103,7 +103,7 @@ add_action(
 		 * 'inner' })`) cleans up its window listener.
 		 */
 		register_rest_route(
-			'test/render-element/v1',
+			'test/render-html/v1',
 			'/fragment/listener',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -124,7 +124,7 @@ add_action(
 		 * `renderElement()`.
 		 */
 		register_rest_route(
-			'test/render-element/v1',
+			'test/render-html/v1',
 			'/fragment/island',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -144,7 +144,7 @@ add_action(
 		 * `renderHTML()` preserves text nodes instead of dropping them.
 		 */
 		register_rest_route(
-			'test/render-element/v1',
+			'test/render-html/v1',
 			'/fragment/mixed',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -152,6 +152,31 @@ add_action(
 				'callback'            => static function () {
 					return rest_ensure_response(
 						'<span data-testid="mixed-span">a</span> and text'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A NESTED ISLAND fragment — a `data-wp-interactive` element inside
+		 * the enclosing island. Used to test that splicing into a container
+		 * inside a nested island (a) does NOT create a second tree for it
+		 * (its `data-wp-init` must not re-run) and (b) resolves the nested
+		 * namespace for the spliced content.
+		 */
+		register_rest_route(
+			'test/render-html/v1',
+			'/fragment/nested',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					return rest_ensure_response(
+						'<div data-wp-interactive="test/render-element/nested" data-testid="nested-island">' .
+						'<span data-testid="nested-init" data-wp-init="callbacks.initOnce"></span>' .
+						'<div data-testid="nested-container"></div>' .
+						'<p data-testid="nested-count" data-wp-text="state.initCount">0</p>' .
+						'</div>'
 					);
 				},
 			)

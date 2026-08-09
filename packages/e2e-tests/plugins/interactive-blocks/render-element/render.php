@@ -1,6 +1,6 @@
 <?php
 /**
- * Block for testing the `renderElement()` API.
+ * Block for testing the `renderHTML()` API.
  *
  * @package e2e-interactivity
  *
@@ -14,14 +14,14 @@
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment' ) ); ?>"
 	>
 		Load fragment
 	</button>
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-region"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/region' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/region' ) ); ?>"
 	>
 		Load region fragment
 	</button>
@@ -29,37 +29,82 @@
 		data-wp-on--click="actions.loadFragment"
 		data-testid="reload"
 		data-position="inner"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment?v=2' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment?v=2' ) ); ?>"
 	>
 		Reload fragment
 	</button>
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-island"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/island' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/island' ) ); ?>"
 	>
 		Load island fragment
 	</button>
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-mixed"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/mixed' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
 	>
 		Load mixed fragment
 	</button>
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-listener"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/listener' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/listener' ) ); ?>"
 	>
 		Load listener fragment
 	</button>
 	<button
 		data-wp-on--click="actions.loadListenerIntoRegion"
 		data-testid="load-listener-region"
-		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-element/v1/fragment/listener' ) ); ?>"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/listener' ) ); ?>"
 	>
 		Load listener into region
+	</button>
+	<button
+		data-wp-on--click="actions.loadFragment"
+		data-testid="load-prepend"
+		data-position="prepend"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
+	>
+		Prepend mixed fragment
+	</button>
+	<button
+		data-wp-on--click="actions.loadFragment"
+		data-testid="load-before"
+		data-position="before"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
+	>
+		Insert mixed fragment before target
+	</button>
+	<button
+		data-wp-on--click="actions.loadFragment"
+		data-testid="load-after"
+		data-position="after"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
+	>
+		Insert mixed fragment after target
+	</button>
+	<button
+		data-wp-on--click="actions.loadFragment"
+		data-testid="load-outer"
+		data-position="outer"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
+	>
+		Replace target with mixed fragment
+	</button>
+	<button
+		data-wp-on--click="actions.loadFragment"
+		data-testid="load-nested"
+		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/nested' ) ); ?>"
+	>
+		Load nested island fragment
+	</button>
+	<button
+		data-wp-on--click="actions.renderIntoNested"
+		data-testid="render-into-nested"
+	>
+		Render into nested island container
 	</button>
 	<?php if ( ! empty( $attributes['next'] ) ) : ?>
 		<a
