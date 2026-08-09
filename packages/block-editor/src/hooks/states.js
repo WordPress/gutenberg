@@ -6,6 +6,7 @@ import StateControlBadges from '../components/global-styles/state-control-badges
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
 import { unlock } from '../lock-unlock';
+import { RESPONSIVE_STATE_LABELS } from './block-style-state';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
@@ -14,11 +15,6 @@ export const PSEUDO_STATE_LABELS = {
 	':focus': __( 'Focus' ),
 	':focus-visible': __( 'Focus-visible' ),
 	':active': __( 'Active' ),
-};
-
-export const RESPONSIVE_STATE_LABELS = {
-	'@tablet': __( 'Tablet' ),
-	'@mobile': __( 'Mobile' ),
 };
 
 // Viewport states are selected globally via the editor's device preview.

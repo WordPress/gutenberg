@@ -33,6 +33,7 @@ import { useBorderPanelLabel } from '../../hooks/border';
 import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
+import ResponsiveStylesInfo from './responsive-styles-info';
 import { unlock } from '../../lock-unlock';
 import {
 	BlockStyleStateProvider,
@@ -492,6 +493,7 @@ const BlockInspectorSingleBlock = ( {
 				</Spacer>
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
+			<ResponsiveStylesInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
 			{ ! isEditingStyleState && (
 				<BlockVariationTransforms

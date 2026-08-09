@@ -1,9 +1,15 @@
 import { createContext, useContext } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
 const DEFAULT_STATE_VALUE = 'default';
 const VIEWPORT_STYLE_STATES = [ '@tablet', '@mobile' ];
+
+export const RESPONSIVE_STATE_LABELS = {
+	'@tablet': __( 'Tablet' ),
+	'@mobile': __( 'Mobile' ),
+};
 
 export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: DEFAULT_STATE_VALUE,
@@ -99,6 +105,28 @@ export function getPopulatedViewportStyleStates( style ) {
 
 		return cleanEmptyObject( viewportStyle ) !== undefined;
 	} );
+}
+
+/**
+ * Returns a description of a block's responsive style overrides.
+ *
+ * @param {Object} style Block style attribute.
+ * @return {?string} Responsive style description, or null when none are set.
+ */
+export function getResponsiveStylesLabel( style ) {
+	const labels = getPopulatedViewportStyleStates( style ).map(
+		( viewport ) => RESPONSIVE_STATE_LABELS[ viewport ]
+	);
+
+	if ( ! labels.length ) {
+		return null;
+	}
+
+	return sprintf(
+		// translators: %s: comma-separated list of viewport names, for example "Tablet, Mobile".
+		__( 'Block has responsive styles for %s.' ),
+		labels.join( ', ' )
+	);
 }
 
 export function setStyleForState( style, selectedState, newStyle ) {

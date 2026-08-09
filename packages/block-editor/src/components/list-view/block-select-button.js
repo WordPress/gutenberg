@@ -3,13 +3,7 @@ import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	symbol,
-	unseen,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall, symbol } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { Stack, Tooltip } from '@wordpress/ui';
 import BlockIcon from '../block-icon';
@@ -34,7 +28,8 @@ function ListViewBlockSelectButton(
 		draggable,
 		isExpanded,
 		ariaDescribedBy,
-		visibilityLabel,
+		statusLabel,
+		statusIcon,
 		isDisabled = false,
 	},
 	ref
@@ -168,10 +163,10 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ !! visibilityLabel && (
+				{ !! statusLabel && (
 					// The tooltip below is a sighted-hover affordance for
-					// the (decorative) visibility icon. The same
-					// `visibilityLabel` is exposed to assistive technology
+					// the decorative status icon. The same status is exposed
+					// to assistive technology
 					// via the row's `aria-describedby`, which references the
 					// hidden `AriaReferencedText` rendered by the parent
 					// `ListViewBlock`.
@@ -179,14 +174,14 @@ function ListViewBlockSelectButton(
 						<Tooltip.Trigger
 							render={
 								<span
-									className="block-editor-list-view-block-select-button__block-visibility"
+									className="block-editor-list-view-block-select-button__status"
 									aria-hidden="true"
 								>
-									<Icon icon={ unseen } />
+									<Icon icon={ statusIcon } />
 								</span>
 							}
 						/>
-						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
+						<Tooltip.Popup>{ statusLabel }</Tooltip.Popup>
 					</Tooltip.Root>
 				) }
 				{ shouldShowLockIcon && (

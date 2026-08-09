@@ -1,5 +1,6 @@
 import {
 	getPopulatedViewportStyleStates,
+	getResponsiveStylesLabel,
 	getStyleForState,
 	scopeResetAllFilterToState,
 	setStyleForState,
@@ -56,6 +57,29 @@ describe( 'getPopulatedViewportStyleStates', () => {
 			'@tablet': { color: { text: undefined } },
 			'@mobile': { color: { text: '#ff0000' } },
 		} );
+	} );
+} );
+
+describe( 'getResponsiveStylesLabel', () => {
+	it( 'returns no description when a block has no responsive styles', () => {
+		expect( getResponsiveStylesLabel( {} ) ).toBeNull();
+	} );
+
+	it( 'describes a single responsive viewport', () => {
+		expect(
+			getResponsiveStylesLabel( {
+				'@mobile': { color: { text: '#ff0000' } },
+			} )
+		).toBe( 'Block has responsive styles for Mobile.' );
+	} );
+
+	it( 'describes all responsive viewports in display order', () => {
+		expect(
+			getResponsiveStylesLabel( {
+				'@mobile': { color: { text: '#ff0000' } },
+				'@tablet': { spacing: { padding: { top: '20px' } } },
+			} )
+		).toBe( 'Block has responsive styles for Tablet, Mobile.' );
 	} );
 } );
 
