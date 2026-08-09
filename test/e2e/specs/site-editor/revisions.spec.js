@@ -207,9 +207,10 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 		// races with it rendering.
 		await admin.visitSiteEditor( { postType: 'page' } );
 
-		// The marker only survives a client-side navigation.
+		// Add a flag to the document to assert that opening the revisions view
+		// happens without a browser reload, which would discard the flag.
 		await page.evaluate( () => {
-			window.__revisionsNavigationMarker = true;
+			window.__pageWasNotReloaded = true;
 		} );
 
 		await page
@@ -230,8 +231,8 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 		expect( new URL( page.url() ).searchParams.get( 'revision' ) ).toBe(
 			String( newestRevisionId )
 		);
-		expect(
-			await page.evaluate( () => window.__revisionsNavigationMarker )
-		).toBe( true );
+		expect( await page.evaluate( () => window.__pageWasNotReloaded ) ).toBe(
+			true
+		);
 	} );
 } );
