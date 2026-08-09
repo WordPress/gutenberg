@@ -3,9 +3,9 @@
  */
 
 /**
- * Router fragment probes (R2–R4) — renderElement/prune guards for navigation.
+ * Router fragment probes (R2–R4) — renderHTML/prune guards for navigation.
  *
- * These probes guard the fragment work's prune/renderElement interaction with
+ * These probes guard the fragment work's prune/renderHTML interaction with
  * router navigation. The attachTo-specific probes (R1, R5, R6) live in
  * `router-attachto.ts`, alongside the router fix they guard.
  *

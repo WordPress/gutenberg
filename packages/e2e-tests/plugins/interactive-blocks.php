@@ -42,7 +42,7 @@ add_action(
 	function () {
 		/*
 		 * REST routes that return server-rendered fragments for the
-		 * `test/render-element` block to fetch and hydrate with
+		 * `test/render-html` block to fetch and hydrate with
 		 * `renderHTML()`.
 		 *
 		 * The base fragment is intentionally a PLAIN fragment — it has no
@@ -88,7 +88,7 @@ add_action(
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
 					return rest_ensure_response(
-						'<div data-wp-interactive="test/render-element" data-wp-router-region="test/region">' .
+						'<div data-wp-interactive="test/render-html" data-wp-router-region="test/region">' .
 						'<p data-testid="region-fragment">fragment content</p>' .
 						'<div data-testid="region-content"></div>' .
 						'</div>'
@@ -121,7 +121,7 @@ add_action(
 		 * A SELF-CONTAINED island fragment — it carries its own
 		 * `data-wp-interactive` and `data-wp-context`, so it does not depend
 		 * on an enclosing island. This is the other supported shape for
-		 * `renderElement()`.
+		 * `renderHTML()`.
 		 */
 		register_rest_route(
 			'test/render-html/v1',
@@ -131,7 +131,7 @@ add_action(
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
 					return rest_ensure_response(
-						'<div data-wp-interactive="test/render-element" data-wp-context=\'{ "count": 0 }\'>' .
+						'<div data-wp-interactive="test/render-html" data-wp-context=\'{ "count": 0 }\'>' .
 						'<button data-testid="island-counter" data-wp-on--click="actions.increment" data-wp-text="context.count">0</button>' .
 						'</div>'
 					);
@@ -172,7 +172,7 @@ add_action(
 				'permission_callback' => '__return_true',
 				'callback'            => static function () {
 					return rest_ensure_response(
-						'<div data-wp-interactive="test/render-element/nested" data-testid="nested-island">' .
+						'<div data-wp-interactive="test/render-html/nested" data-testid="nested-island">' .
 						'<span data-testid="nested-init" data-wp-init="callbacks.initOnce"></span>' .
 						'<div data-testid="nested-container"></div>' .
 						'<p data-testid="nested-count" data-wp-text="state.initCount">0</p>' .
