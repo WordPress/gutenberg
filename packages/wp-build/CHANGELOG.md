@@ -6,8 +6,7 @@
 
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`
     into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
--   Render a no-JavaScript heading and notice from the generated page templates, so every page gets the fallback without duplicating it per page ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
--   Add the `no-js` body class and the `no-js`/`js` swap script from `admin-header.php` to the generated standalone page template, so `.hide-if-js` and `.hide-if-no-js` work on those pages ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
+-   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
 
 ### Bug Fixes
 
