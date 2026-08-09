@@ -57,7 +57,7 @@ const { state } = store( 'test/render-element', {
 		/*
 		 * Loads a window-listener node into a SPECIFIC container (the router
 		 * region's content), as a separate renderHTML fragment — the scenario
-		 * where a navigation must clean up the node's own per-node fragment.
+		 * where a navigation must clean up that node's listeners.
 		 */
 		*loadListenerIntoRegion() {
 			const { ref } = getElement();
@@ -71,6 +71,23 @@ const { state } = store( 'test/render-element', {
 			}
 			state.isHydrated = 'yes';
 		},
+		/*
+		 * Splices a counter button into a container INSIDE the nested island
+		 * (loaded via `load-nested`). Lives in the OUTER store because the
+		 * triggering button is part of the outer island's markup — but the
+		 * spliced content resolves the NESTED island's namespace/store.
+		 */
+		renderIntoNested() {
+			const content = document.querySelector(
+				'[data-testid="nested-container"]'
+			);
+			if ( content ) {
+				renderHTML(
+					content,
+					'<button data-testid="nested-btn" data-wp-on--click="actions.inc" data-wp-text="state.count">0</button>'
+				);
+			}
+		},
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
 			const { actions } = yield import(
@@ -78,5 +95,24 @@ const { state } = store( 'test/render-element', {
 			);
 			yield actions.navigate( event.target.href );
 		} ),
+	},
+} );
+
+/*
+ * The NESTED island's own store. The nested island fragment carries
+ * `data-wp-interactive="test/render-element/nested"`, so its directives
+ * (including content spliced into a container inside it) resolve here.
+ */
+const { state: nestedState } = store( 'test/render-element/nested', {
+	state: { count: 0, initCount: 0 },
+	callbacks: {
+		initOnce() {
+			nestedState.initCount += 1;
+		},
+	},
+	actions: {
+		inc() {
+			nestedState.count += 1;
+		},
 	},
 } );
