@@ -8,6 +8,8 @@ Blocks that have child blocks (such as group or column blocks) are presented wit
 
 In addition to presenting the structure of the blocks in the editor, the ListView component lets users navigate to each block by clicking on its line in the hierarchy tree. Multiple blocks at the same level of nesting can be selected by holding down the `SHIFT` key and clicking blocks within the list.
 
+Block rows use a single status affordance for block-level conditions such as visibility and responsive style overrides. Its tooltip describes every applicable status, and the same description is available to assistive technology through the row.
+
 ![List view](https://make.wordpress.org/core/files/2020/08/block-navigation.png)
 ![View of a group list view](https://make.wordpress.org/core/files/2020/08/view-of-group-block-navigation.png)
 
