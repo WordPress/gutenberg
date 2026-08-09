@@ -21,6 +21,7 @@ import { unlock } from '../../lock-unlock';
 import {
 	useEditPostAction,
 	useSetActiveTemplateAction,
+	useSiteEditorPostActions,
 } from '../dataviews-actions';
 import {
 	authorField,
@@ -36,8 +37,7 @@ import {
 	getActiveViewOverridesForTab,
 } from './view-utils';
 
-const { usePostActions, usePostFields, templateTitleField } =
-	unlock( editorPrivateApis );
+const { usePostFields, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -287,7 +287,7 @@ export default function PageTemplates() {
 		},
 		[ history, createSuccessNotice ]
 	);
-	const postTypeActions = usePostActions( {
+	const postTypeActions = useSiteEditorPostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 		onActionPerformed,
