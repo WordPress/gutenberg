@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
+import { sanitizeBlockAttributes } from '@wordpress/blocks';
 
 export function rendererPath(
 	block: string,
@@ -133,8 +129,7 @@ export function useServerSideRender(
 	} = args;
 
 	let sanitizedAttributes: Record< string, unknown > | null =
-		attributes &&
-		__experimentalSanitizeBlockAttributes( block, attributes );
+		attributes && sanitizeBlockAttributes( block, attributes );
 
 	if ( skipBlockSupportAttributes && sanitizedAttributes ) {
 		sanitizedAttributes =

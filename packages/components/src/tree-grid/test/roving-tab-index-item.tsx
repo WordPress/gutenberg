@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndex from '../roving-tab-index';
 import RovingTabIndexItem from '../roving-tab-index-item';
 
@@ -26,6 +15,7 @@ describe( 'RovingTabIndexItem', () => {
 		expect( () =>
 			render( <RovingTabIndexItem as={ TestButton } /> )
 		).toThrow();
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {

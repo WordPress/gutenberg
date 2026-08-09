@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	blockTable,
@@ -9,16 +6,13 @@ import {
 	formatListBulletsRTL,
 	scheduled,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';
 import ViewActivity from './activity';
 import ViewPickerGrid from './picker-grid';
 import ViewPickerTable from './picker-table';
+import ViewPickerActivity from './picker-activity';
 import {
 	LAYOUT_GRID,
 	LAYOUT_LIST,
@@ -26,6 +20,7 @@ import {
 	LAYOUT_ACTIVITY,
 	LAYOUT_PICKER_GRID,
 	LAYOUT_PICKER_TABLE,
+	LAYOUT_PICKER_ACTIVITY,
 } from '../../constants';
 import DensityPicker from './utils/density-picker';
 import GridConfigOptions from './utils/grid-config-options';
@@ -72,6 +67,14 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Table' ),
 		component: ViewPickerTable,
 		icon: blockTable,
+		viewConfigOptions: DensityPicker,
+		isPicker: true,
+	},
+	{
+		type: LAYOUT_PICKER_ACTIVITY,
+		label: __( 'Activity' ),
+		component: ViewPickerActivity,
+		icon: scheduled,
 		viewConfigOptions: DensityPicker,
 		isPicker: true,
 	},

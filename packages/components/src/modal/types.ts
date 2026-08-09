@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
 
 export type ModalProps = {

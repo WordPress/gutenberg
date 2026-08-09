@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
 	justifyLeft,

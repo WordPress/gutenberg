@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import TextControl from '../../text-control';
@@ -17,11 +10,7 @@ const UnforwardedValidatedTextControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof TextControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof TextControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -34,11 +23,7 @@ const UnforwardedValidatedTextControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<TextControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<TextControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };

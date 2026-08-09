@@ -14,6 +14,7 @@ import { useContext, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { replacePatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import BlockContext from '../../components/block-context';
 import BlockIcon from '../../components/block-icon';
 import useBlockDisplayTitle from '../../components/block-title/use-block-display-title';
@@ -22,7 +23,6 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
-
 // controls
 import RichText from './rich-text';
 import Media from './media';
@@ -80,15 +80,39 @@ function BlockFields( {
 				return _attributes;
 			}
 
+			/*
+			 * The pattern overrides `__default` binding is a placeholder, not
+			 * a real attribute: expand it to the block's bindable attributes
+			 * before resolving values, as other bindings consumers do.
+			 */
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[
+					blockType?.name
+				];
+			const bindings = bindableAttributes
+				? replacePatternOverridesDefaultBinding(
+						_attributes.metadata.bindings,
+						bindableAttributes
+				  )
+				: _attributes.metadata.bindings;
+
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			return Object.entries( _attributes.metadata.bindings ).reduce(
+			return Object.entries( bindings ).reduce(
 				( acc, [ attribute, binding ] ) => {
+					// Skip a `__default` binding that could not be expanded:
+					// it is not a real block attribute.
+					if ( attribute === '__default' ) {
+						return acc;
+					}
 					const source = getBlockBindingsSource( binding.source );
 					if ( ! source ) {
 						return acc;
 					}
 					const values = source.getValues( {
 						select,
+						clientId,
 						context: blockContext,
 						bindings: { [ attribute ]: binding },
 					} );
@@ -97,7 +121,7 @@ function BlockFields( {
 				_attributes
 			);
 		},
-		[ blockContext, clientId ]
+		[ blockContext, clientId, blockType?.name ]
 	);
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );

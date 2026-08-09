@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
@@ -34,10 +27,6 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import MediaContainer from './media-container';
 import {
 	DEFAULT_MEDIA_SIZE_SLUG,
@@ -45,7 +34,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -388,7 +376,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
@@ -521,7 +508,7 @@ function MediaTextEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE, allowedBlocks }
+		{ allowedBlocks }
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -535,6 +522,7 @@ function MediaTextEdit( {
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
 							value={ verticalAlignment }
+							label={ __( 'Align media and text vertically' ) }
 						/>
 						<ToolbarButton
 							icon={ pullLeft }

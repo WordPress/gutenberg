@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	SelectControl,
@@ -12,10 +9,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -116,7 +109,6 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Group by' ) }
 							options={ [
 								{ label: __( 'Year' ), value: 'yearly' },

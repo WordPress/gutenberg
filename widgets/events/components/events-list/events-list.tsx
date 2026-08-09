@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { dateI18n, format } from '@wordpress/date';
 import {
@@ -11,10 +8,6 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { calendar, people, wordpress } from '@wordpress/icons';
 import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './events-list.module.css';
 
 export interface WPEvent {
@@ -233,10 +226,12 @@ function EventMeta( { item }: { item: EventListItem } ) {
 export function EventsList( {
 	events,
 	showEmptyState,
+	location,
 	isLoading = false,
 }: {
 	events: WPEvent[];
 	showEmptyState: boolean;
+	location?: string;
 	isLoading?: boolean;
 } ) {
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
@@ -273,14 +268,20 @@ export function EventsList( {
 	const organizeUrl = __(
 		'https://make.wordpress.org/community/organize-event-landing-page/'
 	);
+	const locationLabel = location?.trim();
+	const emptyTitle = () => {
+		if ( locationLabel ) {
+			/* translators: %s: selected location label. */
+			return sprintf( __( 'No events near %s' ), locationLabel );
+		}
+		return __( 'No events near you' );
+	};
 
 	const empty = showEmptyState ? (
 		<Stack align="center" justify="center" className={ styles.emptyState }>
 			<EmptyState.Root>
 				<EmptyState.Icon icon={ calendar } />
-				<EmptyState.Title>
-					{ __( 'No events near you' ) }
-				</EmptyState.Title>
+				<EmptyState.Title>{ emptyTitle() }</EmptyState.Title>
 				<EmptyState.Description>
 					{ createInterpolateElement(
 						__( '<a>Help organize the next one!</a>' ),
@@ -294,20 +295,37 @@ export function EventsList( {
 	) : undefined;
 
 	return (
-		<div className={ styles.root }>
-			<DataViews
-				data={ items }
-				fields={ fields }
-				view={ view }
-				onChangeView={ setView }
-				getItemId={ ( item ) => item.id }
-				isLoading={ isLoading }
-				paginationInfo={ { totalItems: items.length, totalPages: 1 } }
-				defaultLayouts={ DEFAULT_LAYOUTS }
-				empty={ empty }
-			>
-				<DataViews.Layout />
-			</DataViews>
-		</div>
+		<Stack className={ styles.root } direction="column">
+			<Stack className={ styles.listArea } direction="column">
+				<DataViews
+					data={ items }
+					fields={ fields }
+					view={ view }
+					onChangeView={ setView }
+					getItemId={ ( item ) => item.id }
+					isLoading={ isLoading }
+					paginationInfo={ {
+						totalItems: items.length,
+						totalPages: 1,
+					} }
+					defaultLayouts={ DEFAULT_LAYOUTS }
+					empty={ empty }
+				>
+					<DataViews.Layout />
+				</DataViews>
+			</Stack>
+			{ events.length > 0 && events.length <= 2 && (
+				<Text variant="body-sm" className={ styles.eventNone }>
+					{ createInterpolateElement(
+						__(
+							'Want more events? <a>Help organize the next one!</a>'
+						),
+						{
+							a: <Link href={ organizeUrl } openInNewTab />,
+						}
+					) }
+				</Text>
+			) }
+		</Stack>
 	);
 }

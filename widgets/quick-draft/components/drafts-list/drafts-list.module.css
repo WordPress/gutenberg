@@ -31,8 +31,8 @@
 	width: 100%;
 	height: 100%;
 	border-radius: var(--wpds-border-radius-md);
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 /* Title link on the left, delete control pushed to the right of the cell. */
@@ -49,5 +49,5 @@
 }
 
 .date {
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }

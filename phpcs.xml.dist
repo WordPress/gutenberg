@@ -50,7 +50,6 @@
 	<file>./lib</file>
 	<file>./packages</file>
 	<file>./phpunit</file>
-	<file>./post-content.php</file>
 	<file>./test</file>
 
 	<!-- Exclude generated files -->

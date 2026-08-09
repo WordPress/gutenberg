@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import commentRemover from '../comment-remover';
 import { deepFilterHTML } from '../utils';
 

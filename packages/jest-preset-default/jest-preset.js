@@ -1,21 +1,11 @@
 module.exports = {
 	moduleNameMapper: {
-		'\\.(scss|css)$': require.resolve(
-			'@wordpress/jest-preset-default/scripts/style-mock.js'
-		),
-		// See https://github.com/facebook/jest/issues/11100#issuecomment-967161978
-		'@eslint/eslintrc': '@eslint/eslintrc/dist/eslintrc-universal.cjs',
+		'\\.(scss|css)$': require.resolve( './scripts/style-mock.js' ),
 	},
 	modulePaths: [ '<rootDir>' ],
-	setupFiles: [
-		require.resolve(
-			'@wordpress/jest-preset-default/scripts/setup-globals.js'
-		),
-	],
+	setupFiles: [ require.resolve( './scripts/setup-globals.js' ) ],
 	setupFilesAfterEnv: [
-		require.resolve(
-			'@wordpress/jest-preset-default/scripts/setup-test-framework.js'
-		),
+		require.resolve( './scripts/setup-test-framework.js' ),
 	],
 	testEnvironment: 'jsdom',
 	testMatch: [

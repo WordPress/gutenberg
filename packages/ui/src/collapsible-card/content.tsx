@@ -25,7 +25,7 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 						styles.content,
 						state.open &&
 							state.transitionStatus === 'idle' &&
-							styles.overflowVisible,
+							styles[ 'overflow-visible' ],
 						className
 					)
 				}

@@ -1,8 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { _x, sprintf } from '@wordpress/i18n';
@@ -10,14 +6,8 @@ import {
 	areGlobalStylesEqual,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from '../context';
-
 import { filterObjectByProperties } from '../utils';
 
 interface VariationProps {

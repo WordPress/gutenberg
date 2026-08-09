@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
@@ -17,9 +10,10 @@ export interface MediaEditorFineRotationProps {
 }
 
 /**
- * Fine-rotation slider for the media-editor footer. Lives separately from
- * the snap-rotate / flip buttons so the footer can place the two halves on
- * different rows at intermediate viewport widths.
+ * Fine-rotation slider for the media editor. It renders under the canvas so it
+ * stays constrained to the canvas column at all viewport sizes. Lives
+ * separately from the snap-rotate / flip buttons so the two can be placed
+ * independently per viewport.
  *
  * @param props
  * @param props.onPlacementControlInteraction

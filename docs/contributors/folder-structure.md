@@ -10,9 +10,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── .editorconfig
     ├── eslint.config.cjs
-    ├── eslint.config.strict.cjs
     ├── .jshintignore
-    ├── .prettierrc.js
+    ├── prettier.config.mjs
     ├── .stylelintignore
     ├── .stylelintrc.js
     ├── .markdownlintignore
@@ -53,9 +52,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── gutenberg.php
     │   Entry point of the Gutenberg plugin.
     │
-    ├── post-content.php
-    │   Demo post content used on the Gutenberg plugin to showcase the editor.
-    │
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
@@ -70,12 +66,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── docs/*.md
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
-    │
-    ├── platform-docs
-    │   Documentation website targeted to non WordPress developers
-    │   using Gutenberg in their own applications.
-    │   Deployed on [https://wordpress.org/gutenberg-framework/](https://wordpress.org/gutenberg-framework/).
-    │
     │
     ├── lib
     │   PHP Source code of the Gutenberg plugin.

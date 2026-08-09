@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useInnerBlocksProps,
 	useBlockProps,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
 import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { customLink, formatCapitalize } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useCx } from '../../utils';
 import { Menu } from '..';
 import Icon from '../../icon';
@@ -33,6 +22,7 @@ const meta: Meta< typeof Menu > = {
 		Group: Menu.Group,
 		GroupLabel: Menu.GroupLabel,
 		Separator: Menu.Separator,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
 		RadioItem: Menu.RadioItem,
 		ItemLabel: Menu.ItemLabel,

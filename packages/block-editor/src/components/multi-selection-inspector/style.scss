@@ -5,7 +5,7 @@
 }
 
 .block-editor-multi-selection-inspector__card-title {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .block-editor-multi-selection-inspector__card .block-editor-block-icon {

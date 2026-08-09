@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
 import { useArgs } from 'storybook/preview-api';
-
-/**
- * WordPress dependencies
- */
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -17,10 +10,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
@@ -123,7 +112,6 @@ const LibraryExample = ( {
 			<VStack spacing={ 8 }>
 				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
 					<SearchControl
-						__next40pxDefaultSize
 						label="Icon name"
 						hideLabelFromVision={ false }
 						value={ filter }
@@ -138,7 +126,6 @@ const LibraryExample = ( {
 						onChange={ ( value: string | number | undefined ) =>
 							updateArgs( { size: value } )
 						}
-						__next40pxDefaultSize
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
 							<ToggleGroupControlOption

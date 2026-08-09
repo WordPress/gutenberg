@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { useRegistry } from '@wordpress/data';

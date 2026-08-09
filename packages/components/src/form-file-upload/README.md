@@ -11,7 +11,6 @@ import { FormFileUpload } from '@wordpress/components';
 
 const MyFormFileUpload = () => (
   <FormFileUpload
-    __next40pxDefaultSize
     accept="image/*"
     onChange={ ( event ) => console.log( event.currentTarget.files ) }
   >
@@ -21,14 +20,6 @@ const MyFormFileUpload = () => (
 ```
 
 ## Props
-
-### `__next40pxDefaultSize`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the larger default height that will become the default size in a future version.
 
 ### `accept`
 
@@ -65,7 +56,7 @@ Whether to allow multiple selection of files or not.
 
 ### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement> | undefined`
+ - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
  - Required: Yes
 
 Callback function passed directly to the `input` file element.
@@ -85,7 +76,6 @@ an empty string in the `onClick` function.
 
 ```jsx
 <FormFileUpload
-  __next40pxDefaultSize
   onClick={ ( event ) => ( event.target.value = '' ) }
   onChange={ onChange }
 >

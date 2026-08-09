@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { closeSmall, pencil } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -15,10 +12,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import {
 	defaultForm,
 	hasArchiveField,

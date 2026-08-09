@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import normalizeFields from '../field-types';
 import normalizeForm from '../components/dataform-layouts/normalize-form';
 import type {
@@ -392,8 +381,8 @@ function handleCustomValidationAsync< Item >(
 }
 
 type PromiseHandler< Item > = {
-	customCounterRef: React.RefObject< Record< string, number > >;
-	elementsCounterRef: React.RefObject< Record< string, number > >;
+	customCounterRef: React.MutableRefObject< Record< string, number > >;
+	elementsCounterRef: React.MutableRefObject< Record< string, number > >;
 	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >;
 	path: string[];
 	item: Item;

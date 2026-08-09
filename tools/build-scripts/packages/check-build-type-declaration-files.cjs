@@ -9,10 +9,6 @@
  *
  * @see https://github.com/WordPress/gutenberg/pull/49650 for more discussion.
  */
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { exec } = require( 'child_process' );
@@ -70,7 +66,7 @@ async function getDecFile( packagePath ) {
 async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
 		exec(
-			`npx tsgo --ignoreConfig --target esnext --moduleResolution bundler --noEmit --skipLibCheck "${ file }"`,
+			`npx tsc --ignoreConfig --target esnext --moduleResolution bundler --noEmit --skipLibCheck "${ file }"`,
 			( error, stdout, stderr ) => {
 				if ( error ) {
 					reject( { file, error, stderr, stdout } );

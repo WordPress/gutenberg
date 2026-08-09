@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
@@ -9,10 +6,6 @@ import {
 	useId,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ValidatedControlProps } from './components/types';
 import { ValidityIndicator } from './validity-indicator';
 
@@ -60,12 +53,7 @@ type ValidityTarget =
 	| HTMLSelectElement
 	| HTMLTextAreaElement;
 
-function UnforwardedControlWithError<
-	C extends React.ReactElement< {
-		label: React.ReactNode;
-		required: boolean;
-	} >,
->(
+function UnforwardedControlWithError< C extends React.ReactElement >(
 	{
 		required,
 		markWhenOptional,
@@ -128,6 +116,15 @@ function UnforwardedControlWithError<
 
 		const suppressNativePopover = ( event: Event ) => {
 			event.preventDefault();
+
+			// Only trusted `invalid` events (a form submission or a
+			// `reportValidity()` call) mirror the native focus behavior.
+			// Consumers may dispatch a synthetic `invalid` event to reveal
+			// this control's error message without disturbing the user's
+			// place in the form, so it must not move focus.
+			if ( ! event.isTrusted ) {
+				return;
+			}
 
 			const target = event.target as ValidityTarget;
 			const firstErrorInForm = Array.from(
@@ -315,7 +312,7 @@ function UnforwardedControlWithError<
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ visibleMessage }</div>
+			{ visibleMessage }
 		</div>
 	);
 }

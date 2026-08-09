@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -136,7 +133,6 @@ export default function IncludeControl( {
 
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			value={ value }
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }

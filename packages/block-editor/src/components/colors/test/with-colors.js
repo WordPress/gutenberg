@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
@@ -37,7 +30,7 @@ describe( 'createCustomColorsHOC', () => {
 				colors: undefined,
 				setBackgroundColor: expect.any( Function ),
 			} ),
-			undefined
+			expect.anything()
 		);
 	} );
 

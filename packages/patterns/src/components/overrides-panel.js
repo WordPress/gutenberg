@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -9,10 +6,6 @@ import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { isOverridableBlock } from '../api';
 import { unlock } from '../lock-unlock';
 
