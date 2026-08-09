@@ -1605,7 +1605,7 @@
 	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes-count.tsx": {
@@ -1614,11 +1614,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		}
-	},
-	"packages/global-styles-ui/src/font-sizes/rename-font-size-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
