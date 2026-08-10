@@ -4,20 +4,26 @@
  */
 
 /**
- * RED probes — a splice into a NAVIGATED router region does not persist.
+ * Router-region splice tests — the region signal must mirror the tree.
  *
  * The `router-region` directive renders `routerRegions.get( id ).value` as
  * the region's children. After a navigation the signal holds the region
  * vnode; a `renderHTML` splice rebuilds the TREE path (§3) — but the path
  * rebuild RE-CREATES the region's `Directives` wrapper, whose render re-runs
- * the `router-region` callback, which returns the STALE signal vnode (still
- * the pre-splice object). Preact diffs that stale vnode against the
- * just-spliced tree and REMOVES the new content — the splice is reverted
- * DURING the splice's own render. Net effect: `renderHTML` into a navigated
- * region is a silent no-op (no warn; the path was found).
+ * the `router-region` callback and re-reads the signal. Without a
+ * write-through, the signal still holds the PRE-splice vnode, so preact
+ * diffs it against the just-spliced tree and REMOVES the new content — the
+ * splice is reverted DURING the splice's own render (a silent no-op).
  *
- * These probes are RED on the current code. The fix (region signal
- * write-through from the spliced tree, plan §6) makes them green.
+ * The fix (`writeRegionSignal` in render.ts) writes the rebuilt region
+ * content into the signal before the render, so the signal mirrors the tree
+ * and every splice sticks.
+ *
+ * Signal states: `undefined` (SSR, directive keeps the tree's children),
+ * a vnode (navigated, directive renders it), `null` (hidden — a navigation
+ * removed the region; the directive renders nothing). Only navigated
+ * regions are written through; SSR needs no mirror and hidden regions must
+ * stay hidden.
  */
 
 import { h, type VNode } from 'preact';
@@ -27,7 +33,6 @@ import { h, type VNode } from 'preact';
  */
 import '../directives'; // Registers all the core directives.
 import { store } from '../store';
-import { getContext } from '../scopes';
 import { renderHTML } from '../render';
 import { hydrateRegions } from '../hydration';
 import { routerRegions } from '../directives/router-region';
@@ -35,11 +40,11 @@ import { Directives } from '../hooks';
 
 const NS = 'test/router-region-splice';
 
-store( NS, {
-	state: { active: true },
+const { state } = store( NS, {
+	state: { count: 0, active: true },
 	actions: {
-		bump() {
-			getContext< { n: number } >().n += 1;
+		inc() {
+			state.count += 1;
 		},
 	},
 } );
@@ -54,6 +59,7 @@ let originalIsGutenbergPlugin: boolean | undefined;
 
 beforeEach( () => {
 	document.body.innerHTML = '';
+	state.count = 0;
 	originalIsGutenbergPlugin = testGlobalThis.IS_GUTENBERG_PLUGIN;
 	testGlobalThis.IS_GUTENBERG_PLUGIN = false;
 } );
@@ -87,17 +93,19 @@ const navigateRegion = ( id: string, children: VNode[] ) => {
 
 const islandHtml = ( regionId: string ) => `
 	<div data-wp-interactive="${ NS }">
-		<div data-wp-context='{ "n": 1 }'>
-			<button data-testid="bump" data-wp-on--click="actions.bump">bump</button>
-			<div data-testid="region" data-wp-router-region="${ regionId }">
-				<p data-testid="ssr">ssr</p>
-			</div>
+		<div data-testid="region" data-wp-router-region="${ regionId }">
+			<p data-testid="ssr">ssr</p>
 		</div>
 	</div>
 `;
 
+// A spliced button with REAL directives: proves the splice persists AND the
+// spliced content is fully interactive (not just present in the DOM).
+const interactiveButton = ( id: string ) =>
+	`<button data-testid="${ id }" data-wp-on--click="actions.inc" data-wp-text="state.count">0</button>`;
+
 describe( 'renderHTML into a router region (after a navigation)', () => {
-	it( "RED: a splice into a navigated region does not persist (the stale signal reverts it in the splice's own render)", async () => {
+	it( 'a splice into a navigated region persists and its directives work', async () => {
 		document.body.innerHTML = islandHtml( 'test-r1' );
 		await hydrateRegions();
 		await flush();
@@ -114,16 +122,24 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 		) as HTMLElement;
 		expect( regionEl.querySelectorAll( 'p' ).length ).toBe( 2 );
 
-		// Splice a button into the region — it must persist. RED: the path
-		// rebuild re-creates the Directives wrapper, the router-region
-		// callback re-reads the stale signal vnode, and the button is
-		// removed before the splice's own render commits.
-		renderHTML( regionEl, '<button data-testid="x">x</button>' );
+		// Splice an INTERACTIVE button into the region. Without the
+		// write-through, the stale signal reverts it during the splice's own
+		// render (silent no-op).
+		renderHTML( regionEl, interactiveButton( 'x' ) );
 		await flush();
-		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		const x = regionEl.querySelector(
+			'[data-testid="x"]'
+		) as HTMLButtonElement;
+		expect( x ).not.toBeNull();
+
+		// The spliced button is fully interactive — clicking it must
+		// increment state and re-render its own data-wp-text.
+		x.click();
+		await flush();
+		expect( x ).toHaveTextContent( '1' );
 	} );
 
-	it( 'RED: a splice into a navigated region survives a later region re-render (context change)', async () => {
+	it( 'successive splices into a navigated region accumulate (the signal mirrors the cumulative tree)', async () => {
 		document.body.innerHTML = islandHtml( 'test-r1b' );
 		await hydrateRegions();
 		await flush();
@@ -138,24 +154,31 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 			'[data-testid="region"]'
 		) as HTMLElement;
 
-		// Splice a button into the region.
-		renderHTML( regionEl, '<button data-testid="x">x</button>' );
+		// Splice 1 appends button x. The write-through stores the rebuilt
+		// region content (with x) into the signal.
+		renderHTML( regionEl, interactiveButton( 'x' ) );
 		await flush();
 
-		// The region's Directives wrapper re-renders because the context
-		// above it changed — the splice must survive. RED: it is already
-		// gone (reverted by the stale signal during the splice).
-		(
-			document.querySelector(
-				'[data-testid="bump"]'
-			) as HTMLButtonElement
-		 ).click();
+		// Splice 2 appends button y. Its path rebuild re-creates the region
+		// wrapper again, which re-reads the signal — which must already
+		// contain x, so the second splice builds on the first (no lost
+		// content, no duplicates).
+		renderHTML( regionEl, interactiveButton( 'y' ) );
 		await flush();
 
-		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		const children = regionEl.children;
+		expect( children.length ).toBe( 4 ); // p, p, x, y
+		expect( children[ 2 ] ).toHaveAttribute( 'data-testid', 'x' );
+		expect( children[ 3 ] ).toHaveAttribute( 'data-testid', 'y' );
+
+		// Both spliced buttons are interactive.
+		( children[ 2 ] as HTMLButtonElement ).click();
+		( children[ 3 ] as HTMLButtonElement ).click();
+		await flush();
+		expect( state.count ).toBe( 2 );
 	} );
 
-	it( "GREEN guard: a splice into an SSR-only region survives (signal undefined, children are the tree's)", async () => {
+	it( "a splice into an SSR-only region persists and its directives work (signal undefined, children are the tree's)", async () => {
 		document.body.innerHTML = islandHtml( 'test-r1c' );
 		await hydrateRegions();
 		await flush();
@@ -164,23 +187,23 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 			'[data-testid="region"]'
 		) as HTMLElement;
 
-		// NO navigation — the signal is still undefined (SSR content).
-		renderHTML( regionEl, '<button data-testid="x">x</button>' );
+		// NO navigation — the signal is still undefined (SSR content). The
+		// directive keeps the tree's children, so the splice persists
+		// without any write-through.
+		renderHTML( regionEl, interactiveButton( 'x' ) );
 		await flush();
-		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		const x = regionEl.querySelector(
+			'[data-testid="x"]'
+		) as HTMLButtonElement;
+		expect( x ).not.toBeNull();
 
-		// A context change must NOT remove it (the signal is undefined, so
-		// the directive keeps the tree's children).
-		(
-			document.querySelector(
-				'[data-testid="bump"]'
-			) as HTMLButtonElement
-		 ).click();
+		// The spliced button is interactive.
+		x.click();
 		await flush();
-		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		expect( x ).toHaveTextContent( '1' );
 	} );
 
-	it( 'GREEN: a splice into a navigated region with a lower-priority directive keeps the directive applied', async () => {
+	it( 'a splice into a navigated region with a lower-priority directive keeps the directive applied', async () => {
 		document.body.innerHTML = islandHtml( 'test-r1d' );
 		await hydrateRegions();
 		await flush();
@@ -228,9 +251,57 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 		expect( regionEl ).toHaveClass( 'bn-active' );
 
 		// Splice into the region — must persist AND keep the class directive.
-		renderHTML( regionEl, '<button data-testid="x">x</button>' );
+		renderHTML( regionEl, interactiveButton( 'x' ) );
 		await flush();
-		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		const x = regionEl.querySelector(
+			'[data-testid="x"]'
+		) as HTMLButtonElement;
+		expect( x ).not.toBeNull();
 		expect( regionEl ).toHaveClass( 'bn-active' );
+
+		// And the spliced button is interactive.
+		x.click();
+		await flush();
+		expect( x ).toHaveTextContent( '1' );
+	} );
+
+	it( 'a splice into a hidden region (null signal) is a no-op and does not resurrect it', async () => {
+		document.body.innerHTML = islandHtml( 'test-r1e' );
+		await hydrateRegions();
+		await flush();
+
+		const regionEl = document.querySelector(
+			'[data-testid="region"]'
+		) as HTMLElement;
+
+		// A navigation that REMOVES the region nulls its signal — the
+		// directive renders null, so the region ELEMENT is removed from the
+		// DOM entirely (probed behavior), not just emptied.
+		routerRegions.get( 'test-r1e' )!.value = null;
+		await flush();
+		expect( document.querySelector( '[data-testid="region"]' ) ).toBeNull();
+
+		// Splice into the (now detached) region element: nothing may appear
+		// and the signal stays null (the write-through skips null signals).
+		renderHTML( regionEl, interactiveButton( 'x' ) );
+		await flush();
+		expect( document.querySelector( '[data-testid="x"]' ) ).toBeNull();
+		expect( routerRegions.get( 'test-r1e' )!.value ).toBeNull();
+
+		// A LATER navigation that re-adds the region re-creates its element
+		// and re-enables splicing.
+		navigateRegion( 'test-r1e', [ h( 'p', null, 'a' ) ] );
+		await flush();
+		const newRegion = document.querySelector(
+			'[data-testid="region"]'
+		) as HTMLElement;
+		expect( newRegion ).not.toBeNull();
+		renderHTML( newRegion, interactiveButton( 'y' ) );
+		await flush();
+		const y = newRegion.querySelector(
+			'[data-testid="y"]'
+		) as HTMLButtonElement;
+		expect( y ).not.toBeNull();
+		expect( y ).toHaveTextContent( '0' );
 	} );
 } );
