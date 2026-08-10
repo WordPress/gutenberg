@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getErrorMessage } from '../error-messages';
 import { ErrorCode } from '../upload-error';
 

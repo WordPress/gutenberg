@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
 

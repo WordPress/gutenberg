@@ -1,11 +1,4 @@
-/**
- * Internal dependencies
- */
 import { lock } from '../../lock-unlock';
-
-/**
- * Internal dependencies
- */
 import postMetaBindings from '../post-meta';
 
 describe( 'post-meta bindings', () => {

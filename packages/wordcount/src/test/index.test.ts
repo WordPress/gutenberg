@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { count } from '../';
 import type { UserSettings, Strategy } from '../types';
 

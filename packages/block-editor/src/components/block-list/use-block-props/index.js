@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import useMovingAnimation from '../../use-moving-animation';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
@@ -24,6 +13,7 @@ import {
 	useBlockEditContext,
 } from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
+import { useRegisterBlockEventHandlers } from './use-register-block-event-handlers';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
@@ -105,7 +95,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
+		ariaLabel,
 	} = useContext( PrivateBlockContext );
+
+	useRegisterBlockEventHandlers( clientId, wrapperProps );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
@@ -153,6 +147,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 		view: defaultViewRef.current,
 	} );
 
@@ -181,7 +176,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label': blockLabel,
+		'aria-label': ariaLabel ?? blockLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,

@@ -4,7 +4,7 @@
 	@layer compositions {
 		.icon-button {
 			--wp-ui-button-aspect-ratio: 1;
-			--wp-ui-button-padding-inline: 0;
+			--wp-ui-button-padding-inline: 0px;
 			--wp-ui-button-min-width: unset;
 		}
 

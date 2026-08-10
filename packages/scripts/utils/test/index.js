@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import crossSpawn from 'cross-spawn';
-
-/**
- * Internal dependencies
- */
 import {
 	hasArgInCLI,
 	hasProjectFile,

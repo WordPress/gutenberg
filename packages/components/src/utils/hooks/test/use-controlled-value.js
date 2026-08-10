@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useControlledValue } from '../use-controlled-value';
 
 function Input( props ) {

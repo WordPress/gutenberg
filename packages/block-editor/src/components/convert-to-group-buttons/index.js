@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
 import BlockGroupToolbar from './toolbar';
 
@@ -26,11 +19,7 @@ function ConvertToGroupButton( {
 	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
-		// Activate the `transform` on the Grouping Block which does the conversion.
-		const newBlocks = switchToBlockType(
-			blocksSelection,
-			groupingBlockName
-		);
+		const newBlocks = groupBlocks( blocksSelection, groupingBlockName );
 		if ( newBlocks ) {
 			replaceBlocks( clientIds, newBlocks );
 		}

@@ -1,10 +1,6 @@
 /**
  * Tests for store selectors.
  */
-
-/**
- * Internal dependencies
- */
 import {
 	getAbilities,
 	getAbility,

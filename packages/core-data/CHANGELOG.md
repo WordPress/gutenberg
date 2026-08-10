@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+
+### Bug Fixes
+
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
+### Internal
+
+-   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
+
+## 7.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+## 7.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 7.50.0 (2026-07-01)
+
+## 7.49.0 (2026-06-24)
+
 ## 7.48.1 (2026-06-16)
 
 ## 7.48.0 (2026-06-10)

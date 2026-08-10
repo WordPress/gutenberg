@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import type {
 	AdditionalData,
 	Attachment,
@@ -22,7 +15,6 @@ import { UploadError } from './upload-error';
 declare global {
 	interface Window {
 		__clientSideMediaProcessing?: boolean;
-		__heicUploadSupport?: boolean;
 	}
 }
 

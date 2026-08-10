@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { TemplatePartImportControls } from './import-controls';
 import { unlock } from '../../lock-unlock';
 
@@ -65,7 +58,6 @@ export function TemplatePartAdvancedControls( {
 						onFocus={ ( event ) => event.target.select() }
 					/>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }

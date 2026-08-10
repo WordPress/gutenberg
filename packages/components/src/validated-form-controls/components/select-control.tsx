@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import SelectControl from '../../select-control';
 import type { ValidatedControlProps } from './types';
@@ -19,7 +12,7 @@ const UnforwardedValidatedSelectControl = (
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof SelectControl >,
-		'__next40pxDefaultSize' | 'multiple' | 'onChange' | 'value'
+		'multiple' | 'onChange' | 'value'
 	> & {
 		value?: string;
 		onChange: ( value: string ) => void;
@@ -36,11 +29,7 @@ const UnforwardedValidatedSelectControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<SelectControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<SelectControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };

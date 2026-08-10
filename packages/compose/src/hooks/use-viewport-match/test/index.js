@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useViewportMatch from '../';
-
 jest.mock( '../../use-media-query', () => {
 	return jest.fn();
 } );
-
 import useMediaQueryMock from '../../use-media-query';
 
 describe( 'useViewportMatch', () => {

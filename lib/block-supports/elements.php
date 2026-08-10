@@ -193,7 +193,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 				)
 			);
 
-			if ( isset( $element_style_object[':hover'] ) ) {
+			if ( isset( $element_style_object[':hover'], $element_config['hover_selector'] ) ) {
 				gutenberg_style_engine_get_styles(
 					$element_style_object[':hover'],
 					array(

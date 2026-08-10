@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { paragraph } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockToolbarIcon from '../block-toolbar-icon';
-import { isIsolatedEditorKey } from '../../../store/private-keys';
 
 jest.mock( '@wordpress/blocks', () => {
 	const actualImplementation = jest.requireActual( '@wordpress/blocks' );
@@ -68,15 +56,13 @@ describe( 'BlockToolbarIcon', () => {
 		},
 		blockName = 'core/group',
 		getActiveBlockVariation = () => null,
-		settings = {},
-		isWithinEditedSection = false,
+		isSectionBlock = true,
 	} = {} ) => {
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				get: () => false,
 				getBlockName: () => blockName,
 				getBlockAttributes: () => attributes,
-				getSettings: () => settings,
 				getBlockParentsByBlockName: () => [],
 				canRemoveBlocks: () => true,
 				getTemplateLock: () => undefined,
@@ -84,7 +70,7 @@ describe( 'BlockToolbarIcon', () => {
 				canEditBlock: () => true,
 				getBlockStyles: () => [ {} ],
 				getActiveBlockVariation,
-				isWithinEditedContentOnlySection: () => isWithinEditedSection,
+				isSectionBlock: () => isSectionBlock,
 			} ) )
 		);
 	};
@@ -210,7 +196,7 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should show the block switcher when the section is being edited', () => {
-			setupToolbarSelectors( { isWithinEditedSection: true } );
+			setupToolbarSelectors( { isSectionBlock: false } );
 
 			render( <BlockToolbarIcon { ...defaultProps } /> );
 
@@ -227,9 +213,7 @@ describe( 'BlockToolbarIcon', () => {
 						patternName: 'theme/header-wrapper',
 					},
 				},
-				settings: {
-					[ isIsolatedEditorKey ]: true,
-				},
+				isSectionBlock: false,
 			} );
 
 			render( <BlockToolbarIcon { ...defaultProps } /> );
@@ -239,6 +223,34 @@ describe( 'BlockToolbarIcon', () => {
 			).toBeInTheDocument();
 			expect( screen.getByTestId( 'block-icon' ) ).toHaveTextContent(
 				'core/group-icon'
+			);
+		} );
+
+		it( 'should show the block switcher when content-only editing is disabled', () => {
+			setupToolbarSelectors( {
+				isSectionBlock: false,
+			} );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect(
+				screen.getByTestId( 'block-switcher' )
+			).toBeInTheDocument();
+			expect( screen.getByTestId( 'block-icon' ) ).toHaveTextContent(
+				'core/group-icon'
+			);
+		} );
+
+		it( 'should show the block icon for section blocks without pattern metadata', () => {
+			setupToolbarSelectors( {
+				attributes: {},
+				blockName: 'core/template-part',
+			} );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect( screen.getByTestId( 'block-icon' ) ).toHaveTextContent(
+				'core/template-part-icon'
 			);
 		} );
 	} );

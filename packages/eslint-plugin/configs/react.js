@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { fixupPluginRules } = require( '@eslint/compat' );
 const reactPlugin = require( 'eslint-plugin-react' );
 const reactHooksPlugin = require( 'eslint-plugin-react-hooks' );
-
-/**
- * Internal dependencies
- */
 const wpRules = require( '../rules' );
 
 const wpPlugin = { rules: wpRules };

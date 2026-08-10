@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { renderToString } from '@wordpress/element';
 import {
@@ -15,10 +8,6 @@ import {
 	getBlockVariations,
 } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import metadata from './block.json';
 import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
 import { unlock } from '../lock-unlock';

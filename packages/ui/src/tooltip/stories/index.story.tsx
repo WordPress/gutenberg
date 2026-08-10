@@ -25,12 +25,12 @@ export default meta;
 
 export const Default: StoryObj< typeof Tooltip.Root > = {
 	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup>Save</Tooltip.Popup>
-			</>
-		),
+		children: [
+			<Tooltip.Trigger aria-label="Save" key="trigger">
+				💾
+			</Tooltip.Trigger>,
+			<Tooltip.Popup key="popup">Save</Tooltip.Popup>,
+		],
 	},
 };
 
@@ -108,22 +108,23 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
  */
 export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
 	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup
-					positioner={
-						<Tooltip.Positioner
-							side="right"
-							align="start"
-							sideOffset={ 16 }
-						/>
-					}
-				>
-					Save
-				</Tooltip.Popup>
-			</>
-		),
+		children: [
+			<Tooltip.Trigger aria-label="Save" key="trigger">
+				💾
+			</Tooltip.Trigger>,
+			<Tooltip.Popup
+				positioner={
+					<Tooltip.Positioner
+						side="right"
+						align="start"
+						sideOffset={ 16 }
+					/>
+				}
+				key="popup"
+			>
+				Save
+			</Tooltip.Popup>,
+		],
 	},
 };
 
@@ -146,20 +147,21 @@ export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
 export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup
-					portal={
-						<Tooltip.Portal
-							style={ { '--wp-ui-tooltip-z-index': '9999' } }
-						/>
-					}
-				>
-					Save
-				</Tooltip.Popup>
-			</>
-		),
+		children: [
+			<Tooltip.Trigger aria-label="Save" key="trigger">
+				💾
+			</Tooltip.Trigger>,
+			<Tooltip.Popup
+				portal={
+					<Tooltip.Portal
+						style={ { '--wp-ui-tooltip-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			>
+				Save
+			</Tooltip.Popup>,
+		],
 	},
 };
 

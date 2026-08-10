@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -8,27 +5,23 @@ import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Drawer } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
 import styles from './widget-settings.module.css';
-
-type WidgetAttributes = Record< string, unknown >;
+import type { WidgetAttributeValues } from '../../types';
 
 /**
  * Side drawer that edits one instance's attributes, mounted once at the
  * dashboard root. It resolves the active instance from `settingsWidgetUuid`
- * in the UI context (set by the per-instance gear), renders the type's
- * declarative `attributes` through `DataForm`, and enters from the edge away
- * from the widget.
+ * in the UI context (set by the per-instance settings trigger), renders the
+ * type's declarative `attributes` through `DataForm`, and enters from the
+ * inline-end edge.
  *
  * Edits write to the staging layer, so they preview live behind the drawer
  * and are published on Save or reverted on any other exit. Available in
- * normal mode only; the gear is hidden while the layout is being edited.
+ * normal mode only; the settings entry point is hidden while the layout is
+ * being edited.
  */
 export function WidgetSettings(): React.ReactNode {
 	const {
@@ -39,12 +32,8 @@ export function WidgetSettings(): React.ReactNode {
 		cancel: cancelStaging,
 		hasUncommittedChanges,
 	} = useDashboardInternalContext();
-	const {
-		settingsWidgetUuid,
-		setSettingsWidgetUuid,
-		settingsDrawerSide,
-		settingsDrawerInset,
-	} = useDashboardUIContext();
+	const { settingsWidgetUuid, setSettingsWidgetUuid } =
+		useDashboardUIContext();
 
 	const open = settingsWidgetUuid !== null;
 
@@ -69,8 +58,10 @@ export function WidgetSettings(): React.ReactNode {
 		? widgetTypes.find( ( type ) => type.name === widget.type )
 		: undefined;
 
-	const fields = useMemo< Field< WidgetAttributes >[] >(
-		() => ( widgetType?.attributes ?? [] ) as Field< WidgetAttributes >[],
+	const fields = useMemo< Field< WidgetAttributeValues >[] >(
+		() =>
+			( widgetType?.attributes ??
+				[] ) as Field< WidgetAttributeValues >[],
 		[ widgetType?.attributes ]
 	);
 
@@ -117,24 +108,13 @@ export function WidgetSettings(): React.ReactNode {
 	const handleOpenChange = useCallback(
 		( nextOpen: boolean ) => {
 			// Any path out of the drawer other than Save discards the
-			// staged edits, matching the layout-settings drawer.
+			// staged edits.
 			if ( ! nextOpen ) {
 				cancelStaging();
 				close();
 			}
 		},
 		[ cancelStaging, close ]
-	);
-
-	// For a left drawer, clear the fixed admin menu on the inline-start
-	// edge so the drawer lands beside it. The admin bar at the top is
-	// cleared in the CSS module.
-	const popupStyle = useMemo< React.CSSProperties >(
-		() =>
-			settingsDrawerSide === 'left' && settingsDrawerInset > 0
-				? { marginLeft: settingsDrawerInset }
-				: {},
-		[ settingsDrawerSide, settingsDrawerInset ]
 	);
 
 	const hasForm = !! widget && !! widgetType && fields.length > 0;
@@ -146,28 +126,24 @@ export function WidgetSettings(): React.ReactNode {
 	const title = getWidgetSettingsTitle( widgetType );
 	const data = ( widget?.attributes ??
 		widgetType?.example?.attributes ??
-		{} ) as WidgetAttributes;
+		{} ) as WidgetAttributeValues;
 
 	return (
 		<Drawer.Root
 			open={ open }
 			onOpenChange={ handleOpenChange }
-			swipeDirection={ settingsDrawerSide }
+			swipeDirection="right"
 			modal={ false }
 			disablePointerDismissal
 		>
-			<Drawer.Popup
-				size="medium"
-				className={ styles.popup }
-				style={ popupStyle }
-			>
+			<Drawer.Popup size="medium" className={ styles.popup }>
 				<Drawer.Header>
 					<Drawer.Title>{ title }</Drawer.Title>
 					<Drawer.CloseIcon />
 				</Drawer.Header>
 
 				<Drawer.Content>
-					<DataForm< WidgetAttributes >
+					<DataForm< WidgetAttributeValues >
 						data={ data }
 						fields={ fields }
 						form={ form }

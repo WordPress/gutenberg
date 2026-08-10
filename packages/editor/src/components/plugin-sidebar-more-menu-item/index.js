@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
 
 /**

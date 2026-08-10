@@ -1,0 +1,63 @@
+@use "@wordpress/base-styles/mixins";
+@use "../../utils/theme-variables" as *;
+
+.toggle-group-control {
+	background: $components-color-background;
+	border: 1px solid transparent;
+	border-radius: var(--wpds-border-radius-sm);
+	display: inline-flex;
+	height: 40px;
+	min-width: 0;
+	position: relative;
+
+	@media not ( prefers-reduced-motion ) {
+		&[data-indicator-animated]::before {
+			transition-property: transform, border-radius;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
+		}
+	}
+
+	&::before {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		background: $components-color-gray-100;
+		border: 1px solid $components-color-gray-700;
+
+		outline: 2px solid transparent;
+		outline-offset: -3px;
+
+		border-radius: var(--wpds-border-radius-sm);
+		top: -1px;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the indicator's physical offset. */
+		left: -2px;
+		width: calc(calc(var(--selected-width, 0) * 1px) + 2px);
+		height: calc(calc(var(--selected-height, 0) * 1px) + 2px);
+		transform: translateX(calc(var(--selected-left, 0) * 1px));
+		/* Hide when dimensions are unset (0) */
+		opacity: min(1, max(0, var(--selected-width, 0), var(--selected-height, 0)));
+	}
+}
+
+.has-border {
+	border-color: $components-color-gray-300;
+}
+
+.has-enclosing-borders {
+	&:hover {
+		border-color: $components-color-gray-400;
+	}
+
+	&:focus-within {
+		z-index: 1;
+		@include mixins.outset-ring__focus();
+		// Preserve validated-control accent overrides.
+		outline-color: $components-color-focus;
+	}
+}
+
+.is-block {
+	display: flex;
+	width: 100%;
+}

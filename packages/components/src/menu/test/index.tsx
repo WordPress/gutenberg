@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Menu } from '..';
 
 const waitForFocusedMenu = () =>
@@ -31,22 +20,6 @@ const resetTypeahead = () => {
 
 describe( 'Menu', () => {
 	let user: ReturnType< typeof userEvent.setup >;
-	let originalGetClientRects: () => DOMRectList;
-
-	beforeAll( () => {
-		// Code that considers focusability considers rects in whether the
-		// element is visible, but since jsdom does not simulate layout, we
-		// need to fake it. This should ideally be a global test mock to
-		// faithfully emulate a true browser environment.
-		originalGetClientRects = window.Element.prototype.getClientRects;
-		window.Element.prototype.getClientRects = jest.fn(
-			() => [ { width: 1, height: 1 } ] as unknown as DOMRectList
-		);
-	} );
-
-	afterAll( () => {
-		window.Element.prototype.getClientRects = originalGetClientRects;
-	} );
 
 	beforeEach( () => {
 		user = userEvent.setup();

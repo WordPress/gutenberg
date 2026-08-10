@@ -62,7 +62,7 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 <!-- wp:accordion-item -->
 <div class="wp-block-accordion-item">
 	<!-- wp:accordion-heading -->
-	<h3 class="wp-block-accordion-heading">
+	<h3 class="wp-block-accordion-heading has-icon has-icon-right">
 		<button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
 	</h3>
 	<!-- /wp:accordion-heading -->

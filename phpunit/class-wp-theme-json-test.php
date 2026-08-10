@@ -157,6 +157,33 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_get_settings_block_visibility_allow_editing() {
+		// Test that the value passes through the full sanitization pipeline,
+		// including remove_insecure_properties (called when saving global styles).
+		$theme_json_data = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'blockVisibility' => array(
+					'allowEditing' => false,
+				),
+				'blocks'          => array(
+					'core/group' => array(
+						'blockVisibility' => array(
+							'allowEditing' => true,
+						),
+					),
+				),
+			),
+		);
+		$sanitized       = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $theme_json_data );
+		$theme_json      = new WP_Theme_JSON_Gutenberg( $sanitized );
+		$actual          = $theme_json->get_settings();
+
+		$this->assertFalse( $actual['blockVisibility']['allowEditing'] );
+		// The setting is global-only: block-scoped values are stripped during sanitization.
+		$this->assertArrayNotHasKey( 'blockVisibility', $actual['blocks']['core/group'] ?? array() );
+	}
+
 	public function test_get_settings_presets_are_keyed_by_origin() {
 		$default_origin = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -574,6 +601,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'textAlign' => 'center',
 							),
 						),
+						'core/paragraph'    => array(
+							'typography' => array(
+								'textShadow' => '1px 1px 2px rgba(0,0,0,0.3)',
+							),
+						),
 						'core/post-date'    => array(
 							'color'    => array(
 								'text' => '#123456',
@@ -618,7 +650,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variables = ':root{--wp--preset--color--grey: grey;--wp--preset--gradient--custom-gradient: linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--big: 41px;--wp--preset--font-family--arial: Arial, serif;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
-		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
+		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(p){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
 		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-custom-gradient-gradient-background{background: var(--wp--preset--gradient--custom-gradient) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-big-font-size{font-size: var(--wp--preset--font-size--big) !important;}.has-arial-font-family{font-family: var(--wp--preset--font-family--arial) !important;}';
 		$all       = $variables . $styles . $presets;
 
@@ -761,7 +793,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSameCSS(
-			'.wp-block-heading.has-white-color{color: var(--wp--preset--color--white) !important;}.wp-block-heading.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.wp-block-heading.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}',
+			':where(.wp-block-heading).has-white-color{color: var(--wp--preset--color--white) !important;}:where(.wp-block-heading).has-white-background-color{background-color: var(--wp--preset--color--white) !important;}:where(.wp-block-heading).has-white-border-color{border-color: var(--wp--preset--color--white) !important;}',
 			$theme_json->get_stylesheet( array( 'presets' ) )
 		);
 	}
@@ -849,7 +881,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$styles    = ':root :where(.wp-block-group){color: red;}';
-		$presets   = '.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}';
+		$presets   = ':where(.wp-block-group).has-grey-color{color: var(--wp--preset--color--grey) !important;}:where(.wp-block-group).has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}:where(.wp-block-group).has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}';
 		$variables = '.wp-block-group{--wp--preset--color--grey: grey;}';
 
 		$all = $variables . $styles . $presets;
@@ -899,6 +931,86 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS(
 			':root{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;--wp--custom--white-2-black: value;}',
 			$theme_json->get_stylesheet( array( 'variables' ) )
+		);
+	}
+
+	/**
+	 * References to presets (`var:preset|type|slug`) are converted using the
+	 * same kebab-cased slug as the custom properties generated from the
+	 * presets, so both sides match for slugs that change when kebab-cased.
+	 */
+	public function test_get_stylesheet_kebab_cases_preset_reference_slugs() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontFamilies' => array(
+							array(
+								'name'       => 'N27',
+								'slug'       => 'n27',
+								'fontFamily' => 'N27, sans-serif',
+							),
+						),
+					),
+					'spacing'    => array(
+						'spacingSizes' => array(
+							array(
+								'name' => 'Small 2',
+								'slug' => 'small2',
+								'size' => '8px',
+							),
+						),
+					),
+					'color'      => array(
+						'duotone' => array(
+							array(
+								'colors' => array( '#000000', '#ffffff' ),
+								'name'   => 'Blue Orange 2',
+								'slug'   => 'blueOrange2',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'typography' => array(
+						'fontFamily' => 'var:preset|font-family|n27',
+					),
+					'spacing'    => array(
+						'padding' => array(
+							'top' => 'var:preset|spacing|small2',
+						),
+					),
+					'blocks'     => array(
+						'core/image' => array(
+							'filter' => array(
+								'duotone' => 'var:preset|duotone|blueOrange2',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet();
+
+		// The custom properties generated from the presets kebab-case the slug.
+		$this->assertStringContainsString(
+			'--wp--preset--font-family--n-27: N27, sans-serif',
+			$stylesheet
+		);
+		// References resolve to the same kebab-cased custom property names.
+		$this->assertStringContainsString(
+			'font-family: var(--wp--preset--font-family--n-27)',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'padding-top: var(--wp--preset--spacing--small-2)',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'var(--wp--preset--duotone--blue-orange-2)',
+			$stylesheet
 		);
 	}
 
@@ -1020,6 +1132,259 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_viewport_media_queries_uses_valid_custom_breakpoint_without_merging_defaults() {
+		$this->assertSame(
+			array(
+				'@mobile'  => '@media (width <= 640px)',
+				'@desktop' => '@media (width > 640px)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile'  => ' 640px ',
+					'tablet'  => 'calc(100% - 1rem)',
+					'desktop' => '1200px',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_get_viewport_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
+		$this->assertSame(
+			array(
+				'@mobile'  => '@media (width <= 480px)',
+				'@tablet'  => '@media (480px < width <= 782px)',
+				'@desktop' => '@media (width > 782px)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile' => '100%',
+					'tablet' => 'auto',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_get_viewport_media_queries_uses_valid_tablet_breakpoint_with_single_max_width_query_when_mobile_is_invalid() {
+		$this->assertSame(
+			array(
+				'@tablet'  => '@media (width <= 64rem)',
+				'@desktop' => '@media (width > 64rem)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile' => '100%',
+					'tablet' => '64rem',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_viewport_settings_preserve_valid_tablet_breakpoint_when_mobile_is_invalid() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => '100%',
+						'tablet' => '64rem',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'tablet' => '64rem',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+	}
+
+	public function test_viewport_settings_use_defaults_when_no_custom_breakpoints_are_valid() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile'  => '100%',
+						'tablet'  => 'auto',
+						'desktop' => '1200px',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'mobile' => '480px',
+				'tablet' => '782px',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+	}
+
+	public function test_get_viewport_media_queries_omits_tablet_when_its_breakpoint_is_not_larger_than_mobile() {
+		$this->assertSame(
+			array(
+				'@mobile'  => '@media (width <= 64rem)',
+				'@desktop' => '@media (width > 64rem)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile' => '64rem',
+					'tablet' => '40rem',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_get_stylesheet_uses_custom_viewport_breakpoints_for_responsive_block_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => '640px',
+						'tablet' => '960px',
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+							'@tablet' => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 640px){:root :where(.wp-block-group){color: red;}}',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (640px < width <= 960px){:root :where(.wp-block-group){color: blue;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_get_stylesheet_omits_tablet_styles_when_its_breakpoint_is_not_larger_than_mobile() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => '960px',
+						'tablet' => '640px',
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+							'@tablet' => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertSame(
+			array(
+				'mobile' => '960px',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 960px){:root :where(.wp-block-group){color: red;}}',
+			$stylesheet
+		);
+		$this->assertStringNotContainsString(
+			'color: blue',
+			$stylesheet
+		);
+	}
+
+	public function test_get_stylesheet_uses_single_max_width_tablet_query_when_mobile_is_invalid() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => '100%',
+						'tablet' => '64rem',
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+							'@tablet' => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertSame(
+			array(
+				'tablet' => '64rem',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 64rem){:root :where(.wp-block-group){color: blue;}}',
+			$stylesheet
+		);
+		$this->assertStringNotContainsString(
+			'color: red',
+			$stylesheet
+		);
+	}
+
 	public function test_get_styles_for_block_outputs_responsive_block_gap_after_default_gap() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -1093,6 +1458,150 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'@media (width <= 480px){:root :where(.wp-block-group){color: red;}}',
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_renders_element_styles_defined_only_in_a_breakpoint() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'elements' => array(
+									'link' => array(
+										'color' => array(
+											'text' => 'red',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = '@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_renders_element_pseudo_styles_defined_only_in_a_breakpoint() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'elements' => array(
+									'link' => array(
+										':hover' => array(
+											'color' => array(
+												'text' => 'red',
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = '@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: red;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_renders_element_styles_defined_only_in_separate_breakpoints() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'@mobile' => array(
+								'elements' => array(
+									'link' => array(
+										'color' => array(
+											'text' => 'red',
+										),
+									),
+								),
+							),
+							'@tablet' => array(
+								'elements' => array(
+									'link' => array(
+										'color' => array(
+											'text' => 'blue',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$link_selector = ':root :where(.wp-block-group a:where(:not(.wp-element-button)))';
+		$expected      = '@media (width <= 480px){' . $link_selector . '{color: red;}}' .
+			'@media (480px < width <= 782px){' . $link_selector . '{color: blue;}}';
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	public function test_get_stylesheet_does_not_duplicate_base_element_styles_into_pseudo_rule() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'text' => 'blue',
+									),
+								),
+							),
+							'@mobile'  => array(
+								'elements' => array(
+									'link' => array(
+										':hover' => array(
+											'color' => array(
+												'text' => 'darkred',
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$link_selector = ':root :where(.wp-block-group a:where(:not(.wp-element-button)))';
+		$expected      = $link_selector . '{color: blue;}' .
+			'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: darkred;}}';
+
+		$this->assertSameCSS(
+			$expected,
 			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
 		);
 	}
@@ -5015,7 +5524,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual_styles    = $theme_json->get_styles_for_block( $metadata );
 		$default_styles   = ':root :where(.wp-block-test-milk .liquid, .wp-block-test-milk:is(.frothed, .steamed) .foam, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle){background-color: white;}';
-		$variation_styles = ':root :where(.wp-block-test-milk.is-style-chocolate .liquid,.wp-block-test-milk.is-style-chocolate:is(.frothed, .steamed) .foam,.wp-block-test-milk.is-style-chocolate:not(.spoiled),.wp-block-test-milk.in-bottle.is-style-chocolate){background-color: #35281E;}';
+		$variation_styles = ':root :where(.wp-block-test-milk.is-style-chocolate .liquid, .wp-block-test-milk.is-style-chocolate:is(.frothed, .steamed) .foam, .wp-block-test-milk.is-style-chocolate:not(.spoiled), .wp-block-test-milk.in-bottle.is-style-chocolate){background-color: #35281E;}';
 		$expected         = $default_styles . $variation_styles;
 
 		unregister_block_style( 'test/milk', 'chocolate' );
@@ -7019,6 +7528,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'selector' => '.wp-block:is(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:is(.outer .inner:first-child)',
 			),
+			':is selector list'        => array(
+				'selector' => '.wp-block:is(.outer, .inner:first-child) .content, .wp-block-alternative',
+				'expected' => '.wp-block.is-style-custom:is(.outer, .inner:first-child) .content, .wp-block-alternative.is-style-custom',
+			),
 			':not selector'            => array(
 				'selector' => '.wp-block:not(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:not(.outer .inner:first-child)',
@@ -8086,5 +8599,168 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'opacity', $result, 'Boolean value should be skipped' );
 		$this->assertStringNotContainsString( 'padding', $result, 'Boolean value should be skipped' );
 		$this->assertStringNotContainsString( 'gap', $result, 'Array value should be skipped' );
+	}
+
+	/**
+	 * Tests that prepend_to_selector correctly prepends to single and
+	 * compound (comma-separated) selectors.
+	 *
+	 * @dataProvider data_prepend_to_selector
+	 *
+	 * @param string $selector   Original CSS selector.
+	 * @param string $to_prepend Selector to prepend.
+	 * @param string $expected   Expected resulting selector.
+	 */
+	public function test_prepend_to_selector( $selector, $to_prepend, $expected ) {
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'prepend_to_selector' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
+
+		$actual = $func->invoke( null, $selector, $to_prepend );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Data provider for prepend_to_selector tests.
+	 *
+	 * @return array[]
+	 */
+	public function data_prepend_to_selector() {
+		return array(
+			'single class selector'                        => array(
+				'selector'   => '.inner',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper .inner',
+			),
+			'single element selector'                      => array(
+				'selector'   => 'p',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper p',
+			),
+			'single id selector'                           => array(
+				'selector'   => '#main',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper #main',
+			),
+			'two comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper h1,.wrapper h2',
+			),
+			'three comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2,h3',
+				'to_prepend' => '.some-class ',
+				'expected'   => '.some-class h1,.some-class h2,.some-class h3',
+			),
+			'comma-separated class selectors without spaces' => array(
+				'selector'   => '.foo,.bar',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix .foo,.prefix .bar',
+			),
+			'prepend without trailing space'               => array(
+				'selector'   => '.child',
+				'to_prepend' => '.parent',
+				'expected'   => '.parent.child',
+			),
+			'compound selector without trailing space no comma spaces' => array(
+				'selector'   => '.a,.b',
+				'to_prepend' => '.parent',
+				'expected'   => '.parent.a,.parent.b',
+			),
+			'descendant selector prepended'                => array(
+				'selector'   => '.block .inner',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope .block .inner',
+			),
+			'descendant selectors comma-separated without spaces' => array(
+				'selector'   => '.block .inner,.block .alt',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope .block .inner,.scope .block .alt',
+			),
+			'empty selector'                               => array(
+				'selector'   => '',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix ',
+			),
+			'empty prepend'                                => array(
+				'selector'   => '.child',
+				'to_prepend' => '',
+				'expected'   => '.child',
+			),
+			'both empty'                                   => array(
+				'selector'   => '',
+				'to_prepend' => '',
+				'expected'   => '',
+			),
+			'attribute selector'                           => array(
+				'selector'   => '[data-type="example"]',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope [data-type="example"]',
+			),
+			'pseudo-class selector'                        => array(
+				'selector'   => ':where(.is-layout-flex)',
+				'to_prepend' => '.editor ',
+				'expected'   => '.editor :where(.is-layout-flex)',
+			),
+			'many comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2,h3,h4,h5,h6',
+				'to_prepend' => '.content ',
+				'expected'   => '.content h1,.content h2,.content h3,.content h4,.content h5,.content h6',
+			),
+			'real world block element selector'            => array(
+				'selector'   => 'p',
+				'to_prepend' => '.wp-block-group ',
+				'expected'   => '.wp-block-group p',
+			),
+			'real world compound block element selectors'  => array(
+				'selector'   => 'a,.wp-element-button',
+				'to_prepend' => '.wp-block-group ',
+				'expected'   => '.wp-block-group a,.wp-block-group .wp-element-button',
+			),
+			'spaces after commas are preserved'            => array(
+				'selector'   => 'h1, h2, h3',
+				'to_prepend' => '.some-class ',
+				'expected'   => '.some-class h1,.some-class  h2,.some-class  h3',
+			),
+			'spaces after commas preserved with class selectors' => array(
+				'selector'   => '.foo, .bar',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix .foo,.prefix  .bar',
+			),
+			'mixed whitespace around commas preserved'     => array(
+				'selector'   => '.a ,  .b , .c',
+				'to_prepend' => '.pre ',
+				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
+			),
+			'where with internal commas and no top-level comma' => array(
+				'selector'   => ':where(.a, .b)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b)',
+			),
+			'where with internal commas and top-level comma' => array(
+				'selector'   => ':where(.a, .b),.c',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b), .scope .c',
+			),
+			'is with internal commas and top-level comma'  => array(
+				'selector'   => ':is(.x, .y),.z',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper :is(.x, .y), .wrapper .z',
+			),
+			'multiple parenthesized selectors with top-level comma' => array(
+				'selector'   => ':where(.a, .b),:is(.c, .d)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b), .scope :is(.c, .d)',
+			),
+			'nested parentheses with commas'               => array(
+				'selector'   => ':where(:not(.a, .b), .c),.d',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(:not(.a, .b), .c), .scope .d',
+			),
+		);
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -425,7 +422,7 @@ test.describe( 'Change detection', () => {
 			.getByRole( 'button', { name: 'Trash' } )
 			.click();
 
-		await expect( page ).toHaveURL( '/wp-admin/edit.php?post_type=post' );
+		await expect( page ).toHaveURL( 'wp-admin/edit.php?post_type=post' );
 	} );
 
 	test( 'consecutive edits to the same attribute should mark the post as dirty after a save', async ( {

@@ -34,11 +34,17 @@
 		 * shift the arrow inward by the border width. Keep visual chrome only.
 		 */
 		.surface {
+			--_wp-ui-elevation-md:
+				0 2px 3px rgba(0, 0, 0, 0.05),
+				0 4px 5px rgba(0, 0, 0, 0.04),
+				0 12px 12px rgba(0, 0, 0, 0.03),
+				0 16px 16px rgba(0, 0, 0, 0.02);
+
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			padding: var(--wpds-dimension-padding-lg);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--_wp-ui-elevation-md);
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-md);

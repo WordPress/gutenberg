@@ -63,6 +63,11 @@ function makeListener( { allowedImports, context } ) {
 				return;
 			}
 
+			/* `imported` may be a string literal (e.g. `import { 'a' as b }`); only identifiers are relevant here. */
+			if ( specifierNode.imported.type !== 'Identifier' ) {
+				return;
+			}
+
 			const importedName = specifierNode.imported.name;
 
 			if (

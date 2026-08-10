@@ -1,14 +1,12 @@
 # Design Tokens Maintainer's Guide
 
-Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+This maintainer-facing guide explains how the WordPress Design System token source files are organized and generated.
 
-Components that use these design tokens benefit from the consistency they guarantee with other components that extend from the same system. Future theming improvements or configurations like color theming (or "dark mode") or roundness will cascade automatically to these components without any additional effort on the part of the component maintainer.
-
-This document includes information about how the design system maintains its tokens implementation. For information about how to use design tokens, refer to the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md) and [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+For consumer-facing usage, start with the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md) and the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 
 ## Structure
 
-The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+The design system follows the [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) report from the Design Tokens Community Group (DTCG) and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
 
 | File              | Description                                                                                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -16,14 +14,14 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 | `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
-| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
 | `motion.json`     | Animation durations and easing curves                                                                                            |
+| `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
 
 ## Token Naming
 
-Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
+Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), guidance on how to pick the right token, and the complete generated list of token names.
 
 ## Primitive and Semantic Tokens
 
@@ -70,7 +68,7 @@ Someone using the design system should never see or concern themselves with eith
 
 ## Custom Extensions
 
-The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/drafts/format/#extensions-0) of the DTCG Tokens specification to add additional, optional support for proprietary data.
+The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/2025.10/format/#extensions-0) from the Design Tokens Format Module to add additional, optional support for proprietary data.
 
 ### Figma Support
 

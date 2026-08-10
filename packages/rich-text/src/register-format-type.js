@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
-/**
- * Internal dependencies
- */
 import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
