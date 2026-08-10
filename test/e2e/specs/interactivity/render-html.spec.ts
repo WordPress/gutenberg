@@ -125,7 +125,7 @@ test.describe( 'renderHTML', () => {
 		await expect( page.getByTestId( 'listener' ) ).toHaveCount( 1 );
 		await expect( page.getByTestId( 'resize-count' ) ).toHaveText( '0' );
 
-		// Replacing the fragment's content (`position: 'inner'`) removes the
+		// Replacing the fragment's content (`mode: 'inner'`) removes the
 		// listener node; its window listener must be cleaned up.
 		await page.getByTestId( 'reload' ).click();
 		await expect( page.getByTestId( 'version' ) ).toHaveText( 'version 2' );
@@ -223,7 +223,7 @@ test.describe( 'renderHTML', () => {
 	test( 'replaces the container itself with the new content', async ( {
 		page,
 	} ) => {
-		await page.getByTestId( 'load-outer' ).click();
+		await page.getByTestId( 'load-replace' ).click();
 		await expect( page.getByTestId( 'mixed-span' ) ).toBeVisible();
 		await expect( page.getByTestId( 'target' ) ).toHaveCount( 0 );
 	} );

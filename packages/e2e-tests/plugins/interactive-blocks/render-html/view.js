@@ -41,8 +41,8 @@ const { state } = store( 'test/render-html', {
 			state.isHydrated = 'yes';
 		},
 		/*
-		 * Generic fragment loader. The button's `data-position` attribute
-		 * selects the `renderHTML` position; `data-fragment-url` the endpoint.
+		 * Generic fragment loader. The button's `data-mode` attribute
+		 * selects the `renderHTML` mode; `data-fragment-url` the endpoint.
 		 */
 		*loadFragment() {
 			const { ref } = getElement();
@@ -50,7 +50,7 @@ const { state } = store( 'test/render-html', {
 			const html = yield res.json();
 			const target = document.querySelector( '[data-testid="target"]' );
 			renderHTML( target, html, {
-				position: ref.dataset.position ?? 'append',
+				mode: ref.dataset.mode ?? 'append',
 			} );
 			state.isHydrated = 'yes';
 		},

@@ -98,7 +98,7 @@ describe( 'elementToVnode map', () => {
 		);
 		const victim = document.querySelector( '[data-testid="victim"]' );
 		renderHTML( '[data-testid="outer"]', '<p>new</p>', {
-			position: 'inner',
+			mode: 'inner',
 		} );
 		await flush();
 		const outer = document.querySelector( '[data-testid="outer"]' );
