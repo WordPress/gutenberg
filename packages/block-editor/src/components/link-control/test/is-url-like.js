@@ -23,6 +23,18 @@ describe( 'isURLLike', () => {
 		expect( isURLLike( 'somedirectentryhere' ) ).toBe( false );
 	} );
 
+	it.each( [
+		[ 'an integer', 123 ],
+		[ 'a float', 1.5 ],
+		[ 'a boolean', true ],
+		[ 'an array', [ 'https://wordpress.org' ] ],
+		[ 'an object', { url: 'https://wordpress.org' } ],
+		[ 'null', null ],
+		[ 'undefined', undefined ],
+	] )( 'returns false without throwing for %s', ( _label, value ) => {
+		expect( isURLLike( value ) ).toBe( false );
+	} );
+
 	it( 'returns true for a string beginning with www.', () => {
 		expect( isURLLike( 'www.wordpress.org' ) ).toBe( true );
 	} );
