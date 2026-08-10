@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-exit-template-part-panel {
+	margin: $grid-unit-20;
+
+	.editor-exit-template-part-panel__button {
+		justify-content: center;
+	}
+}
