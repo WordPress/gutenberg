@@ -1,4 +1,4 @@
-import { normalizeTextString } from '../strings';
+import { normalizeTextString } from '../normalize-text-string';
 
 describe( 'normalizeTextString', () => {
 	it( 'should normalize hyphen-like characters to hyphens', () => {

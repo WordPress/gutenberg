@@ -5,10 +5,6 @@ import { paramCase } from 'change-case';
  * Backwards compatible with Lodash's `_.kebabCase()`.
  * Backwards compatible with `_wp_to_kebab_case()`.
  *
- * Verbatim copy of the private `kebabCase` utility of `@wordpress/components`,
- * inlined so DataViews does not depend on private cross-package APIs.
- * Keep in sync with `packages/components/src/utils/strings.ts`.
- *
  * @see https://lodash.com/docs/4.17.15#kebabCase
  * @see https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/
  *

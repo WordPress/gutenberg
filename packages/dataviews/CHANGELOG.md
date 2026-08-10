@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
+
 ### New Features
 
 -   DataViews: Add a `time` field type and matching `time` control for times of day with no date attached. Values are wall-clock `HH:mm`/`HH:mm:ss` strings that render identically regardless of the visitor's timezone, and `format.time` controls both the rendered format and whether the control offers a seconds field. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
