@@ -1,21 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useListViewPanelState from '../components/use-list-view-panel-state';
-
 import { unlock } from '../lock-unlock';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
@@ -50,26 +42,25 @@ export function ListViewPanel( { clientId, name } ) {
 		useDispatch( blockEditorStore )
 	);
 
-	const isEnabled = hasListViewSupport( name );
-	const { hasChildren, isNestedListView } = useSelect(
+	const { isEnabled, hasChildren, isNestedListView } = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlockParents, getBlockName } =
-				select( blockEditorStore );
+			const {
+				getBlockCount,
+				getBlockParents,
+				shouldRenderBlockListView,
+			} = unlock( select( blockEditorStore ) );
 
 			// Avoid showing List Views for both parent and child blocks that have support.
 			// In this situation the parent will show the child in its list already.
 			// Search parents to see if there's one that also has support, and if so skip rendering.
 			// This matches closely the logic in the `BlockCard` component.
 			const parents = getBlockParents( clientId, false );
-			const _isNestedListView = parents.find( ( parentId ) => {
-				const parentName = getBlockName( parentId );
-				return (
-					parentName === 'core/navigation' ||
-					hasBlockSupport( parentName, 'listView' )
-				);
-			} );
+			const _isNestedListView = parents.find( ( parentId ) =>
+				shouldRenderBlockListView( parentId )
+			);
 
 			return {
+				isEnabled: shouldRenderBlockListView( clientId ),
 				hasChildren: !! getBlockCount( clientId ),
 				isNestedListView: _isNestedListView,
 			};

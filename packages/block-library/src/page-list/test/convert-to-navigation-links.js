@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
 
 // Expected entity binding structure for navigation links

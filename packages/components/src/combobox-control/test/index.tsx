@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
@@ -58,7 +47,7 @@ const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
 
 const ComboboxControl = ( props: ComboboxControlProps ) => {
-	return <_ComboboxControl { ...props } __next40pxDefaultSize />;
+	return <_ComboboxControl { ...props } />;
 };
 
 const ControlledComboboxControl = ( {
@@ -92,8 +81,8 @@ describe.each( [
 		render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
-		const label = getLabel( defaultLabelText );
-		expect( label ).toBeVisible();
+		expect( getLabel( defaultLabelText ) ).toBeVisible();
+		expect( getInput( defaultLabelText ) ).toBeVisible();
 	} );
 
 	it( 'should render with hidden label', () => {
@@ -104,13 +93,7 @@ describe.each( [
 				hideLabelFromVision
 			/>
 		);
-		const label = getLabel( defaultLabelText );
-
-		expect( label ).toBeInTheDocument();
-		expect( label ).toHaveAttribute(
-			'data-wp-component',
-			'VisuallyHidden'
-		);
+		expect( getInput( defaultLabelText ) ).toBeVisible();
 	} );
 
 	it( 'should render with the correct options', async () => {
@@ -449,6 +432,19 @@ describe.each( [
 		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
 		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should associate the `help` text with the combobox accessibly', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				help="Help text"
+			/>
+		);
+		expect( getInput( defaultLabelText ) ).toHaveAccessibleDescription(
+			'Help text'
+		);
 	} );
 
 	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {

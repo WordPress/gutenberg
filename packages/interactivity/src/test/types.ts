@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getServerContext } from '../scopes';
 import {
 	store,
@@ -39,13 +36,13 @@ describe( 'Interactivity API types', () => {
 				myStore.state.clientValue satisfies number;
 				myStore.state.derived satisfies number;
 
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;
 				( await myStore.actions.async( 1 ) ) satisfies number;
 
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
 				myStore.actions.nonExistent() satisfies {};
 			};
 		} );
@@ -68,7 +65,7 @@ describe( 'Interactivity API types', () => {
 				const myStore = store< Store >( 'test', {
 					state: {
 						clientValue: 1,
-						// @ts-expect-error
+						// @ts-expect-error `nonExistent` is intentionally not part of the declared store.
 						nonExistent: 2,
 						get derived(): number {
 							return myStore.state.serverValue;
@@ -88,12 +85,12 @@ describe( 'Interactivity API types', () => {
 				myStore.state.clientValue satisfies number;
 				myStore.state.serverValue satisfies number;
 				myStore.state.derived satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;
 				( await myStore.actions.async( 1 ) ) satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
 				myStore.actions.nonExistent();
 			};
 		} );
@@ -139,12 +136,12 @@ describe( 'Interactivity API types', () => {
 				myStore.state.clientValue satisfies number;
 				myStore.state.serverValue satisfies number;
 				myStore.state.derived satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;
 				( await myStore.actions.async( 1 ) ) satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
 				myStore.actions.nonExistent();
 			};
 		} );
@@ -186,12 +183,12 @@ describe( 'Interactivity API types', () => {
 				myStore.state.clientValue satisfies number;
 				myStore.state.serverValue satisfies number;
 				myStore.state.derived satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;
 				( await myStore.actions.async( 1 ) ) satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
 				myStore.actions.nonExistent() satisfies {};
 			};
 		} );
@@ -229,20 +226,20 @@ describe( 'Interactivity API types', () => {
 					},
 					callbacks: {
 						existent: 1,
-						// @ts-expect-error
+						// @ts-expect-error `nonExistent` is intentionally not part of the declared store.
 						nonExistent: 1,
 					},
 				} );
 
-				// @ts-expect-error
+				// @ts-expect-error This store part declares no `state` property.
 				myStore.state.nonExistent satisfies number;
 				myStore.actions.sync( 1 ) satisfies number;
 				myStore.actions.async( 1 ) satisfies Promise< number >;
 				( await myStore.actions.async( 1 ) ) satisfies number;
 				myStore.callbacks.existent satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store callbacks.
 				myStore.callbacks.nonExistent satisfies number;
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
 				myStore.actions.nonExistent() satisfies {};
 			};
 		} );
@@ -296,7 +293,7 @@ describe( 'Interactivity API types', () => {
 				myStore.actions.asyncAction() satisfies Promise< number >;
 				( await myStore.actions.asyncAction() ) satisfies number;
 
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
 				myStore.state.nonExistent satisfies {};
 			};
 		} );
@@ -393,7 +390,7 @@ describe( 'Interactivity API types', () => {
 					};
 				}
 				const state = getServerState< State >();
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the state type.
 				state.nonExistent = 'error';
 				state.foo satisfies string;
 				state.bar.baz satisfies number;
@@ -420,7 +417,7 @@ describe( 'Interactivity API types', () => {
 					};
 				}
 				const context = getServerContext< Context >();
-				// @ts-expect-error
+				// @ts-expect-error `nonExistent` is intentionally absent from the context type.
 				context.nonExistent = 'error';
 				context.foo satisfies string;
 				context.bar.baz satisfies number;

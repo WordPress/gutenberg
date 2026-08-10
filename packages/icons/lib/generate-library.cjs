@@ -8,19 +8,11 @@
  *
  * Note that the generated files are ignored by Git.
  */
-
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { readdir, readFile, writeFile } = require( 'fs' ).promises;
 const { execFile } = require( 'child_process' );
 const { promisify } = require( 'util' );
 const { camelCase } = require( 'change-case' );
-
-/**
- * Internal dependencies
- */
 const { validateCollection } = require( './validate-collection.cjs' );
 
 const execFileAsync = promisify( execFile );
@@ -214,10 +206,12 @@ async function generateIndex() {
 		.map( ( file ) => {
 			const importPath = path.basename( file, '.tsx' );
 
-			// Camel case, but retaining 'RTL' acronym in uppercase
+			// Camel case, but retaining acronyms in uppercase
 			const identifier = importPath
 				.replace( /-([0-9A-Za-z])/g, ( _, c ) => c.toUpperCase() )
-				.replace( /Rtl\b/, 'RTL' );
+				.replace( /Ltr\b/, 'LTR' )
+				.replace( /Rtl\b/, 'RTL' )
+				.replace( /Ne\b/, 'NE' );
 
 			return `export { default as ${ identifier } } from './${ importPath }';`;
 		} )
@@ -304,10 +298,7 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/**
- * WordPress dependencies
- */
-import { ${ Array.from( usedPrimitives )
+	return `import { ${ Array.from( usedPrimitives )
 		.sort()
 		.join( ', ' ) } } from '@wordpress/primitives';
 

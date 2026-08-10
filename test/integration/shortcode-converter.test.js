@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handling/shortcode-converter';
 
 describe( 'segmentHTMLToShortcodeBlock', () => {
@@ -235,6 +228,24 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect(
 			segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 )
 		).toEqual( [ originalMultipleShortcodes ] );
+	} );
+
+	it( 'should convert a shortcode between br tags', () => {
+		const original = `<p>Some text<br />\n[foo bar="apple"]<br />\nSome other text</p>`;
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+		expect( transformed ).toHaveLength( 3 );
+		const expectedBlock = createBlock( 'core/shortcode', {
+			text: '[foo bar="apple"]',
+		} );
+		expectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( expectedBlock );
+	} );
+
+	it( 'should not convert inline shortcodes near br tags', () => {
+		const original = `<p>Hello<br />[foo bar] world</p>`;
+		expect( segmentHTMLToShortcodeBlock( original, 0 ) ).toEqual( [
+			original,
+		] );
 	} );
 
 	it( 'should convert regardless of shortcode alias', () => {

@@ -1,18 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
-import { getRootMap } from './crdt-utils';
+import {
+	asRichTextOffset,
+	getRootMap,
+	getYTextByAttributeKey,
+	richTextOffsetToHtmlIndex,
+} from './crdt-utils';
 import type {
 	AbsoluteBlockIndexPath,
 	WPBlockSelection,
@@ -23,6 +21,7 @@ import type {
 	SelectionInMultipleBlocks,
 	SelectionWholeBlock,
 	CursorPosition,
+	SelectionEndpoint,
 } from '../types';
 
 /**
@@ -37,6 +36,16 @@ export enum SelectionType {
 }
 
 /**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
+}
+
+/**
  * Converts WordPress block editor selection to a SelectionState.
  *
  * Uses getBlockPathForLocalClientId to locate blocks in the Yjs document by
@@ -44,16 +53,20 @@ export enum SelectionType {
  * differ between the block-editor store and the Yjs document (e.g. in "Show
  * Template" mode).
  *
- * @param selectionStart - The start position of the selection
- * @param selectionEnd   - The end position of the selection
- * @param yDoc           - The Yjs document
+ * @param selectionStart             - The start position of the selection
+ * @param selectionEnd               - The end position of the selection
+ * @param yDoc                       - The Yjs document
+ * @param options                    - Optional parameters
+ * @param options.selectionDirection - The direction of the selection (forward or backward)
  * @return The SelectionState
  */
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	yDoc: Y.Doc
+	yDoc: Y.Doc,
+	options?: { selectionDirection?: SelectionDirection }
 ): SelectionState {
+	const { selectionDirection } = options ?? {};
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
 	const yBlocks = ymap.get( 'blocks' );
 
@@ -122,21 +135,25 @@ export function getSelectionState(
 			type: SelectionType.SelectionInOneBlock,
 			cursorStartPosition,
 			cursorEndPosition,
+			selectionDirection,
 		};
 	}
 
-	// Case 5: Selection in multiple blocks
-	const cursorStartPosition = getCursorPosition( selectionStart, yBlocks );
-	const cursorEndPosition = getCursorPosition( selectionEnd, yBlocks );
-	if ( ! cursorStartPosition || ! cursorEndPosition ) {
-		// If we can't find the cursor positions in block text, treat it as a non-selection.
+	// Case 5: Selection in multiple blocks.
+	// Each endpoint is resolved independently — text fields get a CursorEndpoint
+	// (character-level anchor), everything else gets a WholeBlockEndpoint
+	// (block-slot anchor). Mixed combinations across block types are valid.
+	const startEndpoint = getSelectionEndpoint( selectionStart, yBlocks );
+	const endEndpoint = getSelectionEndpoint( selectionEnd, yBlocks );
+	if ( ! startEndpoint || ! endEndpoint ) {
 		return noSelection;
 	}
 
 	return {
 		type: SelectionType.SelectionInMultipleBlocks,
-		cursorStartPosition,
-		cursorEndPosition,
+		startEndpoint,
+		endEndpoint,
+		selectionDirection,
 	};
 }
 
@@ -162,7 +179,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const currentYText = attributes
+		? getYTextByAttributeKey( attributes, selection.attributeKey )
+		: null;
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {
@@ -171,13 +190,53 @@ function getCursorPosition(
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		selection.offset
+		richTextOffsetToHtmlIndex(
+			currentYText.toString(),
+			asRichTextOffset( selection.offset )
+		)
 	);
 
 	return {
 		relativePosition,
 		absoluteOffset: selection.offset,
+		attributeKey: selection.attributeKey,
 	};
+}
+
+/**
+ * Build a SelectionEndpoint for one side of a multi-block selection.
+ *
+ * WHY two shapes: Yjs relative positions must be anchored to the right node
+ * type. If the block has a RichText field with a known character offset, we
+ * anchor to a Y.Text position (CursorEndpoint) so the cursor survives
+ * concurrent text edits. If there is no text offset (whole-block selection,
+ * or a block type with no RichText), we anchor to the block's index slot in
+ * its parent Y.Array (WholeBlockEndpoint) so it survives block insertions and
+ * deletions above or below it.
+ *
+ * @param selection - The WPBlockSelection for this side.
+ * @param blocks    - The root-level Yjs blocks array.
+ * @return A SelectionEndpoint, or null if the block cannot be located in Yjs.
+ */
+function getSelectionEndpoint(
+	selection: WPBlockSelection,
+	blocks: YBlocks
+): SelectionEndpoint | null {
+	const cursorPosition = getCursorPosition( selection, blocks );
+	if ( cursorPosition ) {
+		return { type: SelectionType.Cursor, cursorPosition };
+	}
+
+	// No character offset available — anchor to the block's slot in its
+	// parent Y.Array instead.
+	const path = getBlockPathForLocalClientId( selection.clientId );
+	const blockPosition = path
+		? createRelativePositionForBlockPath( path, blocks )
+		: null;
+	if ( blockPosition ) {
+		return { type: SelectionType.WholeBlock, blockPosition };
+	}
+	return null;
 }
 
 /**
@@ -315,21 +374,24 @@ export function areSelectionsStatesEqual(
 				areCursorPositionsEqual(
 					selection1.cursorEndPosition,
 					( selection2 as SelectionInOneBlock ).cursorEndPosition
-				)
+				) &&
+				selection1.selectionDirection ===
+					( selection2 as SelectionInOneBlock ).selectionDirection
 			);
 
 		case SelectionType.SelectionInMultipleBlocks:
 			return (
-				areCursorPositionsEqual(
-					selection1.cursorStartPosition,
-					( selection2 as SelectionInMultipleBlocks )
-						.cursorStartPosition
+				areEndpointsEqual(
+					selection1.startEndpoint,
+					( selection2 as SelectionInMultipleBlocks ).startEndpoint
 				) &&
-				areCursorPositionsEqual(
-					selection1.cursorEndPosition,
+				areEndpointsEqual(
+					selection1.endEndpoint,
+					( selection2 as SelectionInMultipleBlocks ).endEndpoint
+				) &&
+				selection1.selectionDirection ===
 					( selection2 as SelectionInMultipleBlocks )
-						.cursorEndPosition
-				)
+						.selectionDirection
 			);
 		case SelectionType.WholeBlock:
 			return Y.compareRelativePositions(
@@ -340,6 +402,38 @@ export function areSelectionsStatesEqual(
 		default:
 			return false;
 	}
+}
+
+/**
+ * Check if two SelectionEndpoints are equal.
+ *
+ * Endpoints of different kinds (cursor vs whole-block) are never equal.
+ *
+ * @param ep1 - First endpoint.
+ * @param ep2 - Second endpoint.
+ * @return True if the endpoints represent the same position.
+ */
+function areEndpointsEqual(
+	ep1: SelectionEndpoint,
+	ep2: SelectionEndpoint
+): boolean {
+	if ( ep1.type !== ep2.type ) {
+		return false;
+	}
+	if (
+		ep1.type === SelectionType.Cursor &&
+		ep2.type === SelectionType.Cursor
+	) {
+		return areCursorPositionsEqual(
+			ep1.cursorPosition,
+			ep2.cursorPosition
+		);
+	}
+	// Both SelectionType.WholeBlock.
+	return Y.compareRelativePositions(
+		( ep1 as SelectionWholeBlock ).blockPosition,
+		( ep2 as SelectionWholeBlock ).blockPosition
+	);
 }
 
 /**

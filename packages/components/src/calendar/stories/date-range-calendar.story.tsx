@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { fn } from 'storybook/test';
 import {
 	enUS,
@@ -22,19 +19,21 @@ import {
 	sv,
 } from 'date-fns/locale';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import { DateRangeCalendar, TZDate } from '..';
+
+// Storybook date controls pass a number, but react-day-picker expects a Date for `endMonth`.
+function toDate( value: Date | number | undefined ): Date | undefined {
+	return value === undefined ? undefined : new Date( value );
+}
 
 const meta: Meta< typeof DateRangeCalendar > = {
 	title: 'Components/Selection & Input/Time & Date/DateRangeCalendar',
 	component: DateRangeCalendar,
 	tags: [ 'status-private' ],
+	render: ( { endMonth, ...args } ) => (
+		<DateRangeCalendar { ...args } endMonth={ toDate( endMonth ) } />
+	),
 	argTypes: {
 		locale: {
 			options: [
@@ -163,10 +162,21 @@ export const WithSelectedRangeAndMonth: Story = {
 };
 
 /**
+ * Shows days from adjacent months in the grid. Outside days use a lighter style
+ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
+ */
+export const WithOutsideDays: Story = {
+	args: {
+		showOutsideDays: true,
+		fixedWeeks: true,
+	},
+};
+
+/**
  * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
  */
 export const WithTimeZone: Story = {
-	render: function DateCalendarWithTimeZone( args ) {
+	render: function DateCalendarWithTimeZone( { endMonth, ...args } ) {
 		const [ range, setRange ] = useState< typeof args.selected | null >(
 			null
 		);
@@ -192,6 +202,7 @@ export const WithTimeZone: Story = {
 			<>
 				<DateRangeCalendar
 					{ ...args }
+					endMonth={ toDate( endMonth ) }
 					selected={ range }
 					onSelect={ ( selectedDate, ...rest ) => {
 						setRange(

@@ -1,32 +1,21 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external, moreVertical } from '@wordpress/icons';
-import {
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-	DropdownMenu,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
+import { VisuallyHidden } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
 
-export default function MoreMenu( { disabled = false } ) {
+export default function MoreMenu( { isRevisionMode = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
@@ -39,24 +28,32 @@ export default function MoreMenu( { disabled = false } ) {
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
 	};
+	const dropdownProps = {
+		icon: moreVertical,
+		label: __( 'Options' ),
+		popoverProps: {
+			placement: 'bottom-end',
+			className: 'more-menu-dropdown__content',
+		},
+		toggleProps: {
+			showTooltip: ! showIconLabels,
+			...( showIconLabels && { variant: 'tertiary' } ),
+			tooltipPosition: 'bottom',
+			size: 'compact',
+		},
+	};
+
+	if ( isRevisionMode ) {
+		return (
+			<DropdownMenu { ...dropdownProps }>
+				{ () => <ModeSwitcher /> }
+			</DropdownMenu>
+		);
+	}
 
 	return (
 		<>
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Options' ) }
-				popoverProps={ {
-					placement: 'bottom-end',
-					className: 'more-menu-dropdown__content',
-				} }
-				toggleProps={ {
-					showTooltip: ! showIconLabels,
-					...( showIconLabels && { variant: 'tertiary' } ),
-					tooltipPosition: 'bottom',
-					size: 'compact',
-					disabled,
-				} }
-			>
+			<DropdownMenu { ...dropdownProps }>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
@@ -132,10 +129,10 @@ export default function MoreMenu( { disabled = false } ) {
 									'https://wordpress.org/documentation/article/wordpress-block-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

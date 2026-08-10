@@ -1,0 +1,14 @@
+{
+	"name": "@wordpress/hello-dolly-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}

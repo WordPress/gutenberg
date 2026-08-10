@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getNodeText from '../get-node-text';
 
 describe( 'getNodeText', () => {

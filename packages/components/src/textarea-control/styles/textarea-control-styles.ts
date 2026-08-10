@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { font } from '../../utils/font';
 import { COLORS } from '../../utils/colors-values';
 import { CONFIG } from '../../utils';
@@ -60,6 +53,12 @@ export const StyledTextarea = styled.textarea`
 
 	&:focus {
 		${ inputStyleFocus }
+	}
+
+	&:disabled {
+		background: ${ COLORS.ui.backgroundDisabled };
+		border-color: ${ COLORS.ui.borderDisabled };
+		color: ${ COLORS.ui.textDisabled };
 	}
 
 	// Use opacity to work in various editor styles.

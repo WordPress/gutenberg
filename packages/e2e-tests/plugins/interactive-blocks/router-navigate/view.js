@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, withSyncEvent, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'router', {
@@ -34,7 +31,7 @@ const { state } = store( 'router', {
 
 			try {
 				yield actions.navigate( e.target.href, { force, timeout } );
-			} catch ( error ) {
+			} catch {
 				state.status = 'fail';
 			}
 

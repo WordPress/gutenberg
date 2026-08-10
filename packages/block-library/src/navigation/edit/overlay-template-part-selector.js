@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -11,16 +8,12 @@ import {
 	FlexBlock,
 	FlexItem,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
@@ -309,7 +302,6 @@ export default function OverlayTemplatePartSelector( {
 					>
 						<FlexBlock>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Overlay template' ) }
 								hideLabelFromVision
 								aria-labelledby={ headingId }
@@ -351,7 +343,7 @@ export default function OverlayTemplatePartSelector( {
 				alignment="flex-start"
 				className="wp-block-navigation__overlay-help-text-wrapper"
 			>
-				<Text
+				<WCText
 					variant="muted"
 					isBlock
 					className="wp-block-navigation__overlay-help-text"
@@ -359,7 +351,7 @@ export default function OverlayTemplatePartSelector( {
 					{ __(
 						'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
 					) }
-				</Text>
+				</WCText>
 			</HStack>
 		</div>
 	);

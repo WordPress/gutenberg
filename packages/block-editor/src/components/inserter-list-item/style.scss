@@ -42,7 +42,7 @@
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: transparent;
 	word-break: break-word;
 	@media not ( prefers-reduced-motion ) {
@@ -81,21 +81,6 @@
 				// This fixes drag-and-drop in Firefox.
 				pointer-events: none;
 			}
-		}
-
-		&.is-active {
-			color: $white;
-			background: $gray-900;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
-
-	&:not(:disabled) {
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
 }

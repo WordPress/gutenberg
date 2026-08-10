@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
@@ -33,7 +26,7 @@ const meta: Meta< typeof Text > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
+			notes: 'Use [`Text`](?path=/docs/design-system-components-text--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

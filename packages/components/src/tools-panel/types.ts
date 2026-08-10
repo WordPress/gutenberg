@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { HeadingSize } from '../heading/types';
 import type { DropdownMenu } from '../dropdown-menu';
 
@@ -20,7 +13,10 @@ export type ToolsPanelProps = {
 	/**
 	 * The dropdown menu props to configure the panel's `DropdownMenu`.
 	 */
-	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
+	dropdownMenuProps?: Omit<
+		React.ComponentProps< typeof DropdownMenu >,
+		'label'
+	>;
 	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.

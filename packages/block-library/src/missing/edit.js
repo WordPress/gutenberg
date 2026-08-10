@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
@@ -39,9 +36,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 	function convertToHTML() {
 		replaceBlock(
 			clientId,
-			createBlock( 'core/html', {
-				content: originalUndelimitedContent,
-			} )
+			createBlock( 'core/html', {}, [], [ originalUndelimitedContent ] )
 		);
 	}
 

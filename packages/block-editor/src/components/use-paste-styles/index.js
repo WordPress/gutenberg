@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { getBlockType, parse } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import {
 	hasAlignSupport,
@@ -44,7 +37,7 @@ function hasSerializedBlocks( text ) {
 			return false;
 		}
 		return true;
-	} catch ( err ) {
+	} catch {
 		// Parsing error, the text is not serialized blocks.
 		// (Even though that it technically won't happen)
 		return false;
@@ -153,7 +146,7 @@ export default function usePasteStyles() {
 				}
 
 				html = await window.navigator.clipboard.readText();
-			} catch ( error ) {
+			} catch {
 				// Possibly the permission is denied.
 				createErrorNotice(
 					__(

@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -19,15 +13,10 @@ import {
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
-
 import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
@@ -124,7 +113,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		} catch ( error ) {
+		} catch {
 			// Some browsers like UC Browser paste plain text by default and
 			// don't support clipboardData at all, so allow default
 			// behaviour.
@@ -181,7 +170,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
 
 	return (
-		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
@@ -195,7 +184,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			onPaste={ onPaste }
 			style={ style }
 		/>
-		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
 } );
 

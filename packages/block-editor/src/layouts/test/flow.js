@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import flow from '../flow';
 
 describe( 'getLayoutStyle', () => {

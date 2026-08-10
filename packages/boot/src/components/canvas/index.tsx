@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
 
@@ -74,7 +67,12 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ { isPreviewMode: canvas.isPreview } }
+					settings={ {
+						isPreviewMode: canvas.isPreview,
+						styles: canvas.isPreview
+							? [ { css: 'body{min-height:100vh;}' } ]
+							: [],
+					} }
 					backButton={ backButton }
 				/>
 			</div>

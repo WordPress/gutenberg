@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Spinner from '../';
 import { space } from '../../utils/space';
 
 const meta: Meta< typeof Spinner > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Spinner',
 	id: 'components-spinner',
 	component: Spinner,
@@ -19,7 +13,7 @@ const meta: Meta< typeof Spinner > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

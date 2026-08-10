@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
+const { basename, dirname, relative, resolve, sep } = require( 'path' );
+const { realpathSync } = require( 'fs' );
+const { exec } = require( 'child_process' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-const { exec } = require( 'child_process' );
-
-/**
- * WordPress dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
-
-/**
- * Internal dependencies
- */
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
@@ -220,7 +209,10 @@ const baseConfig = {
 			{
 				test: /\.svg$/,
 				issuer: /\.(j|t)sx?$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
+				use: [
+					require.resolve( '@svgr/webpack' ),
+					require.resolve( 'url-loader' ),
+				],
 				type: 'javascript/auto',
 			},
 			{
@@ -305,13 +297,15 @@ const scriptConfig = {
 				allowedHosts: 'auto',
 				host: 'localhost',
 				port: 8887,
-				proxy: {
-					'/build': {
+				proxy: [
+					{
+						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},
 					},
-				},
+				],
 		  },
 
 	plugins: [

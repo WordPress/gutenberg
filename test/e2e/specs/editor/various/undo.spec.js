@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -177,6 +174,19 @@ test.describe( 'undo', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
+
+		// Real-time collaboration causes block CRDT content to be updated
+		// asynchronously, and the RTC undo manager relies on up-to-date CRDT
+		// content. Ensure the bold has been applied before trying to undo.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<strong>test</strong>',
+				},
+			},
+		] );
+
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -462,7 +472,7 @@ test.describe( 'undo', () => {
 		await expect(
 			page.locator( 'role=button[name="Redo"]' )
 		).toBeEnabled();
-		await page.click( 'role=button[name="Redo"]' );
+		await page.getByRole( 'button', { name: 'Redo', exact: true } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -506,6 +516,179 @@ test.describe( 'undo', () => {
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/24679.
+	test( 'should not be dirty after undoing all changes', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.publishPost();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Howdy!' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeEnabled();
+
+		// Undo new block and content addition.
+		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+
+		// This cleanup runs through `withMultiEntityRecordEdits`, which
+		// real-time collaboration bypasses in favor of its own undo manager.
+		const isCollaborationEnabled = await page.evaluate(
+			() => window._wpCollaborationEnabled === true
+		);
+
+		// The entity is no longer dirty, so the "Save" button is disabled.
+		// Under real-time collaboration the undo runs through the RTC undo
+		// manager, which doesn't yet clear the dirty state, so the button
+		// stays enabled for now. That path is fixed separately.
+		// See: https://github.com/WordPress/gutenberg/pull/77100.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toHaveAttribute(
+			'aria-disabled',
+			isCollaborationEnabled ? 'false' : 'true'
+		);
+	} );
+
+	test( 'should leave undo to the browser inside the link dialog', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'some linked text here' );
+		// Select the word "linked".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 10 } );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect( urlInput ).toBeFocused();
+
+		await page.keyboard.type( 'exampl' );
+		await expect( urlInput ).toHaveValue( 'exampl' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The browser undoes the typing within the field. The dialog stays
+		// open and the canvas content is untouched.
+		await expect( urlInput ).toHaveValue( '' );
+		await expect( urlInput ).toBeFocused();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'some linked text here' },
+			},
+		] );
+	} );
+
+	test( 'should leave undo to the browser when editing a block as HTML', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'third' );
+
+		await editor.canvas.getByText( 'second', { exact: true } ).click();
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+
+		const textarea = editor.canvas.locator(
+			'textarea.block-editor-block-list__block-html-textarea'
+		);
+		await textarea.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'EDIT' );
+		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
+
+		// Undo granularity within the field is the browser's own; press
+		// once per typed character. Excess presses are harmless no-ops in
+		// browsers that group the typing into a single undo unit, since the
+		// editor history must not act while the field is focused.
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The other blocks
+		// are untouched, and redo restores the typing.
+		await expect( textarea ).toHaveValue( '<p>second</p>' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+			{ name: 'core/paragraph', attributes: { content: 'third' } },
+		] );
+
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
+	} );
+
+	test( 'should leave undo to the browser inside the Custom HTML dialog', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'a paragraph' );
+		await editor.insertBlock( {
+			name: 'core/html',
+			attributes: { content: '<p>markup</p>' },
+		} );
+		await editor.clickBlockToolbarButton( 'Edit code' );
+
+		const field = page.getByRole( 'dialog' ).getByRole( 'textbox' );
+		await field.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'EDIT' );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The dialog stays
+		// open and the content behind it is untouched.
+		await expect( field ).toHaveValue( '<p>markup</p>' );
+		await expect.poll( editor.getEditedPostContent )
+			.toBe( `<!-- wp:paragraph -->
+<p>a paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<p>markup</p>
+<!-- /wp:html -->` );
+
+		// Redo restores the typing. This distinguishes the browser's own
+		// undo from the editor history remounting the dialog: a remount
+		// resets the field to the same committed value, but destroys the
+		// browser's redo stack with it.
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
 	} );
 } );
 

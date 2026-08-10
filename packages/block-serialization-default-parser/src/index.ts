@@ -366,7 +366,7 @@ function proceed(): boolean {
 function parseJSON( input: string ): Object | null {
 	try {
 		return JSON.parse( input );
-	} catch ( e ) {
+	} catch {
 		return null;
 	}
 }

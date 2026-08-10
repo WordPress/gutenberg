@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -23,12 +16,8 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -464,7 +453,23 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
-				if ( getBlockOrder( nextBlockClientId ).length ) {
+				// Forward deleting an unmodified default block should
+				// remove it and move into the next block, not pull the
+				// next block's first item out of it.
+				if ( isUnmodifiedDefaultBlock( getBlock( clientId ) ) ) {
+					// Select the first leaf block, so the caret starts at
+					// the beginning of the block's content rather than on
+					// a container's shell.
+					let firstLeafClientId = nextBlockClientId;
+					while ( getBlockOrder( firstLeafClientId ).length ) {
+						firstLeafClientId =
+							getBlockOrder( firstLeafClientId )[ 0 ];
+					}
+					registry.batch( () => {
+						removeBlock( clientId );
+						selectBlock( firstLeafClientId );
+					} );
+				} else if ( getBlockOrder( nextBlockClientId ).length ) {
 					moveFirstItemUp( nextBlockClientId, false );
 				} else {
 					mergeBlocks( clientId, nextBlockClientId );
@@ -622,6 +627,7 @@ function BlockListBlockProvider( props ) {
 			const blockVisibility = attributes?.metadata?.blockVisibility;
 			const deviceType =
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+			const viewportSettings = settings?.__experimentalFeatures?.viewport;
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -645,6 +651,7 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -664,9 +671,13 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const sectionBlockClientId = _isSectionBlock( clientId )
+			const isSectionBlock = _isSectionBlock( clientId );
+			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			const isSelectionWithinCurrentSection =
+				isBlockSelected( sectionBlockClientId ) ||
+				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -684,11 +695,9 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				isSectionBlock,
 				isWithinSectionBlock: !! sectionBlockClientId,
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				isSelectionWithinCurrentSection,
 				blockType,
 				canRemove,
 				canMove,
@@ -736,15 +745,26 @@ function BlockListBlockProvider( props ) {
 					: false,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
 
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
+
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility: selectedProps?.blockVisibility,
 		deviceType: selectedProps?.deviceType,
+		viewportSettings: selectedProps?.viewportSettings,
+		view: defaultViewRef.current,
 	} );
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -808,6 +828,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = selectedProps;
 
 	const privateContext = {
@@ -847,6 +868,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	};
 
 	if (

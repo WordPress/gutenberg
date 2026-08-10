@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-
-/**
- * Internal dependencies
- */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
@@ -21,7 +14,13 @@ import type { CRDTDoc } from './types';
 type DocumentMeta = Record< string, DocumentMetaValue >;
 type DocumentMetaValue = boolean | number | string;
 
-export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
+/**
+ * Creates a new Y.Doc instance with the given document metadata.
+ *
+ * @param {DocumentMeta} documentMeta Optional metadata to associate with the
+ *                                    document. Metadata is not persisted.
+ */
+export function createYjsDoc( documentMeta: DocumentMeta = {} ): CRDTDoc {
 	// Convert the object representation of CRDT document metadata to a map.
 	// Document metadata is passed to the Y.Doc constructor and stored in its
 	// `meta` property. It is not synced to peers or persisted with the document.
@@ -30,17 +29,24 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 		Object.entries( documentMeta )
 	);
 
-	const ydoc = new Y.Doc( { meta: metaMap } );
-	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
-	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
-
-	return ydoc;
+	// IMPORTANT: Do not add update the document itself to avoid generating updates
+	// before observers are attached. Add initial updates in `initializeYjsDoc`.
+	return new Y.Doc( { meta: metaMap } );
 }
 
 /**
- * Record that the entity was saved (persisted to the database) in the CRDT
- * document record metadata.
+ * Initializes a Y.Doc instance with the necessary CRDT state for our use case.
+ *
+ * @param {Y.Doc} ydoc Y.Doc instance to initialize.
+ */
+export function initializeYjsDoc( ydoc: CRDTDoc ): void {
+	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
+}
+
+/**
+ * Record that the entity was saved by a user-facing entity save in the CRDT
+ * document metadata. Background CRDT snapshots should not update this marker.
  *
  * @param {CRDTDoc} ydoc CRDT document.
  */
@@ -55,8 +61,21 @@ function pseudoRandomID(): number {
 }
 
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
+	// Encode a compacted copy of the doc rather than the doc itself. The live
+	// doc can be much larger than its current content: Y.UndoManager flags
+	// items deleted by tracked transactions with `keep`, which blocks garbage
+	// collection while they sit on the undo stack, so the encoded state would
+	// include the full content of everything deleted during the session. The
+	// `keep` flag is not serialized, so applying the state to a temporary doc
+	// garbage-collects that content. Struct identities are preserved, meaning
+	// peers merge the compacted state exactly as they would the original.
+	const tempDoc = createYjsDoc();
+	Y.applyUpdateV2( tempDoc, Y.encodeStateAsUpdateV2( crdtDoc ) );
+	const compactedUpdate = Y.encodeStateAsUpdateV2( tempDoc );
+	tempDoc.destroy();
+
 	return JSON.stringify( {
-		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		document: buffer.toBase64( compactedUpdate ),
 		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }
@@ -83,7 +102,7 @@ export function deserializeCrdtDoc(
 		ydoc.clientID = pseudoRandomID();
 
 		return ydoc;
-	} catch ( e ) {
+	} catch {
 		return null;
 	}
 }

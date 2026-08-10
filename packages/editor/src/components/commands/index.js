@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -26,10 +23,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
@@ -40,6 +33,49 @@ import {
 import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
+
+/**
+ * Returns the command that toggles content-only editing for patterns and template parts.
+ * The command is registered both globally for search and contextually for block
+ * selection, so keeping it in one place ensures the label and callback stay aligned.
+ *
+ * @param {Object}   options                                               Command options.
+ * @param {boolean}  options.disableContentOnlyForPatternsAndTemplateParts Whether content-only editing is disabled for patterns and template parts.
+ * @param {Function} options.stopEditingContentOnlySection                 Stops editing the current content-only section before changing the setting.
+ * @param {Function} options.updateEditorSettings                          Updates the editor settings.
+ * @return {Object} The command configuration.
+ */
+function getTogglePatternEditingCommand( {
+	disableContentOnlyForPatternsAndTemplateParts,
+	stopEditingContentOnlySection,
+	updateEditorSettings,
+} ) {
+	return {
+		name: 'core/toggle-pattern-editing',
+		label: disableContentOnlyForPatternsAndTemplateParts
+			? __( 'Disable editing all patterns' )
+			: __( 'Enable editing all patterns' ),
+		icon: symbol,
+		category: 'command',
+		callback: ( { close } ) => {
+			const disableContentOnly =
+				! disableContentOnlyForPatternsAndTemplateParts;
+			stopEditingContentOnlySection();
+			updateEditorSettings( {
+				disableContentOnlyForUnsyncedPatterns: disableContentOnly,
+				disableContentOnlyForTemplateParts: disableContentOnly,
+			} );
+			close();
+		},
+	};
+}
+
+function isPatternOrTemplatePartBlock( blockName, attributes ) {
+	return (
+		!! attributes?.metadata?.patternName ||
+		blockName === 'core/template-part'
+	);
+}
 
 const getEditorCommandLoader = () =>
 	function useEditorCommandLoader() {
@@ -54,6 +90,8 @@ const getEditorCommandLoader = () =>
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
@@ -74,6 +112,11 @@ const getEditorCommandLoader = () =>
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				disableContentOnlyForUnsyncedPatterns:
+					!! getEditorSettings()
+						.disableContentOnlyForUnsyncedPatterns,
+				disableContentOnlyForTemplateParts:
+					!! getEditorSettings().disableContentOnlyForTemplateParts,
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -86,7 +129,12 @@ const getEditorCommandLoader = () =>
 			toggleDistractionFree,
 			toggleSpotlightMode,
 			toggleTopToolbar,
+			updateEditorSettings,
 		} = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
@@ -98,6 +146,9 @@ const getEditorCommandLoader = () =>
 		}
 
 		const commands = [];
+		const disableContentOnlyForPatternsAndTemplateParts =
+			disableContentOnlyForUnsyncedPatterns &&
+			disableContentOnlyForTemplateParts;
 
 		commands.push( {
 			name: 'core/open-shortcut-help',
@@ -175,6 +226,14 @@ const getEditorCommandLoader = () =>
 				close();
 			},
 		} );
+
+		commands.push(
+			getTogglePatternEditingCommand( {
+				disableContentOnlyForPatternsAndTemplateParts,
+				stopEditingContentOnlySection,
+				updateEditorSettings,
+			} )
+		);
 
 		if ( allowSwitchEditorMode ) {
 			commands.push( {
@@ -287,6 +346,76 @@ const getEditorCommandLoader = () =>
 		return {
 			commands,
 			isLoading: false,
+		};
+	};
+
+const getPatternEditingContextualCommands = () =>
+	function usePatternEditingContextualCommands( { search } ) {
+		const {
+			disableContentOnlyForPatternsAndTemplateParts,
+			hasPatternOrTemplatePartSelection,
+			isPreviewMode,
+		} = useSelect( ( select ) => {
+			const {
+				getBlockAttributes,
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				getSettings,
+			} = select( blockEditorStore );
+			const { getEditorSettings } = select( editorStore );
+			const editorSettings = getEditorSettings();
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const clientIdsToCheck =
+				selectedBlockClientId && selectedBlockClientIds.length === 1
+					? [
+							selectedBlockClientId,
+							...getBlockParents( selectedBlockClientId, true ),
+					  ]
+					: [];
+
+			return {
+				disableContentOnlyForPatternsAndTemplateParts:
+					!! editorSettings.disableContentOnlyForUnsyncedPatterns &&
+					!! editorSettings.disableContentOnlyForTemplateParts,
+				hasPatternOrTemplatePartSelection: clientIdsToCheck.some(
+					( clientId ) =>
+						isPatternOrTemplatePartBlock(
+							getBlockName( clientId ),
+							getBlockAttributes( clientId )
+						)
+				),
+				isPreviewMode: getSettings().isPreviewMode,
+			};
+		}, [] );
+		const { updateEditorSettings } = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
+		// Keep the disable command available after full pattern editing is enabled,
+		// even when the current selection is no longer inside a pattern or template part.
+		if (
+			search ||
+			( ! hasPatternOrTemplatePartSelection &&
+				! disableContentOnlyForPatternsAndTemplateParts ) ||
+			isPreviewMode
+		) {
+			return { isLoading: false, commands: [] };
+		}
+
+		return {
+			isLoading: false,
+			commands: [
+				getTogglePatternEditingCommand( {
+					disableContentOnlyForPatternsAndTemplateParts,
+					stopEditingContentOnlySection,
+					updateEditorSettings,
+				} ),
+			],
 		};
 	};
 
@@ -478,6 +607,12 @@ export default function useCommands() {
 		name: 'core/editor/contextual-commands',
 		hook: getEditedEntityContextualCommands(),
 		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/pattern-editing-contextual-commands',
+		hook: getPatternEditingContextualCommands(),
+		context: 'block-selection-edit',
 	} );
 
 	useCommandLoader( {

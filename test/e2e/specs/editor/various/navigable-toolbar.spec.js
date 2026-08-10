@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -12,6 +9,12 @@ test.use( {
 test.describe( 'Block Toolbar', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so a mid-test failure doesn't leak
+		// the fixed-toolbar setting (or any other pref) to other tests.
+		await requestUtils.resetPreferences();
 	} );
 
 	test.describe( 'Contextual Toolbar', () => {
@@ -91,11 +94,15 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			).toBeFocused();
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			await BlockToolbarUtils.focusBlockToolbar();
 			await expect(
@@ -180,8 +187,6 @@ test.describe( 'Block Toolbar', () => {
 
 		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 
@@ -248,8 +253,6 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is on the block
 		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 
@@ -326,16 +329,11 @@ class BlockToolbarUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`). When a
+		// focused editing host owns the selection, the editable element
+		// containing the selection owns the focus.
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async testScrollable( scrollableElement, elementToTest ) {

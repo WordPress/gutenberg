@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
@@ -10,33 +7,27 @@ import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../lock-unlock';
 import CreateNewTemplate from './create-new-template';
 
-export default function BlockThemeControl( { id } ) {
+export default function BlockThemeControl() {
 	const {
 		isTemplateHidden,
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
 		hasSpecificTemplate,
+		id,
 	} = useSelect( ( select ) => {
 		const {
 			getRenderingMode,
 			getEditorSettings: _getEditorSettings,
 			getCurrentPost,
+			getCurrentTemplateId,
 		} = unlock( select( editorStore ) );
 		const editorSettings = _getEditorSettings();
 		const currentPost = getCurrentPost();
@@ -48,6 +39,7 @@ export default function BlockThemeControl( { id } ) {
 				'onNavigateToPreviousEntityRecord'
 			),
 			hasSpecificTemplate: !! currentPost.template,
+			id: getCurrentTemplateId(),
 		};
 	}, [] );
 

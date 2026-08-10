@@ -109,8 +109,8 @@ You would have something like this as the conversionMap value:
 
 _Parameters_
 
--   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record< string, ReactElement >`: The map used to convert the string to a react element.
+-   _interpolatedString_ `Input`: The interpolation string to be parsed.
+-   _conversionMap_ `ConversionMap< InterpolationString< Input > >`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -122,12 +122,7 @@ Creates a portal into which a component can be rendered.
 
 _Related_
 
--   <https://github.com/facebook/react/issues/10309#issuecomment-318433235>
-
-_Parameters_
-
--   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
--   _container_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/createPortal>
 
 ### createRef
 
@@ -161,9 +156,9 @@ _Parameters_
 
 Forces React to flush any updates inside the provided callback synchronously.
 
-_Parameters_
+_Related_
 
--   _callback_ `Function`: Callback to run synchronously.
+-   <https://react.dev/reference/react-dom/flushSync>
 
 ### forwardRef
 
@@ -243,11 +238,7 @@ _Related_
 
 Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web environment.
 
-This is the same concept as the React Native implementation.
-
-_Related_
-
--   <https://reactnative.dev/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
+Here is an example of how to use the select method:
 
 _Usage_
 
@@ -255,10 +246,10 @@ _Usage_
 import { Platform } from '@wordpress/element';
 
 const placeholderLabel = Platform.select( {
-	native: __( 'Add media' ),
 	web: __(
 		'Drag images, upload new ones or select files from your library.'
 	),
+	default: __( 'Add media' ),
 } );
 ```
 

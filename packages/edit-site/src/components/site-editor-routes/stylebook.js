@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { unlock } from '../../lock-unlock';
-import { isClassicThemeWithStyleBookSupport } from './utils';
+import { isClassicThemeWithStyleBookSupport, isThemeDataLoaded } from './utils';
 
 const { StyleBookPreview } = unlock( editorPrivateApis );
 
@@ -19,6 +12,9 @@ export const stylebookRoute = {
 	path: '/stylebook',
 	areas: {
 		sidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
 				<SidebarNavigationScreen
 					title={ __( 'Styles' ) }
@@ -33,12 +29,18 @@ export const stylebookRoute = {
 		},
 		preview( { siteData } ) {
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
-				<StyleBookPreview isStatic />
+				<StyleBookPreview
+					isStatic
+					settings={ siteData.editorSettings }
+				/>
 			) : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileContent( { siteData } ) {
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
-				<StyleBookPreview isStatic />
+				<StyleBookPreview
+					isStatic
+					settings={ siteData.editorSettings }
+				/>
 			) : undefined;
 		},
 	},

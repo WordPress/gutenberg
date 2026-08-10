@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -22,23 +19,17 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
 import { previewField } from './fields/preview';
 import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
-
 // Unlock WordPress private APIs
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -258,6 +249,7 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
+			headingLevel={ 2 }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }

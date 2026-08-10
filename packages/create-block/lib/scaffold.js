@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { join } = require( 'path' );
 const { pascalCase, snakeCase } = require( 'change-case' );
-
-/**
- * Internal dependencies
- */
 const initBlock = require( './init-block' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );

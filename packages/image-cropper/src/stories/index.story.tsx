@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -9,10 +6,6 @@ import {
 	__experimentalHeading as Heading,
 	SelectControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
@@ -198,7 +191,6 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 						value={ cropperState.aspectRatio.toString() }
 						options={ aspectRatioOptions }
 						onChange={ handleAspectRatioChange }
-						__next40pxDefaultSize
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>

@@ -4,31 +4,50 @@ inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
-        type: string
 
 runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+          uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: npm
+              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm
+              # cache: npm
+              cache-dependency-path: |
+                  package-lock.json
+                  patches/**
+
+        - name: Pin npm version for consistency
+          run: |
+              npm install --global npm@10
+              npm --version
+          shell: bash
 
         - name: Get Node.js and npm version
           id: node-version
           run: |
               echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
+              echo "NPM_VERSION=$(npm -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+          uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
-              path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+              # List workspace node_modules explicitly to support all kinds of layouts - hoisted and isolated.
+              # A '**/node_modules' glob follows the isolated layout's symlinks and stalls the cache step.
+              path: |
+                  node_modules
+                  packages/*/node_modules
+                  routes/*/node_modules
+                  storybook/node_modules
+                  test/*/node_modules
+                  tools/*/node_modules
+                  widgets/*/node_modules
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
@@ -36,7 +55,7 @@ runs:
               npm ci
           shell: bash
         - name: Upload npm logs as an artifact on failure
-          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
           if: failure()
           with:
               name: npm-logs

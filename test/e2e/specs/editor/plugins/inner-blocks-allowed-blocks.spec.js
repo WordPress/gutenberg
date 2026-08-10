@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
@@ -10,14 +7,14 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-innerblocks-allowed-blocks'
 		);
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
 	} );
 
 	test( 'allows all blocks if the allowed blocks setting was not set', async ( {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion } from '@wordpress/admin-ui';
 import { forwardRef, useEffect } from '@wordpress/element';
 import {
@@ -125,7 +118,7 @@ function InterfaceSkeleton(
 						<NavigableRegion
 							as={ motion.div }
 							className="interface-interface-skeleton__header"
-							aria-label={ mergedLabels.header }
+							ariaLabel={ mergedLabels.header }
 							initial={
 								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'

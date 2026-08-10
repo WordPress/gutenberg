@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { privateApis, Spinner } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
@@ -23,6 +16,7 @@ export default function Radio< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
@@ -50,6 +44,7 @@ export default function Radio< Item >( {
 			options={ elements }
 			selected={ value }
 			hideLabelFromVision={ hideLabelFromVision }
+			disabled={ disabled }
 		/>
 	);
 }

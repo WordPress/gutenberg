@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';

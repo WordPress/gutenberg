@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Disabled } from '@wordpress/components';
 import {
 	BlockList,
@@ -13,17 +10,13 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, forwardRef } from '@wordpress/element';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { useGlobalStyles } from '../global-styles/hooks';
 import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
 import { unlock } from '../../lock-unlock';
 
 const {
 	ExperimentalBlockEditorProvider,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -133,7 +126,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 					 * so they can access any registered style overrides.
 					 */ }
 					<EditorStyles styles={ editorStyles } />
-					<__unstableBlockStyleVariationOverridesWithConfig
+					<BlockStyleVariationOverridesWithConfig
 						config={ mergedConfig }
 					/>
 				</ExperimentalBlockEditorProvider>

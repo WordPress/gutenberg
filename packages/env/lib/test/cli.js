@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const cli = require( '../cli' );
 const env = require( '../env' );
 
@@ -34,8 +31,21 @@ describe( 'env cli', () => {
 
 	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
-		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
+		const { spinner, autoPort } = env.start.mock.calls[ 0 ][ 0 ];
 		expect( spinner.text ).toBe( '' );
+		expect( autoPort ).toBeUndefined();
+	} );
+
+	it( 'parses start commands with --auto-port.', () => {
+		cli().parse( [ 'start', '--auto-port' ] );
+		const { autoPort } = env.start.mock.calls[ 0 ][ 0 ];
+		expect( autoPort ).toBe( true );
+	} );
+
+	it( 'parses start commands with --no-auto-port.', () => {
+		cli().parse( [ 'start', '--no-auto-port' ] );
+		const { autoPort } = env.start.mock.calls[ 0 ][ 0 ];
+		expect( autoPort ).toBe( false );
 	} );
 
 	it( 'parses stop commands.', () => {

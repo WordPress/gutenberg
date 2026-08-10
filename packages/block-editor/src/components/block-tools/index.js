@@ -1,27 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef, useState } from '@wordpress/element';
-import {
-	switchToBlockType,
-	hasBlockSupport,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import EmptyBlockInserter from './empty-block-inserter';
 import {
 	InsertionPointOpenRef,
@@ -29,6 +14,7 @@ import {
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
@@ -58,6 +44,9 @@ function selector( select ) {
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 		viewportModalClientIds: getViewportModalClientIds(),
+		blockVisibilitySetting:
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.blockVisibility?.allowEditing,
 	};
 }
 
@@ -82,6 +71,7 @@ export default function BlockTools( {
 		isZoomOutMode,
 		isDragging,
 		viewportModalClientIds,
+		blockVisibilitySetting,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
@@ -92,6 +82,7 @@ export default function BlockTools( {
 		getBlockName,
 		isGroupable,
 		getEditedContentOnlySection,
+		canEditBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
@@ -222,10 +213,7 @@ export default function BlockTools( {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = switchToBlockType(
-					blocks,
-					groupingBlockName
-				);
+				const newBlocks = groupBlocks( blocks, groupingBlockName );
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
@@ -234,7 +222,10 @@ export default function BlockTools( {
 			if ( clientIds.length === 1 ) {
 				const isContentOnly =
 					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
-				const canRenameBlock = canRename && ! isContentOnly;
+				const canRenameBlock =
+					canRename &&
+					! isContentOnly &&
+					canEditBlock( clientIds[ 0 ] );
 				if ( canRenameBlock ) {
 					event.preventDefault();
 					setRenamingBlockClientId( clientIds[ 0 ] );
@@ -243,6 +234,9 @@ export default function BlockTools( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
@@ -255,11 +249,14 @@ export default function BlockTools( {
 					return;
 				}
 
-				// Don't allow visibility toggle for blocks that
-				// are not in the default editing mode.
+				// Don't allow visibility toggle for blocks that are not in the
+				// default editing mode or when block editing is disabled
+				// (e.g. Revisions UI with isPreviewMode).
 				if (
 					clientIds.some(
-						( id ) => getBlockEditingMode( id ) !== 'default'
+						( id ) =>
+							getBlockEditingMode( id ) !== 'default' ||
+							! canEditBlock( id )
 					)
 				) {
 					return;

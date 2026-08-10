@@ -72,6 +72,24 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		return $this->theme_root;
 	}
 
+	/**
+	 * @covers ::gutenberg_sanitize_block_gap_value
+	 */
+	public function test_sanitize_block_gap_value_rejects_nested_array_values() {
+		$this->assertSame(
+			array(
+				'top'  => null,
+				'left' => '2rem',
+			),
+			gutenberg_sanitize_block_gap_value(
+				array(
+					'top'  => array( '1rem' ),
+					'left' => '2rem',
+				)
+			)
+		);
+	}
+
 	public function test_outer_container_not_restored_for_non_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
@@ -147,6 +165,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		'should_skip_gap_serialization' => false,
 		'fallback_gap_value'            => '0.5em',
 		'block_spacing'                 => null,
+		'options'                       => array(),
 	);
 
 	/**
@@ -168,7 +187,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			$args['gap_value'],
 			$args['should_skip_gap_serialization'],
 			$args['fallback_gap_value'],
-			$args['block_spacing']
+			$args['block_spacing'],
+			$args['options']
 		);
 
 		$this->assertSame( $expected_output, $layout_styles );
@@ -255,6 +275,21 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'constrained layout with content size unset in viewport' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'        => 'constrained',
+						'contentSize' => '800px',
+					),
+					'options'  => array(
+						'viewport_overrides' => array(
+							'contentSize' => null,
+						),
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size, none);}.wp-layout > .alignwide{max-width:var(--wp--style--global--wide-size, none);}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with block gap support'    => array(
 				'args'            => array(
@@ -422,6 +457,162 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that gutenberg_get_child_layout_style_rules() renders flex child sizing styles.
+	 *
+	 * @dataProvider data_gutenberg_get_child_layout_style_rules
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 *
+	 * @param array      $child_layout       Child layout values.
+	 * @param array|null $viewport_overrides Optional child viewport layout overrides.
+	 * @param array      $expected_output    The expected output.
+	 */
+	public function test_gutenberg_get_child_layout_style_rules( $child_layout, $viewport_overrides, $expected_output ) {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			$child_layout,
+			array(),
+			$viewport_overrides
+		);
+
+		$this->assertSame( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_child_layout_style_rules().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_child_layout_style_rules() {
+		return array(
+			'legacy fixed sizing remains shrinkable'      => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => '320px',
+							'box-sizing' => 'border-box',
+						),
+					),
+				),
+			),
+			'fixed sizing can opt out of shrinking'       => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => '320px',
+							'flex-shrink' => '0',
+							'box-sizing'  => 'border-box',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to max' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fixed',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => '320px',
+							'flex-shrink' => 'unset',
+							'box-sizing'  => 'border-box',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to fit' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to fit'  => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+							'flex-grow'   => '1',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+							'flex-grow'  => '1',
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
 	 * Check that gutenberg_render_layout_support_flag() renders the correct classnames on the wrapper.
 	 *
 	 * @dataProvider data_layout_support_flag_renders_classnames_on_wrapper
@@ -452,6 +643,32 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'attrs'        => array(
 							'layout' => array(
 								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"></div>',
+			),
+			'single wrapper block layout with malformed axial block gap' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+							'style'  => array(
+								'spacing' => array(
+									'blockGap' => array(
+										'top' => array( '1rem' ),
+									),
+								),
 							),
 						),
 						'innerBlocks'  => array(),
@@ -563,6 +780,33 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '<div class="wp-block-group is-layout-grid wp-container-core-group-is-layout-9d260ee2 wp-block-group-is-layout-grid"></div>',
+			),
+			/*
+			 * When the first innerContent chunk contains a sibling element (one that fully opens
+			 * and closes before the inner blocks), the layout classes must be added to the outer
+			 * container — not to the sibling. The sibling's class was incorrectly chosen by the
+			 * previous logic because it was the last class encountered while scanning the chunk.
+			 */
+			'outer wrapper targeted when sibling element precedes inner blocks' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"><div class="wp-block-group__header">Header</div><p>Inner block</p></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"><div class="wp-block-group__header">Header</div><p>Inner block</p></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"><div class="wp-block-group__header">Header</div>',
+							null,
+							'</div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"><div class="wp-block-group__header">Header</div><p>Inner block</p></div>',
 			),
 		);
 	}
@@ -922,6 +1166,200 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_result'   => 'outlined',
 			),
+		);
+	}
+
+	/**
+	 * Tests that a non-string `className` attribute does not cause a fatal
+	 * when checking for style variation layout styles.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_with_non_string_class_name() {
+		$block_content = '<div class="wp-block-group 0 1"></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'className' => array( '0', '1' ),
+				'layout'    => array(
+					'type' => 'constrained',
+				),
+			),
+		);
+
+		$this->assertSame(
+			'<div class="wp-block-group 0 1 is-layout-constrained wp-block-group-is-layout-constrained"></div>',
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Layout support should render the expected markup when className is not a string'
+		);
+	}
+
+	/**
+	 * Tests that layout support returns early, without resolving global settings,
+	 * for a block that cannot produce any layout output.
+	 *
+	 * Resolving global settings reads the user's `wp_global_styles` post with a
+	 * `WP_Query`, which fires `the_posts`. A callback on that hook that renders
+	 * blocks re-enters this filter, so the bail-out has to happen before the
+	 * lookup or the recursion has no base case.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_returns_early_before_resolving_global_settings() {
+		$user_data_resolutions = 0;
+		add_filter(
+			'wp_theme_json_data_user',
+			static function ( $theme_json ) use ( &$user_data_resolutions ) {
+				++$user_data_resolutions;
+				return $theme_json;
+			}
+		);
+
+		// A block with no layout support and no child layout, as produced by
+		// parsing content that has no block delimiters.
+		$block_content = '<p>Not a block.</p>';
+		$block         = array(
+			'blockName' => null,
+			'attrs'     => array(),
+		);
+
+		// Start from a cold cache, as on a front-end request.
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Block content should be returned unchanged when the block has no layout support.'
+		);
+		$this->assertSame(
+			0,
+			$user_data_resolutions,
+			'Global settings should not be resolved for a block that cannot produce layout output.'
+		);
+
+		// A block that does support layout still resolves global settings, which
+		// confirms the assertion above is not passing because of a warm cache.
+		_gutenberg_clean_theme_json_caches();
+
+		gutenberg_render_layout_support_flag(
+			'<div class="wp-block-group"></div>',
+			array(
+				'blockName' => 'core/group',
+				'attrs'     => array( 'layout' => array( 'type' => 'constrained' ) ),
+			)
+		);
+
+		$this->assertGreaterThan(
+			0,
+			$user_data_resolutions,
+			'Global settings should still be resolved for a block that supports layout.'
+		);
+	}
+
+	/**
+	 * Tests that a constrained layout with non-string contentSize/wideSize/justifyContent
+	 * values (e.g. from hand-edited, imported, or AI-generated content) does not cause a
+	 * fatal error in the explode() calls.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_with_non_string_constrained_sizes() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'           => 'constrained',
+				'contentSize'    => array( '800px' ),
+				'wideSize'       => array( '1200px' ),
+				'justifyContent' => array( 'center' ),
+			)
+		);
+
+		$this->assertIsString( $layout_styles, 'Constrained layout should not fatal when sizes are not strings.' );
+		$this->assertStringNotContainsString( 'Array', $layout_styles, 'A non-string size value should not leak into the output.' );
+	}
+
+	/**
+	 * Tests that a flex layout with non-string justifyContent/verticalAlignment values
+	 * does not cause a fatal error in the array_key_exists() calls.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_with_non_string_flex_alignment() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'flex',
+				'orientation'       => 'horizontal',
+				'justifyContent'    => array( 'right' ),
+				'verticalAlignment' => array( 'center' ),
+			)
+		);
+
+		$this->assertIsString( $layout_styles, 'Flex layout should not fatal when alignment values are not strings.' );
+	}
+
+	/**
+	 * Tests that a responsive grid child with a non-string parent minimumColumnWidth
+	 * does not cause a fatal error in the explode() call.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_with_non_string_minimum_column_width() {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnSpan' => '2' ),
+			array( 'minimumColumnWidth' => array( '12rem' ) ),
+			null
+		);
+
+		$this->assertIsArray( $actual_output, 'Child layout rules should not fatal when minimumColumnWidth is not a string.' );
+	}
+
+	/**
+	 * Tests that layout classname generation does not fatal when the layout type,
+	 * orientation, or justifyContent attributes are not strings.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_with_non_string_layout_values() {
+		$block_content = '<div class="wp-block-group"></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'layout' => array(
+					'type'           => array( 'constrained' ),
+					'orientation'    => array( 'horizontal' ),
+					'justifyContent' => array( 'center' ),
+				),
+			),
+		);
+
+		$this->assertIsString(
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Layout support should not fatal when layout values are not strings.'
+		);
+	}
+
+	/**
+	 * Tests that restoring the group inner container does not fatal when the tagName
+	 * attribute is not a string (which would break the preg_quote() calls).
+	 *
+	 * @covers ::gutenberg_restore_group_inner_container
+	 */
+	public function test_restore_group_inner_container_with_non_string_tag_name() {
+		// The "default" theme doesn't have theme.json support, so the preg_quote() path runs.
+		switch_theme( 'default' );
+		$block_content = '<div class="wp-block-group"><p>Test</p></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'tagName' => array( 'div' ),
+			),
+		);
+
+		$this->assertIsString(
+			gutenberg_restore_group_inner_container( $block_content, $block ),
+			'Group inner container restore should not fatal when tagName is not a string.'
 		);
 	}
 }

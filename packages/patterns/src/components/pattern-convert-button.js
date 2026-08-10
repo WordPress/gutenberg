@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	hasBlockSupport,
 	isReusableBlock,
@@ -16,9 +13,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
@@ -143,7 +137,6 @@ export default function PatternConvertButton( {
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
-			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(
@@ -164,6 +157,7 @@ export default function PatternConvertButton( {
 			}
 		);
 		setIsModalOpen( false );
+		closeBlockSettingsMenu();
 	};
 	return (
 		<>

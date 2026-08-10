@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -14,12 +11,20 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-		// Cross-origin isolation (COEP) prevents page navigations
-		// from working properly during template creation.
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template revert involves visitSiteEditor() page navigations to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -27,10 +32,6 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
-	} );
-	test.beforeEach( async ( { admin, requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor( { canvas: 'edit' } );
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -53,9 +54,10 @@ test.describe( 'Template Revert', () => {
 			)
 			.isVisible();
 		if ( isTemplateTabVisible ) {
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
-			);
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Template' } )
+				.click();
 		}
 
 		// The revert button isn't visible anymore.
@@ -132,9 +134,10 @@ test.describe( 'Template Revert', () => {
 		expect( contentAfterSave ).not.toEqual( contentBefore );
 
 		// Undo revert by clicking header button and check state again.
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 		const contentAfterUndo =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterUndo ).toEqual( contentBefore );
@@ -156,17 +159,19 @@ test.describe( 'Template Revert', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 		await templateRevertUtils.revertTemplate();
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 
 		const contentAfterUndo =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterUndo ).not.toEqual( contentBefore );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Redo' } )
+			.click();
 
 		const contentAfterRedo =
 			await templateRevertUtils.getCurrentSiteEditorContent();
@@ -195,9 +200,10 @@ test.describe( 'Template Revert', () => {
 
 		await templateRevertUtils.revertTemplate();
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
@@ -223,14 +229,16 @@ class TemplateRevertUtils {
 			)
 			.isVisible();
 		if ( isTemplateTabVisible ) {
-			await this.page.click(
-				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
-			);
+			await this.page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tab', { name: 'Template' } )
+				.click();
 		}
-		await this.page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
-		);
-		await this.page.click( 'role=menuitem[name=/Reset/i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await this.page.getByRole( 'menuitem', { name: /Reset/i } ).click();
 		await this.page.getByRole( 'button', { name: 'Reset' } ).click();
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text=/ reset./'

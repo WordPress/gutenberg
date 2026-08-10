@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Flex, FlexItem, FlexBlock } from '../';
 import { View } from '../../view';
 
@@ -34,7 +27,7 @@ const meta: Meta< typeof Flex > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. For use cases not covered by `HStack` and `VStack`, write your own CSS.',
+			notes: 'Planned for deprecation. For use cases not covered by [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui`, write your own CSS.',
 		},
 	},
 };

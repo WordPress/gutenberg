@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ButtonGroup from '..';
 import Button from '../../button';
 
@@ -16,7 +9,7 @@ import Button from '../../button';
  * This component is deprecated. Use `ToggleGroupControl` instead.
  */
 const meta: Meta< typeof ButtonGroup > = {
-	title: 'Components (Deprecated)/ButtonGroup',
+	title: 'Components/Deprecated/ButtonGroup',
 	id: 'components-buttongroup',
 	component: ButtonGroup,
 	argTypes: {

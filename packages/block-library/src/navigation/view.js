@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -80,27 +77,36 @@ const { state, actions } = store(
 					? ctx.overlayOpenedBy
 					: ctx.submenuOpenedBy;
 			},
+			get isSubmenuOpen() {
+				const ctx = getContext();
+				// Once the overlay itself is open, its styles always expand
+				// every submenu regardless of hover/click/focus state, so the
+				// toggle's `aria-expanded` should reflect that immediately
+				// instead of waiting for a hover/click/focus interaction.
+				const isOverlayOpen =
+					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
+						.length > 0;
+				return isOverlayOpen || state.isMenuOpen;
+			},
 		},
 		actions: {
-			openMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only open on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			openMenuOnHover( event ) {
+				// Pointer events from touch should not open the submenu on hover;
+				// touch devices toggle via the click action instead.
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.openMenu( 'hover' );
 				}
 			},
-			closeMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only close on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			closeMenuOnHover( event ) {
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.closeMenu( 'hover' );
 				}
 			},
@@ -128,6 +134,10 @@ const { state, actions } = store(
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					// Also clear hover in case it was set by a synthetic pointerenter
+					// on touch (e.g. the browser-fired mouseenter-equivalent before
+					// the click event), ensuring the submenu fully closes.
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );

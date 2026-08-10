@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 
@@ -58,7 +51,11 @@ export default function EditSectionButton( { clientId } ) {
 	return (
 		<ToolbarGroup>
 			<ToolbarButton onClick={ handleClick }>
-				{ isEditing ? __( 'Exit pattern' ) : __( 'Edit pattern' ) }
+				{ isEditing
+					? /* translators: Button label to leave pattern editing mode. */
+					  __( 'Exit pattern' )
+					: /* translators: Button label to enter pattern editing mode. */
+					  __( 'Edit pattern' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);

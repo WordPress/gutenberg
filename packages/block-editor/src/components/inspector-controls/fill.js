@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalStyleProvider as StyleProvider,
 	__experimentalToolsPanelContext as ToolsPanelContext,
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-import { useEffect, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useEffect, useContext, useMemo } from '@wordpress/element';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -19,10 +12,13 @@ import {
 	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
+import {
+	scopeResetAllFilterToState,
+	useBlockStyleState,
+} from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
-const TEMPLATE_PART_GROUPS = [ 'default', 'settings', 'advanced' ];
 
 export default function InspectorControlsFill( {
 	children,
@@ -43,6 +39,9 @@ export default function InspectorControlsFill( {
 	}
 
 	const context = useBlockEditContext();
+	const isSelectedBlock = context[ mayDisplayControlsKey ];
+	const isPatternEditing = context[ mayDisplayPatternEditingControlsKey ];
+	const isInListViewTree = context[ isInListViewBlockSupportTreeKey ];
 
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
@@ -52,64 +51,52 @@ export default function InspectorControlsFill( {
 
 	// During pattern editing:
 	// - All blocks can show pattern editing groups (content, list).
-	// - Template parts can show a settings tab (default, settings, advanced groups).
+	// - Template parts can show any inspector group.
 	// - Other blocks cannot show a settings tab.
-	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
-		// Template parts are allowed to show a settings tab to allow access to the
-		// 'Design' and 'Advanced' panels.
+	if ( isPatternEditing ) {
+		// Template parts have also historically supported
+		// any block inspector groups for extenders. The settings
+		// tab is also used by core for the 'Design' panel. Specifically
+		// for that block the restrictions on allowed groups are lessened.
 		const isTemplatePart = context.name === 'core/template-part';
-		const isTemplatePartGroup = TEMPLATE_PART_GROUPS.includes( group );
 		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
-
-		const canShowGroup =
-			( isTemplatePart && isTemplatePartGroup ) || isPatternEditingGroup;
+		const canShowGroup = isTemplatePart || isPatternEditingGroup;
 
 		if ( ! canShowGroup ) {
 			return null;
 		}
-	}
-
-	// Outside pattern editing, use the standard rules for displaying controls.
-	if (
-		! context[ mayDisplayPatternEditingControlsKey ] &&
-		! context[ mayDisplayControlsKey ]
-	) {
+	} else if ( ! isSelectedBlock ) {
+		// Outside pattern editing, use the standard rules for displaying controls.
 		return null;
 	}
 
 	// When inside a section with a parent that has ListView block support,
 	// content controls are rendered as part of the ListView via a popover.
-	if (
-		group === 'content' &&
-		!! context[ isInListViewBlockSupportTreeKey ] &&
-		!! context[ mayDisplayPatternEditingControlsKey ]
-	) {
-		if ( context[ mayDisplayControlsKey ] ) {
-			return (
-				<StyleProvider document={ document }>
-					<ListViewContentFill>{ children }</ListViewContentFill>
-				</StyleProvider>
-			);
-		}
+	const rendersInListView =
+		group === 'content' && isPatternEditing && isInListViewTree;
 
-		// When using the ListView fill, only render controls for the selected
-		// block. Other blocks return `null`.
+	// When using the ListView fill, only render controls for the selected
+	// block. Other blocks return `null`.
+	if ( rendersInListView && ! isSelectedBlock ) {
 		return null;
 	}
 
 	return (
 		<StyleProvider document={ document }>
-			<Fill>
-				{ ( fillProps ) => {
-					return (
+			{ rendersInListView ? (
+				<ListViewContentFill>{ children }</ListViewContentFill>
+			) : (
+				<Fill>
+					{ ( fillProps ) => (
 						<ToolsPanelInspectorControl
 							fillProps={ fillProps }
-							children={ children }
 							resetAllFilter={ resetAllFilter }
-						/>
-					);
-				} }
-			</Fill>
+						>
+							{ children }
+						</ToolsPanelInspectorControl>
+					) }
+				</Fill>
+			) }
 		</StyleProvider>
 	);
 }
@@ -117,18 +104,27 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
+	const selectedState = useBlockStyleState();
+	const scopedResetAllFilter = useMemo(
+		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
+		[ resetAllFilter, selectedState ]
+	);
 	useEffect( () => {
 		if (
-			resetAllFilter &&
+			scopedResetAllFilter &&
 			registerResetAllFilter &&
 			deregisterResetAllFilter
 		) {
-			registerResetAllFilter( resetAllFilter );
+			registerResetAllFilter( scopedResetAllFilter );
 			return () => {
-				deregisterResetAllFilter( resetAllFilter );
+				deregisterResetAllFilter( scopedResetAllFilter );
 			};
 		}
-	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	}, [
+		scopedResetAllFilter,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+	] );
 	return children;
 }
 

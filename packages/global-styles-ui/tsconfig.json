@@ -9,6 +9,7 @@
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -18,8 +19,10 @@
 		{ "path": "../global-styles-engine" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis" },
+		{ "path": "../ui" }
 	],
 	"include": [ "src/**/*" ],
 	"exclude": [ "src/font-library/lib/**/*" ]

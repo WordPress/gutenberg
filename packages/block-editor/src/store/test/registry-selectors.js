@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from '../';
 
 describe( 'selectors', () => {
@@ -104,7 +97,7 @@ describe( 'selectors', () => {
 			expect(
 				select( store ).__experimentalGetAllowedPatterns( {
 					blocks: { byClientId: new Map() },
-					blockListSettings: {},
+					blockListSettings: new Map(),
 					settings: {
 						__experimentalBlockPatterns: [
 							{

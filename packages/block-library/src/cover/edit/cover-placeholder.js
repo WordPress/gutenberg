@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { BlockIcon, MediaPlaceholder } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { cover as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { createBlobURL } from '@wordpress/blob';
 import { ALLOWED_MEDIA_TYPES } from '../shared';
 
 export default function CoverPlaceholder( {
@@ -18,6 +12,12 @@ export default function CoverPlaceholder( {
 	style,
 	toggleUseFeaturedImage,
 } ) {
+	const onFilesPreUpload = ( files ) => {
+		if ( files.length === 1 ) {
+			onSelectMedia( { url: createBlobURL( files[ 0 ] ) } );
+		}
+	};
+
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -28,6 +28,7 @@ export default function CoverPlaceholder( {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
+			onFilesPreUpload={ onFilesPreUpload }
 			onError={ onError }
 			style={ style }
 		>

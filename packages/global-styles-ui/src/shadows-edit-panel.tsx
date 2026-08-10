@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -35,10 +28,6 @@ import {
 	moreVertical,
 } from '@wordpress/icons';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
@@ -243,7 +232,6 @@ export default function ShadowsEditPanel() {
 						} }
 					>
 						<InputControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Name' ) }
 							placeholder={ __( 'Shadow name' ) }
@@ -494,7 +482,6 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 					onShadowChange( 'inset', value === 'inset' )
 				}
 				hideLabelFromVision
-				__next40pxDefaultSize
 			>
 				<ToggleGroupControlOption
 					value="outset"
@@ -551,7 +538,6 @@ function ShadowInputControl( {
 	return (
 		<UnitControl
 			label={ label }
-			__next40pxDefaultSize
 			value={ value }
 			onChange={ onValueChange }
 		/>

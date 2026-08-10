@@ -1,13 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
-
-/**
- * Internal dependencies
- */
-import { selectBlockPatternsKey } from './private-keys';
+import {
+	selectBlockPatternsKey,
+	userPatternCategoriesSelectKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 import {
@@ -128,7 +124,8 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 export const getAllPatternsDependants = ( select ) => ( state ) => {
 	return [
 		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalUserPatternCategories,
+		state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
+			state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
 		state.settings[ selectBlockPatternsKey ]?.( select ),
 		state.blockPatterns,
@@ -138,7 +135,7 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 
 export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 	return [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId.get( rootClientId ),
 		state.blocks.order.get( rootClientId || '' ),
 		state.settings.allowedBlockTypes,

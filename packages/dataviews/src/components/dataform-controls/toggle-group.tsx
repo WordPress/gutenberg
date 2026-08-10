@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
@@ -27,6 +20,7 @@ export default function ToggleGroup< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -54,7 +48,6 @@ export default function ToggleGroup< Item >( {
 			required={ !! field.isValid?.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			__next40pxDefaultSize
 			isBlock
 			label={ field.label }
 			help={ selectedOption?.description || field.description }
@@ -67,6 +60,7 @@ export default function ToggleGroup< Item >( {
 					key={ el.value }
 					label={ el.label }
 					value={ el.value }
+					disabled={ disabled }
 				/>
 			) ) }
 		</ValidatedToggleGroupControl>

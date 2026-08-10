@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
