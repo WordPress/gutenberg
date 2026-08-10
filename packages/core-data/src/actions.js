@@ -468,6 +468,23 @@ export const editEntityRecord =
 			return acc;
 		}, {} );
 
+		// The persisted CRDT document is server-managed state, not a user
+		// edit. The merged meta snapshot must not capture it: the value
+		// changes on every save, so a captured copy goes stale immediately
+		// and would keep the record marked dirty after the edit itself has
+		// been persisted (e.g. by a collaborator's save).
+		if (
+			entityConfig.syncConfig &&
+			mergedEdits.meta &&
+			editsWithMerges.meta &&
+			POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in editsWithMerges.meta
+		) {
+			editsWithMerges.meta = { ...editsWithMerges.meta };
+			delete editsWithMerges.meta[
+				POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+			];
+		}
+
 		const edit = {
 			kind,
 			name,
