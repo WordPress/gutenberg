@@ -93,7 +93,7 @@ const CANVAS_TARGET_ASPECT_RATIO = 9 / 16;
  * @param {Object} containerSize The available space, as `{ width, height }` in pixels.
  * @return {number} The canvas height in pixels.
  */
-function getCanvasHeight( width, containerSize ) {
+export function getCanvasHeight( width, containerSize ) {
 	const lerp = ( a, b, amount ) => a + ( b - a ) * amount;
 
 	// The narrower the canvas within the available space, the closer to the
