@@ -4,8 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
-import { useGlobalStyles } from './hooks';
+import { useGlobalStylesReset } from './hooks';
 
 /**
  * Action menu with Reset, Welcome Guide, and Additional CSS.
@@ -19,38 +18,7 @@ export function GlobalStylesActionMenu( {
 	hideWelcomeGuide = false,
 	onChangePath,
 } ) {
-	const { user, setUser } = useGlobalStyles();
-
-	// Check if there are user customizations that can be reset
-	const canReset =
-		!! user &&
-		( Object.keys( user?.styles ?? {} ).length > 0 ||
-			Object.keys( user?.settings ?? {} ).length > 0 );
-
-	const { createSuccessNotice } = useDispatch( noticesStore );
-
-	// Reset function to clear all user customizations
-	const onReset = () => {
-		// Keep the config that is being replaced so the notice can put it back.
-		// It carries `_links` as well as styles and settings, so restoring it
-		// does not drop the capability links the menu reads.
-		const previousUser = user;
-
-		setUser( { styles: {}, settings: {} } );
-
-		createSuccessNotice( __( 'Custom styles reset.' ), {
-			type: 'snackbar',
-			id: 'global-styles-reset',
-			actions: [
-				{
-					label: __( 'Undo' ),
-					onClick: () => {
-						setUser( previousUser );
-					},
-				},
-			],
-		} );
-	};
+	const { canReset, resetGlobalStyles } = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -100,7 +68,7 @@ export function GlobalStylesActionMenu( {
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {
-								onReset();
+								resetGlobalStyles();
 								onClose();
 							} }
 							disabled={ ! canReset }
