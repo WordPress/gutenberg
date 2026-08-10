@@ -74,9 +74,11 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'icon'          => 'core/calendar',
 				'actions'       => array(
 					array(
-						'id'    => 'open-settings',
-						'label' => 'Open settings',
-						'href'  => 'options-general.php',
+						'id'        => 'open-settings',
+						'label'     => 'Open settings',
+						'href'      => 'options-general.php',
+						'icon'      => 'core/cog',
+						'relevance' => 'low',
 					),
 				),
 				'keywords'      => array( 'alpha', 'first' ),
@@ -164,9 +166,11 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'    => 'open-settings',
-					'label' => 'Open settings',
-					'href'  => 'options-general.php',
+					'id'        => 'open-settings',
+					'label'     => 'Open settings',
+					'href'      => 'options-general.php',
+					'icon'      => 'core/cog',
+					'relevance' => 'low',
 				),
 			),
 			$data['actions']
@@ -234,5 +238,13 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'string', 'null' ), $properties['icon']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['actions']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
+
+		$action_properties = $properties['actions']['items']['properties'];
+		$this->assertArrayHasKey( 'icon', $action_properties );
+		$this->assertArrayHasKey( 'relevance', $action_properties );
+		$this->assertSame(
+			array( 'high', 'low' ),
+			$action_properties['relevance']['enum']
+		);
 	}
 }
