@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createElement, forwardRef } from '@wordpress/element';
 
 /** @typedef {{isPressed?: boolean} & React.ComponentPropsWithoutRef<'svg'>} SVGProps */

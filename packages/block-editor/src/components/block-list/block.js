@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -25,10 +18,6 @@ import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -682,9 +671,13 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const sectionBlockClientId = _isSectionBlock( clientId )
+			const isSectionBlock = _isSectionBlock( clientId );
+			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			const isSelectionWithinCurrentSection =
+				isBlockSelected( sectionBlockClientId ) ||
+				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -702,11 +695,9 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				isSectionBlock,
 				isWithinSectionBlock: !! sectionBlockClientId,
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				isSelectionWithinCurrentSection,
 				blockType,
 				canRemove,
 				canMove,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getChildLayoutStyleRules } from '../layout-child';
 
 describe( 'layout child', () => {

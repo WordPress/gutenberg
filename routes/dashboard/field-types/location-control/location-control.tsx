@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { LocationPicker } from '../location-picker';
 
 /*

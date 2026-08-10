@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import moveIndividualPreference from '../move-individual-preference';
 
 describe( 'moveIndividualPreference', () => {

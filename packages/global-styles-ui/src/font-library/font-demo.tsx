@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import { Text, Skeleton } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import {
 	getFacePreviewStyle,

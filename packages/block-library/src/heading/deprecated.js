@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	getColorClassName,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
 
 const blockSupports = {

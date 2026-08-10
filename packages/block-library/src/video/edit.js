@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
@@ -27,10 +20,6 @@ import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -225,36 +214,38 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							autoplay: false,
-							controls: true,
-							loop: false,
-							muted: false,
-							playsInline: false,
-							preload: 'metadata',
-							poster: undefined,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<VideoCommonSettings
-						setAttributes={ setAttributes }
-						attributes={ attributes }
-					/>
-					<PosterImage
-						poster={ poster }
-						onChange={ ( posterImage ) =>
+			{ ! isGif && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
-								poster: posterImage?.url,
-							} )
-						}
-					/>
-				</ToolsPanel>
-			</InspectorControls>
+								autoplay: false,
+								controls: true,
+								loop: false,
+								muted: false,
+								playsInline: false,
+								preload: 'metadata',
+								poster: undefined,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<VideoCommonSettings
+							setAttributes={ setAttributes }
+							attributes={ attributes }
+						/>
+						<PosterImage
+							poster={ poster }
+							onChange={ ( posterImage ) =>
+								setAttributes( {
+									poster: posterImage?.url,
+								} )
+							}
+						/>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }

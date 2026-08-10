@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { addons } from 'storybook/manager-api';
-
-/**
- * Internal dependencies
- */
 import badges from './badges';
 import sidebar from './sidebar';
 import theme from './theme';

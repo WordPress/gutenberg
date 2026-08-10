@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import config from '../';
 
 describe( 'npm-package-json-lint config tests', () => {

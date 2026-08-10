@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createPortal } from 'react-dom';
-
-/**
- * Internal dependencies
- */
 import useDialog from '..';
 
 function Dialog( { onClose }: { onClose?: () => void } ) {

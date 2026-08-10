@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import InputControl from '../../input-control';
 import { COLORS } from '../../utils';
 import Button from '../../button';
