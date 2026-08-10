@@ -1,4 +1,5 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
+import { DirectionProvider } from '../utils/direction-provider';
 import { MenuContext } from './context';
 import type { RootProps } from './types';
 
@@ -21,9 +22,11 @@ import type { RootProps } from './types';
  */
 function Root< Payload = unknown >( props: RootProps< Payload > ) {
 	return (
-		<MenuContext.Provider value={ { isSubmenu: false } }>
-			<_Menu.Root< Payload > { ...props } />
-		</MenuContext.Provider>
+		<DirectionProvider>
+			<MenuContext.Provider value={ { isSubmenu: false } }>
+				<_Menu.Root< Payload > { ...props } />
+			</MenuContext.Provider>
+		</DirectionProvider>
 	);
 }
 

@@ -1,7 +1,20 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useId } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import * as Menu from '../index';
+
+jest.mock( '@wordpress/i18n', () => ( {
+	...jest.requireActual( '@wordpress/i18n' ),
+	isRTL: jest.fn( () => false ),
+} ) );
+
+const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+
+afterEach( () => {
+	mockedIsRTL.mockClear();
+	mockedIsRTL.mockReturnValue( false );
+} );
 
 // The prefix slot is presentational, so this structural regression is not
 // observable through Testing Library's semantic queries.
@@ -25,6 +38,12 @@ function queryItemLabel( item: HTMLElement ) {
 
 function queryItemShortcut( item: HTMLElement ) {
 	return item.querySelector< HTMLElement >( '.style-item-shortcut' );
+}
+
+function queryItemShortcutDisplay( item: HTMLElement ) {
+	return queryItemShortcut( item )?.querySelector< HTMLElement >(
+		'[aria-hidden="true"]'
+	);
 }
 
 function queryItemSuffix( item: HTMLElement ) {
@@ -99,6 +118,41 @@ describe( 'Menu', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Actions' } )
 		).toHaveFocus();
+	} );
+
+	it( 'uses the WordPress text direction for submenu navigation', async () => {
+		const user = userEvent.setup();
+		mockedIsRTL.mockReturnValue( true );
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger openOnHover={ false }>
+							Move to
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>Archive</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const submenuTrigger = await screen.findByRole( 'menuitem', {
+			name: 'Move to',
+		} );
+		act( () => submenuTrigger.focus() );
+		expect( submenuTrigger ).toHaveFocus();
+
+		await user.keyboard( '{ArrowLeft}' );
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'Archive' } )
+		).toBeVisible();
 	} );
 
 	it( 'renders checkbox and radio item roles', async () => {
@@ -223,6 +277,7 @@ describe( 'Menu', () => {
 				'Available offline. Save the current file. Keyboard shortcut: Command S',
 		} );
 		const shortcut = queryItemShortcut( item );
+		const shortcutDisplay = queryItemShortcutDisplay( item );
 		const externalDescription = screen.getByText( 'Available offline.' );
 		const description = screen.getByText( 'Save the current file.' );
 		const shortcutDescription = screen.getByText(
@@ -231,7 +286,8 @@ describe( 'Menu', () => {
 
 		expect( item ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
 		expect( shortcut ).toHaveTextContent( '⌘S' );
-		expect( shortcut ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( shortcutDisplay ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( shortcutDisplay ).toHaveAttribute( 'dir', 'ltr' );
 		expect( item ).toHaveAttribute(
 			'aria-describedby',
 			`${ externalDescription.id } ${ description.id } ${ shortcutDescription.id }`
@@ -324,7 +380,7 @@ describe( 'Menu', () => {
 							shortcut={ {
 								displayShortcut: '⌘M',
 								ariaKeyShortcut: 'Meta+M',
-								description: 'Command M',
+								label: 'Command M',
 							} }
 						>
 							Move to
@@ -398,7 +454,7 @@ describe( 'Menu', () => {
 						shortcut={ {
 							displayShortcut: '⌘S',
 							ariaKeyShortcut: 'Meta+S',
-							description: 'Command S',
+							label: 'Command S',
 						} }
 						suffix="Suffix"
 					>

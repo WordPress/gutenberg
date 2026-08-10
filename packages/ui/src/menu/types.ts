@@ -1,6 +1,5 @@
 import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
-
 import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
 
