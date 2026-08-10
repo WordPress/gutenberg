@@ -155,17 +155,17 @@ describe( 'post-data bindings', () => {
 				{
 					label: 'Post Date',
 					args: { field: 'date' },
-					type: 'string',
+					type: 'datetime',
 				},
 				{
 					label: 'Post Modified Date',
 					args: { field: 'modified' },
-					type: 'string',
+					type: 'datetime',
 				},
 				{
 					label: 'Post Link',
 					args: { field: 'link' },
-					type: 'string',
+					type: 'url',
 				},
 			] );
 		} );

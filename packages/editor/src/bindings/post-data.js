@@ -12,17 +12,17 @@ const postDataFields = [
 	{
 		label: __( 'Post Date' ),
 		args: { field: 'date' },
-		type: 'string',
+		type: 'datetime',
 	},
 	{
 		label: __( 'Post Modified Date' ),
 		args: { field: 'modified' },
-		type: 'string',
+		type: 'datetime',
 	},
 	{
 		label: __( 'Post Link' ),
 		args: { field: 'link' },
-		type: 'string',
+		type: 'url',
 	},
 ];
 
