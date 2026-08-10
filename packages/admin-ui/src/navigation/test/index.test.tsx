@@ -47,6 +47,20 @@ describe( 'Navigation', () => {
 		it( 'should not throw when items is empty', () => {
 			expect( () => render( <Navigation items={ [] } /> ) ).not.toThrow();
 		} );
+
+		it( 'should allow an empty string `href`', () => {
+			expect( () =>
+				render(
+					<Navigation
+						items={ [
+							{ label: 'Overview', href: '' },
+							{ label: 'Products', href: '/products' },
+						] }
+						currentHref=""
+					/>
+				)
+			).not.toThrow();
+		} );
 	} );
 
 	describe( 'rendering', () => {
@@ -119,6 +133,27 @@ describe( 'Navigation', () => {
 			expect(
 				screen.getByRole( 'link', { name: 'Products' } )
 			).not.toHaveAttribute( 'aria-current' );
+		} );
+
+		it( 'should mark an empty string `href` as current when `currentHref` is empty', () => {
+			render(
+				<Navigation
+					items={ [
+						{ label: 'Overview', href: '' },
+						{ label: 'Products', href: '/products' },
+					] }
+					currentHref=""
+				/>
+			);
+
+			// Disable reason: A link with an empty `href` doesn't surface in
+			// the accessibility three via `getByRole` with `name`. In practice
+			// this would likely not be something we would recommend doing, but
+			// this test verifies the expected behavior of current link testing.
+			// eslint-disable-next-line testing-library/no-node-access
+			const overviewLink = screen.getByText( 'Overview' ).closest( 'a' );
+			expect( overviewLink ).toHaveAttribute( 'href', '' );
+			expect( overviewLink ).toHaveAttribute( 'aria-current', 'page' );
 		} );
 	} );
 
