@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Render block element styles defined only inside responsive viewport states.
+-   Drop the tablet viewport breakpoint when it is measured against a different base than mobile (e.g. `30em` and `500px`), since their order cannot be determined in a media query.
 
 ## 1.19.0 (2026-07-29)
 

@@ -102,6 +102,52 @@ describe( 'viewport utils', () => {
 				mobile: '64rem',
 			} );
 		} );
+
+		it( 'omits tablet when mobile is font-relative and tablet is in pixels', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: '30em',
+					tablet: '500px',
+				} )
+			).toEqual( {
+				mobile: '30em',
+			} );
+		} );
+
+		it( 'omits tablet when mobile is in pixels and tablet is font-relative', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: '400px',
+					tablet: '30em',
+				} )
+			).toEqual( {
+				mobile: '400px',
+			} );
+		} );
+
+		it( 'keeps tablet when mobile is in em and tablet is in rem', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: '30em',
+					tablet: '40rem',
+				} )
+			).toEqual( {
+				mobile: '30em',
+				tablet: '40rem',
+			} );
+		} );
+
+		it( 'keeps tablet when mobile is in rem and tablet is in em', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: '30rem',
+					tablet: '40em',
+				} )
+			).toEqual( {
+				mobile: '30rem',
+				tablet: '40em',
+			} );
+		} );
 	} );
 
 	describe( 'getResponsiveMediaQueries', () => {
@@ -159,6 +205,38 @@ describe( 'viewport utils', () => {
 				} )
 			).toEqual( {
 				'@mobile': '@media (width <= 960px)',
+			} );
+		} );
+
+		it( 'omits the tablet media query when the breakpoints do not share a base', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '30em',
+					tablet: '500px',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 30em)',
+			} );
+
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '400px',
+					tablet: '30em',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 400px)',
+			} );
+		} );
+
+		it( 'returns a tablet media query when the breakpoints share a base', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '30em',
+					tablet: '40rem',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 30em)',
+				'@tablet': '@media (30em < width <= 40rem)',
 			} );
 		} );
 	} );

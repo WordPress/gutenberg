@@ -82,7 +82,9 @@ export function getViewportBreakpointValueInPixels(
  * mobile breakpoint is missing, a valid tablet breakpoint remains keyed as
  * tablet so the editor can present it as a tablet breakpoint. If the tablet
  * breakpoint is missing, invalid, or not larger than the mobile breakpoint, the
- * result only includes the mobile breakpoint.
+ * result only includes the mobile breakpoint. The tablet breakpoint is also
+ * dropped when the two breakpoints are measured against different bases, since
+ * their order cannot be determined.
  *
  * @param configOrSettings Global styles config or viewport settings.
  * @return Sanitized viewport breakpoints.
@@ -95,6 +97,8 @@ export function getViewportBreakpoints(
 	const breakpointValuesInPixels: Partial<
 		Record< ViewportBreakpoint, number >
 	> = {};
+	const breakpointsInPx: Partial< Record< ViewportBreakpoint, boolean > > =
+		{};
 
 	Object.keys( DEFAULT_VIEWPORT_BREAKPOINTS ).forEach( ( breakpoint ) => {
 		const key = breakpoint as ViewportBreakpoint;
@@ -103,6 +107,7 @@ export function getViewportBreakpoints(
 		if ( px !== undefined && isValidViewportSize( value ) ) {
 			breakpoints[ key ] = value.trim();
 			breakpointValuesInPixels[ key ] = px;
+			breakpointsInPx[ key ] = value.trim().endsWith( 'px' );
 		}
 	} );
 
@@ -118,6 +123,7 @@ export function getViewportBreakpoints(
 	const mobile = breakpoints.mobile!;
 	const tablet = breakpoints.tablet!;
 	if (
+		breakpointsInPx.mobile !== breakpointsInPx.tablet ||
 		breakpointValuesInPixels.mobile! >= breakpointValuesInPixels.tablet!
 	) {
 		return { mobile };
