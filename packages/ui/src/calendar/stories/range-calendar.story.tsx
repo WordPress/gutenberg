@@ -13,7 +13,7 @@ import {
 
 const meta: Meta< typeof RangeCalendar > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/RangeCalendar',
+	title: 'Design System/Components/Calendar/RangeCalendar',
 	component: RangeCalendar,
 	parameters: {
 		componentStatus: {
@@ -26,12 +26,12 @@ const meta: Meta< typeof RangeCalendar > = {
 	),
 	argTypes: {
 		...SHARED_ARG_TYPES,
-		selected: { control: false },
-		defaultSelected: { control: false },
+		value: { control: false },
+		defaultValue: { control: false },
 	},
 	args: {
 		onMonthChange: fn(),
-		onSelect: fn(),
+		onValueChange: fn(),
 	},
 };
 export default meta;
@@ -48,7 +48,7 @@ export const DisabledDates: Story = {
 
 export const WithSelectedRangeAndMonth: Story = {
 	args: {
-		defaultSelected: {
+		defaultValue: {
 			from: firstDayOfNextMonth,
 			to: fourthDayOfNextMonth,
 		},
@@ -87,9 +87,7 @@ export const WithOutsideDays: Story = {
  */
 export const WithTimeZone: Story = {
 	render: function RangeCalendarWithTimeZone( { endMonth, ...args } ) {
-		const [ range, setRange ] = useState< typeof args.selected | null >(
-			null
-		);
+		const [ range, setRange ] = useState< typeof args.value >( null );
 
 		useEffect( () => {
 			setRange(
@@ -113,8 +111,8 @@ export const WithTimeZone: Story = {
 				<RangeCalendar
 					{ ...args }
 					endMonth={ toDate( endMonth ) }
-					selected={ range }
-					onSelect={ ( selectedDate, ...rest ) => {
+					value={ range }
+					onValueChange={ ( selectedDate, ...rest ) => {
 						setRange(
 							// Set controlled state to null if there's no selection
 							! selectedDate ||
@@ -123,7 +121,7 @@ export const WithTimeZone: Story = {
 								? null
 								: selectedDate
 						);
-						args.onSelect?.( selectedDate, ...rest );
+						args.onValueChange?.( selectedDate, ...rest );
 					} }
 					disabled={ [
 						{

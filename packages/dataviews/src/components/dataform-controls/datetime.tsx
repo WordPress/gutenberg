@@ -192,12 +192,8 @@ function CalendarDateTimeControl< Item >( {
 				{ ! compact && (
 					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value
-								? parseDateTime( value ) || undefined
-								: undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDateTime( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }

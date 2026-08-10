@@ -7,10 +7,14 @@ import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
 import { RootContext } from './utils/root-context';
-import type { RangeCalendarProps, DateRange, OnSelectHandler } from './types';
+import type {
+	RangeCalendarProps,
+	DateRange,
+	OnValueChangeHandler,
+} from './types';
 
 export function usePreviewRange( {
-	selected,
+	value,
 	hoveredDate,
 	excludeDisabled,
 	min,
@@ -18,12 +22,12 @@ export function usePreviewRange( {
 	disabled,
 }: Pick<
 	RangeCalendarProps,
-	'selected' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
+	'value' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
 > & {
 	hoveredDate: Date | undefined;
 } ) {
 	return useMemo( () => {
-		if ( ! hoveredDate || ! selected?.from ) {
+		if ( ! hoveredDate || ! value?.from ) {
 			return;
 		}
 
@@ -31,41 +35,41 @@ export function usePreviewRange( {
 		let potentialNewRange: { from: Date; to: Date } | undefined;
 
 		// Hovering on a date before the start of the selected range
-		if ( hoveredDate < selected.from ) {
+		if ( hoveredDate < value.from ) {
 			previewHighlight = {
 				from: hoveredDate,
-				to: selected.from,
+				to: value.from,
 			};
 
 			potentialNewRange = {
 				from: hoveredDate,
-				to: selected.to ?? selected.from,
+				to: value.to ?? value.from,
 			};
 		} else if (
-			selected.to &&
-			hoveredDate > selected.from &&
-			hoveredDate < selected.to
+			value.to &&
+			hoveredDate > value.from &&
+			hoveredDate < value.to
 		) {
 			// Hovering on a date between the start and end of the selected range
 			previewHighlight = {
-				from: selected.from,
+				from: value.from,
 				to: hoveredDate,
 			};
 
 			potentialNewRange = {
-				from: selected.from,
+				from: value.from,
 				to: hoveredDate,
 			};
-		} else if ( hoveredDate > selected.from ) {
+		} else if ( hoveredDate > value.from ) {
 			// Hovering on a date after the end of the selected range (either
 			// because it's greater than selected.to, or because it's not defined)
 			previewHighlight = {
-				from: selected.to ?? selected.from,
+				from: value.to ?? value.from,
 				to: hoveredDate,
 			};
 
 			potentialNewRange = {
-				from: selected.from,
+				from: value.from,
 				to: hoveredDate,
 			};
 		}
@@ -113,7 +117,7 @@ export function usePreviewRange( {
 		}
 
 		return previewHighlight;
-	}, [ selected, hoveredDate, excludeDisabled, min, max, disabled ] );
+	}, [ value, hoveredDate, excludeDisabled, min, max, disabled ] );
 }
 
 /**
@@ -127,9 +131,9 @@ export function usePreviewRange( {
 export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 	function RangeCalendar(
 		{
-			defaultSelected,
-			selected: selectedProp,
-			onSelect,
+			defaultValue,
+			value: valueProp,
+			onValueChange,
 			numberOfMonths = 1,
 			excludeDisabled,
 			min,
@@ -138,6 +142,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			locale = enUS,
 			timeZone,
 			render,
+			labels: customLabels,
 			...props
 		},
 		ref
@@ -148,19 +153,32 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			mode: 'range',
 		} );
 
-		const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
-			( selected, triggerDate, modifiers, e ) => {
-				// Convert internal `null` to `undefined` for the public event handler.
-				onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
-			},
-			[ onSelect ]
+		const labels = useMemo(
+			() =>
+				customLabels
+					? { ...localizationProps.labels, ...customLabels }
+					: localizationProps.labels,
+			[ localizationProps.labels, customLabels ]
 		);
 
+		const onChange: OnValueChangeHandler< DateRange | null | undefined > =
+			useCallback(
+				( selected, triggerDate, modifiers, e ) => {
+					onValueChange?.(
+						selected ?? null,
+						triggerDate,
+						modifiers,
+						e
+					);
+				},
+				[ onValueChange ]
+			);
+
 		const [ selected, setSelected ] = useControlledValue<
-			typeof selectedProp
+			DateRange | null | undefined
 		>( {
-			defaultValue: defaultSelected,
-			value: selectedProp,
+			defaultValue,
+			value: valueProp,
 			onChange,
 		} );
 
@@ -170,7 +188,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 
 		// Compute the preview range for hover effect
 		const previewRange = usePreviewRange( {
-			selected,
+			value: selected,
 			hoveredDate,
 			excludeDisabled,
 			min,
@@ -197,12 +215,14 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					{ ...COMMON_PROPS }
 					{ ...localizationProps }
 					{ ...props }
+					role="application"
 					mode="range"
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					disabled={ disabled }
 					excludeDisabled={ excludeDisabled }
 					min={ min }
 					max={ max }
+					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
 					onDayMouseEnter={ ( date ) => setHoveredDate( date ) }

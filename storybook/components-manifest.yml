@@ -58,7 +58,7 @@
       - autoFocus
       - className
       - defaultMonth
-      - defaultSelected
+      - defaultValue
       - disabled
       - disableNavigation
       - endMonth
@@ -68,15 +68,14 @@
       - month
       - numberOfMonths
       - onMonthChange
-      - onSelect
+      - onValueChange
       - render
       - required
-      - role
-      - selected
       - showOutsideDays
       - startMonth
       - style
       - timeZone
+      - value
       - weekStartsOn
 - name: Card.Root
   props:
@@ -761,7 +760,7 @@
       - autoFocus
       - className
       - defaultMonth
-      - defaultSelected
+      - defaultValue
       - disabled
       - disableNavigation
       - endMonth
@@ -774,15 +773,14 @@
       - month
       - numberOfMonths
       - onMonthChange
-      - onSelect
+      - onValueChange
       - render
       - required
-      - role
-      - selected
       - showOutsideDays
       - startMonth
       - style
       - timeZone
+      - value
       - weekStartsOn
 - name: RangeControl
   props:

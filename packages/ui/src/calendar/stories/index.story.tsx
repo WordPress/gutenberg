@@ -12,7 +12,7 @@ import {
 
 const meta: Meta< typeof Calendar > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Calendar',
+	title: 'Design System/Components/Calendar/Calendar',
 	component: Calendar,
 	parameters: {
 		componentStatus: {
@@ -26,7 +26,7 @@ const meta: Meta< typeof Calendar > = {
 	argTypes: SHARED_ARG_TYPES,
 	args: {
 		onMonthChange: fn(),
-		onSelect: fn(),
+		onValueChange: fn(),
 	},
 };
 export default meta;
@@ -43,7 +43,7 @@ export const DisabledDates: Story = {
 
 export const WithSelectedDateAndMonth: Story = {
 	args: {
-		defaultSelected: firstDayOfNextMonth,
+		defaultValue: firstDayOfNextMonth,
 		defaultMonth: firstDayOfNextMonth,
 	},
 };
@@ -83,14 +83,14 @@ export const WithTimeZone: Story = {
 				<Calendar
 					{ ...args }
 					endMonth={ toDate( endMonth ) }
-					selected={ selected }
-					onSelect={ ( selectedDate, ...rest ) => {
+					value={ selected }
+					onValueChange={ ( selectedDate, ...rest ) => {
 						setSelected(
 							selectedDate
 								? new TZDate( selectedDate, args.timeZone )
 								: null
 						);
-						args.onSelect?.( selectedDate, ...rest );
+						args.onValueChange?.( selectedDate, ...rest );
 					} }
 					disabled={ [
 						{
@@ -112,10 +112,10 @@ export const WithTimeZone: Story = {
 		timeZone: 'Pacific/Auckland',
 	},
 	argTypes: {
-		selected: {
+		value: {
 			control: false,
 		},
-		defaultSelected: {
+		defaultValue: {
 			control: false,
 		},
 		disabled: {

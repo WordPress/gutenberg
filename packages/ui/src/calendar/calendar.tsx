@@ -6,7 +6,7 @@ import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
 import { RootContext } from './utils/root-context';
-import type { CalendarProps, OnSelectHandler } from './types';
+import type { CalendarProps, OnValueChangeHandler } from './types';
 
 /**
  * `Calendar` provides a customizable calendar interface for **single date**
@@ -19,13 +19,14 @@ import type { CalendarProps, OnSelectHandler } from './types';
 export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 	function Calendar(
 		{
-			defaultSelected,
-			selected: selectedProp,
-			onSelect,
+			defaultValue,
+			value: valueProp,
+			onValueChange,
 			numberOfMonths = 1,
 			locale = enUS,
 			timeZone,
 			render,
+			labels: customLabels,
 			...props
 		},
 		ref
@@ -36,19 +37,32 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			mode: 'single',
 		} );
 
-		const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
-			( selected, triggerDate, modifiers, e ) => {
-				// Convert internal `null` to `undefined` for the public event handler.
-				onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
-			},
-			[ onSelect ]
+		const labels = useMemo(
+			() =>
+				customLabels
+					? { ...localizationProps.labels, ...customLabels }
+					: localizationProps.labels,
+			[ localizationProps.labels, customLabels ]
 		);
 
+		const onChange: OnValueChangeHandler< Date | null | undefined > =
+			useCallback(
+				( selected, triggerDate, modifiers, e ) => {
+					onValueChange?.(
+						selected ?? null,
+						triggerDate,
+						modifiers,
+						e
+					);
+				},
+				[ onValueChange ]
+			);
+
 		const [ selected, setSelected ] = useControlledValue<
-			typeof selectedProp
+			Date | null | undefined
 		>( {
-			defaultValue: defaultSelected,
-			value: selectedProp,
+			defaultValue,
+			value: valueProp,
 			onChange,
 		} );
 
@@ -63,8 +77,10 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 					{ ...COMMON_PROPS }
 					{ ...localizationProps }
 					{ ...props }
+					role="application"
 					mode="single"
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
+					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
 				/>

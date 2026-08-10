@@ -441,10 +441,8 @@ function CalendarDateControl< Item >( {
 					{ /* Calendar widget */ }
 					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value ? parseDate( value ) || undefined : undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDate( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
@@ -511,7 +509,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const selectedRange = useMemo( () => {
 		if ( ! value ) {
-			return { from: undefined, to: undefined };
+			return null;
 		}
 
 		const [ from, to ] = value;
@@ -522,7 +520,7 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange.from || new Date();
+		return selectedRange?.from || new Date();
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
@@ -549,9 +547,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const onSelectCalendarRange = useCallback(
 		(
-			newRange:
-				| { from: Date | undefined; to?: Date | undefined }
-				| undefined
+			newRange: { from: Date | undefined; to?: Date | undefined } | null
 		) => {
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
@@ -697,8 +693,8 @@ function CalendarDateRangeControl< Item >( {
 
 					<RangeCalendar
 						style={ { width: '100%' } }
-						selected={ selectedRange }
-						onSelect={ onSelectCalendarRange }
+						value={ selectedRange }
+						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `Calendar` and `RangeCalendar` components, moved from the private API of `@wordpress/components` (where they were `DateCalendar` and `DateRangeCalendar`) and rewritten to this package's conventions: design tokens, CSS modules, `render` prop support, and `Button` / `Icon` for the month navigation. `TZDate` is no longer re-exported — import it from [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz) instead. ([#81337](https://github.com/WordPress/gutenberg/pull/81337))
+-   Add `Calendar` and `RangeCalendar` components. ([#81337](https://github.com/WordPress/gutenberg/pull/81337))
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 

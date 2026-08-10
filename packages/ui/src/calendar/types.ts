@@ -132,34 +132,37 @@ type DayOfWeek = {
 };
 
 /**
- * Shared handler type for `onSelect` callback when a selection mode is set.
+ * Shared handler type for `onValueChange` callbacks.
  * @example
- *   const handleSelect: OnSelectHandler<Date> = (
- *     selected,
+ *   const handleValueChange: OnValueChangeHandler<Date | null> = (
+ *     value,
  *     triggerDate,
  *     modifiers,
  *     e
  *   ) => {
- *     console.log( "Selected:", selected );
+ *     console.log( "Value:", value );
  *     console.log( "Triggered by:", triggerDate );
  *   };
- * @template T - The type of the selected item.
- * @callback OnSelectHandler
- * @param {T}                                      selected    - The selected item after the event.
+ * @template T - The value type.
+ * @callback OnValueChangeHandler
+ * @param {T}                                      value       - The new value after the event.
  * @param {Date}                                   triggerDate - The date when the event was triggered. This is
  *                                                             typically the day clicked or interacted with.
  * @param {Modifiers}                              modifiers   - The modifiers associated with the event.
  * @param {React.MouseEvent | React.KeyboardEvent} e           - The event object.
  */
-export type OnSelectHandler< T > = (
-	selected: T,
+export type OnValueChangeHandler< T > = (
+	value: T,
 	triggerDate: Date,
 	modifiers: Modifiers,
 	e: React.MouseEvent | React.KeyboardEvent
 ) => void;
 
 export interface BaseProps
-	extends Omit< ComponentProps< 'div' >, 'onSelect' | 'defaultValue' > {
+	extends Omit<
+		ComponentProps< 'div' >,
+		'onSelect' | 'defaultValue' | 'role'
+	> {
 	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
@@ -297,33 +300,31 @@ export interface BaseProps
 	 *
 	 *   export function WithTimeZone() {
 	 *     const timeZone = "America/New_York";
-	 *     const [ selected, setSelected ] = useState< Date | undefined >(
+	 *     const [ value, setValue ] = useState< Date | null >(
 	 *       new TZDate( 2024, 12, 10, timeZone ) // Use `TZDate` instead of `Date`
 	 *     );
 	 *     return (
 	 *       <Calendar
 	 *         timeZone={ timeZone }
-	 *         selected={ selected }
-	 *         onSelect={ setSelected }
+	 *         value={ value }
+	 *         onValueChange={ setValue }
 	 *     />
 	 *   );
 	 * }
 	 */
 	timeZone?: string;
-	/**
-	 * The role attribute to add to the container element.
-	 * @default 'application'
-	 */
-	role?: 'application' | 'dialog' | undefined;
 }
 
 export interface SingleProps {
-	/** The selected date. */
-	selected?: Date | undefined | null;
-	/** Event handler when a day is selected. */
-	onSelect?: OnSelectHandler< Date | undefined >;
-	/** The default selected date (for uncontrolled usage). */
-	defaultSelected?: Date;
+	/**
+	 * The selected date (controlled). Use `null` when there is no selection.
+	 * To render an uncontrolled calendar, use `defaultValue` instead.
+	 */
+	value?: Date | null;
+	/** Event handler called when the selected date changes. */
+	onValueChange?: OnValueChangeHandler< Date | null >;
+	/** The initially selected date (uncontrolled). */
+	defaultValue?: Date;
 }
 
 export interface RangeProps {
@@ -339,12 +340,15 @@ export interface RangeProps {
 	 * The maximum number of nights to include in the range.
 	 */
 	max?: number;
-	/** The selected range. */
-	selected?: DateRange | undefined | null;
-	/** Event handler when the selection changes. */
-	onSelect?: OnSelectHandler< DateRange | undefined >;
-	/** The default selected range (for uncontrolled usage). */
-	defaultSelected?: DateRange;
+	/**
+	 * The selected range (controlled). Use `null` when there is no selection.
+	 * To render an uncontrolled calendar, use `defaultValue` instead.
+	 */
+	value?: DateRange | null;
+	/** Event handler called when the selected range changes. */
+	onValueChange?: OnValueChangeHandler< DateRange | null >;
+	/** The initially selected range (uncontrolled). */
+	defaultValue?: DateRange;
 }
 
 export type CalendarProps = BaseProps & SingleProps;

@@ -83,9 +83,9 @@ export const SHARED_ARG_TYPES = {
 	labels: {
 		control: false,
 	},
-	selected: { control: 'date' },
-	defaultSelected: { control: 'date' },
-	onSelect: {
+	value: { control: 'date' },
+	defaultValue: { control: 'date' },
+	onValueChange: {
 		control: false,
 	},
 	defaultMonth: { control: 'date' },

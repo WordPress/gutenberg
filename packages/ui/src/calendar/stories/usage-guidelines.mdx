@@ -1,10 +1,10 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Design System/Components/Calendar/Best Practices" />
+<Meta title="Design System/Components/Calendar/Usage Guidelines" />
 
 # Calendar
 
-`Calendar` selects a **single date**. `RangeCalendar` selects a **date range**. Both share the same prop surface apart from the shape of `selected` / `defaultSelected` / `onSelect`, and the range-only `min`, `max` and `excludeDisabled` props.
+`Calendar` selects a **single date**. `RangeCalendar` selects a **date range**. Both share the same prop surface apart from the shape of `value` / `defaultValue` / `onValueChange`, and the range-only `min`, `max` and `excludeDisabled` props.
 
 Both are built for accessibility and follow ARIA best practices for calendar widgets: keyboard navigation, screen reader support, and customizable labels for internationalization.
 
@@ -12,31 +12,31 @@ Both are built for accessibility and follow ARIA best practices for calendar wid
 
 ### Uncontrolled Mode
 
-The component manages its own selection. Use `defaultSelected` to set the initial value, and `onSelect` to react to changes.
+The component manages its own selection. Use `defaultValue` to set the initial value, and `onValueChange` to react to changes.
 
 ```jsx
 import { Calendar } from '@wordpress/ui';
 
 const MyUncontrolledCalendar = () => (
 	<Calendar
-		defaultSelected={ new Date() }
-		onSelect={ ( date ) => console.log( 'Selected: ', date ) }
+		defaultValue={ new Date() }
+		onValueChange={ ( date ) => console.log( 'Selected: ', date ) }
 	/>
 );
 ```
 
 ### Controlled Mode
 
-Pass `selected` and update it from `onSelect`. Pass `null` (rather than `undefined`) to explicitly represent "no selection" while staying controlled.
+Pass `value` and update it from `onValueChange`. Pass `null` to represent no selection while staying controlled.
 
 ```jsx
 import { useState } from 'react';
 import { Calendar } from '@wordpress/ui';
 
 const MyControlledCalendar = () => {
-	const [ selected, setSelected ] = useState( new Date() );
+	const [ value, setValue ] = useState( new Date() );
 
-	return <Calendar selected={ selected } onSelect={ setSelected } />;
+	return <Calendar value={ value } onValueChange={ setValue } />;
 };
 ```
 
@@ -49,9 +49,9 @@ import { useState } from 'react';
 import { RangeCalendar } from '@wordpress/ui';
 
 const MyRangeCalendar = () => {
-	const [ range, setRange ] = useState( { from: undefined, to: undefined } );
+	const [ range, setRange ] = useState( null );
 
-	return <RangeCalendar selected={ range } onSelect={ setRange } />;
+	return <RangeCalendar value={ range } onValueChange={ setRange } />;
 };
 ```
 
@@ -127,7 +127,7 @@ const timeZone = 'America/New_York';
 const MyCalendarWithTimeZone = () => (
 	<Calendar
 		timeZone={ timeZone }
-		defaultSelected={ new TZDate( 2024, 11, 10, timeZone ) }
+		defaultValue={ new TZDate( 2024, 11, 10, timeZone ) }
 	/>
 );
 ```
