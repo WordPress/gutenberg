@@ -505,19 +505,29 @@ export function renderHTML(
 			);
 			return;
 		}
-		if ( mode === 'inner' ) {
-			containerElement.replaceChildren( ...nodes );
-		} else if ( mode === 'prepend' ) {
-			containerElement.prepend( ...nodes );
-		} else if ( mode === 'before' ) {
-			containerElement.before( ...nodes );
-		} else if ( mode === 'after' ) {
-			containerElement.after( ...nodes );
-		} else if ( mode === 'replace' ) {
-			containerElement.replaceWith( ...nodes );
-		} else {
-			containerElement.append( ...nodes );
-		}
+		// Place the parsed nodes relative to the container per `mode`. The
+		// mode name IS the native DOM insertion method, except `inner`
+		// (`replaceChildren`) and `replace` (`replaceWith`) — so dispatch
+		// dynamically through a mode→method map (same pattern as datastar's
+		// patchElements) instead of an if/else chain. All six methods share
+		// the `( ...nodes: Array< Node | string > ) => void` signature.
+		const placementMethod: Record<
+			Mode,
+			| 'append'
+			| 'prepend'
+			| 'before'
+			| 'after'
+			| 'replaceWith'
+			| 'replaceChildren'
+		> = {
+			append: 'append',
+			prepend: 'prepend',
+			before: 'before',
+			after: 'after',
+			inner: 'replaceChildren',
+			replace: 'replaceWith',
+		};
+		containerElement[ placementMethod[ mode ] ]( ...nodes );
 		hydrate(
 			toVdom( htmlIsland ) as VNode,
 			getRegionRootFragment( [ htmlIsland ] ) as ContainerNode
