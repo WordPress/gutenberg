@@ -29,7 +29,7 @@
 
 ### Internal
 
--   Update `@base-ui/react` from `1.6.0` to `1.7.0`.
+-   Update `@base-ui/react` from `1.6.0` to `1.7.0`. ([#81390](https://github.com/WordPress/gutenberg/pull/81390))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 
