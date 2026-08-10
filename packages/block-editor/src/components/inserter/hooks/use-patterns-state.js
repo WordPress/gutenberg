@@ -13,14 +13,12 @@ import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
 /**
- * Retrieves the block patterns inserter state.
+ * Returns the blocks that should be inserted for a selected pattern.
  *
- * @param {Function} onInsert         function called when inserter a list of blocks.
- * @param {string=}  rootClientId     Insertion's root client ID.
- * @param {string}   selectedCategory The selected pattern category.
- * @param {boolean}  isQuick          For the quick inserter render only allowed patterns.
+ * @param {Object}   pattern The selected pattern.
+ * @param {Object[]} blocks  The parsed pattern blocks.
  *
- * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
+ * @return {Object[]} Pattern blocks to insert.
  */
 export const getPatternBlocksForInsertion = ( pattern, blocks ) => {
 	if (
@@ -36,6 +34,17 @@ export const getPatternBlocksForInsertion = ( pattern, blocks ) => {
 
 	return blocks;
 };
+
+/**
+ * Retrieves the block patterns inserter state.
+ *
+ * @param {Function} onInsert         function called when inserter a list of blocks.
+ * @param {string=}  rootClientId     Insertion's root client ID.
+ * @param {string}   selectedCategory The selected pattern category.
+ * @param {boolean}  isQuick          For the quick inserter render only allowed patterns.
+ *
+ * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
+ */
 
 const usePatternsState = (
 	onInsert,
@@ -137,7 +146,6 @@ const usePatternsState = (
 						)
 					) {
 						clonedBlock.attributes.metadata.categories = [
-							getPatternBlocksForInsertion,
 							selectedCategory,
 						];
 					}

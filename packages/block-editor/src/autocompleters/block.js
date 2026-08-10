@@ -136,23 +136,27 @@ function createBlockCompleter() {
 				cloneBlock( block )
 			);
 
+			let value;
+			if ( syncStatus === 'unsynced' ) {
+				if ( name === 'core/block' && initialAttributes?.ref ) {
+					value = unsyncedFallbackBlock;
+				} else if ( unsyncedBlocks.length ) {
+					value = unsyncedBlocks;
+				} else {
+					value = unsyncedFallbackBlock;
+				}
+			} else {
+				value = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks ),
+					innerContent
+				);
+			}
+
 			return {
 				action: 'replace',
-				value:
-					syncStatus === 'unsynced'
-						? name === 'core/block' && initialAttributes?.ref
-							? unsyncedFallbackBlock
-							: unsyncedBlocks.length
-							? unsyncedBlocks
-							: unsyncedFallbackBlock
-						: createBlock(
-								name,
-								initialAttributes,
-								createBlocksFromInnerBlocksTemplate(
-									innerBlocks
-								),
-								innerContent
-						  ),
+				value,
 			};
 		},
 	};
