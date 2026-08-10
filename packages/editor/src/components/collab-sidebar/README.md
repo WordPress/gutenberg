@@ -15,6 +15,7 @@ collab-sidebar/
 ├── index.js                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
 ├── notes.js                        Notes - coordinator (outer Stack, actions, keyboard nav)
 ├── note-thread.js                  NoteThread - per-thread (selection, floating registration, reply form)
+├── review-thread.js                ReviewThread - per sequestered pending-review block (approve/reject)
 ├── note.js                         Note - per-card state (edit/delete mode, menu, dialog)
 ├── note-card.js                    NoteCard - presentational shell (byline + actions slot + children)
 ├── note-byline.js                  NoteByline - avatar + name + relative date
@@ -55,6 +56,12 @@ NotesSidebarContainer (index.js)         - gates on post type support
 ```
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+
+## Review threads (experimental)
+
+When the distributed-editing prototype (`lib/experimental/distributed-editing/`) sequesters a protected change, the accepted content carries a `de/pending-review` void block whose attributes hold the raw proposed markup and its kses-filtered placeholder. The sidebar surfaces each of these wrappers as a synthetic "review thread" alongside note threads, in both the All notes panel and the floating board.
+
+Review threads are derived from the block list (`useReviewThreads`), not from comments: their id is `review-<clientId>`, so a thread's identity follows its block and disappears when the block does. Shared thread affordances (selection, block spotlight, floating positioning, keyboard navigation) work unchanged; the card body is always fully expanded, rendering the proposed markup as an editable textarea (writing back to the block's `proposed` attribute, so the in-canvas review surface stays in sync) with Approve / Reject actions (`useReviewActions`) that mirror the block's in-canvas review surface: approve replaces the wrapper with the proposed markup, reject replaces it with the placeholder, and either takes effect on the next save where the server re-evaluates the content. Thread objects only refresh when the block list changes, so both the textarea value and the approve/reject markup are read live from the store rather than from the thread object.
 
 ## Floating board
 

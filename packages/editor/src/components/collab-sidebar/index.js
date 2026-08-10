@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -19,7 +19,11 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
-import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import {
+	useEnableFloatingSidebar,
+	useNoteThreads,
+	useReviewThreads,
+} from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -62,14 +66,29 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const reviews = useReviewThreads();
+
+	/*
+	 * Review threads (sequestered pending-review blocks) share the list with
+	 * note threads. They lead the list as action-needed items; the floating
+	 * board re-sorts by measured anchor position anyway.
+	 */
+	const allThreads = useMemo(
+		() => [ ...reviews, ...notes ],
+		[ reviews, notes ]
+	);
+	const unresolvedThreads = useMemo(
+		() => [ ...reviews, ...unresolvedNotes ],
+		[ reviews, unresolvedNotes ]
+	);
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = allThreads.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
+			( unresolvedThreads.length > 0 || selectedNoteId !== undefined )
 	);
 
 	async function focusNote( {
@@ -181,7 +200,7 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<Notes notes={ allThreads } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
@@ -194,7 +213,7 @@ function NotesSidebar( { postId } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<Notes
-						notes={ unresolvedNotes }
+						notes={ unresolvedThreads }
 						sidebarRef={ sidebarRef }
 						styles={ { backgroundColor } }
 						isFloating

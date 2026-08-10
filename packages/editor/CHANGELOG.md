@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Notes sidebar: Surface sequestered `de/pending-review` blocks from the distributed-editing prototype as review threads with Approve / Reject actions.
+
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
