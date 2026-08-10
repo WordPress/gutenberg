@@ -1251,10 +1251,6 @@ describe( 'saveEntityRecord', () => {
 	} );
 
 	it( 'sends the persisted CRDT document with the save without staging it as an edit', async () => {
-		// The snapshot is request payload, not something the user edited.
-		// Replaying it as `persistedEdits` leaves the record permanently dirty:
-		// the reducer compares the staged edits against it to decide whether the
-		// save cleared them, and a value the store never staged never matches.
 		// See https://github.com/WordPress/gutenberg/issues/77610.
 		const persistedRecord = {
 			id: 10,
@@ -1263,8 +1259,8 @@ describe( 'saveEntityRecord', () => {
 				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'stale-doc',
 			},
 		};
-		// `meta` is a merged edit, so the staged value carries every meta key,
-		// including the snapshot written by the previous save.
+		// `meta` is a merged edit, so the staged value carries the snapshot
+		// written by the previous save.
 		const edits = {
 			id: 10,
 			meta: {
@@ -1314,7 +1310,7 @@ describe( 'saveEntityRecord', () => {
 			10
 		);
 
-		// The request carries the fresh snapshot...
+		// The request carries the fresh snapshot.
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/posts/10',
 			method: 'PUT',
@@ -1327,8 +1323,7 @@ describe( 'saveEntityRecord', () => {
 			},
 		} );
 
-		// ...while the edits replayed to the reducer stay exactly what the
-		// store staged, so the successful save clears them.
+		// The replayed edits stay exactly what the store staged.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
@@ -1383,7 +1378,6 @@ describe( 'saveEntityRecord', () => {
 	} );
 
 	it( 'does not send a persisted CRDT document when creating a record', async () => {
-		// There is no CRDT document for a record the server has not seen yet.
 		const post = { title: 'new post', meta: { my_meta: 'edited' } };
 		const syncManager = {
 			update: jest.fn(),

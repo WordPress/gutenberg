@@ -269,8 +269,7 @@ describe( 'saveEditedEntityRecord with a persisted CRDT document', () => {
 	let registry;
 
 	beforeEach( () => {
-		// Mirror the real post type entity, which persists its CRDT document
-		// into post meta on every save.
+		// Mirror the real post type entity config.
 		registry = createTestRegistry( {
 			syncConfig: { supportsPersistence: true },
 			__unstablePrePersist: ( persistedRecord, edits ) =>
@@ -288,10 +287,10 @@ describe( 'saveEditedEntityRecord with a persisted CRDT document', () => {
 	} );
 
 	it( 'clears the meta edits once the save succeeds', async () => {
-		// Regression test for https://github.com/WordPress/gutenberg/issues/77610.
-		// Each save writes a new CRDT snapshot, so the snapshot the store holds
-		// is always one save behind. If that mismatch is allowed to count as an
-		// unsaved change, no amount of saving ever clears it.
+		// Every save writes a new CRDT snapshot, so the one the store holds is
+		// always a save behind. Counting that as an unsaved change leaves the
+		// record dirty forever.
+		// See https://github.com/WordPress/gutenberg/issues/77610.
 		const post = {
 			...createTestPost( 1 ),
 			meta: {

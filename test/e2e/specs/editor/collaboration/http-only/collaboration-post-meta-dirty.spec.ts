@@ -3,12 +3,9 @@ import { test, expect } from '../fixtures';
 /**
  * Regression test for https://github.com/WordPress/gutenberg/issues/77610.
  *
- * Every save mints a fresh `_crdt_document` snapshot for the post. It used to
- * be added to the edits that `saveEntityRecord` replays to the reducer as
- * `persistedEdits`, so the staged meta edit could never match it and the
- * reducer kept the edit. Saving a post meta change then left the post
- * permanently dirty: the Publish button stayed "Save" and leaving the editor
- * warned about unsaved changes, no matter how many times the post was saved.
+ * Saving a post meta change used to leave the post dirty forever: the fresh
+ * `_crdt_document` snapshot reached the reducer as `persistedEdits`, so the
+ * staged meta edit never matched it and was never cleared.
  */
 test.describe( 'Collaboration - saving post meta', () => {
 	test( 'a saved post meta change leaves the post clean', async ( {
@@ -27,9 +24,9 @@ test.describe( 'Collaboration - saving post meta', () => {
 		await collaborationUtils.openPost( post.id );
 		await collaborationUtils.waitForEntityReadyAndSaveSettled( page );
 
-		// Edit post meta through the store. `footnotes` is registered by core,
-		// so this needs no test plugin, and it keeps the Footnote block UI —
-		// which re-syncs the meta against the content — out of the way.
+		// `footnotes` is registered by core, so this needs no test plugin.
+		// Going through the store keeps the Footnote block UI, which re-syncs
+		// the meta against the content, out of the way.
 		const footnotes =
 			'[{"id":"post-meta-dirty-regression","content":"A footnote"}]';
 		await page.evaluate(
@@ -55,7 +52,6 @@ test.describe( 'Collaboration - saving post meta', () => {
 		);
 		await collaborationUtils.waitForEntityReadyAndSaveSettled( page );
 
-		// The save succeeded...
 		expect(
 			await page.evaluate( () =>
 				window.wp.data
@@ -64,7 +60,7 @@ test.describe( 'Collaboration - saving post meta', () => {
 			)
 		).toBe( true );
 
-		// ...the meta was really persisted...
+		// The edit was persisted, not just discarded.
 		expect(
 			await page.evaluate(
 				( postId ) =>
@@ -76,7 +72,6 @@ test.describe( 'Collaboration - saving post meta', () => {
 			)
 		).toBe( footnotes );
 
-		// ...and nothing is left staged, so leaving the editor is safe.
 		expect(
 			await page.evaluate(
 				( postId ) =>
