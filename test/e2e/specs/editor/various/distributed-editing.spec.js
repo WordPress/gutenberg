@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function waitForDistributedEditingReady( page ) {
@@ -65,7 +62,7 @@ async function sequesterScriptProposal( page, pageUtils, editor ) {
 
 	await page.reload();
 	await expect(
-		editor.canvas.getByText( /Pending review \(/ )
+		editor.canvas.getByText( 'Block contains changes awaiting review.' )
 	).toBeVisible();
 }
 
@@ -130,26 +127,28 @@ test.describe( 'Distributed editing prototype', () => {
 	} ) => {
 		await sequesterScriptProposal( page, pageUtils, editor );
 
-		// Collapsed: the kses-filtered placeholder renders as normal content
-		// and the review UI (with the raw payload) stays out of the DOM.
+		// In-canvas: only the warning box renders — the safe placeholder is
+		// not shown, and the raw payload stays out of the DOM until the
+		// Resolve dialog opens.
 		await expect(
 			editor.canvas.getByText( 'document.title = "proposed";' )
-		).toBeVisible();
-		await expect(
-			editor.canvas.getByLabel( 'Proposed markup' )
 		).toBeHidden();
+		await expect( page.getByLabel( 'Proposed markup' ) ).toBeHidden();
 		expect( await getServerContent( page ) ).not.toContain( '<script' );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Review', exact: true } )
+			.getByRole( 'button', { name: 'Resolve', exact: true } )
 			.click();
 
 		// The proposal renders as inert text, not live markup.
-		await expect(
-			editor.canvas.getByLabel( 'Proposed markup' )
-		).toHaveValue( /document\.title = "proposed"/ );
+		const dialog = page.getByRole( 'dialog', {
+			name: 'Resolve pending changes',
+		} );
+		await expect( dialog.getByLabel( 'Proposed markup' ) ).toHaveValue(
+			/document\.title = "proposed"/
+		);
 
-		await editor.canvas
+		await dialog
 			.getByRole( 'button', { name: 'Approve', exact: true } )
 			.click();
 
@@ -195,7 +194,7 @@ test.describe( 'Distributed editing prototype', () => {
 			)
 		).toBeVisible();
 		await expect(
-			editor.canvas.getByText( /Pending review \(/ )
+			editor.canvas.getByText( 'Block contains changes awaiting review.' )
 		).toBeVisible();
 		expect( await getServerContent( page ) ).not.toContain( '<script' );
 
@@ -204,9 +203,10 @@ test.describe( 'Distributed editing prototype', () => {
 			window.__gutenbergDEBridge.disableAutoApprovals = false;
 		} );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Review', exact: true } )
+			.getByRole( 'button', { name: 'Resolve', exact: true } )
 			.click();
-		await editor.canvas
+		await page
+			.getByRole( 'dialog', { name: 'Resolve pending changes' } )
 			.getByRole( 'button', { name: 'Approve', exact: true } )
 			.click();
 		await pageUtils.pressKeys( 'primary+s' );
@@ -224,9 +224,10 @@ test.describe( 'Distributed editing prototype', () => {
 		await sequesterScriptProposal( page, pageUtils, editor );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Review', exact: true } )
+			.getByRole( 'button', { name: 'Resolve', exact: true } )
 			.click();
-		await editor.canvas
+		await page
+			.getByRole( 'dialog', { name: 'Resolve pending changes' } )
 			.getByRole( 'button', { name: 'Reject', exact: true } )
 			.click();
 

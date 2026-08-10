@@ -23,17 +23,17 @@ single HTML comment carrying two escaped attributes:
 - `proposed`: the exact proposed bytes, inert. Never rendered outside an
   explicit editor review; only an editor unwrap turns it into content, which
   re-enters evaluation as an ordinary protected chunk.
-- `placeholder`: the kses-filtered safe version. The editor renders this in
-  the collapsed state; the block's server **render callback** renders it on
-  the front end. It is the *only* attribute that reaches output, so a
-  wrapper's safety turns solely on the placeholder being kses-clean.
-- Review happens **in-canvas** behind a **Review** button: collapsed, the
-  block shows the safe placeholder rendered normally with a small "Pending
-  review" affordance. Clicking Review reveals the proposal as editable raw
-  text (never live DOM — the canvas is same-origin and privileged), with
-  Approve / Reject / Close. Approving unwraps the (possibly modified) markup
-  and it re-enters evaluation covered by the reviewer's approval hash;
-  rejecting keeps the placeholder.
+- `placeholder`: the kses-filtered safe version. The block's server **render
+  callback** renders it on the front end; the editor doesn't render it at
+  all. It is the *only* attribute that reaches output, so a wrapper's safety
+  turns solely on the placeholder being kses-clean.
+- Review follows the **invalid-block recovery pattern**: in-canvas the
+  wrapper renders only a warning box with a primary **Resolve** button.
+  Resolve opens a dialog showing the proposal as editable raw text (never
+  live DOM — the canvas is same-origin and privileged), with Approve /
+  Reject actions. Approving unwraps the (possibly modified) markup and it
+  re-enters evaluation covered by the reviewer's approval hash; rejecting
+  keeps the placeholder.
 - A hand-crafted wrapper is handled by the same rule: if its `placeholder` is
   kses-clean it passes through (the inert `proposed` payload is harmless); if
   its `placeholder` carries active markup it is itself protected and gets
@@ -106,12 +106,12 @@ A build-free client (WordPress script globals, enqueued on
   only enter content via the explicit Approve action. If a fast relay is
   added, auto-approval must be restricted to tracked local provenance.
 - **Review block** — sequestered proposals render in-canvas as the
-  `de/pending-review` block. **Collapsed by default**: the safe placeholder
-  renders as normal content with a small "Pending review" affordance and a
-  **Review** button; the raw proposed payload stays out of the DOM entirely
-  until requested. Clicking Review reveals editable raw markup (approval
-  applies exactly what is shown, never live DOM) and Approve / Reject / Close
-  actions that unwrap on the next save. The recorded proposer is deliberately not surfaced in the UI:
+  `de/pending-review` block, styled after invalid-block recovery: a warning
+  box ("Block contains changes awaiting review.") with a primary **Resolve**
+  button, and nothing else — neither the safe placeholder nor the raw
+  proposed payload enters the canvas DOM. Resolve opens a dialog with the
+  editable raw markup (approval applies exactly what is shown, never live
+  DOM) and Approve / Reject actions that unwrap on the next save. The recorded proposer is deliberately not surfaced in the UI:
   attribution in this model is transport-level and advisory, so displaying it
   as authorship would overstate what the server can vouch for. It remains in
   the block attributes for auditing.

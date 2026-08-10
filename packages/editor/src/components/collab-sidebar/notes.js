@@ -8,16 +8,14 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { ReviewThread } from './review-thread';
 import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
 	pickPrimaryNote,
 } from './utils';
-import { useFloatingBoard, useNoteActions, useReviewActions } from './hooks';
+import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
-import { REVIEW_THREAD_TYPE } from './constants';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -27,7 +25,6 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		onEdit: onEditNote,
 		onDelete,
 	} = useNoteActions();
-	const { onApprove, onReject } = useReviewActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -135,23 +132,12 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	// Pick the most relevant thread for the selected block. Derived outside
 	// the effect so the effect body stays minimal.
 	const targetNoteId = useMemo( () => {
-		// Selecting a pending-review block in the canvas targets its review
-		// thread; the wrapper carries no note metadata.
-		const reviewThread = notes.find(
-			( t ) =>
-				t.type === REVIEW_THREAD_TYPE &&
-				t.blockClientId === selectedBlockClientId
-		);
-		if ( reviewThread ) {
-			return reviewThread.id;
-		}
-
 		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 		const blockThreads = notes.filter( ( t ) =>
 			blockNoteIds.includes( t.id )
 		);
 		return pickPrimaryNote( blockThreads )?.id;
-	}, [ noteId, notes, selectedBlockClientId ] );
+	}, [ noteId, notes ] );
 
 	// Sync the selected note to the new block's primary thread when the
 	// block context changes. The ref tracks the previous block id so the
@@ -305,60 +291,30 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 									</Text>
 								</Stack>
 							) }
-							{ thread.type === REVIEW_THREAD_TYPE ? (
-								<ReviewThread
-									review={ thread }
-									onApprove={ onApprove }
-									onReject={ onReject }
-									isSelected={ selectedNote === thread.id }
-									sidebarRef={ sidebarRef }
-									floating={
-										isFloating
-											? {
-													y: notePositions[
-														thread.id
-													],
-													registerThread,
-													unregisterThread,
-											  }
-											: undefined
-									}
-									onKeyDown={ ( event ) =>
-										navigate(
-											event,
-											thread,
-											selectedNote === thread.id
-										)
-									}
-								/>
-							) : (
-								<NoteThread
-									note={ thread }
-									onAddReply={ onAddReply }
-									onDeleteNote={ handleDelete }
-									onEditNote={ onEditNote }
-									isSelected={ selectedNote === thread.id }
-									sidebarRef={ sidebarRef }
-									floating={
-										isFloating
-											? {
-													y: notePositions[
-														thread.id
-													],
-													registerThread,
-													unregisterThread,
-											  }
-											: undefined
-									}
-									onKeyDown={ ( event ) =>
-										navigate(
-											event,
-											thread,
-											selectedNote === thread.id
-										)
-									}
-								/>
-							) }
+							<NoteThread
+								note={ thread }
+								onAddReply={ onAddReply }
+								onDeleteNote={ handleDelete }
+								onEditNote={ onEditNote }
+								isSelected={ selectedNote === thread.id }
+								sidebarRef={ sidebarRef }
+								floating={
+									isFloating
+										? {
+												y: notePositions[ thread.id ],
+												registerThread,
+												unregisterThread,
+										  }
+										: undefined
+								}
+								onKeyDown={ ( event ) =>
+									navigate(
+										event,
+										thread,
+										selectedNote === thread.id
+									)
+								}
+							/>
 						</Fragment>
 					) ) }
 				</>

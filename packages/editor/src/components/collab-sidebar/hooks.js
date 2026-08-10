@@ -12,18 +12,13 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { cloneBlock, parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
-import {
-	FLOATING_NOTES_SIDEBAR,
-	PENDING_REVIEW_BLOCK_NAME,
-	REVIEW_THREAD_TYPE,
-} from './constants';
+import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
@@ -172,158 +167,6 @@ export function useNoteThreads( postId ) {
 		notes,
 		unresolvedNotes,
 	};
-}
-
-/**
- * Collect the sequestered `de/pending-review` blocks in the canvas as
- * synthetic review threads, shaped enough like note threads (`id`,
- * `blockClientId`, `status`) to flow through the sidebar list and the
- * floating board alongside them.
- *
- * Ids are derived from the client id, so a review thread's identity follows
- * its block: approving or rejecting replaces the block and the thread
- * disappears with it.
- *
- * @return {Array} Review thread objects, in document order.
- */
-export function useReviewThreads() {
-	const { getBlockAttributes, getBlockName } = useSelect( blockEditorStore );
-	const { clientIds } = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants } = select( blockEditorStore );
-		return {
-			clientIds: getClientIdsWithDescendants(),
-		};
-	}, [] );
-
-	/*
-	 * Keyed on the block list only: attribute edits to an existing wrapper
-	 * (e.g. tweaking the proposal in the canvas review surface) won't refresh
-	 * the sidebar copy until the list changes. Approve/Reject replace the
-	 * block, so the flows this surface owns always recompute.
-	 */
-	return useMemo( () => {
-		const reviews = [];
-		for ( const clientId of clientIds ) {
-			if ( getBlockName( clientId ) !== PENDING_REVIEW_BLOCK_NAME ) {
-				continue;
-			}
-
-			reviews.push( {
-				id: `review-${ clientId }`,
-				type: REVIEW_THREAD_TYPE,
-				// Always in need of attention; sorts with the unresolved notes.
-				status: 'hold',
-				blockClientId: clientId,
-				attributes: getBlockAttributes( clientId ) ?? {},
-			} );
-		}
-		return reviews;
-	}, [ clientIds, getBlockAttributes, getBlockName ] );
-}
-
-/**
- * Actions for review threads. Mirrors the in-canvas review surface of the
- * pending-review block: approving replaces the wrapper with the proposed
- * markup, rejecting replaces it with the kses-filtered placeholder. Either
- * takes effect on the next save, where the distributed-editing engine
- * re-evaluates the content.
- *
- * @return {Object} { onApprove, onReject } callbacks taking a review thread.
- */
-export function useReviewActions() {
-	const { createNotice } = useDispatch( noticesStore );
-	const { replaceBlocks, removeBlock, insertBlock } =
-		useDispatch( blockEditorStore );
-	const { getBlock, getBlockIndex, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-	const { selectNote } = unlock( useDispatch( editorStore ) );
-
-	/*
-	 * Replaces the review's wrapper block with the blocks parsed from the
-	 * wrapper's `attributeKey` attribute, and returns an undoer that restores
-	 * the captured wrapper. The undoer targets only the blocks this action
-	 * inserted (deliberately not the undo stack), so edits made after the
-	 * review action stay intact.
-	 *
-	 * The markup is read from the store at action time, not from the review
-	 * thread object: thread objects only refresh when the block list changes,
-	 * so they go stale while the proposal is edited in the sidebar or canvas.
-	 *
-	 * Attributes come from parsed post content, which a hand-edited document
-	 * can fill with wrongly typed values; only trust strings.
-	 */
-	const unwrapTo = ( review, attributeKey ) => {
-		const wrapper = getBlock( review.blockClientId );
-		if ( ! wrapper ) {
-			// Already gone (e.g. handled from the in-canvas surface first).
-			return null;
-		}
-
-		const rootClientId = getBlockRootClientId( review.blockClientId );
-		const index = getBlockIndex( review.blockClientId );
-		const markup = wrapper.attributes?.[ attributeKey ];
-		const blocks = parse( typeof markup === 'string' ? markup : '' );
-
-		// The thread's block is going away; drop the selection with it.
-		selectNote( undefined );
-
-		if ( blocks.length > 0 ) {
-			replaceBlocks( review.blockClientId, blocks );
-		} else {
-			// Nothing survived the filter (or the proposal was a pure
-			// deletion); removing the wrapper is the whole change.
-			removeBlock( review.blockClientId );
-		}
-
-		return () => {
-			const restored = cloneBlock( wrapper );
-			const insertedIds = blocks
-				.map( ( block ) => block.clientId )
-				.filter( ( clientId ) => !! getBlock( clientId ) );
-
-			if ( insertedIds.length > 0 ) {
-				replaceBlocks( insertedIds, [ restored ] );
-			} else {
-				insertBlock( restored, index, rootClientId );
-			}
-		};
-	};
-
-	const onApprove = ( review ) => {
-		const undo = unwrapTo( review, 'proposed' );
-		if ( ! undo ) {
-			return;
-		}
-
-		createNotice(
-			'snackbar',
-			__( 'Change approved. It takes effect when the post is saved.' ),
-			{
-				type: 'snackbar',
-				isDismissible: true,
-				actions: [ { label: __( 'Undo' ), onClick: undo } ],
-			}
-		);
-	};
-
-	const onReject = ( review ) => {
-		const undo = unwrapTo( review, 'placeholder' );
-		if ( ! undo ) {
-			return;
-		}
-
-		createNotice(
-			'snackbar',
-			__( 'Change rejected. The filtered version was kept.' ),
-			{
-				type: 'snackbar',
-				isDismissible: true,
-				actions: [ { label: __( 'Undo' ), onClick: undo } ],
-			}
-		);
-	};
-
-	return { onApprove, onReject };
 }
 
 /**

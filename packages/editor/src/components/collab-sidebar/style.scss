@@ -59,32 +59,6 @@
 	}
 }
 
-// Review threads: sequestered pending-review blocks surfaced for approval.
-// The left accent mirrors the in-canvas review surface of the block.
-.editor-collab-sidebar-panel__review {
-	border-left: 4px solid $alert-yellow;
-}
-
-.editor-collab-sidebar-panel__review-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	width: 40px;
-	height: 40px;
-	border-radius: $radius-round;
-	background: rgba($alert-yellow, 0.25);
-	color: $gray-900;
-}
-
-// The proposal is raw block markup, edited as text.
-.editor-collab-sidebar-panel__review-markup textarea {
-	font-family: $editor-html-font;
-	font-size: 11px;
-	line-height: 1.6;
-	max-height: 240px;
-}
-
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
 	font-weight: 400;
