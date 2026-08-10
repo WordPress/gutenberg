@@ -1,9 +1,11 @@
+import clsx from 'clsx';
 import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,6 +18,16 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { PatternExplorerSidebar, getPopulatedCategories, searchItems } = unlock(
+	blockEditorPrivateApis
+);
+
+const ALL_PATTERNS_CATEGORY = {
+	name: 'allPatterns',
+	label: _x( 'All', 'patterns' ),
+};
 
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -61,6 +73,43 @@ export function useStartPatterns() {
 	}, [ postType, blockPatternsWithPostContentBlockType ] );
 }
 
+function useStartPatternCategories( startPatterns ) {
+	const { registeredCategories, userCategories } = useSelect( ( select ) => {
+		const { getBlockPatternCategories, getUserPatternCategories } =
+			select( coreStore );
+		return {
+			registeredCategories: getBlockPatternCategories(),
+			userCategories: getUserPatternCategories(),
+		};
+	}, [] );
+
+	return useMemo( () => {
+		const allCategories = [ ...( registeredCategories ?? [] ) ];
+		userCategories?.forEach( ( userCategory ) => {
+			if (
+				! allCategories.some(
+					( { name } ) => name === userCategory.name
+				)
+			) {
+				allCategories.push( userCategory );
+			}
+		} );
+
+		const categories = getPopulatedCategories(
+			startPatterns,
+			allCategories
+		);
+
+		// Filtering is not useful when no start pattern belongs to a
+		// registered category.
+		if ( ! categories.some( ( { name } ) => name !== 'uncategorized' ) ) {
+			return [];
+		}
+
+		return [ ALL_PATTERNS_CATEGORY, ...categories ];
+	}, [ startPatterns, registeredCategories, userCategories ] );
+}
+
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postType, postId } = useSelect( ( select ) => {
@@ -88,9 +137,43 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 
 function StartPageOptionsModal( { onClose } ) {
 	const [ showStartPatterns, setShowStartPatterns ] = useState( true );
+	const [ selectedCategory, setSelectedCategory ] = useState(
+		ALL_PATTERNS_CATEGORY.name
+	);
+	const [ searchValue, setSearchValue ] = useState( '' );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const startPatterns = useStartPatterns();
+	const patternCategories = useStartPatternCategories( startPatterns );
+	const hasCategories = patternCategories.length > 0;
 	const hasStartPattern = startPatterns.length > 0;
+
+	const filteredStartPatterns = useMemo( () => {
+		let patterns = startPatterns;
+		if (
+			hasCategories &&
+			selectedCategory !== ALL_PATTERNS_CATEGORY.name
+		) {
+			patterns = patterns.filter( ( pattern ) =>
+				selectedCategory === 'uncategorized'
+					? ! pattern.categories?.some( ( patternCategory ) =>
+							patternCategories.some(
+								( { name } ) => name === patternCategory
+							)
+					  )
+					: pattern.categories?.includes( selectedCategory )
+			);
+		}
+		if ( searchValue ) {
+			patterns = searchItems( patterns, searchValue );
+		}
+		return patterns;
+	}, [
+		startPatterns,
+		hasCategories,
+		selectedCategory,
+		patternCategories,
+		searchValue,
+	] );
 
 	if ( ! hasStartPattern ) {
 		return null;
@@ -108,9 +191,22 @@ function StartPageOptionsModal( { onClose } ) {
 			isFullScreen
 			onRequestClose={ handleClose }
 		>
-			<div className="editor-start-page-options__modal-content">
+			{ hasCategories && (
+				<PatternExplorerSidebar
+					selectedCategory={ selectedCategory }
+					patternCategories={ patternCategories }
+					onClickCategory={ setSelectedCategory }
+					searchValue={ searchValue }
+					setSearchValue={ setSearchValue }
+				/>
+			) }
+			<div
+				className={ clsx( 'editor-start-page-options__modal-content', {
+					'has-pattern-categories': hasCategories,
+				} ) }
+			>
 				<PatternSelection
-					blockPatterns={ startPatterns }
+					blockPatterns={ filteredStartPatterns }
 					onChoosePattern={ handleClose }
 				/>
 			</div>
