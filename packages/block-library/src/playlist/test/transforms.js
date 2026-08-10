@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getPossibleBlockTransformations,
@@ -8,10 +5,6 @@ import {
 	switchToBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	metadata as playlistMetadata,
 	settings as playlistSettings,
