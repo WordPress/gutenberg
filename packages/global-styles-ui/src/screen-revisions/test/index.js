@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useNavigator } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import ScreenRevisions from '../';
 import { GlobalStylesContext } from '../../context';
 import useGlobalStylesRevisions from '../use-global-styles-revisions';

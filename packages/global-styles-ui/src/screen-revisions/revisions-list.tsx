@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
@@ -15,10 +12,6 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Revision } from './types';
 import { unlock } from '../lock-unlock';
 
