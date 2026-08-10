@@ -9,7 +9,10 @@ import {
 	extractWords,
 	getNormalizedSearchTerms,
 	normalizeString,
+	searchItems,
 } from './components/inserter/search-items';
+import PatternExplorerSidebar from './components/inserter/block-patterns-explorer/pattern-explorer-sidebar';
+import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
@@ -161,4 +164,7 @@ lock( privateApis, {
 	useNativeUndo,
 	usesNativeUndo,
 	isElementVisible,
+	PatternExplorerSidebar,
+	getPopulatedCategories,
+	searchItems,
 } );
