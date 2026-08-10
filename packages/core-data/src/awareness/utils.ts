@@ -1,5 +1,30 @@
+import { _x } from '@wordpress/i18n';
 import type { User } from '../entity-types';
 import type { CollaboratorInfo } from './types';
+
+type CurrentCollaborator = Pick< User< 'view' >, 'id' | 'name' > & {
+	avatar_urls?: unknown;
+	slug?: unknown;
+};
+
+const ANONYMOUS_COLLABORATOR_NAMES = [
+	_x( 'Anonymous Alpaca', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Badger', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Capybara', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Dolphin', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Echidna', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Fox', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Gecko', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Hedgehog', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Ibis', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Koala', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Lemur', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Meerkat', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Narwhal', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Otter', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Panda', 'Name for an anonymous collaborator' ),
+	_x( 'Anonymous Quokka', 'Name for an anonymous collaborator' ),
+];
 
 /**
  * Get the browser name from the user agent.
@@ -86,23 +111,82 @@ export function areCollaboratorInfosEqual(
 }
 
 /**
+ * Check whether a REST response contains the identity fields required for a
+ * named collaborator. Optional presentation fields are normalized separately.
+ *
+ * @param value - The value to check.
+ * @return Whether the value contains a usable WordPress user identity.
+ */
+export function isCurrentCollaborator(
+	value: unknown
+): value is CurrentCollaborator {
+	if ( 'object' !== typeof value || null === value ) {
+		return false;
+	}
+
+	const candidate = value as Record< string, unknown >;
+	return (
+		Number.isInteger( candidate.id ) &&
+		( candidate.id as number ) > 0 &&
+		'string' === typeof candidate.name &&
+		'' !== candidate.name.trim()
+	);
+}
+
+/**
  * Generate a collaborator info object from a current collaborator.
  *
  * @param currentCollaborator - The current collaborator.
  * @return The collaborator info object.
  */
 export function generateCollaboratorInfo(
-	currentCollaborator: User< 'view' >
+	currentCollaborator: CurrentCollaborator
 ): CollaboratorInfo {
-	// eslint-disable-next-line camelcase
-	const { avatar_urls, id, name, slug } = currentCollaborator;
+	const { avatar_urls: rawAvatarUrls, id, name, slug } = currentCollaborator;
+	const avatarUrls: CollaboratorInfo[ 'avatar_urls' ] = {};
+
+	if ( 'object' === typeof rawAvatarUrls && null !== rawAvatarUrls ) {
+		for ( const size of [ '24', '48', '96' ] as const ) {
+			const url = ( rawAvatarUrls as Record< string, unknown > )[ size ];
+			if ( 'string' === typeof url ) {
+				avatarUrls[ size ] = url;
+			}
+		}
+	}
+
 	return {
-		avatar_urls, // eslint-disable-line camelcase
+		avatar_urls: avatarUrls,
 		browserType: getBrowserName(),
 		enteredAt: Date.now(),
 		id,
+		isAnonymous: false,
 		name,
-		slug,
+		slug: 'string' === typeof slug ? slug : '',
+	};
+}
+
+/**
+ * Generate session-scoped collaborator information when the current WordPress
+ * user cannot be resolved. Yjs client IDs are random, so using the client ID to
+ * select a name keeps it stable for the session without exposing user data.
+ *
+ * @param clientId - The Yjs client ID.
+ * @return Anonymous collaborator information.
+ */
+export function generateAnonymousCollaboratorInfo(
+	clientId: number
+): CollaboratorInfo {
+	const nameIndex =
+		Math.abs( clientId ) % ANONYMOUS_COLLABORATOR_NAMES.length;
+
+	return {
+		avatar_urls: {},
+		browserType: getBrowserName(),
+		enteredAt: Date.now(),
+		id: null,
+		isAnonymous: true,
+		name: ANONYMOUS_COLLABORATOR_NAMES[ nameIndex ],
+		slug: `anonymous-${ clientId }`,
 	};
 }
 

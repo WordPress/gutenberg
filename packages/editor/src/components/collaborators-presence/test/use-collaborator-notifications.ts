@@ -83,6 +83,7 @@ function makeCollaborator(
 		isConnected: true,
 		collaboratorInfo: {
 			id,
+			isAnonymous: false,
 			name,
 			slug: name.toLowerCase(),
 			avatar_urls: {},
@@ -182,6 +183,30 @@ describe( 'useCollaboratorNotifications', () => {
 					id: 'collab-user-entered-200',
 					type: 'snackbar',
 					isDismissible: false,
+				} )
+			);
+		} );
+
+		it( 'uses the session ID for an anonymous collaborator notification', () => {
+			const anonymousCollaborator = {
+				...bob,
+				clientId: 321,
+				collaboratorInfo: {
+					...bob.collaboratorInfo,
+					id: null,
+					isAnonymous: true,
+					name: 'Anonymous Koala',
+				},
+			};
+			renderNotifications();
+
+			mockRegistered.join?.( anonymousCollaborator, me );
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Anonymous Koala has joined the post.',
+				expect.objectContaining( {
+					id: 'collab-user-entered-321',
 				} )
 			);
 		} );

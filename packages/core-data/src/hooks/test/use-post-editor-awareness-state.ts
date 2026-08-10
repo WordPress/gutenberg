@@ -43,6 +43,7 @@ const createMockActiveUser = (
 	isConnected: true,
 	collaboratorInfo: {
 		id: 1,
+		isAnonymous: false,
 		name: 'Test User',
 		slug: 'test-user',
 		avatar_urls: mockAvatarUrls,
@@ -456,12 +457,13 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	} );
 
 	describe( 'multiple users scenario', () => {
-		test( 'should handle multiple active users', () => {
+		test( 'should handle named and anonymous active users together', () => {
 			const user1 = createMockActiveUser( {
 				clientId: 1,
 				isMe: true,
 				collaboratorInfo: {
 					id: 1,
+					isAnonymous: false,
 					name: 'User One',
 					slug: 'user-one',
 					avatar_urls: mockAvatarUrls,
@@ -473,10 +475,11 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				clientId: 2,
 				isMe: false,
 				collaboratorInfo: {
-					id: 2,
-					name: 'User Two',
-					slug: 'user-two',
-					avatar_urls: mockAvatarUrls,
+					id: null,
+					isAnonymous: true,
+					name: 'Anonymous Capybara',
+					slug: 'anonymous-2',
+					avatar_urls: {},
 					browserType: 'Firefox',
 					enteredAt: 1704067300000,
 				},
@@ -493,7 +496,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				'User One'
 			);
 			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
-				'User Two'
+				'Anonymous Capybara'
 			);
 		} );
 
@@ -529,6 +532,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: true,
 			collaboratorInfo: {
 				id: 1,
+				isAnonymous: false,
 				name: 'Me',
 				slug: 'me',
 				avatar_urls: mockAvatarUrls,
@@ -542,6 +546,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: false,
 			collaboratorInfo: {
 				id: 100,
+				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,
@@ -634,6 +639,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isConnected: true,
 			collaboratorInfo: {
 				id: 100,
+				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,
@@ -737,6 +743,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: false,
 			collaboratorInfo: {
 				id: 100,
+				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,

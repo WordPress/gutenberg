@@ -1,4 +1,8 @@
-import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
+import {
+	areCollaboratorInfosEqual,
+	generateAnonymousCollaboratorInfo,
+	generateCollaboratorInfo,
+} from '../utils';
 import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
 
@@ -24,6 +28,7 @@ describe( 'Awareness Utils', () => {
 			overrides: Partial< CollaboratorInfo > = {}
 		): CollaboratorInfo => ( {
 			id: 1,
+			isAnonymous: false,
 			name: 'Test User',
 			slug: 'test-user',
 			avatar_urls: sharedAvatarUrls,
@@ -185,6 +190,7 @@ describe( 'Awareness Utils', () => {
 			expect( collaboratorInfo.id ).toBe( 42 );
 			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
 			expect( collaboratorInfo.slug ).toBe( 'test-user' );
+			expect( collaboratorInfo.isAnonymous ).toBe( false );
 		} );
 
 		test( 'should include browser type', () => {
@@ -297,6 +303,58 @@ describe( 'Awareness Utils', () => {
 				'48': 'https://example.com/medium.png',
 				'96': 'https://example.com/large.png',
 			} );
+		} );
+
+		test( 'normalizes invalid optional presentation fields', () => {
+			const user = createMockUser( {
+				avatar_urls: 'invalid',
+				slug: null,
+			} as unknown as Partial< User< 'view' > > );
+			const collaboratorInfo = generateCollaboratorInfo( user );
+
+			expect( collaboratorInfo ).toMatchObject( {
+				avatar_urls: {},
+				id: 1,
+				isAnonymous: false,
+				slug: '',
+			} );
+		} );
+	} );
+
+	describe( 'generateAnonymousCollaboratorInfo', () => {
+		beforeEach( () => {
+			mockUserAgent( 'Some Browser/1.0' );
+			jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+		} );
+
+		afterEach( () => {
+			jest.restoreAllMocks();
+		} );
+
+		test( 'creates a complete anonymous presentation identity', () => {
+			const collaboratorInfo = generateAnonymousCollaboratorInfo( 9 );
+
+			expect( collaboratorInfo ).toEqual( {
+				avatar_urls: {},
+				browserType: 'Unknown',
+				enteredAt: 1704067200000,
+				id: null,
+				isAnonymous: true,
+				name: 'Anonymous Koala',
+				slug: 'anonymous-9',
+			} );
+		} );
+
+		test( 'keeps the name stable for the same session ID', () => {
+			expect( generateAnonymousCollaboratorInfo( 3 ).name ).toBe(
+				generateAnonymousCollaboratorInfo( 3 ).name
+			);
+		} );
+
+		test( 'varies the name across session IDs', () => {
+			expect( generateAnonymousCollaboratorInfo( 3 ).name ).not.toBe(
+				generateAnonymousCollaboratorInfo( 4 ).name
+			);
 		} );
 	} );
 } );

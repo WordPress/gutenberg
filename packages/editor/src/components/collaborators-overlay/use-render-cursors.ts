@@ -201,7 +201,9 @@ export function useRenderCursors(
 			const clientId = user.clientId;
 			const color = user.isMe
 				? 'var(--wp-admin-theme-color)'
-				: getAvatarBorderColor( user.collaboratorInfo.id );
+				: getAvatarBorderColor(
+						user.collaboratorInfo.id ?? user.clientId
+				  );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(

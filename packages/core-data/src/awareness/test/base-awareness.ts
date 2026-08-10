@@ -29,6 +29,7 @@ const mockAvatarUrls = {
 
 const createMockCollaboratorInfo = () => ( {
 	id: 1,
+	isAnonymous: false,
 	name: 'Test User',
 	slug: 'test-user',
 	avatar_urls: mockAvatarUrls,
@@ -99,7 +100,49 @@ describe( 'BaseAwareness', () => {
 			expect( collaboratorInfo ).toBeDefined();
 			expect( collaboratorInfo?.id ).toBe( 1 );
 			expect( collaboratorInfo?.name ).toBe( 'Test User' );
+			expect( collaboratorInfo?.isAnonymous ).toBe( false );
 			expect( collaboratorInfo?.browserType ).toBe( 'Chrome' );
+		} );
+
+		test( 'uses an anonymous identity when the current user fails to resolve', async () => {
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getCurrentUser: jest.fn().mockRejectedValue( {
+					code: 'rest_no_route',
+					data: { status: 404 },
+				} ),
+			} );
+			const awareness = new BaseAwareness( doc );
+
+			awareness.setUp();
+			await Promise.resolve();
+			await Promise.resolve();
+
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).toMatchObject( {
+				avatar_urls: {},
+				id: null,
+				isAnonymous: true,
+				slug: `anonymous-${ doc.clientID }`,
+			} );
+			expect( collaboratorInfo?.name ).toMatch( /^Anonymous / );
+		} );
+
+		test( 'uses an anonymous identity for an invalid user response', async () => {
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getCurrentUser: jest.fn().mockResolvedValue( { id: 1 } ),
+			} );
+			const awareness = new BaseAwareness( doc );
+
+			awareness.setUp();
+			await Promise.resolve();
+
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toMatchObject( {
+				id: null,
+				isAnonymous: true,
+			} );
 		} );
 	} );
 
@@ -165,6 +208,7 @@ describe( 'BaseAwarenessState', () => {
 			// Manually add another user's state
 			awareness.setLocalStateField( 'collaboratorInfo', {
 				id: 2,
+				isAnonymous: false,
 				name: 'Other User',
 				slug: 'other-user',
 				avatar_urls: mockAvatarUrls,
@@ -208,6 +252,7 @@ describe( 'BaseAwarenessState', () => {
 			const awareness = new TestBaseAwarenessState( doc );
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
+				isAnonymous: false,
 				name: 'Custom User',
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,
@@ -229,6 +274,7 @@ describe( 'BaseAwarenessState', () => {
 			const awareness = new TestBaseAwarenessState( doc );
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
+				isAnonymous: false,
 				name: 'Custom User',
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,

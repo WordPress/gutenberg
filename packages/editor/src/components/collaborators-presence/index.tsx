@@ -110,7 +110,8 @@ export function CollaboratorsPresence( {
 										collaboratorState.collaboratorInfo.name
 									}
 									borderColor={ getAvatarBorderColor(
-										collaboratorState.collaboratorInfo.id
+										collaboratorState.collaboratorInfo.id ??
+											collaboratorState.clientId
 									) }
 									size="small"
 								/>

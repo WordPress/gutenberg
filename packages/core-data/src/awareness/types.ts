@@ -2,12 +2,12 @@ import type { Y } from '@wordpress/sync';
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
-export type CollaboratorInfo = Pick<
-	User< 'view' >,
-	'id' | 'name' | 'slug' | 'avatar_urls'
-> & {
+export type CollaboratorInfo = Pick< User< 'view' >, 'name' | 'slug' > & {
+	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
+	id: User< 'view' >[ 'id' ] | null;
+	isAnonymous: boolean;
 };
 
 /**

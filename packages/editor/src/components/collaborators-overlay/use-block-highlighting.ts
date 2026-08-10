@@ -89,7 +89,7 @@ export function useBlockHighlighting(
 		type BlockEntry = {
 			blockId: string;
 			clientId: number;
-			userId: number;
+			collaboratorId: number;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -118,6 +118,8 @@ export function useBlockHighlighting(
 				const selection = userState.editorState?.selection as any;
 
 				if ( selection.type === SelectionType.WholeBlock ) {
+					const collaboratorId =
+						userState.collaboratorInfo.id ?? userState.clientId;
 					let localClientId: string | null;
 					try {
 						( { localClientId } = resolveSelection( selection ) );
@@ -131,10 +133,8 @@ export function useBlockHighlighting(
 						{
 							blockId: localClientId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
-							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
-							),
+							collaboratorId,
+							color: getAvatarBorderColor( collaboratorId ),
 							userName: userState.collaboratorInfo.name,
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
@@ -171,9 +171,9 @@ export function useBlockHighlighting(
 				}
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
-				const color = getAvatarBorderColor(
-					userState.collaboratorInfo.id
-				);
+				const collaboratorId =
+					userState.collaboratorInfo.id ?? userState.clientId;
+				const color = getAvatarBorderColor( collaboratorId );
 				const userName = userState.collaboratorInfo.name;
 				const avatarUrl = getAvatarUrl(
 					userState.collaboratorInfo.avatar_urls
@@ -185,7 +185,7 @@ export function useBlockHighlighting(
 						{
 							blockId: firstId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							collaboratorId,
 							color,
 							userName,
 							avatarUrl,
@@ -202,7 +202,7 @@ export function useBlockHighlighting(
 					( blockId ) => ( {
 						blockId,
 						clientId: userState.clientId,
-						userId: userState.collaboratorInfo.id,
+						collaboratorId,
 						color,
 						userName,
 						avatarUrl,
@@ -284,8 +284,11 @@ export function useBlockHighlighting(
 				currentHighlightedIds.add( blockId );
 			}
 
-			if ( overlayRect && ! usersWithAvatar.has( block.userId ) ) {
-				usersWithAvatar.add( block.userId );
+			if (
+				overlayRect &&
+				! usersWithAvatar.has( block.collaboratorId )
+			) {
+				usersWithAvatar.add( block.collaboratorId );
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,

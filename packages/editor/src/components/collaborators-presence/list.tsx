@@ -96,7 +96,8 @@ export function CollaboratorsList( {
 											? 'var(--wp-admin-theme-color)'
 											: getAvatarBorderColor(
 													collaboratorState
-														.collaboratorInfo.id
+														.collaboratorInfo.id ??
+														collaboratorState.clientId
 											  )
 									}
 									dimmed={ ! collaboratorState.isConnected }

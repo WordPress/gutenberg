@@ -829,6 +829,7 @@ describe( 'PostEditorAwareness', () => {
 			// Set collaboratorInfo and verify equality check works
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 1,
+				isAnonymous: false,
 				name: 'Test',
 				slug: 'test',
 				avatar_urls: mockAvatarUrls,
