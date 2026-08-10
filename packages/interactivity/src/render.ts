@@ -234,7 +234,7 @@ const writeRegionSignal = ( wrapper: any, regionVnode: any ): void => {
  *
  * @param island    The island whose tree receives the splice.
  * @param container The element the mode is relative to.
- * @param mode  Insert mode.
+ * @param mode      Insert mode.
  * @param newVdoms  The vnodes to insert.
  * @param atIndex   For `mode: 'at'` — the child index to insert at.
  */
@@ -328,6 +328,22 @@ const spliceIntoTree = (
 					newVdoms.length === 1
 						? newVdoms[ 0 ]
 						: h( Fragment, null, newVdoms );
+				// Replacing the island root with content that has no island
+				// would ORPHAN the fragment — subsequent renderHTML calls
+				// could not find an island for the container. Warn and leave
+				// the tree untouched.
+				const keepsIsland = newVdoms.some(
+					( v ) =>
+						typeof v === 'object' &&
+						v !== null &&
+						( v as any ).props?.[ islandAttribute ] !== undefined
+				);
+				if ( ! keepsIsland ) {
+					warn(
+						'renderHTML(): replacing the island root with content that has no data-wp-interactive attribute would orphan the tree. The content was not rendered.'
+					);
+					return;
+				}
 				render( newRoot as VNode, fragment as ContainerNode );
 				return;
 			}
@@ -456,14 +472,6 @@ export function renderHTML(
 		);
 	}
 
-	const island = getTreeIsland( containerElement );
-	if ( ! island ) {
-		warn(
-			'renderHTML(): no interactive island found for the container. The container must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
-		);
-		return;
-	}
-
 	// Use a `<template>` to parse the HTML into nodes (same as the browser
 	// would) without triggering side effects like image loading. Use
 	// `childNodes` (not `children`) so text nodes in mixed content are
@@ -474,6 +482,33 @@ export function renderHTML(
 		Element | Text
 	>;
 	if ( ! nodes.length ) {
+		return;
+	}
+
+	const island = getTreeIsland( containerElement );
+	if ( ! island ) {
+		// No island around the container. If the HTML itself carries an
+		// interactive island (a `data-wp-interactive` element), adopt it:
+		// append the parsed nodes to the container, then hydrate the island
+		// through the sanctioned first-render path — the fragment's first
+		// render matches the pre-existing DOM, the same path `hydrateRegions`
+		// uses for SSR islands. Subsequent splices target the island
+		// normally. Anything else: warn + no-op.
+		const htmlIsland = nodes.find(
+			( node ): node is Element =>
+				node instanceof Element && node.hasAttribute( islandAttribute )
+		);
+		if ( ! htmlIsland ) {
+			warn(
+				'renderHTML(): no interactive island found for the container. The container must be inside a [data-wp-interactive] subtree or have its own data-wp-interactive attribute.'
+			);
+			return;
+		}
+		nodes.forEach( ( node ) => containerElement.appendChild( node ) );
+		hydrate(
+			toVdom( htmlIsland ) as VNode,
+			getRegionRootFragment( [ htmlIsland ] ) as ContainerNode
+		);
 		return;
 	}
 
