@@ -208,8 +208,9 @@ export interface BaseProps
 	/**
 	 * Focus the first selected day (if set) or today's date (if not disabled).
 	 *
-	 * Use this prop when you need to focus the calendar after a user action
-	 * (e.g. opening the dialog with the calendar).
+	 * Use this prop when the calendar should receive initial focus as it opens,
+	 * such as in a calendar popover. Do not use it to move focus after updates
+	 * to an open calendar.
 	 */
 	autoFocus?: boolean;
 	/**
