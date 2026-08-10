@@ -1,25 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { getFilename } from '@wordpress/url';
-
-const getPlaylistAttributes = ( { align, anchor, caption, style } ) => ( {
-	caption,
-	...( align && { align } ),
-	...( anchor && { anchor } ),
-	...( style?.spacing && {
-		style: { spacing: style.spacing },
-	} ),
-} );
-
-const createPlaylistTrack = ( { blob, id, src } ) =>
-	createBlock( 'core/playlist-track', {
-		blob,
-		src,
-		...( src && { title: getFilename( src ) } ),
-		...( id !== undefined && { id } ),
-	} );
 
 const transforms = {
 	from: [
