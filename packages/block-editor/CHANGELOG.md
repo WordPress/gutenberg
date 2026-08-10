@@ -36,7 +36,7 @@
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
 -   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 -   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
--   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins. ([#80388](https://github.com/WordPress/gutenberg/issues/80388)).
+-   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins. ([#81393](https://github.com/WordPress/gutenberg/pull/81393)).
 
 ## 16.1.0 (2026-07-29)
 

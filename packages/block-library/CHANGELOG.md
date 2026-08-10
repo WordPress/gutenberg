@@ -18,7 +18,7 @@
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
--   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins([#80388](https://github.com/WordPress/gutenberg/issues/80388)).
+-   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins([#81393](https://github.com/WordPress/gutenberg/pull/81393)).
 
 ### Internal
 
