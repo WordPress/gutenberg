@@ -8,6 +8,7 @@ import {
 import { useMemo } from '@wordpress/element';
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
+import { getInsertableUnsyncedBlocks } from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
@@ -135,13 +136,17 @@ function createBlockCompleter() {
 			const unsyncedBlocks = ( blocks ?? [] ).map( ( block ) =>
 				cloneBlock( block )
 			);
+			const insertableUnsyncedBlocks =
+				getInsertableUnsyncedBlocks( unsyncedBlocks );
 
 			return {
 				action: 'replace',
 				value:
 					syncStatus === 'unsynced'
-						? unsyncedBlocks.length
-							? unsyncedBlocks
+						? name === 'core/block' && initialAttributes?.ref
+							? unsyncedFallbackBlock
+							: insertableUnsyncedBlocks.length
+							? insertableUnsyncedBlocks
 							: unsyncedFallbackBlock
 						: createBlock(
 								name,

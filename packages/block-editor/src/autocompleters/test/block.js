@@ -27,12 +27,30 @@ describe( 'block autocompleter', () => {
 			title: 'Paragraph',
 			attributes: { content: { type: 'string', source: 'html' } },
 		} );
+		registerBlockType( 'core/buttons', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'design',
+			title: 'Buttons',
+		} );
+		registerBlockType( 'core/button', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'design',
+			title: 'Button',
+			parent: [ 'core/buttons' ],
+			attributes: {
+				text: { type: 'string' },
+			},
+		} );
 	} );
 
 	afterAll( () => {
 		unregisterBlockType( 'core/block' );
 		unregisterBlockType( 'core/html' );
 		unregisterBlockType( 'core/paragraph' );
+		unregisterBlockType( 'core/button' );
+		unregisterBlockType( 'core/buttons' );
 	} );
 
 	describe( 'getOptionCompletion', () => {
@@ -92,6 +110,26 @@ describe( 'block autocompleter', () => {
 			expect( value[ 0 ].attributes ).toEqual( {
 				content: 'From pattern',
 			} );
+		} );
+
+		it( 'keeps unsynced reusable patterns as a pattern block when parsed blocks are child-only', () => {
+			const sourceBlock = {
+				name: 'core/button',
+				attributes: { text: 'Fake Text!' },
+				innerBlocks: [],
+				clientId: 'child-only-client-id',
+			};
+
+			const { value } = blockCompleter.getOptionCompletion( {
+				name: 'core/block',
+				initialAttributes: { ref: 18 },
+				syncStatus: 'unsynced',
+				blocks: [ sourceBlock ],
+			} );
+
+			expect( Array.isArray( value ) ).toBe( false );
+			expect( value.name ).toBe( 'core/block' );
+			expect( value.attributes ).toEqual( { ref: 18 } );
 		} );
 	} );
 } );

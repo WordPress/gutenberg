@@ -11,6 +11,63 @@ import {
 } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
+import { getInsertableUnsyncedBlocks } from './use-block-types-state';
+
+/**
+ * Returns the blocks that should be inserted for a selected pattern.
+ *
+ * @param {Object}   pattern            The selected pattern.
+ * @param {Object[]} blocks             The parsed pattern blocks.
+ * @param {string}   selectedCategory   The selected pattern category.
+ * @param {string}   rootClientId       Insertion root client ID.
+ * @param {Function} canInsertBlockType Selector that checks whether a block can be inserted.
+ *
+ * @return {Object[]} Returns cloned blocks ready for insertion.
+ */
+export const getPatternBlocksForInsertion = (
+	pattern,
+	blocks,
+	selectedCategory,
+	rootClientId,
+	canInsertBlockType
+) => {
+	let patternBlocks = blocks ?? [];
+	if (
+		pattern.type === INSERTER_PATTERN_TYPES.user &&
+		pattern.syncStatus !== 'unsynced'
+	) {
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+
+	if (
+		pattern.type === INSERTER_PATTERN_TYPES.user &&
+		pattern.syncStatus === 'unsynced' &&
+		patternBlocks.length === 0 &&
+		pattern.id
+	) {
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+
+	const clonedBlocks = patternBlocks.map( ( block ) => {
+		const clonedBlock = cloneBlock( block );
+		if (
+			clonedBlock.attributes.metadata?.categories?.includes(
+				selectedCategory
+			)
+		) {
+			clonedBlock.attributes.metadata.categories = [ selectedCategory ];
+		}
+		return clonedBlock;
+	} );
+
+	return canInsertBlockType
+		? getInsertableUnsyncedBlocks(
+				clonedBlocks,
+				rootClientId,
+				canInsertBlockType
+		  )
+		: clonedBlocks;
+};
 
 /**
  * Retrieves the block patterns inserter state.
@@ -22,21 +79,6 @@ import { isFiltered } from '../../../store/utils';
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-export const getPatternBlocksForInsertion = ( pattern, blocks ) => {
-	if (
-		pattern.type === INSERTER_PATTERN_TYPES.user &&
-		pattern.syncStatus !== 'unsynced'
-	) {
-		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
-	}
-
-	if ( pattern.type === INSERTER_PATTERN_TYPES.user && ! blocks?.length ) {
-		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
-	}
-
-	return blocks;
-};
-
 const usePatternsState = (
 	onInsert,
 	rootClientId,
@@ -93,9 +135,9 @@ const usePatternsState = (
 			return true;
 		} );
 	}, [ patterns, isWithinNavigationOverlayContext ] );
-	const { getClosestAllowedInsertionPointForPattern } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const selectors = useSelect( blockEditorStore );
+	const { getClosestAllowedInsertionPointForPattern } = unlock( selectors );
+	const { canInsertBlockType } = selectors;
 
 	const allCategories = useMemo( () => {
 		const categories = [ ...patternCategories ];
@@ -126,23 +168,13 @@ const usePatternsState = (
 			}
 			const patternBlocks = getPatternBlocksForInsertion(
 				pattern,
-				blocks
+				blocks,
+				selectedCategory,
+				destinationRootClientId,
+				canInsertBlockType
 			);
 			onInsert(
-				( patternBlocks ?? [] ).map( ( block ) => {
-					const clonedBlock = cloneBlock( block );
-					if (
-						clonedBlock.attributes.metadata?.categories?.includes(
-							selectedCategory
-						)
-					) {
-						clonedBlock.attributes.metadata.categories = [
-							getPatternBlocksForInsertion,
-							selectedCategory,
-						];
-					}
-					return clonedBlock;
-				} ),
+				patternBlocks,
 				pattern.name,
 				false,
 				destinationRootClientId
@@ -165,6 +197,7 @@ const usePatternsState = (
 			selectedCategory,
 			rootClientId,
 			getClosestAllowedInsertionPointForPattern,
+			canInsertBlockType,
 			isQuick,
 		]
 	);
