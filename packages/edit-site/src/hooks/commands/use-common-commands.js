@@ -6,7 +6,6 @@ import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
@@ -15,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { useGlobalStyles } = unlock( editorPrivateApis );
+const { useGlobalStylesReset } = unlock( editorPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
 	function useGlobalStylesToggleWelcomeGuideCommands() {
@@ -66,14 +65,7 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 
 const getGlobalStylesResetCommands = () =>
 	function useGlobalStylesResetCommands() {
-		const { user, setUser } = useGlobalStyles();
-		const { createSuccessNotice } = useDispatch( noticesStore );
-
-		// Check if there are user customizations that can be reset
-		const canReset =
-			!! user &&
-			( Object.keys( user?.styles ?? {} ).length > 0 ||
-				Object.keys( user?.settings ?? {} ).length > 0 );
+		const { canReset, resetGlobalStyles } = useGlobalStylesReset();
 
 		const commands = useMemo( () => {
 			if ( ! canReset ) {
@@ -87,29 +79,11 @@ const getGlobalStylesResetCommands = () =>
 					icon: isRTL() ? rotateRight : rotateLeft,
 					callback: ( { close } ) => {
 						close();
-
-						// Keep the config that is being replaced so the notice
-						// can put it back.
-						const previousUser = user;
-
-						setUser( { styles: {}, settings: {} } );
-
-						createSuccessNotice( __( 'Custom styles reset.' ), {
-							type: 'snackbar',
-							id: 'global-styles-reset',
-							actions: [
-								{
-									label: __( 'Undo' ),
-									onClick: () => {
-										setUser( previousUser );
-									},
-								},
-							],
-						} );
+						resetGlobalStyles();
 					},
 				},
 			];
-		}, [ canReset, setUser, user, createSuccessNotice ] );
+		}, [ canReset, resetGlobalStyles ] );
 
 		return {
 			isLoading: false,
