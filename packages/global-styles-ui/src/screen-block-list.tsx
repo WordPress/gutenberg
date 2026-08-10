@@ -1,7 +1,9 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
+	Button,
 	FlexItem,
+	privateApis as componentsPrivateApis,
 	SearchControl,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
@@ -25,6 +27,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { funnel } from '@wordpress/icons';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -40,6 +43,8 @@ const {
 	useHasColorPanel,
 	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
+
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Whether a value, or anything nested inside it, holds a real user value.
@@ -89,6 +94,8 @@ export function hasUserStylesForBlock(
 		hasAnyValue( user?.settings?.blocks?.[ blockName ] )
 	);
 }
+
+type StyleFilter = 'all' | 'customized';
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -168,9 +175,10 @@ function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 
 interface BlockListProps {
 	filterValue: string;
+	styleFilter: StyleFilter;
 }
 
-function BlockList( { filterValue }: BlockListProps ) {
+function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
@@ -193,17 +201,24 @@ function BlockList( { filterValue }: BlockListProps ) {
 		return names;
 	}, [ user ] );
 
-	const filteredBlockTypes = ! filterValue
+	const searchedBlockTypes = ! filterValue
 		? sortedBlockTypes
 		: sortedBlockTypes.filter( ( blockType ) =>
 				isMatchingSearchTerm( blockType, filterValue )
 		  );
 
+	const filteredBlockTypes =
+		styleFilter === 'customized'
+			? searchedBlockTypes.filter( ( blockType ) =>
+					customizedBlockNames.has( blockType.name )
+			  )
+			: searchedBlockTypes;
+
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
 
-	// Announce search results on change
+	// Announce result count on change
 	useEffect( () => {
-		if ( ! filterValue ) {
+		if ( ! filterValue && styleFilter === 'all' ) {
 			return;
 		}
 		// We extract the results from the wrapper div's `ref` because
@@ -221,7 +236,7 @@ function BlockList( { filterValue }: BlockListProps ) {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [ filterValue, styleFilter, debouncedSpeak ] );
 
 	return (
 		<div
@@ -251,6 +266,7 @@ const MemoizedBlockList = memo( BlockList );
 
 function ScreenBlockList() {
 	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ styleFilter, setStyleFilter ] = useState< StyleFilter >( 'all' );
 	const deferredFilterValue = useDeferredValue( filterValue );
 
 	return (
@@ -261,14 +277,59 @@ function ScreenBlockList() {
 					'Customize the appearance of specific blocks and for the whole site.'
 				) }
 			/>
-			<SearchControl
-				className="global-styles-ui-block-types-search"
-				onChange={ setFilterValue }
-				value={ filterValue }
-				label={ __( 'Search' ) }
-				placeholder={ __( 'Search' ) }
+			<HStack
+				className="global-styles-ui-block-types-filter"
+				alignment="center"
+				spacing={ 2 }
+			>
+				<SearchControl
+					className="global-styles-ui-block-types-search"
+					onChange={ setFilterValue }
+					value={ filterValue }
+					label={ __( 'Search' ) }
+					placeholder={ __( 'Search' ) }
+				/>
+				<Menu>
+					<Menu.TriggerButton
+						render={
+							<Button
+								size="compact"
+								icon={ funnel }
+								label={ __( 'Filter blocks' ) }
+								isPressed={ styleFilter !== 'all' }
+							/>
+						}
+					/>
+					<Menu.Popover>
+						<Menu.RadioItem
+							name="global-styles-block-filter"
+							value="all"
+							checked={ styleFilter === 'all' }
+							onChange={ () => setStyleFilter( 'all' ) }
+							hideOnClick
+						>
+							<Menu.ItemLabel>
+								{ __( 'All blocks' ) }
+							</Menu.ItemLabel>
+						</Menu.RadioItem>
+						<Menu.RadioItem
+							name="global-styles-block-filter"
+							value="customized"
+							checked={ styleFilter === 'customized' }
+							onChange={ () => setStyleFilter( 'customized' ) }
+							hideOnClick
+						>
+							<Menu.ItemLabel>
+								{ __( 'Customized' ) }
+							</Menu.ItemLabel>
+						</Menu.RadioItem>
+					</Menu.Popover>
+				</Menu>
+			</HStack>
+			<MemoizedBlockList
+				filterValue={ deferredFilterValue }
+				styleFilter={ styleFilter }
 			/>
-			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>
 	);
 }

@@ -49,9 +49,13 @@
 	border-radius: 2px;
 }
 
-.global-styles-ui-block-types-search {
+.global-styles-ui-block-types-filter {
 	margin-bottom: 10px;
 	padding: 0 16px;
+}
+
+.global-styles-ui-block-types-search {
+	flex-grow: 1;
 }
 
 .global-styles-ui-block-types-item__indicator {

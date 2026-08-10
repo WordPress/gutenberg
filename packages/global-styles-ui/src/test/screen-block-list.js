@@ -116,3 +116,61 @@ describe( 'hasUserStylesForBlock', () => {
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
 	} );
 } );
+
+describe( 'filter composition', () => {
+	const blocks = [
+		{ name: 'core/paragraph', title: 'Paragraph' },
+		{ name: 'core/quote', title: 'Quote' },
+		{ name: 'core/image', title: 'Image' },
+	];
+	const user = {
+		styles: {
+			blocks: {
+				'core/quote': { color: { text: 'red' } },
+				'core/image': { spacing: { padding: '10px' } },
+			},
+		},
+	};
+
+	// Mirrors the two filters applied in BlockList: search first, then the
+	// customized filter.
+	const visible = ( searchTerm, styleFilter ) => {
+		const customized = new Set(
+			blocks
+				.map( ( { name } ) => name )
+				.filter( ( name ) => hasUserStylesForBlock( user, name ) )
+		);
+		return blocks
+			.filter( ( block ) =>
+				block.title.toLowerCase().includes( searchTerm.toLowerCase() )
+			)
+			.filter(
+				( block ) =>
+					styleFilter !== 'customized' || customized.has( block.name )
+			)
+			.map( ( block ) => block.name );
+	};
+
+	it( 'shows everything when neither filter is active', () => {
+		expect( visible( '', 'all' ) ).toEqual( [
+			'core/paragraph',
+			'core/quote',
+			'core/image',
+		] );
+	} );
+
+	it( 'shows only customized blocks when the filter is on', () => {
+		expect( visible( '', 'customized' ) ).toEqual( [
+			'core/quote',
+			'core/image',
+		] );
+	} );
+
+	it( 'applies search and the customized filter together', () => {
+		// "Paragraph" matches the search but is not customized.
+		expect( visible( 'p', 'all' ) ).toEqual( [ 'core/paragraph' ] );
+		expect( visible( 'p', 'customized' ) ).toEqual( [] );
+		// "Image" matches and is customized.
+		expect( visible( 'ima', 'customized' ) ).toEqual( [ 'core/image' ] );
+	} );
+} );
