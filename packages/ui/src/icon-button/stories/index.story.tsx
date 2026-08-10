@@ -133,10 +133,9 @@ const EXAMPLE_SHORTCUT_OBJECT = {
 };
 
 /**
- * Use the `displayShortcut` and `ariaKeyShortcut` helpers from
- * `@wordpress/keycodes` to create shortcut metadata. Add `shortcutAriaLabel`
- * for a platform-friendly accessible description. When omitted,
- * `ariaKeyShortcut` is used instead.
+ * Use the `displayShortcut`, `ariaKeyShortcut`, and `shortcutAriaLabel` helpers
+ * from `@wordpress/keycodes` to create the visual, ARIA-compatible, and
+ * human-readable representations of the shortcut.
  */
 export const WithShortcut: Story = {
 	...Default,

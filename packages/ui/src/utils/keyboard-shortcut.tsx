@@ -19,11 +19,11 @@ export type KeyboardShortcut = {
 	ariaKeyShortcut: string;
 
 	/**
-	 * An optional plain-text label for the shortcut, used in its accessible
-	 * description (e.g., "Command Shift S"). When omitted, `ariaKeyShortcut`
-	 * is used instead.
+	 * A plain-text label for the shortcut, used in its accessible description
+	 * (e.g., "Command Shift S"). Generate this value with
+	 * `shortcutAriaLabel` from `@wordpress/keycodes`.
 	 */
-	label?: string;
+	label: string;
 };
 
 type ShortcutAriaProps = Pick<
