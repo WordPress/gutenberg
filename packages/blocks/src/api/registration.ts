@@ -912,3 +912,27 @@ export function getBlockBindingsSources(): Record<
 > {
 	return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
 }
+
+/**
+ * Invalidates a registered block bindings source's editability, causing
+ * blocks using it to re-evaluate `canUserEditValue` on their next render.
+ *
+ * @since 6.9.0
+ *
+ * @param name The name of the block bindings source to invalidate. If omitted, all registered sources are invalidated.
+ *
+ * @example
+ * ```js
+ * import { invalidateBlockBindingsSource } from '@wordpress/blocks';
+ *
+ * // After the user's lock state changes for this source:
+ * invalidateBlockBindingsSource( 'plugin/my-custom-source' );
+ * ```
+ */
+export function invalidateBlockBindingsSource( name?: string ): void {
+	if ( name !== undefined && ! getBlockBindingsSource( name ) ) {
+		warning( 'Block bindings source "' + name + '" is not registered.' );
+		return;
+	}
+	unlock( dispatch( blocksStore ) ).invalidateBlockBindingsSource( name );
+}

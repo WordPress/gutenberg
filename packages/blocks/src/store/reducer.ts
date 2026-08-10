@@ -399,6 +399,32 @@ export function blockBindingsSources(
 	return state;
 }
 
+/**
+ * Tracks a revision counter per block bindings source name. Bumped whenever
+ * `invalidateBlockBindingsSource` is dispatched, so that consumers whose
+ * `useSelect` calls read this value are forced to recompute derived state
+ * that depends on a source's `canUserEditValue`, whose result can change
+ * outside of any store state the source itself exposes.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function blockBindingsSourceRevisions(
+	state: Record< string, number > = {},
+	action: Action
+): Record< string, number > {
+	if ( 'INVALIDATE_BLOCK_BINDINGS_SOURCE' === action.type ) {
+		const key = action.name ?? '__all';
+		return {
+			...state,
+			[ key ]: ( state[ key ] ?? 0 ) + 1,
+		};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
@@ -412,4 +438,5 @@ export default combineReducers( {
 	categories,
 	collections,
 	blockBindingsSources,
+	blockBindingsSourceRevisions,
 } );
