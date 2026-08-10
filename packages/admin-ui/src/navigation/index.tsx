@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NavigationProps } from './types';
 import styles from './style.module.css';
 
