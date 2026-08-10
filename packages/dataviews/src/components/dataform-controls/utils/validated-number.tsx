@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	BaseControl,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
 import { unlock } from '../../../lock-unlock';

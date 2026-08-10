@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import SnackbarList from '../list';
 
 window.scrollTo = jest.fn();

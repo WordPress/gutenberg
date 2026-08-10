@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
 	type InlineConfig,
 	type PluginOption,
@@ -10,6 +11,15 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 
+/**
+ * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
+ */
+function getAbsolutePath( packageName: string ) {
+	return path.dirname(
+		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
+	);
+}
+
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
@@ -18,6 +28,7 @@ const stories = [
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -32,6 +43,7 @@ const stories = [
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
 	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
@@ -47,15 +59,15 @@ const config: StorybookConfig = {
 	staticDirs: [ './static' ],
 	addons: [
 		{
-			name: '@storybook/addon-docs',
+			name: getAbsolutePath( '@storybook/addon-docs' ),
 			options: { configureJSX: true },
 		},
-		'@storybook/addon-a11y',
+		getAbsolutePath( '@storybook/addon-a11y' ),
 		import.meta.resolve( './addons/source-link/preset.ts' ),
-		'storybook-addon-tag-badges',
+		getAbsolutePath( 'storybook-addon-tag-badges' ),
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
-	framework: '@storybook/react-vite',
+	framework: getAbsolutePath( '@storybook/react-vite' ),
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -115,9 +127,8 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react( {
-					jsxImportSource: '@emotion/react',
 					babel: {
-						plugins: [ '@emotion/babel-plugin' ],
+						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 					},
 				} ) as PluginOption,
 				{

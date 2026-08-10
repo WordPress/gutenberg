@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Blocks raw handling pasteHandler apple 1`] = `"<strong>This is a</strong> title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:<br>"`;
 

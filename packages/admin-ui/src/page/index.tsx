@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import type { NavigationProps } from '../navigation/types';
 import Header from './header';
 import NavigableRegion from '../navigable-region';

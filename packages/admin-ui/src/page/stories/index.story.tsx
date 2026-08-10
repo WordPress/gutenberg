@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 // eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
 import { Badge, Button, Text } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
 import { withRouter } from '../../stories/with-router';

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useIsDraggingWithin from './use-is-dragging-within';
 
 export default function WidgetAreaInnerBlocks( { id } ) {

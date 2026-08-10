@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs' );
 const readline = require( 'readline' );
@@ -10,10 +7,6 @@ const glob = require( 'fast-glob' );
 const { inc: semverInc } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
@@ -695,11 +688,16 @@ async function runNpmPublishPreflight(
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
-	log( '>> Checking npm package access.' );
-	await commandFn( 'npm access list packages @wordpress --json', {
+	/*
+	 * `npm whoami` fails for every credential problem that happens in practice:
+	 * a missing, expired, or revoked auth token, or an unreachable registry.
+	 */
+	log( '>> Checking npm authentication.' );
+	const { stdout: whoamiOutput } = await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'pipe',
 	} );
+	log( `>> Authenticated as "${ whoamiOutput.trim() }".` );
 
 	log( '>> Verifying target package versions and dist-tags.' );
 	const publishedPackageNames = [];
@@ -1020,6 +1018,80 @@ async function publishPackagesToNpm(
 }
 
 /**
+ * Prepares the npm release branch and changelog updates.
+ *
+ * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
+ *
+ * @return {Promise<Object>} Release state needed by finalization.
+ */
+async function prepareNpmRelease( config, deps = {} ) {
+	const {
+		checkoutNpmReleaseBranchFn = checkoutNpmReleaseBranch,
+		findPluginReleaseBranchNameFn = findPluginReleaseBranchName,
+		runNpmReleaseBranchSyncStepFn = runNpmReleaseBranchSyncStep,
+		updatePackagesFn = updatePackages,
+	} = deps;
+	let pluginReleaseBranch;
+	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
+		pluginReleaseBranch =
+			config.releaseType === 'next'
+				? 'trunk'
+				: await findPluginReleaseBranchNameFn(
+						config.gitWorkingDirectoryPath
+				  );
+		await runNpmReleaseBranchSyncStepFn( pluginReleaseBranch, config );
+	} else {
+		await checkoutNpmReleaseBranchFn( config );
+	}
+
+	return {
+		changelogCommit: await updatePackagesFn( config ),
+		pluginReleaseBranch,
+	};
+}
+
+/**
+ * Publishes the packages prepared in the current checkout.
+ *
+ * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
+ *
+ * @return {Promise<?string>} The npm version commit hash.
+ */
+async function publishPreparedPackagesToNpm( config, deps = {} ) {
+	const { publishPackagesToNpmFn = publishPackagesToNpm } = deps;
+	return publishPackagesToNpmFn( config );
+}
+
+/**
+ * Backports the prepared release commits after publication.
+ *
+ * @param {WPPackagesConfig} config                           Command config.
+ * @param {Object}           releaseState                     Prepared release state.
+ * @param {?string}          releaseState.changelogCommit     Changelog commit.
+ * @param {?string}          releaseState.pluginReleaseBranch Plugin release branch.
+ * @param {?string}          releaseState.publishCommit       Version commit.
+ * @param {Object}           deps                             Dependencies.
+ */
+async function finalizePreparedNpmRelease(
+	config,
+	{ changelogCommit, pluginReleaseBranch, publishCommit },
+	deps = {}
+) {
+	const { backportCommitsToBranchFn = backportCommitsToBranch } = deps;
+	if ( ! [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
+		return;
+	}
+
+	const commits = [ changelogCommit, publishCommit ].filter( Boolean );
+	await backportCommitsToBranchFn( 'trunk', commits, config );
+	if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
+		await backportCommitsToBranchFn( pluginReleaseBranch, commits, config );
+	}
+}
+
+/**
  * Backports commits from the release branch to the selected branch.
  *
  * @param {string}           branchName Selected branch name.
@@ -1071,10 +1143,16 @@ async function backportCommitsToBranch(
  *
  * @param {WPPackagesConfig} config         Command config.
  * @param {string[]}         customMessages Custom messages to print in the terminal.
+ * @param {Object}           deps           Dependencies.
  *
- * @return {Promise<Object>} GitHub release object.
+ * @return {Promise<void>}
  */
-async function runPackagesRelease( config, customMessages ) {
+async function runPackagesRelease( config, customMessages, deps = {} ) {
+	const {
+		finalizePreparedNpmReleaseFn = finalizePreparedNpmRelease,
+		prepareNpmReleaseFn = prepareNpmRelease,
+		publishPreparedPackagesToNpmFn = publishPreparedPackagesToNpm,
+	} = deps;
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
@@ -1109,38 +1187,9 @@ async function runPackagesRelease( config, customMessages ) {
 		);
 	}
 
-	let pluginReleaseBranch;
-	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
-		pluginReleaseBranch =
-			config.releaseType === 'next'
-				? 'trunk'
-				: await findPluginReleaseBranchName(
-						config.gitWorkingDirectoryPath
-				  );
-		await runNpmReleaseBranchSyncStep( pluginReleaseBranch, config );
-	} else {
-		await checkoutNpmReleaseBranch( config );
-	}
-
-	const commitHashChangelogUpdates = await updatePackages( config );
-
-	const commitHashNpmPublish = await publishPackagesToNpm( config );
-
-	if ( [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
-		const commits = [
-			commitHashChangelogUpdates,
-			commitHashNpmPublish,
-		].filter( Boolean );
-		await backportCommitsToBranch( 'trunk', commits, config );
-
-		if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
-			await backportCommitsToBranch(
-				pluginReleaseBranch,
-				commits,
-				config
-			);
-		}
-	}
+	const releaseState = await prepareNpmReleaseFn( config );
+	releaseState.publishCommit = await publishPreparedPackagesToNpmFn( config );
+	await finalizePreparedNpmReleaseFn( config, releaseState );
 
 	await runStep(
 		'Cleaning the temporary folders',
@@ -1240,13 +1289,16 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	prepareNpmRelease,
 	publishPackagesToNpm,
+	publishPreparedPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	publishNpmGutenbergPlugin,
@@ -1255,5 +1307,6 @@ module.exports = {
 	publishNpmNext,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackagesRelease,
 	verifyRemotePackageTags,
 };

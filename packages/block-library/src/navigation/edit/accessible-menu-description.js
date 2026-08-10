@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import AccessibleDescription from './accessible-description';
 
 export default function AccessibleMenuDescription( { id } ) {

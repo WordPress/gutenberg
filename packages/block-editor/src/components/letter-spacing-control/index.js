@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../../components/use-settings';
 
 /**

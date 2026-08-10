@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { space } from '../utils/space';
 import type { DropdownContentWrapperProps } from './types';
 

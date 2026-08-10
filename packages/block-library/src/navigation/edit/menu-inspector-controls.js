@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blockEditorPrivateApis,
 	InspectorControls,
@@ -10,10 +7,6 @@ import { PanelBody, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';

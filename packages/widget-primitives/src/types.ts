@@ -8,15 +8,7 @@
  * widget binds its attribute shape once and gets typed `attributes`,
  * `example`, and `setAttributes`.
  */
-
-/**
- * External dependencies
- */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ResolvableField } from './field-types';
 
 /**
@@ -30,6 +22,12 @@ export type WidgetName = `${ string }/${ string }`;
  * `@wordpress/icons`.
  */
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
+
+/**
+ * Registered icon name (`collection/icon-name`), resolved into a
+ * `WidgetIcon` by the application's resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
 
 /**
  * A link in a widget's help note.
@@ -64,11 +62,66 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant an attribute is. Hosts may promote `'high'` to a prominent
+ * How relevant a declaration is. Hosts may promote `'high'` to a prominent
  * surface; `'low'` (the default) is not. The widget declares importance,
  * not a surface.
  */
-type WidgetAttributeRelevance = 'high' | 'low';
+export type WidgetRelevance = 'high' | 'low';
+
+/**
+ * A user-triggerable verb a widget type declares. The declaration is
+ * serializable data: an envelope (`id`, `label`, optional `icon` and
+ * `relevance`) plus exactly one fulfillment, named by the key carrying it.
+ * Today the only key is `href`, so the only fulfillment is a link.
+ *
+ * The host owns what follows: which primitive materializes the fulfillment,
+ * and where the affordance is placed. For a link that means mounting a real
+ * link primitive wherever the surface allows one, so middle-click, copy
+ * address, and the anchor role survive.
+ */
+export interface WidgetAction {
+	/**
+	 * Stable identifier, local to the widget type.
+	 */
+	id: string;
+
+	/**
+	 * Human-readable label naming the action. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Icon for the action. Declared as a registered icon name
+	 * (`collection/icon-name`); `useWidgetTypes` resolves references, so
+	 * hosts receive a renderable element, or nothing when the reference
+	 * does not resolve.
+	 */
+	icon?: WidgetIconReference | WidgetIcon;
+
+	/**
+	 * How relevant the action is among the widget's actions. Hosts may
+	 * surface `'high'` prominently; `'low'` (the default) belongs in a
+	 * secondary surface such as a menu.
+	 */
+	relevance?: WidgetRelevance;
+
+	/**
+	 * Link fulfillment: the destination. A URL, an admin path, or a
+	 * widget-local file.
+	 */
+	href: string;
+
+	/**
+	 * Link only. When set, the destination downloads instead of navigating.
+	 * A string supplies the suggested filename.
+	 */
+	download?: string | boolean;
+
+	/**
+	 * Link only. Whether the destination opens in a new browser tab.
+	 */
+	openInNewTab?: boolean;
+}
 
 /**
  * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
@@ -77,7 +130,7 @@ type WidgetAttributeRelevance = 'high' | 'low';
  * into plain `Field` props.
  */
 type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
-	relevance?: WidgetAttributeRelevance;
+	relevance?: WidgetRelevance;
 };
 
 /**
@@ -178,6 +231,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	attributes?: WidgetAttribute< Item >[];
 
 	/**
+	 * Declarative actions the widget type exposes. Hosts materialize each
+	 * one as an affordance and decide where to place it.
+	 */
+	actions?: WidgetAction[];
+
+	/**
 	 * Structured example data hosts use for previews, and the default
 	 * attributes applied when a new instance is created without initial
 	 * attributes.
@@ -253,6 +312,7 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
+		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -276,4 +336,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
+
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 * `null`/absent means the module's icon stands.
+	 */
+	icon?: WidgetIconReference | null;
 }

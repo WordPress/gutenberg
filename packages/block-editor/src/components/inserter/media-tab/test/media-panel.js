@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { MediaCategoryPanel } from '../media-panel';
 
 // Keep the panel's data + async surface out of the test: return a small,

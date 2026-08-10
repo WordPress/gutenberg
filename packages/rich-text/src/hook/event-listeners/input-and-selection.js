@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
@@ -305,7 +298,9 @@ export default ( props ) => ( element ) => {
 			// snapshot must not skip synchronization.
 			selectionSnapshot = undefined;
 		} else {
-			applyRecord( record.current, { domOnly: true } );
+			// The document's selection may have moved elsewhere while the
+			// element was blurred, so restore it from the record.
+			applyRecord( record.current );
 		}
 
 		onSelectionChange( record.current.start, record.current.end );

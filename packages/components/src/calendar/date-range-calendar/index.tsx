@@ -1,16 +1,7 @@
-/**
- * External dependencies
- */
 import { differenceInCalendarDays } from 'date-fns';
 import { DayPicker, rangeContainsModifiers } from 'react-day-picker';
 import { enUS } from 'react-day-picker/locale';
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
 import { clampNumberOfMonths } from '../utils/misc';
 import { useControlledValue } from '../../utils/hooks';

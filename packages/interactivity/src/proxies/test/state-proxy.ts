@@ -1,14 +1,7 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
-/**
- * External dependencies
- */
 import { effect } from '@preact/signals';
-/**
- * Internal dependencies
- */
 import { proxifyState, peek } from '../';
 import { setScope, resetScope, getContext, getElement } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';

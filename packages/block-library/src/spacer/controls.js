@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -17,10 +14,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { MIN_SPACER_SIZE } from './constants';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';

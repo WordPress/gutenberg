@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DimensionsTool from '../';
 
 const EMPTY_OBJECT = {};

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SVG,
 	Path,
@@ -12,10 +9,6 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo, createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	myPatternsCategory,
 	INSERTER_SYNC_TYPES,

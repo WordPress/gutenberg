@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
@@ -45,6 +42,12 @@ const userList = [
 		firstName: 'Buddy',
 		lastName: 'Elf',
 		password: 'sm1lingsmyfavorite',
+	},
+	{
+		username: 'thescribe',
+		firstName: 'შოთა',
+		lastName: 'რუსთაველი',
+		password: 'n0nl@t1nName',
 	},
 ];
 
@@ -110,6 +113,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.evaluate( () => {
 					return document.activeElement.getAttribute( 'aria-owns' );
 				} );
+			const ariaControls = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute(
+						'aria-controls'
+					);
+				} );
 			const ariaActiveDescendant = await editor.canvas
 				.locator( ':root' )
 				.evaluate( () => {
@@ -117,10 +127,16 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 						'aria-activedescendant'
 					);
 				} );
-			// Ensure `aria-owns` is part of the same document and ensure the
-			// selected option is equal to the active descendant.
+			// Ensure `aria-owns` and `aria-controls` are part of the same
+			// document and ensure the selected option is equal to the active
+			// descendant.
 			await expect(
 				editor.canvas.locator( `#${ ariaOwns } [aria-selected="true"]` )
+			).toHaveAttribute( 'id', ariaActiveDescendant );
+			await expect(
+				editor.canvas.locator(
+					`#${ ariaControls } [aria-selected="true"]`
+				)
 			).toHaveAttribute( 'id', ariaActiveDescendant );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -745,5 +761,24 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				name: 'Frodo Baggins',
 			} )
 		).toBeVisible();
+	} );
+
+	// The search term must reach the REST API unencoded. Pre-encoding it means
+	// WordPress's `sanitize_text_field` strips every percent-encoded sequence,
+	// so a non-latin term is erased entirely and matches every user.
+	test( 'should filter mentions by non-latin search terms', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+
+		await page.keyboard.type( '@შოთა' );
+
+		await expect(
+			page.getByRole( 'option', { name: 'შოთა რუსთაველი' } )
+		).toBeVisible();
+		await expect( page.getByRole( 'option' ) ).toHaveCount( 1 );
 	} );
 } );

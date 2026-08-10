@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useUserGlobalStyles } from './use-global-styles';
 import { unlock } from '../lock-unlock';
 

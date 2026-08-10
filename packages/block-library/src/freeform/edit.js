@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	BlockIcon,
@@ -17,10 +14,6 @@ import {
 import { useState, useRef, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ConvertToBlocksButton from './convert-to-blocks-button';
 import ModalEdit from './modal';
 

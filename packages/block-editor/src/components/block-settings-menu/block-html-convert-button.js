@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 function BlockHTMLConvertButton( { clientId } ) {

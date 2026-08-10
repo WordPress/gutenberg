@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -45,10 +38,6 @@ import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -75,6 +64,7 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
+import useLayoutCustomProperties from './use-layout-custom-properties';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -280,6 +270,11 @@ function Navigation( {
 	} = attributes;
 
 	const ref = attributes.ref;
+	useLayoutCustomProperties( {
+		clientId,
+		layout: attributes.layout,
+		style: attributes.style,
+	} );
 
 	const setRef = useCallback(
 		( postId ) => {
