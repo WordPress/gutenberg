@@ -60,7 +60,7 @@ function Page( {
 				badges ||
 				actions ||
 				visual ||
-				navigation?.items?.length ) && (
+				!! navigation?.items?.length ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
