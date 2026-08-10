@@ -32,8 +32,7 @@ export function buildTermsTree( flatTerms ) {
 		termsById[ term.id ] = term;
 	}
 
-	// Link each term into its parent instead of cloning the tree a second time.
-	// Terms whose parent is missing are dropped, as they are unreachable.
+	// Terms whose parent is missing are unreachable, so they are dropped.
 	const tree = [];
 	for ( const term of flatTermsWithParentAndChildren ) {
 		const parent = termsById[ term.parent ];
