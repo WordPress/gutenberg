@@ -1,3 +1,5 @@
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 

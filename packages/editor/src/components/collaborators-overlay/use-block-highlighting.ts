@@ -4,6 +4,8 @@ import {
 	type PostEditorAwarenessState as ActiveCollaborator,
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
