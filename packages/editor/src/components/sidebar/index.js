@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockInspector,
 	store as blockEditorStore,
@@ -11,10 +8,6 @@ import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as interfaceStore } from '@wordpress/interface';
 import { Tabs } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';

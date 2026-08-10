@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import ExitTemplatePartPanel from '../';
 
 describe( 'ExitTemplatePartPanel', () => {

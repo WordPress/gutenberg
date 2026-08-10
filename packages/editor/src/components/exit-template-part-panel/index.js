@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';
 
