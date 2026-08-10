@@ -3,13 +3,16 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	FlexItem,
 	SearchControl,
+	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
+	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useDeferredValue,
 	memo,
@@ -27,6 +30,7 @@ import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';
+import { GlobalStylesContext } from './context';
 
 const {
 	useHasDimensionsPanel,
@@ -130,9 +134,10 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 
 interface BlockMenuItemProps {
 	block: any;
+	isCustomized: boolean;
 }
 
-function BlockMenuItem( { block }: BlockMenuItemProps ) {
+function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
@@ -145,6 +150,17 @@ function BlockMenuItem( { block }: BlockMenuItemProps ) {
 			<HStack justify="flex-start">
 				<BlockIcon icon={ block.icon } />
 				<FlexItem>{ block.title }</FlexItem>
+				{ isCustomized && (
+					<>
+						<VisuallyHidden>
+							{ __( 'Has custom styles' ) }
+						</VisuallyHidden>
+						<span
+							aria-hidden="true"
+							className="global-styles-ui-block-types-item__indicator"
+						/>
+					</>
+				) }
 			</HStack>
 		</NavigationButtonAsItem>
 	);
@@ -158,6 +174,24 @@ function BlockList( { filterValue }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
+
+	const { user } = useContext( GlobalStylesContext );
+
+	// Computed once for the whole list rather than per row, so the list does
+	// not open a context subscription for every registered block.
+	const customizedBlockNames = useMemo( () => {
+		const names = new Set< string >();
+		const blockNames = [
+			...Object.keys( user?.styles?.blocks ?? {} ),
+			...Object.keys( user?.settings?.blocks ?? {} ),
+		];
+		blockNames.forEach( ( blockName ) => {
+			if ( hasUserStylesForBlock( user, blockName ) ) {
+				names.add( blockName );
+			}
+		} );
+		return names;
+	}, [ user ] );
 
 	const filteredBlockTypes = ! filterValue
 		? sortedBlockTypes
@@ -204,6 +238,7 @@ function BlockList( { filterValue }: BlockListProps ) {
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
 						block={ block }
+						isCustomized={ customizedBlockNames.has( block.name ) }
 						key={ 'menu-itemblock-' + block.name }
 					/>
 				) )
