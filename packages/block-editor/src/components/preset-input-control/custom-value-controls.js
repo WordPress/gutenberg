@@ -1,11 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-
 import { Tooltip } from '@wordpress/ui';
 
 /**

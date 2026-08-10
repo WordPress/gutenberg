@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
@@ -16,10 +13,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { copy } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useSlugField } from '../fields/general';
 import { pluralLabelField, singularLabelField } from '../../utils/fields';
 import { serializeForSave } from '../utils';

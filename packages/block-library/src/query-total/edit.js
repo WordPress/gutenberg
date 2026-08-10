@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { resultsFound, displayingResults } from './icons';
 
 export default function QueryTotalEdit( { attributes, setAttributes } ) {

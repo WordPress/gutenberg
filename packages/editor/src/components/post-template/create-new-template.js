@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
 

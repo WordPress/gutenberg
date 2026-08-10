@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import addContainer from '../add-container';
 
 describe( 'addContainer', () => {

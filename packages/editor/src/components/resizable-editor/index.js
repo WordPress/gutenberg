@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
 import {
@@ -13,10 +6,6 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { NavigableMenu, Toolbar } from '@wordpress/components';
 import {
 	useState,
@@ -14,10 +11,6 @@ import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

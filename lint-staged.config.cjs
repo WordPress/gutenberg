@@ -2,7 +2,7 @@ module.exports = {
 	'*.{cjs,js,json,jsx,mjs,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
 	'**/*.{cjs,js,jsx,mjs,ts,tsx}': [
 		() => 'npm run prelint:js',
-		'node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs',
+		'node ./tools/eslint/lint-js.cjs',
 	],
 	'*.{css,pcss,scss}': [ 'npm run lint:css' ],
 	'package-lock.json': [ 'npm run lint:lockfile' ],

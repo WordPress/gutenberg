@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
@@ -26,10 +19,6 @@ import { globe, starFilled } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components */
 import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
-
-/**
- * Internal dependencies
- */
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';

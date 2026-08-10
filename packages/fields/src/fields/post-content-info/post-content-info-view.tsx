@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -10,10 +7,6 @@ import { count as wordCount } from '@wordpress/wordcount';
 import type { Strategy } from '@wordpress/wordcount';
 import { humanTimeDiff } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { BasePostWithEditedEntity } from '../../types';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.

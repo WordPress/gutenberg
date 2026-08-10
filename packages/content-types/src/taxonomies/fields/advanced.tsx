@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { Field, Form } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { createBooleanField } from '../../utils/fields';
 import type { TaxonomyFormData } from '../types';
 

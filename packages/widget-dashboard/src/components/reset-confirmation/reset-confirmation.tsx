@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 

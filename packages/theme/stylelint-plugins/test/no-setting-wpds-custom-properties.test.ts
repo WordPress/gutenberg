@@ -1,20 +1,20 @@
 /**
  * @jest-environment node
  */
-import plugin from '../../../stylelint-plugins/no-unknown-ds-tokens.mjs';
+import plugin from '../no-setting-wpds-custom-properties.mjs';
 import { getStylelintResult } from './utils';
 
 const CONFIG = {
 	plugins: [ plugin ],
-	rules: { 'plugin-wpds/no-unknown-ds-tokens': true },
+	rules: { 'plugin-wpds/no-setting-wpds-custom-properties': true },
 };
 
-describe( 'flags no warnings with valid wpds tokens css', () => {
+describe( 'flags no warnings with valid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-unknown-ds-tokens-valid.css',
+			'./fixtures/no-setting-wpds-custom-properties-valid.css',
 			CONFIG
 		);
 	} );
@@ -30,12 +30,12 @@ describe( 'flags no warnings with valid wpds tokens css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid wpds tokens css', () => {
+describe( 'flags warnings with invalid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-unknown-ds-tokens-invalid.css',
+			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
 			CONFIG
 		);
 	} );

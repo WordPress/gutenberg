@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import {
 	getBlockPathInYdoc,
@@ -30,7 +23,6 @@ import {
 	SelectionType,
 	SelectionDirection,
 } from '../utils/crdt-user-selections';
-
 import type {
 	ResolvedSelection,
 	SelectionState,

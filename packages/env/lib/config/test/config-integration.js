@@ -1,14 +1,6 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const { readFile } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
-
-/**
- * Internal dependencies
- */
 const loadConfig = require( '../load-config' );
 const detectDirectoryType = require( '../detect-directory-type' );
 const md5 = require( '../../md5' );

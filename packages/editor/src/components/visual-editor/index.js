@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	BlockList,
 	store as blockEditorStore,
@@ -23,10 +16,6 @@ import {
 	useResizeObserver,
 	useViewportMatch,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

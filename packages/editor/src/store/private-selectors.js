@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
@@ -15,10 +12,6 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	getRenderingMode,
 	getCurrentPost,

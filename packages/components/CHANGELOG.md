@@ -4,7 +4,9 @@
 
 ### Breaking Changes
 
+-	Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
+    -   `Spinner` ([#80511](https://github.com/WordPress/gutenberg/pull/80511))
 
 ### Deprecations
 
@@ -32,6 +34,8 @@
 
 ### Internal
 
+-   Move `withIgnoreIMEEvents` to `@wordpress/keycodes`, where it is now a public API, and remove it from this package's private APIs ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
 -   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).

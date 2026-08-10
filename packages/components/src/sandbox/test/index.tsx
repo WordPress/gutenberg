@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SandBox, { VIEWPORT_UNIT_VALUE_REGEX, buildSandBoxDocument } from '..';
 
 describe( 'SandBox', () => {

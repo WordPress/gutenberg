@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import TermsQueryInspectorControls from './inspector-controls';
 
 export default function TermsQueryContent( {

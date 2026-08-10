@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

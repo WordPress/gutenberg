@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -17,10 +10,6 @@ import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { kebabCase } from '../../utils/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';

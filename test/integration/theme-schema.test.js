@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
 import themeSchema from '../../schemas/json/theme.json';
 
 describe( 'theme.json schema', () => {
