@@ -16,7 +16,6 @@
 		{ "path": "packages/boot" },
 		{ "path": "packages/components" },
 		{ "path": "packages/connectors" },
-		{ "path": "packages/content-types" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-data" },
