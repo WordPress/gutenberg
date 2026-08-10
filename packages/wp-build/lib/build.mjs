@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
@@ -21,7 +17,6 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
 // Optional dependency: @wordpress/theme provides plugins that inject fallback
 // values for design system tokens. Fails gracefully when the package is not
 // installed (it is an optional peerDependency).
@@ -41,10 +36,6 @@ try {
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
 }
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,

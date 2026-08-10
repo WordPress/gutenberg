@@ -1,7 +1,4 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-/**
- * WordPress dependencies
- */
 import {
 	cloneBlock,
 	cloneSanitizedBlock,
@@ -22,10 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,

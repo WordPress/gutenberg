@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getOptimalTextColor, getOptimalTextShade, rgba } from '../colors';
 
 describe( 'rbga', () => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normalizeForm from '../normalize-form';
 import type { Form } from '../../../types';
 

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type gradientParser from 'gradient-parser';
 
 export function serializeGradientColor( {

@@ -1,13 +1,9 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-import glob from 'glob';
 import { fileURLToPath } from 'url';
 import { dirname, basename, resolve } from 'path';
-import JSONC from 'jsonc-parser';
 import { readFileSync } from 'fs';
+import glob from 'glob';
+import JSONC from 'jsonc-parser';
 
 let hasErrors = false;
 

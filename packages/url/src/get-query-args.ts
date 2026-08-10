@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { safeDecodeURIComponent } from './safe-decode-uri-component';
 import { getQueryString } from './get-query-string';
 import type { QueryArgParsed } from './get-query-arg';

@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
 const {
 	wordpressDockerFileContents,

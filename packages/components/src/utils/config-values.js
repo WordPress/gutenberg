@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '36px';
@@ -36,7 +33,6 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
-	spinnerSize: 16,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -13,10 +6,6 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';

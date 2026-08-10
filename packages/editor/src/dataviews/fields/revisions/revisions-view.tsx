@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
