@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   The actions "More" menu renders each action's resolved icon as the menu
+    item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+
 ### Enhancements
 
 -   Widget chrome and picker preview chrome: preserve their flex-column layout
@@ -18,9 +23,6 @@
 ## 0.4.0 (2026-07-29)
 
 ### New Features
-
--   The actions "More" menu renders each action's resolved icon as the menu
-    item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 
 -   Surface a widget's declared `actions` in the tile chrome as a "More"
     menu of links ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
