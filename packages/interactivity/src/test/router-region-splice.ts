@@ -80,8 +80,9 @@ const flush = async () => {
  * Navigation-equivalent region update: sets the region signal to a fresh
  * region vnode with new children — the same shape `renderPage` writes via
  * `cloneRouterRegionContent( page.regions[ id ] )`.
- * @param id
- * @param children
+ *
+ * @param id       The region id.
+ * @param children The children the region renders after the navigation.
  */
 const navigateRegion = ( id: string, children: VNode[] ) => {
 	routerRegions.get( id )!.value = h(

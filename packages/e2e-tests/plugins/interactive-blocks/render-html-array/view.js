@@ -29,7 +29,7 @@ store( 'test/render-html-array', {
 			// Re-render with a subset: fresh markup in slot A only. The
 			// sibling slot B must stay in the DOM, untouched.
 			renderHTML( '[data-testid="slot-a"]', ITEM_A, {
-				position: 'inner',
+				mode: 'inner',
 			} );
 		},
 		loadOne() {

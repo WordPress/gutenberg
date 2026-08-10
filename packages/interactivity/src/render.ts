@@ -35,7 +35,7 @@ import { warn } from './utils';
  * subtrees, so the cost is O(depth + siblings), not O(island).
  */
 
-type Position = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'outer';
+type Mode = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'replace';
 
 // Preact internal property accessors. Preact's published builds mangle vnode
 // internals (see preact's `mangle.json`): `_children` → `__k`, `_parent` → `__`.
@@ -229,19 +229,19 @@ const writeRegionSignal = ( wrapper: any, regionVnode: any ): void => {
 
 /**
  * Locates (and if needed hydrates) the island tree, then splices the new
- * vnodes into it at the position described by `position` relative to
+ * vnodes into it at the mode described by `mode` relative to
  * `container`, and renders the rebuilt tree.
  *
  * @param island    The island whose tree receives the splice.
- * @param container The element the position is relative to.
- * @param position  Insert position.
+ * @param container The element the mode is relative to.
+ * @param mode  Insert mode.
  * @param newVdoms  The vnodes to insert.
- * @param atIndex   For `position: 'at'` — the child index to insert at.
+ * @param atIndex   For `mode: 'at'` — the child index to insert at.
  */
 const spliceIntoTree = (
 	island: Element,
 	container: Element,
-	position: Position | 'at',
+	mode: Mode | 'at',
 	newVdoms: ComponentChild[],
 	atIndex?: number
 ): void => {
@@ -280,10 +280,10 @@ const spliceIntoTree = (
 	let startIdx: number;
 
 	if (
-		position === 'inner' ||
-		position === 'append' ||
-		position === 'prepend' ||
-		position === 'at'
+		mode === 'inner' ||
+		mode === 'append' ||
+		mode === 'prepend' ||
+		mode === 'at'
 	) {
 		// Splice into the container's own children. `at` inserts at a specific
 		// child index (used by the future MutationObserver's cut-and-reinsert,
@@ -291,11 +291,11 @@ const spliceIntoTree = (
 		const target = path[ path.length - 1 ];
 		const oldChildren = vdomChildren( target );
 		let newChildren: ComponentChild[];
-		if ( position === 'inner' ) {
+		if ( mode === 'inner' ) {
 			newChildren = newVdoms;
-		} else if ( position === 'append' ) {
+		} else if ( mode === 'append' ) {
 			newChildren = [ ...oldChildren, ...newVdoms ];
-		} else if ( position === 'prepend' ) {
+		} else if ( mode === 'prepend' ) {
 			newChildren = [ ...newVdoms, ...oldChildren ];
 		} else {
 			// 'at'
@@ -322,8 +322,8 @@ const spliceIntoTree = (
 		const anchor = path[ i ];
 		const parent = path[ i - 1 ];
 		if ( ! parent || typeof parent.type !== 'string' ) {
-			// The container is the tree root: only `outer` is supported.
-			if ( position === 'outer' ) {
+			// The container is the tree root: only `replace` is supported.
+			if ( mode === 'replace' ) {
 				const newRoot =
 					newVdoms.length === 1
 						? newVdoms[ 0 ]
@@ -344,20 +344,20 @@ const spliceIntoTree = (
 			return;
 		}
 		let newChildren: ComponentChild[];
-		if ( position === 'before' ) {
+		if ( mode === 'before' ) {
 			newChildren = [
 				...parentChildren.slice( 0, idx ),
 				...newVdoms,
 				...parentChildren.slice( idx ),
 			];
-		} else if ( position === 'after' ) {
+		} else if ( mode === 'after' ) {
 			newChildren = [
 				...parentChildren.slice( 0, idx + 1 ),
 				...newVdoms,
 				...parentChildren.slice( idx + 1 ),
 			];
 		} else {
-			// outer: replace the anchor.
+			// replace: replace the anchor.
 			newChildren = [
 				...parentChildren.slice( 0, idx ),
 				...newVdoms,
@@ -417,29 +417,32 @@ const spliceIntoTree = (
  * (`[data-wp-interactive]`) or have its own `data-wp-interactive` attribute;
  * otherwise nothing is hydrated and a warning is emitted.
  *
- * Unsupported targets (warn + no-op): content inside a router region (its
- * subtree is owned by the router's signal), `data-wp-ignore` subtrees,
- * `data-wp-each-child` content, and `<template>` elements.
+ * Unsupported targets (warn + no-op): `data-wp-ignore` subtrees,
+ * `data-wp-each-child` content, and `<template>` elements. (Router regions
+ * ARE supported — the region signal is written through from the spliced
+ * tree, §6.)
  *
- * @param container        The element the parsed HTML is inserted into, or a CSS
- *                         selector for it (resolved via `document.querySelector`).
- * @param html             The HTML string.
- * @param options          Options.
- * @param options.position Where to insert the parsed elements:
- *                         - `append`: as the container's last children (default)
- *                         - `prepend`: as the container's first children
- *                         - `before`: as siblings immediately before the container
- *                         - `after`: as siblings immediately after the container
- *                         - `inner`: replace the container's children
- *                         - `outer`: replace the container itself
+ * @param container    The element the parsed HTML is inserted into, or a CSS
+ *                     selector for it (resolved via `document.querySelector`).
+ * @param html         The HTML string.
+ * @param options      Options.
+ * @param options.mode Where to insert the parsed elements:
+ *                     - `append`: as the container's last children (default)
+ *                     - `prepend`: as the container's first children
+ *                     - `before`: as siblings immediately before the container
+ *                     - `after`: as siblings immediately after the container
+ *                     - `inner`: replace the container's children
+ *                     - `replace`: replace the container itself (the
+ *                     datastar `outer` analog is a morph; ours is a hard
+ *                     replace, so `outer` would mislead)
  */
 export function renderHTML(
 	container: Element | string,
 	html: string,
 	{
-		position = 'append',
+		mode = 'append',
 	}: {
-		position?: Position;
+		mode?: Mode;
 	} = {}
 ): void {
 	// Resolve a CSS selector to its element, if one was passed.
@@ -484,5 +487,5 @@ export function renderHTML(
 	const namespace = getIslandNamespace( namespaceIsland );
 	const vdoms = nodes.map( ( node ) => toVdom( node, namespace ) );
 
-	spliceIntoTree( island, containerElement, position, vdoms );
+	spliceIntoTree( island, containerElement, mode, vdoms );
 }

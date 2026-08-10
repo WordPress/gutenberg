@@ -73,7 +73,7 @@ describe( 'render comprehensive — pruned outcome tests', () => {
 
 		// Replace the container's content (router-like): the old vnodes are
 		// unmounted, so the inserted node's window listener is cleaned up.
-		renderHTML( content, '<p>new content</p>', { position: 'inner' } );
+		renderHTML( content, '<p>new content</p>', { mode: 'inner' } );
 		await flush();
 
 		expect( content.querySelector( '[data-testid="ins"]' ) ).toBeNull();
@@ -119,7 +119,7 @@ describe( 'render comprehensive — pruned outcome tests', () => {
 		renderHTML(
 			parent,
 			'hello <span data-testid="s" data-wp-text="state.v"></span> world',
-			{ position: 'inner' }
+			{ mode: 'inner' }
 		);
 
 		expect( parent.childNodes.length ).toBe( 3 );

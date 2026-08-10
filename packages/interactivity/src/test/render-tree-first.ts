@@ -108,12 +108,12 @@ describe( 'renderHTML (tree-first)', () => {
 		expect( feed?.children[ 1 ]?.textContent ).toBe( 'b' );
 	} );
 
-	it( 'prepends when position is "prepend"', async () => {
+	it( 'prepends when mode is "prepend"', async () => {
 		await setup( '<div data-testid="feed"><p>a</p></div>' );
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<p>b</p>',
-			{ position: 'prepend' }
+			{ mode: 'prepend' }
 		);
 		await flush();
 		const feed = document.querySelector( '[data-testid="feed"]' );
@@ -121,12 +121,12 @@ describe( 'renderHTML (tree-first)', () => {
 		expect( feed?.children[ 1 ]?.textContent ).toBe( 'a' );
 	} );
 
-	it( 'replaces children when position is "inner"', async () => {
+	it( 'replaces children when mode is "inner"', async () => {
 		await setup( '<div data-testid="feed"><p>a</p></div>' );
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<p>b</p>',
-			{ position: 'inner' }
+			{ mode: 'inner' }
 		);
 		await flush();
 		const feed = document.querySelector( '[data-testid="feed"]' );
@@ -134,14 +134,14 @@ describe( 'renderHTML (tree-first)', () => {
 		expect( feed?.children[ 0 ]?.textContent ).toBe( 'b' );
 	} );
 
-	it( 'inserts before the container when position is "before"', async () => {
+	it( 'inserts before the container when mode is "before"', async () => {
 		await setup(
 			'<div data-testid="target"></div><p data-testid="after">after</p>'
 		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>before</p>',
-			{ position: 'before' }
+			{ mode: 'before' }
 		);
 		await flush();
 		const before = document.querySelector(
@@ -153,14 +153,14 @@ describe( 'renderHTML (tree-first)', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'inserts after the container when position is "after"', async () => {
+	it( 'inserts after the container when mode is "after"', async () => {
 		await setup(
 			'<p data-testid="before">before</p><div data-testid="target"></div>'
 		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>after</p>',
-			{ position: 'after' }
+			{ mode: 'after' }
 		);
 		await flush();
 		const after = document.querySelector(
@@ -172,14 +172,14 @@ describe( 'renderHTML (tree-first)', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'replaces the container itself when position is "outer"', async () => {
+	it( 'replaces the container itself when mode is "replace"', async () => {
 		await setup(
 			'<div data-testid="wrap"><div data-testid="target">old</div></div>'
 		);
 		renderHTML(
 			document.querySelector( '[data-testid="target"]' ),
 			'<p>new</p>',
-			{ position: 'outer' }
+			{ mode: 'replace' }
 		);
 		await flush();
 		expect( document.querySelector( '[data-testid="target"]' ) ).toBeNull();
@@ -341,7 +341,7 @@ describe( 'renderHTML (tree-first)', () => {
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<p>new content</p>',
-			{ position: 'inner' }
+			{ mode: 'inner' }
 		);
 		await flush();
 		expect(

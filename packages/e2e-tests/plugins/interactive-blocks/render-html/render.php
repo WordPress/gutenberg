@@ -28,7 +28,7 @@
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="reload"
-		data-position="inner"
+		data-mode="inner"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment?v=2' ) ); ?>"
 	>
 		Reload fragment
@@ -64,7 +64,7 @@
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-prepend"
-		data-position="prepend"
+		data-mode="prepend"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
 	>
 		Prepend mixed fragment
@@ -72,7 +72,7 @@
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-before"
-		data-position="before"
+		data-mode="before"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
 	>
 		Insert mixed fragment before target
@@ -80,15 +80,15 @@
 	<button
 		data-wp-on--click="actions.loadFragment"
 		data-testid="load-after"
-		data-position="after"
+		data-mode="after"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
 	>
 		Insert mixed fragment after target
 	</button>
 	<button
 		data-wp-on--click="actions.loadFragment"
-		data-testid="load-outer"
-		data-position="outer"
+		data-testid="load-replace"
+		data-mode="replace"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/render-html/v1/fragment/mixed' ) ); ?>"
 	>
 		Replace target with mixed fragment
