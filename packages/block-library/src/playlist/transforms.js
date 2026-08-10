@@ -49,24 +49,15 @@ const transforms = {
 			isMatch: ( {}, block ) =>
 				block.innerBlocks.length === 1 &&
 				block.innerBlocks[ 0 ].name === 'core/playlist-track',
-			transform: (
-				{ align, anchor, caption, style },
-				[
-					{
-						attributes: { blob, id, src },
-					},
-				]
-			) =>
+			transform: ( { style, ...attributes }, [ track ] ) =>
 				createBlock( 'core/audio', {
-					blob,
-					src,
-					caption,
-					...( align && { align } ),
-					...( anchor && { anchor } ),
+					...attributes,
 					...( style?.spacing && {
 						style: { spacing: style.spacing },
 					} ),
-					...( id !== undefined && { id } ),
+					blob: track.attributes.blob,
+					id: track.attributes.id,
+					src: track.attributes.src,
 				} ),
 		},
 	],
