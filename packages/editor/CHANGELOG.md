@@ -84,7 +84,7 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
--   Keep closed publish and save panel controls at the top of their full-height navigation regions ([#48186](https://github.com/WordPress/gutenberg/issues/48186)).
+-   Keep closed publish and save panel controls at the top of their full-height navigation regions ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
 
 ## 14.52.0 (2026-07-29)
 
