@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 
 function focusDisclosureElement( disclosureElement: HTMLElement ) {
