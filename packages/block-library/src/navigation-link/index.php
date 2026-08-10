@@ -178,6 +178,156 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 
 
 /**
+ * Converts preset references in a style value to CSS custom properties.
+ *
+ * State styles are emitted as CSS rules, so they cannot rely on the preset
+ * classnames the default state uses.
+ *
+ * @since 7.2.0
+ *
+ * @param mixed $value Style value.
+ * @return mixed Style value with preset references resolved.
+ */
+function block_core_navigation_link_resolve_preset_values( $value ) {
+	if ( is_array( $value ) ) {
+		foreach ( $value as $key => $nested_value ) {
+			$value[ $key ] = block_core_navigation_link_resolve_preset_values( $nested_value );
+		}
+		return $value;
+	}
+
+	if ( ! is_string( $value ) || ! str_starts_with( $value, 'var:preset|' ) ) {
+		return $value;
+	}
+
+	return 'var(--wp--' . str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) ) . ')';
+}
+
+/**
+ * Returns the CSS declarations for a navigation link focus state.
+ *
+ * @since 7.2.0
+ *
+ * @param array $state_style Style object for a single focus state.
+ * @return array CSS declarations, marked important so they win over the
+ *               default state's inline styles and preset classnames.
+ */
+function block_core_navigation_link_get_focus_declarations( $state_style ) {
+	if ( ! is_array( $state_style ) || empty( $state_style ) ) {
+		return array();
+	}
+
+	$styles       = wp_style_engine_get_styles(
+		block_core_navigation_link_resolve_preset_values( $state_style )
+	);
+	$declarations = array();
+
+	foreach ( $styles['declarations'] ?? array() as $property => $value ) {
+		if ( '' === $value || null === $value ) {
+			continue;
+		}
+		$declarations[ $property ] = $value . ' !important';
+	}
+
+	return $declarations;
+}
+
+/**
+ * Builds the focus state CSS rules for a navigation link.
+ *
+ * The block's state styles are generated against the block's style root, which
+ * for a navigation link is the `<li>` wrapper. `:hover` and `:active` match an
+ * element while a descendant of it is hovered or activated, so those states
+ * work on the wrapper. Focus does not: it matches only the element that
+ * received focus, which is the `<a>` inside. Focus states therefore need rules
+ * of their own, scoped to the link.
+ *
+ * @since 7.2.0
+ *
+ * @param array $style The block's `style` attribute.
+ * @return array[] Style engine CSS rules, each with a `selector` placeholder of
+ *                 `%s` for the block instance class.
+ */
+function block_core_navigation_link_get_focus_state_rules( $style ) {
+	if ( ! is_array( $style ) ) {
+		return array();
+	}
+
+	$focus_states = array( ':focus', ':focus-visible' );
+	$rules        = array();
+
+	foreach ( $focus_states as $focus_state ) {
+		$declarations = block_core_navigation_link_get_focus_declarations( $style[ $focus_state ] ?? null );
+		if ( ! empty( $declarations ) ) {
+			$rules[] = array(
+				'selector'     => '%s > .wp-block-navigation-item__content' . $focus_state,
+				'declarations' => $declarations,
+			);
+		}
+	}
+
+	$viewport_settings        = wp_get_global_settings( array( 'viewport' ) );
+	$responsive_media_queries = array();
+	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+			break;
+		}
+	}
+
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		foreach ( $focus_states as $focus_state ) {
+			$declarations = block_core_navigation_link_get_focus_declarations(
+				$style[ $breakpoint ][ $focus_state ] ?? null
+			);
+			if ( empty( $declarations ) ) {
+				continue;
+			}
+			$rules[] = array(
+				'selector'     => '%s > .wp-block-navigation-item__content' . $focus_state,
+				'declarations' => $declarations,
+				'rules_group'  => $media_query,
+			);
+		}
+	}
+
+	return $rules;
+}
+
+/**
+ * Registers the focus state styles for a navigation link and returns the class
+ * that scopes them to this block instance.
+ *
+ * @since 7.2.0
+ *
+ * @param array $attributes The block attributes.
+ * @return string Instance class name, or an empty string when the block has no
+ *                focus state styles.
+ */
+function block_core_navigation_link_get_focus_state_class( $attributes ) {
+	$rules = block_core_navigation_link_get_focus_state_rules( $attributes['style'] ?? null );
+
+	if ( empty( $rules ) ) {
+		return '';
+	}
+
+	// Instances with identical focus styles share a class, so the rules are
+	// only emitted once.
+	$instance_class = 'wp-nav-link-focus-' . substr( md5( wp_json_encode( $rules ) ), 0, 8 );
+
+	foreach ( $rules as $index => $rule ) {
+		$rules[ $index ]['selector'] = sprintf( $rule['selector'], ".$instance_class" );
+	}
+
+	wp_style_engine_get_stylesheet_from_css_rules(
+		$rules,
+		array( 'context' => 'block-supports' )
+	);
+
+	return $instance_class;
+}
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @since 5.9.0
@@ -224,10 +374,13 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		}
 	}
 
+	$focus_state_class = block_core_navigation_link_get_focus_state_class( $attributes );
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-				( $is_active ? ' current-menu-item' : '' ),
+				( $is_active ? ' current-menu-item' : '' ) .
+				( $focus_state_class ? " $focus_state_class" : '' ),
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
