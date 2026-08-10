@@ -6,7 +6,7 @@ import * as Tooltip from '../tooltip';
 import {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
-	useKeyboardShortcut,
+	useKeyboardShortcutProps,
 } from '../utils/keyboard-shortcut';
 import styles from './style.module.css';
 import { type IconButtonProps } from './types';
@@ -41,7 +41,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		ref
 	) {
 		const classes = clsx( styles[ 'icon-button' ], className );
-		const { descriptionId, targetProps } = useKeyboardShortcut( {
+		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
 			'aria-describedby': ariaDescribedBy,
 			'aria-keyshortcuts': ariaKeyShortcuts,
 			shortcut,

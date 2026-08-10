@@ -31,7 +31,7 @@ type ShortcutAriaProps = Pick<
 	'aria-describedby' | 'aria-keyshortcuts'
 >;
 
-function useKeyboardShortcut( {
+function useKeyboardShortcutProps( {
 	'aria-describedby': ariaDescribedBy,
 	'aria-keyshortcuts': ariaKeyShortcuts,
 	shortcut,
@@ -90,5 +90,5 @@ function KeyboardShortcutDisplay( {
 export {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
-	useKeyboardShortcut,
+	useKeyboardShortcutProps,
 };
