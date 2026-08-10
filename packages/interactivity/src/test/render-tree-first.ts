@@ -26,7 +26,12 @@ import { hydrateRegions } from '../hydration';
 const NS = 'test/tree-first';
 
 const { state } = store( NS, {
-	state: { text: 'initial', count: 0, items: [ 'x', 'y' ] },
+	state: {
+		text: 'initial',
+		count: 0,
+		items: [ 'x', 'y' ],
+		initCounts: {} as Record< string, number >,
+	},
 	actions: {
 		inc() {
 			state.count += 1;
@@ -39,6 +44,12 @@ const { state } = store( NS, {
 		},
 		watchText() {
 			state.count = state.text.length;
+		},
+		// Counts how many times each item's data-wp-init ran, keyed by the
+		// item's context id. Init must run exactly once per mounted item.
+		initItem() {
+			const { id } = getContext< { id: string } >();
+			state.initCounts[ id ] = ( state.initCounts[ id ] ?? 0 ) + 1;
 		},
 	},
 } );
@@ -58,6 +69,7 @@ const setup = async ( islandHtml: string ) => {
 		</div>
 	`;
 	state.count = 0;
+	state.initCounts = {};
 	await hydrateRegions();
 };
 
@@ -674,5 +686,237 @@ describe( 'element→vnode map', () => {
 		renderHTML( '[data-testid="outer"]', '<p>ok</p>' );
 		await flush();
 		expect( outer?.textContent ).toContain( 'ok' );
+	} );
+} );
+
+describe( 'data-wp-key and list identity across modes', () => {
+	// Every item carries a context id + data-wp-init that tallies into
+	// `state.initCounts`. A correct splice keeps each mounted item's identity
+	// (same element object, held refs still valid) and runs init exactly once.
+	const item = ( key: string, id: string, label: string ) =>
+		`<div data-wp-key="${ key }" data-wp-context='{ "id": "${ id }" }' data-wp-init="actions.initItem">${ label }</div>`;
+	const unkeyedItem = ( id: string, label: string ) =>
+		`<div data-wp-context='{ "id": "${ id }" }' data-wp-init="actions.initItem">${ label }</div>`;
+
+	// Preact reconciles a position by KEY when keys are present and by INDEX
+	// when they are not. An index-shifting splice (prepend/before/after) that
+	// is unkeyed therefore diffs each new vnode against the WRONG old vnode:
+	// the old DOM element is reused for the new item (held refs silently
+	// point at different content), the new item's useInit never runs (its
+	// vnode is absorbed into a reused component instance), and an existing
+	// item's init re-fires. The keyed variants below are the GREEN spec;
+	// the unkeyed ones document the footgun so the failure mode stays
+	// pinned — exact scramble shape may shift with preact versions.
+	it( 'keyed prepend preserves element identity and init counts', async () => {
+		await setup( `${ item( 'a', 'a', 'a' ) }${ item( 'b', 'b', 'b' ) }` );
+		// `setup` wraps the markup directly in the island element, which is
+		// therefore the list container.
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+
+		renderHTML( feed, item( 'new', 'new', 'new' ), { mode: 'prepend' } );
+		await flush();
+
+		expect( feed.children.length ).toBe( 3 );
+		expect( feed!.children[ 0 ]?.textContent ).toBe( 'new' );
+		expect( feed!.children[ 1 ] ).toBe( aEl );
+		expect( feed!.children[ 2 ] ).toBe( bEl );
+		expect( state.initCounts ).toEqual( { new: 1, a: 1, b: 1 } );
+	} );
+
+	it( 'unkeyed prepend scrambles identity and swallows the new item init', async () => {
+		await setup(
+			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem( 'b', 'b' ) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+
+		renderHTML( feed, unkeyedItem( 'new', 'new' ), { mode: 'prepend' } );
+		await flush();
+
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( aEl ).toHaveTextContent( 'new' );
+		// The new item's data-wp-init never ran — it was absorbed into the
+		// reused instance of `a` — and `b` re-initialized.
+		expect( state.initCounts.new ).toBeUndefined();
+		expect( state.initCounts.b ).toBe( 2 ); // `b`'s element was recreated elsewhere: the old element is gone
+		// from the list entirely.
+		expect( feed.children[ 2 ] ).not.toBe( bEl );
+	} );
+
+	it( 'append is safe without keys', async () => {
+		await setup(
+			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem( 'b', 'b' ) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+
+		renderHTML( feed, unkeyedItem( 'c', 'c' ) );
+		await flush();
+
+		// Appending shifts no existing index, so unchanged vnodes keep their
+		// positions: preact bails out on the shared subtree and nothing
+		// remounts or re-inits.
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( feed.children[ 1 ] ).toBe( bEl );
+		expect( state.initCounts ).toEqual( { a: 1, b: 1, c: 1 } );
+	} );
+
+	it( 'keyed before/after around a middle item preserve identity', async () => {
+		await setup(
+			`${ item( 'a', 'a', 'a' ) }${ item( 'b', 'b', 'b' ) }${ item(
+				'c',
+				'c',
+				'c'
+			) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+		const cEl = feed.children[ 2 ];
+
+		renderHTML( bEl, item( 'x', 'x', 'x' ), { mode: 'before' } );
+		renderHTML( bEl, item( 'y', 'y', 'y' ), { mode: 'after' } );
+		await flush();
+
+		expect( [ ...feed.children ].map( ( c ) => c.textContent ) ).toEqual( [
+			'a',
+			'x',
+			'b',
+			'y',
+			'c',
+		] );
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( feed.children[ 2 ] ).toBe( bEl );
+		expect( feed.children[ 4 ] ).toBe( cEl );
+		expect( state.initCounts ).toEqual( {
+			a: 1,
+			b: 1,
+			c: 1,
+			x: 1,
+			y: 1,
+		} );
+	} );
+
+	it( 'unkeyed before scrambles identity and swallows the new item init', async () => {
+		await setup(
+			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem(
+				'b',
+				'b'
+			) }${ unkeyedItem( 'c', 'c' ) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+		const cEl = feed.children[ 2 ];
+
+		renderHTML( bEl, unkeyedItem( 'x', 'x' ), { mode: 'before' } );
+		await flush();
+
+		expect( feed.children[ 1 ] ).toBe( bEl );
+		expect( bEl ).toHaveTextContent( 'x' );
+		expect( state.initCounts.x ).toBeUndefined();
+		expect( state.initCounts.c ).toBe( 2 );
+		// `a` sits before the insertion point and is untouched.
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( state.initCounts.a ).toBe( 1 );
+		// `c`'s element was recreated (its position was consumed by the
+		// shifted `b`), so the held ref is stale.
+		expect( feed.children[ 3 ] ).not.toBe( cEl );
+	} );
+
+	it( 'keyed replace with a new key mounts the replacement fresh', async () => {
+		await setup(
+			`${ item( 'a', 'a', 'a' ) }${ item( 'b', 'b', 'b' ) }${ item(
+				'c',
+				'c',
+				'c'
+			) }`
+		);
+		// useInit effects flush after paint. If the splice ran before that
+		// flush, the replaced item's pending hydration init would be dropped
+		// with its unmount (preact discards deferred callbacks of unmounted
+		// components). Flush first so the assertion documents the stable
+		// semantics: every item init'd exactly once.
+		await flush();
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+		const cEl = feed.children[ 2 ];
+
+		renderHTML( bEl, item( 'b2', 'b2', 'b2' ), { mode: 'replace' } );
+		await flush();
+
+		expect( [ ...feed.children ].map( ( c ) => c.textContent ) ).toEqual( [
+			'a',
+			'b2',
+			'c',
+		] );
+		expect( feed.children[ 1 ] ).not.toBe( bEl );
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( feed.children[ 2 ] ).toBe( cEl );
+		expect( state.initCounts ).toEqual( { a: 1, b: 1, c: 1, b2: 1 } );
+	} );
+
+	it( 'unkeyed replace reuses the old element and swallows the replacement init', async () => {
+		await setup(
+			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem(
+				'b',
+				'b'
+			) }${ unkeyedItem( 'c', 'c' ) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+		const cEl = feed.children[ 2 ];
+
+		renderHTML( bEl, unkeyedItem( 'b2', 'b2' ), { mode: 'replace' } );
+		await flush();
+
+		// Siblings survive (same vnode objects at the same indices), but the
+		// replacement is diffed into the old element's component instance:
+		// the old element renders the new content and the new content's
+		// data-wp-init never runs.
+		expect( [ ...feed.children ].map( ( c ) => c.textContent ) ).toEqual( [
+			'a',
+			'b2',
+			'c',
+		] );
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( feed.children[ 2 ] ).toBe( cEl );
+		expect( state.initCounts.b2 ).toBeUndefined();
+	} );
+
+	it( 'keyed inner mounts fresh', async () => {
+		await setup( `${ item( 'a', 'a', 'a' ) }${ item( 'b', 'b', 'b' ) }` );
+		// Same deferred-effect note as the keyed replace test above.
+		await flush();
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+
+		renderHTML( feed, item( 'z', 'z', 'z' ), { mode: 'inner' } );
+		await flush();
+
+		expect( feed.children.length ).toBe( 1 );
+		expect( feed.children[ 0 ] ).not.toBe( aEl );
+		expect( state.initCounts ).toEqual( { a: 1, b: 1, z: 1 } );
+	} );
+
+	it( 'unkeyed inner swallows the new content init', async () => {
+		await setup(
+			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem( 'b', 'b' ) }`
+		);
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+
+		renderHTML( feed, unkeyedItem( 'z', 'z' ), { mode: 'inner' } );
+		await flush();
+
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( aEl ).toHaveTextContent( 'z' );
+		expect( state.initCounts.z ).toBeUndefined();
 	} );
 } );
