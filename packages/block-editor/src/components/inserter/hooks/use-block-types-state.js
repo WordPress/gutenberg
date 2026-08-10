@@ -12,40 +12,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../../store';
 import { isFiltered } from '../../../store/utils';
 import { unlock } from '../../../lock-unlock';
-
-/**
- * Returns unsynced pattern blocks in a shape the insertion action can accept.
- *
- * @param {Object[]} blocks             Parsed unsynced pattern blocks.
- * @param {string}   rootClientId       Insertion root client ID.
- * @param {Function} canInsertBlockType Selector that checks whether a block can be inserted.
- *
- * @return {Object[]} Insertable blocks.
- */
-export const getInsertableUnsyncedBlocks = (
-	blocks,
-	rootClientId,
-	canInsertBlockType
-) => {
-	return blocks.map( ( block ) => {
-		if ( canInsertBlockType?.( block.name, rootClientId ) ) {
-			return block;
-		}
-
-		const { parent } = getBlockType( block.name ) ?? {};
-		const parentName = parent?.length === 1 ? parent[ 0 ] : undefined;
-
-		if (
-			parentName &&
-			( ! canInsertBlockType ||
-				canInsertBlockType( parentName, rootClientId ) )
-		) {
-			return createBlock( parentName, {}, [ block ] );
-		}
-
-		return block;
-	} );
-};
 /**
  * Retrieves the block types inserter state.
  *
@@ -68,9 +34,9 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 		],
 		[ rootClientId, options ]
 	);
-	const selectors = useSelect( blockEditorStore );
-	const { getClosestAllowedInsertionPoint } = unlock( selectors );
-	const { canInsertBlockType } = selectors;
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ categories, collections ] = useSelect( ( select ) => {
@@ -123,13 +89,9 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				syncStatus === 'unsynced'
 					? name === 'core/block' && initialAttributes?.ref
 						? [ unsyncedFallbackBlock ]
-						: getInsertableUnsyncedBlocks(
-								unsyncedBlocks.length
-									? unsyncedBlocks
-									: [ unsyncedFallbackBlock ],
-								destinationClientId,
-								canInsertBlockType
-						  )
+						: unsyncedBlocks.length
+						? unsyncedBlocks
+						: [ unsyncedFallbackBlock ]
 					: createBlock(
 							name,
 							initialAttributes,
@@ -148,7 +110,6 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 			rootClientId,
 			onInsert,
 			createErrorNotice,
-			canInsertBlockType,
 		]
 	);
 

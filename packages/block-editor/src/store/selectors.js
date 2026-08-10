@@ -2826,18 +2826,6 @@ function enhancePatternWithParsedBlocks( pattern ) {
 	return enhancedPattern;
 }
 
-function canInsertBlockOrSingleParent( state, blockName, rootClientId ) {
-	if ( canInsertBlockType( state, blockName, rootClientId ) ) {
-		return true;
-	}
-
-	const { parent } = getBlockType( blockName ) ?? {};
-	const parentName = parent?.length === 1 ? parent[ 0 ] : undefined;
-
-	return (
-		!! parentName && canInsertBlockType( state, parentName, rootClientId )
-	);
-}
 /**
  * Returns the list of allowed patterns for inner blocks children.
  *
@@ -2872,7 +2860,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 					( pattern ) =>
 						getGrammar( pattern ).every( ( { blockName: name } ) =>
 							options[ isFiltered ] !== false
-								? canInsertBlockOrSingleParent(
+								? canInsertBlockType(
 										state,
 										name,
 										rootClientId

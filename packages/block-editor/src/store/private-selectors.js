@@ -990,20 +990,6 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 	return current;
 }
 
-function getInsertableBlockNameForPattern( state, blockName, rootClientId ) {
-	if ( canInsertBlockType( state, blockName, rootClientId ) ) {
-		return blockName;
-	}
-
-	const { parent } = getBlockType( blockName ) ?? {};
-	const parentName = parent?.length === 1 ? parent[ 0 ] : undefined;
-
-	if ( parentName && canInsertBlockType( state, parentName, rootClientId ) ) {
-		return parentName;
-	}
-
-	return blockName;
-}
 export function getClosestAllowedInsertionPointForPattern(
 	state,
 	pattern,
@@ -1017,9 +1003,7 @@ export function getClosestAllowedInsertionPointForPattern(
 	if ( ! isAllowed ) {
 		return null;
 	}
-	const names = getGrammar( pattern ).map( ( { blockName: name } ) =>
-		getInsertableBlockNameForPattern( state, name, clientId )
-	);
+	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
 	return getClosestAllowedInsertionPoint( state, names, clientId );
 }
 
