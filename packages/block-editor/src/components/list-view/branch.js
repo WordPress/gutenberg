@@ -1,26 +1,19 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useListViewContext } from './context';
+import { useListViewTreeState } from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
 	isClientIdSelected,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -77,23 +70,27 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
-		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const parentBlockInformation = useBlockDisplayInformation( parentId );
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
-
-	const canParentExpand = useSelect(
+	const { canParentExpand, isParentSynced } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return true;
+				return { canParentExpand: true, isParentSynced: false };
 			}
-			return select( blockEditorStore ).canEditBlock( parentId );
+			const { canEditBlock, isSyncedBlock } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				canParentExpand: canEditBlock( parentId ),
+				isParentSynced: isSyncedBlock( parentId ),
+			};
 		},
 		[ parentId ]
 	);
+
+	const syncedBranch = isSyncedBranch || isParentSynced;
 
 	const {
 		blockDropPosition,
@@ -102,7 +99,7 @@ function ListViewBranch( props ) {
 		blockIndexes,
 		expansionState,
 		draggedClientIds,
-	} = useListViewContext();
+	} = useListViewTreeState();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -165,10 +162,9 @@ function ListViewBranch( props ) {
 			path.length > 0 ? `${ path }_${ position }` : `${ position }`;
 		const hasNestedBlocks = !! innerBlocks?.length;
 
-		const shouldExpand =
-			hasNestedBlocks && shouldShowInnerBlocks
-				? expansionState[ clientId ] ?? isExpanded
-				: undefined;
+		const shouldExpand = hasNestedBlocks
+			? expansionState[ clientId ] ?? isExpanded
+			: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
 		// but asynchronous for any other block.
@@ -234,7 +230,6 @@ function ListViewBranch( props ) {
 						showBlockMovers={ showBlockMovers }
 						path={ updatedPath }
 						isExpanded={ isDragged ? false : shouldExpand }
-						listPosition={ blockListPosition }
 						selectedClientIds={ selectedClientIds }
 						isSyncedBranch={ syncedBranch }
 						displacement={ displacement }

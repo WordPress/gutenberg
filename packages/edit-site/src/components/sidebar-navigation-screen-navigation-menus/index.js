@@ -1,20 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	__experimentalItemGroup as ItemGroup,
 	Spinner,
 } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';

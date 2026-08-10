@@ -2,17 +2,38 @@
 
 ## Unreleased
 
+### Internal
+
+-   Embed: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
 ### Enhancements
 
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
 -   Playlist: Expose the parent "Add track" toolbar control to selected Playlist Track child blocks via block toolbar sharing ([#80368](https://github.com/WordPress/gutenberg/pull/80368)).
--   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
 -   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab" ([#81009](https://github.com/WordPress/gutenberg/pull/81009)).
 
 ### Bug Fixes
 
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
+
+### Internal
+
+-   Details: Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components` ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+
+## 10.3.0 (2026-07-29)
+
+### Enhancements
+
+-   Playlist: Shorten the track toolbar button label from "Add track" to "Add".
+-   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
+
+### Bug Fixes
+
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
+-   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ### Internal
 
@@ -93,6 +114,13 @@
 
 ## 9.34.0 (2025-10-29)
 
+## 9.33.11 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 9.33.0 (2025-10-17)
 
 ### Enhancements
@@ -129,6 +157,12 @@
 
 -   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
 
+## 9.19.7 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 9.19.0 (2025-02-28)
 
 ## 9.18.0 (2025-02-12)
@@ -151,6 +185,12 @@
 
 ## 9.9.0 (2024-10-03)
 
+## 9.8.18 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 9.8.0 (2024-09-19)
 
 ## 9.7.0 (2024-09-05)
@@ -170,6 +210,12 @@
 ## 9.2.0 (2024-06-26)
 
 ## 9.1.0 (2024-06-15)
+
+## 9.0.9 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ## 9.0.0 (2024-05-31)
 
@@ -196,6 +242,12 @@
 
 ## 8.29.0 (2024-02-21)
 
+## 8.28.13 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 8.28.0 (2024-02-09)
 
 ## 8.27.0 (2024-01-24)
@@ -218,6 +270,12 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.19 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 8.19.0 (2023-09-20)
 
 ## 8.18.0 (2023-08-31)
@@ -231,6 +289,12 @@
 ## 8.14.0 (2023-07-05)
 
 ## 8.13.0 (2023-06-23)
+
+## 8.12.21 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ## 8.12.0 (2023-06-07)
 
@@ -249,6 +313,12 @@
 ## 8.5.0 (2023-03-01)
 
 ## 8.4.0 (2023-02-15)
+
+## 8.3.17 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ## 8.3.0 (2023-02-01)
 
@@ -271,6 +341,12 @@
 ## 7.16.0 (2022-10-05)
 
 ## 7.15.0 (2022-09-21)
+
+## 7.14.16 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ## 7.14.0 (2022-09-13)
 
@@ -306,6 +382,12 @@
 
 ## 7.4.0 (2022-04-21)
 
+## 7.3.20 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 7.3.0 (2022-04-08)
 
 ## 7.2.0 (2022-03-23)
@@ -335,6 +417,12 @@
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
 
+## 6.0.32 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
+
 ## 6.0.0 (2021-09-09)
 
 ### Breaking Changes
@@ -356,6 +444,12 @@
 ### Bug Fixes
 
 -   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
+
+## 3.2.22 (2026-08-06)
+
+### Bug Fixes
+
+-   Post Date: Escape date values and link URLs before rendering the block.
 
 ## 3.2.0 (2021-05-24)
 

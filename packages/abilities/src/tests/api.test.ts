@@ -1,15 +1,7 @@
 /**
  * Tests for API functions.
  */
-
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	getAbilities,
 	getAbility,

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldLayoutProps,
 	NormalizedForm,

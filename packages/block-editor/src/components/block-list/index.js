@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	AsyncModeProvider,
 	useSelect,
@@ -20,10 +13,6 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';

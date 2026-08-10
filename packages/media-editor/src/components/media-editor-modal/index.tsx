@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';

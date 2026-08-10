@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -18,10 +15,6 @@ import {
 	moreVertical,
 } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { ScreenHeader } from './screen-header';

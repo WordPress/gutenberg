@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { notFound } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import { ensureView, viewToQuery } from './view-utils';
 
 /**

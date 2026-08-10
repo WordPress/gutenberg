@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useFormValidity } from '../use-form-validity';
 import type { Field } from '../../types';
 
@@ -2439,7 +2432,7 @@ describe( 'useFormValidity', () => {
 					id: 'title',
 					type: 'text',
 					isValid: {
-						// @ts-ignore returns wrong type for testing purposes
+						// @ts-expect-error Resolves to `number`, but custom validators may resolve only to `string | null`.
 						custom: async () =>
 							await new Promise( ( resolve ) =>
 								setTimeout( resolve, 5 )

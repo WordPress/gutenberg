@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { SelectControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 

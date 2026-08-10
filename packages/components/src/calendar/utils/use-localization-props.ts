@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import type { Modifiers, BaseProps } from '../types';
 
 function isLocaleRTL( localeCode: string ) {

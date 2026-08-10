@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	useRef,
@@ -28,10 +25,6 @@ import {
 	linkOff,
 } from '@wordpress/icons';
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import URLPopover from './index';
 
 const LINK_DESTINATION_NONE = 'none';

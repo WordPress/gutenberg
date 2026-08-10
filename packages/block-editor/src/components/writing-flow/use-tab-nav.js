@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { focus, isFormElement } from '@wordpress/dom';
 import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';

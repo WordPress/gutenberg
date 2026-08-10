@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createElement, isValidElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { registerFieldType, unregisterFieldType } from '../../field-types';
 import {
 	registerIconResolver,

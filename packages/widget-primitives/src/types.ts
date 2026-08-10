@@ -8,15 +8,7 @@
  * widget binds its attribute shape once and gets typed `attributes`,
  * `example`, and `setAttributes`.
  */
-
-/**
- * External dependencies
- */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ResolvableField } from './field-types';
 
 /**

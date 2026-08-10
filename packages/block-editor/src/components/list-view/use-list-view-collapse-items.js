@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -26,8 +19,7 @@ export default function useListViewCollapseItems( { updateExpansion } ) {
 		if ( expandedBlock ) {
 			const blockParents = getBlockParents( expandedBlock, false );
 			// Collapse all blocks and expand the block's parents.
-			updateExpansion( { type: 'clear' } );
-			updateExpansion( { type: 'expand', clientIds: blockParents } );
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		}
 	}, [ updateExpansion, expandedBlock, getBlockParents ] );
 }

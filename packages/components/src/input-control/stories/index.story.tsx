@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { closeSmall, Icon, link, seen, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';

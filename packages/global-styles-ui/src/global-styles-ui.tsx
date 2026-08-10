@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Navigator, useNavigator } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -13,10 +10,6 @@ import {
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';

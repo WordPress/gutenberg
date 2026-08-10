@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Dropdown,
 	FlexItem,
@@ -17,10 +10,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -229,7 +218,7 @@ export default function Filter( {
 			activeElements = [
 				{
 					value: filterInView.value,
-					// @ts-ignore
+					// @ts-expect-error `label` is a `string[]` here, but the element type expects a `string`.
 					label,
 				},
 			];
