@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 

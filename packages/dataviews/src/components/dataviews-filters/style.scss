@@ -76,7 +76,7 @@
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 		cursor: var(--wpds-cursor-control);
 		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
-		min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+		min-height: var(--wpds-dimension-size-md);
 		color: var(--wpds-color-foreground-interactive-neutral);
 		position: relative;
 		display: flex;
@@ -88,7 +88,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(#{vars.$icon-size} + var(--wpds-dimension-padding-xs));
+			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-xs));
 		}
 
 		&:hover:not(&.is-not-clickable),
@@ -120,14 +120,13 @@
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: var(--wpds-typography-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 
 	.dataviews-filters__summary-chip-remove {
-		// TODO: use size token when available.
-		width: vars.$icon-size;
-		height: vars.$icon-size;
+		width: var(--wpds-dimension-size-sm);
+		height: var(--wpds-dimension-size-sm);
 		border-radius: var(--wpds-border-radius-md);
 		border: 0;
 		padding: 0;
@@ -172,14 +171,14 @@
 }
 
 .dataviews-filters__search-widget-filter-combobox-list {
-	max-height: calc(var(--wpds-dimension-base) * 46);
+	max-height: 184px;
 	padding: var(--wpds-dimension-padding-xs);
 	overflow: auto;
 	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.dataviews-filters__search-widget-filter-combobox-item-value {
 		[data-user-value] {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 }
@@ -197,8 +196,9 @@
 	box-sizing: border-box;
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
 	cursor: default;
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-md);
 	@include body-medium();
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:last-child {
 		margin-block-end: 0;
@@ -208,6 +208,7 @@
 	&[data-active-item],
 	&:focus {
 		background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
@@ -227,6 +228,10 @@
 				background: var(--wpds-color-background-interactive-brand-strong-active);
 			}
 		}
+
+		.dataviews-filters__search-widget-listitem-description {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+		}
 	}
 
 	.dataviews-filters__search-widget-listitem-value {
@@ -242,7 +247,7 @@
 		text-overflow: ellipsis;
 		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 16px;
-		color: var(--wpds-color-foreground-content-neutral-weak);
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	.dataviews-filters__search-widget-listitem-single-selection {
@@ -329,9 +334,9 @@
 	.dataviews-filters__search-widget-filter-combobox__input {
 		@include input-control;
 		display: block;
-		padding: 0 var(--wpds-dimension-padding-sm) 0 calc(var(--wpds-dimension-base) * 8);
+		padding: 0 var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-size-md);
 		width: 100%;
-		height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+		height: var(--wpds-dimension-size-md);
 
 		// Unset inherited values.
 		margin-left: 0;
@@ -370,7 +375,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: vars.$icon-size;
+		width: var(--wpds-dimension-size-sm);
 
 		&:dir(ltr) {
 			transform: scaleX(-1);
@@ -389,8 +394,8 @@
 	right: 0;
 	transform: translate(50%, -50%);
 	background: var(--wpds-color-background-interactive-brand-strong);
-	height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
-	min-width: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+	height: var(--wpds-dimension-size-2xs);
+	min-width: var(--wpds-dimension-size-2xs);
 	line-height: var(--wpds-typography-line-height-xs);
 	padding: 0 var(--wpds-dimension-padding-xs);
 	text-align: center;
@@ -402,7 +407,8 @@
 }
 
 .dataviews-search {
-	width: fit-content;
+	// Fixed width to ensure the control doesn't resize with the reset button.
+	flex-basis: 210px;
 }
 
 .dataviews-filters__user-input-widget {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
@@ -18,10 +15,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store } from '../../store';
 
 /**
@@ -169,7 +162,6 @@ export default function ReusableBlockConvertButton( {
 					>
 						<VStack spacing="5">
 							<TextControl
-								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ title }
 								onChange={ setTitle }

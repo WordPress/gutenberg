@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../react-no-unsafe-timeout';
 
 const ruleTester = new RuleTester( {

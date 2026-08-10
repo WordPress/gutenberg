@@ -6,7 +6,7 @@
 			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
 
 			display: flex;
-			height: 40px;
+			height: var(--wpds-dimension-size-lg);
 			background-color: var(--wpds-color-background-interactive-neutral-weak);
 			border-width: var(--wpds-border-width-xs);
 			border-style: solid;
@@ -23,12 +23,12 @@
 
 			&.is-size-compact {
 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
-				height: 32px;
+				height: var(--wpds-dimension-size-md);
 			}
 
 			&.is-size-small {
 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
-				height: 24px;
+				height: var(--wpds-dimension-size-sm);
 			}
 
 			&.is-disabled,

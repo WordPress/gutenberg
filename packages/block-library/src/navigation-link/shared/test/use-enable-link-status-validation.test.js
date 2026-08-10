@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useEnableLinkStatusValidation } from '../use-enable-link-status-validation';
-
 // Mock useSelect directly at the implementation level to avoid loading complex dependencies
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	const mock = jest.fn();
 	return mock;
 } );
-
 const { useSelect } = require( '@wordpress/data' );
 
 describe( 'useEnableLinkStatusValidation', () => {

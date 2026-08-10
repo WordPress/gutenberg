@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getComputedAcceptAttribute } from '../utils';
 
 describe( 'getComputedAcceptAttribute', () => {

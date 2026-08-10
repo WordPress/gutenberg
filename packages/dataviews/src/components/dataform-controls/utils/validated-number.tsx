@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	BaseControl,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
 import { unlock } from '../../../lock-unlock';
@@ -65,7 +58,6 @@ function BetweenControls( {
 					value={ min }
 					max={ max ? Number( max ) - step : undefined }
 					onChange={ onChangeMin }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -74,7 +66,6 @@ function BetweenControls( {
 					value={ max }
 					min={ min ? Number( min ) + step : undefined }
 					onChange={ onChangeMax }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -157,7 +148,6 @@ export default function ValidatedNumber< Item >( {
 			help={ description }
 			value={ value }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
 			min={ isValid.min ? isValid.min.constraint : undefined }

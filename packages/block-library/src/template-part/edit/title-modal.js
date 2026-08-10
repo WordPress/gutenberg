@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -39,7 +36,6 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'Custom Template Part' ) }
-						__next40pxDefaultSize
 					/>
 					<HStack justify="right">
 						<Button

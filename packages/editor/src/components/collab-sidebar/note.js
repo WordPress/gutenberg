@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { RawHTML, useRef, useState, useEffect } from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -16,10 +9,6 @@ import {
 import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { unlock } from '../../lock-unlock';
@@ -68,6 +57,28 @@ export function Note( {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
+	const commentRef = useRef( null );
+	const rawContent = note?.content?.raw;
+	const [ prevContent, setPrevContent ] = useState( rawContent );
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+
+	// Collapse whenever the content changes so it can be re-measured.
+	if ( prevContent !== rawContent ) {
+		setPrevContent( rawContent );
+		setIsExpanded( false );
+	}
+
+	// Measure the (clamped) content to decide whether the toggle is needed.
+	useLayoutEffect( () => {
+		const commentElement = commentRef.current;
+		if ( commentElement ) {
+			setIsOverflowing(
+				commentElement.scrollHeight > commentElement.clientHeight
+			);
+		}
+	}, [ rawContent ] );
+
 	const canResolve = note.parent === 0;
 	const isResolutionNote =
 		note.type === 'note' &&
@@ -107,42 +118,6 @@ export function Note( {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
-	const prevContentRef = useRef( note?.content?.raw );
-	const commentRef = useRef( null );
-	const [ isOverflowing, setIsOverflowing ] = useState( false );
-	const [ collapsed, setCollapsed ] = useState( true );
-
-	useEffect( () => {
-		if ( prevContentRef.current !== note?.content?.raw ) {
-			setCollapsed( true );
-		}
-	}, [ note?.content?.raw ] );
-
-	useEffect( () => {
-		if ( ! collapsed ) {
-			return;
-		}
-
-		const commentElement = commentRef.current;
-		if ( ! commentElement ) {
-			return;
-		}
-
-		const isEdit = prevContentRef.current !== note?.content?.raw;
-		prevContentRef.current = note?.content?.raw;
-
-		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
-			setIsOverflowing( true );
-
-			if ( isEdit ) {
-				setCollapsed( false );
-			}
-		} else {
-			setIsOverflowing( false );
-			setCollapsed( null );
-		}
-	}, [ collapsed, note?.content?.raw ] );
-
 	const handleCancel = () => {
 		setActionState( null );
 		actionButtonRef.current?.focus();
@@ -152,10 +127,16 @@ export function Note( {
 	if ( actionState === 'edit' ) {
 		body = (
 			<NoteForm
-				onSubmit={ ( value ) => {
-					onEditNote( { id: note.id, content: value } );
-					setActionState( null );
-					actionButtonRef.current?.focus();
+				onSubmit={ async ( value ) => {
+					const saved = await onEditNote( {
+						id: note.id,
+						content: value,
+					} );
+					// Keep the form open on failure so the edit isn't lost.
+					if ( saved ) {
+						handleCancel();
+					}
+					return saved;
 				} }
 				onCancel={ handleCancel }
 				note={ note }
@@ -197,11 +178,10 @@ export function Note( {
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
 					'editor-collab-sidebar-panel__resolution-text':
 						isResolutionNote,
-					'is-collapsed': collapsed,
+					'is-collapsed': ! isExpanded,
 				} ) }
-			>
-				<RawHTML>{ content }</RawHTML>
-			</div>
+				dangerouslySetInnerHTML={ { __html: content ?? '' } }
+			/>
 		);
 	}
 
@@ -249,9 +229,9 @@ export function Note( {
 					className="editor-collab-sidebar-panel__show-more-button"
 					variant="unstyled"
 					size="small"
-					onClick={ () => setCollapsed( ! collapsed ) }
+					onClick={ () => setIsExpanded( ! isExpanded ) }
 				>
-					{ collapsed ? __( 'Show more' ) : __( 'Show less' ) }
+					{ ! isExpanded ? __( 'Show more' ) : __( 'Show less' ) }
 				</UIButton>
 			) }
 		</NoteCard>

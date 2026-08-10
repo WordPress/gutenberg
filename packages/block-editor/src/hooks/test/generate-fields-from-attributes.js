@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
 
 /**

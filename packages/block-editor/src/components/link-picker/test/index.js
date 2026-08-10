@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { LinkPicker } from '../';
 
 const mockFetchSearchSuggestions = jest.fn();
@@ -141,7 +130,9 @@ describe( 'LinkPicker', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			const image = within( button ).getByRole( 'img', { hidden: true } );
+			const image = within( button ).getByRole( 'presentation', {
+				hidden: true,
+			} );
 
 			expect( image ).toHaveAttribute(
 				'src',

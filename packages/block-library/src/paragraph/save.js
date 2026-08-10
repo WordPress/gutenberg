@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { isRTL } from '@wordpress/i18n';
 

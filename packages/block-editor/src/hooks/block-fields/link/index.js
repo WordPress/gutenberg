@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -11,10 +8,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { link } from '@wordpress/icons';
 import { prependHTTP } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import LinkControl from '../../../components/link-control';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 

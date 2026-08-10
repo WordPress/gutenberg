@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
@@ -300,6 +293,19 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test { height: 20rem !important; aspect-ratio: unset !important; }'
 		);
 	} );
+
+	it( 'adds important text alignment declarations for state styles', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					typography: {
+						textAlign: 'center',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { text-align: center !important; }' );
+	} );
 } );
 
 describe( 'getBlockStateStylesCSS', () => {
@@ -402,7 +408,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { text: 'red' },
 					},
 				},
@@ -414,11 +420,27 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'generates media-query scoped text alignment styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						typography: { textAlign: 'right' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { text-align: right !important; }}',
+		] );
+	} );
+
 	it( 'routes viewport styles through feature selectors', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { background: '#ff00d0' },
 						dimensions: { width: '50%' },
 					},
@@ -435,7 +457,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						dimensions: { objectFit: 'fill' },
 					},
 				},
@@ -451,7 +473,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { background: 'black' },
 						},
@@ -469,7 +491,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						elements: {
 							link: {
 								color: { text: 'blue' },
@@ -510,7 +532,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						color: { text: 'red' },
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { text: 'red' },
@@ -524,13 +546,13 @@ describe( 'getCanvasStateStyleValue', () => {
 					':hover': {
 						color: { background: 'blue', text: 'red' },
 					},
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { text: 'yellow' },
 						},
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { background: 'blue', text: 'yellow' },

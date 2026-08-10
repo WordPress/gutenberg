@@ -1,24 +1,9 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
+import type { DashboardWidget } from '@wordpress/widget-dashboard';
 import { useDashboardLayout } from '../';
-import type { DashboardWidget } from '../../../widget-dashboard';
 
 jest.mock( '@wordpress/api-fetch' );
 

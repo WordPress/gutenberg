@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -24,10 +21,6 @@ import {
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -417,7 +410,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		<Flex direction="column" gap="4">
 			{ showFilter && ! loading && (
 				<SearchControl
-					__next40pxDefaultSize
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }
@@ -462,7 +454,6 @@ export function HierarchicalTermSelector( { slug } ) {
 				<form onSubmit={ onAddTerm }>
 					<Flex direction="column" gap="4">
 						<TextControl
-							__next40pxDefaultSize
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
 							value={ formName }
@@ -471,7 +462,6 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
-								__next40pxDefaultSize
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
 
@@ -252,12 +245,17 @@ export default function useBlockSync( {
 					cloneBlockWithMapping( block, idMappingRef.current )
 				);
 
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				setHasControlledInnerBlocks( clientId, true );
 
 				if ( subscribedRef.current ) {
 					pendingChangesRef.current.incoming = storeBlocks;
 				}
-				__unstableMarkNextChangeAsNotPersistent();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				replaceInnerBlocks( clientId, storeBlocks );
 
 				// Invalidate the applied-selection ref so that
@@ -270,7 +268,9 @@ export default function useBlockSync( {
 			if ( subscribedRef.current ) {
 				pendingChangesRef.current.incoming = controlledBlocks;
 			}
-			__unstableMarkNextChangeAsNotPersistent();
+			__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
 			resetBlocks( controlledBlocks );
 		}
 	};
@@ -278,12 +278,19 @@ export default function useBlockSync( {
 	// Clean up the changes made by setControlledBlocks() when the component
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
-		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
+			__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
 			setHasControlledInnerBlocks( clientId, false );
-			__unstableMarkNextChangeAsNotPersistent();
+			__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
 			replaceInnerBlocks( clientId, [] );
 		} else {
+			__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
 			resetBlocks( [] );
 		}
 	};

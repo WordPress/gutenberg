@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import os from 'os';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 const baseTestIgnore: Array< string | RegExp > = [];
@@ -17,6 +10,25 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
 
+const flakinessOptions = {
+	/*
+	 * Tests dashboard is available at https://flakiness.io/WordPress/gutenberg
+	 */
+	flakinessProject: 'WordPress/gutenberg',
+	/*
+	 * Use historical test-duration data to balance shards.
+	 * Documentation is available at https://github.com/flakiness/playwright
+	 */
+	shardBalancing: {
+		timingsFile: './timings.json',
+	},
+	/*
+	 * Only upload to Flakiness.io for the official WordPress/Gutenberg
+	 * repository. Forks and private mirrors are not configured on the service.
+	 */
+	disableUpload: process.env.GITHUB_REPOSITORY !== 'WordPress/gutenberg',
+};
+
 const config = defineConfig( {
 	...baseConfig,
 	webServer: {
@@ -24,8 +36,13 @@ const config = defineConfig( {
 		command: 'npm run --prefix ../.. wp-env-test -- start',
 	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
-		: 'list',
+		? [
+				[ 'github' ],
+				[ './config/flaky-tests-reporter.ts' ],
+				[ 'blob' ],
+				[ '@flakiness/playwright', flakinessOptions ],
+		  ]
+		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
