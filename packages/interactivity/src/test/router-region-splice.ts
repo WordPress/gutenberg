@@ -31,10 +31,12 @@ import { getContext } from '../scopes';
 import { renderHTML } from '../render';
 import { hydrateRegions } from '../hydration';
 import { routerRegions } from '../directives/router-region';
+import { Directives } from '../hooks';
 
 const NS = 'test/router-region-splice';
 
 store( NS, {
+	state: { active: true },
 	actions: {
 		bump() {
 			getContext< { n: number } >().n += 1;
@@ -176,5 +178,59 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 		 ).click();
 		await flush();
 		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+	} );
+
+	it( 'GREEN: a splice into a navigated region with a lower-priority directive keeps the directive applied', async () => {
+		document.body.innerHTML = islandHtml( 'test-r1d' );
+		await hydrateRegions();
+		await flush();
+
+		// Simulate a navigation whose region element ALSO carries a class
+		// directive: `cloneRouterRegionContent` keeps the priority levels
+		// BELOW `router-region`, so the signal holds a `Directives` wrapper
+		// with the remaining ['class'] level — the same shape the real router
+		// produces. The write-through must preserve that level.
+		routerRegions.get( 'test-r1d' )!.value = h( Directives, {
+			directives: {
+				'router-region': [
+					{
+						value: 'test-r1d',
+						namespace: NS,
+						suffix: null,
+						uniqueId: null,
+					},
+				],
+				class: [
+					{
+						value: 'state.active',
+						namespace: NS,
+						suffix: 'bn-active',
+						uniqueId: null,
+					},
+				],
+			},
+			priorityLevels: [ [ 'class' ] ],
+			element: h(
+				'div',
+				{
+					'data-testid': 'region',
+					'data-wp-class--bn-active': 'state.active',
+				},
+				[ h( 'p', null, 'a' ) ]
+			),
+			originalProps: {},
+		} );
+		await flush();
+
+		const regionEl = document.querySelector(
+			'[data-testid="region"]'
+		) as HTMLElement;
+		expect( regionEl ).toHaveClass( 'bn-active' );
+
+		// Splice into the region — must persist AND keep the class directive.
+		renderHTML( regionEl, '<button data-testid="x">x</button>' );
+		await flush();
+		expect( regionEl.querySelector( '[data-testid="x"]' ) ).not.toBeNull();
+		expect( regionEl ).toHaveClass( 'bn-active' );
 	} );
 } );

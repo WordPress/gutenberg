@@ -15,8 +15,9 @@ import {
  * Internal dependencies
  */
 import { toVdom } from './vdom';
-import { Directives, elementToVnode } from './hooks';
+import { Directives, elementToVnode, isDefaultDirectiveSuffix } from './hooks';
 import { getRegionRootFragment } from './hydration';
+import { routerRegions } from './directives/router-region';
 import { warn } from './utils';
 
 /**
@@ -188,6 +189,45 @@ const rebuildPathNode = (
 };
 
 /**
+ * Mirrors a spliced region element into its router signal (write-through).
+ *
+ * When a splice rebuilds the path through a region's `router-region`
+ * `Directives` level, that wrapper re-renders during the splice's own
+ * `render()` and re-reads `routerRegions` — if the signal still holds the
+ * PRE-splice vnode, the new content is reverted (a silent no-op). Writing
+ * the rebuilt region content into the signal before the render makes the
+ * splice stick; the signal then mirrors the tree (§6).
+ *
+ * Only NAVIGATED regions are written (signal holds a vnode). SSR regions
+ * (signal `undefined`) render the tree's children directly and need no
+ * mirror; hidden regions (`null`) have no content to splice into.
+ *
+ * @param wrapper     The rebuilt `Directives` wrapper whose CURRENT priority
+ *                    level is the `router-region` directive.
+ * @param regionVnode The rebuilt content the wrapper renders — the chain
+ *                    below the wrapper (its `element` chain), which is the
+ *                    same shape `cloneRouterRegionContent` produces.
+ */
+const writeRegionSignal = ( wrapper: any, regionVnode: any ): void => {
+	const entries: any[] = wrapper.props?.directives?.[ 'router-region' ];
+	const entry = entries?.find( isDefaultDirectiveSuffix );
+	if ( ! entry || entry.uniqueId ) {
+		return;
+	}
+	const regionId =
+		typeof entry.value === 'string'
+			? entry.value
+			: ( entry.value as any )?.id;
+	if ( ! regionId ) {
+		return;
+	}
+	const signal = routerRegions.get( regionId );
+	if ( signal && signal.value ) {
+		signal.value = regionVnode;
+	}
+};
+
+/**
  * Locates (and if needed hydrates) the island tree, then splices the new
  * vnodes into it at the position described by `position` relative to
  * `container`, and renders the rebuilt tree.
@@ -329,8 +369,18 @@ const spliceIntoTree = (
 		chainElement = current;
 	}
 
-	// Rebuild the path from the insertion point up to the root.
+	// Rebuild the path from the insertion point up to the root. When the
+	// rebuild passes a region's `router-region` Directives level, mirror the
+	// rebuilt region content into the region's signal BEFORE the render
+	// below — otherwise the wrapper's re-render re-reads the stale signal
+	// and reverts the splice (§6).
 	for ( let i = startIdx; i >= 0; i-- ) {
+		if (
+			path[ i ].type === Directives &&
+			path[ i ].props?.priorityLevels?.[ 0 ]?.includes( 'router-region' )
+		) {
+			writeRegionSignal( path[ i ], current );
+		}
 		current = rebuildPathNode(
 			path[ i ],
 			current,
