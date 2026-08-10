@@ -59,7 +59,7 @@
 }
 
 .header-navigation {
-	padding-block-start: var(--wpds-dimension-padding-sm);
+	margin-block-start: var(--wpds-dimension-gap-sm);
 }
 
 .content {
