@@ -13,7 +13,7 @@ import styles from './style.module.css';
 export const Navigation = ( {
 	items,
 	currentHref,
-	ariaLabel,
+	ariaLabel = __( 'Sections' ),
 }: NavigationProps ) => {
 	if ( ! items.length ) {
 		return null;
@@ -42,7 +42,7 @@ export const Navigation = ( {
 	}
 
 	return (
-		<nav aria-label={ ariaLabel ?? __( 'Sections' ) }>
+		<nav aria-label={ ariaLabel }>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.
