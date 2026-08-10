@@ -25,27 +25,21 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/audio' ],
-			transform: ( audio ) => {
-				return createBlock(
-					'core/playlist',
-					getPlaylistAttributes( audio ),
-					[ createPlaylistTrack( audio ) ]
-				);
-			},
-		},
-		{
-			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/audio' ],
-			transform: ( attributes ) => {
-				const [ firstAudio ] = attributes;
-				return createBlock(
+			transform: ( attributes ) =>
+				createBlock(
 					'core/playlist',
-					getPlaylistAttributes( firstAudio ),
-					attributes.map( createPlaylistTrack )
-				);
-			},
+					{ ...attributes[ 0 ] },
+					attributes.map( ( { blob, id, src } ) =>
+						createBlock( 'core/playlist-track', {
+							blob,
+							id,
+							src,
+							title: getFilename( src ),
+						} )
+					)
+				),
 		},
 	],
 	to: [
