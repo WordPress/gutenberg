@@ -64,12 +64,80 @@ describe( 'style state dimension utilities', () => {
 			},
 			'@mobile': {
 				dimensions: {
+					aspectRatio: 'auto',
 					width: '200px',
 				},
 			},
 			'@tablet': {
 				dimensions: {
 					aspectRatio: '3',
+				},
+			},
+		} );
+	} );
+
+	it( 'stores auto when clearing aspect ratio in a selected style state', () => {
+		expect(
+			getDimensionUpdateAttributes( {
+				style: {
+					dimensions: {
+						aspectRatio: '16/9',
+					},
+					'@mobile': {
+						dimensions: {
+							aspectRatio: '1',
+						},
+					},
+				},
+				selectedState: { viewport: '@mobile', pseudo: 'default' },
+				hasSelectedStyleState: true,
+				nextDimensions: {
+					aspectRatio: undefined,
+				},
+			} )
+		).toEqual( {
+			style: {
+				dimensions: {
+					aspectRatio: '16/9',
+				},
+				'@mobile': {
+					dimensions: {
+						aspectRatio: 'auto',
+					},
+				},
+			},
+		} );
+	} );
+
+	it( 'persists auto aspect ratio when resetting an already-scoped state style slice', () => {
+		expect(
+			getDimensionResetAttributes( {
+				attributes: {
+					style: {
+						dimensions: {
+							aspectRatio: '1',
+							width: '200px',
+						},
+					},
+				},
+				hasSelectedStyleState: false,
+				persistAspectRatioDefault: true,
+				keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+				defaultAttributes: {
+					aspectRatio: undefined,
+					width: undefined,
+					height: undefined,
+					scale: undefined,
+				},
+			} )
+		).toEqual( {
+			aspectRatio: undefined,
+			width: undefined,
+			height: undefined,
+			scale: undefined,
+			style: {
+				dimensions: {
+					aspectRatio: 'auto',
 				},
 			},
 		} );

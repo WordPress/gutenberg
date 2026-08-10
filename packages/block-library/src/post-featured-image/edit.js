@@ -246,10 +246,14 @@ export default function PostFeaturedImageEdit( {
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => {
+					// scopeResetAllFilterToState already passes the selected
+					// viewport style slice and writes the result back to that
+					// state only. Reset the provided style directly; do not
+					// call the state-aware path again or the state key nests.
 					return getDimensionResetAttributes( {
 						attributes: attrs,
-						selectedState: selectedStyleState,
-						hasSelectedStyleState,
+						hasSelectedStyleState: false,
+						persistAspectRatioDefault: hasSelectedStyleState,
 						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
 						defaultAttributes: {
 							aspectRatio: undefined,
