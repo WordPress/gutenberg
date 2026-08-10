@@ -754,6 +754,12 @@ When the new content contains repeated elements, the Interactivity API matches t
 
 Safest is to always add a `data-wp-key` or `id` attribute, but the auto-key mechanism will work in most cases. Testing is recommended if you choose to do that.
 
+#### Known limitations
+
+- **Refreshes remount unkeyed content.** When refreshed content (`inner`/`replace`) has no `data-wp-key`/`id`, it is remounted — `data-wp-init` re-runs and component state is lost. Only content with a stable key is reused across refreshes. The auto-generated key cannot help here: it is created fresh on every parse, so it can never match the previous parse's key. (The same is true of router navigation — navigation relies on unkeyed positional matching, which is why auto-keying is applied only to content inserted by `renderHTML`, never to server-rendered content.)
+- **Duplicate deliveries are not deduplicated.** If the same entity arrives twice (e.g. a push race), a second copy is rendered — even with a matching `data-wp-key`/`id`. The key distinguishes items; it does not merge duplicates.
+- **Duplicate keys in one list do not reconcile.** Two siblings with the same `data-wp-key` (or the same `id`) in the same list cannot be told apart; matching picks one and the other misbehaves. Keys only need to be unique among siblings — the same value in different lists is fine.
+
 ## Values of directives are references to store properties
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
