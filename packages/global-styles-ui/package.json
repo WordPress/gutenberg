@@ -57,6 +57,7 @@
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
