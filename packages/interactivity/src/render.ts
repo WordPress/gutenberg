@@ -47,6 +47,12 @@ const getFragmentRoot = ( fragment: any ): any => fragment?.__k ?? null;
 const islandAttribute = 'data-wp-interactive';
 const islandSelector = `[${ islandAttribute }]`;
 
+// Synthetic-key counter (see spliceIntoTree): monotonically increasing so
+// successive splices never collide; the prefix is reserved so user
+// `data-wp-key` values can never collide with it.
+let syntheticKeyId = 0;
+const syntheticKeyPrefix = 'renderHTML-synthetic-';
+
 /**
  * Returns the OUTERMOST `data-wp-interactive` boundary — the island whose
  * tree owns the element's subtree. Nested islands belong to the outer
@@ -230,6 +236,31 @@ const spliceIntoTree = (
 	newVdoms: ComponentChild[],
 	atIndex?: number
 ): void => {
+	// EXPERIMENTAL — behavior under test. Give every new top-level vnode
+	// without a user `data-wp-key` a unique SYNTHETIC key so it matches no
+	// existing vnode and mounts fresh. Preact's skew then re-aligns the
+	// existing children to their old partners (findMatchingIndex in
+	// diff/children.js), so an index-shifting splice (prepend/before/after/at)
+	// no longer absorbs the new item into the existing item at its index —
+	// which previously swallowed the new item's data-wp-init and re-ran an
+	// existing item's. The key claims DISTINCTNESS ("not one of you"), not
+	// identity: it lives on the vnode, so it survives later splices but not a
+	// re-parse (inner/replace rebuild fresh vnodes — behavior pinned by the
+	// synthetic-key tests; see plan.md §9). Text nodes are plain strings and
+	// are skipped; user keys are never overwritten.
+	for ( const vdom of newVdoms ) {
+		if (
+			vdom &&
+			typeof vdom === 'object' &&
+			// Nullish on purpose: preact vnodes may carry key null (no key)
+			// or undefined.
+			// eslint-disable-next-line eqeqeq
+			( vdom as any ).key == null
+		) {
+			( vdom as any ).key = syntheticKeyPrefix + ( syntheticKeyId += 1 );
+		}
+	}
+
 	const fragment = getRegionRootFragment( [ island ] ) as any;
 	let root = getFragmentRoot( fragment );
 	if ( ! root ) {
