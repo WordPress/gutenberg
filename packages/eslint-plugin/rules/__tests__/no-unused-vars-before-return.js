@@ -50,6 +50,39 @@ function example() {
 		},
 		{
 			code: `
+function example( queue ) {
+	const next = queue.shift();
+	if ( ! queue.length ) {
+		return null;
+	}
+
+	return next;
+}`,
+		},
+		{
+			code: `
+function example( queue ) {
+	const next = queue[ 'shift' ]();
+	if ( ! queue.length ) {
+		return null;
+	}
+
+	return next;
+}`,
+		},
+		{
+			code: `
+function example( items ) {
+	const sorted = items.sort();
+	if ( ! items.length ) {
+		return null;
+	}
+
+	return sorted;
+}`,
+		},
+		{
+			code: `
 function MyComponent() {
 	const Foo = getSomeComponent();
 	return <Foo />;
@@ -121,6 +154,23 @@ function example() {
 	return number + foo + bar;
 }`,
 			options: [ { excludePattern: '^do' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example( items ) {
+	const foo = items.map( doSomeCostlyOperation );
+	if ( ! items.length ) {
+		return null;
+	}
+
+	return foo;
+}`,
 			errors: [
 				{
 					message:
