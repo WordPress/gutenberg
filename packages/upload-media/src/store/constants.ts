@@ -55,13 +55,3 @@ export const HEIC_MIME_TYPES: readonly string[] = [
 	'image/heic',
 	'image/heif',
 ] as const;
-
-/**
- * HEIC/HEIF file extensions.
- *
- * Used as a fallback when the browser can't report a MIME type at all
- * (`file.type === ''`), which happens for HEIC files on platforms that lack
- * the OS-level codec needed to identify the format (e.g. Windows without the
- * HEVC Video Extension).
- */
-export const HEIC_EXTENSIONS: readonly string[] = [ 'heic', 'heif' ] as const;
