@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `Page`: Add a `navigation` prop (`{ items, currentHref }`) for link-based navigation between sections, rendered in the page header.
+-   `Page`: Add a `navigation` prop (`{ items, currentHref }`) for link-based navigation between sections, rendered in the page header ([#79746](https://github.com/WordPress/gutenberg/pull/79746)).
 
 ### Bug Fixes
 
