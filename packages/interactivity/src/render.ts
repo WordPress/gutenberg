@@ -417,6 +417,13 @@ const spliceIntoTree = (
  * through from the spliced tree. Unsupported (warn + no-op): `data-wp-ignore`
  * subtrees, `data-wp-each-child` content, and `<template>` elements.
  *
+ * List identity: `append` is safe without keys; `prepend`/`before`/`after`
+ * shift sibling indices, so unkeyed items lose identity (an existing item
+ * re-initializes and the new one's `data-wp-init` never runs) — key list
+ * items with `data-wp-key`. `inner`/`replace` reuse the old element's
+ * component instance when unkeyed (the new content's `data-wp-init` won't
+ * run) — a new key mounts fresh.
+ *
  * @param container    The element the parsed HTML is inserted into, or a CSS
  *                     selector for it (resolved via `document.querySelector`).
  * @param html         The HTML string.
