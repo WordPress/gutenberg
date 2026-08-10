@@ -19,7 +19,6 @@ const meta: Meta< typeof Page > = {
 				<Story />
 			</div>
 		),
-		withRouter,
 	],
 };
 
@@ -47,6 +46,7 @@ export const WithSubtitle: Story = {
 };
 
 export const WithBreadcrumbs: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		breadcrumbs: (
@@ -73,6 +73,7 @@ export const WithVisual: Story = {
 };
 
 export const WithVisualAndBreadcrumbs: Story = {
+	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
@@ -111,6 +112,7 @@ export const WithImageVisual: Story = {
 };
 
 export const WithBreadcrumbsAndSubtitle: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		subTitle: 'All of the subtitle text you need goes here.',
@@ -146,6 +148,7 @@ export const WithTitleAndBadges: Story = {
 };
 
 export const WithBreadcrumbsAndBadges: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		breadcrumbs: (
@@ -176,24 +179,6 @@ export const WithActions: Story = {
 			</>
 		),
 		showSidebarToggle: false,
-		hasPadding: true,
-		children: <Text>Page content here</Text>,
-	},
-};
-
-export const WithNavigation: Story = {
-	args: {
-		title: 'Analytics',
-		showSidebarToggle: false,
-		navigation: {
-			items: [
-				{ label: 'Overview', href: '/overview' },
-				{ label: 'Products', href: '/products' },
-				{ label: 'Orders', href: '/orders' },
-				{ label: 'Customers', href: '/customers' },
-			],
-			currentHref: '/overview',
-		},
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -253,7 +238,12 @@ export const WithInteractiveNavigation: Story = {
 	},
 };
 
+export const WithNavigation: Story = {
+	...WithInteractiveNavigation,
+};
+
 export const WithNavigationAndActions: Story = {
+	...WithInteractiveNavigation,
 	args: {
 		title: 'Analytics',
 		subTitle: 'Review key metrics to understand performance.',
@@ -267,15 +257,6 @@ export const WithNavigationAndActions: Story = {
 				</Button>
 			</>
 		),
-		navigation: {
-			items: [
-				{ label: 'Overview', href: '/overview' },
-				{ label: 'Products', href: '/products' },
-				{ label: 'Orders', href: '/orders' },
-				{ label: 'Customers', href: '/customers' },
-			],
-			currentHref: '/overview',
-		},
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -283,6 +264,7 @@ export const WithNavigationAndActions: Story = {
 };
 
 export const FullHeader: Story = {
+	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
