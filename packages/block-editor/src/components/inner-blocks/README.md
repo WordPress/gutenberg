@@ -76,6 +76,26 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 
 If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
 
+### `inheritAllowedBlocks`
+
+-   **Type:** `Boolean`
+-   **Default:** `false`
+
+When set to `true`, the `allowedBlocks` restriction is applied recursively to all nested InnerBlocks within child blocks. This ensures that blocks inserted at any nesting level must be in the `allowedBlocks` list.
+
+```jsx
+const ALLOWED_BLOCKS = [ 'core/paragraph', 'core/heading', 'core/group' ];
+...
+<InnerBlocks
+    allowedBlocks={ ALLOWED_BLOCKS }
+    inheritAllowedBlocks
+/>
+```
+
+In the example above, even if `core/group` normally allows any blocks as children, when nested inside this parent block it will only allow `core/paragraph`, `core/heading`, and `core/group`.
+
+**Note:** If a child block explicitly sets its own `allowedBlocks`, it will override the inherited restriction rather than merge with it.
+
 ### `orientation`
 
 -   **Type:** `"horizontal"|"vertical"|undefined`
