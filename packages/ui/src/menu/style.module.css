@@ -143,6 +143,12 @@
 				cursor: var(--wpds-cursor-control);
 			}
 
+			/* Links should always use the pointer cursor. */
+			&[href] {
+				/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
+				cursor: pointer;
+			}
+
 			@supports ( grid-template-columns: subgrid ) {
 				grid-template-columns: subgrid;
 			}
