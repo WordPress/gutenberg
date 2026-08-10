@@ -68,7 +68,7 @@ function CalendarDateTimeControl< Item >( {
 	}, [] );
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
+		( newDate: Date | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Extract the date part in WP timezone from the calendar selection
