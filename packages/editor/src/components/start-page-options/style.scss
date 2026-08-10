@@ -28,6 +28,23 @@ $actions-height: 72px;
 		// bar without causing the wrapper to show a scrollbar.
 		padding-bottom: $actions-height;
 	}
+
+	.block-editor-block-patterns-explorer__sidebar {
+		// Unlike the pattern explorer, this modal has a footer actions bar the
+		// sidebar must not run under.
+		bottom: $actions-height;
+		display: none;
+
+		@include break-medium() {
+			display: block;
+		}
+	}
+}
+
+.editor-start-page-options__modal-content.has-pattern-categories {
+	@include break-medium() {
+		margin-left: $sidebar-width;
+	}
 }
 
 // 2 column masonry layout.
