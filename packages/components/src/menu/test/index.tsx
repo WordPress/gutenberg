@@ -22,6 +22,9 @@ const openMenu = async ( user: ReturnType< typeof userEvent.setup > ) => {
 	await waitForFocusedMenu();
 };
 
+// TODO: Add browser coverage for the computed overflow once component stories
+// use interaction tests. Jest mocks stylesheet imports, so this only verifies
+// the handoff between Ariakit's inline lock and Modal's body class.
 const isBodyScrollLocked = () =>
 	document.body.style.overflow === 'hidden' ||
 	document.body.classList.contains( 'modal-open' );
