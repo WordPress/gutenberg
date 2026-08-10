@@ -1,12 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const fields = [
 	{
@@ -16,6 +14,7 @@ const fields = [
 		description: __(
 			"Displays in your site's layout via the Site Title block."
 		),
+		getValue: ( { item } ) => decodeEntities( item.title ?? '' ),
 	},
 	{
 		id: 'description',
@@ -24,6 +23,7 @@ const fields = [
 		description: __(
 			"In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block."
 		),
+		getValue: ( { item } ) => decodeEntities( item.description ?? '' ),
 	},
 	{
 		id: 'site_logo',

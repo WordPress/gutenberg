@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import {
 	useCallback,
 	useEffect,
@@ -8,14 +6,9 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type {
 	ToolsPanelItem,
 	ToolsPanelMenuItemKey,
@@ -24,8 +17,6 @@ import type {
 	ToolsPanelProps,
 	ResetAllFilter,
 } from '../types';
-
-const DEFAULT_COLUMNS = 2;
 
 type PanelItemsState = {
 	panelItems: ToolsPanelItem[];
@@ -339,17 +330,13 @@ export function useToolsPanel(
 		);
 	}, [ menuItems ] );
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx(
-			styles.getToolsPanelStyles( {
-				columns: DEFAULT_COLUMNS,
-				hasInnerWrapper,
-				areAllOptionalControlsHidden,
-			} ),
-			className
-		);
-	}, [ areAllOptionalControlsHidden, className, cx, hasInnerWrapper ] );
+	const classes = clsx(
+		styles[ 'tools-panel' ],
+		hasInnerWrapper && styles[ 'tools-panel-with-inner-wrapper' ],
+		areAllOptionalControlsHidden &&
+			styles[ 'tools-panel-hidden-inner-wrapper' ],
+		className
+	);
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { RectangleStencil } from '../rectangle-stencil';
 import type { NormalizedRect, Size } from '../../../../core/types';
 import { DEFAULT_KEYBOARD_STEP } from '../../../../core/constants';

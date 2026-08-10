@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	createBlocksFromInnerBlocksTemplate,
@@ -15,10 +12,6 @@ import {
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useResizeObserver } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useScopedBlockVariations } from '../utils';
 import { useBlockPatterns } from './pattern-selection';
 import QueryToolbar from './query-toolbar';

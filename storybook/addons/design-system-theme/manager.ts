@@ -8,8 +8,6 @@ import {
 	TooltipMessage,
 	TooltipLinkList,
 } from 'storybook/internal/components';
-import { storyIdMatchesDesignSystemTheme } from '../../decorators/utils/design-system-theme-story-matchers';
-
 interface ThemeOption {
 	id: string;
 	title: string;
@@ -105,8 +103,7 @@ addons.register( ADDON_ID, () => {
 	addons.add( `${ ADDON_ID }/tool`, {
 		type: types.TOOL,
 		title: 'Design System Theme',
-		match: ( { storyId, viewMode } ) =>
-			storyIdMatchesDesignSystemTheme( storyId ) &&
+		match: ( { viewMode } ) =>
 			( [ 'story', 'docs' ] as any[] ).includes( viewMode ),
 		render: ThemeTool,
 	} );

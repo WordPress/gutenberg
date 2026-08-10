@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';

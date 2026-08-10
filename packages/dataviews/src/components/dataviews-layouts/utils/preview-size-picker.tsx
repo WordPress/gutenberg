@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import type { ViewGrid } from '../../../types';
 

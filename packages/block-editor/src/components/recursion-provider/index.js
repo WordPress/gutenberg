@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditContext } from '../block-edit/context';
 
 const RenderedRefsContext = createContext( {} );

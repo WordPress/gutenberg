@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { dateI18n } from '@wordpress/date';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, _x } from '@wordpress/i18n';
 import { globe, postList, wordpress } from '@wordpress/icons';
 import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './news-list.module.css';
 
 interface NewsPost {

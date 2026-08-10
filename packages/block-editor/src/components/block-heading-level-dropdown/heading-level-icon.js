@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	headingLevel1,
 	headingLevel2,

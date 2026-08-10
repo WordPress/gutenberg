@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import {
 	BaseControl,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 
 const RANGE_CONTROL_CUSTOM_SETTINGS = {

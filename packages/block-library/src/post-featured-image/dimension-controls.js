@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
 import {
 	privateApis as blockEditorPrivateApis,
 	useSettings,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	getActiveDimensionValue,
 	getDimensionUpdateAttributes,

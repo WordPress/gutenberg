@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NavigableContainer from './container';
 import type { NavigableMenuProps } from './types';
 
