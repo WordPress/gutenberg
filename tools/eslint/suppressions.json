@@ -761,11 +761,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/menu/stories/index.story.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/menu/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2

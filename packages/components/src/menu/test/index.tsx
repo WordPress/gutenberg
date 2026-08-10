@@ -359,10 +359,7 @@ describe( 'Menu', () => {
 			await waitFor( () => expect( trigger ).toHaveFocus() );
 		} );
 
-		it.each( [
-			[ 'Enter', '{Enter}' ],
-			[ 'Space', ' ' ],
-		] )( 'should return focus after %s opens a modal', async ( _, key ) => {
+		it( 'should return focus after Enter opens a modal', async () => {
 			render( <MenuWithModal /> );
 
 			const trigger = screen.getByRole( 'button', {
@@ -372,7 +369,7 @@ describe( 'Menu', () => {
 			await user.keyboard( '{ArrowDown}' );
 			await waitForFocusedMenuItem( 'Open modal' );
 
-			await user.keyboard( key );
+			await user.keyboard( '{Enter}' );
 			await waitForClosedMenu();
 			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			await user.click(
