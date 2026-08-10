@@ -511,12 +511,19 @@ export function getPostChangesFromCRDTDoc(
 	}
 
 	// Meta changes must be merged with the edited record since not all meta
-	// properties are synced.
+	// properties are synced. Disallowed keys (e.g. the persisted CRDT
+	// document) are excluded: they are server-managed rather than user
+	// edits, and copying a soon-stale value into the dispatched edits would
+	// keep the record marked dirty long after every real change is saved.
 	if ( 'object' === typeof changes.meta ) {
-		changes.meta = {
-			...editedRecord.meta,
-			...allowedMetaChanges,
-		};
+		changes.meta = Object.fromEntries(
+			Object.entries( {
+				...editedRecord.meta,
+				...allowedMetaChanges,
+			} ).filter(
+				( [ metaKey ] ) => ! disallowedPostMetaKeys.has( metaKey )
+			)
+		);
 	}
 
 	// When remote content changes are detected, recalculate the local user's

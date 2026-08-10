@@ -113,6 +113,149 @@ describe( 'entities', () => {
 		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
 
+	describe( 'edits cleared by received items', () => {
+		const stateWithConfig = entities( undefined, {
+			type: 'ADD_ENTITIES',
+			entities: [
+				{
+					kind: 'postType',
+					name: 'post',
+					mergedEdits: { meta: true },
+				},
+			],
+		} );
+
+		function withMetaEdit( meta ) {
+			return entities( deepFreeze( stateWithConfig ), {
+				type: 'EDIT_ENTITY_RECORD',
+				kind: 'postType',
+				name: 'post',
+				recordId: 1,
+				edits: { meta },
+			} );
+		}
+
+		it( 'removes a merged-edit key when the received record only adds properties absent from the edit', () => {
+			// A received record may carry server-managed meta the client never
+			// edits (e.g. the persisted CRDT document). Those extra properties
+			// must not keep the meta edit marked dirty.
+			const state = withMetaEdit( {
+				edited: 'new value',
+				untouched: 'same',
+			} );
+			const nextState = entities( deepFreeze( state ), {
+				type: 'RECEIVE_ITEMS',
+				kind: 'postType',
+				name: 'post',
+				items: [
+					{
+						id: 1,
+						meta: {
+							edited: 'new value',
+							untouched: 'same',
+							_crdt_document: 'server-managed',
+						},
+					},
+				],
+			} );
+
+			expect(
+				nextState.records.postType.post.edits[ 1 ]
+			).toBeUndefined();
+		} );
+
+		it( 'keeps a merged-edit key whole when any of its properties differs from the received record', () => {
+			const state = withMetaEdit( {
+				edited: 'unsaved value',
+				untouched: 'same',
+			} );
+			const nextState = entities( deepFreeze( state ), {
+				type: 'RECEIVE_ITEMS',
+				kind: 'postType',
+				name: 'post',
+				items: [
+					{
+						id: 1,
+						meta: {
+							edited: 'old value',
+							untouched: 'same',
+							_crdt_document: 'server-managed',
+						},
+					},
+				],
+			} );
+
+			expect( nextState.records.postType.post.edits[ 1 ] ).toEqual( {
+				meta: {
+					edited: 'unsaved value',
+					untouched: 'same',
+				},
+			} );
+		} );
+
+		it( 'removes a merged-edit key when differing properties match the persisted edits', () => {
+			// The server may alter a sent value (e.g. a plugin normalizing
+			// meta in a save hook). If the edit matches what was sent, the
+			// response is authoritative and the edit is no longer dirty.
+			const state = withMetaEdit( {
+				edited: 'Sent Value',
+				untouched: 'same',
+			} );
+			const nextState = entities( deepFreeze( state ), {
+				type: 'RECEIVE_ITEMS',
+				kind: 'postType',
+				name: 'post',
+				items: [
+					{
+						id: 1,
+						meta: {
+							edited: 'normalized-value',
+							untouched: 'same',
+							_crdt_document: 'server-managed',
+						},
+					},
+				],
+				persistedEdits: {
+					meta: {
+						edited: 'Sent Value',
+						untouched: 'same',
+					},
+				},
+			} );
+
+			expect(
+				nextState.records.postType.post.edits[ 1 ]
+			).toBeUndefined();
+		} );
+
+		it( 'removes a non-merged key only when it matches the received record or persisted edits', () => {
+			let state = entities( deepFreeze( stateWithConfig ), {
+				type: 'EDIT_ENTITY_RECORD',
+				kind: 'postType',
+				name: 'post',
+				recordId: 1,
+				edits: { title: 'unsaved title', slug: 'sent-slug' },
+			} );
+			state = entities( deepFreeze( state ), {
+				type: 'RECEIVE_ITEMS',
+				kind: 'postType',
+				name: 'post',
+				items: [
+					{
+						id: 1,
+						title: { raw: 'saved title' },
+						slug: 'normalized-slug',
+					},
+				],
+				persistedEdits: { slug: 'sent-slug' },
+			} );
+
+			expect( state.records.postType.post.edits[ 1 ] ).toEqual( {
+				title: 'unsaved title',
+			} );
+		} );
+	} );
+
 	describe( 'entity revisions', () => {
 		const stateWithConfig = entities( undefined, {
 			type: 'ADD_ENTITIES',

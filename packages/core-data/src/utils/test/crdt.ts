@@ -964,6 +964,35 @@ describe( 'crdt', () => {
 			);
 		} );
 
+		it( 'excludes disallowed meta keys copied from the edited record', () => {
+			const metaMap = createYMap();
+			metaMap.set( 'public_meta', 'new value' );
+			map.set( 'meta', metaMap );
+
+			// The persisted CRDT document is never synced to the CRDT meta
+			// map, but it is present on the edited record. It must not leak
+			// into the dispatched meta edit: the value goes stale as soon as
+			// the next save persists a new document, which would keep the
+			// record marked dirty.
+			const editedRecord = {
+				meta: {
+					public_meta: 'old value',
+					[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
+						'stale persisted doc',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: 'new value', // from CRDT
+			} );
+		} );
+
 		it( 'returns taxonomy rest_base changes when in syncedProperties', () => {
 			map.set( 'categories', [ 1, 2 ] );
 			map.set( 'genre', [ 10, 20 ] );
