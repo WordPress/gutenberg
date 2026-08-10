@@ -126,6 +126,11 @@ if ( typeof window !== 'undefined' ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
 	}
 
+	// jsdom lacks PointerEvent (needed by Base UI keyboard activation ≥1.7).
+	if ( ! global.PointerEvent ) {
+		global.PointerEvent = global.MouseEvent;
+	}
+
 	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
 	if ( ! global.CSS ) {
 		global.CSS = {};
