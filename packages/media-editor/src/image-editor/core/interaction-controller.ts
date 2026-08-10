@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, Size } from './types';
 import {
 	DEFAULT_KEYBOARD_STEP,

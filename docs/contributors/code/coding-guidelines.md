@@ -82,6 +82,8 @@ In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mo
 
 Imports can reference third-party packages, WordPress packages, or local files.
 
+Write imports as one contiguous block. Do not separate dependency types with comments or blank lines.
+
 #### External dependencies
 
 An external dependency is third-party code that is not maintained by WordPress contributors, but instead [included in WordPress as a default script](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress) or referenced from an outside package manager like [npm](https://www.npmjs.com/).

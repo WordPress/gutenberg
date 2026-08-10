@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalTruncate as Truncate,
@@ -12,10 +9,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';

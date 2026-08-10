@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -20,10 +17,6 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 

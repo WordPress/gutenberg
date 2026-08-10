@@ -6,6 +6,10 @@
 
 -   `MediaEdit`: Decode HTML entities when displaying attachment titles. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
 
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
 ## 0.44.0 (2026-07-29)
 
 ## 0.43.0 (2026-07-14)

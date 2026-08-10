@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import PatternExplorerSidebar from './pattern-explorer-sidebar';
 import PatternList from './pattern-list';
 import { usePatternCategories } from '../block-patterns-tab/use-pattern-categories';

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Internal
+
+-   Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`. Adds a `@wordpress/keycodes` dependency ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
 
 ## 1.52.0 (2026-07-29)
 

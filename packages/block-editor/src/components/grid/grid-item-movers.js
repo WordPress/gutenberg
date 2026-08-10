@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -17,10 +10,6 @@ import {
 } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockControls from '../block-controls';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';

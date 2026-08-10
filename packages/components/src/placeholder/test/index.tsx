@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import BasePlaceholder from '../';
 import type { WordPressComponentProps } from '../../context';
 import type { PlaceholderProps } from '../types';

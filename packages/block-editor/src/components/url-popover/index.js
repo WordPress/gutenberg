@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { forwardRef, useState } from '@wordpress/element';
 import {
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
 import { unlock } from '../../lock-unlock';

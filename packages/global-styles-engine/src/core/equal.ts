@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * Internal dependencies
- */
 import type { GlobalStylesConfig } from '../types';
 
 /**

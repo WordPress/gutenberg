@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
-import metadata from './block.json';
-
-/**
- * WordPress dependencies
- */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
+import metadata from './block.json';
 
 const { attributes: blockAttributes } = metadata;
 

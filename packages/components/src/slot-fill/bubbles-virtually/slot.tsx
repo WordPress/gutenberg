@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useRef,
 	useLayoutEffect,
@@ -13,10 +6,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import SlotFillContext from '../context';
 import type { WordPressComponentProps } from '../../context';

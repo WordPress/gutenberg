@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
@@ -26,18 +19,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
-
-/**
- * Internal dependencies
- */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
-
-/**
- * Module constants
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_CUSTOM,
