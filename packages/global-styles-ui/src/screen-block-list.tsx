@@ -3,10 +3,10 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	FlexItem,
 	SearchControl,
-	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,

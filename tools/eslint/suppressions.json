@@ -1650,7 +1650,7 @@
 	},
 	"packages/global-styles-ui/src/screen-block-list.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/screen-block.tsx": {
