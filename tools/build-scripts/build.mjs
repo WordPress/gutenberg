@@ -168,6 +168,11 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
+		console.log( '\n📦 Generating widget metadata strings...' );
+		await exec( 'node', [
+			path.join( __dirname, 'packages/generate-widget-strings.mjs' ),
+		] );
+
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{
