@@ -6,7 +6,6 @@ inputs:
         required: false
     enable-caching:
         description: 'Whether to enable and configure caching for npm.'
-        required: true
         default: 'true'
 
 runs:
