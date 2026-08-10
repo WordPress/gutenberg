@@ -3,8 +3,55 @@ import {
 	updateStylesWithSCS,
 	preloadStyles,
 	applyStyles,
+	initRouterManagedMode,
 	type StyleElement,
 } from '../styles';
+
+/**
+ * Attribute added by the server to the style assets it renders on pages where
+ * client-side navigation is enabled.
+ */
+const ROUTER_MANAGED_ATTRIBUTE = 'data-wp-router-managed';
+
+/**
+ * Adds the router-managed attribute to the passed element, emulating a style
+ * asset rendered by a server that marks them.
+ *
+ * @param element Style or Link element.
+ * @return The same element.
+ */
+const markManaged = < T extends StyleElement >( element: T ): T => {
+	element.setAttribute( ROUTER_MANAGED_ATTRIBUTE, '' );
+	return element;
+};
+
+/**
+ * Marks the passed elements as server-managed by matching them against
+ * equivalent clones, mirroring what happens when a page is prepared.
+ *
+ * @param elements Style or Link elements. They must be in the DOM.
+ */
+const markAsServerManaged = ( elements: StyleElement[] ) => {
+	updateStylesWithSCS(
+		elements,
+		elements.map( ( el ) => el.cloneNode( true ) as StyleElement )
+	);
+};
+
+/**
+ * Creates a Document instance containing copies of the passed style elements,
+ * emulating the HTML fetched for another page.
+ *
+ * @param elements Style or Link elements to copy into the document head.
+ * @return A Document instance.
+ */
+const createFetchedDocument = ( elements: StyleElement[] ): Document => {
+	const doc = document.implementation.createHTMLDocument();
+	elements.forEach( ( el ) =>
+		doc.head.appendChild( doc.importNode( el, true ) )
+	);
+	return doc;
+};
 
 /**
  * Mocks the `sheet` property for the
@@ -67,6 +114,10 @@ describe( 'Router styles management', () => {
 
 	beforeEach( () => {
 		document.head.replaceChildren();
+		// The document is empty at this point, so the router-managed mode is
+		// reset to `false` — i.e., the behavior of servers that don't mark
+		// their style assets.
+		initRouterManagedMode();
 	} );
 
 	afterAll( () => {
@@ -645,6 +696,346 @@ describe( 'Router styles management', () => {
 		} );
 	} );
 
+	// Tests for the `data-wp-router-managed` attribute handling.
+	describe( 'router-managed styles', () => {
+		describe( 'mode detection', () => {
+			it( 'should preserve unmarked elements when the initial document marks its style assets', () => {
+				const server = markManaged( createStyleElement( 'server' ) );
+				const client = createStyleElement( 'client' );
+				document.head.append( server, client );
+
+				// The document contains marked style assets, so the router
+				// enters the managed mode.
+				initRouterManagedMode();
+
+				markAsServerManaged( [ server ] );
+
+				mockSheet( server, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+
+				// Render a page that contains none of these styles.
+				applyStyles( [] );
+
+				// Only the server-rendered element is disabled. The one
+				// injected by a client script is left untouched.
+				expect( server.sheet!.disabled ).toBe( true );
+				expect( client.sheet!.disabled ).toBe( false );
+			} );
+
+			it( 'should disable every element when the initial document does not mark its style assets', () => {
+				const server = createStyleElement( 'server' );
+				const client = createStyleElement( 'client' );
+				document.head.append( server, client );
+
+				// No marked style assets, so the router keeps the previous
+				// behavior.
+				initRouterManagedMode();
+
+				markAsServerManaged( [ server ] );
+
+				mockSheet( server, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+
+				applyStyles( [] );
+
+				// Without markers, the router cannot tell them apart, so
+				// everything not included in the page is disabled.
+				expect( server.sheet!.disabled ).toBe( true );
+				expect( client.sheet!.disabled ).toBe( true );
+			} );
+
+			it( 'should claim marked elements without waiting for the initial page to be prepared', () => {
+				const server = markManaged( createStyleElement( 'server' ) );
+				document.head.appendChild( server );
+
+				// Only the initialization runs. The initial page is prepared
+				// asynchronously, after hydration, so a navigation may apply
+				// styles before that happens — or hydration may never
+				// complete. The element must be managed regardless.
+				initRouterManagedMode();
+
+				mockSheet( server, { disabled: false, mediaText: 'all' } );
+
+				applyStyles( [] );
+
+				expect( server.sheet!.disabled ).toBe( true );
+			} );
+
+			it( 'should ignore marked elements that are not style assets when detecting the mode', () => {
+				// A preload link is not a style asset, so it must not put the
+				// router in managed mode on its own.
+				const preload = document.createElement( 'link' );
+				preload.rel = 'preload';
+				preload.setAttribute( 'as', 'style' );
+				markManaged( preload );
+				const client = createStyleElement( 'client' );
+				document.head.append( preload, client );
+
+				initRouterManagedMode();
+
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+
+				applyStyles( [] );
+
+				// The mode stayed off, so the previous behavior applies and
+				// the unmarked element is disabled.
+				expect( client.sheet!.disabled ).toBe( true );
+			} );
+		} );
+
+		describe( 'server-rendered elements', () => {
+			it( 'should disable and re-enable marked elements across navigations', () => {
+				const styleA = markManaged( createStyleElement( 'styleA' ) );
+				const styleB = markManaged( createStyleElement( 'styleB' ) );
+				document.head.append( styleA, styleB );
+
+				initRouterManagedMode();
+				markAsServerManaged( [ styleA, styleB ] );
+
+				mockSheet( styleA, { disabled: false, mediaText: 'all' } );
+				mockSheet( styleB, { disabled: false, mediaText: 'all' } );
+
+				// Page A.
+				applyStyles( [ styleA ] );
+				expect( styleA.sheet!.disabled ).toBe( false );
+				expect( styleB.sheet!.disabled ).toBe( true );
+
+				// Page B.
+				applyStyles( [ styleB ] );
+				expect( styleA.sheet!.disabled ).toBe( true );
+				expect( styleB.sheet!.disabled ).toBe( false );
+
+				// Back to page A.
+				applyStyles( [ styleA ] );
+				expect( styleA.sheet!.disabled ).toBe( false );
+				expect( styleB.sheet!.disabled ).toBe( true );
+			} );
+
+			it( 'should re-enable elements it disabled itself when their page renders again', () => {
+				const style = markManaged( createStyleElement( 'style' ) );
+				document.head.appendChild( style );
+
+				initRouterManagedMode();
+				markAsServerManaged( [ style ] );
+
+				mockSheet( style, { disabled: false, mediaText: 'all' } );
+
+				// The router disables it because it is not part of the page.
+				applyStyles( [] );
+				expect( style.sheet!.disabled ).toBe( true );
+
+				// It belongs to this page, so the router restores it.
+				applyStyles( [ style ] );
+				expect( style.sheet!.disabled ).toBe( false );
+			} );
+
+			it( 'should not touch marked elements disabled by client scripts', () => {
+				const style = markManaged( createStyleElement( 'variant' ) );
+				document.head.appendChild( style );
+
+				initRouterManagedMode();
+				markAsServerManaged( [ style ] );
+
+				// A client script disabled this server-rendered stylesheet,
+				// e.g., an inactive theme variant.
+				mockSheet( style, { disabled: true, mediaText: 'all' } );
+
+				// The router must not claim it, as it is already disabled.
+				applyStyles( [] );
+				expect( style.sheet!.disabled ).toBe( true );
+
+				// The router did not disable it, so it must not enable it
+				// when the page containing it is rendered again.
+				applyStyles( [ style ] );
+				expect( style.sheet!.disabled ).toBe( true );
+			} );
+		} );
+
+		describe( 'client-injected elements', () => {
+			it( 'should keep enabled client-injected elements enabled across navigations', () => {
+				const server = markManaged( createStyleElement( 'server' ) );
+				document.head.appendChild( server );
+
+				initRouterManagedMode();
+				markAsServerManaged( [ server ] );
+
+				// Injected afterwards by a script unaware of the router.
+				const client = createStyleElement( 'client' );
+				document.head.appendChild( client );
+
+				mockSheet( server, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+
+				applyStyles( [] );
+				applyStyles( [ server ] );
+				applyStyles( [] );
+
+				expect( client.sheet!.disabled ).toBe( false );
+			} );
+
+			it( 'should keep disabled client-injected elements disabled, even when included in the applied styles', () => {
+				const server = markManaged( createStyleElement( 'server' ) );
+				document.head.appendChild( server );
+
+				initRouterManagedMode();
+				markAsServerManaged( [ server ] );
+
+				// A client script injected this element already disabled.
+				const client = createStyleElement( 'client' );
+				document.head.appendChild( client );
+
+				mockSheet( server, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: true, mediaText: 'all' } );
+
+				applyStyles( [] );
+				expect( client.sheet!.disabled ).toBe( true );
+
+				// Even if the element ends up in a list of applied styles,
+				// the router never enables what it did not disable.
+				applyStyles( [ server, client ] );
+				expect( client.sheet!.disabled ).toBe( true );
+			} );
+		} );
+
+		describe( 'ownership stickiness', () => {
+			it( 'should keep elements prepared outside the document as server-managed', () => {
+				const marker = markManaged( createStyleElement( 'marker' ) );
+				document.head.appendChild( marker );
+				initRouterManagedMode();
+
+				// This element comes from a fetched document, so it lacks the
+				// marker attribute but is server-rendered by definition.
+				const fetched = createStyleElement( 'fetched' );
+				expect( document.contains( fetched ) ).toBe( false );
+
+				updateStylesWithSCS( [], [ fetched ], document.head );
+				expect( document.contains( fetched ) ).toBe( true );
+
+				// A later navigation prepares it again, this time while it is
+				// already in the document and still without the attribute.
+				markAsServerManaged( [ fetched ] );
+
+				mockSheet( fetched, { disabled: false, mediaText: 'all' } );
+
+				applyStyles( [] );
+
+				// Ownership is sticky, so the router still manages it.
+				expect( fetched.sheet!.disabled ).toBe( true );
+			} );
+		} );
+
+		describe( 'mixed navigations', () => {
+			it( 'should keep the managed mode when navigating to an unmarked page', () => {
+				const theme = markManaged( createLinkElement( 'theme' ) );
+				const blocks = markManaged( createStyleElement( 'blocks' ) );
+				const client = createStyleElement( 'client' );
+				document.head.append( theme, blocks, client );
+
+				initRouterManagedMode();
+
+				// Prepare the initial page, like `preparePage()` does.
+				preloadStyles( document );
+
+				// The fetched page is rendered by a server that does not mark
+				// its style assets. Its theme stylesheet is identical to the
+				// one already in the document except for the attribute.
+				const fetchedDoc = createFetchedDocument( [
+					createLinkElement( 'theme' ),
+					createStyleElement( 'extra' ),
+				] );
+				const [ fetchedTheme, fetchedExtra ] = Array.from(
+					fetchedDoc.head.children
+				) as StyleElement[];
+
+				preloadStyles( fetchedDoc );
+
+				// The unmarked theme stylesheet matched the marked one, so no
+				// duplicate was inserted.
+				expect( document.querySelectorAll( '#theme' ) ).toHaveLength(
+					1
+				);
+				expect( document.querySelector( '#theme' ) ).toBe( theme );
+				expect( document.contains( fetchedTheme ) ).toBe( false );
+				expect( document.contains( fetchedExtra ) ).toBe( true );
+
+				mockSheet( theme, { disabled: false, mediaText: 'all' } );
+				mockSheet( blocks, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+				mockSheet( fetchedExtra, {
+					disabled: false,
+					mediaText: 'preload',
+				} );
+
+				// Render the fetched page.
+				applyStyles( [ theme, fetchedExtra ] );
+
+				expect( theme.sheet!.disabled ).toBe( false );
+				expect( blocks.sheet!.disabled ).toBe( true );
+				expect( fetchedExtra.sheet!.disabled ).toBe( false );
+				expect( fetchedExtra.sheet!.media.mediaText ).toBe( 'all' );
+				// The client-injected element is never touched.
+				expect( client.sheet!.disabled ).toBe( false );
+
+				// Navigate back to the initial page. The element coming from
+				// the unmarked page is server-managed, so it is disabled, and
+				// the marked one the router disabled is restored.
+				applyStyles( [ theme, blocks ] );
+
+				expect( blocks.sheet!.disabled ).toBe( false );
+				expect( fetchedExtra.sheet!.disabled ).toBe( true );
+				expect( client.sheet!.disabled ).toBe( false );
+			} );
+
+			it( 'should keep the previous behavior when navigating to a marked page', () => {
+				const theme = createLinkElement( 'theme' );
+				const client = createStyleElement( 'client' );
+				document.head.append( theme, client );
+
+				// The initial page has no marked style assets, so the router
+				// never enters the managed mode.
+				initRouterManagedMode();
+
+				preloadStyles( document );
+
+				// The fetched page is rendered by a server that marks its
+				// style assets.
+				const fetchedDoc = createFetchedDocument( [
+					markManaged( createLinkElement( 'theme' ) ),
+					markManaged( createStyleElement( 'extra' ) ),
+				] );
+				const [ fetchedTheme, fetchedExtra ] = Array.from(
+					fetchedDoc.head.children
+				) as StyleElement[];
+
+				preloadStyles( fetchedDoc );
+
+				// The attribute is ignored when comparing elements, so the
+				// existing theme stylesheet is reused.
+				expect( document.querySelectorAll( '#theme' ) ).toHaveLength(
+					1
+				);
+				expect( document.querySelector( '#theme' ) ).toBe( theme );
+				expect( document.contains( fetchedTheme ) ).toBe( false );
+				expect( document.contains( fetchedExtra ) ).toBe( true );
+
+				mockSheet( theme, { disabled: false, mediaText: 'all' } );
+				mockSheet( client, { disabled: false, mediaText: 'all' } );
+				mockSheet( fetchedExtra, {
+					disabled: false,
+					mediaText: 'preload',
+				} );
+
+				applyStyles( [ theme, fetchedExtra ] );
+
+				expect( theme.sheet!.disabled ).toBe( false );
+				expect( fetchedExtra.sheet!.disabled ).toBe( false );
+				// Like in previous versions, elements not included in the
+				// page are disabled.
+				expect( client.sheet!.disabled ).toBe( true );
+			} );
+		} );
+	} );
+
 	describe( 'normalizeMedia', () => {
 		let linkElement: HTMLLinkElement;
 		let styleElement: HTMLStyleElement;
@@ -721,6 +1112,25 @@ describe( 'Router styles management', () => {
 			expect( result ).toHaveAttribute( 'media', 'all' );
 			expect( result ).toHaveAttribute( 'data-test', 'value' );
 			expect( result ).toHaveAttribute( 'integrity', 'hash123' );
+		} );
+
+		it( 'should remove the router-managed attribute from the clone', () => {
+			linkElement.setAttribute( ROUTER_MANAGED_ATTRIBUTE, '' );
+
+			const result = normalizeMedia( linkElement );
+
+			// The clone is normalized, but the original element keeps the
+			// attribute so the router can still classify it.
+			expect( result ).not.toHaveAttribute( ROUTER_MANAGED_ATTRIBUTE );
+			expect( linkElement ).toHaveAttribute( ROUTER_MANAGED_ATTRIBUTE );
+
+			// A marked element and an otherwise identical unmarked one are
+			// considered equal.
+			const unmarked = normalizeMedia(
+				linkElement.cloneNode( true ) as HTMLLinkElement
+			);
+			unmarked.removeAttribute( ROUTER_MANAGED_ATTRIBUTE );
+			expect( result.isEqualNode( unmarked ) ).toBe( true );
 		} );
 
 		it( 'should output the same for equivalent link elements', () => {

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Preserve style assets injected by client scripts during client-side navigation on pages marked with the `data-wp-router-managed` attribute. ([#76031](https://github.com/WordPress/gutenberg/discussions/76031))
 
 ## 2.52.0 (2026-07-29)
 

@@ -1,0 +1,8 @@
+/*
+ * This style sheet is never enqueued by the server. It is only meant to be
+ * injected by the client during the tests, to simulate a script that adds
+ * style assets the router doesn't know about.
+ */
+.injected-from-link-target {
+	color: rgb(0, 100, 200);
+}

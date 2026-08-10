@@ -1,5 +1,10 @@
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
+import {
+	preloadStyles,
+	applyStyles,
+	initRouterManagedMode,
+	type StyleElement,
+} from './assets/styles';
 import {
 	preloadScriptModules,
 	importScriptModules,
@@ -349,6 +354,17 @@ document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		initialRegionsToAttach.add( id );
 	}
 } );
+
+// Detect whether the server marks its style assets with the
+// `data-wp-router-managed` attribute, and claim the marked ones. This runs
+// during module evaluation, which is synchronous, so no navigation, prefetch
+// or popstate can interleave before it. Claiming the marked elements here
+// rather than when the initial page is prepared matters because that
+// preparation awaits hydration: a navigation can apply styles before it
+// completes, or hydration may never complete at all. Elements injected by
+// client scripts afterwards are still classified correctly, as the
+// classification is done per element and they lack the attribute.
+initRouterManagedMode();
 
 // Initialize the router and cache the initial page using the initial vDOM.
 window.document
