@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useCallback, useState } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
 import { Badge, Button, Text } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
@@ -193,6 +194,60 @@ export const WithNavigation: Story = {
 			],
 			currentHref: '/overview',
 		},
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+/**
+ * Demonstrates `navigation.components.link`: a custom link that intercepts
+ * navigation and drives `currentHref` from local state, keeping the links
+ * usable without a real router.
+ */
+export const WithInteractiveNavigation: Story = {
+	render: function Render( args ) {
+		const [ currentHref, setCurrentHref ] = useState( '/overview' );
+		const link = useCallback(
+			( {
+				href,
+				children,
+				...props
+			}: React.AnchorHTMLAttributes< HTMLAnchorElement > ) => (
+				<a
+					{ ...props }
+					href={ href }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						if ( href ) {
+							setCurrentHref( href );
+						}
+					} }
+				>
+					{ children }
+				</a>
+			),
+			[]
+		);
+
+		return (
+			<Page
+				{ ...args }
+				navigation={ {
+					items: [
+						{ label: 'Overview', href: '/overview' },
+						{ label: 'Products', href: '/products' },
+						{ label: 'Orders', href: '/orders' },
+						{ label: 'Customers', href: '/customers' },
+					],
+					currentHref,
+					components: { link },
+				} }
+			/>
+		);
+	},
+	args: {
+		title: 'Analytics',
+		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},

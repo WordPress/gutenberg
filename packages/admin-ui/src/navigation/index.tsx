@@ -14,10 +14,13 @@ export const Navigation = ( {
 	items,
 	currentHref,
 	ariaLabel = __( 'Sections' ),
+	components,
 }: NavigationProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
+
+	const LinkComponent = components?.link;
 
 	if ( process.env.NODE_ENV !== 'production' ) {
 		const invalidItem = items.find(
@@ -68,6 +71,11 @@ export const Navigation = ( {
 										item.href === currentHref
 											? 'page'
 											: undefined
+									}
+									render={
+										LinkComponent ? (
+											<LinkComponent />
+										) : undefined
 									}
 								/>
 							}

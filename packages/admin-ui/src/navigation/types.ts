@@ -1,3 +1,5 @@
+import { type AnchorHTMLAttributes, type ComponentType } from 'react';
+
 export interface NavigationItem {
 	/**
 	 * The label text for the navigation item.
@@ -8,6 +10,18 @@ export interface NavigationItem {
 	 * The URL the item links to.
 	 */
 	href: string;
+}
+
+export interface NavigationComponents {
+	/**
+	 * Component rendered in place of the default `<a>` for each item, e.g. a
+	 * client-side router link. It receives standard anchor attributes
+	 * (`href`, `aria-current`, `className`, `children`) and must forward
+	 * them to the element it renders.
+	 *
+	 * @default 'a'
+	 */
+	link?: ComponentType< AnchorHTMLAttributes< HTMLAnchorElement > >;
 }
 
 export interface NavigationProps {
@@ -30,4 +44,9 @@ export interface NavigationProps {
 	 * @default 'Sections'
 	 */
 	ariaLabel?: string;
+
+	/**
+	 * Overrides for the elements the navigation renders.
+	 */
+	components?: NavigationComponents;
 }

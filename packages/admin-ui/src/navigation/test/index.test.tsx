@@ -121,4 +121,36 @@ describe( 'Navigation', () => {
 			).not.toHaveAttribute( 'aria-current' );
 		} );
 	} );
+
+	describe( 'components', () => {
+		it( 'should render items with the provided link component', () => {
+			const CustomLink = ( {
+				children,
+				...props
+			}: React.AnchorHTMLAttributes< HTMLAnchorElement > ) => (
+				<a data-custom="true" { ...props }>
+					{ children }
+				</a>
+			);
+
+			render(
+				<Navigation
+					items={ [
+						{ label: 'Overview', href: '/overview' },
+						{ label: 'Products', href: '/products' },
+					] }
+					currentHref="/overview"
+					components={ { link: CustomLink } }
+				/>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'Overview' } );
+			expect( link ).toHaveAttribute( 'data-custom', 'true' );
+			expect( link ).toHaveAttribute( 'href', '/overview' );
+			expect( link ).toHaveAttribute( 'aria-current', 'page' );
+			expect(
+				screen.getByRole( 'link', { name: 'Products' } )
+			).toHaveAttribute( 'data-custom', 'true' );
+		} );
+	} );
 } );
