@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   The actions "More" menu renders each action's resolved icon as the menu
+    item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+
 ### Enhancements
 
 -   Widget chrome and picker preview chrome: preserve their flex-column layout

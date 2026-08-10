@@ -116,6 +116,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/interactivity-router": "file:../interactivity-router",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",

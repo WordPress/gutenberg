@@ -2622,6 +2622,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keyboard-shortcuts",
 		"slug": "packages-keyboard-shortcuts",
 		"markdown_source": "../packages/keyboard-shortcuts/README.md",

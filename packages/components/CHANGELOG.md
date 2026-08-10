@@ -35,6 +35,8 @@
 ### Internal
 
 -   Move `withIgnoreIMEEvents` to `@wordpress/keycodes`, where it is now a public API, and remove it from this package's private APIs ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+-   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package and remove it from the private APIs; all consumers now use the package directly ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Remove `normalizeTextString` from the private APIs; the utility remains internal to this package ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 -   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).

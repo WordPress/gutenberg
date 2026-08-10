@@ -121,11 +121,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-content-types',
-					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),

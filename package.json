@@ -37,10 +37,6 @@
 			"font-library",
 			"options-connectors",
 			{
-				"id": "content-types",
-				"experimental": true
-			},
-			{
 				"id": "dashboard",
 				"init": [
 					"@wordpress/dashboard-init"

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Embed: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
 ### Enhancements
 
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))

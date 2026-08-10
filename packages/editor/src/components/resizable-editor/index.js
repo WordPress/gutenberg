@@ -1,7 +1,11 @@
 import clsx from 'clsx';
 import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
-import { ResizableBox } from '@wordpress/components';
+import {
+	ResizableBox,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -36,11 +40,10 @@ function ResizableEditor( {
 	enableResizing,
 	width = '100%',
 	height = '100%',
-	onResizeStart,
-	onResizeStop,
 	children,
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
+	const disableMotion = useReducedMotion();
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
 
 	const resizableRef = useRef();
@@ -63,11 +66,11 @@ function ResizableEditor( {
 	);
 
 	const updateCanvasWidth = useCallback(
-		( element ) => {
+		( element, isResizeEnd ) => {
 			const currentWidth = element.offsetWidth;
 			const containerWidth = element.parentElement?.offsetWidth ?? 0;
 			setCanvasWidth(
-				isAtMaxWidth( currentWidth, containerWidth, 80 )
+				isResizeEnd && isAtMaxWidth( currentWidth, containerWidth, 80 )
 					? undefined
 					: currentWidth
 			);
@@ -77,6 +80,14 @@ function ResizableEditor( {
 
 	return (
 		<ResizableBox
+			as={ motion.div }
+			initial={ false }
+			animate={ { height } }
+			transition={ {
+				type: 'tween',
+				duration: isResizing || disableMotion ? 0 : 0.2,
+				ease: 'easeOut',
+			} }
 			className={ clsx( 'editor-resizable-editor', className, {
 				'is-resizable': enableResizing,
 				'is-resizing': isResizing,
@@ -90,15 +101,13 @@ function ResizableEditor( {
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
-				onResizeStart?.();
 			} }
 			onResize={ ( event, direction, element ) => {
 				updateCanvasWidth( element );
 			} }
 			onResizeStop={ ( event, direction, element ) => {
-				updateCanvasWidth( element );
+				updateCanvasWidth( element, true );
 				setIsResizing( false );
-				onResizeStop?.();
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"
