@@ -1105,4 +1105,105 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		] );
 		expect( state.initCounts ).toEqual( { a: 1, b: 1, x: 2 } );
 	} );
+
+	it( 'mixed tags (data-wp-key, id, synthetic) coexist in one list with identity preserved', async () => {
+		await setup(
+			`${ item( 'a', 'a', 'a' ) }` + // data-wp-key → key 'a'
+				`${ idItem( 'b', 'b' ) }` + // id → but SSR'd: no key in tree
+				`${ unkeyedItem( 'c', 'c' ) }` // neither → no key in tree
+		);
+		await flush();
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+		const cEl = feed.children[ 2 ];
+
+		// Prepend one item of each tag type (data-wp-key / id /
+		// neither → synthetic). The mixed key types must not collide
+		// or absorb each other: preact 10.29 matches key-to-key
+		// (null==null for unkeyed), so distinct tags coexist.
+		renderHTML( feed, unkeyedItem( 'd', 'd' ), { mode: 'prepend' } );
+		renderHTML( feed, idItem( 'e', 'e' ), { mode: 'prepend' } );
+		renderHTML( feed, item( 'f', 'f', 'f' ), { mode: 'prepend' } );
+		await flush();
+
+		expect( [ ...feed.children ].map( ( c ) => c.textContent ) ).toEqual( [
+			'f',
+			'e',
+			'd',
+			'a',
+			'b',
+			'c',
+		] );
+		expect( feed.children[ 3 ] ).toBe( aEl );
+		expect( feed.children[ 4 ] ).toBe( bEl );
+		expect( feed.children[ 5 ] ).toBe( cEl );
+		expect( state.initCounts ).toEqual( {
+			a: 1,
+			b: 1,
+			c: 1,
+			d: 1,
+			e: 1,
+			f: 1,
+		} );
+	} );
+
+	it( 'mixed-tag refresh: data-wp-key and spliced-id items reuse; SSR-id and synthetic items do not', async () => {
+		await setup(
+			`${ item( 'a', 'a', 'a' ) }` + // data-wp-key → key 'a' in tree
+				`${ idItem( 'b', 'b' ) }` // SSR'd id → NO key in tree (ids are only read at splice time)
+		);
+		await flush();
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+		const bEl = feed.children[ 1 ];
+
+		// Splice in one id-keyed item (gets key 'e') and one
+		// id-less item (gets a synthetic key).
+		renderHTML( feed, idItem( 'e', 'e' ), { mode: 'prepend' } );
+		renderHTML( feed, unkeyedItem( 'd', 'd' ), { mode: 'prepend' } );
+		await flush();
+		const eEl = feed.children[ 1 ];
+
+		// Server re-fetch of the same four entities, same order.
+		// Refresh via inner.
+		renderHTML(
+			feed,
+			`${ unkeyedItem( 'd', 'd' ) }${ idItem( 'e', 'e' ) }${ item(
+				'a',
+				'a',
+				'a'
+			) }${ idItem( 'b', 'b' ) }`,
+			{ mode: 'inner' }
+		);
+		await flush();
+
+		// Order/content is correct — but look at the elements:
+		// - e' (id 'e') matches the spliced e (key 'e' in tree):
+		//   element reused, init NOT re-run. ✓
+		// - a' (data-wp-key 'a') matches the SSR'd a (key 'a' in
+		//   tree): element reused, init NOT re-run. ✓
+		// - b' (SSR'd id) has key 'b', but the old b has NO key in
+		//   the tree (SSR ids aren't read at hydration) → no match:
+		//   b' mounts fresh, init re-runs (b: 2). ✗
+		// - d' (id-less) can't match the synthetic-keyed old d, so
+		//   the positional scan absorbs d' into the OLD b element
+		//   (the first unkeyed hole): identity misattributed, d's
+		//   init swallowed. The old d is unmounted. ✗
+		expect( [ ...feed.children ].map( ( c ) => c.textContent ) ).toEqual( [
+			'd',
+			'e',
+			'a',
+			'b',
+		] );
+		expect( feed.children[ 0 ] ).toBe( bEl ); // d' absorbed b's element
+		expect( feed.children[ 1 ] ).toBe( eEl ); // e' reused e's element
+		expect( feed.children[ 2 ] ).toBe( aEl ); // a' reused a's element
+		expect( state.initCounts ).toEqual( {
+			a: 1,
+			b: 2,
+			d: 1,
+			e: 1,
+		} );
+	} );
 } );

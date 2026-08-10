@@ -720,12 +720,12 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 
 ## `renderHTML()`
 
-The `renderHTML()` function renders an HTML string into the live DOM, processing all Interactivity API directives on it. It is commonly used to add server-rendered content dynamically — for example, a new post fetched from a REST endpoint and prepended to a feed, or a filtered list re-rendered in place.
+The `renderHTML()` function renders an HTML string into the live DOM, processing all Interactivity API directives on it. It is commonly used to add server-rendered content dynamically — for example, prepend a new post to a feed, load more posts appeneded to the bottom, or a filtered list re-rendered in place.
 
 ```js
 import { renderHTML } from '@wordpress/interactivity';
 
-const res = await fetch( '/wp-json/my-plugin/v1/cards' );
+const res = await fetch( '/wp-json/my-plugin/v1/posts' );
 renderHTML( '#feed', await res.text() );
 ```
 
@@ -744,13 +744,15 @@ The `mode` option controls where the parsed HTML is inserted:
 
 ### List identity
 
-When the new content contains repeated elements (list items), the Interactivity API matches them against the existing elements by key, so it can decide whether an item is new, reused, or removed:
+When the new content contains repeated elements, the Interactivity API matches them against the existing elements by key, so it can decide whether an item is new, reused, or removed:
 
-1. A `data-wp-key` attribute wins.
+1. An explicit `data-wp-key` attribute wins.
 2. Otherwise, the element's `id` attribute is used as the key.
-3. For insertion modes (`prepend`, `before`, `after`), items with neither get an auto-generated key, so inserting new content never disrupts existing items — they keep their state and their `data-wp-init` callbacks don't re-run.
+3. For insertion modes (`prepend`, `before`, `after`), items with neither `data-wp-key` or `id` will get an auto-generated key, so inserting new content never disrupts existing items — they keep their state and their `data-wp-init` callbacks don't re-run.
 
 `append` is safe without any keys. `inner` and `replace` reuse existing elements by position, so same-shape content keeps its state across refreshes; give items a `data-wp-key` (or `id`) when you need identity across refreshes, reorders, or duplicate deliveries.
+
+Safest is to always add a `data-wp-key` or `id` attribute, but the auto-key mechanism will work in most cases. Testing is recommended if you choose to do that.
 
 ## Values of directives are references to store properties
 
