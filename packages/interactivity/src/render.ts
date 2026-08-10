@@ -236,28 +236,43 @@ const spliceIntoTree = (
 	newVdoms: ComponentChild[],
 	atIndex?: number
 ): void => {
-	// EXPERIMENTAL — behavior under test. Give every new top-level vnode
-	// without a user `data-wp-key` a unique SYNTHETIC key so it matches no
-	// existing vnode and mounts fresh. Preact's skew then re-aligns the
-	// existing children to their old partners (findMatchingIndex in
-	// diff/children.js), so an index-shifting splice (prepend/before/after/at)
-	// no longer absorbs the new item into the existing item at its index —
-	// which previously swallowed the new item's data-wp-init and re-ran an
-	// existing item's. The key claims DISTINCTNESS ("not one of you"), not
-	// identity: it lives on the vnode, so it survives later splices but not a
-	// re-parse (inner/replace rebuild fresh vnodes — behavior pinned by the
-	// synthetic-key tests; see plan.md §9). Text nodes are plain strings and
-	// are skipped; user keys are never overwritten.
+	// Key the new top-level vnodes so preact can tell them apart from the
+	// existing children. Priority: a user `data-wp-key` (already on
+	// `vnode.key` — never overwritten), then the element's `id` (a stable,
+	// server-visible name: refreshed HTML carrying the same id matches the
+	// existing item — identity across refreshes, reorders, and duplicate
+	// deliveries), then — for INSERTION modes only (prepend/before/after/at)
+	// — a unique SYNTHETIC key so the new item mounts fresh instead of being
+	// absorbed into the existing item at its index (which would swallow the
+	// new item's data-wp-init and re-run an existing item's). `inner`/`replace`
+	// get NO synthetic key: they are wholesale swaps where positional reuse
+	// is the desired default — same-shape content keeps its element and
+	// state, and id-bearing content matches by id. Text nodes are plain
+	// strings and are skipped.
+	const indexShifting =
+		mode === 'prepend' ||
+		mode === 'before' ||
+		mode === 'after' ||
+		mode === 'at';
 	for ( const vdom of newVdoms ) {
-		if (
-			vdom &&
-			typeof vdom === 'object' &&
-			// Nullish on purpose: preact vnodes may carry key null (no key)
-			// or undefined.
-			// eslint-disable-next-line eqeqeq
-			( vdom as any ).key == null
-		) {
-			( vdom as any ).key = syntheticKeyPrefix + ( syntheticKeyId += 1 );
+		if ( ! vdom || typeof vdom !== 'object' ) {
+			continue;
+		}
+		const vnode = vdom as any;
+		// Nullish on purpose: preact vnodes may carry key null (no
+		// key) or undefined.
+		// eslint-disable-next-line eqeqeq
+		if ( vnode.key != null ) {
+			continue;
+		}
+		// Directive-wrapped vnodes keep their real props in `originalProps`.
+		const id = vnode.props?.originalProps?.id ?? vnode.props?.id;
+		if ( typeof id === 'string' && id !== '' ) {
+			vnode.key = id;
+			continue;
+		}
+		if ( indexShifting ) {
+			vnode.key = syntheticKeyPrefix + ( syntheticKeyId += 1 );
 		}
 	}
 
@@ -448,12 +463,13 @@ const spliceIntoTree = (
  * through from the spliced tree. Unsupported (warn + no-op): `data-wp-ignore`
  * subtrees, `data-wp-each-child` content, and `<template>` elements.
  *
- * List identity: `append` is safe without keys; `prepend`/`before`/`after`
- * shift sibling indices, so unkeyed items lose identity (an existing item
- * re-initializes and the new one's `data-wp-init` never runs) — key list
- * items with `data-wp-key`. `inner`/`replace` reuse the old element's
- * component instance when unkeyed (the new content's `data-wp-init` won't
- * run) — a new key mounts fresh.
+ * List identity: items are matched by key — a user `data-wp-key` wins, then
+ * the element's `id`, and (for `prepend`/`before`/`after` only) an
+ * auto-generated key as a last resort, so inserting new content never
+ * disrupts existing items. `append` is safe with no keys at all.
+ * `inner`/`replace` reuse existing elements by position, so same-shape
+ * content keeps its state; give items `data-wp-key` (or rely on `id`) when
+ * you need identity across refreshes, reorders, or duplicate deliveries.
  *
  * @param container    The element the parsed HTML is inserted into, or a CSS
  *                     selector for it (resolved via `document.querySelector`).
