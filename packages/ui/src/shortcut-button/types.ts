@@ -5,8 +5,8 @@ import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 export interface ShortcutButtonProps
 	extends Omit< ButtonProps, 'aria-keyshortcuts' > {
 	/**
-	 * The keyboard shortcut associated with this button. The shortcut is
-	 * displayed in the tooltip and announced to assistive technology.
+	 * The keyboard shortcut associated with this button. Its display value is
+	 * shown in the tooltip, and its label is used in an accessible description.
 	 *
 	 * This prop is for display and accessibility purposes only. The consumer is
 	 * responsible for registering the keyboard shortcut and keeping its handler

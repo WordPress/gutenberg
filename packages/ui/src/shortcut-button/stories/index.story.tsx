@@ -10,7 +10,7 @@ import * as Tooltip from '../../tooltip';
 const EXAMPLE_SHORTCUT = {
 	displayShortcut: displayShortcut.primary( 's' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
-	description: shortcutAriaLabel.primary( 's' ),
+	label: shortcutAriaLabel.primary( 's' ),
 };
 
 const meta: Meta< typeof ShortcutButton > = {

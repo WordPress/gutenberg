@@ -29,7 +29,7 @@ Use `Button`, `ShortcutButton`, or `IconButton` when activation should **not** n
 
 Use [IconButton](?path=/docs/design-system-components-iconbutton--docs) for the same kinds of actions when the control is **icon-only** — for example, toolbar buttons. It inherits `Button` props and adds a built-in tooltip via the required `label` prop (used as the accessible name).
 
-Use [ShortcutButton](?path=/docs/design-system-components-shortcutbutton--docs) when a text-label action has an associated keyboard shortcut. It inherits `Button` props, displays the shortcut in a tooltip, and exposes its human-readable description to assistive technology. It does not register or handle the shortcut; keep the external shortcut handler synchronized with the button's disabled state.
+Use [ShortcutButton](?path=/docs/design-system-components-shortcutbutton--docs) when a text-label action has an associated keyboard shortcut. It inherits `Button` props, displays the shortcut in a tooltip, and uses the shortcut label in an accessible description. It does not register or handle the shortcut; keep the external shortcut handler synchronized with the button's disabled state.
 
 `Button`, `ShortcutButton`, and `IconButton` use button semantics. Do not use them as stand-ins for navigation when a real URL is the primary outcome.
 

@@ -4,13 +4,13 @@ import * as Tooltip from '../tooltip';
 import {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
-	useKeyboardShortcut,
+	useKeyboardShortcutProps,
 } from '../utils/keyboard-shortcut';
 import type { ShortcutButtonProps } from './types';
 
 /**
- * A button that displays its keyboard shortcut in a tooltip and exposes a
- * human-readable shortcut description to assistive technology.
+ * A button that displays its keyboard shortcut in a tooltip and uses its
+ * shortcut label in an accessible description.
  *
  * This component does not register or handle the keyboard shortcut. Consumers
  * are responsible for implementing the shortcut and keeping its handler
@@ -39,7 +39,7 @@ export const ShortcutButton = forwardRef<
 	},
 	ref
 ) {
-	const { descriptionId, shortcutAriaProps } = useKeyboardShortcut( {
+	const { descriptionId, targetProps } = useKeyboardShortcutProps( {
 		'aria-describedby': ariaDescribedBy,
 		shortcut,
 	} );
@@ -49,7 +49,7 @@ export const ShortcutButton = forwardRef<
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				ref={ ref }
-				{ ...shortcutAriaProps }
+				{ ...targetProps }
 				disabled={ isDisabled && ! focusableWhenDisabled }
 				render={
 					<Button
@@ -69,8 +69,7 @@ export const ShortcutButton = forwardRef<
 				) }
 			</Tooltip.Trigger>
 			<Tooltip.Popup positioner={ positioner }>
-				{ children }
-				<KeyboardShortcutDisplay shortcut={ shortcut } />
+				{ children } <KeyboardShortcutDisplay shortcut={ shortcut } />
 			</Tooltip.Popup>
 		</Tooltip.Root>
 	);

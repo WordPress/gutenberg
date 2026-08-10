@@ -8,7 +8,7 @@ import * as Tooltip from '../../tooltip';
 const SHORTCUT = {
 	displayShortcut: '⌘S',
 	ariaKeyShortcut: 'Meta+S',
-	description: 'Command S',
+	label: 'Command S',
 };
 
 function TestProvider( { children }: { children: ReactNode } ) {
@@ -35,7 +35,7 @@ describe( 'ShortcutButton', () => {
 		expect( ref.current ).toHaveAttribute( 'aria-pressed', 'true' );
 	} );
 
-	it( 'uses shortcut metadata and preserves an existing accessible description', () => {
+	it( 'uses the shortcut label and preserves an existing accessible description', () => {
 		const externalDescriptionId = 'external-description';
 
 		render(
@@ -84,11 +84,11 @@ describe( 'ShortcutButton', () => {
 		await waitFor( () => {
 			expect( screen.getByText( '⌘S' ) ).toBeVisible();
 		} );
-		expect( screen.getByText( '⌘S' ) ).toHaveAttribute(
-			'aria-hidden',
-			'true'
-		);
-		expect( screen.getByText( '⌘S' ) ).toHaveAttribute( 'dir', 'ltr' );
+		const shortcutDisplay = screen.getByText( '⌘S' );
+		const tooltipContent = screen.getAllByText( 'Save' )[ 1 ];
+		expect( tooltipContent ).toHaveTextContent( 'Save ⌘S' );
+		expect( shortcutDisplay ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( shortcutDisplay ).toHaveAttribute( 'dir', 'ltr' );
 	} );
 
 	it( 'shows the tooltip when focusable while disabled', async () => {
@@ -113,6 +113,27 @@ describe( 'ShortcutButton', () => {
 		} );
 	} );
 
+	it( 'shows the tooltip when focusable while loading', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<TestProvider>
+				<ShortcutButton loading shortcut={ SHORTCUT }>
+					Save
+				</ShortcutButton>
+			</TestProvider>
+		);
+
+		const button = screen.getByRole( 'button', { name: 'Save' } );
+		expect( button ).toBeEnabled();
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.hover( button );
+		await waitFor( () => {
+			expect( screen.getByText( '⌘S' ) ).toBeVisible();
+		} );
+	} );
+
 	it( 'does not show the tooltip when truly disabled', async () => {
 		const user = userEvent.setup();
 
@@ -120,6 +141,28 @@ describe( 'ShortcutButton', () => {
 			<TestProvider>
 				<ShortcutButton
 					disabled
+					focusableWhenDisabled={ false }
+					shortcut={ SHORTCUT }
+				>
+					Save
+				</ShortcutButton>
+			</TestProvider>
+		);
+
+		const button = screen.getByRole( 'button', { name: 'Save' } );
+		expect( button ).toBeDisabled();
+		await user.hover( button );
+
+		expect( screen.queryByText( '⌘S' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'does not show the tooltip when loading and truly disabled', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<TestProvider>
+				<ShortcutButton
+					loading
 					focusableWhenDisabled={ false }
 					shortcut={ SHORTCUT }
 				>
