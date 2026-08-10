@@ -55,7 +55,7 @@ export const Navigation = ( {
 				render={ <ul role="list" /> }
 				direction="row"
 				align="center"
-				gap="lg"
+				gap="md"
 				className={ styles.list }
 			>
 				{ items.map( ( item ) => (

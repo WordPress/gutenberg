@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
 import type { NavigationProps } from '../navigation/types';
@@ -26,8 +27,16 @@ export default function Header( {
 	showSidebarToggle?: boolean;
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
+	const hasNavigation = !! navigation?.items?.length;
+
 	return (
-		<Stack direction="column" className={ styles.header }>
+		<Stack
+			direction="column"
+			className={ clsx(
+				styles.header,
+				hasNavigation && styles[ 'has-navigation' ]
+			) }
+		>
 			<Stack
 				className={ styles[ 'header-content' ] }
 				direction="row"
@@ -82,11 +91,11 @@ export default function Header( {
 				</Text>
 			) }
 
-			{ navigation?.items?.length ? (
+			{ hasNavigation && (
 				<div className={ styles[ 'header-navigation' ] }>
 					<Navigation { ...navigation } />
 				</div>
-			) : null }
+			) }
 		</Stack>
 	);
 }
