@@ -22,6 +22,21 @@ import { isFiltered } from '../../../store/utils';
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
+export const getPatternBlocksForInsertion = ( pattern, blocks ) => {
+	if (
+		pattern.type === INSERTER_PATTERN_TYPES.user &&
+		pattern.syncStatus !== 'unsynced'
+	) {
+		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+
+	if ( pattern.type === INSERTER_PATTERN_TYPES.user && ! blocks?.length ) {
+		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+
+	return blocks;
+};
+
 const usePatternsState = (
 	onInsert,
 	rootClientId,
@@ -109,11 +124,10 @@ const usePatternsState = (
 			if ( destinationRootClientId === null ) {
 				return;
 			}
-			const patternBlocks =
-				pattern.type === INSERTER_PATTERN_TYPES.user &&
-				pattern.syncStatus !== 'unsynced'
-					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
-					: blocks;
+			const patternBlocks = getPatternBlocksForInsertion(
+				pattern,
+				blocks
+			);
 			onInsert(
 				( patternBlocks ?? [] ).map( ( block ) => {
 					const clonedBlock = cloneBlock( block );
@@ -123,6 +137,7 @@ const usePatternsState = (
 						)
 					) {
 						clonedBlock.attributes.metadata.categories = [
+							getPatternBlocksForInsertion,
 							selectedCategory,
 						];
 					}
