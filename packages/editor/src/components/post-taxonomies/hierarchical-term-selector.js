@@ -50,40 +50,27 @@ const EMPTY_ARRAY = [];
  * @return {Object[]} Sorted array of terms.
  */
 export function sortBySelected( termsTree, terms ) {
+	const selectedTerms = new Set( terms );
 	const treeHasSelection = ( termTree ) => {
-		if ( terms.indexOf( termTree.id ) !== -1 ) {
+		if ( selectedTerms.has( termTree.id ) ) {
 			return true;
 		}
-		if ( undefined === termTree.children ) {
-			return false;
-		}
-		return (
-			termTree.children
-				.map( treeHasSelection )
-				.filter( ( child ) => child ).length > 0
-		);
+		return !! termTree.children?.some( treeHasSelection );
 	};
-	const termOrChildIsSelected = ( termA, termB ) => {
-		const termASelected = treeHasSelection( termA );
-		const termBSelected = treeHasSelection( termB );
 
-		if ( termASelected === termBSelected ) {
-			return 0;
+	// Partition rather than sort, so each subtree is walked once instead of
+	// once per comparison. Terms keep their relative order within each group.
+	const selected = [];
+	const unselected = [];
+	for ( const termTree of termsTree ) {
+		if ( treeHasSelection( termTree ) ) {
+			selected.push( termTree );
+		} else {
+			unselected.push( termTree );
 		}
+	}
 
-		if ( termASelected && ! termBSelected ) {
-			return -1;
-		}
-
-		if ( ! termASelected && termBSelected ) {
-			return 1;
-		}
-
-		return 0;
-	};
-	const newTermTree = [ ...termsTree ];
-	newTermTree.sort( termOrChildIsSelected );
-	return newTermTree;
+	return [ ...selected, ...unselected ];
 }
 
 /**
