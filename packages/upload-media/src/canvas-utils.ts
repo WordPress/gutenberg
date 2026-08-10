@@ -68,7 +68,7 @@ export async function canvasConvertToJpeg(
 	// Strategy 2: WebCodecs ImageDecoder API.
 	// Uses platform codecs (e.g., macOS HEIC support) that may not be
 	// exposed through createImageBitmap or <img> elements.
-	if ( typeof ImageDecoder !== 'undefined' ) {
+	if ( file.type && typeof ImageDecoder !== 'undefined' ) {
 		const supported = await ImageDecoder.isTypeSupported( file.type );
 		if ( supported ) {
 			const decoder = new ImageDecoder( {
