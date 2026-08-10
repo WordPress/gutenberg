@@ -24,24 +24,18 @@ import { warn } from './utils';
  * Tree-first dynamic content rendering.
  *
  * The island's Preact tree is the single source of truth: new content is
- * parsed to vdom (detached) and SPLICED into the tree, then `render()` diffs
+ * parsed to vdom (detached) and spliced into the tree, then `render()` diffs
  * it in. The DOM is created by Preact — never adopted after the fact — so
- * component state survives re-renders, removed content unmounts (cleanups
- * run), and the tree/DOM correspondence is maintained by construction.
- *
- * The splice rebuilds the tree by cloning ONLY the path from the root to the
- * insertion point, sharing every other vnode object by reference. Preact's
- * same-vnode-object bailout (`_original` equality) skips the diff for shared
- * subtrees, so the cost is O(depth + siblings), not O(island).
+ * component state survives re-renders and removed content unmounts cleanly.
+ * The splice rebuilds only the path from the root to the insertion point,
+ * sharing every other vnode by reference (Preact's `_original` bailout),
+ * so the cost is O(depth + siblings), not O(island).
  */
 
 type Mode = 'append' | 'prepend' | 'before' | 'after' | 'inner' | 'replace';
 
-// Preact internal property accessors. Preact's published builds mangle vnode
-// internals (see preact's `mangle.json`): `_children` → `__k`, `_parent` → `__`.
-// The mangled names are what exist at runtime — the source names (`_children`,
-// `_parent`, `_dom`) appear only in preact's `src/` code and are noted here
-// for reference when reading it.
+// Preact internal property accessors: `__k` is a vnode's children,
+// `__` its parent pointer.
 const vdomChildren = ( vnode: any ): any[] => vnode?.__k ?? [];
 const vdomParent = ( vnode: any ): any => vnode?.__ ?? null;
 
@@ -54,12 +48,11 @@ const islandAttribute = 'data-wp-interactive';
 const islandSelector = `[${ islandAttribute }]`;
 
 /**
- * Returns the island whose TREE owns the given element's subtree — the
- * OUTERMOST `data-wp-interactive` boundary. Nested islands are part of the
- * outer island's tree (the outer island's `toVdom` walk descends into them
- * and claims them via `hydratedIslands`), so any dynamic content spliced in
- * must go through the outermost tree. Returns `null` if there is no island
- * at all.
+ * Returns the OUTERMOST `data-wp-interactive` boundary — the island whose
+ * tree owns the element's subtree. Nested islands belong to the outer
+ * island's tree (its `toVdom` walk claims them via `hydratedIslands`), so
+ * spliced content must go through the outermost tree. Returns `null` if
+ * there is no island.
  *
  * @param element The element to locate.
  * @return The outermost island element, or `null`.
@@ -67,9 +60,8 @@ const islandSelector = `[${ islandAttribute }]`;
 const getTreeIsland = ( element: Element ): Element | null => {
 	let island = element.closest( islandSelector );
 	while ( island ) {
-		// Search ABOVE the island: `closest()` includes the element it
-		// starts at, so starting from the parent finds the nearest island
-		// strictly outside this one.
+		// `closest()` includes the element it starts at, so start from the
+		// parent to find the nearest island strictly outside this one.
 		const outer = island.parentElement?.closest( islandSelector ) ?? null;
 		if ( ! outer ) {
 			return island;
@@ -81,8 +73,8 @@ const getTreeIsland = ( element: Element ): Element | null => {
 
 /**
  * Parses an island's `data-wp-interactive` value into its namespace, using
- * the same rules as `vdom.ts`: a plain string is used verbatim, a JSON object
- * contributes its `namespace` string property, anything else is `null`.
+ * the same rules as `vdom.ts`: a plain string verbatim, a JSON object's
+ * `namespace` string, anything else `null`.
  *
  * @param island The island element.
  * @return The island's namespace, or `null`.
@@ -109,18 +101,13 @@ const getIslandNamespace = ( island: Element ): string | null => {
 };
 
 /**
- * Locates the container's vnode via the element→vnode map (O(1) — populated
- * by the `options.diffed` hook in `hooks.tsx`) and walks up each vnode's
- * `_parent` pointer to the tree root, collecting the path of vnodes from the
- * root to the container (inclusive). The cost is O(depth), independent of
- * the island's size.
+ * Locates the container's vnode via the element→vnode map (O(1)) and walks
+ * up each vnode's `_parent` pointer to the tree root, collecting the path
+ * (root → container, inclusive). O(depth), independent of island size.
  *
- * No per-step connectivity check is needed: every splice rebuilds the tree
- * root as a NEW vnode object, so a stale map entry (an element removed by a
- * previous splice and re-inserted) still chains to an old root object and is
- * rejected by the final `vnode !== root` comparison. A vnode that IS in the
- * current tree always chains to the current root, and the chain terminates
- * (the topmost vnode's `_parent` is null), so the walk cannot loop.
+ * No per-step connectivity check: every splice rebuilds the root as a NEW
+ * vnode, so a stale map entry (removed + re-inserted element) chains to an
+ * old root and is rejected by the final `vnode !== root` comparison.
  *
  * @param root   The tree root vnode (the island vnode).
  * @param target The container element.
@@ -149,14 +136,14 @@ const getPathTo = ( root: any, target: Element ): any[] | null => {
  * - String (element) vnodes: recreated with the new children array.
  * - `Directives` wrappers: recreated with the rebuilt element as their
  *   `element` prop — re-running the component re-wraps it in the directive /
- *   Provider chain, so the change propagates through the whole chain.
+ *   Provider chain, propagating the change.
  * - Other components: rebuilt with `children` (best effort — only
  *   transparent pass-through wrappers like `Provider` are expected).
  *
  * @param pathNode     The vnode to rebuild.
  * @param child        The rebuilt vnode occupying this node's child slot.
- * @param childVNode   The ORIGINAL vnode at that slot (to locate its index in
- *                     the parent's children array — siblings must survive).
+ * @param childVNode   The ORIGINAL vnode at that slot (to locate its index —
+ *                     siblings must survive the rebuild).
  * @param chainElement The rebuild of the deepest string vnode in this node's
  *                     rendered chain (the `element` prop for Directives).
  * @return The rebuilt vnode.
@@ -191,22 +178,20 @@ const rebuildPathNode = (
 /**
  * Mirrors a spliced region element into its router signal (write-through).
  *
- * When a splice rebuilds the path through a region's `router-region`
- * `Directives` level, that wrapper re-renders during the splice's own
- * `render()` and re-reads `routerRegions` — if the signal still holds the
- * PRE-splice vnode, the new content is reverted (a silent no-op). Writing
- * the rebuilt region content into the signal before the render makes the
- * splice stick; the signal then mirrors the tree (§6).
+ * A splice rebuilds the path through the region's `router-region`
+ * `Directives` level, whose render re-runs the callback and re-reads the
+ * signal — if it still holds the PRE-splice vnode, the splice is reverted
+ * during its own render (a silent no-op). Writing the rebuilt region content
+ * into the signal first makes it stick; the signal then mirrors the tree.
  *
  * Only NAVIGATED regions are written (signal holds a vnode). SSR regions
- * (signal `undefined`) render the tree's children directly and need no
- * mirror; hidden regions (`null`) have no content to splice into.
+ * (`undefined`) render the tree's children directly; hidden regions (`null`)
+ * have no content to splice into.
  *
  * @param wrapper     The rebuilt `Directives` wrapper whose CURRENT priority
  *                    level is the `router-region` directive.
- * @param regionVnode The rebuilt content the wrapper renders — the chain
- *                    below the wrapper (its `element` chain), which is the
- *                    same shape `cloneRouterRegionContent` produces.
+ * @param regionVnode The rebuilt content the wrapper renders — the same
+ *                    shape `cloneRouterRegionContent` produces.
  */
 const writeRegionSignal = ( wrapper: any, regionVnode: any ): void => {
 	const entries: any[] = wrapper.props?.directives?.[ 'router-region' ];
@@ -229,8 +214,8 @@ const writeRegionSignal = ( wrapper: any, regionVnode: any ): void => {
 
 /**
  * Locates (and if needed hydrates) the island tree, then splices the new
- * vnodes into it at the mode described by `mode` relative to
- * `container`, and renders the rebuilt tree.
+ * vnodes into it at the mode described by `mode` relative to `container`,
+ * and renders the rebuilt tree.
  *
  * @param island    The island whose tree receives the splice.
  * @param container The element the mode is relative to.
@@ -260,12 +245,11 @@ const spliceIntoTree = (
 		return;
 	}
 
-	// The fragment's root is Preact's artificial Fragment wrapper (created by
-	// `render()`/`hydrate()`); the island's vnode is its only child. Locate
-	// the container through the element→vnode map and the `_parent` pointers
-	// so the path is [island, ..., container] — never includes the wrapper (a
-	// rebuilt wrapper would nest a Fragment that cannot type-match the island
-	// element, remounting the whole tree).
+	// The fragment's root is Preact's artificial Fragment wrapper; the island
+	// vnode is its only child. Locate the container via the element→vnode
+	// map + `_parent` pointers so the path is [island, ..., container] — never
+	// includes the wrapper (rebuilding it would nest a Fragment that cannot
+	// type-match the island element, remounting the whole tree).
 	const treeRoot = vdomChildren( root )[ 0 ] ?? root;
 	const path = getPathTo( treeRoot, container );
 	if ( ! path || path.length === 0 ) {
@@ -286,8 +270,7 @@ const spliceIntoTree = (
 		mode === 'at'
 	) {
 		// Splice into the container's own children. `at` inserts at a specific
-		// child index (used by the future MutationObserver's cut-and-reinsert,
-		// §7).
+		// child index (used by the future MutationObserver's cut-and-reinsert).
 		const target = path[ path.length - 1 ];
 		const oldChildren = vdomChildren( target );
 		let newChildren: ComponentChild[];
@@ -310,7 +293,7 @@ const spliceIntoTree = (
 		current = h( target.type, { ...target.props, children: newChildren } );
 		chainElement = current;
 	} else {
-		// before / after / outer / at: splice into the container's parent's
+		// before / after / replace / at: splice into the container's parent's
 		// children, next to the container's rendered chain root. Climb past
 		// component wrappers (Directives/Provider) — a directive-wrapped
 		// element is rendered alone by its chain, so its siblings live at the
@@ -387,9 +370,9 @@ const spliceIntoTree = (
 
 	// Rebuild the path from the insertion point up to the root. When the
 	// rebuild passes a region's `router-region` Directives level, mirror the
-	// rebuilt region content into the region's signal BEFORE the render
-	// below — otherwise the wrapper's re-render re-reads the stale signal
-	// and reverts the splice (§6).
+	// rebuilt region content into the signal BEFORE the render — otherwise
+	// the wrapper's re-render re-reads the stale signal and reverts the
+	// splice.
 	for ( let i = startIdx; i >= 0; i-- ) {
 		if (
 			path[ i ].type === Directives &&
@@ -418,25 +401,21 @@ const spliceIntoTree = (
  * The HTML is parsed DETACHED and spliced into the container's island tree,
  * so Preact creates the elements itself: the tree stays the single source of
  * truth, component state is preserved across re-renders, and content removed
- * by a later `inner`/`outer` replacement unmounts cleanly (listeners cleaned
- * up).
+ * by a later `inner`/`replace` swap unmounts cleanly (listeners cleaned up).
  *
  * ```js
  * import { renderHTML } from '@wordpress/interactivity';
  *
  * const res = await fetch( '/wp-json/my-plugin/v1/cards' );
- * renderHTML( '#feed', await res.text() ); // or: renderHTML( document.querySelector( '#feed' ), ... )
+ * renderHTML( '#feed', await res.text() );
  * ```
  *
- * The container can be passed as an element or as a CSS selector (a selector
- * matching nothing throws). The container must be inside an island
- * (`[data-wp-interactive]`) or have its own `data-wp-interactive` attribute;
- * otherwise nothing is hydrated and a warning is emitted.
- *
- * Unsupported targets (warn + no-op): `data-wp-ignore` subtrees,
- * `data-wp-each-child` content, and `<template>` elements. (Router regions
- * ARE supported — the region signal is written through from the spliced
- * tree, §6.)
+ * The container can be an element or a CSS selector (no match → throw) and
+ * must be inside an island (`[data-wp-interactive]`) or carry its own
+ * `data-wp-interactive`; otherwise nothing is hydrated and a warning is
+ * emitted. Router regions ARE supported — the region signal is written
+ * through from the spliced tree. Unsupported (warn + no-op): `data-wp-ignore`
+ * subtrees, `data-wp-each-child` content, and `<template>` elements.
  *
  * @param container    The element the parsed HTML is inserted into, or a CSS
  *                     selector for it (resolved via `document.querySelector`).
@@ -488,13 +467,9 @@ export function renderHTML(
 	const island = getTreeIsland( containerElement );
 	if ( ! island ) {
 		// No island around the container. If the HTML itself carries an
-		// interactive island (a `data-wp-interactive` element), adopt it:
-		// place the parsed nodes relative to the container per `mode` (raw
-		// DOM — there is no tree yet), then hydrate the island through the
-		// sanctioned first-render path — the fragment's first render matches
-		// the pre-existing DOM, the same path `hydrateRegions` uses for SSR
-		// islands. Subsequent splices target the island normally. Anything
-		// else: warn + no-op.
+		// interactive island, adopt it: place the parsed nodes per `mode`
+		// (raw DOM — no tree yet) and hydrate via the sanctioned first-render
+		// path (same as `hydrateRegions`). Otherwise warn + no-op.
 		const htmlIsland = nodes.find(
 			( node ): node is Element =>
 				node instanceof Element && node.hasAttribute( islandAttribute )
@@ -505,12 +480,10 @@ export function renderHTML(
 			);
 			return;
 		}
-		// Place the parsed nodes relative to the container per `mode`. The
-		// mode name IS the native DOM insertion method, except `inner`
-		// (`replaceChildren`) and `replace` (`replaceWith`) — so dispatch
-		// dynamically through a mode→method map (same pattern as datastar's
-		// patchElements) instead of an if/else chain. All six methods share
-		// the `( ...nodes: Array< Node | string > ) => void` signature.
+		// The mode name IS the native DOM insertion method, except `inner`
+		// (`replaceChildren`) and `replace` (`replaceWith`) — dispatch
+		// dynamically through a mode→method map (datastar's patchElements
+		// pattern) instead of an if/else chain.
 		const placementMethod: Record<
 			Mode,
 			| 'append'
@@ -539,8 +512,6 @@ export function renderHTML(
 	// directives on the new content resolve against the right store (a
 	// container inside a nested island resolves the nested namespace, even
 	// though the content is spliced into the OUTER island's tree).
-	// `getTreeIsland` starts with the same closest() call, so after the
-	// island check above the nearest island is guaranteed to exist.
 	const namespaceIsland = containerElement.closest( islandSelector )!;
 	const namespace = getIslandNamespace( namespaceIsland );
 	const vdoms = nodes.map( ( node ) => toVdom( node, namespace ) );

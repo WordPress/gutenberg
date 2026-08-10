@@ -304,12 +304,8 @@ const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 };
 
 // Component that wraps each priority level of directives of an element.
-/**
- * Component that wraps each priority level of directives of an element.
- * Exported so `render.ts` can rebuild vnodes on the path to a splice target
- * (a Directives wrapper re-renders its `element` prop through its directive
- * chain when the element vnode is replaced).
- */
+// Exported so `render.ts` can rebuild it on the splice path (it re-renders
+// its `element` prop through the directive chain when that vnode is replaced).
 export const Directives = ( {
 	directives,
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
@@ -399,28 +395,17 @@ options.vnode = ( vnode: VNode< any > ) => {
 };
 
 /**
- * Maps each rendered DOM element to its vnode. Populated by the
- * `options.diffed` hook below — Preact calls it after every vnode is
- * diffed into the DOM, when string-type (element) vnodes already have
- * their DOM node assigned (`__e` — the mangled `_dom` — IS the element).
- *
- * `renderHTML` uses the map for the O(1) container lookup, then walks up
- * each vnode's `_parent` pointer to the tree root — replacing a
- * depth-first search over the whole island. Removed elements keep their
- * entry until GC (a WeakMap); the walk in `render.ts` rejects stale
- * entries, because they no longer connect to the tree root.
+ * Maps each rendered DOM element to its vnode, populated by the
+ * `options.diffed` hook below (the vnode's `__e` IS the element).
+ * `renderHTML` uses it for the O(1) container lookup, then walks `_parent`
+ * pointers to the island root. Removed elements keep their entry until GC;
+ * the walk in `render.ts` rejects stale entries (they no longer connect to
+ * the current root).
  */
 export const elementToVnode = new WeakMap< Element, VNode< any > >();
 
-// Preact Options Hook called after each vnode is diffed into the DOM:
-// register the element → vnode mapping. Chained so previously registered
-// hooks keep running.
-//
-// Preact's published builds mangle vnode internals (see preact's
-// `mangle.json`: `_dom` → `__e`, `_children` → `__k`, `_parent` → `__`).
-// The mangled names are what exist at runtime — the source names appear
-// only in preact's `src/` code, which neither jest nor the browser bundle
-// executes (verified: both run the mangled dist build).
+// Preact Options Hook called after each vnode is diffed into the DOM.
+// Chained so previously registered hooks keep running.
 const oldDiffed = options.diffed;
 options.diffed = ( vnode: any ) => {
 	const dom = vnode?.__e;
