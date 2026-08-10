@@ -18,6 +18,7 @@ runs:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
+              cache: ${{ inputs.enable-caching == 'true' && 'npm' || '' }}
               check-latest: true
 
         - name: Get Node.js and npm version
