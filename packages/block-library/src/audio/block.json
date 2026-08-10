@@ -64,5 +64,6 @@
 		}
 	},
 	"editorStyle": "wp-block-audio-editor",
-	"style": "wp-block-audio"
+	"style": "wp-block-audio",
+	"viewScriptModule": "@wordpress/block-library/media-playback"
 }

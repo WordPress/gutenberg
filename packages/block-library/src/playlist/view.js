@@ -5,6 +5,10 @@ import {
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
+import {
+	notifyMediaPlayback,
+	registerPlaylistPlayer,
+} from '../utils/media-playback';
 
 /**
  * Store player state for each element.
@@ -174,28 +178,32 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			}
 		},
 	} );
-	const setIsPlaying = ( isPlaying ) => {
-		context.isPlaying = isPlaying;
-	};
-	const onPlay = () => setIsPlaying( true );
-	const onPause = () => setIsPlaying( false );
-	player.container.addEventListener( 'waveformplayer:play', onPlay );
-	player.container.addEventListener( 'waveformplayer:pause', onPause );
-	player.container.addEventListener( 'waveformplayer:ended', onPause );
-	const destroy = () => {
-		player.container.removeEventListener( 'waveformplayer:play', onPlay );
-		player.container.removeEventListener( 'waveformplayer:pause', onPause );
-		player.container.removeEventListener( 'waveformplayer:ended', onPause );
-		player.destroy();
-	};
-
-	// Store state for cleanup, including instance for loadTrack reuse.
 	const nextState = {
 		url: track.url,
 		instance: player.instance,
 		container: player.container,
 		destroy,
 	};
+	const unregisterPlaylistPlayer = registerPlaylistPlayer( nextState );
+	const setIsPlaying = ( isPlaying ) => {
+		context.isPlaying = isPlaying;
+	};
+	const onPlay = () => {
+		setIsPlaying( true );
+		notifyMediaPlayback( nextState );
+	};
+	const onPause = () => setIsPlaying( false );
+	player.container.addEventListener( 'waveformplayer:play', onPlay );
+	player.container.addEventListener( 'waveformplayer:pause', onPause );
+	player.container.addEventListener( 'waveformplayer:ended', onPause );
+	function destroy() {
+		unregisterPlaylistPlayer?.();
+		player.container.removeEventListener( 'waveformplayer:play', onPlay );
+		player.container.removeEventListener( 'waveformplayer:pause', onPause );
+		player.container.removeEventListener( 'waveformplayer:ended', onPause );
+		player.destroy();
+	}
+
 	playerState.set( ref, nextState );
 	playlistPlayerState.set( context.playlistId, nextState );
 }
