@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedSelectControl } from '../components';
+import { ValidatedSelectControl } from '../select-control';
 
 describe( 'ValidatedSelectControl', () => {
 	const options = [

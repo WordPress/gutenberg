@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { ControlWithError } from '../control-with-error';
-import SelectControl from '../../select-control';
+import { SelectControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
 
 const UnforwardedValidatedSelectControl = (
@@ -10,13 +10,7 @@ const UnforwardedValidatedSelectControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof SelectControl >,
-		'multiple' | 'onChange' | 'value'
-	> & {
-		value?: string;
-		onChange: ( value: string ) => void;
-	} & ValidatedControlProps,
+	}: React.ComponentProps< typeof SelectControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLSelectElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
