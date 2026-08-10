@@ -22,6 +22,7 @@ import {
 	getBlockSupport,
 	getBlockVariations,
 	getBlockBindingsSource,
+	invalidateBlockBindingsSource,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -1801,6 +1802,93 @@ describe( 'blocks', () => {
 
 		it( 'should reject removing a source that does not exist', () => {
 			unregisterBlockBindingsSource( 'core/non-existing-source' );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source "core/non-existing-source" is not registered.'
+			);
+		} );
+	} );
+
+	describe( 'invalidateBlockBindingsSource', () => {
+		afterEach( () => {
+			unregisterBlockBindingsSource( 'core/test-source' );
+		} );
+
+		it( 'should bump the revision for a registered source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/test-source',
+				label: 'Test Source',
+			} );
+
+			const before = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/test-source' );
+
+			invalidateBlockBindingsSource( 'core/test-source' );
+
+			const after = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/test-source' );
+
+			expect( after ).toBe( before + 1 );
+		} );
+
+		it( 'should not affect other sources’ revisions', () => {
+			registerBlockBindingsSource( {
+				name: 'core/test-source',
+				label: 'Test Source',
+			} );
+			registerBlockBindingsSource( {
+				name: 'core/other-source',
+				label: 'Other Source',
+			} );
+
+			const before = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/other-source' );
+
+			invalidateBlockBindingsSource( 'core/test-source' );
+
+			const after = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/other-source' );
+
+			expect( after ).toBe( before );
+			unregisterBlockBindingsSource( 'core/other-source' );
+		} );
+
+		it( 'should bump every source’s revision when called without a name', () => {
+			registerBlockBindingsSource( {
+				name: 'core/test-source',
+				label: 'Test Source',
+			} );
+			registerBlockBindingsSource( {
+				name: 'core/other-source',
+				label: 'Other Source',
+			} );
+
+			const beforeA = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/test-source' );
+			const beforeB = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/other-source' );
+
+			invalidateBlockBindingsSource();
+
+			const afterA = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/test-source' );
+			const afterB = unlock(
+				select( blocksStore )
+			).getBlockBindingsSourceRevision( 'core/other-source' );
+
+			expect( afterA ).toBe( beforeA + 1 );
+			expect( afterB ).toBe( beforeB + 1 );
+			unregisterBlockBindingsSource( 'core/other-source' );
+		} );
+
+		it( 'should reject invalidating a source that does not exist', () => {
+			invalidateBlockBindingsSource( 'core/non-existing-source' );
 			expect( console ).toHaveWarnedWith(
 				'Block bindings source "core/non-existing-source" is not registered.'
 			);

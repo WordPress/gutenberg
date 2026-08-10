@@ -15,6 +15,7 @@ import {
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
 	groupingBlockName,
+	blockBindingsSourceRevisions,
 	DEFAULT_CATEGORIES,
 } from '../reducer';
 
@@ -526,5 +527,62 @@ describe( 'categories', () => {
 				icon: 'old-icon',
 			},
 		] );
+	} );
+} );
+
+describe( 'blockBindingsSourceRevisions', () => {
+	it( 'should return an empty object as default state', () => {
+		expect( blockBindingsSourceRevisions( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'should ignore unrelated actions', () => {
+		const original = deepFreeze( { 'my/source': 1 } );
+
+		const state = blockBindingsSourceRevisions( original, {
+			type: 'SOME_OTHER_ACTION',
+		} );
+
+		expect( state ).toBe( original );
+	} );
+
+	it( 'should set the revision to 1 the first time a source is invalidated', () => {
+		const state = blockBindingsSourceRevisions( undefined, {
+			type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE',
+			name: 'my/source',
+		} );
+
+		expect( state ).toEqual( { 'my/source': 1 } );
+	} );
+
+	it( 'should increment the revision for a source on each invalidation', () => {
+		const original = deepFreeze( { 'my/source': 1, 'other/source': 5 } );
+
+		const state = blockBindingsSourceRevisions( original, {
+			type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE',
+			name: 'my/source',
+		} );
+
+		expect( state ).toEqual( { 'my/source': 2, 'other/source': 5 } );
+	} );
+
+	it( 'should not affect other sources when invalidating one source', () => {
+		const original = deepFreeze( { 'my/source': 1, 'other/source': 5 } );
+
+		const state = blockBindingsSourceRevisions( original, {
+			type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE',
+			name: 'other/source',
+		} );
+
+		expect( state ).toEqual( { 'my/source': 1, 'other/source': 6 } );
+	} );
+
+	it( 'should track a global "__all" revision when no name is passed', () => {
+		const original = deepFreeze( { 'my/source': 1 } );
+
+		const state = blockBindingsSourceRevisions( original, {
+			type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE',
+		} );
+
+		expect( state ).toEqual( { 'my/source': 1, __all: 1 } );
 	} );
 } );
