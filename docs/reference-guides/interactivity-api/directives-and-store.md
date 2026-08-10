@@ -640,6 +640,10 @@ But it can also be used on other elements:
 
 When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
 
+The key only needs to be unique among its **siblings** (the items of the same list). Two elements in different lists may share a key value without issue.
+
+When content is added dynamically with [`renderHTML()`](#renderhtml), elements without `data-wp-key` fall back to their `id` attribute as the key, and — for insertion modes — to an auto-generated key, so adding new items never disrupts the existing ones.
+
 ### `wp-each`
 
 The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.
@@ -713,6 +717,40 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 	<li data-wp-each-child>olá</li>
 </ul>
 ```
+
+## `renderHTML()`
+
+The `renderHTML()` function renders an HTML string into the live DOM, processing all Interactivity API directives on it. It is commonly used to add server-rendered content dynamically — for example, a new post fetched from a REST endpoint and prepended to a feed, or a filtered list re-rendered in place.
+
+```js
+import { renderHTML } from '@wordpress/interactivity';
+
+const res = await fetch( '/wp-json/my-plugin/v1/cards' );
+renderHTML( '#feed', await res.text() );
+```
+
+The container can be an element or a CSS selector, and must be inside an island (`[data-wp-interactive]`) or carry its own `data-wp-interactive` attribute. Router regions are supported.
+
+### Modes
+
+The `mode` option controls where the parsed HTML is inserted:
+
+- `append` (default): as the container's last children.
+- `prepend`: as the container's first children.
+- `before`: as siblings immediately before the container.
+- `after`: as siblings immediately after the container.
+- `inner`: replaces the container's children.
+- `replace`: replaces the container itself.
+
+### List identity
+
+When the new content contains repeated elements (list items), the Interactivity API matches them against the existing elements by key, so it can decide whether an item is new, reused, or removed:
+
+1. A `data-wp-key` attribute wins.
+2. Otherwise, the element's `id` attribute is used as the key.
+3. For insertion modes (`prepend`, `before`, `after`), items with neither get an auto-generated key, so inserting new content never disrupts existing items — they keep their state and their `data-wp-init` callbacks don't re-run.
+
+`append` is safe without any keys. `inner` and `replace` reuse existing elements by position, so same-shape content keeps its state across refreshes; give items a `data-wp-key` (or `id`) when you need identity across refreshes, reorders, or duplicate deliveries.
 
 ## Values of directives are references to store properties
 
