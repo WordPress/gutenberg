@@ -15,6 +15,7 @@
 ### Enhancements
 
 -   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
+-   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81316](https://github.com/WordPress/gutenberg/issues/81316)).
 
 ## 1.19.0 (2026-07-29)
 
