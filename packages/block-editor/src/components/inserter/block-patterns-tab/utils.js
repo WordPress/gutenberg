@@ -26,6 +26,50 @@ export const starterPatternsCategory = {
 	label: __( 'Starter content' ),
 };
 
+function hasRegisteredCategory( pattern, allCategories ) {
+	if ( ! pattern.categories || ! pattern.categories.length ) {
+		return false;
+	}
+
+	return pattern.categories.some( ( cat ) =>
+		allCategories.some( ( category ) => category.name === cat )
+	);
+}
+
+/**
+ * Returns the categories that contain at least one of the given patterns,
+ * sorted by label. An "Uncategorized" category is appended when some pattern
+ * belongs to no registered category.
+ *
+ * @param {Array} patterns      The patterns to derive the categories from.
+ * @param {Array} allCategories The registered pattern categories.
+ *
+ * @return {Array} The populated categories.
+ */
+export function getPopulatedCategories( patterns, allCategories ) {
+	const categories = allCategories
+		.filter( ( category ) =>
+			patterns.some( ( pattern ) =>
+				pattern.categories?.includes( category.name )
+			)
+		)
+		.sort( ( a, b ) => a.label.localeCompare( b.label ) );
+
+	if (
+		patterns.some(
+			( pattern ) => ! hasRegisteredCategory( pattern, allCategories )
+		) &&
+		! categories.find( ( category ) => category.name === 'uncategorized' )
+	) {
+		categories.push( {
+			name: 'uncategorized',
+			label: _x( 'Uncategorized' ),
+		} );
+	}
+
+	return categories;
+}
+
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
