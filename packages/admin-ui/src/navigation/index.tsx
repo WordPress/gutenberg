@@ -15,6 +15,7 @@ export const Navigation = ( {
 	currentHref,
 	ariaLabel = __( 'Sections' ),
 	components,
+	className,
 }: NavigationProps ) => {
 	if ( ! items.length ) {
 		return null;
@@ -45,7 +46,7 @@ export const Navigation = ( {
 	}
 
 	return (
-		<nav aria-label={ ariaLabel }>
+		<nav aria-label={ ariaLabel } className={ className }>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.

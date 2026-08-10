@@ -49,4 +49,9 @@ export interface NavigationProps {
 	 * Overrides for the elements the navigation renders.
 	 */
 	components?: NavigationComponents;
+
+	/**
+	 * Optional class name for the root element.
+	 */
+	className?: string;
 }

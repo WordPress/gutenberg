@@ -92,9 +92,10 @@ export default function Header( {
 			) }
 
 			{ hasNavigation && (
-				<div className={ styles[ 'header-navigation' ] }>
-					<Navigation { ...navigation } />
-				</div>
+				<Navigation
+					{ ...navigation }
+					className={ styles[ 'header-navigation' ] }
+				/>
 			) }
 		</Stack>
 	);
