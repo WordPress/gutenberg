@@ -322,15 +322,22 @@ describe( 'saveEditedEntityRecord with a persisted CRDT document', () => {
 
 		await dispatch.saveEditedEntityRecord( 'postType', 'post', post.id );
 
+		// The snapshot still reaches the server...
+		expect( triggerFetch ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				data: expect.objectContaining( {
+					meta: {
+						footnotes,
+						[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
+					},
+				} ),
+			} )
+		);
+
+		// ...without leaving the record dirty.
 		expect(
 			select.hasEditsForEntityRecord( 'postType', 'post', post.id )
 		).toBe( false );
-		expect(
-			select.getEditedEntityRecord( 'postType', 'post', post.id ).meta
-		).toEqual( {
-			footnotes,
-			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'fresh-doc',
-		} );
 	} );
 } );
 
