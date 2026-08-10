@@ -14,20 +14,23 @@ const stylelintBin = path.join(
 	'bin/stylelint.mjs'
 );
 
-const generateStylelintCommand = ( filename ) =>
+const generateStylelintCommand = ( filename, configFile ) =>
 	'node ' +
 	stylelintBin +
 	' ' +
 	path.resolve( __dirname, '../', filename ) +
 	' -c' +
-	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +
+	path.resolve( __dirname, '../', configFile ) +
 	' --formatter json' +
 	' --ignore-path ' +
 	path.resolve( __dirname, '../', './.stylelintignore' );
 
 module.exports = {
-	getStylelintResult: ( filename ) =>
-		execute( generateStylelintCommand( filename ) )
+	getStylelintResult: (
+		filename,
+		configFile = './.stylelintrc.tests.json'
+	) =>
+		execute( generateStylelintCommand( filename, configFile ) )
 			.then( ( { stderr } ) => {
 				return {
 					errored: false,

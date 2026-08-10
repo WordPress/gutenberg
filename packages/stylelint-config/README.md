@@ -30,7 +30,7 @@ If you've globally installed `@wordpress/stylelint-config` using the `-g` flag, 
 
 ## Presets
 
-In addition to the default preset, there is also a SCSS preset and 2 stylistic variant presets.
+In addition to the default preset, there is also a SCSS preset, 2 stylistic variant presets, and a preset for the WordPress projects themselves.
 
 ### SCSS
 
@@ -59,6 +59,18 @@ This preset extends`@wordpress/stylelint-config`, `@wordpress/stylelint-config/s
 ```json
 {
 	"extends": [ "@wordpress/stylelint-config/scss-stylistic" ]
+}
+```
+
+### Project
+
+This preset extends `@wordpress/stylelint-config/scss-stylistic` with the rules shared by the WordPress projects that lint their own stylesheets — Gutenberg and WordPress Core. Compared to `scss-stylistic` it turns off the stylistic and SCSS rules those codebases do not follow, adds accessibility rules for the `order` property and reversed `flex-direction` values, and relaxes `selector-class-pattern` to allow BEM-style class names.
+
+Use it if you want to match how WordPress itself is linted. If you are configuring a theme or plugin, one of the presets above is likely a better fit.
+
+```json
+{
+	"extends": [ "@wordpress/stylelint-config/project" ]
 }
 ```
 

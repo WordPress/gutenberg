@@ -28,6 +28,7 @@
 		"LICENSE",
 		"README.md",
 		"index.js",
+		"project.js",
 		"scss.js",
 		"scss-stylistic.js",
 		"stylistic.js"
@@ -36,6 +37,7 @@
 	"main": "index.js",
 	"exports": {
 		".": "./index.js",
+		"./project": "./project.js",
 		"./scss": "./scss.js",
 		"./scss-stylistic": "./scss-stylistic.js",
 		"./stylistic": "./stylistic.js",

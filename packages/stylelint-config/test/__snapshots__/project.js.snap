@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`flags warnings with invalid project scss snapshot matches warnings 1`] = `
+[
+  {
+    "column": 18,
+    "endColumn": 29,
+    "endLine": 3,
+    "line": 3,
+    "rule": "declaration-property-value-allowed-list",
+    "severity": "error",
+    "text": "Avoid "row-reverse" value for the "flex-direction" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction. (declaration-property-value-allowed-list)",
+  },
+  {
+    "column": 2,
+    "endColumn": 7,
+    "endLine": 4,
+    "line": 4,
+    "rule": "property-disallowed-list",
+    "severity": "error",
+    "text": "Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction. (property-disallowed-list)",
+  },
+]
+`;
