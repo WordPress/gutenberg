@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { writeFileSync } from 'fs';
 import type {
@@ -9,10 +6,6 @@ import type {
 	TestCase,
 	TestResult,
 } from '@playwright/test/reporter';
-
-/**
- * Internal dependencies
- */
 import { stats, round } from '../utils';
 
 export interface WPRawPerformanceResults {

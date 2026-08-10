@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import useBlockDisplayInformation from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );

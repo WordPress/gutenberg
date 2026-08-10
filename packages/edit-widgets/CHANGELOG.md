@@ -10,6 +10,8 @@
 
 -   Header toolbar: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81176](https://github.com/WordPress/gutenberg/pull/81176)).
 
+## 6.52.0 (2026-07-29)
+
 ## 6.51.0 (2026-07-14)
 
 ### Enhancements

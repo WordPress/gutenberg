@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 

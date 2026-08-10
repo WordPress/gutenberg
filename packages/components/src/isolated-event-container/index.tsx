@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentPropsWithoutRef, MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 

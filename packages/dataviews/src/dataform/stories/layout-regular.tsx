@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 // Registers the core format types (bold, italic, link, …) as a side effect so
 // the `richtext` control's keyboard shortcuts (⌘B / ⌘I / ⌘K) and the inline
 // link popover can be exercised in the story.
 import '@wordpress/format-library';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type {
 	CardLayout,

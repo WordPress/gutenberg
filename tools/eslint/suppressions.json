@@ -24,11 +24,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-inspector/edit-contents.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-inspector/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -844,11 +839,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/spinner/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/style-provider/index.tsx": {
 		"no-restricted-imports": {
 			"count": 2
@@ -1620,7 +1610,7 @@
 	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes-count.tsx": {
@@ -1629,11 +1619,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		}
-	},
-	"packages/global-styles-ui/src/font-sizes/rename-font-size-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}

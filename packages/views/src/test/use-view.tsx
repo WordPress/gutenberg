@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import type { View } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { useView } from '../use-view';
 
 const PREFERENCE_KEY = 'dataviews-postType-page-default';

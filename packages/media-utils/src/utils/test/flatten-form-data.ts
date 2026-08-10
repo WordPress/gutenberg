@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { flattenFormData } from '../flatten-form-data';
 
 describe( 'flattenFormData', () => {

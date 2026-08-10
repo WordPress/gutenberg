@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { WidgetAttributeField } from '@wordpress/widget-primitives';
 
 type HelloWorldWidgetAttributes = {

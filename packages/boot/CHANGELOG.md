@@ -6,6 +6,8 @@
 
 -   Adjust the specificity of the responsive image default in the layout container so components can size their own images ([#80845](https://github.com/WordPress/gutenberg/pull/80845)).
 
+## 0.19.0 (2026-07-29)
+
 ## 0.18.0 (2026-07-14)
 
 ### Enhancements

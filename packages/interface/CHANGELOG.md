@@ -13,6 +13,12 @@
 
 ### Internal
 
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 9.37.0 (2026-07-29)
+
+### Internal
+
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 9.36.0 (2026-07-14)

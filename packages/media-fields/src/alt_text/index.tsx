@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { TextareaControl } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
