@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { findAspectRatioOption, parseAspectRatio } from '../utils';
 
 describe( 'parseAspectRatio', () => {
