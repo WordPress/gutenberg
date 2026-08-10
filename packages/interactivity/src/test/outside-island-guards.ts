@@ -129,6 +129,104 @@ describe( 'renderHTML outside any island', () => {
 	} );
 } );
 
+describe( 'HTML-island fallback honors mode', () => {
+	const islandHtml = `
+		<div data-wp-interactive="${ NS }" data-testid="island">
+			<span data-testid="txt" data-wp-text="state.text">initial</span>
+		</div>
+	`;
+
+	const setupHost = ( content = '' ) => {
+		document.body.innerHTML = `<div data-testid="host">${ content }</div>`;
+		return document.querySelector( '[data-testid="host"]' )!;
+	};
+
+	it( "prepend: the island lands BEFORE the host's existing children, hydrated", async () => {
+		const host = setupHost( '<p data-testid="existing">old</p>' );
+		renderHTML( host, islandHtml, { mode: 'prepend' } );
+		await flush();
+
+		expect( host.children.length ).toBe( 2 );
+		expect( host.children[ 0 ] ).toHaveAttribute( 'data-testid', 'island' );
+		expect( host.children[ 1 ] ).toHaveAttribute(
+			'data-testid',
+			'existing'
+		);
+		// Hydrated: the directive works.
+		expect( host.querySelector( '[data-testid="txt"]' )?.textContent ).toBe(
+			'initial'
+		);
+	} );
+
+	it( "inner: the island REPLACES the host's children, hydrated", async () => {
+		const host = setupHost( '<p data-testid="existing">old</p>' );
+		renderHTML( host, islandHtml, { mode: 'inner' } );
+		await flush();
+
+		expect( host.querySelector( '[data-testid="existing"]' ) ).toBeNull();
+		expect( host.children.length ).toBe( 1 );
+		expect( host.children[ 0 ] ).toHaveAttribute( 'data-testid', 'island' );
+		expect( host.querySelector( '[data-testid="txt"]' )?.textContent ).toBe(
+			'initial'
+		);
+	} );
+
+	it( 'before: the island becomes a sibling immediately BEFORE the host, hydrated', async () => {
+		const host = setupHost();
+		renderHTML( host, islandHtml, { mode: 'before' } );
+		await flush();
+
+		expect( host.previousElementSibling ).toHaveAttribute(
+			'data-testid',
+			'island'
+		);
+		expect(
+			document.querySelector( '[data-testid="txt"]' )?.textContent
+		).toBe( 'initial' );
+	} );
+
+	it( 'after: the island becomes a sibling immediately AFTER the host, hydrated', async () => {
+		const host = setupHost();
+		renderHTML( host, islandHtml, { mode: 'after' } );
+		await flush();
+
+		expect( host.nextElementSibling ).toHaveAttribute(
+			'data-testid',
+			'island'
+		);
+		expect(
+			document.querySelector( '[data-testid="txt"]' )?.textContent
+		).toBe( 'initial' );
+	} );
+
+	it( 'replace: the host is replaced by the island, hydrated, and accepts follow-up splices', async () => {
+		const host = setupHost();
+		renderHTML( host, islandHtml, { mode: 'replace' } );
+		await flush();
+
+		expect( document.querySelector( '[data-testid="host"]' ) ).toBeNull();
+		const island = document.querySelector( '[data-testid="island"]' );
+		expect( island ).not.toBeNull();
+		expect(
+			document.querySelector( '[data-testid="txt"]' )?.textContent
+		).toBe( 'initial' );
+
+		// A subsequent splice into the new island works (not orphaned).
+		renderHTML(
+			'[data-testid="island"]',
+			'<button data-testid="btn" data-wp-on--click="actions.setChanged">go</button>'
+		);
+		await flush();
+		(
+			document.querySelector( '[data-testid="btn"]' ) as HTMLButtonElement
+		 ).click();
+		await flush();
+		expect(
+			document.querySelector( '[data-testid="txt"]' )?.textContent
+		).toBe( 'changed' );
+	} );
+} );
+
 describe( 'renderHTML at the island root', () => {
 	it( 'RED: replacing the island root with non-island HTML warns and does nothing', async () => {
 		// eslint-disable-next-line @wordpress/wp-global-usage
