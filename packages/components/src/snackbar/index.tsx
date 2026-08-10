@@ -93,33 +93,6 @@ function UnforwardedSnackbar(
 		}
 	}
 
-	const singleAction =
-		! explicitDismiss && actions?.length === 1 ? actions[ 0 ] : undefined;
-
-	function onSnackbarClick( event: KeyboardEvent | MouseEvent ) {
-		if ( singleAction ) {
-			// The action element handles its own click (with stopPropagation),
-			// so we only reach here when the user clicked the snackbar body
-			// outside the action element itself.
-			if ( singleAction.url ) {
-				// Mirror the window.open target that ExternalLink / Button use
-				// so we stay consistent with direct action-element clicks.
-				const target = singleAction.openInNewTab ? '_blank' : '_self';
-				window.open( singleAction.url, target );
-			}
-			if ( singleAction.onClick ) {
-				singleAction.onClick(
-					event as unknown as MouseEvent<
-						HTMLButtonElement | HTMLAnchorElement
-					>
-				);
-			}
-			onRemove?.();
-		} else if ( ! explicitDismiss ) {
-			dismissMe( event );
-		}
-	}
-
 	useSpokenMessage( spokenMessage, politeness );
 
 	// The `onDismiss/onRemove` can have unstable references,
@@ -157,23 +130,17 @@ function UnforwardedSnackbar(
 		'components-snackbar__content-with-icon': !! icon,
 	} );
 
-	// Determine the accessible label for the snackbar wrapper.
-	let wrapperAriaLabel: string | undefined;
-	if ( ! explicitDismiss ) {
-		wrapperAriaLabel = singleAction
-			? singleAction.label
-			: __( 'Dismiss this notice' );
-	}
-
 	return (
 		<div
 			ref={ ref }
 			className={ classes }
-			onClick={ ! explicitDismiss ? onSnackbarClick : undefined }
+			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : undefined }
-			onKeyPress={ ! explicitDismiss ? onSnackbarClick : undefined }
-			aria-label={ wrapperAriaLabel }
+			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
+			aria-label={
+				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
+			}
 			data-testid="snackbar"
 		>
 			<div className={ snackbarContentClassnames }>

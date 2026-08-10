@@ -15,6 +15,10 @@
 
 -   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
 
+### Enhancements
+
+-   `Snackbar`: Enlarge the action's click target with a bleeding pseudo-element so it is easier to hit, and reveal that area on hover and keyboard focus. The target stops short of the dismiss button when `explicitDismiss` is set, and clicking the snackbar body still dismisses the notice as before.
+
 ### Bug Fixes
 
 -   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
