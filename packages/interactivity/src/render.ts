@@ -51,7 +51,33 @@ const islandSelector = `[${ islandAttribute }]`;
 // successive splices never collide; the prefix is reserved so user
 // `data-wp-key` values can never collide with it.
 let syntheticKeyId = 0;
-const syntheticKeyPrefix = 'renderHTML-synthetic-';
+const syntheticKeyPrefix = 'wpiapi-synthetic-';
+
+// Assigns a key fallback to a top-level vnode being spliced in: a user
+// `data-wp-key` (already on `vnode.key`) wins, then the element's `id` (a
+// stable, server-visible name: refreshed HTML carrying the same id matches
+// the existing item — identity across refreshes, reorders, and duplicate
+// deliveries), then — for INSERTION modes only — a unique synthetic key so
+// the new item mounts fresh instead of being absorbed into the existing
+// item at its index (which would swallow the new item's data-wp-init and
+// re-run an existing item's). `inner`/`replace` get no synthetic key: they
+// are wholesale swaps where positional reuse is the desired default.
+// Directive-wrapped vnodes keep their real props in `originalProps`.
+const applyKeyFallback = ( vnode: any, allowSynthetic: boolean ): void => {
+	// Nullish on purpose: preact vnodes may carry key null (no key) or
+	// undefined.
+	// eslint-disable-next-line eqeqeq
+	if ( vnode.key != null ) {
+		return;
+	}
+	const realProps = vnode.props?.originalProps ?? vnode.props;
+	const id = realProps?.id;
+	if ( typeof id === 'string' && id !== '' ) {
+		vnode.key = id;
+	} else if ( allowSynthetic ) {
+		vnode.key = syntheticKeyPrefix + ( syntheticKeyId += 1 );
+	}
+};
 
 /**
  * Returns the OUTERMOST `data-wp-interactive` boundary — the island whose
@@ -237,18 +263,13 @@ const spliceIntoTree = (
 	atIndex?: number
 ): void => {
 	// Key the new top-level vnodes so preact can tell them apart from the
-	// existing children. Priority: a user `data-wp-key` (already on
-	// `vnode.key` — never overwritten), then the element's `id` (a stable,
-	// server-visible name: refreshed HTML carrying the same id matches the
-	// existing item — identity across refreshes, reorders, and duplicate
-	// deliveries), then — for INSERTION modes only (prepend/before/after/at)
-	// — a unique SYNTHETIC key so the new item mounts fresh instead of being
-	// absorbed into the existing item at its index (which would swallow the
-	// new item's data-wp-init and re-run an existing item's). `inner`/`replace`
-	// get NO synthetic key: they are wholesale swaps where positional reuse
-	// is the desired default — same-shape content keeps its element and
-	// state, and id-bearing content matches by id. Text nodes are plain
-	// strings and are skipped.
+	// Key the new top-level vnodes (the direct children of the container).
+	// A user `data-wp-key` wins, then the element's `id`, then — for
+	// INSERTION modes only (prepend/before/after/at) — a unique synthetic
+	// key so the new item mounts fresh instead of being absorbed into the
+	// existing item at its index. `inner`/`replace` get no synthetic key:
+	// positional reuse is the desired default for wholesale swaps. Text
+	// nodes are plain strings and are skipped.
 	const indexShifting =
 		mode === 'prepend' ||
 		mode === 'before' ||
@@ -258,22 +279,7 @@ const spliceIntoTree = (
 		if ( ! vdom || typeof vdom !== 'object' ) {
 			continue;
 		}
-		const vnode = vdom as any;
-		// Nullish on purpose: preact vnodes may carry key null (no
-		// key) or undefined.
-		// eslint-disable-next-line eqeqeq
-		if ( vnode.key != null ) {
-			continue;
-		}
-		// Directive-wrapped vnodes keep their real props in `originalProps`.
-		const id = vnode.props?.originalProps?.id ?? vnode.props?.id;
-		if ( typeof id === 'string' && id !== '' ) {
-			vnode.key = id;
-			continue;
-		}
-		if ( indexShifting ) {
-			vnode.key = syntheticKeyPrefix + ( syntheticKeyId += 1 );
-		}
+		applyKeyFallback( vdom as any, indexShifting );
 	}
 
 	const fragment = getRegionRootFragment( [ island ] ) as any;
