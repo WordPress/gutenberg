@@ -28,7 +28,10 @@ const UnforwardedValidatedSelectControl = (
 	);
 };
 
-export const ValidatedSelectControl = forwardRef(
-	UnforwardedValidatedSelectControl
-);
+export const ValidatedSelectControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef<
+		React.ComponentProps< typeof SelectControl > & ValidatedControlProps
+	> &
+		React.RefAttributes< HTMLSelectElement >
+> = forwardRef( UnforwardedValidatedSelectControl );
 ValidatedSelectControl.displayName = 'ValidatedSelectControl';
