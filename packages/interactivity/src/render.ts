@@ -489,11 +489,12 @@ export function renderHTML(
 	if ( ! island ) {
 		// No island around the container. If the HTML itself carries an
 		// interactive island (a `data-wp-interactive` element), adopt it:
-		// append the parsed nodes to the container, then hydrate the island
-		// through the sanctioned first-render path — the fragment's first
-		// render matches the pre-existing DOM, the same path `hydrateRegions`
-		// uses for SSR islands. Subsequent splices target the island
-		// normally. Anything else: warn + no-op.
+		// place the parsed nodes relative to the container per `mode` (raw
+		// DOM — there is no tree yet), then hydrate the island through the
+		// sanctioned first-render path — the fragment's first render matches
+		// the pre-existing DOM, the same path `hydrateRegions` uses for SSR
+		// islands. Subsequent splices target the island normally. Anything
+		// else: warn + no-op.
 		const htmlIsland = nodes.find(
 			( node ): node is Element =>
 				node instanceof Element && node.hasAttribute( islandAttribute )
@@ -504,7 +505,19 @@ export function renderHTML(
 			);
 			return;
 		}
-		nodes.forEach( ( node ) => containerElement.appendChild( node ) );
+		if ( mode === 'inner' ) {
+			containerElement.replaceChildren( ...nodes );
+		} else if ( mode === 'prepend' ) {
+			containerElement.prepend( ...nodes );
+		} else if ( mode === 'before' ) {
+			containerElement.before( ...nodes );
+		} else if ( mode === 'after' ) {
+			containerElement.after( ...nodes );
+		} else if ( mode === 'replace' ) {
+			containerElement.replaceWith( ...nodes );
+		} else {
+			containerElement.append( ...nodes );
+		}
 		hydrate(
 			toVdom( htmlIsland ) as VNode,
 			getRegionRootFragment( [ htmlIsland ] ) as ContainerNode
