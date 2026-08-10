@@ -198,19 +198,15 @@ html.interface-interface-skeleton__html-container {
 
 	&:focus,
 	&:focus-within {
-		top: auto;
+		top: $admin-bar-height-big;
 		bottom: 0;
 
-		.is-entity-save-view-open & {
-			top: $admin-bar-height-big;
+		@include break-medium() {
+			border-left: $border-width solid $gray-300;
+			top: $admin-bar-height;
 
-			@include break-medium() {
-				border-left: $border-width solid $gray-300;
-				top: $admin-bar-height;
-
-				.is-fullscreen-mode & {
-					top: var(--wp-admin--admin-bar--height, 0);
-				}
+			.is-fullscreen-mode & {
+				top: var(--wp-admin--admin-bar--height, 0);
 			}
 		}
 	}

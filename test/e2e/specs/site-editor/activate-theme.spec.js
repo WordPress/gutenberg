@@ -6,6 +6,40 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 // redirects to the themes screen.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
+async function navigateToRegion( page, pageUtils, region ) {
+	const regionCount = await page
+		.locator( '[role="region"][tabindex="-1"]' )
+		.count();
+
+	for ( let index = 0; index < regionCount; index++ ) {
+		await pageUtils.pressKeys( 'ctrl+`' );
+		if (
+			await region.evaluate(
+				( element ) => element === document.activeElement
+			)
+		) {
+			return;
+		}
+	}
+}
+
+async function expectRegionToFillEditor( page, region, openPanelButton ) {
+	await expect( region ).toBeVisible();
+	const editor = page
+		.locator( '.interface-interface-skeleton' )
+		.filter( { has: region } )
+		.last();
+	const [ regionBox, editorBox, buttonBox ] = await Promise.all( [
+		region.boundingBox(),
+		editor.boundingBox(),
+		openPanelButton.boundingBox(),
+	] );
+
+	expect( regionBox.y ).toBe( editorBox.y );
+	expect( regionBox.height ).toBe( editorBox.height );
+	expect( buttonBox.y ).toBeLessThan( regionBox.y + regionBox.height / 2 );
+}
+
 test.describe( 'Activate theme', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitAdminPage( 'themes.php' );
@@ -76,5 +110,33 @@ test.describe( 'Activate theme', () => {
 		).toContainText( 'Theme activated.' );
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
+	} );
+
+	// The extensible site editor does not expose the classic editor's keyboard
+	// region navigation order.
+	test( 'shows a closed save region at full editor height @site-editor-v1-only', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await expect(
+			page.getByRole( 'button', { name: 'Activate Emptytheme' } )
+		).toBeVisible();
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+		} );
+		await editor.canvas.locator( 'body' ).click();
+
+		const saveRegion = page.getByRole( 'region', {
+			name: 'Save panel',
+		} );
+		await navigateToRegion( page, pageUtils, saveRegion );
+
+		await expect( saveRegion ).toBeFocused();
+		const openSavePanel = saveRegion.getByRole( 'button', {
+			name: 'Open save panel',
+		} );
+		await expect( openSavePanel ).toBeVisible();
+		await expectRegionToFillEditor( page, saveRegion, openSavePanel );
 	} );
 } );

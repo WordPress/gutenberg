@@ -204,7 +204,6 @@ export default function EditorInterface( {
 		<InterfaceSkeleton
 			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
-				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 				'is-distraction-free': isDistractionFree && ! isPreviewMode,
 			} ) }
 			labels={ {
