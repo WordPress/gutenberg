@@ -74,9 +74,7 @@ export const Navigation = ( {
 											: undefined
 									}
 									render={
-										LinkComponent ? (
-											<LinkComponent />
-										) : undefined
+										LinkComponent && <LinkComponent />
 									}
 								/>
 							}
