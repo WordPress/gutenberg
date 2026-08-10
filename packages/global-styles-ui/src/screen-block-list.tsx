@@ -14,6 +14,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
@@ -35,6 +36,55 @@ const {
 	useHasColorPanel,
 	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
+
+/**
+ * Whether a value, or anything nested inside it, holds a real user value.
+ *
+ * A user entry can survive as an empty husk: clearing a value writes
+ * `undefined` in place rather than removing the key, so
+ * `{ color: { text: undefined } }` means "not customized". An empty string
+ * and zero are real values — an intentionally blank CSS string is still a
+ * user entry.
+ *
+ * @param value The value to inspect.
+ * @return Whether the value holds at least one leaf value.
+ */
+function hasAnyValue( value: unknown ): boolean {
+	if ( value === undefined || value === null ) {
+		return false;
+	}
+	if ( Array.isArray( value ) ) {
+		return value.length > 0;
+	}
+	if ( typeof value === 'object' ) {
+		return Object.values( value ).some( hasAnyValue );
+	}
+	return true;
+}
+
+/**
+ * Whether the user has customized a block.
+ *
+ * Per-block user data lives under two roots: `styles.blocks` for style values
+ * and `settings.blocks` for things like a block-specific color palette. Either
+ * one counts as a customization, and both are resettable by the user.
+ *
+ * Reads the user layer only. The merged config would match nearly every block,
+ * because themes style most of them.
+ *
+ * @param user      The user's global styles config.
+ * @param blockName The block to check, e.g. `core/quote`.
+ * @return Whether the user has any styles or settings for that block.
+ */
+export function hasUserStylesForBlock(
+	user: GlobalStylesConfig | undefined,
+	blockName: string
+): boolean {
+	return (
+		hasAnyValue( user?.styles?.blocks?.[ blockName ] ) ||
+		hasAnyValue( user?.settings?.blocks?.[ blockName ] )
+	);
+}
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
