@@ -40,8 +40,6 @@ function ResizableEditor( {
 	enableResizing,
 	width = '100%',
 	height = '100%',
-	onResizeStart,
-	onResizeStop,
 	children,
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
@@ -103,7 +101,6 @@ function ResizableEditor( {
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
-				onResizeStart?.();
 			} }
 			onResize={ ( event, direction, element ) => {
 				updateCanvasWidth( element );
@@ -111,7 +108,6 @@ function ResizableEditor( {
 			onResizeStop={ ( event, direction, element ) => {
 				updateCanvasWidth( element, true );
 				setIsResizing( false );
-				onResizeStop?.();
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"
