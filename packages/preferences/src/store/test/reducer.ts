@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { preferences } from '../reducer';
 
 describe( 'withPersistenceLayer( preferences )', () => {

@@ -381,4 +381,29 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 			array_keys( $schema['properties'] )
 		);
 	}
+
+	/**
+	 * `search` and `page` are not part of the view schema: they are managed via
+	 * the URL, which is their only source of truth.
+	 *
+	 * @covers ::get_item_schema
+	 */
+	public function test_get_item_schema_excludes_url_managed_view_properties() {
+		$controller = new Gutenberg_REST_View_Config_Controller_7_1();
+		$schema     = $controller->get_item_schema();
+
+		$views = array(
+			'default_view'             => $schema['properties']['default_view']['properties'],
+			'view_list item view'      => $schema['properties']['view_list']['items']['properties']['view']['properties'],
+			'default_layouts.table'    => $schema['properties']['default_layouts']['properties']['table']['properties'],
+			'default_layouts.grid'     => $schema['properties']['default_layouts']['properties']['grid']['properties'],
+			'default_layouts.list'     => $schema['properties']['default_layouts']['properties']['list']['properties'],
+			'default_layouts.activity' => $schema['properties']['default_layouts']['properties']['activity']['properties'],
+		);
+
+		foreach ( $views as $label => $properties ) {
+			$this->assertArrayNotHasKey( 'search', $properties, "$label should not declare a `search` property." );
+			$this->assertArrayNotHasKey( 'page', $properties, "$label should not declare a `page` property." );
+		}
+	}
 }

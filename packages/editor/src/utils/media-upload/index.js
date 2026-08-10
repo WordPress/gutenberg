@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { uploadMedia } from '@wordpress/media-utils';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import {
 	addFiles as trackStart,

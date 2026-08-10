@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Utilities/Animate',
+	title: 'Components/Deprecated/Animate',
 	id: 'components-animate',
 	component: Animate,
 	parameters: {
@@ -19,7 +12,7 @@ const meta: Meta< typeof Animate > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Write your own CSS animations instead, preferably using the [`motion tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
 	},
 };

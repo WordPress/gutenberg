@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {

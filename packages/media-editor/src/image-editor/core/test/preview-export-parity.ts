@@ -29,7 +29,6 @@
  * the center would agree (symmetric bug) but the corners would drift.
  */
 import { mat2d, vec2 } from 'gl-matrix';
-
 import {
 	createCamera,
 	createExportCamera,

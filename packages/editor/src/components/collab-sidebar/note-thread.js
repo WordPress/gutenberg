@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
@@ -20,10 +13,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { AddNote } from './add-note';
 import { Note } from './note';
 import { NoteCard } from './note-card';
@@ -103,6 +92,8 @@ export function NoteThread( {
 
 		// Drop the highlight, unless another note (possibly on the same block) now owns it.
 		if ( ! isNoteFocused ) {
+			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
+			debouncedToggleBlockHighlight.cancel();
 			toggleBlockHighlight( note.blockClientId, false );
 		}
 
@@ -127,6 +118,7 @@ export function NoteThread( {
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
+		debouncedToggleBlockHighlight.cancel();
 		toggleBlockHighlight( note.blockClientId, true );
 	}
 

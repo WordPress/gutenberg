@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { RegistryProvider, createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useUpdatePostLinkListener } from '../listener-hooks';
 import { STORE_NAME } from '../../../store/constants';
 

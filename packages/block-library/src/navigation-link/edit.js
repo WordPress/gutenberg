@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
@@ -25,10 +18,6 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,

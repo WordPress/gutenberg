@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Composite } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { MediaPreview } from './media-preview';
 
 function MediaList( {

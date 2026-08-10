@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
@@ -9,10 +6,6 @@ import {
 	plugins as pluginIcon,
 	globe,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 

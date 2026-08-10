@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import {
 	globalStylesDataKey,
@@ -18,7 +11,7 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import { ENABLE_GLOBAL_STYLES_INHERITANCE } from './inheritance';
+import { isGlobalStylesInheritanceEnabled } from './inheritance';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
@@ -247,8 +240,8 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
-		// Skip the cascade merge entirely when the feature is off.
-		if ( ! ENABLE_GLOBAL_STYLES_INHERITANCE ) {
+		// Skip the cascade merge entirely when the experiment is off.
+		if ( ! isGlobalStylesInheritanceEnabled() ) {
 			return NO_RESOLVED_STYLE;
 		}
 		if ( ! blockName ) {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	AlignmentControl,
 	BlockControls,
@@ -32,10 +25,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { recreateWithRecommendedBlocks } from './utils';
 import {
 	useDefaultAvatar,

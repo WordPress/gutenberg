@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useWidgetContext } from '../context/widget-context';
 
 function CaptureWidgetContext( {
