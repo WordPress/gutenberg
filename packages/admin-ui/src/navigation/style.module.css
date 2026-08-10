@@ -24,10 +24,11 @@
 	display: flex;
 	align-items: center;
 	/**
-	 * Meet the minimum 44x44px pointer target size (WCAG 2.5.8). No design
-	 * token maps to this accessibility constant.
+	 * Meet the 44x44px pointer target size of WCAG 2.5.5 Target Size
+	 * (Enhanced). No design token maps to this accessibility constant.
 	 */
 	min-block-size: 44px;
+	min-inline-size: 44px;
 	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	font-weight: var(--wpds-typography-font-weight-default);
 	text-decoration: none;
