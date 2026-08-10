@@ -8,6 +8,9 @@
     into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`
     into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Limit concurrent `esbuild` build jobs by default and add `--concurrency`
+    / `WP_BUILD_CONCURRENCY` overrides for `wp-build`
+    ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
 ### Bug Fixes
 

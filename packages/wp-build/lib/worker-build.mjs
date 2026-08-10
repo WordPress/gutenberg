@@ -8,7 +8,11 @@
  */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
-import esbuild from 'esbuild';
+
+/**
+ * Internal dependencies
+ */
+import { buildWithConcurrency } from './build-concurrency.mjs';
 
 /**
  * Creates an esbuild plugin that redirects module loads based on filename patterns.
@@ -169,7 +173,7 @@ export async function buildWorkers(
 		// Build ESM worker for build-module (primary for browser use).
 		if ( packageJson.module ) {
 			workerBuilds.push(
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join(
 						buildModuleDir,
@@ -211,7 +215,7 @@ export async function buildWorkers(
 		// unused or misleading CJS artifacts.
 		if ( packageJson.main ) {
 			workerBuilds.push(
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join( buildDir, `${ workerOutputName }.cjs` ),
 					bundle: true,
@@ -318,7 +322,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 
 	if ( packageJson.module ) {
 		retranspileBuilds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ workerCodeSrcFile ],
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -341,7 +345,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 
 	if ( packageJson.main ) {
 		retranspileBuilds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ workerCodeSrcFile ],
 				outdir: buildDir,
 				outbase: srcDir,
