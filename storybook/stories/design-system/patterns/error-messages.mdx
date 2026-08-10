@@ -6,6 +6,20 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 An error message can be the only conversation a user has with the software when something breaks. A good one turns a dead end into a next step or an action item. These guidelines describe how to write error messages that explain what happened, why, and what the user can do about it.
 
+See also: [Copy guide](docs/contributors/documentation/copy-guide.md).
+
+## Anatomy of a good error message
+
+A strong message answers three questions in order:
+
+1. **What happened?** The outcome, stated plainly.
+2. **Why?** The specific cause.
+3. **What now?** One or more next steps to try.
+
+> _{Browser} can't read {format} photos, so we couldn't convert this one. {Supported option} usually can, or {fallback} instead._
+
+Keep it to a sentence or two. If a message needs a paragraph, the underlying flow probably needs rethinking more than the copy does.
+
 ## Principles
 
 ### Explain the _why_
@@ -42,20 +56,11 @@ A message the user can't read or copy isn't actionable:
 -   **Place it near the problem.** If possible, place the message where the failure happened.
 -   **Let people copy it.** Optionally offer a copy-to-clipboard affordance so users can paste messages into search, documentation, or an AI assistant.
 
-## Anatomy of a good error message
-
-A strong message answers three questions in order:
-
-1. **What happened?** The outcome, stated plainly.
-2. **Why?** The specific cause.
-3. **What now?** One or more next steps to try.
-
-> _{Browser} can't read {format} photos, so we couldn't convert this one. {Supported option} usually can, or {fallback} instead._
-
-Keep it to a sentence or two. If a message needs a paragraph, the underlying flow probably needs rethinking more than the copy does.
-
 ## Displaying error messages
 
--   Use [`Notice`](https://wordpress.github.io/gutenberg/?path=/docs/components-notice--docs) with `status="error"` for errors that need the user's attention and a decision. A `Notice` persists until dismissed or resolved. Optionally you can use a [`Snackbar` with explicit dismiss](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--with-explicit-dismiss) if it is closer to the context of the error-source.
--   Generally avoid [`Snackbar`](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) for errors that require action: it's designed to clear itself after a short delay.
--   For validation of user input on save or submit, follow the [Save & Submit](https://wordpress.github.io/gutenberg/?path=/docs/design-system-patterns-save-submit--docs) pattern: scroll to the first invalid field and show the message there.
+1.  **Does the user have to make a decision?** If not, use a [`Snackbar`](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs). It clears itself after after a short delay.
+2.  If yes, **Can you show where the failure happened?** Then do that: render a [`Notice`](https://wordpress.github.io/gutenberg/?path=/docs/components-notice--docs) with `status="error"` in the block, panel, or row that failed, rather than at the top of the screen. For invalid fields on save or submit, follow the [Save & Submit](https://wordpress.github.io/gutenberg/?path=/docs/design-system-patterns-save-submit--docs) pattern, which scrolls to the first field and shows the message there.
+3.  **Does it affect the whole screen?** Use a `Notice` at the top of the screen, below any toolbars. It persists until dismissed or resolved.
+4.  **Must it be resolved before the user can continue?** Use a `Modal`, not a `Notice`. See the [`Notice` guidelines](https://wordpress.github.io/gutenberg/?path=/docs/components-notice--docs).
+
+Note: if a Snackbar's position is right but its timer isn't, set `explicitDismiss` to keep it on screen until the user closes it.
