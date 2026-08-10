@@ -26,7 +26,9 @@ export interface CursorCoords {
  *
  * Used to give collaborators a visible presence indicator (avatar/outline)
  * on the container when their cursor/selection is inside hidden content, in
- * place of a cursor that would otherwise have nowhere valid to render.
+ * place of a cursor that would otherwise have nowhere valid to render. Also
+ * used by collaborators-presence/list.tsx's click-to-navigate handler to
+ * find a stable scroll target when jumping to a collaborator's location.
  *
  * @param element - The hidden element to walk up from.
  * @return The nearest visible [data-block] ancestor, or null if none found.
