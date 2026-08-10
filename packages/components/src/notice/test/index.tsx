@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import Notice from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );

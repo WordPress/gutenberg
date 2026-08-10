@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getFilteredTemplatePartBlocks from '../get-filtered-template-parts';
 
 const NESTED_BLOCKS = [

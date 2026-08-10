@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import normalizeFields from '../field-types';
 import normalizeForm from '../components/dataform-layouts/normalize-form';
 import type {

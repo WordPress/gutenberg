@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { calculateRetryDelay, shouldRetryError } from '../utils/retry';
 import { UploadError } from '../../upload-error';
 

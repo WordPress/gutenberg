@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { identity as aIdentity, store as aStore } from './a.js';
 import { identity as bIdentity, store as bStore } from './b.js';
 

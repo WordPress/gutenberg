@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	act,
 	render,
@@ -10,15 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	computePopoverPosition,
 	positionToPlacement,

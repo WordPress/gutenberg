@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { BackgroundStyle } from '../types';
 
 export const BACKGROUND_BLOCK_DEFAULT_VALUES = {

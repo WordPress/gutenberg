@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../../name';
 
 /**

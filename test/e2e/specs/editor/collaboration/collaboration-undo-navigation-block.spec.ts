@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import { type UserCredentials } from './fixtures/collaboration-utils';
 

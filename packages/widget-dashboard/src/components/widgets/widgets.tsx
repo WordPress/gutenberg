@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
@@ -15,10 +8,6 @@ import type {
 	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
 import { WidgetActions } from '../widget-actions';

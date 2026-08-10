@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 

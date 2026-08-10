@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 23.7.1 =
+
+**This is a security release. All users are strongly encouraged to update to this version as soon as possible.**
+
+## Changelog
+
+### Security
+
+- Address GHSAs for phpcs, wpcs. ([81279](https://github.com/WordPress/gutenberg/pull/81279))
+
+### Bug Fixes
+
+- Fix missing return value in force_filtered_html_on_import footnotes filter. ([81293](https://github.com/WordPress/gutenberg/pull/81293))
+- Content block: Ensure block tags always match the available options.
+- Latest Comments block: Ensure latest comments can be viewed only for public posts.
+- Post Date block: Fix the output of the post date.
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aduth @johnbillion @sirreal
+
+
 = 23.7.0 =
 
 

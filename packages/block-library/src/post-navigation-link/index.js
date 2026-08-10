@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';

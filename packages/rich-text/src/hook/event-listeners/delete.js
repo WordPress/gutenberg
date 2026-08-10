@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { remove } from '../../remove';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 

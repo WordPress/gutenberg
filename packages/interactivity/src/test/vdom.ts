@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { h } from 'preact';
 import type { VNode } from 'preact';
-
-/**
- * Internal dependencies
- */
 import { toVdom, hydratedIslands } from '../vdom';
 
 function createElementFromHTML( html: string ): HTMLElement {

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { isCollapsed } from '../../is-collapsed';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 

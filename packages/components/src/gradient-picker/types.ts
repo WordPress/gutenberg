@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { HeadingSize } from '../heading/types';
 
 export type GradientObject = {

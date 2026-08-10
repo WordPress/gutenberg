@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import {
 	getStyle,
 	getValueFromVariable,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { getStyleLabel } from './style-labels';
 import {
 	formatStyleValue,

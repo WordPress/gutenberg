@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	FontSizePicker,
 	__experimentalNumberControl as NumberControl,
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
