@@ -17,6 +17,7 @@
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Media blocks: Stop other Playlist, Audio, and Video blocks when playback starts ([#81387](https://github.com/WordPress/gutenberg/pull/81387)).
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 
 ### Internal
