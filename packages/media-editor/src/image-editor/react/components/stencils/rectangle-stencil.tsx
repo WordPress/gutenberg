@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -9,10 +6,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	DEFAULT_KEYBOARD_STEP,
@@ -59,21 +52,21 @@ const ALL_POSITIONS: HandlePosition[] = [
 function getHandleLabel( pos: HandlePosition ): string {
 	switch ( pos ) {
 		case 'n':
-			return __( 'Resize top edge' );
+			return __( 'Resize from top edge' );
 		case 's':
-			return __( 'Resize bottom edge' );
+			return __( 'Resize from bottom edge' );
 		case 'e':
-			return __( 'Resize right edge' );
+			return __( 'Resize from right edge' );
 		case 'w':
-			return __( 'Resize left edge' );
+			return __( 'Resize from left edge' );
 		case 'nw':
-			return __( 'Resize top-left corner' );
+			return __( 'Resize from top-left corner' );
 		case 'ne':
-			return __( 'Resize top-right corner' );
+			return __( 'Resize from top-right corner' );
 		case 'sw':
-			return __( 'Resize bottom-left corner' );
+			return __( 'Resize from bottom-left corner' );
 		case 'se':
-			return __( 'Resize bottom-right corner' );
+			return __( 'Resize from bottom-right corner' );
 	}
 }
 
@@ -101,6 +94,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.onResizeEnd        Callback fired when a resize drag ends (mouseup).
  * @param props.aspectRatio        Optional fixed aspect ratio (width / height).
  * @param props.freeformCrop       Whether resize handles are shown.
+ * @param props.isResizeDisabled   Whether resize handles should ignore pointer and keyboard input.
  * @param props.stencilTransition  CSS transition string for settle animation.
  * @param props.cropBounds         Maximum crop rect bounds from camera (zoom/rotation-aware).
  * @param props.onEscape           Called when Escape is pressed on a resize handle.
@@ -118,6 +112,7 @@ export function RectangleStencil( {
 	onResizeEnd,
 	aspectRatio,
 	freeformCrop = false,
+	isResizeDisabled = false,
 	stencilTransition,
 	cropBounds,
 	onEscape,
@@ -143,6 +138,9 @@ export function RectangleStencil( {
 	const keyboardResizeActiveRef = useRef( false );
 	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
+	const activePointerResizeRef = useRef< {
+		cancel: ( notifyResizeEnd?: boolean ) => void;
+	} | null >( null );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
 	// fire onResizeEnd / dispatch onto an unmounted parent.
@@ -150,8 +148,15 @@ export function RectangleStencil( {
 		return () => {
 			clearTimeout( keyboardSettleTimerRef.current );
 			keyboardResizeActiveRef.current = false;
+			activePointerResizeRef.current?.cancel( false );
 		};
 	}, [] );
+
+	useEffect( () => {
+		if ( isResizeDisabled ) {
+			activePointerResizeRef.current?.cancel();
+		}
+	}, [ isResizeDisabled ] );
 
 	// Latest callbacks for the drag listeners. The drag closure in
 	// handlePointerDown reads from this ref so it always sees current
@@ -212,6 +217,14 @@ export function RectangleStencil( {
 	 */
 	const handlePointerDown = useCallback(
 		( handle: HandlePosition, event: React.PointerEvent ) => {
+			if (
+				isResizeDisabled ||
+				( event.pointerType === 'touch' && event.isPrimary === false )
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
 			if ( event.button !== 0 ) {
 				return;
 			}
@@ -278,7 +291,10 @@ export function RectangleStencil( {
 			// Guard against duplicate firing: pointerup and
 			// lostpointercapture both fire on normal release.
 			let ended = false;
-			const onEnd = () => {
+			const endResize = (
+				notifyResizeEnd = true,
+				restoreFocus = true
+			) => {
 				if ( ended ) {
 					return;
 				}
@@ -290,17 +306,26 @@ export function RectangleStencil( {
 				el.removeEventListener( 'pointermove', onMove );
 				el.removeEventListener( 'pointerup', onEnd );
 				el.removeEventListener( 'lostpointercapture', onEnd );
-				latestHandlersRef.current?.onResizeEnd?.();
+				activePointerResizeRef.current = null;
+				if ( notifyResizeEnd ) {
+					latestHandlersRef.current?.onResizeEnd?.();
+				}
 				// Restore focus to the handle so arrow keys work
 				// immediately after a mouse drag. Browsers suppress
 				// :focus-visible after pointer interactions, so the
 				// focus ring stays hidden until the user presses a key.
-				el.focus( { preventScroll: true } );
+				if ( restoreFocus ) {
+					el.focus( { preventScroll: true } );
+				}
 			};
+			const cancelResize = ( notifyResizeEnd = true ) =>
+				endResize( notifyResizeEnd, false );
+			const onEnd = () => endResize();
 
 			el.addEventListener( 'pointermove', onMove );
 			el.addEventListener( 'pointerup', onEnd );
 			el.addEventListener( 'lostpointercapture', onEnd );
+			activePointerResizeRef.current = { cancel: cancelResize };
 
 			onResizeStart?.( handle );
 			// Cancel any pending keyboard settle so it can't fire onResizeEnd
@@ -309,7 +334,7 @@ export function RectangleStencil( {
 			clearTimeout( keyboardSettleTimerRef.current );
 			keyboardResizeActiveRef.current = false;
 		},
-		[ cropRect, onResizeStart ]
+		[ cropRect, isResizeDisabled, onResizeStart ]
 	);
 
 	/**
@@ -396,6 +421,10 @@ export function RectangleStencil( {
 	const handleKeyDown = useCallback(
 		( handle: HandlePosition, event: React.KeyboardEvent ) => {
 			const key = event.key;
+
+			if ( isResizeDisabled ) {
+				return;
+			}
 
 			if ( key === 'Escape' ) {
 				event.preventDefault();
@@ -503,6 +532,7 @@ export function RectangleStencil( {
 			onEscape,
 			keyboardResizeStep,
 			snapCropRect,
+			isResizeDisabled,
 		]
 	);
 
@@ -560,7 +590,11 @@ export function RectangleStencil( {
 						onPointerDown={ ( event ) =>
 							handlePointerDown( pos, event )
 						}
-						onTouchStart={ ( event ) => event.stopPropagation() }
+						onTouchStart={ ( event ) => {
+							if ( event.touches.length < 2 ) {
+								event.stopPropagation();
+							}
+						} }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
 						aria-label={ getHandleLabel( pos ) }
 						aria-describedby={ resizeHandleDescriptionId }

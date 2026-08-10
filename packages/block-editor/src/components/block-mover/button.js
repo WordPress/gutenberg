@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -14,10 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef, useMemo } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import {
 	chevronLeft,
 	chevronRight,

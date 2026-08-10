@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -14,19 +11,9 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 import { QueryPaginationLabelControl } from './query-pagination-label-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-const TEMPLATE = [
-	[ 'core/query-pagination-previous' ],
-	[ 'core/query-pagination-numbers' ],
-	[ 'core/query-pagination-next' ],
-];
 
 export default function QueryPaginationEdit( {
 	attributes: { paginationArrow, showLabel },
@@ -54,9 +41,7 @@ export default function QueryPaginationEdit( {
 		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	// Always show label text if paginationArrow is set to 'none'.
 	useEffect( () => {

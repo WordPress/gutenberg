@@ -44,6 +44,14 @@ function isInWordPressEnvironment(): boolean {
 // slot's connection state.
 let cachedSlot: HTMLDivElement | null = null;
 
+function ensureSlotIsAccessible( element: HTMLDivElement ): HTMLDivElement {
+	// `@wordpress/components` Modal preserves body children that already
+	// declare their `aria-hidden` state. Explicitly keep the slot exposed and
+	// reset stale isolation left on a persistent slot.
+	element.setAttribute( 'aria-hidden', 'false' );
+	return element;
+}
+
 function createSlot( ownerDocument: Document ): HTMLDivElement {
 	const element = ownerDocument.createElement( 'div' );
 	element.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
@@ -99,7 +107,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
 		cachedSlot.ownerDocument === ownerDocument &&
 		cachedSlot.isConnected
 	) {
-		return cachedSlot;
+		return ensureSlotIsAccessible( cachedSlot );
 	}
 
 	// Prefer an existing slot in the document over creating a duplicate —
@@ -108,8 +116,8 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
 		`[${ WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE }]`
 	);
 	if ( existing instanceof HTMLDivElement ) {
-		cachedSlot = existing;
-		return existing;
+		cachedSlot = ensureSlotIsAccessible( existing );
+		return cachedSlot;
 	}
 
 	// Don't orphan a cached slot still attached to a foreign document.
@@ -117,7 +125,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
 		cachedSlot.remove();
 	}
 
-	cachedSlot = createSlot( ownerDocument );
+	cachedSlot = ensureSlotIsAccessible( createSlot( ownerDocument ) );
 	return cachedSlot;
 }
 

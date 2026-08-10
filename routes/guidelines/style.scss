@@ -44,7 +44,7 @@
 	align-self: flex-start;
 	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 	margin-left: -$grid-unit-20;
-	font-weight: 500;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
 }
 

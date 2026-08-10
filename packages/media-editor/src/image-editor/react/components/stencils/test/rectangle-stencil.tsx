@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { RectangleStencil } from '../rectangle-stencil';
 import type { NormalizedRect, Size } from '../../../../core/types';
 import { DEFAULT_KEYBOARD_STEP } from '../../../../core/constants';
@@ -33,23 +26,29 @@ function renderStencil(
 	const onResizeStart = jest.fn();
 	const onResizeEnd = jest.fn();
 	const onEscape = jest.fn();
+	const props = {
+		cropRect: DEFAULT_CROP_RECT,
+		containerSize: CONTAINER_SIZE,
+		imageSize: IMAGE_SIZE,
+		onCropChange,
+		onResizeStart,
+		onResizeEnd,
+		onEscape,
+		freeformCrop: true,
+		cropBounds: CROP_BOUNDS,
+		...overrides,
+	};
 
-	render(
-		<RectangleStencil
-			cropRect={ DEFAULT_CROP_RECT }
-			containerSize={ CONTAINER_SIZE }
-			imageSize={ IMAGE_SIZE }
-			onCropChange={ onCropChange }
-			onResizeStart={ onResizeStart }
-			onResizeEnd={ onResizeEnd }
-			onEscape={ onEscape }
-			freeformCrop
-			cropBounds={ CROP_BOUNDS }
-			{ ...overrides }
-		/>
-	);
+	const utils = render( <RectangleStencil { ...props } /> );
 
-	return { onCropChange, onResizeStart, onResizeEnd, onEscape };
+	return {
+		...utils,
+		props,
+		onCropChange,
+		onResizeStart,
+		onResizeEnd,
+		onEscape,
+	};
 }
 
 describe( 'RectangleStencil', () => {
@@ -88,21 +87,23 @@ describe( 'RectangleStencil', () => {
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
 
 			expect( labels ).toEqual( [
-				'Resize top-left corner',
-				'Resize top edge',
-				'Resize top-right corner',
-				'Resize right edge',
-				'Resize bottom-right corner',
-				'Resize bottom edge',
-				'Resize bottom-left corner',
-				'Resize left edge',
+				'Resize from top-left corner',
+				'Resize from top edge',
+				'Resize from top-right corner',
+				'Resize from right edge',
+				'Resize from bottom-right corner',
+				'Resize from bottom edge',
+				'Resize from bottom-left corner',
+				'Resize from left edge',
 			] );
 		} );
 
 		it( 'describes keyboard resizing on resize handles', () => {
 			renderStencil();
 			expect(
-				screen.getByRole( 'button', { name: 'Resize top-left corner' } )
+				screen.getByRole( 'button', {
+					name: 'Resize from top-left corner',
+				} )
 			).toHaveAccessibleDescription(
 				'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
 			);
@@ -115,10 +116,10 @@ describe( 'RectangleStencil', () => {
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
 
 			expect( labels ).toEqual( [
-				'Resize top-left corner',
-				'Resize top-right corner',
-				'Resize bottom-right corner',
-				'Resize bottom-left corner',
+				'Resize from top-left corner',
+				'Resize from top-right corner',
+				'Resize from bottom-right corner',
+				'Resize from bottom-left corner',
 			] );
 		} );
 	} );
@@ -246,7 +247,7 @@ describe( 'RectangleStencil', () => {
 				imageSize: { width: 500, height: 500 },
 			} );
 			const nwHandle = screen.getByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} );
 
 			fireEvent.keyDown( nwHandle, {
@@ -313,7 +314,7 @@ describe( 'RectangleStencil', () => {
 			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => rect );
 			renderStencil( { aspectRatio: 1, snapCropRect } );
 			const nwHandle = screen.getByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} );
 
 			fireEvent.keyDown( nwHandle, {
@@ -362,6 +363,76 @@ describe( 'RectangleStencil', () => {
 			} );
 
 			expect( firstHandle.focus ).toHaveBeenCalled();
+		} );
+
+		it( 'does not start a pointer resize while resizing is disabled', () => {
+			const { onResizeStart } = renderStencil( {
+				isResizeDisabled: true,
+			} );
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).not.toHaveBeenCalled();
+		} );
+
+		it( 'cancels an active pointer resize when resizing becomes disabled', () => {
+			const { props, rerender, onResizeStart, onResizeEnd } =
+				renderStencil();
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			rerender( <RectangleStencil { ...props } isResizeDisabled /> );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+
+			fireEvent.pointerUp( firstHandle, { pointerId: 1 } );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'only stops touchstart propagation for single-touch handle gestures', () => {
+			const onTouchStart = jest.fn();
+			render(
+				<div onTouchStart={ onTouchStart }>
+					<RectangleStencil
+						cropRect={ DEFAULT_CROP_RECT }
+						containerSize={ CONTAINER_SIZE }
+						imageSize={ IMAGE_SIZE }
+						onCropChange={ jest.fn() }
+						freeformCrop
+						cropBounds={ CROP_BOUNDS }
+					/>
+				</div>
+			);
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.touchStart( firstHandle, {
+				touches: [ { clientX: 100, clientY: 100 } ],
+			} );
+			expect( onTouchStart ).not.toHaveBeenCalled();
+
+			fireEvent.touchStart( firstHandle, {
+				touches: [
+					{ clientX: 100, clientY: 100 },
+					{ clientX: 160, clientY: 100 },
+				],
+			} );
+			expect( onTouchStart ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

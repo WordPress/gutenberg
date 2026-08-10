@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { kebabCase } = unlock( componentsPrivateApis );

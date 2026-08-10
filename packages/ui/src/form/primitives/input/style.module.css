@@ -4,8 +4,8 @@
 	@layer components {
 		.input {
 			--_gcd-input-padding:
-				var(--wp-ui-input-padding-block, 0)
-				var(--wp-ui-input-layout-padding-inline, 0);
+				var(--wp-ui-input-padding-block, 0px)
+				var(--wp-ui-input-layout-padding-inline, 0px);
 
 			padding-block: var(--wp-ui-input-padding-block, 0);
 			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
@@ -34,6 +34,16 @@
 			&[type="email"],
 			&[type="url"] {
 				direction: ltr; /* maintain LTR in RTL languages */
+			}
+
+			&[type="number"] {
+				appearance: textfield;
+
+				&::-webkit-outer-spin-button,
+				&::-webkit-inner-spin-button {
+					appearance: none;
+					margin: 0;
+				}
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 .dataforms-layouts-regular__field {
 	width: 100%;
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-md);
 	justify-content: flex-start !important;
 	align-items: flex-start !important;
 
@@ -14,7 +14,7 @@
 .dataforms-layouts-regular__field-label {
 	width: 38%;
 	flex-shrink: 0;
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-md);
 	display: flex;
 	align-items: center;
 	line-height: var(--wpds-typography-line-height-sm);
@@ -31,7 +31,7 @@
 
 .dataforms-layouts-regular__field-control {
 	flex-grow: 1;
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-md);
 	display: flex;
 	align-items: center;
 }

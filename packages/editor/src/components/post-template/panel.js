@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { usePostTemplatePanelMode } from './hooks';
 import ClassicThemeControl from './classic-theme';
 import BlockThemeControl from './block-theme';

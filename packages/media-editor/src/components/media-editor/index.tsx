@@ -1,21 +1,15 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
-	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tabs } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
 	useCallback,
-	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -34,14 +28,9 @@ import {
 	ComplementaryArea,
 	InterfaceSkeleton,
 	PinnedItems,
-	// No type declarations available for @wordpress/interface.
-	// @ts-expect-error
+	// @ts-expect-error `@wordpress/interface` is not typed yet.
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -50,7 +39,6 @@ import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
-import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -71,8 +59,6 @@ export type { MediaEditorSaveResult } from './use-save-media-editor';
 const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 interface EditorTab {
 	id: string;
@@ -115,8 +101,17 @@ export interface MediaEditorProps {
 	shouldCloseOnEsc?: boolean;
 }
 
-function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	const tabsContextValue = useContext( Tabs.Context );
+interface MediaEditorSidebarProps {
+	tabs: EditorTab[];
+	activeTabId?: string;
+	onTabChange: ( tabId: string ) => void;
+}
+
+function MediaEditorSidebar( {
+	tabs,
+	activeTabId,
+	onTabChange,
+}: MediaEditorSidebarProps ) {
 	return (
 		<ComplementaryArea
 			scope="media-editor"
@@ -128,29 +123,31 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
 			closeLabel={ __( 'Close media panel' ) }
+			// Makes `Tabs.Root` the container, so the tab list passed as
+			// `header` and the panels below share a subtree across the fill.
+			render={
+				<Tabs.Root
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						onTabChange( value as string )
+					}
+				/>
+			}
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabList>
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } tabId={ tab.id }>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</Tabs.Context.Provider>
+				<Tabs.List variant="minimal">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
 			}
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel
-						key={ tab.id }
-						tabId={ tab.id }
-						focusable={ false }
-					>
-						{ tab.panel }
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs.Context.Provider>
+			{ tabs.map( ( tab ) => (
+				<Tabs.Panel key={ tab.id } value={ tab.id } tabIndex={ -1 }>
+					{ tab.panel }
+				</Tabs.Panel>
+			) ) }
 		</ComplementaryArea>
 	);
 }
@@ -170,11 +167,11 @@ function HeaderActions( {
 }: HeaderActionsProps ) {
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
-		<Flex
+		<Stack
 			className="media-editor__header-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			{ isImage && (
 				<Button
@@ -200,7 +197,7 @@ function HeaderActions( {
 					onClose={ () => setIsShortcutsModalOpen( false ) }
 				/>
 			) }
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -242,10 +239,10 @@ function HistoryActions( {
 		endGesture();
 	};
 	return (
-		<Flex
+		<Stack
 			className="media-editor__history-actions"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				size="compact"
@@ -280,7 +277,7 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -301,11 +298,11 @@ function FooterActions( {
 }: FooterActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
-		<Flex
+		<Stack
 			className="media-editor__footer-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				__next40pxDefaultSize
@@ -326,7 +323,7 @@ function FooterActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -501,6 +498,13 @@ function MediaEditorContent( {
 		isPanelLayout,
 	] );
 
+	// Control the active tab from state here so the selection survives the
+	// sidebar closing (which unmounts the `ComplementaryArea` Fill and its
+	// tabs). Fall back to the first tab until one is picked, so images open on
+	// Crop.
+	const [ selectedTabId, setSelectedTabId ] = useState< string >();
+	const activeTabId = selectedTabId ?? tabs[ 0 ]?.id;
+
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
@@ -588,9 +592,11 @@ function MediaEditorContent( {
 					</div>
 				) : (
 					<>
-						<Tabs>
-							<MediaEditorSidebar tabs={ tabs } />
-						</Tabs>
+						<MediaEditorSidebar
+							tabs={ tabs }
+							activeTabId={ activeTabId }
+							onTabChange={ setSelectedTabId }
+						/>
 						<InterfaceSkeleton
 							className="media-editor__skeleton"
 							labels={ {

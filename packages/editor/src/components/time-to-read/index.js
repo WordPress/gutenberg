@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { _x, _n, __, sprintf } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

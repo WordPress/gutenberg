@@ -4,6 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "./internal/wpds-token-fallbacks" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -12,12 +13,12 @@
 
 @mixin _text-heading() {
 	font-family: variables.$font-family-headings;
-	font-weight: variables.$font-weight-medium;
+	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
 }
 
 @mixin _text-body() {
 	font-family: variables.$font-family-body;
-	font-weight: variables.$font-weight-regular;
+	font-weight: wpds.var("--wpds-typography-font-weight-default");
 }
 
 @mixin heading-small() {
@@ -155,10 +156,10 @@
 }
 
 
-@mixin input-style__focus($accent-color: var(--wp-admin-theme-color)) {
-	border-color: $accent-color;
+@mixin input-style__focus() {
+	border-color: var(--wp-admin-theme-color);
 	// Expand the default border focus style by .5px to be a total of 1.5px.
-	box-shadow: 0 0 0 0.5px $accent-color;
+	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 }
@@ -177,6 +178,21 @@
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+}
+
+
+/**
+ * Standard focus rings for the WordPress Design System.
+ *
+ * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+ * e.g. `&:focus { @include outset-ring__focus(); }`.
+ */
+
+@mixin outset-ring__focus() {
+	--focus-color: #{ wpds.var("--wpds-color-stroke-focus") };
+
+	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color);
+	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
 
@@ -223,7 +239,7 @@
 
 @mixin snackbar-container() {
 	position: fixed;
-	bottom: 24px;
+	bottom: wpds.var("--wpds-dimension-size-md");
 	left: 0;
 	right: 0;
 	padding-inline: 16px;
@@ -279,7 +295,7 @@
 	}
 }
 
-@mixin input-control($accent-color: var(--wp-admin-theme-color)) {
+@mixin input-control() {
 	font-family: variables.$default-font;
 	padding: 6px 8px;
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
@@ -295,7 +311,7 @@
 	}
 
 	&:focus {
-		@include input-style__focus($accent-color);
+		@include input-style__focus();
 	}
 
 	// Use opacity to work in various editor styles.

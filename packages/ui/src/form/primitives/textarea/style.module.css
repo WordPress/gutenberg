@@ -3,7 +3,7 @@
 
 	@layer components {
 		.wrapper {
-			--wp-ui-textarea-min-height: 40px;
+			--wp-ui-textarea-min-height: var(--wpds-dimension-size-lg);
 		}
 
 		.textarea {

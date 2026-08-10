@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { textHorizontal, textVertical } from '@wordpress/icons';
 import {
@@ -40,7 +33,6 @@ export default function WritingModeControl( { className, value, onChange } ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__next40pxDefaultSize
 			label={ __( 'Orientation' ) }
 			className={ clsx( 'block-editor-writing-mode-control', className ) }
 			value={ value }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type {
 	DataFormControlProps,
@@ -9,13 +6,8 @@ import type {
 	NormalizedRules,
 } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
 import { Badge } from '@wordpress/ui';
 import { cleanForSlug } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import type { ContentType } from '../types';
 
@@ -262,7 +254,6 @@ export function SlugEdit< T extends ContentType >( {
 	};
 	return (
 		<ValidatedInputControl
-			__next40pxDefaultSize
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( validity ) }

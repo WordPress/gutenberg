@@ -3,7 +3,7 @@
 
 	@layer components {
 		.notice {
-			--icon-height: 24px;
+			--icon-height: var(--wpds-dimension-size-sm);
 			--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
 
 			--wp-ui-notice-background-color: var(--wpds-color-background-surface-neutral-weak);

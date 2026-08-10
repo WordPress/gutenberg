@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { version as reactVersion } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -269,8 +258,8 @@ function Iframe( {
 	}, [] );
 
 	const {
-		contentResizeListener,
-		containerResizeListener,
+		contentRef: scaleContentRef,
+		containerRef,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -286,6 +275,7 @@ function Iframe( {
 		contentRef,
 		writingFlowRef,
 		disabledRef,
+		scaleContentRef,
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.
@@ -365,7 +355,6 @@ function Iframe( {
 								...bodyClasses
 							) }
 						>
-							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
@@ -378,8 +367,7 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container">
-			{ containerResizeListener }
+		<div className="block-editor-iframe__container" ref={ containerRef }>
 			<div
 				className={ clsx(
 					'block-editor-iframe__scale-container',

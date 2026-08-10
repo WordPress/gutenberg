@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -26,10 +23,6 @@ import type {
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
