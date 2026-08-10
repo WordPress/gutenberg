@@ -4,6 +4,9 @@
 
 ### New Features
 
+-   `WidgetAction` gains envelope fields: `icon`, a registered icon name
+    resolved by `useWidgetTypes` into a renderable element, and `relevance`
+    (`'high' | 'low'`) ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets can reference their icon declaratively: `WidgetModuleRecord`
     carries a registered icon name and `useWidgetTypes` resolves it through
     the application-registered resolver (`registerIconResolver`), so

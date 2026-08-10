@@ -165,9 +165,10 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 
 /**
  * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
- * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe
- * entries; dropped hrefs are reported through `_doing_it_wrong()`. With
- * `$dir_name`, resolves widget-local file hrefs first.
+ * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
+ * incomplete or unsafe entries; dropped hrefs are reported through
+ * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
+ * first. A malformed `icon` or `relevance` drops the key, never the action.
  *
  * This is the registration gate for manifest-sourced widget types. Definitions
  * registered only on the client do not pass through it; any future CPT/API
@@ -232,6 +233,17 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 
 		if ( isset( $action['openInNewTab'] ) ) {
 			$entry['openInNewTab'] = (bool) $action['openInNewTab'];
+		}
+
+		if ( isset( $action['icon'] ) ) {
+			$icon = gutenberg_sanitize_widget_icon( $action['icon'] );
+			if ( $icon ) {
+				$entry['icon'] = $icon;
+			}
+		}
+
+		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'low' ), true ) ) {
+			$entry['relevance'] = $action['relevance'];
 		}
 
 		$sanitized[] = $entry;

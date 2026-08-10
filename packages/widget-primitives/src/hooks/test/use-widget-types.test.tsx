@@ -71,6 +71,21 @@ const pendingIconRecords: WidgetModuleRecord[] = [
 	{ ...stringIconRecords[ 0 ], icon: 'core/pending' },
 ];
 
+const actionIconRecords: WidgetModuleRecord[] = [
+	{
+		...records[ 0 ],
+		actions: [
+			{
+				id: 'report',
+				label: 'Open report',
+				href: 'https://example.com/report',
+				icon: 'core/chart-bar',
+				relevance: 'high',
+			},
+		],
+	},
+];
+
 describe( 'useWidgetTypes', () => {
 	afterEach( () => {
 		unregisterFieldType( 'test/location' );
@@ -177,5 +192,36 @@ describe( 'useWidgetTypes', () => {
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
 		expect( result.current[ 0 ][ 0 ].icon ).toBeUndefined();
+	} );
+
+	it( 'resolves action icon references through the resolver', async () => {
+		const resolvedIcon = createElement( 'svg', {
+			viewBox: '0 0 32 32',
+		} ) as WidgetIcon;
+		registerIconResolver( async () => resolvedIcon );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( actionIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBe(
+				resolvedIcon
+			)
+		);
+	} );
+
+	it( 'clears an action icon reference that does not resolve', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( actionIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect(
+				result.current[ 0 ][ 0 ].actions?.[ 0 ].icon
+			).toBeUndefined()
+		);
 	} );
 } );
