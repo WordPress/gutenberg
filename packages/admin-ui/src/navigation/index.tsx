@@ -43,8 +43,13 @@ export const Navigation = ( {
 
 	return (
 		<nav aria-label={ ariaLabel ?? __( 'Sections' ) }>
+			{ /*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */
+			/* eslint-disable jsx-a11y/no-redundant-roles */ }
 			<Stack
-				render={ <ul /> }
+				render={ <ul role="list" /> }
 				direction="row"
 				align="center"
 				gap="lg"
@@ -72,6 +77,7 @@ export const Navigation = ( {
 					</li>
 				) ) }
 			</Stack>
+			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 		</nav>
 	);
 };
