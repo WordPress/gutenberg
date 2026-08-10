@@ -1,26 +1,24 @@
+// eslint-disable-next-line no-warning-comments
 /**
  * @jest-environment jsdom
  */
 
 /**
- * Router fragment probes (R2–R4) — renderHTML/prune guards for navigation.
+ * Router probes (R2–R4) — renderHTML + router navigation interplay.
  *
- * These probes guard the fragment work's prune/renderHTML interaction with
- * router navigation. The attachTo-specific probes (R1, R5, R6) live in
- * `router-attachto.ts`, alongside the router fix they guard.
+ * These probe how a navigation interacts with a `renderHTML`-inserted node
+ * and with region content generally. All probes share ONE module registry
+ * (no `jest.resetModules`): the importmap loader defines a non-configurable
+ * `wpInteractivityRouterImport` global at module-eval, so re-importing per
+ * test would throw. Contamination is avoided by using a distinct region id
+ * per probe (r2–r4), fresh DOM per probe, and resetting the test store's
+ * `count` in `setup`.
  *
- * All probes share ONE module registry (no `jest.resetModules`): the
- * importmap loader defines a non-configurable `wpInteractivityRouterImport`
- * global at module-eval, so re-importing per test would throw. Contamination
- * is avoided by using a distinct region id per probe (r2–r4), fresh DOM per
- * probe, and resetting the test store's `count` in `setup`.
- *
- * - R2: a `renderHTML`-inserted node with a window listener inside a region
- *   is removed from the DOM when a navigation replaces the region (full
- *   listener cleanup is the router fix / MutationObserver, §8).
- * - R3: repeated navigations do not accumulate event listeners (green guard).
+ * - R2: a `renderHTML`-inserted node inside a region is removed from the DOM
+ *   when a navigation replaces the region.
+ * - R3: repeated navigations do not accumulate event listeners (guard).
  * - R4: a region that disappears from a later page leaves its element behind
- *   (green guard).
+ *   (guard).
  */
 
 /*
@@ -31,25 +29,31 @@
  * why upstream only e2e-tests the router.
  */
 jest.mock( '@wordpress/interactivity', () => {
-	const { store, getConfig, parseServerData, populateServerData } = require(
-		'../../../interactivity/src/store'
-	);
+	// preact / @preact/signals back the mocked internals but are not direct
+	// deps of this package — test-only requires, so disable the rule.
+	/* eslint-disable import/no-extraneous-dependencies */
+	const {
+		store,
+		getConfig,
+		parseServerData,
+		populateServerData,
+	} = require( '../../../interactivity/src/store' );
 	const {
 		getRegionRootFragment,
 		initialVdomPromise,
 	} = require( '../../../interactivity/src/hydration' );
 	const { toVdom } = require( '../../../interactivity/src/vdom' );
-	const { routerRegions } = require(
-		'../../../interactivity/src/directives/router-region'
-	);
-	const { navigationSignal, sessionId, warn } = require(
-		'../../../interactivity/src/utils'
-	);
-	const { pruneNodeFragments } = require(
-		'../../../interactivity/src/render'
-	);
+	const {
+		routerRegions,
+	} = require( '../../../interactivity/src/directives/router-region' );
+	const {
+		navigationSignal,
+		sessionId,
+		warn,
+	} = require( '../../../interactivity/src/utils' );
 	const { h, render } = require( 'preact' );
 	const { batch } = require( '@preact/signals' );
+	/* eslint-enable import/no-extraneous-dependencies */
 
 	return {
 		store,
@@ -67,7 +71,6 @@ jest.mock( '@wordpress/interactivity', () => {
 			navigationSignal,
 			sessionId,
 			warn,
-			pruneNodeFragments,
 		} ),
 	};
 } );
@@ -87,7 +90,9 @@ const ROUTER_NS = 'router-regions';
 
 // Suppress `state.navigation` deprecation warnings (and other SCRIPT_DEBUG
 // noise) that trip the global `not.toHaveWarned` console matcher.
+/* eslint-disable @wordpress/wp-global-usage */
 ( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
+/* eslint-enable @wordpress/wp-global-usage */
 
 const { state } = store( ROUTER_NS, {
 	// Each probe uses its own counter/action so a leaked listener from one
@@ -137,16 +142,14 @@ const setup = async ( initialHtml: string ) => {
 
 const navigate = async ( href: string, html: string ) => {
 	await actions.navigate( href, { html } );
-	// Settle the signal-driven region re-renders AND the router's async
-	// `pruneNodeFragments` (setTimeout 0) so the removed nodes' listeners are
-	// cleaned up before the probe asserts.
+	// Settle the signal-driven region re-renders before the probe asserts.
 	await tick();
 	await tick();
 	await flush();
 };
 
 describe( 'router fragment probes (R2-R4)', () => {
-	it( 'R2: renderHTML node inside a region is removed from the DOM on navigation (listener cleanup is Rev E)', async () => {
+	it( 'R2: renderHTML node inside a region is removed from the DOM on navigation', async () => {
 		await setup( `
 			<div data-wp-interactive="${ ROUTER_NS }">
 				<div
@@ -168,10 +171,14 @@ describe( 'router fragment probes (R2-R4)', () => {
 			'<span data-testid="extra" data-wp-on-window--resize="actions.incB"></span>'
 		);
 		await flush();
-		expect( content.querySelector( '[data-testid="extra"]' ) ).not.toBeNull();
+		expect(
+			content.querySelector( '[data-testid="extra"]' )
+		).not.toBeNull();
 
 		// Navigate to a page whose r2 content does NOT include the extra node.
-		await navigate( '/r2-b', page( `
+		await navigate(
+			'/r2-b',
+			page( `
 			<div data-wp-interactive="${ ROUTER_NS }">
 				<div
 					data-wp-interactive="${ ROUTER_NS }"
@@ -181,7 +188,8 @@ describe( 'router fragment probes (R2-R4)', () => {
 					<p>page B</p>
 				</div>
 			</div>
-		` ) );
+		` )
+		);
 
 		// The renderHTML node is removed from the DOM by the navigation.
 		expect( document.querySelector( '[data-testid="extra"]' ) ).toBeNull();
@@ -220,7 +228,9 @@ describe( 'router fragment probes (R2-R4)', () => {
 
 		// One listener each: clicking once and resizing once each increment once.
 		(
-			document.querySelector( '[data-testid="inc-btn"]' ) as HTMLButtonElement
+			document.querySelector(
+				'[data-testid="inc-btn"]'
+			) as HTMLButtonElement
 		 ).click();
 		expect( state.countC ).toBe( 1 );
 		window.dispatchEvent( new Event( 'resize' ) );
@@ -240,14 +250,18 @@ describe( 'router fragment probes (R2-R4)', () => {
 			</div>
 		` );
 
-		await navigate( '/r4-b', page( `
+		await navigate(
+			'/r4-b',
+			page( `
 			<div data-wp-interactive="${ ROUTER_NS }">
 				<p>no region here</p>
 			</div>
-		` ) );
+		` )
+		);
 
 		// Correct: the region element is removed from the DOM.
-		expect( document.querySelector( '[data-testid="region-r4"]' ) ).toBeNull();
+		expect(
+			document.querySelector( '[data-testid="region-r4"]' )
+		).toBeNull();
 	} );
-
 } );

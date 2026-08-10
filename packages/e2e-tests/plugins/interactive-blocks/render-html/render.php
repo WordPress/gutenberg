@@ -2,11 +2,20 @@
 /**
  * Block for testing the `renderHTML()` API.
  *
+ * Renders the fragment-loader UI, the overlapping re-render slots, and —
+ * when the `region` attribute is set — a router region with server content
+ * (the navigation target for the region-swap test).
+ *
  * @package e2e-interactivity
  *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 ?>
+<?php if ( ! empty( $attributes['region'] ) ) : ?>
+	<div data-wp-interactive="test/render-html" data-wp-router-region="test/region">
+		<p data-testid="region-server">server content</p>
+	</div>
+<?php else : ?>
 <div
 	data-wp-interactive="test/render-html"
 	data-wp-context='{ "count": 0 }'
@@ -106,6 +115,30 @@
 	>
 		Render into nested island container
 	</button>
+	<button
+		data-wp-on--click="actions.loadTwo"
+		data-testid="load-two"
+	>
+		Load two
+	</button>
+	<button
+		data-wp-on--click="actions.shrink"
+		data-testid="shrink"
+	>
+		Re-render slot A
+	</button>
+	<button
+		data-wp-on--click="actions.loadOne"
+		data-testid="load-one"
+	>
+		Load one
+	</button>
+	<button
+		data-wp-on--click="actions.grow"
+		data-testid="grow"
+	>
+		Grow to two
+	</button>
 	<?php if ( ! empty( $attributes['next'] ) ) : ?>
 		<a
 			data-wp-on--click="actions.navigate"
@@ -116,7 +149,12 @@
 		</a>
 	<?php endif; ?>
 	<div data-testid="target"></div>
+	<div data-testid="array-target">
+		<div data-testid="slot-a"></div>
+		<div data-testid="slot-b"></div>
+	</div>
 	<p data-testid="block-count" data-wp-text="context.count">0</p>
 	<p data-testid="hydrated" data-wp-text="state.isHydrated">no</p>
 	<p data-testid="resize-count" data-wp-text="state.resizeCount">0</p>
 </div>
+<?php endif; ?>

@@ -9,6 +9,15 @@ import {
 	renderHTML,
 } from '@wordpress/interactivity';
 
+/*
+ * Counter buttons for the slot-based overlapping re-render tests, bound to
+ * the island's context so both slots share one counter.
+ */
+const ITEM_A =
+	'<button data-testid="item-a" data-wp-text="context.count" data-wp-on--click="actions.increment">0</button>';
+const ITEM_B =
+	'<button data-testid="item-b" data-wp-text="context.count" data-wp-on--click="actions.increment">0</button>';
+
 const { state } = store( 'test/render-html', {
 	state: {
 		isHydrated: 'no',
@@ -87,6 +96,26 @@ const { state } = store( 'test/render-html', {
 					'<button data-testid="nested-btn" data-wp-on--click="actions.inc" data-wp-text="state.count">0</button>'
 				);
 			}
+		},
+		/*
+		 * Overlapping re-renders: each item lives in its own container slot.
+		 * Re-rendering one slot with fresh markup must never disturb the
+		 * other (a splice targets a single container).
+		 */
+		loadTwo() {
+			renderHTML( '[data-testid="slot-a"]', ITEM_A );
+			renderHTML( '[data-testid="slot-b"]', ITEM_B );
+		},
+		shrink() {
+			renderHTML( '[data-testid="slot-a"]', ITEM_A, {
+				mode: 'inner',
+			} );
+		},
+		loadOne() {
+			renderHTML( '[data-testid="slot-a"]', ITEM_A );
+		},
+		grow() {
+			renderHTML( '[data-testid="slot-b"]', ITEM_B );
 		},
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();

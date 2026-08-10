@@ -7,12 +7,13 @@ test.describe( 'renderHTML', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
 		// Post B renders the same router region (`test/region`) with server
-		// content; post A loads a fragment carrying that region via
-		// `renderElement()`, then navigates to B to test the swap.
-		const regionUrl = await utils.addPostWithBlock(
-			'test/render-html-region',
-			{ alias: 'render html - region' }
-		);
+		// content (the block's `region` variant); post A loads a fragment
+		// carrying that region via `renderHTML()`, then navigates to B to
+		// test the swap.
+		const regionUrl = await utils.addPostWithBlock( 'test/render-html', {
+			alias: 'render html - region',
+			attributes: { region: true },
+		} );
 		await utils.addPostWithBlock( 'test/render-html', {
 			alias: 'render html - main',
 			attributes: { next: regionUrl },
@@ -251,14 +252,16 @@ test.describe( 'renderHTML', () => {
 
 test.describe( 'renderHTML overlapping re-renders', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		// The first describe's afterAll deletes all posts, so re-create the
+		// main post (which now also hosts the overlapping-re-render slots).
 		await utils.activatePlugins();
-		await utils.addPostWithBlock( 'test/render-html-array', {
-			alias: 'render html - array',
+		await utils.addPostWithBlock( 'test/render-html', {
+			alias: 'render html - main',
 		} );
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		await page.goto( utils.getLink( 'render html - array' ) );
+		await page.goto( utils.getLink( 'render html - main' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
