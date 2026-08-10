@@ -20,6 +20,7 @@ import { getContext } from '../scopes';
  */
 import '../directives'; // Registers all the core directives.
 import { renderHTML } from '../render';
+import { elementToVnode } from '../hooks';
 import { hydrateRegions } from '../hydration';
 
 const NS = 'test/tree-first';
@@ -535,5 +536,143 @@ describe( 'nested islands (targeting a container inside one)', () => {
 		expect(
 			document.querySelector( '[data-testid="ns"]' )?.textContent
 		).toBe( 'nested' );
+	} );
+} );
+
+describe( 'text nodes in mixed content', () => {
+	it( 'text nodes mixed with elements survive re-renders by identity', async () => {
+		store( 'test/comp-C4', { state: { v: 'V', w: 'W' } } );
+		document.body.innerHTML =
+			'<div data-wp-interactive="test/comp-C4"><div data-testid="parent"></div></div>';
+		await hydrateRegions();
+		const parent = document.querySelector(
+			'[data-testid="parent"]'
+		) as HTMLElement;
+
+		renderHTML(
+			parent,
+			'hello <span data-testid="s" data-wp-text="state.v"></span> world'
+		);
+		expect( parent.childNodes.length ).toBe( 3 );
+		renderHTML(
+			parent,
+			'<span data-testid="t" data-wp-text="state.w"></span> tail'
+		);
+		expect( parent.childNodes.length ).toBe( 5 );
+		const s = parent.childNodes[ 1 ];
+		const t = parent.childNodes[ 3 ];
+		expect( ( parent.childNodes[ 0 ] as Text ).nodeValue ).toBe( 'hello ' );
+		expect( parent.childNodes[ 1 ] ).toBe( s );
+		expect( ( parent.childNodes[ 2 ] as Text ).nodeValue ).toBe( ' world' );
+		expect( parent.childNodes[ 3 ] ).toBe( t );
+		expect( ( parent.childNodes[ 4 ] as Text ).nodeValue ).toBe( ' tail' );
+
+		// Re-render the FIRST fragment (same HTML) via `inner` — the matched
+		// text nodes must survive BY IDENTITY (Preact reuses them), not just
+		// by content: recreating them would break caret/selection in live
+		// text. The second fragment (t/tail) is unmounted by the inner swap.
+		const helloText = parent.childNodes[ 0 ];
+		const worldText = parent.childNodes[ 2 ];
+
+		renderHTML(
+			parent,
+			'hello <span data-testid="s" data-wp-text="state.v"></span> world',
+			{ mode: 'inner' }
+		);
+
+		expect( parent.childNodes.length ).toBe( 3 );
+		expect( parent.childNodes[ 0 ] ).toBe( helloText );
+		expect( ( parent.childNodes[ 0 ] as Text ).nodeValue ).toBe( 'hello ' );
+		expect( parent.childNodes[ 1 ] ).toBe( s );
+		expect( parent.childNodes[ 2 ] ).toBe( worldText );
+		expect( ( parent.childNodes[ 2 ] as Text ).nodeValue ).toBe( ' world' );
+	} );
+} );
+
+describe( 'element→vnode map', () => {
+	const vdomParent = ( vnode: any ): any => vnode?.__ ?? null;
+	const vdomDom = ( vnode: any ): Node | null => vnode?.__e ?? null;
+
+	it( 'maps every rendered element to its vnode after initial hydration', async () => {
+		await setup(
+			'<div data-testid="a"><span data-testid="b"></span></div>'
+		);
+		expect(
+			elementToVnode.get( document.querySelector( '[data-testid="a"]' ) )
+		).toBeDefined();
+		expect(
+			elementToVnode.get( document.querySelector( '[data-testid="b"]' ) )
+		).toBeDefined();
+	} );
+
+	it( 'maps elements spliced in by renderHTML', async () => {
+		await setup( '<div data-testid="feed"></div>' );
+		renderHTML( '[data-testid="feed"]', '<p data-testid="p">x</p>' );
+		await flush();
+		expect(
+			elementToVnode.get( document.querySelector( '[data-testid="p"]' ) )
+		).toBeDefined();
+	} );
+
+	it( 'walks the _parent chain from a spliced element through the Directives wrapper to the island vnode', async () => {
+		await setup(
+			'<div data-testid="feed" data-wp-context=\'{ "n": 42 }\'></div>'
+		);
+		renderHTML(
+			'[data-testid="feed"]',
+			'<span data-testid="ctx" data-wp-text="context.n"></span>'
+		);
+		await flush();
+		const ctx = document.querySelector( '[data-testid="ctx"]' );
+		// The spliced content is wrapped in a Directives chain (data-wp-text
+		// is a directive) — the chain must climb through it to the island
+		// vnode, whose DOM node is the island element.
+		const island = document.querySelector( '[data-wp-interactive]' );
+		let vnode: any = elementToVnode.get( ctx );
+		let reachedIsland = false;
+		for ( let i = 0; vnode && i < 10; i += 1 ) {
+			if ( vdomDom( vnode ) === island ) {
+				reachedIsland = true;
+				break;
+			}
+			vnode = vdomParent( vnode );
+		}
+		expect( reachedIsland ).toBe( true );
+	} );
+
+	it( 'rejects a stale entry for an element removed by a splice and re-inserted raw', async () => {
+		await setup(
+			'<div data-testid="outer"><div data-testid="victim">v</div></div>'
+		);
+		const victim = document.querySelector( '[data-testid="victim"]' );
+		renderHTML( '[data-testid="outer"]', '<p>new</p>', {
+			mode: 'inner',
+		} );
+		await flush();
+		const outer = document.querySelector( '[data-testid="outer"]' );
+		expect( outer?.children.length ).toBe( 1 );
+		expect( outer?.children[ 0 ]?.textContent ).toBe( 'new' );
+
+		// Raw re-insertion of the removed element (unsupported territory, but
+		// its map entry survives) — renderHTML must reject the stale vnode
+		// instead of corrupting the tree.
+		outer?.appendChild( victim as Node );
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
+		const warnSpy = jest
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
+		renderHTML( victim as Element, '<p>x</p>' );
+		expect( warnSpy ).toHaveBeenCalled();
+		warnSpy.mockRestore();
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
+
+		// The tree is still consistent: the failed splice left the DOM alone
+		// and the island still accepts splices.
+		expect( outer?.children[ 0 ]?.textContent ).toBe( 'new' );
+		renderHTML( '[data-testid="outer"]', '<p>ok</p>' );
+		await flush();
+		expect( outer?.textContent ).toContain( 'ok' );
 	} );
 } );
