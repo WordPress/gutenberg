@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { describe, expect, test, beforeEach, afterEach } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { TypedAwareness } from '../typed-awareness';
 import type { EnhancedState } from '../types';
 

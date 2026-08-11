@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { diffLines } from 'diff';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { buildRevisionsPageQuery } from '../../store/private-selectors';
 import { unlock } from '../../lock-unlock';

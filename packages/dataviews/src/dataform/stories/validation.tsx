@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { Button, privateApis } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {

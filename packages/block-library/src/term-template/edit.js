@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { ToolbarGroup } from '@wordpress/components';
 import { list, grid } from '@wordpress/icons';
 import { memo, useMemo, useState } from '@wordpress/element';

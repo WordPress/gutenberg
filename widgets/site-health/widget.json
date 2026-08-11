@@ -9,5 +9,21 @@
 	"icon": "core/shield",
 	"category": "site",
 	"presentation": "framed",
-	"textdomain": "default"
+	"textdomain": "default",
+	"actions": [
+		{
+			"id": "site-health-status",
+			"label": "Status",
+			"icon": "dashboard-widgets/seen",
+			"relevance": "low",
+			"href": "site-health.php"
+		},
+		{
+			"id": "site-health-info",
+			"label": "Info",
+			"icon": "core/info",
+			"relevance": "low",
+			"href": "site-health.php?tab=debug"
+		}
+	]
 }

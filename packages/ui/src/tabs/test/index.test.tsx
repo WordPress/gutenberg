@@ -1,10 +1,22 @@
 /* eslint-disable jest/no-conditional-expect */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DirectionProvider } from '@base-ui/react/direction-provider';
 import { useEffect, useState, createRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import { Tabs } from '../..';
 import type { TabRootProps } from '../types';
+
+jest.mock( '@wordpress/i18n', () => ( {
+	...jest.requireActual( '@wordpress/i18n' ),
+	isRTL: jest.fn( () => false ),
+} ) );
+
+const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+
+afterEach( () => {
+	mockedIsRTL.mockClear();
+	mockedIsRTL.mockReturnValue( false );
+} );
 
 type Tab = {
 	value: string;
@@ -1382,6 +1394,7 @@ describe( 'Tabs', () => {
 				const mockOnValueChange = jest.fn();
 
 				const user = userEvent.setup();
+				mockedIsRTL.mockReturnValue( true );
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1389,13 +1402,11 @@ describe( 'Tabs', () => {
 						: { value: 'alpha' };
 
 				render(
-					<DirectionProvider direction="rtl">
-						<Component
-							tabs={ TABS }
-							onValueChange={ mockOnValueChange }
-							{ ...valueProps }
-						/>
-					</DirectionProvider>
+					<Component
+						tabs={ TABS }
+						onValueChange={ mockOnValueChange }
+						{ ...valueProps }
+					/>
 				);
 
 				// Alpha is selected from the consumer-provided initial value;

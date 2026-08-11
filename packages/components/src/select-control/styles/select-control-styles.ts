@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';

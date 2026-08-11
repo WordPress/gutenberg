@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	createElement,
 	isValidElement,
 	useEffect,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { resolveFields } from '../field-types';
 import { resolveIcon } from '../icon-resolver';
 import type {
@@ -41,7 +34,7 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * registered field types reach hosts as plain DataViews fields. Icon
  * references resolve through the registered icon resolver, off the loading
  * flag: widget types emit as soon as their modules land, and each resolved
- * icon patches in afterwards.
+ * icon patches in afterwards. Action icon references resolve the same way.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -177,6 +170,47 @@ export function useWidgetTypes(
 						} )
 					);
 				} );
+			}
+
+			/*
+			 * Each action icon reference resolves off the gate and patches
+			 * into the emitted type; an unresolvable reference clears, so
+			 * hosts only render elements.
+			 */
+			for ( const widgetType of results ) {
+				for ( const action of widgetType?.actions ?? [] ) {
+					if ( typeof action.icon !== 'string' ) {
+						continue;
+					}
+
+					const reference = action.icon;
+					void resolveIcon( reference ).then( ( resolved ) => {
+						if ( cancelled ) {
+							return;
+						}
+
+						setWidgetTypes( ( prev ) =>
+							prev.map( ( type ) => {
+								if ( type.name !== widgetType?.name ) {
+									return type;
+								}
+
+								return {
+									...type,
+									actions: type.actions?.map( ( entry ) =>
+										entry.id === action.id &&
+										entry.icon === reference
+											? {
+													...entry,
+													icon: resolved ?? undefined,
+											  }
+											: entry
+									),
+								};
+							} )
+						);
+					} );
+				}
 			}
 		} );
 

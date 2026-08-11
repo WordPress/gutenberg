@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { filterURLForDisplay, safeDecodeURIComponent } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

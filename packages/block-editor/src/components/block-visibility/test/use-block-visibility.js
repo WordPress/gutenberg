@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useMediaQuery } from '@wordpress/compose';
-
 // Mock WordPress dependencies before importing the hook
 jest.mock( '@wordpress/compose', () => ( {
 	...jest.requireActual( '@wordpress/compose' ),
 	useMediaQuery: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
 import useBlockVisibility from '../use-block-visibility';
 
 describe( 'useBlockVisibility', () => {

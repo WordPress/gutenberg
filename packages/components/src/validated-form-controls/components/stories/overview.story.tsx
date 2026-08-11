@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';

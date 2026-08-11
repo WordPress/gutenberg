@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Modal from '../modal';
 import type { ConfirmDialogProps, DialogInputEvent } from './types';
 import type { WordPressComponentProps } from '../context';
