@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { SVG, Circle } from '@wordpress/primitives';
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';
 import * as Styled from './styles';
-import { SVG, Circle } from '@wordpress/primitives';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

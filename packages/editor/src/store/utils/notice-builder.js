@@ -1,7 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
+import { ATTACHMENT_POST_TYPE } from '../constants';
+
+const AUTO_SAVE_FAILURE_NOTICE = __(
+	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.'
+);
+
+const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
+	'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.'
+);
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -32,6 +38,10 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	if ( willTrash ) {
 		noticeMessage = postType.labels.item_trashed;
 		shouldShowLink = false;
+	} else if ( post.type === ATTACHMENT_POST_TYPE ) {
+		// Attachments should always show a simple updated message because they don't have a draft state.
+		noticeMessage = __( 'Media updated.' );
+		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = __( 'Draft saved.' );
@@ -58,6 +68,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		actions.push( {
 			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
 			url: post.link,
+			openInNewTab: true,
 		} );
 	}
 	return [
@@ -79,7 +90,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
-	const { post, edits, error } = data;
+	const { post, edits, error, options } = data;
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.
@@ -88,23 +99,59 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
-	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message.
-	const messages = {
-		publish: __( 'Publishing failed.' ),
-		private: __( 'Publishing failed.' ),
-		future: __( 'Scheduling failed.' ),
-	};
-	let noticeMessage =
-		! isPublished && publishStatus.indexOf( edits.status ) !== -1
-			? messages[ edits.status ]
-			: __( 'Updating failed.' );
 
-	// Check if message string contains HTML. Notice text is currently only
-	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
-		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
+	if ( error.code === 'offline_error' ) {
+		const messages = {
+			publish: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			private: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			future: __(
+				'Scheduling failed because you were offline. Please verify your connection and try again.'
+			),
+			default: __(
+				'Updating failed because you were offline. Please verify your connection and try again.'
+			),
+		};
+
+		let noticeMessage =
+			! isPublished && edits.status in messages
+				? messages[ edits.status ]
+				: messages.default;
+
+		if ( options?.isAutosave ) {
+			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
+		}
+
+		return [ noticeMessage, { id: 'editor-save' } ];
 	}
+
+	const messages = {
+		publish: __(
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+		),
+		private: __(
+			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+		),
+		future: __(
+			'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.'
+		),
+		default: __(
+			'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
+		),
+	};
+
+	let noticeMessage =
+		! isPublished && edits.status in messages
+			? messages[ edits.status ]
+			: messages.default;
+
+	if ( options?.isAutosave ) {
+		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
+	}
+
 	return [
 		noticeMessage,
 		{

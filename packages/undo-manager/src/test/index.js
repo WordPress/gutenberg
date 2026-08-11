@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createUndoManager } from '../';
 
 describe( 'Undo Manager', () => {

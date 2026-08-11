@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { effect } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import { proxifyContext, proxifyState, deepMerge } from '../';
 
 describe( 'Interactivity API', () => {

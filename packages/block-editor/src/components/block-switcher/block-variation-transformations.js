@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import {
 	getBlockMenuDefaultClassName,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
@@ -100,6 +93,8 @@ function BlockVariationTransformationItem( {
 			} }
 			onMouseLeave={ () => setHoveredTransformItemName( null ) }
 			onMouseEnter={ () => setHoveredTransformItemName( name ) }
+			onFocus={ () => setHoveredTransformItemName( name ) }
+			onBlur={ () => setHoveredTransformItemName( null ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { Flex, FlexItem, Modal, ToggleControl } from '@wordpress/components';
+import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
@@ -13,10 +10,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
+import {
+	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 
 export function useStartPatterns() {
@@ -118,16 +116,14 @@ function StartPageOptionsModal( { onClose } ) {
 			</div>
 			<Flex
 				className="editor-start-page-options__modal__actions"
-				justify="flex-end"
+				justify="flex-start"
 				expanded={ false }
 			>
 				<FlexItem>
-					<ToggleControl
-						__nextHasNoMarginBottom
+					<CheckboxControl
 						checked={ showStartPatterns }
-						label={ __( 'Show starter patterns' ) }
-						help={ __(
-							'Shows starter patterns when creating a new page.'
+						label={ __(
+							'Always show starter patterns for new pages'
 						) }
 						onChange={ ( newValue ) => {
 							setShowStartPatterns( newValue );
@@ -141,25 +137,43 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const { isEditedPostDirty, isEditedPostEmpty } = useSelect( editorStore );
+	const { isEditedPostEmpty } = useSelect( editorStore );
+	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
 	const { isModalActive } = useSelect( interfaceStore );
-	const { enabled, postId } = useSelect( ( select ) => {
+	const { enabled, postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
 			'enableChoosePatternModal'
 		);
+		const currentPostType = getCurrentPostType();
 		return {
+			postType: currentPostType,
 			postId: getCurrentPostId(),
 			enabled:
-				choosePatternModalEnabled && 'page' === getCurrentPostType(),
+				choosePatternModalEnabled &&
+				ATTACHMENT_POST_TYPE !== currentPostType &&
+				TEMPLATE_POST_TYPE !== currentPostType &&
+				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};
 	}, [] );
 
 	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
 	// Examples: changing pages in the List View, creating a new page via Command Palette.
 	useEffect( () => {
-		const isFreshPage = ! isEditedPostDirty() && isEditedPostEmpty();
+		// Read non-transient edits directly. `isEditedPostDirty` /
+		// `hasEditsForEntityRecord` also return true while the CRDT
+		// sync manager's phantom save (fired off `receiveEntityRecords`
+		// at boot) is in flight, which would suppress the modal.
+		const hasEdits =
+			Object.keys(
+				getEntityRecordNonTransientEdits(
+					'postType',
+					postType,
+					postId
+				) ?? {}
+			).length > 0;
+		const isFreshPage = ! hasEdits && isEditedPostEmpty();
 		// Prevents immediately opening when features is enabled via preferences modal.
 		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
 		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
@@ -170,8 +184,9 @@ export default function StartPageOptions() {
 		setIsOpen( true );
 	}, [
 		enabled,
+		postType,
 		postId,
-		isEditedPostDirty,
+		getEntityRecordNonTransientEdits,
 		isEditedPostEmpty,
 		isModalActive,
 	] );

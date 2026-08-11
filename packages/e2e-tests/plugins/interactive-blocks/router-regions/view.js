@@ -1,7 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getServerContext,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const { state } = store( 'router-regions', {
 	state: {
@@ -14,6 +16,8 @@ const { state } = store( 'router-regions', {
 		counter: {
 			value: 0,
 		},
+		items: [ 'item 1', 'item 2', 'item 3' ],
+		initCount: 0,
 	},
 	actions: {
 		router: {
@@ -24,9 +28,10 @@ const { state } = store( 'router-regions', {
 				);
 				yield actions.navigate( e.target.href );
 			} ),
-			back() {
+			back: withSyncEvent( function* ( e ) {
+				e.preventDefault();
 				history.back();
-			},
+			} ),
 		},
 		counter: {
 			increment() {
@@ -43,6 +48,22 @@ const { state } = store( 'router-regions', {
 					context.counter.value = context.counter.initialValue;
 				}
 			},
+			updateCounterFromServer() {
+				const context = getContext();
+				const serverContext = getServerContext();
+				context.counter.serverValue = serverContext.counter.serverValue;
+			},
+		},
+		addItem() {
+			state.items.push( `item ${ state.items.length + 1 }` );
+		},
+	},
+	callbacks: {
+		init() {
+			state.initCount += 1;
+		},
+		nope() {
+			// This function does nothing.
 		},
 	},
 } );

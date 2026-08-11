@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
+import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { BorderBoxControl } from '..';
 
 const colors = [
@@ -44,16 +38,21 @@ const props = {
 		props.value = newValue;
 	} ),
 	value: undefined,
-	__next40pxDefaultSize: true,
 };
 
 const toggleLabelRegex = /Border color( and style)* picker/;
 const colorPickerRegex = /Border color picker/;
 
+function TestBorderBoxControl(
+	restProps: ComponentProps< typeof BorderBoxControl >
+) {
+	return <BorderBoxControl { ...props } { ...restProps } />;
+}
+
 describe( 'BorderBoxControl', () => {
 	describe( 'Linked view rendering', () => {
 		it( 'should render correctly when no value provided', () => {
-			render( <BorderBoxControl { ...props } /> );
+			render( <TestBorderBoxControl { ...props } /> );
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
@@ -78,7 +77,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should hide label', () => {
-			render( <BorderBoxControl { ...props } hideLabelFromVision /> );
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
 
 			const label = screen.getByText( props.label );
 
@@ -92,7 +91,9 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should show correct width value when flat border value provided', () => {
-			render( <BorderBoxControl { ...props } value={ defaultBorder } /> );
+			render(
+				<TestBorderBoxControl { ...props } value={ defaultBorder } />
+			);
 
 			const widthInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
@@ -103,7 +104,7 @@ describe( 'BorderBoxControl', () => {
 
 		it( 'should show correct width value when consistent split borders provided', () => {
 			render(
-				<BorderBoxControl { ...props } value={ defaultBorders } />
+				<TestBorderBoxControl { ...props } value={ defaultBorders } />
 			);
 
 			const widthInput = screen.getByRole( 'spinbutton', {
@@ -116,7 +117,9 @@ describe( 'BorderBoxControl', () => {
 		it( 'should render placeholder and omit unit select when border values are mixed', async () => {
 			const user = userEvent.setup();
 
-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
+			render(
+				<TestBorderBoxControl { ...props } value={ mixedBorders } />
+			);
 
 			// There are 4 inputs when in unlinked mode (top/right/bottom/left)
 			expect(
@@ -155,7 +158,7 @@ describe( 'BorderBoxControl', () => {
 
 			// Render control with mixed border values but consistent widths.
 			render(
-				<BorderBoxControl
+				<TestBorderBoxControl
 					{ ...props }
 					value={ {
 						top: { color: 'red', width: '5px', style: 'solid' },
@@ -193,7 +196,9 @@ describe( 'BorderBoxControl', () => {
 		it( 'should omit style options when requested', async () => {
 			const user = userEvent.setup();
 
-			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
+			render(
+				<TestBorderBoxControl { ...props } enableStyle={ false } />
+			);
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
@@ -220,7 +225,9 @@ describe( 'BorderBoxControl', () => {
 
 	describe( 'Split view rendering', () => {
 		it( 'should render split view by default when mixed values provided', () => {
-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
+			render(
+				<TestBorderBoxControl { ...props } value={ mixedBorders } />
+			);
 
 			const colorButtons = screen.getAllByLabelText( toggleLabelRegex );
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
@@ -242,7 +249,9 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render correct width values in appropriate inputs', () => {
-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
+			render(
+				<TestBorderBoxControl { ...props } value={ mixedBorders } />
+			);
 
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
 				name: 'Border width',
@@ -258,7 +267,7 @@ describe( 'BorderBoxControl', () => {
 			const user = userEvent.setup();
 
 			render(
-				<BorderBoxControl { ...props } value={ defaultBorders } />
+				<TestBorderBoxControl { ...props } value={ defaultBorders } />
 			);
 
 			await user.click(
@@ -283,7 +292,7 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl { ...props } enableStyle={ false } />
+					<TestBorderBoxControl { ...props } enableStyle={ false } />
 				);
 
 				await user.click(
@@ -318,7 +327,10 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl { ...props } value={ { width: '1px' } } />
+					<TestBorderBoxControl
+						{ ...props }
+						value={ { width: '1px' } }
+					/>
 				);
 
 				await user.clear(
@@ -332,7 +344,10 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl { ...props } value={ defaultBorder } />
+					<TestBorderBoxControl
+						{ ...props }
+						value={ defaultBorder }
+					/>
 				);
 
 				const widthInput = screen.getByRole( 'spinbutton', {
@@ -351,7 +366,7 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl
+					<TestBorderBoxControl
 						{ ...props }
 						value={ {
 							top: { color: '#72aee6' },
@@ -384,7 +399,10 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl { ...props } value={ defaultBorders } />
+					<TestBorderBoxControl
+						{ ...props }
+						value={ defaultBorders }
+					/>
 				);
 
 				const widthInput = screen.getByRole( 'spinbutton', {
@@ -403,7 +421,7 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl
+					<TestBorderBoxControl
 						{ ...props }
 						value={ {
 							top: { width: '1px' },
@@ -425,7 +443,7 @@ describe( 'BorderBoxControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<BorderBoxControl
+					<TestBorderBoxControl
 						{ ...props }
 						value={ {
 							top: { ...defaultBorder, width: '1px' },
@@ -464,7 +482,9 @@ describe( 'BorderBoxControl', () => {
 					left: { ...defaultBorder, width: '4px' },
 				};
 
-				render( <BorderBoxControl { ...props } value={ borders } /> );
+				render(
+					<TestBorderBoxControl { ...props } value={ borders } />
+				);
 
 				const widthInput = screen.getAllByRole( 'spinbutton', {
 					name: 'Border width',
@@ -488,7 +508,9 @@ describe( 'BorderBoxControl', () => {
 					left: { ...defaultBorder, width: '1px' },
 				};
 
-				render( <BorderBoxControl { ...props } value={ borders } /> );
+				render(
+					<TestBorderBoxControl { ...props } value={ borders } />
+				);
 
 				const widthInput = screen.getAllByRole( 'spinbutton', {
 					name: 'Border width',

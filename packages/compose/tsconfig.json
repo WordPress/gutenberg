@@ -13,6 +13,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../priority-queue" },
+		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }
 	],
 	"include": [ "src/**/*" ]
