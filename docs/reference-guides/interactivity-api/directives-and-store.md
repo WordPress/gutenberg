@@ -754,7 +754,7 @@ When the new content contains repeated elements, the Interactivity API matches t
 
 `append` is safe without any keys. `inner` and `replace` reuse existing elements by position, so same-shape content keeps its state across refreshes; to keep identity across a refresh, the refreshed content must carry the same `data-wp-key` (or `id`) as the current items.
 
-Safest is to always add a `data-wp-key` or `id` attribute, but the auto-key mechanism will work in most cases. Testing is recommended if you choose to do that.
+Safest is to always add a `data-wp-key` to the content you inject with `renderHTML()` and to the server-rendered content it joins — the `id` fallback and auto-generated keys are conveniences, not substitutes. Testing is recommended if you rely on the fallbacks.
 
 #### Known limitations
 
