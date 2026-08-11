@@ -233,10 +233,7 @@ function BackgroundInspectorControl( { children } ) {
 	);
 
 	return (
-		<InspectorControls
-			group="background"
-			resetAllFilter={ resetAllFilter }
-		>
+		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
 			{ children }
 		</InspectorControls>
 	);

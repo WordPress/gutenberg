@@ -741,9 +741,8 @@ export default function BackgroundImagePanel( {
 		hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue = hasExplicitImageUnset
-		? 'none'
-		: localBackgroundImage ||
-		  inheritedValue?.background?.backgroundImage;
+	? 'none'
+	: localBackgroundImage || inheritedValue?.background?.backgroundImage;
 
 	const shouldShowBackgroundImageControls =
 		hasImageValue &&
