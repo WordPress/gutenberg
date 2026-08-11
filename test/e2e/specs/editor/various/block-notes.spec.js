@@ -1,4 +1,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
 
 const CORE_DATA_PRIVATE_APIS_CONSENT =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
@@ -39,6 +42,10 @@ async function selectInlineText( page, paragraph, endOffset ) {
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
 		await use( new BlockNoteUtils( { page, editor, pageUtils } ) );
+	},
+	enableCollaboration: async ( { requestUtils }, use ) => {
+		await use( () => setCollaboration( requestUtils, true ) );
+		await setCollaboration( requestUtils, false );
 	},
 } );
 
@@ -1091,6 +1098,27 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Attachment persistence', () => {
+		test.beforeEach( async ( { enableCollaboration, page } ) => {
+			await enableCollaboration();
+			await page.reload();
+			await page.waitForFunction( () => {
+				const postId = window.wp?.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				return (
+					window._wpCollaborationEnabled === true &&
+					postId &&
+					window.wp.data
+						.select( 'core' )
+						.hasFinishedResolution( 'getEntityRecord', [
+							'postType',
+							'post',
+							postId,
+						] )
+				);
+			} );
+		} );
+
 		test( 'refuses a divergent dirty path instead of attaching to a saved sibling', async ( {
 			editor,
 			page,
