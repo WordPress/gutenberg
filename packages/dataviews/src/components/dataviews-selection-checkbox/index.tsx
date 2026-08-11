@@ -1,22 +1,19 @@
-/**
- * WordPress dependencies
- */
 import { CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import type { SetSelection } from '../../types/private';
+import type { NormalizedField } from '../../types';
 
-/**
- * Internal dependencies
- */
-import type { Field } from '../../types';
-import type { SetSelection } from '../../private-types';
+// This class is also used elsewhere to detect the selection checkbox.
+export const SELECTION_CHECKBOX_CLASS = 'dataviews-selection-checkbox';
 
 interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	item: Item;
 	getItemId: ( item: Item ) => string;
-	titleField?: Field< Item >;
+	titleField?: NormalizedField< Item >;
 	disabled: boolean;
+	tabIndex?: number;
 }
 
 export default function DataViewsSelectionCheckbox< Item >( {
@@ -26,9 +23,11 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	getItemId,
 	titleField,
 	disabled,
+	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
-	const checked = ! disabled && selection.includes( id );
+	const isInSelectionArray = selection.includes( id );
+	const checked = ! disabled && isInSelectionArray;
 
 	// Fallback label to ensure accessibility
 	const selectionLabel =
@@ -36,8 +35,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 
 	return (
 		<CheckboxControl
-			className="dataviews-selection-checkbox"
-			__nextHasNoMarginBottom
+			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }
@@ -46,12 +44,14 @@ export default function DataViewsSelectionCheckbox< Item >( {
 					return;
 				}
 
+				// Toggle in/out of selection array
 				onChangeSelection(
-					selection.includes( id )
+					isInSelectionArray
 						? selection.filter( ( itemId ) => id !== itemId )
 						: [ ...selection, id ]
 				);
 			} }
+			{ ...extraProps }
 		/>
 	);
 }

@@ -1,0 +1,43 @@
+[
+	{
+		"blockName": "core/comments-title",
+		"attrs": {
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/comments-title",
+		"attrs": {
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/comments-title",
+		"attrs": {
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

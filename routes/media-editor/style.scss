@@ -1,0 +1,8 @@
+@use "@wordpress/media-editor/build-style/style.css" as media-editor;
+
+.media-editor-route__content {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}

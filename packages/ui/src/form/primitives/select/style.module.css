@@ -1,0 +1,9 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.positioner {
+			z-index: var(--wp-ui-select-z-index, initial);
+		}
+	}
+}

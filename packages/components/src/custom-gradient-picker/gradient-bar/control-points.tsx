@@ -1,26 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { HStack } from '../../h-stack';
 import { ColorPicker } from '../../color-picker';
 import { VisuallyHidden } from '../../visually-hidden';
 import { CustomColorPickerDropdown } from '../../color-palette';
-
 import {
 	addControlPoint,
 	clampPercent,
@@ -58,7 +46,7 @@ function ControlPointButton( {
 				aria-label={ sprintf(
 					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
-						'Gradient control point at position %1$s%% with color code %2$s.'
+						'Gradient control point at position %1$d%% with color code %2$s.'
 					),
 					position,
 					color
@@ -129,7 +117,8 @@ function ControlPoints( {
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
 }: ControlPointsProps ) {
-	const controlPointMoveStateRef = useRef< ControlPointMoveState >();
+	const controlPointMoveStateRef =
+		useRef< ControlPointMoveState >( undefined );
 
 	const onMouseMove = ( event: MouseEvent ) => {
 		if (
@@ -177,7 +166,7 @@ function ControlPoints( {
 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
 	// This memoization would prevent the event listeners from being properly cleaned.
 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
-	const cleanEventListenersRef = useRef< () => void >();
+	const cleanEventListenersRef = useRef< () => void >( undefined );
 	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {

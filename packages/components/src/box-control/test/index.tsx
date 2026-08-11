@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
 
@@ -29,7 +18,6 @@ const ControlledBoxControl = (
 
 	return (
 		<BoxControl
-			__next40pxDefaultSize
 			values={ state }
 			onChange={ ( next ) => setState( next ) }
 			{ ...extraProps }
@@ -42,7 +30,7 @@ const UncontrolledBoxControl = ( {
 	...props
 }: DistributiveOmit< BoxControlProps, 'onChange' > & {
 	onChange?: BoxControlProps[ 'onChange' ];
-} ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
+} ) => <BoxControl onChange={ onChange } { ...props } />;
 
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
@@ -472,6 +460,20 @@ describe( 'BoxControl', () => {
 				bottom: undefined,
 				left: undefined,
 			} );
+		} );
+	} );
+
+	describe( 'Placeholder', () => {
+		it( 'applies a consumer-supplied placeholder passed via inputProps', () => {
+			render(
+				<UncontrolledBoxControl
+					inputProps={ { placeholder: 'Inherited' } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toHaveAttribute( 'placeholder', 'Inherited' );
 		} );
 	} );
 } );

@@ -1,0 +1,47 @@
+[
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"showPostTitle": true,
+			"showCommentsCount": true,
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"showPostTitle": true,
+			"showCommentsCount": true,
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"showPostTitle": true,
+			"showCommentsCount": true,
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

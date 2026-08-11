@@ -1,14 +1,7 @@
 'use strict';
 /* eslint-disable jest/no-conditional-expect */
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { homedir } = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
@@ -85,12 +78,12 @@ describe( 'parseSourceString', () => {
 
 		it( 'should parse other sources', () => {
 			expect(
-				parseSourceString( 'http://test.com/testing.zip', options )
+				parseSourceString( 'http://example.com/testing.zip', options )
 			).toEqual( {
 				basename: 'testing',
 				path: '/test/cache/testing',
 				type: 'zip',
-				url: 'http://test.com/testing.zip',
+				url: 'http://example.com/testing.zip',
 			} );
 		} );
 	} );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -13,20 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useCommentQueryArgs, useCommentTree } from './hooks';
-
-const TEMPLATE = [
-	[ 'core/avatar' ],
-	[ 'core/comment-author-name' ],
-	[ 'core/comment-date' ],
-	[ 'core/comment-content' ],
-	[ 'core/comment-reply-link' ],
-	[ 'core/comment-edit-link' ],
-];
 
 /**
  * Function that returns a comment structure that will be rendered with default placehoders.
@@ -114,10 +98,7 @@ function CommentTemplateInnerBlocks( {
 	firstCommentId,
 	blocks,
 } ) {
-	const { children, ...innerBlocksProps } = useInnerBlocksProps(
-		{},
-		{ template: TEMPLATE }
-	);
+	const { children, ...innerBlocksProps } = useInnerBlocksProps( {} );
 
 	return (
 		<li { ...innerBlocksProps }>
@@ -182,7 +163,6 @@ const CommentTemplatePreview = ( {
 			tabIndex={ 0 }
 			role="button"
 			style={ style }
-			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			onClick={ handleOnClick }
 			onKeyPress={ handleOnClick }
 		/>
@@ -253,8 +233,8 @@ export default function CommentTemplateEdit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
 
 	const commentQuery = useCommentQueryArgs( {
 		postId,
