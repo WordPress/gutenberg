@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
@@ -185,8 +182,9 @@ test.describe( 'Block Notes: floating panel', () => {
 
 		// The divider is a `:root::after` pseudo-element inside the canvas
 		// (the body's overflow clip would cut a body-attached line short),
-		// pinned a small gap inside the reserved space so clipped full-bleed
-		// content never touches it. Its color derives from `currentColor`.
+		// occupying the outermost pixel of the reserved space so clipped
+		// full-bleed content meets it without covering it. Its color derives
+		// from `currentColor`.
 		const divider = await editor.canvas
 			.locator( 'body' )
 			.evaluate( ( body ) => {
@@ -209,11 +207,10 @@ test.describe( 'Block Notes: floating panel', () => {
 
 		expect( divider.position ).toBe( 'fixed' );
 		expect( divider.width ).toBe( 1 );
-		// The divider sits inside the reserved space, leaving a gap from the
-		// content clipped at the boundary.
-		expect( divider.insetInlineEnd ).toBeLessThan( divider.reservedWidth );
-		expect( divider.insetInlineEnd ).toBeGreaterThanOrEqual(
-			divider.reservedWidth - 16
+		// The divider's far edge lands exactly on the content boundary: flush
+		// with full-bleed content clipped there, with no gap and no overlap.
+		expect( divider.insetInlineEnd + divider.width ).toBe(
+			divider.reservedWidth
 		);
 		// Spans the visible canvas top to bottom.
 		expect( divider.height ).toBe( divider.viewportHeight );
