@@ -59,6 +59,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
+		getInteractiveTarget,
 		children,
 	}: {
 		/**
@@ -74,6 +75,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
 		getValidityTarget: () => ValidityTarget | null | undefined;
+		/**
+		 * A function that returns the element that the validity message should
+		 * describe. Defaults to the validity target.
+		 *
+		 * Controls that validate through a visually hidden delegate element must
+		 * provide this, so the message reaches the element the user actually
+		 * focuses rather than the delegate.
+		 */
+		getInteractiveTarget?: () => Element | null | undefined;
 		/**
 		 * The control component to apply validation to.
 		 *
@@ -272,11 +282,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 	const visibleMessage = showMessage ? message : null;
 
-	// Imperatively manage `aria-describedby` on the validity target so we
+	// Imperatively manage `aria-describedby` on the described element so we
 	// merge with any value the child control sets internally (e.g. from a
 	// `help` prop), rather than competing with it at the props level.
 	useEffect( () => {
-		const target = getValidityTarget();
+		const target = getInteractiveTarget?.() ?? getValidityTarget();
 		if ( ! target ) {
 			return;
 		}
@@ -300,7 +310,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		setDescribedBy( target, !! visibleMessage );
 
 		return () => setDescribedBy( target, false );
-	}, [ visibleMessage, messageId, getValidityTarget ] );
+	}, [ visibleMessage, messageId, getValidityTarget, getInteractiveTarget ] );
 
 	return (
 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>

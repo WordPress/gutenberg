@@ -37,9 +37,8 @@ describe( 'ValidatedFormTokenField', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
 
-		// The validation error targets the hidden delegate input, not the
-		// interactive combobox. The combobox's built-in description should
-		// be unaffected.
+		// The validation error is attached to the interactive combobox, and
+		// merges with — rather than replaces — the built-in description.
 		await waitFor( () => {
 			expect(
 				screen.getByText( 'Constraints not satisfied' )
@@ -48,5 +47,30 @@ describe( 'ValidatedFormTokenField', () => {
 		expect( input ).toHaveAccessibleDescription(
 			expect.stringContaining( 'Separate with commas or the Enter key.' )
 		);
+	} );
+
+	it( 'should connect the validation error to the interactive combobox', async () => {
+		const user = userEvent.setup();
+		render(
+			<form>
+				<ValidatedFormTokenField
+					label="Tags"
+					value={ [] }
+					onChange={ () => {} }
+					required
+				/>
+				<button type="submit">Submit</button>
+			</form>
+		);
+
+		const input = screen.getByRole( 'combobox', { name: /^Tags/ } );
+
+		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
+
+		await waitFor( () => {
+			expect( input ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Constraints not satisfied' )
+			);
+		} );
 	} );
 } );

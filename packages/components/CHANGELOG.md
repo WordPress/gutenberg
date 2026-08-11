@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   Validated form controls: Attach validation messages to the interactive element rather than the hidden validation delegate, so screen reader users hear the error on the control they focus. Affects `ValidatedFormTokenField`, `ValidatedToggleGroupControl`, and `ValidatedCustomSelectControl` ([#76741](https://github.com/WordPress/gutenberg/issues/76741)).
 -   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 
 ### TypeScript

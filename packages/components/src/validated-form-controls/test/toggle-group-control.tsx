@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ValidatedToggleGroupControl } from '../components';
 import { ToggleGroupControlOption } from '../../toggle-group-control';
 
@@ -24,5 +25,33 @@ describe( 'ValidatedToggleGroupControl', () => {
 		expect(
 			screen.getByRole( 'radiogroup', { name: 'Alignment' } )
 		).toHaveAccessibleDescription( 'Choose text alignment.' );
+	} );
+
+	it( 'should connect the validation error to the toggle group', async () => {
+		const user = userEvent.setup();
+		render(
+			<form>
+				<ValidatedToggleGroupControl
+					label="Alignment"
+					value={ undefined }
+					onChange={ () => {} }
+					required
+				>
+					<ToggleGroupControlOption label="Left" value="left" />
+					<ToggleGroupControlOption label="Center" value="center" />
+				</ValidatedToggleGroupControl>
+				<button type="submit">Submit</button>
+			</form>
+		);
+
+		const group = screen.getByRole( 'radiogroup', { name: /^Alignment/ } );
+
+		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
+
+		await waitFor( () => {
+			expect( group ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Constraints not satisfied' )
+			);
+		} );
 	} );
 } );
