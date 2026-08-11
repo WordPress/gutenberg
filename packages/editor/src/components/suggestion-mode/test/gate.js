@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createRegistry,
 	createReduxStore,
 	RegistryProvider,
 } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { isSuggestionModeEnabled, useCanSuggest } from '../gate';
 
 /*

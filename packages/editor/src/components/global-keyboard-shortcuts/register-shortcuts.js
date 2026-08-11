@@ -4,10 +4,6 @@ import { __ } from '@wordpress/i18n';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 
 /**
