@@ -186,6 +186,12 @@ const rebuildPathNode = (
 	childVNode: any,
 	chainElement: any
 ): any => {
+	// The key must be carried over explicitly (preact reads it only from
+	// props.key, and the original key lives on the vnode itself, not in
+	// props): a keyed node on the path that loses its key cannot match the
+	// old keyed vnode, so it would remount — re-running its data-wp-init
+	// and resetting its context.
+	const propsWithKey = { ...pathNode.props, key: pathNode.key };
 	if ( typeof pathNode.type === 'string' ) {
 		const oldChildren = vdomChildren( pathNode );
 		const idx = oldChildren.indexOf( childVNode );
@@ -199,12 +205,12 @@ const rebuildPathNode = (
 			// fall back to appending.
 			newChildren.push( child );
 		}
-		return h( pathNode.type, { ...pathNode.props, children: newChildren } );
+		return h( pathNode.type, { ...propsWithKey, children: newChildren } );
 	}
 	if ( pathNode.type === Directives ) {
-		return h( Directives, { ...pathNode.props, element: chainElement } );
+		return h( Directives, { ...propsWithKey, element: chainElement } );
 	}
-	return h( pathNode.type, { ...pathNode.props, children: [ child ] } );
+	return h( pathNode.type, { ...propsWithKey, children: [ child ] } );
 };
 
 /**
@@ -342,7 +348,11 @@ const spliceIntoTree = (
 			];
 		}
 		startIdx = path.length - 2;
-		current = h( target.type, { ...target.props, children: newChildren } );
+		current = h( target.type, {
+			...target.props,
+			key: target.key,
+			children: newChildren,
+		} );
 		chainElement = current;
 	} else {
 		// before / after / replace / at: splice into the container's parent's
@@ -416,7 +426,11 @@ const spliceIntoTree = (
 			];
 		}
 		startIdx = i - 2;
-		current = h( parent.type, { ...parent.props, children: newChildren } );
+		current = h( parent.type, {
+			...parent.props,
+			key: parent.key,
+			children: newChildren,
+		} );
 		chainElement = current;
 	}
 
