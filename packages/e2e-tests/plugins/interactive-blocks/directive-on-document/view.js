@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis } from '@wordpress/interactivity';
 
 const { directive } = privateApis(
@@ -31,6 +28,7 @@ const { state } = store( 'directive-on-document', {
 		isEventAttached: 'no',
 		keydownHandler: 'no',
 		keydownSecondHandler: 'no',
+		keydownThirdHandler: 'no',
 	},
 	callbacks: {
 		keydownHandler() {
@@ -50,6 +48,9 @@ const { state } = store( 'directive-on-document', {
 		},
 		keydownSecondHandler: () => {
 			state.keydownSecondHandler = 'yes';
+		},
+		keydownThirdHandler: () => {
+			state.keydownThirdHandler = 'yes';
 		},
 	},
 } );

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __unstableMotion as motion } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import FullscreenModeClose from './fullscreen-mode-close';
 import { unlock } from '../../lock-unlock';
 

@@ -7,16 +7,24 @@
 	"description": "Displays the contents of a post or page.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"attributes": {
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
 	"example": {
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
 				"backgroundImage": true
 			}
@@ -54,6 +62,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		},
 		"__experimentalBorder": {
 			"radius": true,

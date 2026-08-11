@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
-
 import type { DropdownProps } from '../types';
 
 export function useBorderControlDropdown(
@@ -25,7 +17,6 @@ export function useBorderControlDropdown(
 		enableStyle = true,
 		onChange,
 		previousStyleSelection,
-		size = 'default',
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
@@ -65,8 +56,8 @@ export function useBorderControlDropdown(
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.colorIndicatorWrapper( border, size ) );
-	}, [ border, cx, size ] );
+		return cx( styles.colorIndicatorWrapper( border ) );
+	}, [ border, cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
@@ -95,7 +86,6 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
-		size,
 		__experimentalIsRenderedInSidebar,
 	};
 }

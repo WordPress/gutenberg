@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { chevronDown, Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	chevronIconSize,
 	DownArrowWrapper,

@@ -1,0 +1,50 @@
+[
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

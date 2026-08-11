@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { blockTable as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -48,7 +41,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: 'Jaco Pastorius',
+							content: __( 'Jaco Pastorius' ),
 							tag: 'td',
 						},
 						{
@@ -64,7 +57,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: 'Betty Carter',
+							content: __( 'Betty Carter' ),
 							tag: 'td',
 						},
 						{
@@ -80,7 +73,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: 'Bebo Valdés',
+							content: __( 'Bebo Valdés' ),
 							tag: 'td',
 						},
 						{

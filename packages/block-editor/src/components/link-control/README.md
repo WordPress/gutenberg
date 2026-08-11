@@ -275,14 +275,14 @@ If passed, children are rendered after the input.
 
 ```jsx
 <LinkControlSearchInput>
-	<HStack justify="right">
+	<Stack justify="flex-end">
 		<Button
 			type="submit"
 			label={ __( 'Submit' ) }
 			icon={ keyboardReturn }
 			className="block-editor-link-control__search-submit"
 		/>
-	</HStack>
+	</Stack>
 </LinkControlSearchInput>
 ```
 
