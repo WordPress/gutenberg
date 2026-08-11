@@ -4,7 +4,7 @@ import {
 	type ResolvedSelection,
 } from '@wordpress/core-data';
 import { unlock } from '../../../lock-unlock';
-import { resolvePrimaryPosition } from '../resolve-primary-position';
+import { resolveStartPosition } from '../resolve-start-position';
 
 const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
 	CoreDataPrivateApis,
@@ -17,12 +17,12 @@ const RESOLVED: ResolvedSelection = {
 	attributeKey: 'content',
 };
 
-describe( 'resolvePrimaryPosition', () => {
+describe( 'resolveStartPosition', () => {
 	it( 'returns null when there is no selection', () => {
 		const resolveSelection = jest.fn();
 
 		expect(
-			resolvePrimaryPosition( undefined, resolveSelection )
+			resolveStartPosition( undefined, resolveSelection )
 		).toBeNull();
 		expect( resolveSelection ).not.toHaveBeenCalled();
 	} );
@@ -34,7 +34,7 @@ describe( 'resolvePrimaryPosition', () => {
 		} as any;
 		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
 
-		expect( resolvePrimaryPosition( selection, resolveSelection ) ).toBe(
+		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
 		);
 		expect( resolveSelection ).toHaveBeenCalledWith( selection );
@@ -47,7 +47,7 @@ describe( 'resolvePrimaryPosition', () => {
 		} as any;
 		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
 
-		expect( resolvePrimaryPosition( selection, resolveSelection ) ).toBe(
+		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
 		);
 		expect( resolveSelection ).toHaveBeenCalledWith( selection );
@@ -62,7 +62,7 @@ describe( 'resolvePrimaryPosition', () => {
 		} as any;
 		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
 
-		expect( resolvePrimaryPosition( selection, resolveSelection ) ).toBe(
+		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
 		);
 		expect( resolveSelection ).toHaveBeenCalledWith( {
@@ -83,7 +83,7 @@ describe( 'resolvePrimaryPosition', () => {
 		} as any;
 		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
 
-		expect( resolvePrimaryPosition( selection, resolveSelection ) ).toBe(
+		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
 		);
 		expect( resolveSelection ).toHaveBeenCalledWith( startEndpoint );
@@ -94,7 +94,7 @@ describe( 'resolvePrimaryPosition', () => {
 		const resolveSelection = jest.fn();
 
 		expect(
-			resolvePrimaryPosition( selection, resolveSelection )
+			resolveStartPosition( selection, resolveSelection )
 		).toBeNull();
 		expect( resolveSelection ).not.toHaveBeenCalled();
 	} );
@@ -109,7 +109,7 @@ describe( 'resolvePrimaryPosition', () => {
 		} );
 
 		expect(
-			resolvePrimaryPosition( selection, resolveSelection )
+			resolveStartPosition( selection, resolveSelection )
 		).toBeNull();
 	} );
 } );

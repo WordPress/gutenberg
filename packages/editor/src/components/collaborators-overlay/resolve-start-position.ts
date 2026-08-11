@@ -17,15 +17,11 @@ const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
  * For range selections (SelectionInOneBlock, SelectionInMultipleBlocks) this
  * is the start; a Cursor or WholeBlock selection has only one position.
  *
- * Shared by the collaborators overlay's hidden-content highlighting and the
- * "click an avatar to jump to that collaborator" handler, so both resolve
- * selections the same way instead of each re-implementing the branching.
- *
  * @param selection        - The collaborator's current selection state.
  * @param resolveSelection - Resolver from useResolvedSelection().
  * @return The resolved position, or null if there's nothing to resolve.
  */
-export function resolvePrimaryPosition(
+export function resolveStartPosition(
 	selection: SelectionState | undefined,
 	resolveSelection: ( selection: SelectionState ) => ResolvedSelection
 ): ResolvedSelection | null {

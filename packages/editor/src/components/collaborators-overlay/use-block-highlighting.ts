@@ -20,7 +20,7 @@ import {
 	getOrderedBlockRange,
 } from './cursor-dom-utils';
 import { resolveTargetElement } from './compute-selection';
-import { resolvePrimaryPosition } from './resolve-primary-position';
+import { resolveStartPosition } from './resolve-start-position';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -168,7 +168,7 @@ export function useBlockHighlighting(
 					// and placing an avatar on the nearest *visible*
 					// ancestor block, so collaborators still have a
 					// findable presence indicator.
-					const resolved = resolvePrimaryPosition(
+					const resolved = resolveStartPosition(
 						selection,
 						resolveSelection
 					);
