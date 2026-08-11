@@ -1,6 +1,6 @@
 import {
 	areCollaboratorInfosEqual,
-	generateAnonymousCollaboratorInfo,
+	generateFallbackCollaboratorInfo,
 	generateCollaboratorInfo,
 } from '../utils';
 import type { CollaboratorInfo } from '../types';
@@ -28,7 +28,6 @@ describe( 'Awareness Utils', () => {
 			overrides: Partial< CollaboratorInfo > = {}
 		): CollaboratorInfo => ( {
 			id: 1,
-			isAnonymous: false,
 			name: 'Test User',
 			slug: 'test-user',
 			avatar_urls: sharedAvatarUrls,
@@ -188,9 +187,9 @@ describe( 'Awareness Utils', () => {
 			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.id ).toBe( 42 );
+			expect( collaboratorInfo.wpUserId ).toBe( 42 );
 			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
 			expect( collaboratorInfo.slug ).toBe( 'test-user' );
-			expect( collaboratorInfo.isAnonymous ).toBe( false );
 		} );
 
 		test( 'should include browser type', () => {
@@ -315,13 +314,12 @@ describe( 'Awareness Utils', () => {
 			expect( collaboratorInfo ).toMatchObject( {
 				avatar_urls: {},
 				id: 1,
-				isAnonymous: false,
 				slug: '',
 			} );
 		} );
 	} );
 
-	describe( 'generateAnonymousCollaboratorInfo', () => {
+	describe( 'generateFallbackCollaboratorInfo', () => {
 		beforeEach( () => {
 			mockUserAgent( 'Some Browser/1.0' );
 			jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
@@ -331,29 +329,29 @@ describe( 'Awareness Utils', () => {
 			jest.restoreAllMocks();
 		} );
 
-		test( 'creates a complete anonymous presentation identity', () => {
-			const collaboratorInfo = generateAnonymousCollaboratorInfo( 9 );
+		test( 'creates complete fallback presentation information', () => {
+			const collaboratorInfo = generateFallbackCollaboratorInfo( 9 );
 
 			expect( collaboratorInfo ).toEqual( {
 				avatar_urls: {},
 				browserType: 'Unknown',
 				enteredAt: 1704067200000,
-				id: null,
-				isAnonymous: true,
-				name: 'Anonymous Koala',
+				id: 9,
+				name: 'Anonymous Meerkat · 9',
 				slug: 'anonymous-9',
+				wpUserId: null,
 			} );
 		} );
 
 		test( 'keeps the name stable for the same session ID', () => {
-			expect( generateAnonymousCollaboratorInfo( 3 ).name ).toBe(
-				generateAnonymousCollaboratorInfo( 3 ).name
+			expect( generateFallbackCollaboratorInfo( 3 ).name ).toBe(
+				generateFallbackCollaboratorInfo( 3 ).name
 			);
 		} );
 
 		test( 'varies the name across session IDs', () => {
-			expect( generateAnonymousCollaboratorInfo( 3 ).name ).not.toBe(
-				generateAnonymousCollaboratorInfo( 4 ).name
+			expect( generateFallbackCollaboratorInfo( 3 ).name ).not.toBe(
+				generateFallbackCollaboratorInfo( 4 ).name
 			);
 		} );
 	} );

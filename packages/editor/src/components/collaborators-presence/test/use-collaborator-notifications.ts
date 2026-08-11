@@ -83,7 +83,6 @@ function makeCollaborator(
 		isConnected: true,
 		collaboratorInfo: {
 			id,
-			isAnonymous: false,
 			name,
 			slug: name.toLowerCase(),
 			avatar_urls: {},
@@ -187,24 +186,23 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
-		it( 'uses the session ID for an anonymous collaborator notification', () => {
-			const anonymousCollaborator = {
+		it( 'uses the session ID for a fallback collaborator notification', () => {
+			const fallbackCollaborator = {
 				...bob,
 				clientId: 321,
 				collaboratorInfo: {
 					...bob.collaboratorInfo,
-					id: null,
-					isAnonymous: true,
-					name: 'Anonymous Koala',
+					id: 321,
+					name: 'Anonymous Rabbit · 8X',
 				},
 			};
 			renderNotifications();
 
-			mockRegistered.join?.( anonymousCollaborator, me );
+			mockRegistered.join?.( fallbackCollaborator, me );
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
-				'Anonymous Koala has joined the post.',
+				'Anonymous Rabbit · 8X has joined the post.',
 				expect.objectContaining( {
 					id: 'collab-user-entered-321',
 				} )

@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { AwarenessState } from './awareness-state';
 import { STORE_NAME as coreStore } from '../name';
 import {
-	generateAnonymousCollaboratorInfo,
+	generateFallbackCollaboratorInfo,
 	generateCollaboratorInfo,
 	isCurrentCollaborator,
 	areCollaboratorInfosEqual,
@@ -20,23 +20,26 @@ export abstract class BaseAwarenessState<
 	 * Set the current collaborator info in the local state.
 	 */
 	private async setCurrentCollaboratorInfo(): Promise< void > {
-		let collaboratorInfo;
+		const fallbackCollaboratorInfo = generateFallbackCollaboratorInfo(
+			this.clientID
+		);
+		this.setLocalStateField( 'collaboratorInfo', fallbackCollaboratorInfo );
 
 		try {
 			const currentUser =
 				await resolveSelect( coreStore ).getCurrentUser();
-			collaboratorInfo = isCurrentCollaborator( currentUser )
-				? generateCollaboratorInfo( currentUser )
-				: generateAnonymousCollaboratorInfo( this.clientID );
-		} catch {
-			// User routes can be disabled independently of collaboration. Keep
-			// awareness available with a session-scoped presentation identity.
-			collaboratorInfo = generateAnonymousCollaboratorInfo(
-				this.clientID
-			);
-		}
+			if ( ! isCurrentCollaborator( currentUser ) ) {
+				return;
+			}
 
-		this.setLocalStateField( 'collaboratorInfo', collaboratorInfo );
+			this.setLocalStateField( 'collaboratorInfo', {
+				...generateCollaboratorInfo( currentUser ),
+				enteredAt: fallbackCollaboratorInfo.enteredAt,
+			} );
+		} catch {
+			// User resolution can fail when the route is unavailable or because of
+			// a temporary request failure. The fallback identity is already usable.
+		}
 	}
 }
 

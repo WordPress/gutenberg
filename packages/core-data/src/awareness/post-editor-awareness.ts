@@ -3,6 +3,7 @@ import { Y } from '@wordpress/sync';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
+import { hasPresentableCollaboratorInfo } from './utils';
 import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
@@ -352,17 +353,25 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		// Build collaboratorMap from awareness store (all collaborators seen this session)
-		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
-			Array.from( this.getSeenStates().entries() ).map(
-				( [ clientId, collaboratorState ] ) => [
-					String( clientId ),
-					{
-						name: collaboratorState.collaboratorInfo.name,
-						wpUserId: collaboratorState.collaboratorInfo.id,
-					},
-				]
-			)
-		);
+		const collaboratorMap: Record< string, DebugCollaboratorData > = {};
+		for ( const [ clientId, collaboratorState ] of this.getSeenStates() ) {
+			const { collaboratorInfo } = collaboratorState;
+			if ( ! hasPresentableCollaboratorInfo( collaboratorInfo ) ) {
+				continue;
+			}
+
+			collaboratorMap[ clientId ] = {
+				name: collaboratorInfo.name,
+				// Peers running an older version do not send `wpUserId`. Their
+				// established `id` field is a WordPress user ID, so use it only
+				// when the explicit WordPress ID field is absent. Preserve null for
+				// fallback collaborators.
+				wpUserId:
+					collaboratorInfo.wpUserId === undefined
+						? collaboratorInfo.id
+						: collaboratorInfo.wpUserId,
+			};
+		}
 
 		// Serialize Yjs client items to avoid deep nesting
 		const serializableClientItems: Record<
@@ -402,7 +411,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			doc: docData,
 			clients: serializableClientItems,
-			collaboratorMap: Object.fromEntries( collaboratorMapData ),
+			collaboratorMap,
 		};
 	}
 }

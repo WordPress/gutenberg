@@ -29,7 +29,6 @@ const mockAvatarUrls = {
 
 const createMockCollaboratorInfo = () => ( {
 	id: 1,
-	isAnonymous: false,
 	name: 'Test User',
 	slug: 'test-user',
 	avatar_urls: mockAvatarUrls,
@@ -82,15 +81,16 @@ describe( 'BaseAwareness', () => {
 
 			awareness.setUp();
 			awareness.setUp();
-
 			// Should not throw and should only call getCurrentUser once
 			expect( resolveSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		test( 'should fetch current user and set userInfo', async () => {
+		test( 'replaces the fallback identity when the current user resolves', async () => {
 			const awareness = new BaseAwareness( doc );
 
 			awareness.setUp();
+			const enteredAt =
+				awareness.getLocalStateField( 'collaboratorInfo' )?.enteredAt;
 
 			// Wait for async operations
 			await Promise.resolve();
@@ -99,36 +99,59 @@ describe( 'BaseAwareness', () => {
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toBeDefined();
 			expect( collaboratorInfo?.id ).toBe( 1 );
+			expect( collaboratorInfo?.wpUserId ).toBe( 1 );
 			expect( collaboratorInfo?.name ).toBe( 'Test User' );
-			expect( collaboratorInfo?.isAnonymous ).toBe( false );
 			expect( collaboratorInfo?.browserType ).toBe( 'Chrome' );
+			expect( collaboratorInfo?.enteredAt ).toBe( enteredAt );
 		} );
 
-		test( 'uses an anonymous identity when the current user fails to resolve', async () => {
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getCurrentUser: jest.fn().mockRejectedValue( {
-					code: 'rest_no_route',
-					data: { status: 404 },
+		test( 'publishes a fallback identity while the current user is pending', () => {
+			const awareness = new BaseAwareness( doc );
+
+			awareness.setUp();
+
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).toMatchObject( {
+				avatar_urls: {},
+				id: doc.clientID,
+				slug: `anonymous-${ doc.clientID }`,
+				wpUserId: null,
+			} );
+			expect( collaboratorInfo?.name ).toMatch(
+				/^Anonymous \S+ · [0-9A-Z]+$/
+			);
+			expect( awareness.getCurrentState() ).toEqual( [
+				expect.objectContaining( {
+					clientId: doc.clientID,
+					collaboratorInfo,
 				} ),
+			] );
+		} );
+
+		test( 'keeps the fallback identity when user resolution fails', async () => {
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getCurrentUser: jest.fn().mockRejectedValue( new Error() ),
 			} );
 			const awareness = new BaseAwareness( doc );
 
 			awareness.setUp();
-			await Promise.resolve();
 			await Promise.resolve();
 
 			const collaboratorInfo =
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toMatchObject( {
 				avatar_urls: {},
-				id: null,
-				isAnonymous: true,
+				id: doc.clientID,
 				slug: `anonymous-${ doc.clientID }`,
+				wpUserId: null,
 			} );
-			expect( collaboratorInfo?.name ).toMatch( /^Anonymous / );
+			expect( collaboratorInfo?.name ).toMatch(
+				/^Anonymous \S+ · [0-9A-Z]+$/
+			);
 		} );
 
-		test( 'uses an anonymous identity for an invalid user response', async () => {
+		test( 'keeps the fallback identity for an invalid user response', async () => {
 			( resolveSelect as jest.Mock ).mockReturnValue( {
 				getCurrentUser: jest.fn().mockResolvedValue( { id: 1 } ),
 			} );
@@ -140,8 +163,7 @@ describe( 'BaseAwareness', () => {
 			expect(
 				awareness.getLocalStateField( 'collaboratorInfo' )
 			).toMatchObject( {
-				id: null,
-				isAnonymous: true,
+				id: doc.clientID,
 			} );
 		} );
 	} );
@@ -208,7 +230,6 @@ describe( 'BaseAwarenessState', () => {
 			// Manually add another user's state
 			awareness.setLocalStateField( 'collaboratorInfo', {
 				id: 2,
-				isAnonymous: false,
 				name: 'Other User',
 				slug: 'other-user',
 				avatar_urls: mockAvatarUrls,
@@ -252,7 +273,6 @@ describe( 'BaseAwarenessState', () => {
 			const awareness = new TestBaseAwarenessState( doc );
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
-				isAnonymous: false,
 				name: 'Custom User',
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,
@@ -274,7 +294,6 @@ describe( 'BaseAwarenessState', () => {
 			const awareness = new TestBaseAwarenessState( doc );
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
-				isAnonymous: false,
 				name: 'Custom User',
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,

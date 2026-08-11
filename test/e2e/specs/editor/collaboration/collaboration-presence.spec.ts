@@ -70,14 +70,14 @@ test.describe( 'Collaboration - Presence', () => {
 		).toBeVisible();
 	} );
 
-	test( 'A collaborator whose user profile request fails appears with an anonymous name and initials avatar', async ( {
+	test( 'A collaborator whose user profile request fails appears with a fallback name and initials avatar', async ( {
 		collaborationUtils,
 		requestUtils,
 		page,
 	} ) => {
 		await hideCurrentUserRoutes( page );
 		const post = await requestUtils.createPost( {
-			title: 'Presence Test - Anonymous identity',
+			title: 'Presence Test - Fallback identity',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
@@ -90,22 +90,22 @@ test.describe( 'Collaboration - Presence', () => {
 		await expect( presenceButton ).toBeVisible( { timeout: 10000 } );
 		await presenceButton.click();
 
-		const anonymousName = page2.locator(
+		const fallbackName = page2.locator(
 			'.editor-collaborators-presence__list-item-name',
-			{ hasText: /^Anonymous / }
+			{ hasText: /^Anonymous \S+ · [0-9A-Z]+$/ }
 		);
-		const anonymousItem = page2
+		const fallbackItem = page2
 			.locator( '.editor-collaborators-presence__list-item' )
-			.filter( { has: anonymousName } );
-		await expect( anonymousItem ).toBeVisible();
+			.filter( { has: fallbackName } );
+		await expect( fallbackItem ).toBeVisible();
 
-		const anonymousAvatar = anonymousItem.getByRole( 'img', {
-			name: /^Anonymous /,
+		const fallbackAvatar = fallbackItem.getByRole( 'img', {
+			name: /^Anonymous \S+ · [0-9A-Z]+$/,
 		} );
-		await expect( anonymousAvatar ).toBeVisible();
-		await expect( anonymousAvatar.locator( 'img' ) ).toHaveCount( 0 );
+		await expect( fallbackAvatar ).toBeVisible();
+		await expect( fallbackAvatar.locator( 'img' ) ).toHaveCount( 0 );
 		await expect(
-			anonymousAvatar.locator( '.editor-avatar__image' )
+			fallbackAvatar.locator( '.editor-avatar__image' )
 		).toHaveText( /^A[A-Z]$/ );
 	} );
 
@@ -117,7 +117,7 @@ test.describe( 'Collaboration - Presence', () => {
 	} ) => {
 		await hideCurrentUserRoutes( page );
 		const post = await requestUtils.createPost( {
-			title: 'Presence Test - Anonymous collaboration',
+			title: 'Presence Test - Fallback collaboration',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 		} );
@@ -126,7 +126,7 @@ test.describe( 'Collaboration - Presence', () => {
 		const { editor2, page2 } = collaborationUtils;
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: { content: 'Edit from anonymous collaborator' },
+			attributes: { content: 'Edit from fallback collaborator' },
 		} );
 		await expect
 			.poll( () => editor2.getBlocks(), { timeout: 5000 } )
@@ -134,7 +134,7 @@ test.describe( 'Collaboration - Presence', () => {
 				{
 					name: 'core/paragraph',
 					attributes: {
-						content: 'Edit from anonymous collaborator',
+						content: 'Edit from fallback collaborator',
 					},
 				},
 			] );
@@ -150,7 +150,7 @@ test.describe( 'Collaboration - Presence', () => {
 			.toMatchObject( [
 				{
 					attributes: {
-						content: 'Edit from anonymous collaborator',
+						content: 'Edit from fallback collaborator',
 					},
 				},
 				{

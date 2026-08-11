@@ -43,7 +43,6 @@ const createMockActiveUser = (
 	isConnected: true,
 	collaboratorInfo: {
 		id: 1,
-		isAnonymous: false,
 		name: 'Test User',
 		slug: 'test-user',
 		avatar_urls: mockAvatarUrls,
@@ -201,6 +200,22 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			);
 
 			expect( result.current ).toEqual( mockUsers );
+		} );
+
+		test( 'does not expose a collaborator until identity information is available', () => {
+			const incompleteCollaborator = {
+				...createMockActiveUser(),
+				collaboratorInfo: undefined,
+			} as unknown as PostEditorAwarenessState;
+			mockAwareness.getCurrentState.mockReturnValue( [
+				incompleteCollaborator,
+			] );
+
+			const { result } = renderHook( () =>
+				useActiveCollaborators( 123, 'post' )
+			);
+
+			expect( result.current ).toEqual( [] );
 		} );
 
 		test( 'should subscribe to state changes', () => {
@@ -457,13 +472,12 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	} );
 
 	describe( 'multiple users scenario', () => {
-		test( 'should handle named and anonymous active users together', () => {
+		test( 'should handle resolved and fallback active users together', () => {
 			const user1 = createMockActiveUser( {
 				clientId: 1,
 				isMe: true,
 				collaboratorInfo: {
 					id: 1,
-					isAnonymous: false,
 					name: 'User One',
 					slug: 'user-one',
 					avatar_urls: mockAvatarUrls,
@@ -475,9 +489,8 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				clientId: 2,
 				isMe: false,
 				collaboratorInfo: {
-					id: null,
-					isAnonymous: true,
-					name: 'Anonymous Capybara',
+					id: 2,
+					name: 'Anonymous Capybara · 2',
 					slug: 'anonymous-2',
 					avatar_urls: {},
 					browserType: 'Firefox',
@@ -496,7 +509,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				'User One'
 			);
 			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
-				'Anonymous Capybara'
+				'Anonymous Capybara · 2'
 			);
 		} );
 
@@ -532,7 +545,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: true,
 			collaboratorInfo: {
 				id: 1,
-				isAnonymous: false,
 				name: 'Me',
 				slug: 'me',
 				avatar_urls: mockAvatarUrls,
@@ -546,7 +558,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: false,
 			collaboratorInfo: {
 				id: 100,
-				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,
@@ -639,7 +650,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isConnected: true,
 			collaboratorInfo: {
 				id: 100,
-				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,
@@ -743,7 +753,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			isMe: false,
 			collaboratorInfo: {
 				id: 100,
-				isAnonymous: false,
 				name: 'Alice',
 				slug: 'alice',
 				avatar_urls: mockAvatarUrls,

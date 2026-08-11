@@ -89,7 +89,6 @@ export function useBlockHighlighting(
 		type BlockEntry = {
 			blockId: string;
 			clientId: number;
-			collaboratorId: number;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -116,10 +115,7 @@ export function useBlockHighlighting(
 				// Cast to any: the selection union type is narrowed by the
 				// filter above, but TypeScript cannot infer that after .flatMap.
 				const selection = userState.editorState?.selection as any;
-
 				if ( selection.type === SelectionType.WholeBlock ) {
-					const collaboratorId =
-						userState.collaboratorInfo.id ?? userState.clientId;
 					let localClientId: string | null;
 					try {
 						( { localClientId } = resolveSelection( selection ) );
@@ -133,8 +129,7 @@ export function useBlockHighlighting(
 						{
 							blockId: localClientId,
 							clientId: userState.clientId,
-							collaboratorId,
-							color: getAvatarBorderColor( collaboratorId ),
+							color: getAvatarBorderColor( userState.clientId ),
 							userName: userState.collaboratorInfo.name,
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
@@ -171,9 +166,7 @@ export function useBlockHighlighting(
 				}
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
-				const collaboratorId =
-					userState.collaboratorInfo.id ?? userState.clientId;
-				const color = getAvatarBorderColor( collaboratorId );
+				const color = getAvatarBorderColor( userState.clientId );
 				const userName = userState.collaboratorInfo.name;
 				const avatarUrl = getAvatarUrl(
 					userState.collaboratorInfo.avatar_urls
@@ -185,7 +178,6 @@ export function useBlockHighlighting(
 						{
 							blockId: firstId,
 							clientId: userState.clientId,
-							collaboratorId,
 							color,
 							userName,
 							avatarUrl,
@@ -202,7 +194,6 @@ export function useBlockHighlighting(
 					( blockId ) => ( {
 						blockId,
 						clientId: userState.clientId,
-						collaboratorId,
 						color,
 						userName,
 						avatarUrl,
@@ -245,10 +236,9 @@ export function useBlockHighlighting(
 		const results: BlockHighlightData[] = [];
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
-		// Track which users already have an avatar placed, keyed by WordPress
-		// user ID. Blocks arrive in document order (top to bottom) so the first
-		// block encountered per user is always the topmost visible one.
-		const usersWithAvatar = new Set< number >();
+		// Track which collaboration sessions already have an avatar placed. Blocks
+		// arrive in document order, so the first is the topmost visible one.
+		const collaboratorsWithAvatar = new Set< number >();
 
 		blocksToHighlight.forEach( ( block ) => {
 			const { color, blockId, userName, avatarUrl } = block;
@@ -286,9 +276,9 @@ export function useBlockHighlighting(
 
 			if (
 				overlayRect &&
-				! usersWithAvatar.has( block.collaboratorId )
+				! collaboratorsWithAvatar.has( block.clientId )
 			) {
-				usersWithAvatar.add( block.collaboratorId );
+				collaboratorsWithAvatar.add( block.clientId );
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,

@@ -1,4 +1,4 @@
-import { _x } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import type { User } from '../entity-types';
 import type { CollaboratorInfo } from './types';
 
@@ -7,23 +7,23 @@ type CurrentCollaborator = Pick< User< 'view' >, 'id' | 'name' > & {
 	slug?: unknown;
 };
 
-const ANONYMOUS_COLLABORATOR_NAMES = [
-	_x( 'Anonymous Alpaca', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Badger', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Capybara', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Dolphin', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Echidna', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Fox', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Gecko', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Hedgehog', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Ibis', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Koala', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Lemur', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Meerkat', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Narwhal', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Otter', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Panda', 'Name for an anonymous collaborator' ),
-	_x( 'Anonymous Quokka', 'Name for an anonymous collaborator' ),
+const FALLBACK_COLLABORATOR_ANIMALS = [
+	_x( 'Alpaca', 'Animal name for a fallback collaborator' ),
+	_x( 'Badger', 'Animal name for a fallback collaborator' ),
+	_x( 'Capybara', 'Animal name for a fallback collaborator' ),
+	_x( 'Dolphin', 'Animal name for a fallback collaborator' ),
+	_x( 'Elephant', 'Animal name for a fallback collaborator' ),
+	_x( 'Fox', 'Animal name for a fallback collaborator' ),
+	_x( 'Gecko', 'Animal name for a fallback collaborator' ),
+	_x( 'Hedgehog', 'Animal name for a fallback collaborator' ),
+	_x( 'Lemur', 'Animal name for a fallback collaborator' ),
+	_x( 'Meerkat', 'Animal name for a fallback collaborator' ),
+	_x( 'Narwhal', 'Animal name for a fallback collaborator' ),
+	_x( 'Otter', 'Animal name for a fallback collaborator' ),
+	_x( 'Panda', 'Animal name for a fallback collaborator' ),
+	_x( 'Rabbit', 'Animal name for a fallback collaborator' ),
+	_x( 'Tiger', 'Animal name for a fallback collaborator' ),
+	_x( 'Zebra', 'Animal name for a fallback collaborator' ),
 ];
 
 /**
@@ -134,6 +134,30 @@ export function isCurrentCollaborator(
 }
 
 /**
+ * Check that awareness information contains the fields required to present a
+ * collaborator. Awareness is supplied by peers, so its runtime shape cannot be
+ * guaranteed by the local TypeScript type.
+ *
+ * @param value - The collaborator information to check.
+ * @return Whether the collaborator can be presented safely.
+ */
+export function hasPresentableCollaboratorInfo( value: unknown ): boolean {
+	if ( 'object' !== typeof value || null === value ) {
+		return false;
+	}
+
+	const candidate = value as Record< string, unknown >;
+	return (
+		Number.isInteger( candidate.id ) &&
+		( candidate.id as number ) >= 0 &&
+		'string' === typeof candidate.name &&
+		'' !== candidate.name.trim() &&
+		'number' === typeof candidate.enteredAt &&
+		Number.isFinite( candidate.enteredAt )
+	);
+}
+
+/**
  * Generate a collaborator info object from a current collaborator.
  *
  * @param currentCollaborator - The current collaborator.
@@ -159,34 +183,43 @@ export function generateCollaboratorInfo(
 		browserType: getBrowserName(),
 		enteredAt: Date.now(),
 		id,
-		isAnonymous: false,
 		name,
 		slug: 'string' === typeof slug ? slug : '',
+		wpUserId: id,
 	};
 }
 
 /**
  * Generate session-scoped collaborator information when the current WordPress
  * user cannot be resolved. Yjs client IDs are random, so using the client ID to
- * select a name keeps it stable for the session without exposing user data.
+ * select a name and append a discriminator keeps the identity stable and unique
+ * for the session without exposing user data.
  *
  * @param clientId - The Yjs client ID.
- * @return Anonymous collaborator information.
+ * @return Fallback collaborator information.
  */
-export function generateAnonymousCollaboratorInfo(
+export function generateFallbackCollaboratorInfo(
 	clientId: number
 ): CollaboratorInfo {
-	const nameIndex =
-		Math.abs( clientId ) % ANONYMOUS_COLLABORATOR_NAMES.length;
+	const nameIndex = clientId % FALLBACK_COLLABORATOR_ANIMALS.length;
+	const discriminator = clientId.toString( 36 ).toUpperCase();
+	const name = sprintf(
+		// translators: 1: animal name, 2: session discriminator.
+		_x( 'Anonymous %1$s · %2$s', 'Name for a fallback collaborator' ),
+		FALLBACK_COLLABORATOR_ANIMALS[ nameIndex ],
+		discriminator
+	);
 
 	return {
 		avatar_urls: {},
 		browserType: getBrowserName(),
 		enteredAt: Date.now(),
-		id: null,
-		isAnonymous: true,
-		name: ANONYMOUS_COLLABORATOR_NAMES[ nameIndex ],
+		id: clientId,
+		name,
 		slug: `anonymous-${ clientId }`,
+		// Keep `id` numeric for compatibility, but do not mistake the Yjs client
+		// ID for a WordPress user ID when exporting or inspecting awareness data.
+		wpUserId: null,
 	};
 }
 

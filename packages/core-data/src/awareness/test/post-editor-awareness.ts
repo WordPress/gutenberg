@@ -8,7 +8,7 @@ import type {
 	SelectionWholeBlock,
 } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import type { CollaboratorInfo } from '../types';
+import type { CollaboratorInfo, PostEditorState } from '../types';
 
 // Mock WordPress dependencies
 jest.mock( '@wordpress/data', () => ( {
@@ -813,6 +813,70 @@ describe( 'PostEditorAwareness', () => {
 			expect( debugData.clients ).toBeDefined();
 			expect( typeof debugData.clients ).toBe( 'object' );
 		} );
+
+		test( 'should omit incomplete collaborator identities', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				editorState: { selection: { type: SelectionType.None } },
+			} as PostEditorState );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {} );
+		} );
+
+		test( 'should preserve null WordPress user IDs for fallback collaborators', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				collaboratorInfo: {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 123,
+					id: 456,
+					name: 'Anonymous Fox · CO',
+					slug: 'anonymous-456',
+					wpUserId: null,
+				},
+			} );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {
+				456: {
+					name: 'Anonymous Fox · CO',
+					wpUserId: null,
+				},
+			} );
+		} );
+
+		test( 'should use the existing ID for debug data from older peers', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				collaboratorInfo: {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 123,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				},
+			} );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {
+				456: { name: 'Test User', wpUserId: 42 },
+			} );
+		} );
 	} );
 
 	describe( 'equalityFieldChecks', () => {
@@ -829,7 +893,6 @@ describe( 'PostEditorAwareness', () => {
 			// Set collaboratorInfo and verify equality check works
 			const collaboratorInfo: CollaboratorInfo = {
 				id: 1,
-				isAnonymous: false,
 				name: 'Test',
 				slug: 'test',
 				avatar_urls: mockAvatarUrls,

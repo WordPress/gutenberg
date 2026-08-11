@@ -6,8 +6,16 @@ export type CollaboratorInfo = Pick< User< 'view' >, 'name' | 'slug' > & {
 	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
-	id: User< 'view' >[ 'id' ] | null;
-	isAnonymous: boolean;
+	/**
+	 * Stable numeric identity used by existing consumers. This is the WordPress
+	 * user ID when resolved, or the Yjs client ID for a fallback collaborator.
+	 */
+	id: User< 'view' >[ 'id' ];
+	/**
+	 * The resolved WordPress user ID, or null for a fallback collaborator.
+	 * Optional because awareness data from older peers does not include it.
+	 */
+	wpUserId?: User< 'view' >[ 'id' ] | null;
 };
 
 /**
@@ -49,9 +57,9 @@ export type EnhancedState< State > = State & {
  */
 export type PostEditorAwarenessState = EnhancedState< PostEditorState >;
 
-// WordPress collaborator info for debug export (subset of CollaboratorInfo)
+// Keep the established debug export shape while allowing fallback collaborators.
 export type DebugCollaboratorData = Pick< CollaboratorInfo, 'name' > & {
-	wpUserId: CollaboratorInfo[ 'id' ];
+	wpUserId: User< 'view' >[ 'id' ] | null;
 };
 
 export interface YDocDebugData {
