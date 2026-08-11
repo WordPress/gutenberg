@@ -518,4 +518,50 @@ test.describe( 'Block Notes: floating panel', () => {
 		await expect( notes ).toBeVisible();
 		await expect( overlay ).not.toHaveClass( /is-compact/ );
 	} );
+
+	test( 'notes display modes have keyboard shortcuts', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Shortcut mode note' );
+		// Keep the canvas wide enough for the full-notes tier so the chosen
+		// mode (not the canvas width) drives the presentation.
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		await pageUtils.pressKeys( 'access+i' );
+		await expect( overlay ).toHaveClass( /is-compact/ );
+
+		await pageUtils.pressKeys( 'access+j' );
+		await expect( notes ).toBeHidden();
+
+		await pageUtils.pressKeys( 'access+e' );
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		// The combinations are advertised on the menu choices themselves.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+		).toContainText( /E$/ );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
+		).toContainText( /I$/ );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toContainText( /J$/ );
+	} );
 } );
