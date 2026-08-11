@@ -61,7 +61,7 @@ export type RovingTabIndexItemProps = {
 	 * </TreeGridCell>
 	 * ```
 	 */
-	children?: ( props: RovingTabIndexItemPassThruProps ) => JSX.Element;
+	children?: ( props: RovingTabIndexItemPassThruProps ) => React.JSX.Element;
 	/**
 	 * If `children` is not a function, this component will be used instead.
 	 */

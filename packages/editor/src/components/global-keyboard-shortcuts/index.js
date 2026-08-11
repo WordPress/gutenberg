@@ -1,15 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { usesNativeUndo } = unlock( blockEditorPrivateApis );
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -41,6 +40,7 @@ export default function EditorKeyboardShortcuts() {
 		isPostSavingLocked,
 		isListViewOpened,
 		getEditorMode,
+		isSavingNonPostEntityChanges,
 	} = useSelect( editorStore );
 
 	useShortcut(
@@ -60,11 +60,17 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		undo();
 		event.preventDefault();
 	} );
 
 	useShortcut( 'core/editor/redo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		redo();
 		event.preventDefault();
 	} );
@@ -75,7 +81,7 @@ export default function EditorKeyboardShortcuts() {
 		/**
 		 * Do not save the post if post saving is locked.
 		 */
-		if ( isPostSavingLocked() ) {
+		if ( isPostSavingLocked() || isSavingNonPostEntityChanges() ) {
 			return;
 		}
 

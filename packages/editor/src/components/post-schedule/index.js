@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { getSettings } from '@wordpress/date';
 import { _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -59,7 +48,7 @@ export function PrivatePostSchedule( {
 		startOfMonth( new Date( postDate ) )
 	);
 
-	// Pick up published and schduled site posts.
+	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {

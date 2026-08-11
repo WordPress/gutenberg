@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Editor } from './index';
 
 interface Options {
@@ -50,5 +47,6 @@ export async function saveSiteEditorEntities(
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
 		.getByText( /(updated|published)\./ )
+		.first()
 		.waitFor();
 }

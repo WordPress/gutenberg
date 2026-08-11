@@ -1,19 +1,7 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * External dependencies
- */
 import { render, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 
@@ -99,7 +87,7 @@ describe( 'useResourcePermissions', () => {
 		const TestComponent = () => {
 			data = useResourcePermissions( {
 				kind: 'root',
-				name: 'media',
+				name: 'user',
 			} );
 			return <div />;
 		};
@@ -127,12 +115,69 @@ describe( 'useResourcePermissions', () => {
 		);
 	} );
 
+	it( 'normalizes id-less entity resources before resolving permissions', async () => {
+		let data;
+		triggerFetch.mockImplementation( ( options ) => {
+			if ( options.path === '/wp/v2/types?context=view' ) {
+				return {
+					wp_navigation: {
+						name: 'Navigation Menus',
+						slug: 'wp_navigation',
+						rest_base: 'navigation',
+						rest_namespace: 'wp/v2',
+					},
+				};
+			}
+			if (
+				options.path === '/wp/v2/navigation' &&
+				options.method === 'OPTIONS'
+			) {
+				return {
+					headers: new Headers( { allow: 'GET, POST' } ),
+				};
+			}
+			throw new Error(
+				`Unexpected request: ${ JSON.stringify( options ) }`
+			);
+		} );
+
+		const TestComponent = () => {
+			data = useResourcePermissions( {
+				kind: 'postType',
+				name: 'wp_navigation',
+				id: undefined,
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: true,
+			} )
+		);
+
+		expect(
+			triggerFetch.mock.calls.filter(
+				( [ options ] ) => options.path === '/wp/v2/navigation'
+			)
+		).toHaveLength( 1 );
+	} );
+
 	it( 'retrieves the relevant permissions for an entity', async () => {
 		let data;
 		const TestComponent = () => {
 			data = useResourcePermissions( {
 				kind: 'root',
-				name: 'media',
+				name: 'user',
 				id: 1,
 			} );
 			return <div />;
@@ -170,7 +215,7 @@ describe( 'useResourcePermissions', () => {
 			useResourcePermissions(
 				{
 					kind: 'root',
-					name: 'media',
+					name: 'user',
 				},
 				1
 			);

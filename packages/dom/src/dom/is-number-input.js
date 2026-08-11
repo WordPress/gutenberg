@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import isHTMLInputElement from './is-html-input-element';
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is an input field of type number.
  *
@@ -21,7 +13,6 @@ export default function isNumberInput( node ) {
 		since: '6.1',
 		version: '6.5',
 	} );
-	/* eslint-enable jsdoc/valid-types */
 	return (
 		isHTMLInputElement( node ) &&
 		node.type === 'number' &&
