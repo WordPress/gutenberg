@@ -1180,6 +1180,91 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'resets persisted edits using the pre-prePersist edits so the record is clean after saving', async () => {
+		const persistedRecord = {
+			id: 10,
+			meta: {
+				plugin_value: 'persisted',
+				_crdt_document: 'old-doc',
+			},
+		};
+		// Mirrors a store meta edit: `mergedEdits` snapshots the full edited
+		// meta, including the load-time CRDT document.
+		const edits = {
+			id: 10,
+			meta: {
+				plugin_value: 'edited',
+				_crdt_document: 'old-doc',
+			},
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+				// Mirrors prePersistPostType, which injects a freshly
+				// serialized CRDT snapshot into the request meta.
+				__unstablePrePersist: async ( _persisted, saveEdits ) => ( {
+					meta: {
+						...saveEdits.meta,
+						_crdt_document: 'new-doc',
+					},
+				} ),
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			id: 10,
+			meta: {
+				plugin_value: 'edited',
+				// The server may also mutate meta on save (e.g. a plugin
+				// normalizing a value in a save hook).
+				server_value: 'server-mutated',
+				_crdt_document: 'new-doc',
+			},
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: {
+				...edits,
+				meta: {
+					plugin_value: 'edited',
+					_crdt_document: 'new-doc',
+				},
+			},
+		} );
+
+		// The persisted edits passed to the reducer must be the original
+		// edits, not the prePersist-augmented request payload. Otherwise the
+		// injected CRDT snapshot makes the comparison against the state edits
+		// fail and the record stays dirty after a successful save.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			edits
+		);
+	} );
+
 	it( 'syncs direct save changes before pre-persisting the record', async () => {
 		const persistedRecord = {
 			id: 10,
