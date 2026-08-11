@@ -1,5 +1,4 @@
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { isValidElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -60,7 +59,7 @@ export function WidgetActions( {
 							<Menu.Item
 								key={ action.id }
 								prefix={
-									isValidElement( action.icon ) ? (
+									action.icon ? (
 										<Icon icon={ action.icon } />
 									) : undefined
 								}
