@@ -3,9 +3,44 @@ import { createRef } from '@wordpress/element';
 import { Calendar, RangeCalendar } from '..';
 
 describe.each( [
-	[ 'Calendar', Calendar ],
-	[ 'RangeCalendar', RangeCalendar ],
-] )( '%s', ( _name, Component ) => {
+	[ 'Calendar', Calendar, 'Date calendar' ],
+	[ 'RangeCalendar', RangeCalendar, 'Date range calendar' ],
+] )( '%s', ( _name, Component, defaultLabel ) => {
+	describe( 'root role', () => {
+		it( 'should forward a custom root role', () => {
+			render(
+				<Component role="region" aria-label="Availability calendar" />
+			);
+
+			expect(
+				screen.getByRole( 'region', {
+					name: 'Availability calendar',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'should preserve the default label for the `application` role', () => {
+			render( <Component role="application" /> );
+
+			expect(
+				screen.getByRole( 'application', { name: defaultLabel } )
+			).toBeVisible();
+		} );
+
+		it.each( [ 'none', 'presentation' ] as const )(
+			'should omit the default root label when the role is `%s`',
+			( role ) => {
+				render(
+					<Component role={ role } data-testid="calendar-root" />
+				);
+				const root = screen.getByTestId( 'calendar-root' );
+
+				expect( root ).toHaveAttribute( 'role', role );
+				expect( root ).not.toHaveAttribute( 'aria-label' );
+			}
+		);
+	} );
+
 	describe( 'render prop', () => {
 		it( 'should render a `div` by default', () => {
 			render( <Component aria-label="Test calendar" /> );

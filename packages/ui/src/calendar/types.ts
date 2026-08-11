@@ -164,6 +164,20 @@ export interface BaseProps
 		'onSelect' | 'defaultValue' | 'role'
 	> {
 	/**
+	 * The ARIA role for the calendar's root element.
+	 *
+	 * Most calendars should use the default `group` role. Use `none` or
+	 * `presentation` when a surrounding element provides the grouping semantics.
+	 * Use `application` only when assistive technology testing shows that it is
+	 * needed to support keyboard interaction. Roles that require additional
+	 * behavior, such as `dialog`, should usually be applied to a component that
+	 * wraps the calendar and implements that behavior.
+	 *
+	 * @default 'group'
+	 */
+	role?: ComponentProps< 'div' >[ 'role' ];
+
+	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
 	 * @default false

@@ -2,6 +2,7 @@ import { fn } from 'storybook/test';
 import { TZDate } from '@daypicker/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from '@wordpress/element';
+import * as Dialog from '../../dialog';
 import { Calendar } from '../index';
 import {
 	toDate,
@@ -34,6 +35,54 @@ export default meta;
 type Story = StoryObj< typeof Calendar >;
 
 export const Default: Story = {};
+
+/**
+ * The dialog owns the dialog semantics, focus containment, and close behavior.
+ * The calendar keeps its default `group` role inside it.
+ */
+export const InDialog: Story = {
+	render: ( { endMonth, ...args } ) => (
+		<Dialog.Root>
+			<Dialog.Trigger>Choose a date</Dialog.Trigger>
+			<Dialog.Popup size="small">
+				<Dialog.Header>
+					<Dialog.Title>Choose a date</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<Dialog.Content>
+					<Calendar { ...args } endMonth={ toDate( endMonth ) } />
+				</Dialog.Content>
+			</Dialog.Popup>
+		</Dialog.Root>
+	),
+	args: {
+		autoFocus: true,
+	},
+};
+
+/**
+ * Remove the calendar's grouping semantics when a surrounding element already
+ * provides the accessible group or region.
+ */
+export const WithExternalGrouping: Story = {
+	render: ( { endMonth, ...args } ) => (
+		<section aria-label="Availability dates">
+			<Calendar { ...args } endMonth={ toDate( endMonth ) } role="none" />
+		</section>
+	),
+};
+
+/**
+ * Use the `application` role only when manual assistive technology testing
+ * shows that it is needed for calendar keyboard events to reach the calendar.
+ * This story provides a test fixture; Storybook cannot verify screen reader
+ * browse and focus modes.
+ */
+export const WithApplicationRole: Story = {
+	args: {
+		role: 'application',
+	},
+};
 
 export const DisabledDates: Story = {
 	args: {

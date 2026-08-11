@@ -5,6 +5,7 @@ import type { ComponentProps } from '../../utils/types';
 export type RootContextValue = {
 	render?: ComponentProps< 'div' >[ 'render' ];
 	ref?: Ref< HTMLDivElement >;
+	role?: ComponentProps< 'div' >[ 'role' ];
 };
 
 /**

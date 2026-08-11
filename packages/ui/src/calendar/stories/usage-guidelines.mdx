@@ -8,6 +8,42 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 Both are built for accessibility and follow ARIA best practices for calendar widgets: keyboard navigation, screen reader support, and customizable labels for internationalization.
 
+## Root role
+
+By default, `Calendar` and `RangeCalendar` use a named [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) for the root element. The group contains the month navigation and one or more calendar grids.
+
+Most calendars should keep this default. Use the native `role` prop when the surrounding composition needs different root semantics:
+
+-   Use `none` or `presentation` when a surrounding element already groups or labels the calendar. The calendar omits its default root label for these roles.
+-   Use `application` only when testing with the supported browsers and assistive technologies shows that the screen reader intercepts the calendar's keyboard events. The [`application` role](https://www.w3.org/TR/wai-aria-1.2/#application) changes how some assistive technologies expose and interact with its contents.
+-   Apply roles that require additional behavior, such as `dialog`, to a component that wraps the calendar and implements that behavior. Changing the calendar's role does not add focus containment, close behavior, or focus return.
+
+For example, remove the root group when a surrounding region already provides the calendar's context:
+
+```jsx
+<section aria-labelledby="availability-heading">
+	<h2 id="availability-heading">Availability</h2>
+	<Calendar role="none" />
+</section>
+```
+
+When presenting a calendar in a dialog, let the dialog own the dialog semantics:
+
+```jsx
+<Dialog.Root>
+	<Dialog.Trigger>Choose a date</Dialog.Trigger>
+	<Dialog.Popup>
+		<Dialog.Header>
+			<Dialog.Title>Choose a date</Dialog.Title>
+			<Dialog.CloseIcon />
+		</Dialog.Header>
+		<Dialog.Content>
+			<Calendar autoFocus />
+		</Dialog.Content>
+	</Dialog.Popup>
+</Dialog.Root>
+```
+
 ## Usage
 
 ### Uncontrolled Mode
