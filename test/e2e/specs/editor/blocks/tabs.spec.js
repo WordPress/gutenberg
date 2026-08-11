@@ -40,6 +40,60 @@ test.describe( 'Tabs', () => {
 			await admin.createNewPost();
 		} );
 
+		test( 'inserts two empty tabs by default', async ( { editor } ) => {
+			await editor.insertBlock( { name: 'core/tabs' } );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/tabs',
+					attributes: { activeTabIndex: 0 },
+					innerBlocks: [
+						{
+							name: 'core/tab-list',
+							attributes: {
+								tabs: [ { label: 'Tab' }, { label: 'Tab' } ],
+							},
+							innerBlocks: [],
+						},
+						{
+							name: 'core/tab-panels',
+							innerBlocks: [
+								{
+									name: 'core/tab-panel',
+									attributes: { label: 'Tab' },
+									innerBlocks: [],
+								},
+								{
+									name: 'core/tab-panel',
+									attributes: { label: 'Tab' },
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+			] );
+
+			// The first tab is the active one.
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs.nth( 0 ) ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await expect( tabs.nth( 1 ) ).toHaveAttribute(
+				'aria-selected',
+				'false'
+			);
+
+			const panels = editor.canvas.getByRole( 'document', {
+				name: 'Block: Tab Panel',
+				exact: true,
+				includeHidden: true,
+			} );
+			await expect( panels.nth( 0 ) ).toBeVisible();
+			await expect( panels.nth( 1 ) ).toBeHidden();
+		} );
+
 		test( 'activates the next tab when the caret moves into its label with the right arrow key', async ( {
 			editor,
 			pageUtils,
@@ -195,10 +249,6 @@ test.describe( 'Tabs', () => {
 				newTab.locator( '[data-rich-text-placeholder]' )
 			).toHaveAttribute( 'data-rich-text-placeholder', 'Tab title' );
 
-			// The new tab's panel is the active one and is visible.
-			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
-			// Use `includeHidden: true` so the hidden panels are indexed too;
-			// getByRole() only returns visible elements by default.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
 				exact: true,
