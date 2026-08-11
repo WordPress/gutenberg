@@ -1658,13 +1658,13 @@ test.describe( 'Block Notes', () => {
 				content: 'Alpha note',
 			} );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+			const notesRegion = page.getByRole( 'region', {
+				name: 'Notes',
 			} );
-			const alphaThread = settings.getByRole( 'treeitem', {
+			const alphaThread = notesRegion.getByRole( 'treeitem', {
 				name: 'Note: Alpha note',
 			} );
-			const charlieThread = settings.getByRole( 'treeitem', {
+			const charlieThread = notesRegion.getByRole( 'treeitem', {
 				name: 'Note: Charlie note',
 			} );
 			const alphaMark = editor.canvas
