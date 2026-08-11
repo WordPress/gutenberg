@@ -72,5 +72,24 @@ const { state } = store( 'test/activity-feed', {
 				renderHTML( feedList, html, { mode: 'prepend' } );
 			}
 		},
+		// Add comment: fetches a fragment for a new comment and splices it
+		// INTO the card that owns the button — a splice below a keyed
+		// item. The card's identity (like state, context) must survive.
+		*addComment() {
+			const { ref } = getElement();
+			const { id } = getContext();
+			const identity = ref.dataset.identity ?? 'data-wp-key';
+			const url = new URL( ref.dataset.fragmentUrl );
+			url.searchParams.set( 'identity', identity );
+			url.searchParams.set( 'postId', id );
+			const res = yield fetch( url );
+			const html = yield res.json();
+			const comments = document.querySelector(
+				`[data-testid="post-${ id }-comments"]`
+			);
+			if ( comments ) {
+				renderHTML( comments, html );
+			}
+		},
 	},
 } );
