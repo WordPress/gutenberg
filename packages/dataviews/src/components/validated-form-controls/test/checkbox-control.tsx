@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedCheckboxControl } from '../components';
+import { ValidatedCheckboxControl } from '../checkbox-control';
 
 describe( 'ValidatedCheckboxControl', () => {
 	it( 'should preserve the help description', () => {
