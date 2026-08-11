@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import {
 	format,
@@ -11,10 +8,6 @@ import {
 	startOfMonth,
 	startOfYear,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
@@ -34,10 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -211,7 +200,8 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ inputRefs, isValid, validity ] );
 
-	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	// Listen for 'invalid' events (e.g., dispatched by layouts when a card
+	// re-expands or loses focus).
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const handleInvalid = ( event: Event ) => {
@@ -545,15 +535,18 @@ function CalendarDateRangeControl< Item >( {
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
-			if ( fromDate && toDate ) {
-				onChangeCallback( [
-					formatDate( fromDate ),
-					formatDate( toDate ),
-				] );
-			} else if ( ! fromDate && ! toDate ) {
+			if ( ! fromDate && ! toDate ) {
 				onChangeCallback( undefined );
+				return;
 			}
-			// Do nothing if only one date is set - wait for both
+			// An incomplete range is committed with an empty-string bound
+			// rather than held back until both dates are set: the inputs are
+			// controlled, so an uncommitted date would be wiped on blur. The
+			// `between` operator does not filter while a bound is unfilled.
+			onChangeCallback( [
+				formatDate( fromDate ),
+				formatDate( toDate ),
+			] );
 		},
 		[ onChangeCallback ]
 	);

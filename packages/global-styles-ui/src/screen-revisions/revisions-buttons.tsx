@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -12,10 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import type { Revision } from './types';
 import { unlock } from '../lock-unlock';
 

@@ -43,16 +43,18 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 	/**
 	 * Dispatches a CRDT document save request.
 	 *
-	 * @param string $room Room identifier.
-	 * @param string $doc  Serialized CRDT document.
+	 * @param string $room         Room identifier.
+	 * @param string $doc          Serialized CRDT document.
+	 * @param string $expected_doc Expected persisted CRDT document.
 	 * @return WP_REST_Response Response object.
 	 */
-	private function dispatch_save( $room, $doc = 'serialized-crdt-doc' ) {
+	private function dispatch_save( $room, $doc = 'serialized-crdt-doc', $expected_doc = '' ) {
 		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/save' );
 		$request->set_body_params(
 			array(
-				'room' => $room,
-				'doc'  => $doc,
+				'room'         => $room,
+				'doc'          => $doc,
+				'expected_doc' => $expected_doc,
 			)
 		);
 		return rest_get_server()->dispatch( $request );
@@ -63,15 +65,17 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 	 *
 	 * @param string $expected_content Expected persisted post content.
 	 * @param string $content          Replacement post content.
+	 * @param string $expected_doc      Expected persisted CRDT document.
 	 * @return WP_REST_Response Response object.
 	 */
-	private function dispatch_entity_save( $expected_content, $content ) {
+	private function dispatch_entity_save( $expected_content, $content, $expected_doc = '' ) {
 		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/save-entity' );
 		$request->set_body_params(
 			array(
 				'room'             => $this->get_post_room(),
 				'doc'              => 'serialized-entity-crdt-doc',
 				'expected_content' => $expected_content,
+				'expected_doc'     => $expected_doc,
 				'content'          => $content,
 			)
 		);
@@ -241,17 +245,17 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		$nested_response = null;
 		$interleave      = function ( $check, $object_id, $meta_key ) use ( &$nested_response ) {
 			if ( WP_Sync_Save_Server::CRDT_DOC_META_KEY === $meta_key ) {
-				$nested_response = $this->dispatch_entity_save( 'replacement content', 'nested content' );
+				$nested_response = $this->dispatch_entity_save( 'replacement content', 'nested content', 'initial-crdt-doc' );
 			}
 			return $check;
 		};
 		add_filter( 'update_post_metadata', $interleave, 10, 3 );
 
-		$response = $this->dispatch_entity_save( 'expected content', 'replacement content' );
+		$response = $this->dispatch_entity_save( 'expected content', 'replacement content', 'initial-crdt-doc' );
 
 		remove_filter( 'update_post_metadata', $interleave, 10 );
 		$this->assertSame( 200, $response->get_status() );
-		$this->assertErrorResponse( 'rest_sync_content_conflict', $nested_response, 409 );
+		$this->assertErrorResponse( 'rest_sync_document_conflict', $nested_response, 409 );
 		$this->assertSame( 'replacement content', get_post_field( 'post_content', self::$post_id, 'raw' ) );
 		$this->assertSame( 'serialized-entity-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
 	}
@@ -270,7 +274,7 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		};
 		add_filter( 'update_post_metadata', $reject_meta, 10, 3 );
 
-		$response = $this->dispatch_entity_save( 'expected content', 'replacement content' );
+		$response = $this->dispatch_entity_save( 'expected content', 'replacement content', 'initial-crdt-doc' );
 
 		remove_filter( 'update_post_metadata', $reject_meta, 10 );
 		$this->assertErrorResponse( 'rest_crdt_save_failed', $response, 500 );
@@ -282,10 +286,29 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		wp_set_current_user( self::$editor_id );
 		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'serialized-crdt-doc' );
 
-		$response = $this->dispatch_save( $this->get_post_room(), 'serialized-crdt-doc' );
+		$response = $this->dispatch_save( $this->get_post_room(), 'serialized-crdt-doc', 'serialized-crdt-doc' );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'serialized-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
+	public function test_stale_sync_save_cannot_overwrite_entity_repair_document() {
+		wp_set_current_user( self::$editor_id );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => 'expected content',
+			)
+		);
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'initial-crdt-doc' );
+
+		$repair_response = $this->dispatch_entity_save( 'expected content', 'repaired content', 'initial-crdt-doc' );
+		$stale_response  = $this->dispatch_save( $this->get_post_room(), 'stale-crdt-doc', 'initial-crdt-doc' );
+
+		$this->assertSame( 200, $repair_response->get_status() );
+		$this->assertErrorResponse( 'rest_sync_document_conflict', $stale_response, 409 );
+		$this->assertSame( 'repaired content', get_post_field( 'post_content', self::$post_id, 'raw' ) );
+		$this->assertSame( 'serialized-entity-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
 	}
 
 	public function test_save_rejects_taxonomy_entity() {

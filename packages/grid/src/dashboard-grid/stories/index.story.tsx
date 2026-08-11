@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { Icon, IconButton, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {

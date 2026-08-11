@@ -108,9 +108,20 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $help = null;
 
 		/**
+		 * Registered icon name (`collection/icon-name`), resolved by
+		 * clients through the Icons API.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $icon = null;
+
+		/**
 		 * Declarative actions the widget exposes. Each entry carries `id`,
-		 * `label`, `href`, and optional `download`/`openInNewTab`. Labels are
-		 * translated at registration time using the widget's text domain.
+		 * `label`, `href`, and optional `download`/`openInNewTab`/`icon`/
+		 * `relevance`. Labels are translated at registration time using the
+		 * widget's text domain.
 		 *
 		 * Null when the widget did not declare the field.
 		 *

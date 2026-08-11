@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import {
 	Root,

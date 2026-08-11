@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-
 import { Spacer } from '../index';
 import styles from '../style.module.scss';
 

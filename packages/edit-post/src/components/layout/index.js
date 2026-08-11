@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { NavigableRegion } from '@wordpress/admin-ui';
+import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
@@ -49,11 +42,8 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
+import { ThemeProvider } from '@wordpress/theme';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BackButton from '../back-button';
 import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
@@ -562,53 +552,61 @@ function Layout( {
 			<BackButton initialPost={ initialPost } />
 		) : null;
 
+	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
+
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ErrorBoundary canCopyContent>
-					<WelcomeGuide postType={ currentPostType } />
-					<div { ...navigateRegionsProps }>
-						<Editor
-							settings={ editorSettings }
-							initialEdits={ initialEdits }
-							postType={ currentPostType }
-							postId={ currentPostId }
-							templateId={ templateId }
-							className={ className }
-							forceIsDirty={ hasActiveMetaboxes }
-							// We should auto-focus the canvas (title) on load.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ ! isWelcomeGuideVisible }
-							onActionPerformed={ onActionPerformed }
-							extraSidebarPanels={
-								showMetaBoxes && <MetaBoxes location="side" />
-							}
-							extraContent={
-								! isDistractionFree &&
-								showMetaBoxes && <MetaBoxesMain />
-							}
-						>
-							<PostLockedModal />
-							<EditorInitialization />
-							<FullscreenMode isActive={ isFullscreenActive } />
-							<BrowserURL />
-							<UnsavedChangesWarning />
-							<AutosaveMonitor />
-							<LocalAutosaveMonitor />
-							<EditPostKeyboardShortcuts />
-							<EditorKeyboardShortcutsRegister />
-							<BlockKeyboardShortcuts />
-							{ currentPostType === 'wp_block' && (
-								<InitPatternModal />
-							) }
-							<PluginArea onError={ onPluginAreaError } />
-							<PostEditorMoreMenu />
-							{ backButton }
-							<SnackbarNotices className="edit-post-layout__snackbar" />
-							<UploadProgressSnackbar />
-						</Editor>
-					</div>
-				</ErrorBoundary>
+				<ThemeProvider isRoot color={ { primary: adminPrimary } }>
+					<ErrorBoundary canCopyContent>
+						<WelcomeGuide postType={ currentPostType } />
+						<div { ...navigateRegionsProps }>
+							<Editor
+								settings={ editorSettings }
+								initialEdits={ initialEdits }
+								postType={ currentPostType }
+								postId={ currentPostId }
+								templateId={ templateId }
+								className={ className }
+								forceIsDirty={ hasActiveMetaboxes }
+								// We should auto-focus the canvas (title) on load.
+								// eslint-disable-next-line jsx-a11y/no-autofocus
+								autoFocus={ ! isWelcomeGuideVisible }
+								onActionPerformed={ onActionPerformed }
+								extraSidebarPanels={
+									showMetaBoxes && (
+										<MetaBoxes location="side" />
+									)
+								}
+								extraContent={
+									! isDistractionFree &&
+									showMetaBoxes && <MetaBoxesMain />
+								}
+							>
+								<PostLockedModal />
+								<EditorInitialization />
+								<FullscreenMode
+									isActive={ isFullscreenActive }
+								/>
+								<BrowserURL />
+								<UnsavedChangesWarning />
+								<AutosaveMonitor />
+								<LocalAutosaveMonitor />
+								<EditPostKeyboardShortcuts />
+								<EditorKeyboardShortcutsRegister />
+								<BlockKeyboardShortcuts />
+								{ currentPostType === 'wp_block' && (
+									<InitPatternModal />
+								) }
+								<PluginArea onError={ onPluginAreaError } />
+								<PostEditorMoreMenu />
+								{ backButton }
+								<SnackbarNotices className="edit-post-layout__snackbar" />
+								<UploadProgressSnackbar />
+							</Editor>
+						</div>
+					</ErrorBoundary>
+				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>
 	);

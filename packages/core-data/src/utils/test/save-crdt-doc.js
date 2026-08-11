@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../../sync';
-import { enqueueCRDTDocSave, saveCRDTDoc } from '../save-crdt-doc';
+import {
+	enqueueCRDTDocSave,
+	saveCRDTDoc,
+	setPersistedCRDTDoc,
+} from '../save-crdt-doc';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../../sync', () => ( {
@@ -34,6 +31,8 @@ describe( 'saveCRDTDoc', () => {
 
 	beforeEach( () => {
 		apiFetch.mockReset();
+		setPersistedCRDTDoc( 'postType/post', 1, undefined );
+		setPersistedCRDTDoc( 'postType/post', 2, undefined );
 		syncManager = {
 			createPersistedCRDTDoc: jest.fn(),
 		};
@@ -58,6 +57,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc',
+				expected_doc: '',
 			},
 		} );
 	} );
@@ -94,6 +94,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-1',
+				expected_doc: '',
 			},
 		} );
 
@@ -109,6 +110,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-2',
+				expected_doc: 'doc-1',
 			},
 		} );
 
@@ -137,6 +139,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-1',
+				expected_doc: '',
 			},
 		} );
 		expect( apiFetch ).toHaveBeenNthCalledWith( 2, {
@@ -145,6 +148,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:2',
 				doc: 'doc-2',
+				expected_doc: '',
 			},
 		} );
 
@@ -179,6 +183,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-2',
+				expected_doc: '',
 			},
 		} );
 
@@ -221,6 +226,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'sync-doc',
+				expected_doc: '',
 			},
 		} );
 		await syncSave;

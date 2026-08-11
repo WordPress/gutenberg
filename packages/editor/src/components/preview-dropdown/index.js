@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	DropdownMenu,
@@ -22,10 +15,6 @@ import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
@@ -46,6 +35,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		isTemplateHidden,
 		templateId,
 		isResponsiveEditing,
+		isResponsiveEditingEnabled,
 		hasBlockSelection,
 		activeComplementaryArea,
 	} = useSelect( ( select ) => {
@@ -54,6 +44,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			getCurrentTemplateId,
 			getRenderingMode,
 			getDeviceType,
+			getEditorSettings,
 		} = unlock( select( editorStore ) );
 		const {
 			isResponsiveEditing: _isResponsiveEditing,
@@ -77,6 +68,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
+			isResponsiveEditingEnabled:
+				getEditorSettings().responsiveEditingEnabled,
 			hasBlockSelection: !! getBlockSelectionStart(),
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
@@ -204,19 +197,21 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							icon={ isResponsiveEditing ? check : undefined }
-							isSelected={ isResponsiveEditing }
-							role="menuitemcheckbox"
-							onClick={ handleResponsiveEditingChange }
-							info={ __(
-								'Style changes apply only to the selected viewport.'
-							) }
-						>
-							{ __( 'Responsive styles' ) }
-						</MenuItem>
-					</MenuGroup>
+					{ isResponsiveEditingEnabled && (
+						<MenuGroup>
+							<MenuItem
+								icon={ isResponsiveEditing ? check : undefined }
+								isSelected={ isResponsiveEditing }
+								role="menuitemcheckbox"
+								onClick={ handleResponsiveEditingChange }
+								info={ __(
+									'Style changes apply only to the selected viewport.'
+								) }
+							>
+								{ __( 'Responsive styles' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
 					{ isTemplate && (
 						<MenuGroup>
 							<MenuItem

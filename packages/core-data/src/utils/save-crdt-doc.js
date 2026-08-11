@@ -1,29 +1,39 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
 const saveCRDTDocQueues = new Map();
+const persistedCRDTDocs = new Map();
 
-async function saveSerializedCRDTDoc( room, serializedDoc ) {
-	await apiFetch( {
-		path: SYNC_SAVE_API_PATH,
-		method: 'POST',
-		data: {
-			room,
-			doc: serializedDoc,
-		},
-	} );
+async function saveSerializedCRDTDoc( room, serializedDoc, expectedDoc ) {
+	try {
+		await apiFetch( {
+			path: SYNC_SAVE_API_PATH,
+			method: 'POST',
+			data: {
+				room,
+				doc: serializedDoc,
+				expected_doc:
+					persistedCRDTDocs.get( room ) ?? expectedDoc ?? '',
+			},
+		} );
+	} catch ( error ) {
+		if ( error?.code === 'rest_sync_document_conflict' ) {
+			persistedCRDTDocs.delete( room );
+		}
+		throw error;
+	}
+
+	persistedCRDTDocs.set( room, serializedDoc );
 	return true;
 }
 
-async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
+async function serializeAndSaveCRDTDoc(
+	objectType,
+	objectId,
+	room,
+	expectedDoc
+) {
 	const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 		objectType,
 		objectId
@@ -33,7 +43,7 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 		return false;
 	}
 
-	return saveSerializedCRDTDoc( room, serializedDoc );
+	return saveSerializedCRDTDoc( room, serializedDoc, expectedDoc );
 }
 
 async function enqueueRoomSave( room, save ) {
@@ -74,15 +84,35 @@ export function enqueueCRDTDocSave( objectType, objectId, save ) {
 }
 
 /**
- * Persist the current CRDT document through the sync /save endpoint.
+ * Record the latest CRDT document persisted by another room-queued operation.
  *
  * @param {import('@wordpress/sync').ObjectType} objectType Object type.
  * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
+ * @param {string}                               doc        Persisted CRDT document.
+ */
+export function setPersistedCRDTDoc( objectType, objectId, doc ) {
+	const room = `${ objectType }:${ objectId }`;
+	if ( doc === undefined ) {
+		persistedCRDTDocs.delete( room );
+		return;
+	}
+	persistedCRDTDocs.set( room, doc );
+}
+
+/**
+ * Persist the current CRDT document through the sync /save endpoint.
+ *
+ * @param {import('@wordpress/sync').ObjectType} objectType    Object type.
+ * @param {import('@wordpress/sync').ObjectID}   objectId      Object ID.
+ * @param {string}                               [expectedDoc] Last persisted CRDT document.
  * @return {Promise<boolean>}                         Whether a CRDT document was persisted.
  */
-export async function saveCRDTDoc( objectType, objectId ) {
+export async function saveCRDTDoc( objectType, objectId, expectedDoc ) {
 	const room = `${ objectType }:${ objectId }`;
+	if ( expectedDoc !== undefined ) {
+		persistedCRDTDocs.set( room, expectedDoc );
+	}
 	return enqueueCRDTDocSave( objectType, objectId, () =>
-		serializeAndSaveCRDTDoc( objectType, objectId, room )
+		serializeAndSaveCRDTDoc( objectType, objectId, room, expectedDoc )
 	);
 }

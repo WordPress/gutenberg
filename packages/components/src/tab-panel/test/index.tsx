@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, category, media } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TabPanel from '..';
 
 const TABS = [

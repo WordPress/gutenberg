@@ -1,22 +1,10 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
-
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	getEntityRecord,
 	getEntityRecords,
@@ -392,6 +380,7 @@ describe( 'getEntityRecord', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: SERIALIZED_DOC,
+				expected_doc: 'doc2',
 			},
 		} );
 		expect( syncManager.update ).not.toHaveBeenCalled();
@@ -452,6 +441,7 @@ describe( 'getEntityRecord', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: SERIALIZED_DOC,
+				expected_doc: '',
 			},
 		} );
 		expect( syncManager.update ).not.toHaveBeenCalled();

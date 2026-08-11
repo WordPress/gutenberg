@@ -1,18 +1,12 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { parse, serialize } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
-import { enqueueCRDTDocSave, saveCRDTDoc } from './utils';
+import { enqueueCRDTDocSave, saveCRDTDoc, setPersistedCRDTDoc } from './utils';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -204,7 +198,12 @@ export const persistEntityCRDTDoc =
 			return false;
 		}
 
-		return saveCRDTDoc( `${ kind }/${ name }`, recordId );
+		const record = select.getRawEntityRecord?.( kind, name, recordId );
+		return saveCRDTDoc(
+			`${ kind }/${ name }`,
+			recordId,
+			record?.meta?._crdt_document || ''
+		);
 	};
 
 function getRawContent( record ) {
@@ -297,18 +296,19 @@ function updateBlockAttributesAtPath( blocks, path, attributes ) {
  * Persists targeted block attribute changes against a sync-enabled entity's
  * saved content and CRDT document without using unrelated dirty editor state.
  *
- * @param {string}          kind               Entity kind.
- * @param {string}          name               Entity name.
- * @param {number|string}   recordId           Entity record ID.
- * @param {Object}          options            Options.
- * @param {Object}          options.record     Saved entity record snapshot.
- * @param {number[]}        options.blockPath  Path to the block in saved content.
- * @param {Object|Function} options.attributes Attribute changes or updater.
- * @param {Function}        options.isMatch    Optional block matcher for path validation.
- * @param {number}          options.matchIndex Zero-based occurrence of the matched live block.
- * @param {number}          options.matchCount Number of matching blocks in the live tree.
- * @param {number}          options.blockCount Number of blocks in the live tree.
- * @param {string}          options.blockName  Name of the live target block.
+ * @param {string}          kind                     Entity kind.
+ * @param {string}          name                     Entity name.
+ * @param {number|string}   recordId                 Entity record ID.
+ * @param {Object}          options                  Options.
+ * @param {Object}          options.record           Saved entity record snapshot.
+ * @param {number[]}        options.blockPath        Path to the block in saved content.
+ * @param {Object|Function} options.attributes       Attribute changes or updater.
+ * @param {Function}        options.isMatch          Optional block matcher for path validation.
+ * @param {number}          options.matchIndex       Zero-based occurrence of the matched live block.
+ * @param {number}          options.matchCount       Number of matching blocks in the live tree.
+ * @param {Function}        options.isDirtyPathValid Validates the saved tree before using a dirty path.
+ * @param {number}          options.blockCount       Number of blocks in the live tree.
+ * @param {string}          options.blockName        Name of the live target block.
  * @return {Promise<boolean>} Whether block attributes were persisted.
  */
 export const persistEntityBlockAttributes =
@@ -323,6 +323,7 @@ export const persistEntityBlockAttributes =
 			isMatch,
 			matchIndex,
 			matchCount,
+			isDirtyPathValid,
 			blockCount,
 			blockName,
 		}
@@ -381,7 +382,9 @@ export const persistEntityBlockAttributes =
 							matchCount === 1 &&
 							Number.isInteger( blockCount ) &&
 							countBlocks( parsedBlocks ) === blockCount &&
-							pathBlock?.name === blockName;
+							pathBlock?.name === blockName &&
+							typeof isDirtyPathValid === 'function' &&
+							isDirtyPathValid( parsedBlocks );
 						if ( ! canUseDirtyPath ) {
 							return false;
 						}
@@ -410,6 +413,7 @@ export const persistEntityBlockAttributes =
 				if ( ! serializedDoc ) {
 					return false;
 				}
+				const expectedDoc = persistedRecord?.meta?._crdt_document || '';
 
 				try {
 					await apiFetch( {
@@ -418,17 +422,22 @@ export const persistEntityBlockAttributes =
 						data: {
 							room,
 							expected_content: content,
+							expected_doc: expectedDoc,
 							content: serialize( blocks ),
 							doc: serializedDoc,
 						},
 					} );
 				} catch ( error ) {
-					if ( error?.code === 'rest_sync_content_conflict' ) {
+					if (
+						error?.code === 'rest_sync_content_conflict' ||
+						error?.code === 'rest_sync_document_conflict'
+					) {
 						continue;
 					}
 					throw error;
 				}
 
+				setPersistedCRDTDoc( objectType, recordId, serializedDoc );
 				return true;
 			}
 
@@ -563,7 +572,10 @@ export const saveDirtyEntities =
 				pendingSavedRecords.push(
 					registry
 						.dispatch( STORE_NAME )
-						.saveEditedEntityRecord( kind, name, key )
+						.saveEditedEntityRecord( kind, name, key, {
+							throwOnError: true,
+						} )
+						.catch( ensureError )
 				);
 			}
 		} );
@@ -575,15 +587,19 @@ export const saveDirtyEntities =
 						'root',
 						'site',
 						undefined,
-						siteItemsToSave
+						siteItemsToSave,
+						{
+							throwOnError: true,
+						}
 					)
+					.catch( ensureError )
 			);
 		}
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
 
-		Promise.all( pendingSavedRecords )
+		return Promise.all( pendingSavedRecords )
 			.then( async ( values ) => {
 				if ( onSave ) {
 					await onSave();
@@ -591,12 +607,23 @@ export const saveDirtyEntities =
 				return values;
 			} )
 			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
+				const errors = values.filter( ( v ) => v instanceof Error );
+				if ( errors.length ) {
+					const firstMessage = errors.find(
+						( e ) => e.message
+					)?.message;
+
 					registry
 						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
+						.createErrorNotice(
+							decodeEntities(
+								firstMessage || __( 'Saving failed.' )
+							),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+							}
+						);
 				} else {
 					registry
 						.dispatch( noticesStore )
@@ -620,7 +647,43 @@ export const saveDirtyEntities =
 				registry
 					.dispatch( noticesStore )
 					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
+						decodeEntities(
+							error?.message || __( 'Saving failed.' )
+						),
+						{
+							type: 'snackbar',
+							id: saveNoticeId,
+						}
 					)
 			);
+
+		function ensureError( error ) {
+			if ( error instanceof Error ) {
+				return error;
+			}
+
+			// Expect certain errors to be plain objects with a `message`
+			// property, such as those thrown by `apiFetch`. Otherwise, do our
+			// best to infer a message via duck typing.
+			let message;
+			if ( ! error ) {
+			} else if ( typeof error.message === 'string' ) {
+				message = error.message;
+			} else if ( typeof error === 'string' ) {
+				message = error;
+			} else if (
+				// Only consider own method, lest we erroneously end up calling
+				// `Object#toString` at the end of the prototype chain, thereby
+				// returning `"[object Object]"`.
+				Object.hasOwn( error, 'toString' ) &&
+				typeof error.toString === 'function'
+			) {
+				const result = error.toString();
+				if ( typeof result === 'string' ) {
+					message = result;
+				}
+			}
+
+			return new Error( message, { cause: error } );
+		}
 	};

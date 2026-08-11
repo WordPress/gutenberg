@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHeading as Heading,
 	__unstableMotion as motion,
@@ -16,10 +9,6 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 const ANIMATION_DURATION = 0.3;

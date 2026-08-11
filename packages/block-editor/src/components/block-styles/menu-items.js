@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem, __experimentalText as WCText } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 

@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
-
 import { __ } from '@wordpress/i18n';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { MetaBoxesSection } from './meta-boxes-section';
 

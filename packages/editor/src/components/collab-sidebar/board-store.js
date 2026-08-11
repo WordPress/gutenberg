@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNoteMarkerSelector, getSelectionRect } from './utils';
 
 export function createBoardStore() {

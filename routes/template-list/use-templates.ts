@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -9,10 +6,6 @@ import {
 	type WpTemplate,
 } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import type { Template } from './types';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	useCropperReducer,
 	type CropperController,

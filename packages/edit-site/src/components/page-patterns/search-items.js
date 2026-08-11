@@ -1,20 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
-
 const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
 	blockEditorPrivateApis
 );
-
-/**
- * Internal dependencies
- */
 import {
 	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_DEFAULT_CATEGORY,
