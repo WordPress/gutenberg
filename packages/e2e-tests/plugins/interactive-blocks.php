@@ -7,43 +7,6 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-/**
- * Renders a single activity-feed post card: a keyed article with its own
- * context (id + likes), a comment list, an init hook, and a like button.
- * Shared by the `test/activity-feed` block's server markup and the REST
- * fragments it fetches, so spliced-in cards are identical to SSR'd ones.
- *
- * @param array $post The post: id, title, text, comments (id => text).
- * @return string The card HTML.
- */
-function gutenberg_e2e_activity_feed_card( $post ) {
-	$post_id   = (int) $post['id'];
-	$title     = $post['title'] ?? 'Untitled';
-	$text      = $post['text'] ?? '';
-	$comments  = $post['comments'] ?? array();
-	$comments_html = '';
-	foreach ( $comments as $comment_id => $comment_text ) {
-		$comments_html .= sprintf(
-			'<p data-wp-key="comment-%1$d" data-testid="comment-%1$d">%2$s</p>',
-			(int) $comment_id,
-			esc_html( $comment_text )
-		);
-	}
-	return sprintf(
-		'<article data-wp-key="post-%1$d" data-testid="post-%1$d" data-wp-context=\'{ "id": %1$d, "likes": 0 }\'>' .
-		'<h3>%2$s</h3>' .
-		'<p data-testid="post-%1$d-text">%3$s</p>' .
-		'<div data-testid="post-%1$d-comments">%4$s</div>' .
-		'<button data-testid="post-%1$d-like" data-wp-on--click="actions.like" data-wp-text="context.likes">0</button>' .
-		'<span data-wp-init="callbacks.initPost"></span>' .
-		'</article>',
-		$post_id,
-		esc_html( $title ),
-		esc_html( $text ),
-		$comments_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	);
-}
-
 add_action(
 	'init',
 	function () {
@@ -283,3 +246,40 @@ add_action(
 		);
 	}
 );
+
+/**
+ * Renders a single activity-feed post card: a keyed article with its own
+ * context (id + likes), a comment list, an init hook, and a like button.
+ * Shared by the `test/activity-feed` block's server markup and the REST
+ * fragments it fetches, so spliced-in cards are identical to SSR'd ones.
+ *
+ * @param array $post The post: id, title, text, comments (id => text).
+ * @return string The card HTML.
+ */
+function gutenberg_e2e_activity_feed_card( $post ) {
+	$post_id   = (int) $post['id'];
+	$title     = $post['title'] ?? 'Untitled';
+	$text      = $post['text'] ?? '';
+	$comments  = $post['comments'] ?? array();
+	$comments_html = '';
+	foreach ( $comments as $comment_id => $comment_text ) {
+		$comments_html .= sprintf(
+			'<p data-wp-key="comment-%1$d" data-testid="comment-%1$d">%2$s</p>',
+			(int) $comment_id,
+			esc_html( $comment_text )
+		);
+	}
+	return sprintf(
+		'<article data-wp-key="post-%1$d" data-testid="post-%1$d" data-wp-context=\'{ "id": %1$d, "likes": 0 }\'>' .
+		'<h3>%2$s</h3>' .
+		'<p data-testid="post-%1$d-text">%3$s</p>' .
+		'<div data-testid="post-%1$d-comments">%4$s</div>' .
+		'<button data-testid="post-%1$d-like" data-wp-on--click="actions.like" data-wp-text="context.likes">0</button>' .
+		'<span data-wp-init="callbacks.initPost"></span>' .
+		'</article>',
+		$post_id,
+		esc_html( $title ),
+		esc_html( $text ),
+		$comments_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	);
+}
