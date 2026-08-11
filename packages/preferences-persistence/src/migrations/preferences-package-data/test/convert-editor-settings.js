@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import convertEditorSettings from '../convert-editor-settings';
 
 describe( 'convertEditorSettings', () => {

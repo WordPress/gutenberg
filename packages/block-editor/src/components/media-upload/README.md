@@ -62,7 +62,6 @@ If allowedTypes is unset all mime types should be allowed.
 
 -   Type: `Array`
 -   Required: No
--   Platform: Web | Mobile
 
 ### mode
 
@@ -71,7 +70,6 @@ Value of Frame content default mode like 'browse', 'upload' etc.
 -   Type: `String`
 -   Required: No
 -   Default: false
--   Platform: Web
 
 ### multiple
 
@@ -80,7 +78,6 @@ Whether to allow multiple selection of files or not. This property will also acc
 -   Type: `Boolean|String`
 -   Required: No
 -   Default: false
--   Platform: Web
 
 ### value
 
@@ -88,7 +85,6 @@ Media ID (or media IDs if multiple is true) to be selected by default when openi
 
 -   Type: `Number|Array`
 -   Required: No
--   Platform: Web
 
 ### onClose
 
@@ -109,7 +105,6 @@ The `image.sizes.full` resolution does always exist. Other defined sizes are onl
 
 -   Type: `Function`
 -   Required: Yes
--   Platform: Web | Mobile
 
 ### title
 
@@ -118,7 +113,6 @@ Title displayed in the media modal.
 -   Type: `String`
 -   Required: No
 -   Default: `Select or Upload Media`
--   Platform: Web
 
 ### modalClass
 
@@ -126,7 +120,6 @@ CSS class added to the media modal frame.
 
 -   Type: `String`
 -   Required: No
--   Platform: Web
 
 ### addToGallery
 
@@ -137,16 +130,6 @@ Only applies if `gallery === true`.
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
--   Platform: Web
-
-### autoOpen
-
-If true, the picker of the respective platform auto-opens.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-- Platform: Mobile
 
 ### gallery
 
@@ -155,7 +138,6 @@ If true, the component will initiate all the states required to represent a gall
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
--   Platform: Web
 
 ## render
 
@@ -163,7 +145,6 @@ A callback invoked to render the Button opening the media library.
 
 -   Type: `Function`
 -   Required: Yes
--   Platform: Web | Mobile
 
 The first argument of the callback is an object containing the following properties:
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import TextHighlight from '..';
 
 const getMarks = ( container: Element ) =>

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { RichText, InnerBlocks, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 import { migrateToListV2, migrateTypeToInlineStyle } from './utils';
 

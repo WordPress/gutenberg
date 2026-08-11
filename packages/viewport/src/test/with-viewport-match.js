@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import '../store';
 import withViewportMatch from '../with-viewport-match';
 

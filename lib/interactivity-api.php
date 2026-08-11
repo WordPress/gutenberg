@@ -13,7 +13,7 @@
  * to ensure that the conditional registration happens after Core and correctly determine whether
  * the filter should be added.
  *
- * @see https://github.com/WordPress/wordpress-develop/pull/7304
+ * @link https://github.com/WordPress/wordpress-develop/pull/7304
  */
 function gutenberg_register_interactivity_script_module_data_hooks() {
 	if ( ! has_filter( 'script_module_data_@wordpress/interactivity-router', array( wp_interactivity(), 'filter_script_module_interactivity_router_data' ) ) ) {

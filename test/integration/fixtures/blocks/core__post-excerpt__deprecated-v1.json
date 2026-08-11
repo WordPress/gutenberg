@@ -1,0 +1,44 @@
+[
+	{
+		"name": "core/post-excerpt",
+		"isValid": true,
+		"attributes": {
+			"showMoreOnNewLine": true,
+			"excerptLength": 55,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-excerpt",
+		"isValid": true,
+		"attributes": {
+			"showMoreOnNewLine": true,
+			"excerptLength": 55,
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-excerpt",
+		"isValid": true,
+		"attributes": {
+			"showMoreOnNewLine": true,
+			"excerptLength": 55,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

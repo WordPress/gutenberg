@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { serializeRawBlock } from '../serialize-raw-block';
 
 describe( 'serializeRawBlock', () => {

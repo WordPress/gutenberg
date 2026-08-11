@@ -1,22 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getValidAlignments, addAssignedAlign } from '../align';
 
 const noop = () => {};
 
 describe( 'align', () => {
 	const blockSettings = {
+		apiVersion: 3,
 		save: noop,
 		category: 'text',
 		title: 'block title',

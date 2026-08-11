@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';

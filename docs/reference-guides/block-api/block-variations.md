@@ -35,6 +35,7 @@ A block variation is defined by an object that can contain the following fields:
 -   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
 -   `attributes` (optional, type `Object`) – Values that override block attributes.
 -   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
+-   `innerContent` (optional, type `Array`) – Static HTML fragments interleaved with inner blocks, where `null` entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.
 -   `example` (optional, type `Object`) – Provides structured data for the block preview. Set to `undefined` to disable the preview. See the [Block Registration API](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 -   `scope` (optional, type `WPBlockVariationScope[]`) - Defaults to `block` and `inserter`. The list of scopes where the variation is applicable. Available options include:
     -   `block` - Used by blocks to filter specific block variations. `Columns` and `Query` blocks have such variations, which are passed to the [experimental BlockVariationPicker](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md) component. This component handles displaying the variations and allows users to choose one of them.

@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	hasBlockSupport,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 
 export default function BlockActions( {
 	clientIds,
@@ -43,7 +33,12 @@ export default function BlockActions( {
 
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
-				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
+				canInsertBlock: blocks.every( ( block ) => {
+					return (
+						( canInsertDefaultBlock || !! directInsertBlock ) &&
+						canInsertBlockType( block.name, rootClientId )
+					);
+				} ),
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
@@ -101,8 +96,7 @@ export default function BlockActions( {
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType(
+			const newBlocks = groupBlocks(
 				getBlocksByClientId( clientIds ),
 				groupingBlockName
 			);

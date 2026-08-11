@@ -1,32 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { Button, Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
 import { usePostScheduleLabel } from './label';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../store/constants';
-
-const DESIGN_POST_TYPES = [
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-];
+import { DESIGN_POST_TYPES } from '../../store/constants';
 
 /**
  * Renders the Post Schedule Panel component.

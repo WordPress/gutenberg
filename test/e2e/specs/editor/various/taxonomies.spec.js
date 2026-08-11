@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 function generateRandomNumber() {
@@ -30,7 +27,7 @@ test.describe( 'Taxonomies', () => {
 
 		await page
 			.getByRole( 'button', {
-				name: 'Add New Category',
+				name: 'Add Category',
 				expanded: false,
 			} )
 			.click();

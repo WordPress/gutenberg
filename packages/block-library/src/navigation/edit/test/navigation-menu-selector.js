@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
+import { useEntityRecords } from '@wordpress/core-data';
 import NavigationMenuSelector from '../navigation-menu-selector';
 import useNavigationMenu from '../../use-navigation-menu';
-import useNavigationEntities from '../../use-navigation-entities';
 
 jest.mock( '../../use-navigation-menu', () => {
 	// This allows us to tweak the returned value on each test.
@@ -17,14 +10,13 @@ jest.mock( '../../use-navigation-menu', () => {
 	return mock;
 } );
 
-jest.mock( '../../use-navigation-entities', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+jest.mock( '@wordpress/core-data', () => ( {
+	...jest.requireActual( '@wordpress/core-data' ),
+	useEntityRecords: jest.fn(),
+} ) );
 
-useNavigationEntities.mockReturnValue( {
-	menus: [],
+useEntityRecords.mockReturnValue( {
+	records: [],
 } );
 
 const navigationMenu1 = {
@@ -295,7 +287,7 @@ describe( 'NavigationMenuSelector', () => {
 					screen.queryByRole( 'menuitem', {
 						name: 'Create new Menu',
 					} )
-				).toBeDisabled();
+				).toHaveAttribute( 'aria-disabled', 'true' );
 
 				// once the menu is created
 				// no more network activity to wait on
@@ -485,8 +477,8 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should not show classic menus if there are no classic menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationEntities.mockReturnValue( {
-					menus: [],
+				useEntityRecords.mockReturnValue( {
+					records: [],
 				} );
 
 				render( <NavigationMenuSelector /> );
@@ -507,8 +499,8 @@ describe( 'NavigationMenuSelector', () => {
 					canUserCreateNavigationMenus: false,
 				} );
 
-				useNavigationEntities.mockReturnValue( {
-					menus: classicMenusFixture,
+				useEntityRecords.mockReturnValue( {
+					records: classicMenusFixture,
 				} );
 
 				render( <NavigationMenuSelector /> );
@@ -529,8 +521,8 @@ describe( 'NavigationMenuSelector', () => {
 					canUserCreateNavigationMenus: true,
 				} );
 
-				useNavigationEntities.mockReturnValue( {
-					menus: classicMenusFixture,
+				useEntityRecords.mockReturnValue( {
+					records: classicMenusFixture,
 				} );
 
 				render( <NavigationMenuSelector /> );
@@ -566,8 +558,8 @@ describe( 'NavigationMenuSelector', () => {
 					canUserCreateNavigationMenus: true,
 				} );
 
-				useNavigationEntities.mockReturnValue( {
-					menus: classicMenusFixture,
+				useEntityRecords.mockReturnValue( {
+					records: classicMenusFixture,
 				} );
 
 				const { rerender } = render(
@@ -598,8 +590,8 @@ describe( 'NavigationMenuSelector', () => {
 					canUserCreateNavigationMenus: true,
 				} );
 
-				useNavigationEntities.mockReturnValue( {
-					menus: classicMenusFixture,
+				useEntityRecords.mockReturnValue( {
+					records: classicMenusFixture,
 				} );
 
 				rerender(
@@ -619,7 +611,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check all menu items are present but disabled.
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
 					// // Check all menu items are present but disabled.
-					expect( item ).toBeDisabled();
+					expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
 				} );
 
 				// once the menu is imported
@@ -631,8 +623,8 @@ describe( 'NavigationMenuSelector', () => {
 					canUserCreateNavigationMenus: true,
 				} );
 
-				useNavigationEntities.mockReturnValue( {
-					menus: classicMenusFixture,
+				useEntityRecords.mockReturnValue( {
+					records: classicMenusFixture,
 				} );
 
 				// Simulate the menu being created and component being re-rendered.

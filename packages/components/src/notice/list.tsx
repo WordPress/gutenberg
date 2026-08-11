@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import Notice from '.';
 import type { WordPressComponentProps } from '../context';
 import type { NoticeListProps } from './types';

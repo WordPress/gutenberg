@@ -1,34 +1,33 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import PagePatterns from '../page-patterns';
-import { unlock } from '../../lock-unlock';
-
-const { useLocation } = unlock( routerPrivateApis );
-
-function MobilePatternsView() {
-	const { query = {} } = useLocation();
-	const { categoryId } = query;
-
-	return !! categoryId ? (
-		<PagePatterns />
-	) : (
-		<SidebarNavigationScreenPatterns backPath="/" />
-	);
-}
+import { isClassicThemeWithStyleBookSupport } from './utils';
 
 export const patternsRoute = {
 	name: 'patterns',
 	path: '/pattern',
 	areas: {
-		sidebar: <SidebarNavigationScreenPatterns backPath="/" />,
+		sidebar( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			const backPath =
+				isBlockTheme || isClassicThemeWithStyleBookSupport( siteData )
+					? '/'
+					: undefined;
+			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
+		},
 		content: <PagePatterns />,
-		mobile: <MobilePatternsView />,
+		mobileSidebar( { siteData, query } ) {
+			if ( query.categoryId ) {
+				return undefined;
+			}
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			const backPath =
+				isBlockTheme || isClassicThemeWithStyleBookSupport( siteData )
+					? '/'
+					: undefined;
+			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
+		},
+		mobileContent( { query } ) {
+			return query.categoryId ? <PagePatterns /> : undefined;
+		},
 	},
 };
