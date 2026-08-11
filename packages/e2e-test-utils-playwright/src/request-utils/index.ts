@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { request } from '@playwright/test';
 import type { APIRequestContext, Cookie } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';

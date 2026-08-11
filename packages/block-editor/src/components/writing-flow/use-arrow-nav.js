@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	computeCaretRect,
 	focus,
@@ -14,10 +11,6 @@ import {
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import {
 	Icon as WCIcon,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';

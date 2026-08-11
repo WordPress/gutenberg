@@ -1,18 +1,11 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const util = require( 'util' );
+const pipeline = util.promisify( require( 'stream' ).pipeline );
 const got = require( 'got' );
 const AdmZip = require( 'adm-zip' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Promisified dependencies
- */
-const pipeline = util.promisify( require( 'stream' ).pipeline );
 const { rimraf } = require( 'rimraf' );
 
 /**

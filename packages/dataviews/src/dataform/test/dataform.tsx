@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 

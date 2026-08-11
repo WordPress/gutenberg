@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -25,10 +18,6 @@ import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -686,13 +675,9 @@ function BlockListBlockProvider( props ) {
 			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
-			// Without a section block there is nothing for the deep check to
-			// match, and it walks the parents of every selected block to find
-			// that out.
 			const isSelectionWithinCurrentSection =
 				isBlockSelected( sectionBlockClientId ) ||
-				( !! sectionBlockClientId &&
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
+				hasSelectedInnerBlock( sectionBlockClientId, checkDeep );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 

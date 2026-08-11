@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	focus,
@@ -9,10 +6,6 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';

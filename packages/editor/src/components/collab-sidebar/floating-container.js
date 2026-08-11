@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
 
 export function FloatingContainer( {

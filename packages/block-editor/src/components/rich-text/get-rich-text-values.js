@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { RawHTML, StrictMode, Fragment } from '@wordpress/element';
 import {
 	getSaveElement,
 	__unstableGetBlockProps as getBlockProps,
 } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import InnerBlocks from '../inner-blocks';
 import { Content } from './content';
 

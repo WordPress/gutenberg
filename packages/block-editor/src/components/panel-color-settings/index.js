@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import PanelColorGradientSettings from '../colors-gradients/panel-color-gradient-settings';
 
 const PanelColorSettings = ( { colorSettings, ...props } ) => {
