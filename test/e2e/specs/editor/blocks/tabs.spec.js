@@ -51,7 +51,7 @@ test.describe( 'Tabs', () => {
 						{
 							name: 'core/tab-list',
 							attributes: {
-								tabs: [ { label: 'Tab' }, { label: 'Tab' } ],
+								tabs: [ { label: '' }, { label: '' } ],
 							},
 							innerBlocks: [],
 						},
@@ -60,13 +60,23 @@ test.describe( 'Tabs', () => {
 							innerBlocks: [
 								{
 									name: 'core/tab-panel',
-									attributes: { label: 'Tab' },
-									innerBlocks: [],
+									attributes: { label: '' },
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											attributes: { content: '' },
+										},
+									],
 								},
 								{
 									name: 'core/tab-panel',
-									attributes: { label: 'Tab' },
-									innerBlocks: [],
+									attributes: { label: '' },
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											attributes: { content: '' },
+										},
+									],
 								},
 							],
 						},
