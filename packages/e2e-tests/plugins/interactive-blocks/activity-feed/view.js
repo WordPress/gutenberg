@@ -39,7 +39,10 @@ const { state } = store( 'test/activity-feed', {
 		// Load more: fetches a fragment of older posts and appends it.
 		*loadMore() {
 			const { ref } = getElement();
-			const res = yield fetch( ref.dataset.fragmentUrl );
+			const identity = ref.dataset.identity ?? 'data-wp-key';
+			const url = new URL( ref.dataset.fragmentUrl );
+			url.searchParams.set( 'identity', identity );
+			const res = yield fetch( url );
 			const html = yield res.json();
 			const feedList = document.querySelector(
 				'[data-testid="feed-list"]'
@@ -55,10 +58,12 @@ const { state } = store( 'test/activity-feed', {
 			const input = document.querySelector(
 				'[data-testid="new-post-title"]'
 			);
-			const title = encodeURIComponent( input?.value ?? '' );
-			const res = yield fetch(
-				`${ ref.dataset.fragmentUrl }?title=${ title }`
-			);
+			const title = input?.value ?? '';
+			const identity = ref.dataset.identity ?? 'data-wp-key';
+			const url = new URL( ref.dataset.fragmentUrl );
+			url.searchParams.set( 'title', title );
+			url.searchParams.set( 'identity', identity );
+			const res = yield fetch( url );
 			const html = yield res.json();
 			const feedList = document.querySelector(
 				'[data-testid="feed-list"]'

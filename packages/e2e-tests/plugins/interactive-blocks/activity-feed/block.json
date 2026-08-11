@@ -6,6 +6,12 @@
     "category": "text",
     "icon": "heart",
     "description": "",
+    "attributes": {
+        "identity": {
+            "type": "string",
+            "default": "data-wp-key"
+        }
+    },
     "supports": {
         "interactivity": true
     },
