@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -11,10 +8,6 @@ import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
@@ -85,7 +78,10 @@ export default function InserterSidebar() {
 				showMostUsedBlocks={ showMostUsedBlocks }
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
-				rootClientId={ blockSectionRootClientId }
+				rootClientId={
+					blockSectionRootClientId ?? inserter.rootClientId
+				}
+				__experimentalInsertionIndex={ inserter.insertionIndex }
 				onSelect={ inserter.onSelect }
 				__experimentalInitialTab={ inserter.tab }
 				__experimentalInitialCategory={ inserter.category }

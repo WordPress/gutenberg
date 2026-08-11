@@ -12,22 +12,10 @@
  *
  * @see https://ariakit.org/components/composite
  */
-
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { Composite as Current } from '..';
 
 type Orientation = 'horizontal' | 'vertical';
@@ -238,7 +226,6 @@ export function useCompositeState(
 		loop: focusLoop = false,
 		wrap: focusWrap = false,
 		shift: focusShift = false,
-		// eslint-disable-next-line camelcase
 		unstable_virtual: virtualFocus,
 	} = legacyStateOptions;
 

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, category, media } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TabPanel from '..';
 
 const TABS = [
@@ -35,8 +24,6 @@ const TABS = [
 const getSelectedTab = async () =>
 	await screen.findByRole( 'tab', { selected: true } );
 
-let originalGetClientRects: () => DOMRectList;
-
 describe.each( [
 	[ 'uncontrolled', TabPanel ],
 	// The controlled component tests will be added once we certify the
@@ -44,21 +31,6 @@ describe.each( [
 	// [ 'controlled', TabPanel ],
 ] )( 'TabPanel %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
-
-	beforeAll( () => {
-		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-	} );
 
 	describe( 'Accessibility and semantics', () => {
 		it( 'should use the correct aria attributes', async () => {

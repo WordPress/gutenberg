@@ -41,53 +41,33 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		}
 	}
 
-	if ( wp_theme_has_theme_json() ) {
-		$block_classes = array(
-			'css'            => 'styles',
-			'__unstableType' => 'theme',
-			'isGlobalStyles' => true,
-		);
-		$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
-		if ( '' !== $actual_css ) {
-			$block_classes['css'] = $actual_css;
-			$global_styles[]      = $block_classes;
-		}
-
-		// Get any additional css from the customizer and add it before global styles custom CSS.
-		$global_styles[] = array(
-			'css'            => wp_get_custom_css(),
-			'__unstableType' => 'user',
-			'isGlobalStyles' => false,
-		);
-
-		/*
-		 * Add the custom CSS as a separate stylesheet so any invalid CSS
-		 * entered by users does not break other global styles.
-		 */
-		$global_styles[] = array(
-			'css'            => gutenberg_get_global_stylesheet( array( 'custom-css' ) ),
-			'__unstableType' => 'user',
-			'isGlobalStyles' => true,
-		);
-	} else {
-		// If there is no `theme.json` file, ensure base layout styles are still available.
-		$block_classes = array(
-			'css'            => 'base-layout-styles',
-			'__unstableType' => 'base-layout',
-			'isGlobalStyles' => true,
-		);
-		$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
-		if ( '' !== $actual_css ) {
-			$block_classes['css'] = $actual_css;
-			$global_styles[]      = $block_classes;
-		}
-		// Get any additional css from the customizer.
-		$global_styles[] = array(
-			'css'            => wp_get_custom_css(),
-			'__unstableType' => 'user',
-			'isGlobalStyles' => false,
-		);
+	$block_classes = array(
+		'css'            => 'styles',
+		'__unstableType' => 'theme',
+		'isGlobalStyles' => true,
+	);
+	$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
+	if ( '' !== $actual_css ) {
+		$block_classes['css'] = $actual_css;
+		$global_styles[]      = $block_classes;
 	}
+
+	// Get any additional css from the customizer and add it before global styles custom CSS.
+	$global_styles[] = array(
+		'css'            => wp_get_custom_css(),
+		'__unstableType' => 'user',
+		'isGlobalStyles' => false,
+	);
+
+	/*
+	 * Add the custom CSS as a separate stylesheet so any invalid CSS
+	 * entered by users does not break other global styles.
+	 */
+	$global_styles[] = array(
+		'css'            => gutenberg_get_global_stylesheet( array( 'custom-css' ) ),
+		'__unstableType' => 'user',
+		'isGlobalStyles' => true,
+	);
 
 	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );
 
@@ -95,30 +75,15 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	// These settings may need to be updated based on data coming from theme.json sources.
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
-		$settings['colors'] = isset( $colors_by_origin['custom'] ) ?
-			$colors_by_origin['custom'] : (
-				isset( $colors_by_origin['theme'] ) ?
-					$colors_by_origin['theme'] :
-					$colors_by_origin['default']
-			);
+		$settings['colors'] = $colors_by_origin['custom'] ?? $colors_by_origin['theme'] ?? $colors_by_origin['default'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
 		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
-		$settings['gradients'] = isset( $gradients_by_origin['custom'] ) ?
-			$gradients_by_origin['custom'] : (
-				isset( $gradients_by_origin['theme'] ) ?
-					$gradients_by_origin['theme'] :
-					$gradients_by_origin['default']
-			);
+		$settings['gradients'] = $gradients_by_origin['custom'] ?? $gradients_by_origin['theme'] ?? $gradients_by_origin['default'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
 		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
-		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
-			$font_sizes_by_origin['custom'] : (
-				isset( $font_sizes_by_origin['theme'] ) ?
-					$font_sizes_by_origin['theme'] :
-					$font_sizes_by_origin['default']
-			);
+		$settings['fontSizes'] = $font_sizes_by_origin['custom'] ?? $font_sizes_by_origin['theme'] ?? $font_sizes_by_origin['default'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
 		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
@@ -151,13 +116,10 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	if ( isset( $settings['__experimentalFeatures']['spacing']['spacingSizes'] ) ) {
 		$spacing_sizes_by_origin  = $settings['__experimentalFeatures']['spacing']['spacingSizes'];
-		$settings['spacingSizes'] = isset( $spacing_sizes_by_origin['custom'] ) ?
-			$spacing_sizes_by_origin['custom'] : (
-				isset( $spacing_sizes_by_origin['theme'] ) ?
-					$spacing_sizes_by_origin['theme'] :
-					$spacing_sizes_by_origin['default']
-			);
+		$settings['spacingSizes'] = $spacing_sizes_by_origin['custom'] ?? $spacing_sizes_by_origin['theme'] ?? $spacing_sizes_by_origin['default'];
 	}
+
+	$settings['canEditCSS'] = current_user_can( 'edit_css' );
 
 	return $settings;
 }

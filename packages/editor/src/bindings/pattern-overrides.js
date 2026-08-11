@@ -1,10 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/pattern-overrides',
 	getValues( { select, clientId, context, bindings } ) {
@@ -19,11 +19,11 @@ export default {
 					currentBlockAttributes?.metadata?.name
 				]?.[ attributeName ];
 
-			// If it has not been overriden, return the original value.
+			// If it has not been overridden, return the original value.
 			// Check undefined because empty string is a valid value.
 			if ( overridableValue === undefined ) {
 				overridesValues[ attributeName ] =
-					currentBlockAttributes[ attributeName ];
+					currentBlockAttributes?.[ attributeName ];
 				continue;
 			} else {
 				overridesValues[ attributeName ] =

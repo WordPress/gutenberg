@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-
-/**
- * Internal dependencies
- */
+import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
 import {
 	getFontSize,
 	getFontSizeClass,
@@ -21,7 +15,6 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
-import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -97,8 +90,11 @@ export function FontSizeEdit( props ) {
 	} = props;
 	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
-	const onChange = ( value ) => {
-		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
+	const onChange = ( value, selectedItem ) => {
+		// Use the selectedItem's slug if available, otherwise fall back to finding by value
+		const fontSizeSlug =
+			selectedItem?.slug ||
+			getFontSizeObjectByValue( fontSizes, value ).slug;
 
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -124,10 +120,10 @@ export function FontSizeEdit( props ) {
 	return (
 		<FontSizePicker
 			onChange={ onChange }
-			value={ fontSizeValue }
+			value={ fontSize || fontSizeValue }
+			valueMode={ fontSize ? 'slug' : 'literal' }
 			withReset={ false }
 			withSlider
-			size="__unstable-large"
 		/>
 	);
 }

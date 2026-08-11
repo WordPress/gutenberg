@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const {
 	parseSourceString,
 	includeTestsPath,
@@ -103,6 +100,8 @@ function getLifecycleScriptOverrides() {
 	const lifecycleEnvironmentVars = {
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_START: 'afterStart',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEAN: 'afterClean',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_RESET: 'afterReset',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEANUP: 'afterCleanup',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_DESTROY: 'afterDestroy',
 	};
 	for ( const envVar in lifecycleEnvironmentVars ) {
