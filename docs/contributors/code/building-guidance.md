@@ -9,10 +9,6 @@ Use this guidance when implementing, self-reviewing, or reviewing a Gutenberg ch
 3. Search for existing helpers, analogous implementations, public consumers, fixtures, and surrounding tests before adding a new pattern or claiming a break.
 4. Treat repository `AGENTS.md` instructions as authoritative for agent work. Current code and repository instructions always win over historical review patterns.
 
-## Shared method
-
--   Use the [cross-cutting method](cross-cutting-method.md) when a change crosses more than one Gutenberg boundary.
-
 ## Focused guidance
 
 -   Cross-cutting lifecycle, boundary, and verification checks: [Cross-cutting method](cross-cutting-method.md)
@@ -22,3 +18,4 @@ Use this guidance when implementing, self-reviewing, or reviewing a Gutenberg ch
 -   PHP, REST routes and schemas, permissions, sanitization, escaping: [PHP, REST, schema, and security](php-rest-schema.md)
 -   Workspaces, dependencies, builds, CI, generated artifacts, releases: [Tooling, dependencies, CI, generated artifacts, and releases](tooling-ci-release.md)
 -   Tests, changelogs, documentation, fixtures, snapshots, delivery evidence: [Tests, documentation, changelogs, and delivery evidence](testing-docs-delivery.md)
+-   Use the [cross-cutting method](cross-cutting-method.md) when a change crosses more than one Gutenberg boundary.
