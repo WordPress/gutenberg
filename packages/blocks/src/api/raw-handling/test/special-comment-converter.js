@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import specialCommentConverter from '../special-comment-converter';
 import { deepFilterHTML } from '../utils';
 

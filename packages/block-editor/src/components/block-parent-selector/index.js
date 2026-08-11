@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
@@ -26,10 +19,13 @@ export default function BlockParentSelector() {
 	const { parentClientId } = useSelect( ( select ) => {
 		const {
 			getBlockParents,
-			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			getParentSectionBlock,
 		} = unlock( select( blockEditorStore ) );
-		const selectedBlockClientId = getSelectedBlockClientId();
+		// Not getSelectedBlockClientId: a text selection crossing into a
+		// nested block resolves to the ancestor alone, but its selection
+		// start and end differ.
+		const [ selectedBlockClientId ] = getSelectedBlockClientIds();
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];

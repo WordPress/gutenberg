@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Fragment } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { store as editorStore } from '../../store';
@@ -18,7 +11,10 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 	const { postType, taxonomies } = useSelect( ( select ) => {
 		return {
 			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+			taxonomies: select( coreStore ).getEntityRecords(
+				'root',
+				'taxonomy'
+			),
 		};
 	}, [] );
 	const visibleTaxonomies = ( taxonomies ?? [] ).filter(
@@ -32,17 +28,11 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
-		const taxonomyComponentProps = {
-			slug: taxonomy.slug,
-			...( taxonomy.hierarchical
-				? {}
-				: { __nextHasNoMarginBottom: true } ),
-		};
 
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
-					<TaxonomyComponent { ...taxonomyComponentProps } />,
+					<TaxonomyComponent slug={ taxonomy.slug } />,
 					taxonomy
 				) }
 			</Fragment>

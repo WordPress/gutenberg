@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PostLastRevision from './';
 import PostLastRevisionCheck from './check';
 

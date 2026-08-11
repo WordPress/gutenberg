@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef, memo } from '@wordpress/element';
 import {
 	createBlock,
@@ -15,10 +8,6 @@ import {
 } from '@wordpress/blocks';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER, isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import { InserterListboxItem } from '../inserter-listbox';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
@@ -44,10 +33,16 @@ function InserterListItem( {
 			createBlock(
 				item.name,
 				item.initialAttributes,
-				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+				createBlocksFromInnerBlocksTemplate( item.innerBlocks ),
+				item.innerContent
 			),
 		],
-		[ item.name, item.initialAttributes, item.innerBlocks ]
+		[
+			item.name,
+			item.initialAttributes,
+			item.innerBlocks,
+			item.innerContent,
+		]
 	);
 
 	const isSynced =

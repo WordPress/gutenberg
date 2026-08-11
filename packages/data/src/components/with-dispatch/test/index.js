@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { memo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import withDispatch from '../';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
@@ -77,7 +66,7 @@ describe( 'withDispatch', () => {
 		);
 
 		// Function value reference should not have changed in props update.
-		// The spy method is only called during inital render.
+		// The spy method is only called during initial render.
 		expect( ButtonSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );

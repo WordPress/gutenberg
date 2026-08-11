@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseSlotFills as useSlotFills,
 	createSlotFill,

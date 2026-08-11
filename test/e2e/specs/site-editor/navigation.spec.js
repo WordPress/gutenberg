@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -106,6 +103,23 @@ test.describe( 'Site editor navigation', () => {
 		// We should have our editor canvas button back
 		await expect( editorCanvasButton ).toBeVisible();
 	} );
+
+	test( 'Should show 404 page when navigating to non-existent template', async ( {
+		admin,
+		page,
+	} ) => {
+		// Navigate to a non-existent template.
+		await admin.visitAdminPage( 'site-editor.php', 'p=/template-foo-bar' );
+
+		// Verify the 404 error notice is displayed with the correct message.
+		await expect(
+			page.locator(
+				'.edit-site-layout__area .components-notice__content'
+			)
+		).toHaveText(
+			'The requested page could not be found. Please check the URL.'
+		);
+	} );
 } );
 
 class EditorNavigationUtils {
@@ -114,7 +128,7 @@ class EditorNavigationUtils {
 		this.pageUtils = pageUtils;
 	}
 
-	async tabToLabel( label, times = 10 ) {
+	async tabToLabel( label, times = 20 ) {
 		for ( let i = 0; i < times; i++ ) {
 			await this.pageUtils.pressKeys( 'Tab' );
 			const activeLabel = await this.page.evaluate( () => {

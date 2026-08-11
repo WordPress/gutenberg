@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import {
 	BaseControl,
@@ -13,10 +10,7 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import { useSettings } from '../use-settings';
 
 const RANGE_CONTROL_CUSTOM_SETTINGS = {
@@ -53,6 +47,8 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
 /**
  * HeightControl renders a linked unit control and range control for adjusting the height of a block.
  *
+ * @deprecated Use DimensionControl instead.
+ *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md
  *
  * @param {Object}                     props
@@ -67,6 +63,11 @@ export default function HeightControl( {
 	onChange,
 	value,
 } ) {
+	deprecated( 'wp.blockEditor.HeightControl', {
+		since: '7.0',
+		version: '7.2',
+		alternative: 'wp.blockEditor.DimensionControl',
+	} );
 	const customRangeValue = parseFloat( value );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
@@ -156,7 +157,6 @@ export default function HeightControl( {
 						onChange={ onChange }
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
-						size="__unstable-large"
 						label={ label }
 						hideLabelFromVision
 					/>
@@ -164,7 +164,6 @@ export default function HeightControl( {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
-							__next40pxDefaultSize
 							value={ customRangeValue }
 							min={ 0 }
 							max={
@@ -177,7 +176,6 @@ export default function HeightControl( {
 							}
 							withInputField={ false }
 							onChange={ handleSliderChange }
-							__nextHasNoMarginBottom
 							label={ label }
 							hideLabelFromVision
 						/>

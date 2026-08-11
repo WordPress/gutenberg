@@ -87,6 +87,7 @@ While this prop doesn't change any styles for the inner blocks themselves, it do
 ### `template`
 
 -   **Type:** `Array<Array<Object>>`
+-   **Deprecated:** Declare `template` in the block type settings passed to `registerBlockType` instead, which also applies the template when the block is inserted.
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
 More information about templates can be found in [template docs](/docs/reference-guides/block-api/block-templates.md).
@@ -112,6 +113,7 @@ The previous example creates an InnerBlocks area containing two columns one with
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
+-   **Deprecated:** Declare `templateInsertUpdatesSelection` in the block type settings passed to `registerBlockType` instead.
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.
@@ -125,7 +127,7 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 _Options:_
 
--   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overridable by children.
 -   `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 -   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 -   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
@@ -205,4 +207,8 @@ const DEFAULT_BLOCK = { name: 'core/paragraph', attributes: { content: 'Lorem ip
 ### `directInsert`
 
 - **Type:** `Boolean`
-- **Default:** - `undefined`. Determines whether the default block should be inserted directly into the InnerBlocks area by the block appender.
+- **Default:** `undefined`.
+
+When `true`, the appender inserts `defaultBlock` directly and skips the inserter dropdown, **including any registered inserter variations** of that block type. Use this to opt out of the variation picker; otherwise leave unset.
+
+Note: redundant when `allowedBlocks` resolves to a single block type with no variations, the appender already inserts directly.

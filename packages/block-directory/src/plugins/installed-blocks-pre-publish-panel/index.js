@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { blockDefault } from '@wordpress/icons';
 import { PluginPrePublishPanel } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import CompactList from '../../components/compact-list';
 import { store as blockDirectoryStore } from '../../store';
 
@@ -24,7 +16,6 @@ export default function InstalledBlocksPrePublishPanel() {
 
 	return (
 		<PluginPrePublishPanel
-			icon={ blockDefault }
 			title={ sprintf(
 				// translators: %d: number of blocks (number).
 				_n(

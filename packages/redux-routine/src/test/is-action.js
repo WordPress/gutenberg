@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isAction, isActionOfType } from '../is-action';
 
 const nonActions = [ null, [], 42, 'foo', () => {}, { foo: 'bar' } ];
