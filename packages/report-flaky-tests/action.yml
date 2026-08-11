@@ -1,17 +1,17 @@
 name: 'Report flaky tests'
-description: 'Report flaky tests to GitHub issues'
+description: 'Report flaky tests as a comment on the pull request'
 inputs:
     repo-token:
         description: 'GitHub token'
         required: true
-    label:
-        description: 'The flaky-test label name'
-        required: true
-        default: 'flaky-test'
     artifact-path:
         description: 'The path of the downloaded artifact'
         required: true
         default: 'flaky-tests'
 runs:
+    # Node 24 strips the types on the fly, so the action runs straight from its
+    # TypeScript sources without a build step. This requires every relative
+    # import to carry its `.ts` extension, and the syntax to be erasable, which
+    # rules out enums, namespaces, parameter properties and decorators.
     using: 'node24'
-    main: 'build/index.cjs'
+    main: 'src/index.ts'

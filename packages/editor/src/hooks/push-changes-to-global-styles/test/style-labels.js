@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
-
-/**
- * Internal dependencies
- */
 import { getStyleLabel, STYLE_LABELS } from '../style-labels';
 
 describe( 'getStyleLabel', () => {

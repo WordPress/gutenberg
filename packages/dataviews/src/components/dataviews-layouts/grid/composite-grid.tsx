@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentProps,
@@ -8,17 +5,8 @@ import type {
 	HTMLAttributes,
 	CSSProperties,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Flex,
-	FlexItem,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { Stack, Tooltip } from '@wordpress/ui';
+import { Flex, FlexItem, Composite } from '@wordpress/components';
+import { Badge, Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -27,11 +15,6 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
@@ -48,7 +31,6 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
 import { GridItems } from '../utils/grid-items';
 import {
@@ -261,7 +243,8 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						>
 							{ badgeFields.map( ( field ) => {
 								return (
-									<WCBadge
+									/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+									<Badge
 										key={ field.id }
 										className="dataviews-view-grid__field-value"
 									>
@@ -269,7 +252,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 											item={ item }
 											field={ field }
 										/>
-									</WCBadge>
+									</Badge>
 								);
 							} ) }
 						</Stack>

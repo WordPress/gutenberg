@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import mediaUpload from '../media-upload';
 import {
 	getState,

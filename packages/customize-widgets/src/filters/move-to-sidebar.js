@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	store as blockEditorStore,
@@ -9,10 +6,6 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { MoveToWidgetArea, getWidgetIdFromBlock } from '@wordpress/widgets';
-
-/**
- * Internal dependencies
- */
 import {
 	useSidebarControls,
 	useActiveSidebarControl,

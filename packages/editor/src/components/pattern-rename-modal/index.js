@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import { PATTERN_POST_TYPE } from '../../store/constants';

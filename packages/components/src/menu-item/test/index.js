@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { more } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import MenuItem from '../';
 
 const noop = () => {};

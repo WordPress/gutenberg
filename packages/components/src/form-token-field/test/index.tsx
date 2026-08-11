@@ -1,8 +1,4 @@
 /* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
-
-/**
- * External dependencies
- */
 import {
 	render,
 	screen,
@@ -12,16 +8,8 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import FormTokenField from '../';
 
 const FormTokenFieldWithState = ( {

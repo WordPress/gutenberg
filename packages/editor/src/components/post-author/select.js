@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { SelectControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { useAuthorsQuery } from './hook';
 

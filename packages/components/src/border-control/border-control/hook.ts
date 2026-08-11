@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createBoardStore } from '../board-store';
 
 function mockRect( element, top ) {

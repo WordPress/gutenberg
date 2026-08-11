@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -13,10 +10,6 @@ import { createBlock } from '@wordpress/blocks';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import LeafMoreMenu from './leaf-more-menu';
 
 type Block = {
