@@ -387,7 +387,13 @@ function block_core_social_link_get_color_styles( $context ) {
 		$styles[] = 'color:' . $context['iconColorValue'] . ';';
 	}
 
-	if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
+	/*
+	 * A gradient replaces the background color rather than layering on top of
+	 * it, so only one of the two is ever emitted.
+	 */
+	if ( ! empty( $context['iconBackgroundGradientValue'] ) ) {
+		$styles[] = 'background:' . $context['iconBackgroundGradientValue'] . ';';
+	} elseif ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
 		$styles[] = 'background-color:' . $context['iconBackgroundColorValue'] . ';';
 	}
 
@@ -412,6 +418,10 @@ function block_core_social_link_get_color_classes( $context ) {
 
 	if ( array_key_exists( 'iconBackgroundColor', $context ) ) {
 		$classes[] = 'has-' . $context['iconBackgroundColor'] . '-background-color';
+	}
+
+	if ( ! empty( $context['iconBackgroundGradient'] ) ) {
+		$classes[] = 'has-' . $context['iconBackgroundGradient'] . '-gradient-background';
 	}
 
 	return ' ' . implode( ' ', $classes );

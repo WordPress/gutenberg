@@ -27,6 +27,12 @@
 		"iconBackgroundColorValue": {
 			"type": "string"
 		},
+		"iconBackgroundGradient": {
+			"type": "string"
+		},
+		"iconBackgroundGradientValue": {
+			"type": "string"
+		},
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
@@ -45,7 +51,9 @@
 		"iconColor": "iconColor",
 		"iconColorValue": "iconColorValue",
 		"iconBackgroundColor": "iconBackgroundColor",
-		"iconBackgroundColorValue": "iconBackgroundColorValue"
+		"iconBackgroundColorValue": "iconBackgroundColorValue",
+		"iconBackgroundGradient": "iconBackgroundGradient",
+		"iconBackgroundGradientValue": "iconBackgroundGradientValue"
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],

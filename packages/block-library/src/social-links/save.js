@@ -5,6 +5,7 @@ export default function save( props ) {
 	const {
 		attributes: {
 			iconBackgroundColorValue,
+			iconBackgroundGradientValue,
 			iconColorValue,
 			showLabels,
 			size,
@@ -15,6 +16,7 @@ export default function save( props ) {
 		'has-visible-labels': showLabels,
 		'has-icon-color': iconColorValue,
 		'has-icon-background-color': iconBackgroundColorValue,
+		'has-icon-background-gradient': iconBackgroundGradientValue,
 	} );
 	const blockProps = useBlockProps.save( { className } );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );

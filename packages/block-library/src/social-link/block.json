@@ -29,7 +29,9 @@
 		"iconColor",
 		"iconColorValue",
 		"iconBackgroundColor",
-		"iconBackgroundColorValue"
+		"iconBackgroundColorValue",
+		"iconBackgroundGradient",
+		"iconBackgroundGradientValue"
 	],
 	"supports": {
 		"anchor": true,

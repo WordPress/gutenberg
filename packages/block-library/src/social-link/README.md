@@ -69,6 +69,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `iconColorValue`
 - `iconBackgroundColor`
 - `iconBackgroundColorValue`
+- `iconBackgroundGradient`
+- `iconBackgroundGradientValue`
 
 ## Block Markup
 
