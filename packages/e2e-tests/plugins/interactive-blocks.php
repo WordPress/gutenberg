@@ -194,8 +194,9 @@ add_action(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'permission_callback' => '__return_true',
-				'callback'            => static function () {
-					$posts = array(
+				'callback'            => static function ( $request ) {
+					$identity = $request->get_param( 'identity' );
+					$posts    = array(
 						array(
 							'id'       => 101,
 							'title'    => 'Older post one',
@@ -212,7 +213,7 @@ add_action(
 					);
 					$html = '';
 					foreach ( $posts as $post ) {
-						$html .= gutenberg_e2e_activity_feed_card( $post );
+						$html .= gutenberg_e2e_activity_feed_card( $post, $identity );
 					}
 					return rest_ensure_response( $html );
 				},
@@ -231,14 +232,16 @@ add_action(
 				'methods'             => WP_REST_Server::READABLE,
 				'permission_callback' => '__return_true',
 				'callback'            => static function ( $request ) {
-					$title = $request->get_param( 'title' ) ?? 'New post';
+					$identity = $request->get_param( 'identity' );
+					$title    = $request->get_param( 'title' ) ?? 'New post';
 					return rest_ensure_response(
 						gutenberg_e2e_activity_feed_card(
 							array(
 								'id'    => 900,
 								'title' => $title,
 								'text'  => 'just published',
-							)
+							),
+							$identity
 						)
 					);
 				},
@@ -248,29 +251,53 @@ add_action(
 );
 
 /**
- * Renders a single activity-feed post card: a keyed article with its own
+ * Renders a single activity-feed post card: an article with its own
  * context (id + likes), a comment list, an init hook, and a like button.
  * Shared by the `test/activity-feed` block's server markup and the REST
  * fragments it fetches, so spliced-in cards are identical to SSR'd ones.
  *
- * @param array $post The post: id, title, text, comments (id => text).
+ * The `identity` mode decides how the card (and its comments) are named:
+ * `data-wp-key` (the user key, `renderHTML`'s first fallback candidate),
+ * `id` (its second fallback), or neither (`none` — synthetic keys at
+ * splice time). The e2e journey runs all three modes.
+ *
+ * @param array  $post     The post: id, title, text, comments (id => text).
+ * @param string $identity Identity mode: 'data-wp-key', 'id', or 'none'.
  * @return string The card HTML.
  */
-function gutenberg_e2e_activity_feed_card( $post ) {
+function gutenberg_e2e_activity_feed_card( $post, $identity = 'data-wp-key' ) {
+	if ( ! in_array( $identity, array( 'data-wp-key', 'id', 'none' ), true ) ) {
+		$identity = 'data-wp-key';
+	}
 	$post_id   = (int) $post['id'];
 	$title     = $post['title'] ?? 'Untitled';
 	$text      = $post['text'] ?? '';
 	$comments  = $post['comments'] ?? array();
+
+	// The key attribute for a named element: `data-wp-key` (user key),
+	// `id` (`renderHTML`'s fallback), or nothing (synthetic at splice
+	// time). Comments follow the card's mode so the markup stays coherent.
+	$key_attr = static function ( $name ) use ( $identity ) {
+		if ( 'id' === $identity ) {
+			return 'id="' . esc_attr( $name ) . '"';
+		}
+		if ( 'none' === $identity ) {
+			return '';
+		}
+		return 'data-wp-key="' . esc_attr( $name ) . '"';
+	};
+
 	$comments_html = '';
 	foreach ( $comments as $comment_id => $comment_text ) {
 		$comments_html .= sprintf(
-			'<p data-wp-key="comment-%1$d" data-testid="comment-%1$d">%2$s</p>',
+			'<p %3$s data-testid="comment-%1$d">%2$s</p>',
 			(int) $comment_id,
-			esc_html( $comment_text )
+			esc_html( $comment_text ),
+			$key_attr( 'comment-' . $comment_id )
 		);
 	}
 	return sprintf(
-		'<article data-wp-key="post-%1$d" data-testid="post-%1$d" data-wp-context=\'{ "id": %1$d, "likes": 0 }\'>' .
+		'<article %5$s data-testid="post-%1$d" data-wp-context=\'{ "id": %1$d, "likes": 0 }\'>' .
 		'<h3>%2$s</h3>' .
 		'<p data-testid="post-%1$d-text">%3$s</p>' .
 		'<div data-testid="post-%1$d-comments">%4$s</div>' .
@@ -280,6 +307,7 @@ function gutenberg_e2e_activity_feed_card( $post ) {
 		$post_id,
 		esc_html( $title ),
 		esc_html( $text ),
-		$comments_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$comments_html, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$key_attr( 'post-' . $post_id )
 	);
 }

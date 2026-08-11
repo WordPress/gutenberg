@@ -13,6 +13,8 @@
  */
 ?>
 
+<?php $identity = $attributes['identity'] ?? 'data-wp-key'; ?>
+
 <section data-wp-interactive="test/activity-feed">
 	<nav data-testid="filter-tabs">
 		<?php foreach ( $attributes['tabs'] ?? array() as $label => $href ) : ?>
@@ -31,7 +33,7 @@
 	>
 		<div data-testid="feed-list">
 			<?php foreach ( $attributes['posts'] ?? array() as $post ) : ?>
-				<?php echo gutenberg_e2e_activity_feed_card( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo gutenberg_e2e_activity_feed_card( $post, $identity ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php endforeach; ?>
 		</div>
 	</div>
@@ -39,6 +41,7 @@
 	<button
 		data-testid="load-more"
 		data-wp-on--click="actions.loadMore"
+		data-identity="<?php echo esc_attr( $identity ); ?>"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/activity-feed/v1/feed' ) ); ?>"
 	>Load more</button>
 
@@ -46,6 +49,7 @@
 	<button
 		data-testid="create-post"
 		data-wp-on--click="actions.createPost"
+		data-identity="<?php echo esc_attr( $identity ); ?>"
 		data-fragment-url="<?php echo esc_url( rest_url( 'test/activity-feed/v1/post' ) ); ?>"
 	>Post</button>
 

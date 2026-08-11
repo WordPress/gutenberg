@@ -644,6 +644,8 @@ The key only needs to be unique among its **siblings** (the items of the same li
 
 When content is added dynamically with [`renderHTML()`](#renderhtml), elements without `data-wp-key` fall back to their `id` attribute as the key, and — for insertion modes — to an auto-generated key, so adding new items never disrupts the existing ones.
 
+Router navigation matches region content by key too: `data-wp-key` items that don't match anything in the current tree mount fresh, while unkeyed items are matched by position and keep their state. The `id` fallback applies to `renderHTML()` only, so the router does not read `id` as a key.
+
 ### `wp-each`
 
 The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.
@@ -757,6 +759,7 @@ Safest is to always add a `data-wp-key` or `id` attribute, but the auto-key mech
 #### Known limitations
 
 - **Refreshes remount unkeyed content.** When refreshed content (`inner`/`replace`) has no `data-wp-key`/`id`, it is remounted — `data-wp-init` re-runs and component state is lost. Only content with a stable key is reused across refreshes. The auto-generated key cannot help here: it is created fresh on every parse, so it can never match the previous parse's key. (The same is true of router navigation — navigation relies on unkeyed positional matching, which is why auto-keying is applied only to content inserted by `renderHTML`, never to server-rendered content.)
+- **Router navigation remounts keyed content.** `data-wp-key` items on the new page are matched by key; keys that match nothing mount fresh, so `data-wp-init` re-runs and state is lost. Unkeyed items are matched by position and keep their state. `id` is only used as a key by `renderHTML()`, not by navigation.
 - **Duplicate deliveries are not deduplicated.** If the same entity arrives twice (e.g. a push race), a second copy is rendered — even with a matching `data-wp-key`/`id`. The key distinguishes items; it does not merge duplicates.
 - **Duplicate keys in one list do not reconcile.** Two siblings with the same `data-wp-key` (or the same `id`) in the same list cannot be told apart; matching picks one and the other misbehaves. Keys only need to be unique among siblings — the same value in different lists is fine.
 
