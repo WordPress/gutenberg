@@ -250,6 +250,22 @@ export function getBlockBindingsSource(
 }
 
 /**
+ * Returns the current invalidation revision for a block bindings source.
+ *
+ * @param state      Data state.
+ * @param sourceName Name of the source to check.
+ *
+ * @return The revision counter for the source (and the global "all sources" counter).
+ */
+export function getBlockBindingsSourceRevision(
+	state: BlockStoreState,
+	sourceName: string
+): number {
+	const revisions = state.blockBindingsSourceRevisions ?? {};
+	return ( revisions[ sourceName ] ?? 0 ) + ( revisions.__all ?? 0 );
+}
+
+/**
  * Compute the fields list for a specific block bindings source.
  *
  * @param state        Data state.

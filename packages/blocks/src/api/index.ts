@@ -137,6 +137,7 @@ export {
 	unregisterBlockBindingsSource,
 	getBlockBindingsSource,
 	getBlockBindingsSources,
+	invalidateBlockBindingsSource,
 } from './registration';
 export {
 	isUnmodifiedBlock,

@@ -371,6 +371,27 @@ _Returns_
 
 -   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
+### invalidateBlockBindingsSource
+
+Invalidates a registered block bindings source's editability, causing blocks using it to re-evaluate `canUserEditValue` on their next render.
+
+_Usage_
+
+```js
+import { invalidateBlockBindingsSource } from '@wordpress/blocks';
+
+// After the user's lock state changes for this source:
+invalidateBlockBindingsSource( 'plugin/my-custom-source' );
+```
+
+_Parameters_
+
+-   _name_ `string`: The name of the block bindings source to invalidate. If omitted, all registered sources are invalidated.
+
+_Changelog_
+
+`6.9.0`
+
 ### isReusableBlock
 
 Determines whether or not the given block is a reusable block. This is a special block type that is used to point to a global block stored via the API.

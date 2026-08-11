@@ -1,5 +1,8 @@
 import deepFreeze from 'deep-freeze';
-import { getSupportedStyles } from '../private-selectors';
+import {
+	getSupportedStyles,
+	getBlockBindingsSourceRevision,
+} from '../private-selectors';
 
 const keyBlocksByName = ( blocks ) =>
 	blocks.reduce(
@@ -193,6 +196,62 @@ describe( 'private selectors', () => {
 			);
 
 			expect( supports ).toEqual( [ 'fontSize', 'textIndent' ] );
+		} );
+	} );
+
+	describe( 'getBlockBindingsSourceRevision', () => {
+		it( 'should return 0 when there are no revisions recorded', () => {
+			const state = deepFreeze( { blockBindingsSourceRevisions: {} } );
+
+			expect( getBlockBindingsSourceRevision( state, 'my/source' ) ).toBe(
+				0
+			);
+		} );
+
+		it( 'should return the revision recorded for the given source', () => {
+			const state = deepFreeze( {
+				blockBindingsSourceRevisions: { 'my/source': 3 },
+			} );
+
+			expect( getBlockBindingsSourceRevision( state, 'my/source' ) ).toBe(
+				3
+			);
+		} );
+
+		it( 'should not be affected by another source’s revision', () => {
+			const state = deepFreeze( {
+				blockBindingsSourceRevisions: {
+					'my/source': 3,
+					'other/source': 10,
+				},
+			} );
+
+			expect( getBlockBindingsSourceRevision( state, 'my/source' ) ).toBe(
+				3
+			);
+		} );
+
+		it( 'should add the global "__all" revision on top of the source-specific one', () => {
+			const state = deepFreeze( {
+				blockBindingsSourceRevisions: {
+					'my/source': 3,
+					__all: 2,
+				},
+			} );
+
+			expect( getBlockBindingsSourceRevision( state, 'my/source' ) ).toBe(
+				5
+			);
+		} );
+
+		it( 'should return the global revision for a source with no revisions of its own', () => {
+			const state = deepFreeze( {
+				blockBindingsSourceRevisions: { __all: 2 },
+			} );
+
+			expect( getBlockBindingsSourceRevision( state, 'my/source' ) ).toBe(
+				2
+			);
 		} );
 	} );
 } );

@@ -73,3 +73,15 @@ export function removeBlockBindingsSource( name: string ): Action {
 		name,
 	};
 }
+
+/**
+ * Invalidates the cached editability of a block bindings source.
+ *
+ * @param name Optional name of the source to invalidate. If omitted, all sources are invalidated.
+ */
+export function invalidateBlockBindingsSource( name?: string ): Action {
+	return {
+		type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE',
+		name,
+	};
+}

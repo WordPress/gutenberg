@@ -65,6 +65,13 @@ export interface BlockStoreState {
 	 * The stored form omits `name` since it's the record key.
 	 */
 	blockBindingsSources: Record< string, Omit< BlockBindingsSource, 'name' > >;
+
+	/**
+	 * Revision counters for block bindings sources, bumped by
+	 * `invalidateBlockBindingsSource`. A `__all` key tracks invalidations
+	 * that apply to every source.
+	 */
+	blockBindingsSourceRevisions: Record< string, number >;
 }
 
 /**
@@ -130,7 +137,8 @@ export type Action =
 			canUserEditValue?: Function;
 			getFieldsList?: Function;
 	  }
-	| { type: 'REMOVE_BLOCK_BINDINGS_SOURCE'; name: string };
+	| { type: 'REMOVE_BLOCK_BINDINGS_SOURCE'; name: string }
+	| { type: 'INVALIDATE_BLOCK_BINDINGS_SOURCE'; name?: string };
 
 /**
  * Thunk arguments for the blocks store, including private selectors and actions.
