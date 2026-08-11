@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+
 ## 7.52.0 (2026-07-29)
 
 ### Internal
