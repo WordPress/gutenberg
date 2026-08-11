@@ -1211,4 +1211,57 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 			e: 1,
 		} );
 	} );
+
+	it( 'splicing into a data-wp-key SSR item keeps its identity (init does not re-run)', async () => {
+		await setup( item( 'a', 'a', 'a' ) );
+		await flush();
+		const feed = document.querySelector( '[data-wp-interactive]' )!;
+		const aEl = feed.children[ 0 ];
+
+		// Insert content INTO the keyed item. The item sits on the rebuild
+		// path; its key must survive the rebuild, or preact remounts it
+		// (init re-runs, element identity lost).
+		renderHTML( aEl as Element, '<span>child</span>' );
+		await flush();
+
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( state.initCounts ).toEqual( { a: 1 } );
+	} );
+
+	it( 'splicing into an id-keyed spliced item keeps its identity (init does not re-run)', async () => {
+		await setup( '<div data-testid="feed"></div>' );
+		const feed = document.querySelector( '[data-testid="feed"]' )!;
+		renderHTML( feed, idItem( 'a', 'a' ), { mode: 'prepend' } );
+		await flush();
+		const aEl = feed.children[ 0 ];
+
+		// Same as above, but the key came from the id fallback at splice
+		// time: the wrapper carries the key, and the rebuild must keep it.
+		renderHTML( aEl as Element, '<span>child</span>' );
+		await flush();
+
+		expect( feed.children[ 0 ] ).toBe( aEl );
+		expect( state.initCounts ).toEqual( { a: 1 } );
+	} );
+
+	it( 'inserting below a directive-carrying parent does not re-run its init', async () => {
+		await setup(
+			'<div data-wp-context=\'{ "id": "parent" }\' data-wp-init="actions.initItem">' +
+				'<div data-testid="feed"></div>' +
+				'</div>'
+		);
+		await flush();
+		expect( state.initCounts.parent ).toBe( 1 );
+
+		// The parent is on the rebuild path and is directive-wrapped
+		// (unkeyed). The rebuilt wrapper must match the old one so the
+		// component instance is reused — its init must not re-run.
+		renderHTML(
+			document.querySelector( '[data-testid="feed"]' ),
+			'<span>x</span>'
+		);
+		await flush();
+
+		expect( state.initCounts.parent ).toBe( 1 );
+	} );
 } );
