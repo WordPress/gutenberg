@@ -13,6 +13,7 @@
 -   Playlist: Allow selecting audio tracks individually in the Media Library without holding Shift or Command, transform multiple Audio blocks into a Playlist, and transform a one-track Playlist into Audio. ([#80926](https://github.com/WordPress/gutenberg/pull/80926))
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
 -   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab" ([#81009](https://github.com/WordPress/gutenberg/pull/81009)).
+-   Tab Panel: Show the tab's title in the Document Overview instead of the generic block title, so tabs can be told apart ([#81427](https://github.com/WordPress/gutenberg/pull/81427)).
 
 ### Bug Fixes
 
@@ -33,6 +34,7 @@
 
 ### Bug Fixes
 
+-   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
 -   Post Date: Escape date values and link URLs before rendering the block.
