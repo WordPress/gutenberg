@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useStyleOverride } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
 import { colorEditingSettingsKey } from '../../store/private-keys';
