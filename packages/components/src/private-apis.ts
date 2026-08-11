@@ -8,7 +8,6 @@ import Badge from './badge';
 import {
 	ValidatedComboboxControl,
 	ValidatedInputControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
@@ -28,7 +27,6 @@ lock( privateApis, {
 	useDrag,
 	ValidatedInputControl,
 	ValidatedComboboxControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,

@@ -2,7 +2,6 @@ export * from './combobox-control';
 export * from './custom-select-control';
 export * from './form-token-field';
 export * from './input-control';
-export * from './radio-control';
 export * from './range-control';
 export * from './content-editable-control';
 export * from './textarea-control';
