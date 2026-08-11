@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { info } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import TableOfContentsPanel from './panel';
 
 function TableOfContents(

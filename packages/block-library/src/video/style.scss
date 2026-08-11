@@ -1,8 +1,11 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .wp-block-video {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	video {
 		width: 100%;
+		height: auto;
 		vertical-align: middle;
 	}
 

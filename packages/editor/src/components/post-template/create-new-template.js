@@ -1,19 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
 
-export default function CreateNewTemplate( { onClick } ) {
+export default function CreateNewTemplate() {
 	const { canCreateTemplates } = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
 		return {
@@ -44,7 +37,6 @@ export default function CreateNewTemplate( { onClick } ) {
 				<CreateNewTemplateModal
 					onClose={ () => {
 						setIsCreateModalOpen( false );
-						onClick();
 					} }
 				/>
 			) }

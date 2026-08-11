@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import CreatePatternModal from './create-pattern-modal';
 import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../constants';
 

@@ -1,23 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useMemo } from '@wordpress/element';
 import {
-	GlobalStylesContext,
 	toStyles,
 	getBlockSelectors,
-} from '../components/global-styles';
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import { usePrivateStyleOverride } from './utils';
-import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
+
+const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -44,7 +38,7 @@ function getVariationMatches( className ) {
  *
  * @return {string|null} The name of the first registered variation.
  */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );
@@ -75,12 +69,11 @@ function OverrideStyles( { override } ) {
  *
  * @param {Object} props        Props.
  * @param {Object} props.config A global styles object, containing settings and styles.
- * @return {JSX.Element|undefined} An array of new block variation overrides.
+ * @return {React.JSX.Element}  An array of new block variation overrides.
  */
-export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
-	const { getBlockStyles, overrides } = useSelect(
+export function BlockStyleVariationOverridesWithConfig( { config } ) {
+	const { overrides } = useSelect(
 		( select ) => ( {
-			getBlockStyles: select( blocksStore ).getBlockStyles,
 			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		} ),
 		[]
@@ -127,7 +120,6 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 					};
 					const blockSelectors = getBlockSelectors(
 						getBlockTypes(),
-						getBlockStyles,
 						override.clientId
 					);
 					const hasBlockGapSupport = false;
@@ -166,10 +158,10 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 			}
 		}
 		return newOverrides;
-	}, [ config, overrides, getBlockStyles, getBlockName ] );
+	}, [ config, overrides, getBlockName ] );
 
 	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
-		return;
+		return null;
 	}
 
 	return (
@@ -181,82 +173,7 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 	);
 }
 
-/**
- * Retrieves any variation styles data and resolves any referenced values.
- *
- * @param {Object}    globalStyles A complete global styles object, containing settings and styles.
- * @param {string}    name         The name of the desired block type.
- * @param {variation} variation    The of the block style variation to retrieve data for.
- *
- * @return {Object|undefined} The global styles data for the specified variation.
- */
-export function getVariationStylesWithRefValues(
-	globalStyles,
-	name,
-	variation
-) {
-	if ( ! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ] ) {
-		return;
-	}
-
-	// Helper to recursively look for `ref` values to resolve.
-	const replaceRefs = ( variationStyles ) => {
-		Object.keys( variationStyles ).forEach( ( key ) => {
-			const value = variationStyles[ key ];
-
-			// Only process objects.
-			if ( typeof value === 'object' && value !== null ) {
-				// Process `ref` value if present.
-				if ( value.ref !== undefined ) {
-					if (
-						typeof value.ref !== 'string' ||
-						value.ref.trim() === ''
-					) {
-						// Remove invalid ref.
-						delete variationStyles[ key ];
-					} else {
-						// Resolve `ref` value.
-						const refValue = getValueFromObjectPath(
-							globalStyles,
-							value.ref
-						);
-
-						if ( refValue ) {
-							variationStyles[ key ] = refValue;
-						} else {
-							delete variationStyles[ key ];
-						}
-					}
-				} else {
-					// Recursively resolve `ref` values in nested objects.
-					replaceRefs( value );
-
-					// After recursion, if value is empty due to explicitly
-					// `undefined` ref value, remove it.
-					if ( Object.keys( value ).length === 0 ) {
-						delete variationStyles[ key ];
-					}
-				}
-			}
-		} );
-	};
-
-	// Deep clone variation node to avoid mutating it within global styles and losing refs.
-	const styles = JSON.parse(
-		JSON.stringify(
-			globalStyles.styles.blocks[ name ].variations[ variation ]
-		)
-	);
-	replaceRefs( styles );
-
-	return styles;
-}
-
 function useBlockStyleVariation( name, variation, clientId ) {
-	// Prefer global styles data in GlobalStylesContext, which are available
-	// if in the site editor. Otherwise fall back to whatever is in the
-	// editor settings and available in the post editor.
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
@@ -266,17 +183,17 @@ function useBlockStyleVariation( name, variation, clientId ) {
 	}, [] );
 
 	return useMemo( () => {
-		const variationStyles = getVariationStylesWithRefValues(
+		const variationStyles = getVariationStyle(
 			{
-				settings: mergedConfig?.settings ?? globalSettings,
-				styles: mergedConfig?.styles ?? globalStyles,
+				settings: globalSettings,
+				styles: globalStyles,
 			},
 			name,
 			variation
 		);
 
 		return {
-			settings: mergedConfig?.settings ?? globalSettings,
+			settings: globalSettings,
 			// The variation style data is all that is needed to generate
 			// the styles for the current application to a block. The variation
 			// name is updated to match the instance specific class name.
@@ -290,14 +207,7 @@ function useBlockStyleVariation( name, variation, clientId ) {
 				},
 			},
 		};
-	}, [
-		mergedConfig,
-		globalSettings,
-		globalStyles,
-		variation,
-		clientId,
-		name,
-	] );
+	}, [ globalSettings, globalStyles, variation, clientId, name ] );
 }
 
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
@@ -322,11 +232,7 @@ function useBlockProps( { name, className, clientId } ) {
 		}
 
 		const variationConfig = { settings, styles };
-		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
-			getBlockStyles,
-			clientId
-		);
+		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
@@ -349,7 +255,7 @@ function useBlockProps( { name, className, clientId } ) {
 				variationStyles: true,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, clientId ] );
+	}, [ variation, settings, styles, clientId ] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,

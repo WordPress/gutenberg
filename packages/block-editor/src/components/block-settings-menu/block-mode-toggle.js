@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
 export default function BlockModeToggle( { clientId, onToggle = noop } ) {
-	const { blockType, mode, isCodeEditingEnabled } = useSelect(
+	const { blockType, mode, enabled } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockMode, getSettings } =
 				select( blockEditorStore );
@@ -23,7 +16,7 @@ export default function BlockModeToggle( { clientId, onToggle = noop } ) {
 			return {
 				mode: getBlockMode( clientId ),
 				blockType: block ? getBlockType( block.name ) : null,
-				isCodeEditingEnabled: getSettings().codeEditingEnabled,
+				enabled: getSettings().codeEditingEnabled && !! block?.isValid,
 			};
 		},
 		[ clientId ]
@@ -33,7 +26,7 @@ export default function BlockModeToggle( { clientId, onToggle = noop } ) {
 	if (
 		! blockType ||
 		! hasBlockSupport( blockType, 'html', true ) ||
-		! isCodeEditingEnabled
+		! enabled
 	) {
 		return null;
 	}

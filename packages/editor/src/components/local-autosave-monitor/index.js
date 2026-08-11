@@ -1,22 +1,17 @@
-/**
- * WordPress dependencies
- */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import AutosaveMonitor from '../autosave-monitor';
 import {
 	localAutosaveGet,
+	localAutosaveGetSnapshot,
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
+import useEntityContainsSnapshot from '../provider/use-entity-contains-snapshot';
 
 const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
@@ -51,55 +46,93 @@ const hasSessionStorageSupport = () => {
 /**
  * Custom hook which manages the creation of a notice prompting the user to
  * restore a local autosave, if one exists.
+ *
+ * Under real-time collaboration, the backup records a Yjs snapshot of the
+ * shared document it captured. The notice decision is deferred until the
+ * shared document is checked against that snapshot (see
+ * `useEntityContainsSnapshot`): a positive result proves the shared
+ * document already accounts for everything the backup captured (even when
+ * the post content has since moved on, e.g. after a revision restore), so
+ * the backup is redundant and is cleared without a notice.
  */
 function useAutosaveNotice() {
-	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
+	const registry = useRegistry();
+	const { postId, postType, isEditedPostNew } = useSelect(
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
+			postType: select( editorStore ).getCurrentPostType(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			hasRemoteAutosave:
-				!! select( editorStore ).getEditorSettings().autosave,
 		} ),
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( editorStore );
 
-	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
-	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
+	// Read and parse the backup once per post, so that its snapshot (if any)
+	// can drive the snapshot status decision below.
+	const localAutosave = useMemo( () => {
+		const backup = localAutosaveGet( postId, isEditedPostNew );
+		if ( ! backup ) {
+			return null;
+		}
+
+		try {
+			return JSON.parse( backup );
+		} catch {
+			// Not usable if it can't be parsed.
+			return null;
+		}
+	}, [ postId, isEditedPostNew ] );
+
+	const snapshotStatus = useEntityContainsSnapshot( {
+		postType,
+		postId,
+		snapshot: localAutosaveGetSnapshot( localAutosave ),
+	} );
 
 	useEffect( () => {
-		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
 		if ( ! localAutosave ) {
 			return;
 		}
 
-		try {
-			localAutosave = JSON.parse( localAutosave );
-		} catch {
-			// Not usable if it can't be parsed.
+		// Keep waiting for the snapshot status to resolve.
+		if ( 'pending' === snapshotStatus ) {
+			return;
+		}
+
+		if ( 'present' === snapshotStatus ) {
+			// The shared document provably holds everything the backup
+			// captured, so the backup is redundant even when its content
+			// differs from the current post (e.g. after a revision restore).
+			localAutosaveClear( postId, isEditedPostNew );
 			return;
 		}
 
 		const { post_title: title, content, excerpt } = localAutosave;
 		const edits = { title, content, excerpt };
 
-		{
-			// Only display a notice if there is a difference between what has been
-			// saved and that which is stored in sessionStorage.
-			const hasDifference = Object.keys( edits ).some( ( key ) => {
-				return edits[ key ] !== getEditedPostAttribute( key );
-			} );
+		const { getEditedPostAttribute, getEditorSettings } =
+			registry.select( editorStore );
 
-			if ( ! hasDifference ) {
-				// If there is no difference, it can be safely ejected from storage.
-				localAutosaveClear( postId, isEditedPostNew );
-				return;
-			}
+		// Only display a notice if there is a difference between what has been
+		// saved and that which is stored in sessionStorage.
+		const hasDifference = Object.keys( edits ).some( ( key ) => {
+			return edits[ key ] !== getEditedPostAttribute( key );
+		} );
+
+		if ( ! hasDifference ) {
+			// If there is no difference, it can be safely ejected from storage.
+			localAutosaveClear( postId, isEditedPostNew );
+			return;
 		}
 
+		const hasRemoteAutosave = !! getEditorSettings().autosave;
 		if ( hasRemoteAutosave ) {
 			return;
 		}
+
+		const { createWarningNotice, removeNotice } =
+			registry.dispatch( noticesStore );
+		const { editPost, resetEditorBlocks } =
+			registry.dispatch( editorStore );
 
 		const id = 'wpEditorAutosaveRestore';
 
@@ -125,7 +158,7 @@ function useAutosaveNotice() {
 				],
 			}
 		);
-	}, [ isEditedPostNew, postId ] );
+	}, [ registry, postId, isEditedPostNew, localAutosave, snapshotStatus ] );
 }
 
 /**

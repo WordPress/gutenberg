@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
@@ -78,6 +75,24 @@ describe( 'applyValue', () => {
 			future: '<span data-1="ii" data-2="i">a</span>',
 			movedCount: 0,
 			description: 'should update attributes',
+		},
+		{
+			current: '<math><mi>x</mi></math>',
+			future: '<math><mi>y</mi></math>',
+			movedCount: 0,
+			description: 'should update MathML content',
+		},
+		{
+			current: '<math><mfrac><mi>a</mi><mi>b</mi></mfrac></math>',
+			future: '<math><mfrac><mi>x</mi><mi>y</mi></mfrac></math>',
+			movedCount: 0,
+			description: 'should update MathML fraction',
+		},
+		{
+			current: '<math><mtext><strong>bold</strong></mtext></math>',
+			future: '<math><mtext><em>italic</em></mtext></math>',
+			movedCount: 0,
+			description: 'should update HTML elements within MathML mtext',
 		},
 	];
 
