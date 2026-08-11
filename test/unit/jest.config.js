@@ -1,11 +1,11 @@
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
+const testMigration = require( './test-migration.json' );
 
 /**
  * Path to root project directory.
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
-const testMigration = require( './test-migration.json' );
 
 const escapeRegExp = ( value ) =>
 	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
