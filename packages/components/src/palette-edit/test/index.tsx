@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
@@ -416,7 +409,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Color: Primary' ) );
+		await click( screen.getByLabelText( 'Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );

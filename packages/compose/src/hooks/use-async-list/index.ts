@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { flushSync, useEffect, useState } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
@@ -13,7 +10,7 @@ type AsyncListConfig = {
  *
  * @param list  New array.
  * @param state Current state.
- * @return First items present iin state.
+ * @return First items present in state.
  */
 function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
 	const firstItems = [];

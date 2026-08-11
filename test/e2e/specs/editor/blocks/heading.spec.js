@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Heading', () => {
@@ -148,6 +145,26 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'should not remove an empty heading on backspace when removal is locked', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { lock: { remove: true, move: false } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		await page.keyboard.press( 'Backspace' );
+
+		// The locked heading cannot be removed, so it should still be there.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/heading' } ] );
+	} );
+
 	test( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async ( {
 		editor,
 		page,
@@ -180,11 +197,15 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text' } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 		await page
-			.getByRole( 'button', { name: /Custom color picker./i } )
+			.getByRole( 'button', { name: /Custom color picker/i } )
 			.click();
 
 		await page
@@ -214,13 +235,17 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text', exact: true } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 
 		await page
 			.getByRole( 'option', {
-				name: 'Color: Luminous vivid orange',
+				name: 'Luminous vivid orange',
 			} )
 			.click();
 
@@ -265,8 +290,10 @@ test.describe( 'Heading', () => {
 				name: 'core/heading',
 				attributes: {
 					content: 'Heading',
-					textAlign: 'center',
 					level: 4,
+					style: {
+						typography: { textAlign: 'center' },
+					},
 				},
 			},
 		] );
@@ -298,8 +325,10 @@ test.describe( 'Heading', () => {
 				name: 'core/heading',
 				attributes: {
 					content: 'Paragraph',
-					textAlign: 'center',
 					level: 2,
+					style: {
+						typography: { textAlign: 'center' },
+					},
 				},
 			},
 		] );
@@ -333,7 +362,11 @@ test.describe( 'Heading', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		] );
@@ -361,8 +394,8 @@ test.describe( 'Heading', () => {
 
 		await expect(
 			headingListViewItem,
-			'should show default block name if the content is empty'
-		).toHaveText( 'Heading' );
+			'should show variation name if the content is empty'
+		).toHaveText( 'Heading 2' );
 
 		await editor.canvas
 			.getByRole( 'document', {
@@ -408,20 +441,22 @@ test.describe( 'Heading', () => {
 				);
 			} );
 
-			test( 'should preserve the text align attribute', async ( {
+			test( 'should preserve the text align block support', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
-						align: 'right',
+						style: { typography: { textAlign: 'right' } },
 						content: 'initial content',
 					},
 				} );
 				await editor.transformBlockTo( 'core/heading' );
 				const headingBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( headingBlock.name ).toBe( 'core/heading' );
-				expect( headingBlock.attributes.textAlign ).toBe( 'right' );
+				expect(
+					headingBlock.attributes.style.typography.textAlign
+				).toBe( 'right' );
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {
@@ -503,14 +538,16 @@ test.describe( 'Heading', () => {
 				await editor.insertBlock( {
 					name: 'core/heading',
 					attributes: {
-						textAlign: 'right',
 						content: 'initial content',
+						style: { typography: { textAlign: 'right' } },
 					},
 				} );
 				await editor.transformBlockTo( 'core/paragraph' );
 				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
-				expect( paragraphBlock.attributes.align ).toBe( 'right' );
+				expect(
+					paragraphBlock.attributes.style.typography.textAlign
+				).toBe( 'right' );
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {

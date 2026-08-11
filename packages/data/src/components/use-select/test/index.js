@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { act, render, fireEvent, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useState, useReducer } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	createRegistry,
 	createRegistrySelector,
@@ -705,7 +694,12 @@ describe( 'useSelect', () => {
 				'count2:0'
 			);
 
-			act( () => screen.getByText( 'Open' ).click() );
+			act( () =>
+				screen
+					.getByText( 'Open' )
+					// eslint-disable-next-line testing-library/no-node-access
+					.click()
+			);
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );

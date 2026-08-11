@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import filter from '../html-formatting-remover';
 import { deepFilterHTML, deepFilterNodeList } from '../utils';
 
@@ -120,7 +117,7 @@ describe( 'HTMLFormattingRemover', () => {
 		expect( doc.body.innerHTML ).toEqual( input );
 	} );
 
-	it( 'should not remove white space if next elemnt has none', () => {
+	it( 'should not remove white space if next element has none', () => {
 		const input = `<div><strong>a </strong>b</div>`;
 		const output = '<div><strong>a </strong>b</div>';
 		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( output );

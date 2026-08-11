@@ -1,18 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import AutoBlockUninstaller from '../components/auto-block-uninstaller';
 import InserterMenuDownloadableBlocksPanel from './inserter-menu-downloadable-blocks-panel';
 import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel';
 import getInstallMissing from './get-install-missing';
 
 registerPlugin( 'block-directory', {
+	// The icon is explicitly set to undefined to prevent PluginPrePublishPanel
+	// from rendering the fallback icon pluginIcon.
+	icon: undefined,
 	render() {
 		return (
 			<>

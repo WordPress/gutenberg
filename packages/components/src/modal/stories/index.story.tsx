@@ -1,23 +1,13 @@
-/**
- * External dependencies
- */
-import type { StoryFn, Meta } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { StoryFn, Meta } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
 
 const meta: Meta< typeof Modal > = {
+	tags: [ 'manifest' ],
 	component: Modal,
 	title: 'Components/Overlays/Modal',
 	id: 'components-modal',
@@ -44,6 +34,11 @@ const meta: Meta< typeof Modal > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by [`Dialog`](?path=/docs/design-system-components-dialog--docs) in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -58,7 +53,11 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ openModal }>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ openModal }
+			>
 				Open Modal
 			</Button>
 			{ isOpen && (
@@ -75,12 +74,13 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 						anim id est laborum.
 					</p>
 
-					<InputControl
-						__next40pxDefaultSize
-						style={ { marginBottom: '20px' } }
-					/>
+					<InputControl style={ { marginBottom: '20px' } } />
 
-					<Button variant="secondary" onClick={ closeModal }>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ closeModal }
+					>
 						Close Modal
 					</Button>
 				</Modal>

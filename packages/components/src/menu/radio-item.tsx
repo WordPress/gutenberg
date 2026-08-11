@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuRadioItemProps } from './types';
-import * as Styled from './styles';
 import { SVG, Circle } from '@wordpress/primitives';
+import type { WordPressComponentProps } from '../context';
+import { Context } from './context';
+import type { RadioItemProps } from './types';
+import * as Styled from './styles';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -24,14 +13,14 @@ const radioCheck = (
 	</SVG>
 );
 
-export const MenuRadioItem = forwardRef<
+export const RadioItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuRadioItemProps, 'div', false >
->( function MenuRadioItem(
+	WordPressComponentProps< RadioItemProps, 'div', false >
+>( function RadioItem(
 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -40,7 +29,7 @@ export const MenuRadioItem = forwardRef<
 	}
 
 	return (
-		<Styled.MenuRadioItem
+		<Styled.RadioItem
 			ref={ ref }
 			{ ...props }
 			accessibleWhenDisabled
@@ -57,17 +46,17 @@ export const MenuRadioItem = forwardRef<
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<Styled.ItemContentWrapper>
+				<Styled.ItemChildrenWrapper>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</Styled.ItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuRadioItem>
+			</Styled.ItemContentWrapper>
+		</Styled.RadioItem>
 	);
 } );
