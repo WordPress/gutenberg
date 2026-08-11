@@ -247,6 +247,44 @@ add_action(
 				},
 			)
 		);
+
+		/*
+		 * A single NEW comment for the activity feed's per-card "Add
+		 * comment" button: spliced INTO the card's comments container via
+		 * `renderHTML( comments, html )` — a splice below a keyed item,
+		 * which must not remount the card (see the key-preservation tests).
+		 */
+		register_rest_route(
+			'test/activity-feed/v1',
+			'/comment',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function ( $request ) {
+					$identity = $request->get_param( 'identity' );
+					$post_id  = (int) $request->get_param( 'postId' );
+					// A fresh comment id unique per post.
+					$comment_id = 9000 + $post_id;
+					$key_attr   = static function ( $name ) use ( $identity ) {
+						if ( 'id' === $identity ) {
+							return 'id="' . esc_attr( $name ) . '"';
+						}
+						if ( 'none' === $identity ) {
+							return '';
+						}
+						return 'data-wp-key="' . esc_attr( $name ) . '"';
+					};
+					return rest_ensure_response(
+						sprintf(
+							'<p %3$s data-testid="comment-%1$d">a fresh comment on post %2$d</p>',
+							$comment_id,
+							$post_id,
+							$key_attr( 'comment-' . $comment_id ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						)
+					);
+				},
+			)
+		);
 	}
 );
 
@@ -302,6 +340,7 @@ function gutenberg_e2e_activity_feed_card( $post, $identity = 'data-wp-key' ) {
 		'<p data-testid="post-%1$d-text">%3$s</p>' .
 		'<div data-testid="post-%1$d-comments">%4$s</div>' .
 		'<button data-testid="post-%1$d-like" data-wp-on--click="actions.like" data-wp-text="context.likes">0</button>' .
+		'<button data-testid="post-%1$d-comment" data-wp-on--click="actions.addComment" data-identity="' . esc_attr( $identity ) . '" data-fragment-url="' . esc_url( rest_url( 'test/activity-feed/v1/comment' ) ) . '">Add comment</button>' .
 		'<span data-wp-init="callbacks.initPost"></span>' .
 		'</article>',
 		$post_id,

@@ -38,6 +38,16 @@ const browseFeed = async ( page: Page ) => {
 	await page.getByTestId( 'post-1-like' ).click();
 	await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '1' );
 
+	// --- Add a comment INTO the card: a splice below a keyed item. ---
+	// The card's identity must survive: the like stays, no re-init.
+	await page.getByTestId( 'post-1-comment' ).click();
+	await expect( page.getByTestId( 'comment-9001' ) ).toBeVisible();
+	await expect( page.getByTestId( 'comment-9001' ) ).toHaveText(
+		'a fresh comment on post 1'
+	);
+	// The like survived the splice into the card.
+	await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '1' );
+
 	// --- Load more: older posts appended at the end. ---
 	await page.getByTestId( 'load-more' ).click();
 	await expect( page.getByTestId( 'post-101' ) ).toBeVisible();
