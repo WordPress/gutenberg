@@ -1,26 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { HStack } from '../../h-stack';
 import { ColorPicker } from '../../color-picker';
 import { VisuallyHidden } from '../../visually-hidden';
 import { CustomColorPickerDropdown } from '../../color-palette';
-
 import {
 	addControlPoint,
 	clampPercent,

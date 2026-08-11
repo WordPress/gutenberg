@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getLayoutType } from '../../layouts';
 import { useSettings } from '../use-settings';
 

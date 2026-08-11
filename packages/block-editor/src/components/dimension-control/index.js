@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useMemo, useState } from '@wordpress/element';
 import {
 	BaseControl,
@@ -8,10 +6,6 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import PresetInputControl from '../preset-input-control';
 import { CUSTOM_VALUE_SETTINGS } from '../preset-input-control/constants';
@@ -58,6 +52,8 @@ function useDimensionSizes( presets ) {
  * @param {?string}                    props.label          A label for the control.
  * @param {( value: string ) => void } props.onChange       Called when the dimension value changes.
  * @param {string}                     props.value          The current dimension value.
+ * @param {?string}                    props.placeholder    Placeholder text for the custom-value input.
+ * @param {?string}                    props.className      Additional CSS class on the wrapping fieldset.
  * @param {?Object}                    props.dimensionSizes Optional dimension size presets. Falls back to settings from the store.
  *
  * @return {Component} The component to be rendered.
@@ -66,6 +62,8 @@ export default function DimensionControl( {
 	label = __( 'Dimension' ),
 	onChange,
 	value,
+	placeholder,
+	className,
 	dimensionSizes: dimensionSizesProp,
 } ) {
 	const [ dimensionSizesFromSettings, availableUnits ] = useSettings(
@@ -146,7 +144,9 @@ export default function DimensionControl( {
 	};
 
 	return (
-		<fieldset className="block-editor-dimension-control">
+		<fieldset
+			className={ clsx( 'block-editor-dimension-control', className ) }
+		>
 			<BaseControl.VisualLabel as="legend">
 				{ label }
 			</BaseControl.VisualLabel>
@@ -157,6 +157,7 @@ export default function DimensionControl( {
 				minimumCustomValue={ 0 }
 				onChange={ onChange }
 				onUnitChange={ handleUnitChange }
+				placeholder={ placeholder }
 				presets={ options }
 				presetType="dimension"
 				selectedUnit={ selectedUnit }

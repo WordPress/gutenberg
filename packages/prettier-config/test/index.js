@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { execFile } from 'child_process';
 import path from 'path';
 import { promisify } from 'util';
-
-/**
- * Internal dependencies
- */
 import config from '../lib/';
 
 const execFileAsync = promisify( execFile );
@@ -20,8 +13,10 @@ describe( 'prettier config tests', () => {
 
 	it( 'should resolve file-specific options from the root config', async () => {
 		const repositoryRoot = path.resolve( __dirname, '../../..' );
+		// Resolve prettier from this file
+		const prettierPath = require.resolve( 'prettier' );
 		const resolveConfigScript = `
-			const prettier = require( 'prettier' );
+			const prettier = require( ${ JSON.stringify( prettierPath ) } );
 			Promise.all(
 				process.argv
 					.slice( 1 )

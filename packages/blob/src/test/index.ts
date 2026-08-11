@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isBlobURL, getBlobTypeByURL, downloadBlob } from '..';
 
 describe( 'isBlobURL', () => {

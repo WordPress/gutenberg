@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { normalizeRowColSpan } from '../utils';
 
 describe( 'normalizeRowColSpan', () => {

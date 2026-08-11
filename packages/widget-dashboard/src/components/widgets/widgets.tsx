@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
@@ -15,14 +8,10 @@ import type {
 	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
 import { WidgetActions } from '../widget-actions';
-import { WidgetAttributeControls } from '../widget-attribute-controls';
+import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -150,7 +139,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				controls = (
 					<>
 						{ hasSettings && (
-							<WidgetAttributeControls
+							<WidgetAttributes
 								widget={ widget }
 								widgetType={ widgetType }
 							/>

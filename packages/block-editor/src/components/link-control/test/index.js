@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	fireEvent,
 	render as baseRender,
@@ -9,17 +6,9 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import LinkControl from '../';
 import {
 	fauxEntitySuggestions,

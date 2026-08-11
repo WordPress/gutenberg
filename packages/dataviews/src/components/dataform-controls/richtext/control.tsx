@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type { MutableRefObject, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { ReactNode } from 'react';
 import {
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
@@ -23,15 +16,12 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import {
 	insert,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import type { EventListenersProps, RichTextValue } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
@@ -41,10 +31,9 @@ import FormatEdit from './format-edit';
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
 // required/validity treatment the sibling text controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
-const {
-	ValidatedContentEditableControl: RichTextControlShell,
-	withIgnoreIMEEvents,
-} = unlock( componentsPrivateApis );
+const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
+	componentsPrivateApis
+);
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
@@ -405,33 +394,18 @@ export default function RichTextControl( {
 	 * returned props (including the rendered popover as `children`). With no
 	 * `completers` it does no work and renders nothing, keeping the control
 	 * zero-cost for consumers that don't opt in.
-	 * The hook anchors its popover to its own internal ref and overrides
-	 * whatever `contentRef` is passed, but the parameter type requires one.
 	 */
-	const unusedContentRef = useRef< HTMLElement >( null );
-	const {
-		ref: autocompleteRef,
-		'aria-activedescendant': autocompleteActiveDescendant,
-		'aria-autocomplete': autocompleteAriaAutocomplete,
-		...autocompleteRest
-	} = useAutocompleteProps( {
-		completers,
-		record: value,
-		onChange: onRichTextChange,
-		// This control's completers insert their completion into the value;
-		// none replace the whole value, so the required `onReplace` is a
-		// no-op here.
-		onReplace: () => {},
-		contentRef: unusedContentRef,
-	} );
-	// Normalize the hook's loosely-typed aria values for the DOM element:
-	// `aria-activedescendant` may be `null` (React wants `undefined`) and
-	// `aria-autocomplete` is only ever `'list'` or `undefined` at runtime.
-	const autocompleteProps = {
-		...autocompleteRest,
-		'aria-activedescendant': autocompleteActiveDescendant ?? undefined,
-		'aria-autocomplete': autocompleteAriaAutocomplete as 'list' | undefined,
-	};
+	const { ref: autocompleteRef, ...autocompleteProps } = useAutocompleteProps(
+		{
+			completers,
+			record: value,
+			onChange: onRichTextChange,
+			// This control's completers insert their completion into the value;
+			// none replace the whole value, so the required `onReplace` is a
+			// no-op here.
+			onReplace: () => {},
+		}
+	);
 
 	// The shell exposes no focus management of its own (form controls leave
 	// that to the surrounding region); focus the field on mount here when the
@@ -447,7 +421,7 @@ export default function RichTextControl( {
 
 	const editableRef = useMergeRefs( [
 		richTextRef,
-		anchorRef as MutableRefObject< HTMLElement | undefined >,
+		anchorRef,
 		eventListenersRef,
 		enterRef,
 		focusOnMountRef,

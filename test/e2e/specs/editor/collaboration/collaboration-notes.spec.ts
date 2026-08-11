@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 // Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
