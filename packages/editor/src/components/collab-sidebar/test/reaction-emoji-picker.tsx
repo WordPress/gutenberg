@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import ReactionEmojiPicker, {
 	REACTION_EMOJIS,
 	buildEmojiBySlugMap,
