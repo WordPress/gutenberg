@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Report changes to border, shadow, outline, filter and dimensions in the global styles changelist. These are rendered by the styles engine but were not compared, so a revision or a pending save that changed only one of them said nothing had changed.
 -   Render block element styles defined only inside responsive viewport states.
 
 ## 1.19.0 (2026-07-29)

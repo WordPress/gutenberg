@@ -280,5 +280,48 @@ describe( 'getGlobalStylesChanges and utils', () => {
 
 			expect( resultB ).toEqual( resultA );
 		} );
+
+		/*
+		 * These properties are rendered by the styles engine but were not
+		 * compared, so changing only one of them reported no change at all.
+		 */
+		it.each( [
+			[ 'border', { border: { width: '2px' } }, 'Border' ],
+			[
+				'shadow',
+				{ shadow: 'var(--wp--preset--shadow--natural)' },
+				'Shadow',
+			],
+			[ 'outline', { outline: { style: 'dotted' } }, 'Outline' ],
+			[ 'filter', { filter: { opacity: '40' } }, 'Filter' ],
+			[
+				'dimensions',
+				{ dimensions: { minHeight: '10px' } },
+				'Dimensions',
+			],
+		] )( 'reports a change to %s', ( _name, styles, label ) => {
+			expect(
+				getGlobalStylesChangelist( { styles }, { styles: {} } )
+			).toEqual( [ [ 'styles', label ] ] );
+		} );
+
+		it( 'reports the newly compared properties alongside the existing ones', () => {
+			expect(
+				getGlobalStylesChangelist(
+					{
+						styles: {
+							color: { text: 'red' },
+							border: { radius: '4px' },
+							dimensions: { maxWidth: '20px' },
+						},
+					},
+					{ styles: {} }
+				)
+			).toEqual( [
+				[ 'styles', 'Colors' ],
+				[ 'styles', 'Border' ],
+				[ 'styles', 'Dimensions' ],
+			] );
+		} );
 	} );
 } );
