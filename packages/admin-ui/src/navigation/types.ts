@@ -1,4 +1,4 @@
-import { type AnchorHTMLAttributes, type ComponentType } from 'react';
+import { type AnchorHTMLAttributes, type ElementType } from 'react';
 
 export type NavigationLinkProps = Omit<
 	AnchorHTMLAttributes< HTMLAnchorElement >,
@@ -44,7 +44,7 @@ export interface NavigationProps {
 	 *
 	 * @default 'a'
 	 */
-	linkComponent?: ComponentType< NavigationLinkProps >;
+	linkComponent?: ElementType< NavigationLinkProps >;
 
 	/**
 	 * Optional class name for the root element.

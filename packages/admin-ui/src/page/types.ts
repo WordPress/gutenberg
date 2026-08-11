@@ -1,4 +1,4 @@
-import { type ComponentType } from 'react';
+import { type ElementType } from 'react';
 import type { NavigationLinkProps } from '../navigation/types';
 
 export interface PageComponents {
@@ -10,5 +10,5 @@ export interface PageComponents {
 	 *
 	 * @default 'a'
 	 */
-	link?: ComponentType< NavigationLinkProps >;
+	link?: ElementType< NavigationLinkProps >;
 }
