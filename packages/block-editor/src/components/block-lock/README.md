@@ -2,6 +2,8 @@
 
 The `Block Lock` module provides UI components and hooks for managing block locking in the WordPress editor. This includes locking block movement, editing, and removal.
 
+These are private components of the `@wordpress/block-editor` package. They are not exported publicly and are meant to be consumed from within the package only.
+
 ## Components
 
 ### `BlockLockMenuItem`
@@ -33,17 +35,19 @@ A custom hook that returns lock status and permissions for a given block.
 
 #### Returns
 An object containing:
-- `canEdit` (boolean): Whether the block can be edited.
-- `canMove` (boolean): Whether the block can be moved.
-- `canRemove` (boolean): Whether the block can be removed.
-- `canLock` (boolean): Whether the block can be locked.
-- `isContentLocked` (boolean): Whether the block's content is locked.
-- `isLocked` (boolean): Whether the block is fully locked.
+- `isEditLocked` (boolean): Whether editing the block is locked.
+- `isMoveLocked` (boolean): Whether moving the block is locked.
+- `isRemoveLocked` (boolean): Whether removing the block is locked.
+- `canLock` (boolean): Whether the block type allows locking.
+- `isLocked` (boolean): Whether any of the block's lock features are applied.
 
 ## Usage
 
 ```jsx
-import { BlockLockMenuItem, BlockLockToolbar } from 'path-to-block-lock';
+/**
+ * Internal dependencies
+ */
+import { BlockLockMenuItem, BlockLockToolbar } from '../block-lock';
 
 function MyBlockControls( { clientId } ) {
     return (
