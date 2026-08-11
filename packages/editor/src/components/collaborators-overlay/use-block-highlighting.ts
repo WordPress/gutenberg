@@ -138,9 +138,33 @@ export function useBlockHighlighting(
 					if ( ! localClientId ) {
 						return [];
 					}
+
+					// The selected block may be hidden inside collapsed
+					// content (e.g. a closed core/details or an inactive
+					// core/accordion panel). Fall back to outlining the
+					// nearest *visible* ancestor instead, same as the
+					// Cursor/SelectionInOneBlock case below, so the
+					// collaborator still has a findable presence indicator
+					// rather than silently getting no highlight at all.
+					let blockId = localClientId;
+					const blockElement = getBlockElementById(
+						blockEditorDocument,
+						localClientId
+					);
+					if ( blockElement && ! isElementVisible( blockElement ) ) {
+						const container =
+							getNearestVisibleBlockAncestor( blockElement );
+						const containerId =
+							container?.getAttribute( 'data-block' );
+						if ( ! containerId ) {
+							return [];
+						}
+						blockId = containerId;
+					}
+
 					return [
 						{
-							blockId: localClientId,
+							blockId,
 							clientId: userState.clientId,
 							userId: userState.collaboratorInfo.id,
 							color: getAvatarBorderColor(
