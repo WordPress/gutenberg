@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 /* Styles for backwards compatibility with the legacy `post-comments` block */
 .wp-block-post-comments {
 	// This block has customizable padding, border-box makes that more predictable.

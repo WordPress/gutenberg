@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
@@ -13,17 +10,22 @@ const {
 } = require( './cli' );
 const {
 	getJestOverrideConfigFile,
-	getWebpackArgs,
-	getWordPressSrcDirectory,
-	getWebpackEntryPoints,
 	getPhpFilePaths,
+	getProjectSourcePath,
+	getWebpackArgs,
+	getWebpackEntryPoints,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 } = require( './config' );
-const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
+const {
+	fromConfigRoot,
+	fromProjectRoot,
+	fromScriptsRoot,
+	hasProjectFile,
+} = require( './file' );
 const { getPackageProp, hasPackageProp } = require( './package' );
 const {
 	getBlockJsonModuleFields,
@@ -31,8 +33,9 @@ const {
 } = require( './block-json' );
 
 module.exports = {
-	fromProjectRoot,
 	fromConfigRoot,
+	fromProjectRoot,
+	fromScriptsRoot,
 	getAsBooleanFromENV,
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -40,10 +43,10 @@ module.exports = {
 	getJestOverrideConfigFile,
 	getNodeArgsFromCLI,
 	getPackageProp,
-	getWebpackArgs,
-	getWordPressSrcDirectory,
-	getWebpackEntryPoints,
 	getPhpFilePaths,
+	getProjectSourcePath,
+	getWebpackArgs,
+	getWebpackEntryPoints,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 	hasArgInCLI,

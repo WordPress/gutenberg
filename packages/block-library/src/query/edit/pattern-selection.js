@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Modal, SearchControl } from '@wordpress/components';
@@ -10,10 +7,6 @@ import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	useBlockNameForPatterns,
 	getTransformedBlocksFromPattern,
@@ -43,7 +36,16 @@ export function useBlockPatterns( clientId, attributes ) {
 		clientId,
 		attributes
 	);
-	return usePatterns( clientId, blockNameForPatterns );
+	const allPatterns = usePatterns( clientId, blockNameForPatterns );
+	// Filter out any patterns that don't have Query as their root block
+	// so that a Query block is always replaced by another Query block.
+	const rootBlockPatterns = useMemo( () => {
+		return allPatterns.filter( ( pattern ) => {
+			return pattern.blocks?.[ 0 ]?.name === 'core/query';
+		} );
+	}, [ allPatterns ] );
+
+	return rootBlockPatterns;
 }
 
 export default function PatternSelection( {
@@ -84,7 +86,6 @@ export default function PatternSelection( {
 			{ showSearch && (
 				<div className="block-library-query-pattern__selection-search">
 					<SearchControl
-						__nextHasNoMarginBottom
 						onChange={ setSearchValue }
 						value={ searchValue }
 						label={ __( 'Search' ) }

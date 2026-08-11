@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/breadcrumbs",
+		"isValid": true,
+		"attributes": {
+			"prefersTaxonomy": false,
+			"separator": "/",
+			"showHomeItem": true,
+			"showCurrentItem": true,
+			"showOnHomePage": false
+		},
+		"innerBlocks": []
+	}
+]

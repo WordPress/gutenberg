@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Global styles sidebar', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -18,6 +11,10 @@ test.describe( 'Global styles sidebar', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {
@@ -35,15 +32,13 @@ test.describe( 'Global styles sidebar', () => {
 			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'heading' );
 
-		// Matches both Heading and Table of Contents blocks.
+		// Matches both Heading and Accordion Item blocks.
 		// The latter contains "heading" in its description.
 		await expect(
 			page.getByRole( 'button', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Table of Contents',
-			} )
+			page.getByRole( 'button', { name: 'Accordion Item' } )
 		).toBeVisible();
 	} );
 } );

@@ -1,4 +1,4 @@
-@import "./style.scss";
+@use "./style.scss" as *;
 
 .block-library-comments-toolbar__popover .components-popover__content {
 	min-width: 230px;

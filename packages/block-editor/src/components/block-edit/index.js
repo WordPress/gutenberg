@@ -1,21 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import Edit from './edit';
 import {
 	BlockEditContextProvider,
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
+	mayDisplayPatternEditingControlsKey,
 	blockEditingModeKey,
 	blockBindingsKey,
 	isPreviewModeKey,
+	isInListViewBlockSupportTreeKey,
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
@@ -33,6 +28,7 @@ export { useBlockEditContext };
 export default function BlockEdit( {
 	mayDisplayControls,
 	mayDisplayParentControls,
+	mayDisplayPatternEditingControls,
 	blockEditingMode,
 	isPreviewMode,
 	// The remaining props are passed through the BlockEdit filters and are thus
@@ -51,6 +47,11 @@ export default function BlockEdit( {
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
+	const parentBlockEditContext = useBlockEditContext();
+	const isInListViewBlockSupportTree =
+		!! parentBlockEditContext[ isInListViewBlockSupportTreeKey ] ||
+		hasBlockSupport( name, 'listView' ) ||
+		name === 'core/navigation';
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
 
 	return (
@@ -69,9 +70,14 @@ export default function BlockEdit( {
 					// usage outside of the package (this context is exposed).
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
+					[ mayDisplayPatternEditingControlsKey ]:
+						mayDisplayPatternEditingControls &&
+						blockEditingMode !== 'disabled',
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
+					[ isInListViewBlockSupportTreeKey ]:
+						isInListViewBlockSupportTree,
 				} ),
 				[
 					name,
@@ -82,9 +88,11 @@ export default function BlockEdit( {
 					__unstableLayoutClassNames,
 					mayDisplayControls,
 					mayDisplayParentControls,
+					mayDisplayPatternEditingControls,
 					blockEditingMode,
 					bindings,
 					isPreviewMode,
+					isInListViewBlockSupportTree,
 				]
 			) }
 		>

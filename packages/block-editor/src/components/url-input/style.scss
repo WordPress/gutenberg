@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 // Link input
 $input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
 $input-size: 300px;
@@ -33,8 +37,9 @@ $input-size: 300px;
 // Suggestions
 .block-editor-url-input__suggestions {
 	max-height: 200px;
-	transition: all 0.15s ease-in-out;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.15s ease-in-out;
+	}
 	padding: 4px 0;
 	// To match the url-input width: input width + padding + 2 buttons.
 	width: $input-size + 2;
@@ -56,7 +61,7 @@ $input-size: 300px;
 	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: $white;
 	width: 100%;
 	border: none;

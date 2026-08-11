@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
@@ -13,6 +10,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
 	 * @default false
+	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
@@ -67,7 +67,7 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 
 export type SuffixItemProps = Pick<
 	SearchControlProps,
-	'value' | 'onChange' | 'onClose'
+	'onChange' | 'onClose'
 > & {
-	searchRef: React.RefObject< HTMLInputElement >;
+	searchRef: React.RefObject< HTMLInputElement | null >;
 };
