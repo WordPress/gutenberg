@@ -15,49 +15,50 @@ import {
 } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useState } from '@wordpress/element';
-import { DateCalendar, TZDate } from '..';
+import { TZDate } from 'react-day-picker';
+import { Calendar } from '..';
 import {
 	getDateButton,
 	getDateCell,
 	queryDateCell,
 	monthNameFormatter,
 } from './__utils__';
-import type { DateCalendarProps } from '../types';
+import type { CalendarProps } from '../types';
 
-const UncontrolledDateCalendar = (
-	props: DateCalendarProps & {
+const UncontrolledCalendar = (
+	props: CalendarProps & {
 		initialSelected?: Date | undefined | null;
 		initialMonth?: Date | undefined;
 	}
 ) => {
 	return (
-		<DateCalendar
+		<Calendar
 			{ ...props }
-			defaultSelected={ props.initialSelected ?? undefined }
+			defaultValue={ props.initialSelected ?? undefined }
 			defaultMonth={ props.initialMonth }
 		/>
 	);
 };
 
-const ControlledDateCalendar = (
-	props: DateCalendarProps & {
+const ControlledCalendar = (
+	props: CalendarProps & {
 		initialSelected?: Date | undefined | null;
 		initialMonth?: Date | undefined;
 	}
 ) => {
-	const [ selected, setSelected ] = useState< Date | undefined | null >(
-		props.initialSelected
+	const [ selected, setSelected ] = useState< Date | null >(
+		props.initialSelected ?? null
 	);
 	const [ month, setMonth ] = useState< Date | undefined >(
 		props.initialMonth
 	);
 	return (
-		<DateCalendar
+		<Calendar
 			{ ...props }
-			selected={ selected ?? null }
-			onSelect={ ( ...args ) => {
+			value={ selected }
+			onValueChange={ ( ...args ) => {
 				setSelected( args[ 0 ] );
-				props.onSelect?.( ...args );
+				props.onValueChange?.( ...args );
 			} }
 			month={ month }
 			onMonthChange={ ( newMonth ) => {
@@ -75,7 +76,7 @@ function setupUserEvent() {
 	return user;
 }
 
-describe( 'DateCalendar', () => {
+describe( 'Calendar', () => {
 	let today: Date;
 	let tomorrow: Date;
 	let yesterday: Date;
@@ -106,7 +107,7 @@ describe( 'DateCalendar', () => {
 
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
-			render( <DateCalendar /> );
+			render( <Calendar /> );
 
 			expect(
 				screen.getByRole( 'application', { name: 'Date calendar' } )
@@ -127,7 +128,7 @@ describe( 'DateCalendar', () => {
 		} );
 
 		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
-			render( <DateCalendar numberOfMonths={ 2 } /> );
+			render( <Calendar numberOfMonths={ 2 } /> );
 
 			const grids = screen.getAllByRole( 'grid' );
 			expect( grids ).toHaveLength( 2 );
@@ -141,8 +142,8 @@ describe( 'DateCalendar', () => {
 	} );
 
 	describe( 'Date selection', () => {
-		it( 'should select an initial date in uncontrolled mode via the `defaultSelected` prop', () => {
-			render( <DateCalendar defaultSelected={ today } /> );
+		it( 'should select an initial date in uncontrolled mode via the `defaultValue` prop', () => {
+			render( <Calendar defaultValue={ today } /> );
 
 			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
 
@@ -151,11 +152,9 @@ describe( 'DateCalendar', () => {
 			expect( todayButton ).toHaveAccessibleName( /selected/i );
 		} );
 
-		it( 'should select an initial date in controlled mode via the `selected` prop', () => {
-			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
-			render(
-				<DateCalendar defaultSelected={ tomorrow } selected={ today } />
-			);
+		it( 'should select an initial date in controlled mode via the `value` prop', () => {
+			// Note: the `defaultValue` prop is ignored when the `value` prop is set.
+			render( <Calendar defaultValue={ tomorrow } value={ today } /> );
 
 			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
 
@@ -164,8 +163,8 @@ describe( 'DateCalendar', () => {
 			expect( todayButton ).toHaveAccessibleName( /selected/i );
 		} );
 
-		it( 'should have no date selected in uncontrolled mode when the `selected` and `defaultSelected` props are set to `undefined`', () => {
-			render( <DateCalendar /> );
+		it( 'should have no date selected in uncontrolled mode when no initial value is provided', () => {
+			render( <Calendar /> );
 
 			expect(
 				screen.queryByRole( 'gridcell', { selected: true } )
@@ -175,11 +174,9 @@ describe( 'DateCalendar', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should have no date selected in controlled mode when the `selected` prop is set to `null`', () => {
-			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
-			render(
-				<DateCalendar defaultSelected={ tomorrow } selected={ null } />
-			);
+		it( 'should have no date selected in controlled mode when the `value` prop is set to `null`', () => {
+			// Note: the `defaultValue` prop is ignored when the `value` prop is set.
+			render( <Calendar defaultValue={ tomorrow } value={ null } /> );
 
 			expect(
 				screen.queryByRole( 'gridcell', { selected: true } )
@@ -189,12 +186,25 @@ describe( 'DateCalendar', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should select a date in uncontrolled mode via the `defaultSelected` prop even if the date is disabled`', () => {
+		it( 'should stay controlled when a direct state setter clears the value', async () => {
+			const user = setupUserEvent();
+
+			function CalendarWithDirectStateSetter() {
+				const [ value, setValue ] = useState< Date | null >( today );
+				return <Calendar value={ value } onValueChange={ setValue } />;
+			}
+
+			render( <CalendarWithDirectStateSetter /> );
+			await user.click( getDateButton( today ) );
+
+			expect(
+				screen.queryByRole( 'gridcell', { selected: true } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should select a date in uncontrolled mode via the `defaultValue` prop even if the date is disabled`', () => {
 			render(
-				<DateCalendar
-					defaultSelected={ tomorrow }
-					disabled={ tomorrow }
-				/>
+				<Calendar defaultValue={ tomorrow } disabled={ tomorrow } />
 			);
 
 			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
@@ -205,10 +215,8 @@ describe( 'DateCalendar', () => {
 			expect( tomorrowButton ).toBeDisabled();
 		} );
 
-		it( 'should select a date in controlled mode via the `selected` prop even if the date is disabled`', () => {
-			render(
-				<DateCalendar selected={ tomorrow } disabled={ tomorrow } />
-			);
+		it( 'should select a date in controlled mode via the `value` prop even if the date is disabled`', () => {
+			render( <Calendar value={ tomorrow } disabled={ tomorrow } /> );
 
 			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
 
@@ -219,20 +227,20 @@ describe( 'DateCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateCalendar ],
-			[ 'Controlled', ControlledDateCalendar ],
+			[ 'Uncontrolled', UncontrolledCalendar ],
+			[ 'Controlled', ControlledCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should select a date when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					today,
 					today,
 					expect.objectContaining( { today: true } ),
@@ -249,15 +257,18 @@ describe( 'DateCalendar', () => {
 
 			it( 'should not select a disabled date when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
-					<Component onSelect={ onSelect } disabled={ tomorrow } />
+					<Component
+						onValueChange={ onValueChange }
+						disabled={ tomorrow }
+					/>
 				);
 
 				await user.click( getDateButton( tomorrow ) );
 
-				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onValueChange ).not.toHaveBeenCalled();
 				expect(
 					screen.queryByRole( 'button', { name: /selected/i } )
 				).not.toBeInTheDocument();
@@ -265,20 +276,20 @@ describe( 'DateCalendar', () => {
 
 			it( 'should select a new date when a different date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
 					<Component
 						initialSelected={ today }
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 					/>
 				);
 
 				const tomorrowButton = getDateButton( tomorrow );
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					tomorrow,
 					tomorrow,
 					expect.objectContaining( { today: false } ),
@@ -295,21 +306,21 @@ describe( 'DateCalendar', () => {
 
 			it( 'should de-select the selected date when the selected date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render(
+				const { rerender } = render(
 					<Component
 						initialSelected={ today }
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 					/>
 				);
 
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
-					undefined,
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
+					null,
 					today,
 					expect.objectContaining( { today: true, selected: true } ),
 					expect.objectContaining( {
@@ -321,16 +332,26 @@ describe( 'DateCalendar', () => {
 				expect(
 					queryDateCell( today, { selected: true } )
 				).not.toBeInTheDocument();
+
+				rerender(
+					<Component
+						initialSelected={ today }
+						onValueChange={ onValueChange }
+					/>
+				);
+				expect(
+					queryDateCell( today, { selected: true } )
+				).not.toBeInTheDocument();
 			} );
 
 			it( 'should not de-select the selected date when the selected date button is clicked if the `required` prop is set to `true`', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
 					<Component
 						initialSelected={ today }
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 						required
 					/>
 				);
@@ -338,8 +359,8 @@ describe( 'DateCalendar', () => {
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					today,
 					today,
 					expect.objectContaining( { today: true, selected: true } ),
@@ -357,7 +378,7 @@ describe( 'DateCalendar', () => {
 
 	describe( 'Month navigation', () => {
 		it( 'should select an initial month in uncontrolled mode via the `defaultMonth` prop', () => {
-			render( <DateCalendar defaultMonth={ nextMonth } /> );
+			render( <Calendar defaultMonth={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -369,7 +390,7 @@ describe( 'DateCalendar', () => {
 		} );
 
 		it( 'should select an initial month in controlled mode via the `month` prop', () => {
-			render( <DateCalendar month={ nextMonth } /> );
+			render( <Calendar month={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -381,8 +402,8 @@ describe( 'DateCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateCalendar ],
-			[ 'Controlled', ControlledDateCalendar ],
+			[ 'Uncontrolled', UncontrolledCalendar ],
+			[ 'Controlled', ControlledCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
 				const user = setupUserEvent();
@@ -485,7 +506,10 @@ describe( 'DateCalendar', () => {
 				expect( getDateCell( nextNextMonth ) ).toBeVisible();
 				expect( getDateButton( nextNextMonth ) ).toBeVisible();
 
-				expect( prevButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( prevButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 
 			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
@@ -535,7 +559,10 @@ describe( 'DateCalendar', () => {
 				expect( getDateCell( prevPrevMonth ) ).toBeVisible();
 				expect( getDateButton( prevPrevMonth ) ).toBeVisible();
 
-				expect( nextButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( nextButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 		} );
 	} );
@@ -543,19 +570,19 @@ describe( 'DateCalendar', () => {
 	describe( 'Keyboard focus and navigation', () => {
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
-			render( <DateCalendar autoFocus defaultSelected={ tomorrow } /> );
+			render( <Calendar autoFocus defaultValue={ tomorrow } /> );
 			expect( getDateButton( tomorrow ) ).toHaveFocus();
 		} );
 
 		it( "should auto-focus today's date if there is not selected date when the `autoFocus` prop is set to `true`", async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
-			render( <DateCalendar autoFocus /> );
+			render( <Calendar autoFocus /> );
 			expect( getDateButton( today ) ).toHaveFocus();
 		} );
 
 		it( 'should focus each arrow as a tab stop, but treat the grid as a 2d composite widget', async () => {
 			const user = setupUserEvent();
-			render( <DateCalendar /> );
+			render( <Calendar /> );
 
 			// Focus previous month button
 			await user.tab();
@@ -655,7 +682,7 @@ describe( 'DateCalendar', () => {
 			const user = setupUserEvent();
 
 			render(
-				<DateCalendar
+				<Calendar
 					disabled={ [
 						tomorrow,
 						addWeeks( addDays( tomorrow, 1 ), 1 ),
@@ -687,7 +714,7 @@ describe( 'DateCalendar', () => {
 
 		it( 'should focus the selected date when tabbing into the calendar', async () => {
 			const user = setupUserEvent();
-			render( <DateCalendar selected={ tomorrow } /> );
+			render( <Calendar value={ tomorrow } /> );
 
 			// Tab to the calendar grid
 			await user.tab();
@@ -702,7 +729,7 @@ describe( 'DateCalendar', () => {
 		it( 'should support disabling all dates via the `disabled` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateCalendar disabled /> );
+			render( <Calendar disabled /> );
 
 			within( screen.getByRole( 'grid' ) )
 				.getAllByRole( 'button' )
@@ -731,7 +758,7 @@ describe( 'DateCalendar', () => {
 		} );
 
 		it( 'should support disabling single dates via the `disabled` prop', async () => {
-			render( <DateCalendar disabled={ tomorrow } /> );
+			render( <Calendar disabled={ tomorrow } /> );
 
 			expect( getDateButton( tomorrow ) ).toBeDisabled();
 		} );
@@ -739,7 +766,7 @@ describe( 'DateCalendar', () => {
 		it( 'should support passing a custom function via the `disabled` prop', async () => {
 			const primeNumbers = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ];
 			render(
-				<DateCalendar
+				<Calendar
 					disabled={ ( date ) =>
 						primeNumbers.includes( date.getDate() )
 					}
@@ -756,7 +783,7 @@ describe( 'DateCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates before a certain date via the `disabled` prop', async () => {
-			render( <DateCalendar disabled={ { before: today } } /> );
+			render( <Calendar disabled={ { before: today } } /> );
 
 			for ( let date = 1; date < today.getDate(); date++ ) {
 				expect(
@@ -769,7 +796,7 @@ describe( 'DateCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates after a certain date via the `disabled` prop', async () => {
-			render( <DateCalendar disabled={ { after: today } } /> );
+			render( <Calendar disabled={ { after: today } } /> );
 
 			for ( let date = today.getDate() + 1; date < 32; date++ ) {
 				expect(
@@ -783,7 +810,7 @@ describe( 'DateCalendar', () => {
 
 		it( 'should support disabling all dates before a certain date and after a certain date via the `disabled` prop', async () => {
 			render(
-				<DateCalendar
+				<Calendar
 					disabled={ {
 						before: yesterday,
 						after: addDays( today, 1 ),
@@ -815,7 +842,7 @@ describe( 'DateCalendar', () => {
 
 		it( 'should support disabling all dates within a certain date range via the `disabled` prop', async () => {
 			render(
-				<DateCalendar
+				<Calendar
 					disabled={ { from: yesterday, to: addDays( today, 1 ) } }
 				/>
 			);
@@ -844,7 +871,7 @@ describe( 'DateCalendar', () => {
 
 		it( 'should support disabling specific days of the week via the `disabled` prop', async () => {
 			const weekendsInMay = [ 3, 4, 10, 11, 17, 18, 24, 25, 31 ];
-			render( <DateCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } /> );
+			render( <Calendar disabled={ { dayOfWeek: [ 0, 6 ] } } /> );
 
 			for ( const date of weekendsInMay ) {
 				expect(
@@ -858,7 +885,7 @@ describe( 'DateCalendar', () => {
 		it( 'should disable the previous and next months buttons if the `disableNavigation` is set to `true`', async () => {
 			const user = setupUserEvent();
 
-			render( <DateCalendar disableNavigation /> );
+			render( <Calendar disableNavigation /> );
 
 			expect(
 				screen.getByRole( 'button', { name: /previous month/i } )
@@ -880,7 +907,7 @@ describe( 'DateCalendar', () => {
 		it( 'should localize the calendar based on the `locale` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateCalendar locale={ ar } /> );
+			render( <Calendar locale={ ar } /> );
 
 			// Check computed writing direction
 			expect(
@@ -911,10 +938,13 @@ describe( 'DateCalendar', () => {
 
 		it( 'should support timezones according to the `timeZone` prop', async () => {
 			const user = setupUserEvent();
-			const onSelect = jest.fn();
+			const onValueChange = jest.fn();
 
 			render(
-				<DateCalendar timeZone="Asia/Tokyo" onSelect={ onSelect } />
+				<Calendar
+					timeZone="Asia/Tokyo"
+					onValueChange={ onValueChange }
+				/>
 			);
 
 			// For someone in Tokyo, the current time simulated in the test
@@ -932,7 +962,7 @@ describe( 'DateCalendar', () => {
 				new TZDate( tomorrow, 'Asia/Tokyo' ).getTimezoneOffset() / 60
 			);
 
-			expect( onSelect ).toHaveBeenCalledWith(
+			expect( onValueChange ).toHaveBeenCalledWith(
 				tomorrowFromTokyoTimezone,
 				tomorrowFromTokyoTimezone,
 				expect.objectContaining( { today: true } ),
@@ -951,8 +981,8 @@ describe( 'DateCalendar', () => {
 			);
 
 			render(
-				<DateCalendar
-					defaultSelected={ tomorrowAtMidnightInTokyo }
+				<Calendar
+					defaultValue={ tomorrowAtMidnightInTokyo }
 					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
 					timeZone="Etc/GMT+2"
 				/>
