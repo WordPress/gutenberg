@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
@@ -11,10 +8,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import {
 	BlockBindingsAttributeControl,
 	useBlockBindingsUtils,

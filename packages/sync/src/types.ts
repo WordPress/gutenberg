@@ -1,17 +1,6 @@
-/**
- * WordPress dependencies
- */
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type { ConnectionError } from './errors';
 
 /* globalThis */

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getServerContext } from '../scopes';
 import {
 	store,

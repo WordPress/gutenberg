@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
@@ -445,6 +434,9 @@ export const deleteEntityRecord =
  * @param {Object}        edits                The edits.
  * @param {Object}        options              Options for the edit.
  * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {boolean}       [options.isCached]   Whether the edit is transient (e.g. typing). Transient
+ *                                             edits are staged and eventually merged into the
+ *                                             preceding undo level instead of creating a new one.
  *
  * @return {Object} Action object.
  */
@@ -870,13 +862,19 @@ export const saveEntityRecord =
 						method: recordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
+					// Pass the pre-`__unstablePrePersist` edits so the reducer
+					// can clear the persisted edits from state. The values
+					// added by `__unstablePrePersist` (e.g. a fresh CRDT
+					// snapshot in `meta`) never exist in the state edits, so
+					// comparing against them would fail to match and leave the
+					// record dirty after a successful save.
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						record
 					);
 					if ( entityConfig.syncConfig ) {
 						let syncChanges;

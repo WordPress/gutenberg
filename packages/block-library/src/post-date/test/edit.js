@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { is12HourFormat } from '../edit';
 
 describe( 'is12HourFormat', () => {

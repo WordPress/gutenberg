@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, parse } from '@wordpress/blocks';
 import { create } from '@wordpress/rich-text';
 

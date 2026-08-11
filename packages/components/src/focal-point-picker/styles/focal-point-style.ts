@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { CONFIG } from '../../utils';
 
 export const PointerCircle = styled.div`

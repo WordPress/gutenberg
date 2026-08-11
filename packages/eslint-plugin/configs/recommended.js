@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
-
-/**
- * Internal dependencies
- */
 const { isPackageInstalled } = require( '../utils' );
 const recommendedWithFormattingConfig = require( './recommended-with-formatting' );
 

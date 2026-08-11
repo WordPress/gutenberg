@@ -83,6 +83,7 @@
 		"@wordpress/image-cropper": "file:../image-cropper",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",

@@ -1,13 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG, rtl } from '../utils';
-
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
 

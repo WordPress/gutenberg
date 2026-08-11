@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';

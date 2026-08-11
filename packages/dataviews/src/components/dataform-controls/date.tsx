@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import {
 	format,
@@ -11,15 +8,10 @@ import {
 	startOfMonth,
 	startOfYear,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
 	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
@@ -33,11 +25,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Calendar, RangeCalendar, Stack } from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -45,7 +33,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import type {
 	DataFormControlProps,
 	FieldValidity,
@@ -53,8 +40,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
 type DateRange = [ string, string ] | undefined;
 
@@ -335,7 +320,7 @@ function CalendarDateControl< Item >( {
 	);
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
+		( newDate: Date | null ) => {
 			const dateValue = newDate
 				? format( newDate, 'yyyy-MM-dd' )
 				: undefined;
@@ -454,12 +439,10 @@ function CalendarDateControl< Item >( {
 					/>
 
 					{ /* Calendar widget */ }
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value ? parseDate( value ) || undefined : undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDate( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
@@ -526,7 +509,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const selectedRange = useMemo( () => {
 		if ( ! value ) {
-			return { from: undefined, to: undefined };
+			return null;
 		}
 
 		const [ from, to ] = value;
@@ -537,7 +520,7 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange.from || new Date();
+		return selectedRange?.from || new Date();
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
@@ -564,9 +547,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const onSelectCalendarRange = useCallback(
 		(
-			newRange:
-				| { from: Date | undefined; to?: Date | undefined }
-				| undefined
+			newRange: { from: Date | undefined; to?: Date | undefined } | null
 		) => {
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
@@ -710,10 +691,10 @@ function CalendarDateRangeControl< Item >( {
 						/>
 					</Stack>
 
-					<DateRangeCalendar
+					<RangeCalendar
 						style={ { width: '100%' } }
-						selected={ selectedRange }
-						onSelect={ onSelectCalendarRange }
+						value={ selectedRange }
+						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }

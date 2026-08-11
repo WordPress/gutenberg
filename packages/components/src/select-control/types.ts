@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 

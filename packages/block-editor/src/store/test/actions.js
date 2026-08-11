@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import {
 	getBlockTypes,
@@ -13,11 +6,6 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';

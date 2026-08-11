@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -22,10 +19,6 @@ import {
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { alignLeft, alignCenter } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import AlignmentUI from '../ui';
 
 describe( 'AlignmentUI', () => {

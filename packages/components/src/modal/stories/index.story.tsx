@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import InputControl from '../../input-control';
 import Modal from '../';

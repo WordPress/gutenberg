@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';

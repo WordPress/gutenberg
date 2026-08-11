@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const { parseConfig } = require( '../parse-config' );
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { getLatestWordPressVersion } = require( '../../wordpress' );

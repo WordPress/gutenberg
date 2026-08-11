@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ComponentType } from 'react';
 
 /**

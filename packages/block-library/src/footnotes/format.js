@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { v4 as createId } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { formatListNumbered as icon } from '@wordpress/icons';
 import { insertObject } from '@wordpress/rich-text';
@@ -17,10 +10,6 @@ import {
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { name as FOOTNOTES_BLOCK_NAME } from './';
 

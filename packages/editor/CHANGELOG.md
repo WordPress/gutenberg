@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Vendor a local copy of the `normalizeTextString` utility instead of unlocking it from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
