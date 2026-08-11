@@ -124,8 +124,6 @@ export function CollaboratorsPresence( {
 						popoverAnchor={ popoverAnchor }
 						setIsPopoverVisible={ setIsPopoverVisible }
 						cursorRegistry={ cursorRegistry }
-						postId={ postId }
-						postType={ postType }
 					/>
 				) }
 			</div>
