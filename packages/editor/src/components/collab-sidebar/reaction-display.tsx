@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
@@ -13,6 +6,10 @@ import { SVG, Path } from '@wordpress/primitives';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import ReactionEmojiPicker, {
+	buildEmojiBySlugMap,
+	useReactionEmojis,
+} from './reaction-emoji-picker';
 
 // Inlined while reactions remain experimental in scope. If/when this
 // icon is needed elsewhere it can be promoted to `@wordpress/icons`.
@@ -30,14 +27,6 @@ const smileyIcon = (
 		/>
 	</SVG>
 );
-
-/**
- * Internal dependencies
- */
-import ReactionEmojiPicker, {
-	buildEmojiBySlugMap,
-	useReactionEmojis,
-} from './reaction-emoji-picker';
 
 interface ReactionSummaryEntry {
 	count: number;
