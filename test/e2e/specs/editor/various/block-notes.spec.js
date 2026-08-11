@@ -1,7 +1,4 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-/**
- * Internal dependencies
- */
 const {
 	setCollaboration,
 } = require( '../collaboration/fixtures/collaboration-utils' );
