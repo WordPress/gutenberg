@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
@@ -18,10 +11,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import ReactionEmojiPicker, {
 	emojiToHexKey,
 	emojiToStorageKey,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_FREQUENT_EMOJI_KEYS,
 	MAX_FREQUENT_EMOJIS,

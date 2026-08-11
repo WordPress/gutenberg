@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import {
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,

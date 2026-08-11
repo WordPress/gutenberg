@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	REACTION_EMOJIS,
 	emojiToHexKey,

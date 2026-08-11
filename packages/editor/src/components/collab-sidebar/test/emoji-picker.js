@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import EmojiPicker, {
 	chunkRows,
 	groupEmojis,

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Composite, SearchControl } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 import { useDebounce } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import {
 	detectLocale,
 	normalizeHexcode,

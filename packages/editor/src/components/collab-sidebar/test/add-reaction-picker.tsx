@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { speak } from '@wordpress/a11y';
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { AddReactionButton } from '../add-reaction-picker';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
@@ -54,13 +43,15 @@ describe( 'AddReactionButton', () => {
 		expect(
 			screen.getByRole( 'dialog', { name: 'Add reaction' } )
 		).toBeVisible();
-		// The curated options are laid out horizontally, so the listbox
-		// must report its orientation (the ARIA default is vertical).
+		// The curated options wrap into rows once the set grows past one
+		// row, and a narrow popover can stack them into a column, so the
+		// listbox deliberately reports no orientation and both axes move
+		// the roving tab index.
 		expect(
 			screen.getByRole( 'listbox', {
 				name: 'Select an emoji reaction',
 			} )
-		).toHaveAttribute( 'aria-orientation', 'horizontal' );
+		).not.toHaveAttribute( 'aria-orientation' );
 		await user.click(
 			await screen.findByRole( 'option', { name: 'Rocket' } )
 		);

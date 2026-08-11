@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import ReactionDisplay from '../reaction-display';
 import { AddReactionButton } from '../add-reaction-picker';
 

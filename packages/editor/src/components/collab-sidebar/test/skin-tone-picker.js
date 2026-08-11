@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import SkinTonePicker, { SKIN_TONES, applySkinTone } from '../skin-tone-picker';
 
 const RAISED_HAND = {

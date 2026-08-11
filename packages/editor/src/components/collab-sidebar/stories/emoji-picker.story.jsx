@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import EmojiPicker from '../emoji-picker';
 
 /**

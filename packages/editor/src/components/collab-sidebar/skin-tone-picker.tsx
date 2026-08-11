@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Composite, Dropdown } from '@wordpress/components';
 import { useFocusReturn, useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { EmojibaseEntry, EmojibaseSkin } from './emojibase-data';
 
 /**
