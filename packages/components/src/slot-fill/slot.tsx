@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, Key } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useObservableValue } from '@wordpress/compose';
 import {
 	useContext,
@@ -15,10 +8,6 @@ import {
 	cloneElement,
 	isEmptyElement,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SlotFillContext from './context';
 import type { SlotComponentProps } from './types';
 
@@ -49,14 +38,14 @@ function addKeysToChildren( children: ReactNode ) {
 }
 
 function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+	const { name, children, fillProps = {} } = props;
+
 	const registry = useContext( SlotFillContext );
 	const instanceRef = useRef( {} );
 
-	const { name, children, fillProps = {} } = props;
-
 	useLayoutEffect( () => {
 		const instance = instanceRef.current;
-		registry.registerSlot( name, instance );
+		registry.registerSlot( name, { type: 'children', instance } );
 		return () => registry.unregisterSlot( name, instance );
 	}, [ registry, name ] );
 
@@ -64,7 +53,7 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
 	const currentSlot = useObservableValue( registry.slots, name );
 
 	// Fills should only be rendered in the currently registered instance of the slot.
-	if ( currentSlot !== instanceRef.current ) {
+	if ( ! currentSlot || currentSlot.instance !== instanceRef.current ) {
 		fills = [];
 	}
 

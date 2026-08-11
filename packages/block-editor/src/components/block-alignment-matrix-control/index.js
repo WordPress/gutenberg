@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import {
@@ -77,11 +74,7 @@ function BlockAlignmentMatrixControl( props ) {
 				);
 			} }
 			renderContent={ () => (
-				<AlignmentMatrixControl
-					hasFocusBorder={ false }
-					onChange={ onChange }
-					value={ value }
-				/>
+				<AlignmentMatrixControl onChange={ onChange } value={ value } />
 			) }
 		/>
 	);

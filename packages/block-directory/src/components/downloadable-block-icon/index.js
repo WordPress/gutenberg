@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { BlockIcon } from '@wordpress/block-editor';
 
 function DownloadableBlockIcon( { icon } ) {

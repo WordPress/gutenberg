@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getNormalizedCommaSeparable from '../get-normalized-comma-separable';
 
 describe( 'getNormalizedCommaSeparable', () => {

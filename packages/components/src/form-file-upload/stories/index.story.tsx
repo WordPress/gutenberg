@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { upload as uploadIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/File Upload/FormFileUpload',
 	id: 'components-formfileupload',
 	component: FormFileUpload,
@@ -25,6 +15,10 @@ const meta: Meta< typeof FormFileUpload > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -36,7 +30,6 @@ const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Select file',
-	__next40pxDefaultSize: true,
 };
 
 export const RestrictFileTypes = Template.bind( {} );

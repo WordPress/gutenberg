@@ -1,10 +1,6 @@
 /**
  * Defines as extensibility slot for the Summary panel.
  */
-
-/**
- * WordPress dependencies
- */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );

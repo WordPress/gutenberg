@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -70,7 +67,9 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				'updated',
 				{
 					...defaultExpectedAction,
-					actions: [ { label: 'view', url: 'some_link' } ],
+					actions: [
+						{ label: 'view', openInNewTab: true, url: 'some_link' },
+					],
 				},
 			],
 		],
@@ -118,7 +117,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'publish' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -127,7 +126,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'private' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -136,7 +135,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'future' ],
 			[
-				'Scheduling failed. Something went wrong.',
+				'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.',
 				defaultExpectedAction,
 			],
 		],
@@ -144,7 +143,20 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is published and edits is published',
 			'',
 			[ 'publish', 'publish' ],
-			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				defaultExpectedAction,
+			],
+		],
+		[
+			'when the save is an autosave',
+			'',
+			[ 'publish', 'publish' ],
+			[
+				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
+				defaultExpectedAction,
+			],
+			{ isAutosave: true },
 		],
 	].forEach(
 		( [
@@ -152,6 +164,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			errorCode,
 			[ postStatus, editsStatus ],
 			expectedValue,
+			options = {},
 		] ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
@@ -163,6 +176,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 						post,
 						edits,
 						error,
+						options,
 					} )
 				).toEqual( expectedValue );
 			} );

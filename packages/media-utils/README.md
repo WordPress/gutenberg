@@ -33,6 +33,10 @@ Private @wordpress/media-utils APIs.
 
 Undocumented declaration.
 
+### SubSizeData
+
+Undocumented declaration.
+
 ### transformAttachment
 
 Transforms an attachment object from the REST API shape into the shape expected by the block editor and other consumers.
@@ -56,6 +60,7 @@ _Parameters_
 -   _$0.onFileChange_ `UploadMediaArgs[ 'onFileChange' ]`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.wpAllowedMimeTypes_ `UploadMediaArgs[ 'wpAllowedMimeTypes' ]`: List of allowed mime types and file extensions.
 -   _$0.signal_ `UploadMediaArgs[ 'signal' ]`: Abort signal.
+-   _$0.multiple_ `UploadMediaArgs[ 'multiple' ]`: Whether to allow multiple files to be uploaded.
 
 ### validateFileSize
 

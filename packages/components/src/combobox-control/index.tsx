@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Component,
@@ -17,10 +10,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
@@ -32,9 +22,7 @@ import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+import Spinner from '../spinner';
 
 const noop = () => {};
 
@@ -44,7 +32,7 @@ interface DetectOutsideComponentProps {
 }
 
 const DetectOutside = withFocusOutside(
-	class extends Component< DetectOutsideComponentProps > {
+	class DetectOutsideComponent extends Component< DetectOutsideComponentProps > {
 		handleFocusOutside( event: React.FocusEvent ) {
 			this.props.onFocusOutside( event );
 		}
@@ -93,8 +81,6 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
- * 			__next40pxDefaultSize
- * 			__nextHasNoMarginBottom
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -115,8 +101,6 @@ const getIndexOfMatchingSuggestion = (
  */
 function ComboboxControl( props: ComboboxControlProps ) {
 	const {
-		__nextHasNoMarginBottom = false,
-		__next40pxDefaultSize = false,
 		value: valueProp,
 		label,
 		options,
@@ -126,13 +110,14 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		help,
 		allowReset = true,
 		className,
+		isLoading = false,
 		messages = {
 			selected: __( 'Item selected.' ),
 		},
 		__experimentalRenderItem,
 		expandOnFocus = true,
 		placeholder,
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
@@ -315,12 +300,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'ComboboxControl',
-		__next40pxDefaultSize,
-		size: undefined,
-	} );
-
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
 	// TODO: Refactor click detection to use blur to stop propagation.
@@ -328,8 +307,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				__associatedWPComponentName="ComboboxControl"
 				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
@@ -341,9 +318,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
-					<InputWrapperFlex
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-					>
+					<InputWrapperFlex>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -360,22 +335,26 @@ function ComboboxControl( props: ComboboxControlProps ) {
 									matchingSuggestions
 								) }
 								onChange={ onInputChange }
+								aria-describedby={
+									help
+										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
+										  `components-form-token-input-${ instanceId }__help`
+										: undefined
+								}
 							/>
 						</FlexBlock>
-						{ allowReset && (
+						{ isLoading && <Spinner /> }
+						{ allowReset && Boolean( value ) && ! isExpanded && (
 							<Button
 								size="small"
 								icon={ closeSmall }
-								// Disable reason: Focus returns to input field when reset is clicked.
-								// eslint-disable-next-line no-restricted-syntax
-								disabled={ ! value }
 								onClick={ handleOnReset }
 								onKeyDown={ handleResetStopPropagation }
 								label={ __( 'Reset' ) }
 							/>
 						) }
 					</InputWrapperFlex>
-					{ isExpanded && (
+					{ isExpanded && ! isLoading && (
 						<SuggestionsList
 							instanceId={ instanceId }
 							// The empty string for `value` here is not actually used, but is

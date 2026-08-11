@@ -1,18 +1,19 @@
-/**
- * External dependencies
- */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Component, createPortal, useState } from '@wordpress/element';
+import { registerStyle } from '@wordpress/style-runtime';
+import { Slot, Fill, Provider, useSlotFills } from '../';
 
-/**
- * Internal dependencies
- */
-import { Slot, Fill, Provider } from '../';
+function IframePortal( { children } ) {
+	const [ iframe, setIframe ] = useState( null );
+	const body = iframe?.contentDocument?.body;
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+	return (
+		<iframe title="Slot document" ref={ setIframe }>
+			{ body && createPortal( children, body ) }
+		</iframe>
+	);
+}
 
 class Filler extends Component {
 	constructor() {
@@ -287,6 +288,45 @@ describe( 'Slot', () => {
 		expect( console ).toHaveWarned();
 	} );
 
+	describe( 'cross-document styles', () => {
+		afterEach( () => {
+			delete globalThis.__wpStyleRuntime;
+			document.head.innerHTML = '';
+		} );
+
+		it( 'injects registered SCSS module styles into the Slot document', () => {
+			const styleHash = 'slot-fill-cross-document-style';
+			const css = '.slot-fill-cross-document{padding:32px;}';
+
+			// CSS module registration is skipped by the Jest transform, so mirror the
+			// generated production call explicitly.
+			registerStyle( styleHash, css );
+
+			render(
+				<Provider>
+					<IframePortal>
+						<Slot name="cross-document" bubblesVirtually />
+					</IframePortal>
+					<Fill name="cross-document">
+						<div className="slot-fill-cross-document">
+							Styled content
+						</div>
+					</Fill>
+				</Provider>
+			);
+			const iframeDocument =
+				screen.getByTitle( 'Slot document' ).contentDocument;
+
+			const styledElement = within( iframeDocument.body ).getByText(
+				'Styled content'
+			);
+			expect(
+				iframeDocument.defaultView.getComputedStyle( styledElement )
+					.padding
+			).toBe( '32px' );
+		} );
+	} );
+
 	describe.each( [ false, true ] )(
 		'bubblesVirtually %p',
 		( bubblesVirtually ) => {
@@ -381,4 +421,27 @@ describe( 'Slot', () => {
 			} );
 		}
 	);
+
+	it( 'should not infinite loop with useSlotFills', () => {
+		function App() {
+			// if `useSlotFills` triggers a state update every time the `Fill` is rerendered with
+			// new `children`, it will cause infinite rerender loop. This test checks we don't do that.
+			const fills = useSlotFills( 'editor' );
+			return (
+				<div>
+					<div>fills:{ fills?.length ?? 'none' }</div>
+					<Slot name="editor" />
+					<Fill name="editor">
+						<div>fill content</div>
+					</Fill>
+				</div>
+			);
+		}
+		const { container } = render(
+			<Provider>
+				<App />
+			</Provider>
+		);
+		expect( container ).toMatchSnapshot();
+	} );
 } );

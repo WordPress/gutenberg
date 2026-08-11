@@ -1,27 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	__experimentalGetElementClassName,
-	privateApis as blockEditorPrivateApis,
+	RichText,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
 
 export function Caption( {
 	attributeKey = 'caption',
@@ -43,7 +31,6 @@ export function Caption( {
 } ) {
 	const caption = attributes[ attributeKey ];
 	const prevCaption = usePrevious( caption );
-	const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
 	const isCaptionEmpty = RichText.isEmpty( caption );
 	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
@@ -110,10 +97,13 @@ export function Caption( {
 							setAttributes( { [ attributeKey ]: value } )
 						}
 						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock( getDefaultBlockName() )
+										)
+								: undefined
 						}
 						readOnly={ readOnly }
 						{ ...props }

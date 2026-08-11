@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import setNestedValue from '../set-nested-value';
 
 describe( 'setNestedValue', () => {
