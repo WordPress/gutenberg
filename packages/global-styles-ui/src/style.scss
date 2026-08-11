@@ -50,8 +50,8 @@
 }
 
 .global-styles-ui-block-types-filter {
-	margin-bottom: 10px;
-	padding: 0 16px;
+	margin-bottom: variables.$grid-unit-15;
+	padding: 0 variables.$grid-unit-20;
 }
 
 .global-styles-ui-block-types-search {
@@ -65,6 +65,10 @@
 	height: 6px;
 	margin-left: auto;
 	width: 6px;
+}
+
+.global-styles-ui-block-types-item-list__no-results {
+	padding-top: variables.$grid-unit-20;
 }
 
 .global-styles-ui-screen-typography__font-variants-count {

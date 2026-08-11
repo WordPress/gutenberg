@@ -173,6 +173,22 @@ function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 	);
 }
 
+function EmptyBlockList( { styleFilter }: { styleFilter: StyleFilter } ) {
+	const label =
+		'customized' === styleFilter
+			? __( "You haven't customized any blocks yet." )
+			: __( 'No blocks found.' );
+	return (
+		<WCText
+			align="center"
+			as="p"
+			className="global-styles-ui-block-types-item-list__no-results"
+		>
+			{ label }
+		</WCText>
+	);
+}
+
 interface BlockListProps {
 	filterValue: string;
 	styleFilter: StyleFilter;
@@ -182,7 +198,6 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
-
 	const { user } = useContext( GlobalStylesContext );
 
 	// Computed once for the whole list rather than per row, so the list does
@@ -246,9 +261,7 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 			role="list"
 		>
 			{ filteredBlockTypes.length === 0 ? (
-				<WCText align="center" as="p">
-					{ __( 'No blocks found.' ) }
-				</WCText>
+				<EmptyBlockList styleFilter={ styleFilter } />
 			) : (
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
@@ -288,6 +301,7 @@ function ScreenBlockList() {
 					value={ filterValue }
 					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
+					size="compact"
 				/>
 				<Menu>
 					<Menu.TriggerButton
