@@ -241,7 +241,8 @@ test( 'selects jsdom and the stylesheet mock by filename', () => {
 
 \texpect( element.props.className ).toBe( 'style-primary-action' );
 \texpect( document ).toBeDefined();
-\texpect( window.matchMedia( 'screen' ).matches ).toBe( false );
+\texpect( window.matchMedia ).toBeUndefined();
+\texpect( window.requestIdleCallback ).toBeUndefined();
 } );
 `
 	);
