@@ -46,6 +46,15 @@ jobs:
             - name: Validate JavaScript test routing
               run: npm run test:unit:routing
 
+            - name: Build workspaces and package TypeScript declarations
+              run: |
+                  npm exec -- lerna run build
+                  npm run --workspace @wordpress/build-scripts generate-worker-placeholders
+                  npm exec --workspace @wordpress/unit-tests -- tsc6 --build ../../tsconfig.json --noCheck
+
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
@@ -109,7 +118,8 @@ jobs:
                     --ci \
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache"
+                    --cacheDirectory="$HOME/.jest-cache" \
+                    --passWithNoTests
 
             - name: Run the migrated Vitest partition
               env:
