@@ -43,6 +43,7 @@
 -   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
 -   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
 -   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
+-   `ColorPalette`: Add a private API for inline palette color editing. ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ## 38.0.0 (2026-07-29)
 
@@ -89,7 +90,6 @@
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
 -   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
--   `ColorPalette`: Add a private API for inline palette color editing. ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ## 37.0.0 (2026-07-14)
 
