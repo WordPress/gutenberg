@@ -1,68 +1,66 @@
 # Block Lock
 
-The `Block Lock` module provides UI components and hooks for managing block locking in the WordPress editor. This includes locking block movement, editing, and removal.
+The `BlockLock` components render the UI for locking a block's movement, editing and removal, and the `useBlockLock` hook exposes a block's current lock state.
 
 These are private components of the `@wordpress/block-editor` package. They are not exported publicly and are meant to be consumed from within the package only.
 
-## Components
+## Development guidelines
 
-### `BlockLockMenuItem`
-A menu item component that allows users to lock or unlock a block via a modal.
+### Usage
 
-#### Props
-- `clientId` (string): The unique identifier of the block.
-
-### `BlockLockModal`
-A modal component that provides detailed lock options for a block.
-
-#### Props
-- `clientId` (string): The unique identifier of the block.
-- `onClose` (function): Callback function triggered when the modal is closed.
-
-### `BlockLockToolbar`
-A toolbar button component that provides a lock/unlock button for a block.
-
-#### Props
-- `clientId` (string): The unique identifier of the block.
-
-## Hook
-
-### `useBlockLock`
-A custom hook that returns lock status and permissions for a given block.
-
-#### Parameters
-- `clientId` (string): The unique identifier of the block.
-
-#### Returns
-An object containing:
-- `isEditLocked` (boolean): Whether editing the block is locked.
-- `isMoveLocked` (boolean): Whether moving the block is locked.
-- `isRemoveLocked` (boolean): Whether removing the block is locked.
-- `canLock` (boolean): Whether the block type allows locking.
-- `isLocked` (boolean): Whether any of the block's lock features are applied.
-
-## Usage
+Renders a toolbar button that opens the block lock modal.
 
 ```jsx
 /**
  * Internal dependencies
  */
-import { BlockLockMenuItem, BlockLockToolbar } from '../block-lock';
+import { BlockLockToolbar } from '../block-lock';
 
-function MyBlockControls( { clientId } ) {
-    return (
-        <>
-            <BlockLockToolbar clientId={ clientId } />
-            <BlockLockMenuItem clientId={ clientId } />
-        </>
-    );
-}
+const MyBlockToolbar = ( { clientId } ) => (
+	<BlockLockToolbar clientId={ clientId } />
+);
 ```
 
-## Implementation Details
-- The `BlockLockMenuItem` and `BlockLockToolbar` components toggle the `BlockLockModal`.
-- The modal allows users to specify which lock features to apply.
-- The `useBlockLock` hook determines the lock state and permissions based on the block's settings and editor state.
+### Components
 
-This module enhances block editing control by allowing users to enforce restrictions on movement, editing, and removal.
+#### `BlockLockMenuItem`
 
+A menu item that opens the block lock modal. Renders nothing when the block type does not allow locking.
+
+#### `BlockLockModal`
+
+A modal that lets the user choose which lock features to apply to the block.
+
+#### `BlockLockToolbar`
+
+A toolbar button that opens the block lock modal. Renders nothing until the block is locked.
+
+### Props
+
+#### `clientId`
+
+-   **Type:** `String`
+-   **Required:** Yes
+
+The client ID of the block. Accepted by all three components.
+
+#### `onClose`
+
+-   **Type:** `Function`
+-   **Required:** Yes
+
+A callback invoked when the modal is dismissed. Accepted by `BlockLockModal` only.
+
+### `useBlockLock`
+
+A hook that returns the lock state of a block. It accepts the block's client ID and returns an object with the following properties.
+
+-   `isEditLocked` (`Boolean`): Whether editing the block is locked.
+-   `isMoveLocked` (`Boolean`): Whether moving the block is locked.
+-   `isRemoveLocked` (`Boolean`): Whether removing the block is locked.
+-   `canLock` (`Boolean`): Whether the block type allows locking.
+-   `isLocked` (`Boolean`): Whether any of the block's lock features are applied.
+
+## Related components
+
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
