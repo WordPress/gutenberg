@@ -21,6 +21,7 @@ import {
 import { code } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
+import { parseContent } from './utils';
 
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
@@ -98,7 +99,7 @@ export default function HTMLEdit( { clientId, attributes } ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ attributes.content ] );
 
-	// Show placeholder when content is empty
+	// Show placeholder when content is empty.
 	if ( ! content?.trim() ) {
 		return (
 			<div { ...blockProps }>
@@ -115,6 +116,59 @@ export default function HTMLEdit( { clientId, attributes } ) {
 						onClick={ () => setIsModalOpen( true ) }
 					>
 						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				{ isModalOpen && (
+					<HTMLEditModal
+						onRequestClose={ () => setIsModalOpen( false ) }
+						content={ content }
+						onUpdate={ onUpdate }
+					/>
+				) }
+			</div>
+		);
+	}
+
+	// Scripts and Styles get stripped before canvas injection, which
+	// leaves the InnerContent empty and the block becomes invisible.
+	// Show a named placeholder instead, so it's always visible and the
+	// modal stays reachable.
+	const { html: visibleHtml } = parseContent( content );
+	if ( ! visibleHtml ) {
+		return (
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+							{ __( 'Edit code' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<VStack className="block-library-html__edit-code" expanded>
+						<Button
+							className="block-library-html__edit-code-button"
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => setIsModalOpen( true ) }
+						>
+							{ __( 'Edit code' ) }
+						</Button>
+					</VStack>
+				</InspectorControls>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'This block contains JavaScript or CSS that cannot be previewed in the editor.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Show code' ) }
 					</Button>
 				</Placeholder>
 				{ isModalOpen && (
