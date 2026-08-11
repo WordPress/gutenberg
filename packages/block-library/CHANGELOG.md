@@ -6,12 +6,14 @@
 
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
 -   Playlist: Expose the parent "Add track" toolbar control to selected Playlist Track child blocks via block toolbar sharing ([#80368](https://github.com/WordPress/gutenberg/pull/80368)).
+-   Playlist: Allow selecting audio tracks individually in the Media Library without holding Shift or Command, transform multiple Audio blocks into a Playlist, and transform a one-track Playlist into Audio. ([#80926](https://github.com/WordPress/gutenberg/pull/80926))
 -   Gallery: Rename the dynamic variation's "Convert to images" action to "Detach", and confirm it in a dialog explaining that the gallery will keep its current images but stop updating automatically ([#80727](https://github.com/WordPress/gutenberg/pull/80727)).
 -   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab" ([#81009](https://github.com/WordPress/gutenberg/pull/81009)).
 
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
+-   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 
 ### Internal
 
