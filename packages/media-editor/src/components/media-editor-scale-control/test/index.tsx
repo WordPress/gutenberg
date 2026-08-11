@@ -39,9 +39,6 @@ function setupScaleControl( initialCropperState?: Partial< CropperState > ) {
 	};
 }
 
-const OVER_ORIGINAL_WARNING =
-	'640 × 480 is the original size. Anything larger scales back down.';
-
 describe( 'MediaEditorScaleControl', () => {
 	it( 'renders nothing until an image is loaded', () => {
 		render(
@@ -118,16 +115,6 @@ describe( 'MediaEditorScaleControl', () => {
 		expect( undo ).toBeDisabled();
 	} );
 
-	it( 'caps a width larger than the image at its natural size', () => {
-		const { width, height } = setupScaleControl();
-
-		fireEvent.change( width, { target: { value: '1280' } } );
-		fireEvent.blur( width );
-
-		expect( width ).toHaveValue( 640 );
-		expect( height ).toHaveValue( 480 );
-	} );
-
 	it( 'restores the previous size when the field is left empty', () => {
 		const { width, height } = setupScaleControl();
 
@@ -177,59 +164,31 @@ describe( 'MediaEditorScaleControl', () => {
 		).toBeInTheDocument();
 	} );
 	describe( 'when a value exceeds the original', () => {
-		it( 'warns while the value is still being typed', () => {
-			const { width } = setupScaleControl();
-
-			fireEvent.change( width, { target: { value: '1280' } } );
-
-			expect(
-				screen.getByText( OVER_ORIGINAL_WARNING )
-			).toBeInTheDocument();
-		} );
-
-		it( 'stays quiet for a value within the original', () => {
-			const { width } = setupScaleControl();
-
-			fireEvent.change( width, { target: { value: '320' } } );
-
-			expect(
-				screen.queryByText( OVER_ORIGINAL_WARNING )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'warns when the linked field is the one that overflows', () => {
-			const { height } = setupScaleControl();
-
-			// 481 is over the 480 height on its own.
-			fireEvent.change( height, { target: { value: '481' } } );
-
-			expect(
-				screen.getByText( OVER_ORIGINAL_WARNING )
-			).toBeInTheDocument();
-		} );
-
-		it( 'describes both fields with the warning for screen readers', () => {
+		it( 'caps each field at the original dimension', () => {
 			const { width, height } = setupScaleControl();
 
-			fireEvent.change( width, { target: { value: '1280' } } );
-
-			expect( width ).toHaveAccessibleDescription(
-				OVER_ORIGINAL_WARNING
-			);
-			expect( height ).toHaveAccessibleDescription(
-				OVER_ORIGINAL_WARNING
-			);
+			expect( width ).toHaveAttribute( 'max', '640' );
+			expect( height ).toHaveAttribute( 'max', '480' );
 		} );
 
-		it( 'clears the warning once the value is capped', () => {
+		it( 'still accepts a larger number being typed a digit at a time', () => {
 			const { width } = setupScaleControl();
+
+			// 1 and 12 are both under 640 on the way to 1280, so the field
+			// must not clamp mid-entry.
+			fireEvent.change( width, { target: { value: '1280' } } );
+
+			expect( width ).toHaveValue( 1280 );
+		} );
+
+		it( 'snaps back to the original once the field is left', () => {
+			const { width, height } = setupScaleControl();
 
 			fireEvent.change( width, { target: { value: '1280' } } );
 			fireEvent.blur( width );
 
-			expect(
-				screen.queryByText( OVER_ORIGINAL_WARNING )
-			).not.toBeInTheDocument();
+			expect( width ).toHaveValue( 640 );
+			expect( height ).toHaveValue( 480 );
 		} );
 	} );
 

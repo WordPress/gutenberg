@@ -5,7 +5,6 @@ import {
 import { Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useMediaEditor } from '../../state';
 import { getSourceRegion } from '../../image-editor';
@@ -37,10 +36,6 @@ interface ScaleDraft {
 export default function MediaEditorScaleControl() {
 	const { state, setScaledSize } = useMediaEditor();
 	const [ draft, setDraft ] = useState< ScaleDraft | null >( null );
-	const warningId = useInstanceId(
-		MediaEditorScaleControl,
-		'media-editor-scale-control__warning'
-	);
 
 	const image = state.image;
 	const naturalWidth = image?.naturalWidth ?? 0;
@@ -149,22 +144,17 @@ export default function MediaEditorScaleControl() {
 		height: String( committed.height ),
 	};
 
-	// Flagged while typing rather than on commit, so the message arrives on
-	// the keystroke that crosses the line instead of explaining a snap that
-	// already happened.
-	const exceedsOriginal =
-		parseInt( shown.width, 10 ) > naturalWidth ||
-		parseInt( shown.height, 10 ) > naturalHeight;
-
+	// `max` carries the "no scaling up" rule on its own. NumberControl only
+	// applies it on commit — Enter, blur, arrow keys and drag — never while
+	// typing, so a larger number can still be entered a digit at a time and
+	// snaps back when the field is left. It also caps the increment arrows
+	// and gives assistive tech the range for free.
 	// `spinControls` is left at its default of `native`. The `custom`
 	// variant renders real buttons, which take focus and blur the field, so
 	// every arrow click would commit the value from before the click.
 	const sharedFieldProps = {
 		step: 1,
-		// No min/max: the reducer is the single place that caps a request at
-		// the natural size and floors it, and clamping mid-keystroke would
-		// fight someone typing "1000" into a 640-wide image.
-		'aria-describedby': exceedsOriginal ? warningId : undefined,
+		min: 1,
 		onBlur: commit,
 		onKeyDown: handleKeyDown,
 	};
@@ -175,6 +165,7 @@ export default function MediaEditorScaleControl() {
 				<NumberControl
 					label={ __( 'Width' ) }
 					value={ shown.width }
+					max={ naturalWidth }
 					onChange={ ( next?: string ) =>
 						handleChange( 'width', next ?? '' )
 					}
@@ -183,6 +174,7 @@ export default function MediaEditorScaleControl() {
 				<NumberControl
 					label={ __( 'Height' ) }
 					value={ shown.height }
+					max={ naturalHeight }
 					onChange={ ( next?: string ) =>
 						handleChange( 'height', next ?? '' )
 					}
@@ -191,7 +183,7 @@ export default function MediaEditorScaleControl() {
 			</Stack>
 			<Button
 				variant="tertiary"
-				size="small"
+				size="compact"
 				disabled={ state.scaledSize === null }
 				accessibleWhenDisabled
 				onClick={ () => {
@@ -201,22 +193,6 @@ export default function MediaEditorScaleControl() {
 			>
 				{ __( 'Reset to original' ) }
 			</Button>
-			{ /* The live region is always mounted so the message is announced
-			     when it appears, rather than arriving with its container. */ }
-			<div role="status" id={ warningId }>
-				{ exceedsOriginal && (
-					<Text variant="body-sm">
-						{ sprintf(
-							/* translators: 1: original image width in pixels, 2: original image height in pixels. */
-							__(
-								'%1$d × %2$d is the original size. Anything larger scales back down.'
-							),
-							naturalWidth,
-							naturalHeight
-						) }
-					</Text>
-				) }
-			</div>
 			<Text variant="body-sm">
 				{ __( 'Scaling applies to the whole image, before any crop.' ) }
 			</Text>
