@@ -38,22 +38,22 @@ git log <base>..<branch> --oneline
 
 ## Load focused guidance
 
-Read the shared [Gutenberg building guidance](../../docs/contributors/code/building-guidance.md), then read the directly relevant focused files. Combine them for cross-cutting changes.
+Read the shared [Gutenberg building guidance](../../../docs/contributors/code/building-guidance.md), then read the directly relevant focused files. Combine them for cross-cutting changes.
 
 - Cross-cutting lifecycle, boundary, and verification checks:
-  [cross-cutting-method.md](../../docs/contributors/code/cross-cutting-method.md)
+  [cross-cutting-method.md](../../../docs/contributors/code/cross-cutting-method.md)
 - UI components, interaction, keyboard, focus, styles, responsive behavior,
-  localization: [ui-accessibility.md](../../docs/contributors/code/ui-accessibility.md)
+  localization: [ui-accessibility.md](../../../docs/contributors/code/ui-accessibility.md)
 - React hooks, `@wordpress/data`, async work, entities, preferences,
-  performance: [react-data-lifecycle.md](../../docs/contributors/code/react-data-lifecycle.md)
+  performance: [react-data-lifecycle.md](../../../docs/contributors/code/react-data-lifecycle.md)
 - Package layering, exports, public APIs, blocks, saved markup, compatibility:
-  [packages-apis-compatibility.md](../../docs/contributors/code/packages-apis-compatibility.md)
+  [packages-apis-compatibility.md](../../../docs/contributors/code/packages-apis-compatibility.md)
 - PHP, REST routes and schemas, permissions, sanitization, escaping:
-  [php-rest-schema.md](../../docs/contributors/code/php-rest-schema.md)
+  [php-rest-schema.md](../../../docs/contributors/code/php-rest-schema.md)
 - Workspaces, dependencies, builds, CI, generated artifacts, releases:
-  [tooling-ci-release.md](../../docs/contributors/code/tooling-ci-release.md)
+  [tooling-ci-release.md](../../../docs/contributors/code/tooling-ci-release.md)
 - Tests, changelogs, documentation, fixtures, snapshots, delivery evidence:
-  [testing-docs-delivery.md](../../docs/contributors/code/testing-docs-delivery.md)
+  [testing-docs-delivery.md](../../../docs/contributors/code/testing-docs-delivery.md)
 
 ## Finding threshold
 
