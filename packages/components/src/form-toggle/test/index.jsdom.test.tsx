@@ -36,34 +36,24 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render with an additional className', () => {
-			const { container: containerDefault } = render(
-				<FormToggle onChange={ noop } />
-			);
-
-			const { container: containerWithClassName } = render(
+			const { container } = render(
 				<FormToggle onChange={ noop } className="testing" />
 			);
 
-			// Expect the diff snapshot to be mostly about the className.
-			expect( containerDefault ).toMatchDiffSnapshot(
-				containerWithClassName
-			);
+			// The class is applied to a non-semantic wrapper.
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( container.firstChild ).toHaveClass( 'testing' );
 		} );
 
 		it( 'should render an id prop for the input checkbox', () => {
-			const { container: containerDefault } = render(
-				<FormToggle onChange={ noop } />
-			);
-
-			const { container: containerWithID } = render(
+			render(
 				// Disabled because of our rule restricting literal IDs, preferring
 				// `withInstanceId`. In this case, it's fine to use literal IDs.
 				// eslint-disable-next-line no-restricted-syntax
 				<FormToggle onChange={ noop } id="test" />
 			);
 
-			// Expect the diff snapshot to be mostly about the ID.
-			expect( containerDefault ).toMatchDiffSnapshot( containerWithID );
+			expect( getInput() ).toHaveAttribute( 'id', 'test' );
 		} );
 	} );
 
