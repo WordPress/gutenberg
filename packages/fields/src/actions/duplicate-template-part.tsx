@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Post, TemplatePart } from '../types';
 import { CreateTemplatePartModalContents } from '../components/create-template-part-modal';
 import { getItemTitle } from './utils';

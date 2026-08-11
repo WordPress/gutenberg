@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const {
 	createPortResolver,
 	resolveConfigPorts,

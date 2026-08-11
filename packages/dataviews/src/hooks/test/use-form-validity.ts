@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useFormValidity } from '../use-form-validity';
 import type { Field } from '../../types';
 
@@ -2265,6 +2258,47 @@ describe( 'useFormValidity', () => {
 				custom: {
 					type: 'invalid',
 					message: 'Value must be a number.',
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'array is valid if value is empty', () => {
+			const item = { id: 1, tags: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'array is invalid if values are not strings when not empty', () => {
+			const item = { id: 1, tags: [ 'valid', 42 ] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( {
+				custom: {
+					type: 'invalid',
+					message: 'Every value must be a string.',
 				},
 			} );
 			expect( isValid ).toBe( false );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -19,10 +16,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import WelcomeGuide from '../welcome-guide';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';

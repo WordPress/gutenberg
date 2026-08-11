@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
@@ -12,10 +9,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 

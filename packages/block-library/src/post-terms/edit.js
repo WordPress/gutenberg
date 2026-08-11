@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	useBlockProps,
@@ -13,10 +10,6 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import usePostTerms from './use-post-terms';
 
 // Allowed formats for the prefix and suffix fields.

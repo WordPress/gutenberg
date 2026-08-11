@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
 import { space } from '../utils/space';

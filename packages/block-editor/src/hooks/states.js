@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';

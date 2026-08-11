@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getUndoManager } from '../private-selectors';
 import { getSyncManager } from '../sync';
 

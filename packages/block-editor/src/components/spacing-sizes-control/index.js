@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	__experimentalHStack as HStack,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useSpacingSizes from './hooks/use-spacing-sizes';
 import AxialInputControls from './input-controls/axial';
 import SeparatedInputControls from './input-controls/separated';
