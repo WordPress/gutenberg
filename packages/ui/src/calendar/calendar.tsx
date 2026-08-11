@@ -1,5 +1,5 @@
-import { DayPicker } from 'react-day-picker';
-import { enUS } from 'react-day-picker/locale';
+import { DayPicker } from '@daypicker/react';
+import { enUS } from '@daypicker/react/locale';
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { COMMON_PROPS } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
