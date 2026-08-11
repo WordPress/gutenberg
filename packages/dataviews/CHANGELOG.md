@@ -5,6 +5,7 @@
 ### Internal
 
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
+-   DataForm: Internalize `ValidatedSelectControl` and its `ControlWithError` foundation instead of unlocking them from the `@wordpress/components` private APIs. The foundation is a temporary copy slated to be replaced by the upcoming `@wordpress/ui` implementation. [#81391](https://github.com/WordPress/gutenberg/pull/81391)
 
 ### New Features
 
