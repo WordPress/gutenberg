@@ -58,7 +58,7 @@
 ### Enhancements
 
 -   Add `Calendar` and `RangeCalendar` components. ([#81337](https://github.com/WordPress/gutenberg/pull/81337))
--   `Calendar`, `RangeCalendar`: Use a named `group` by default and support custom root roles. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
+-   `Calendar`, `RangeCalendar`: Support custom root roles and include the displayed months in the default application label. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 

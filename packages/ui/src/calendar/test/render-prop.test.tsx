@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
+import userEvent from '@testing-library/user-event';
+import { createRef, useId } from '@wordpress/element';
 import { Calendar, RangeCalendar } from '..';
 
 describe.each( [
@@ -7,6 +8,45 @@ describe.each( [
 	[ 'RangeCalendar', RangeCalendar, 'Date range calendar' ],
 ] )( '%s', ( _name, Component, defaultLabel ) => {
 	describe( 'root role', () => {
+		const may2025 = new Date( 2025, 4, 1 );
+
+		it( 'should use an application role with the displayed month in its default label', () => {
+			render( <Component defaultMonth={ may2025 } /> );
+
+			expect(
+				screen.getByRole( 'application', {
+					name: `${ defaultLabel }, May 2025`,
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'should include every displayed month in the default application label', () => {
+			render(
+				<Component defaultMonth={ may2025 } numberOfMonths={ 2 } />
+			);
+
+			expect(
+				screen.getByRole( 'application', {
+					name: `${ defaultLabel }, May 2025 and June 2025`,
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'should update the default application label when navigating between months', async () => {
+			const user = userEvent.setup();
+			render( <Component defaultMonth={ may2025 } /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: /next month/i } )
+			);
+
+			expect(
+				screen.getByRole( 'application', {
+					name: `${ defaultLabel }, June 2025`,
+				} )
+			).toBeVisible();
+		} );
+
 		it( 'should forward a custom root role', () => {
 			render(
 				<Component role="region" aria-label="Availability calendar" />
@@ -19,15 +59,15 @@ describe.each( [
 			).toBeVisible();
 		} );
 
-		it( 'should preserve the default label for the `application` role', () => {
-			render( <Component role="application" /> );
+		it( 'should preserve the default label for the `group` role', () => {
+			render( <Component role="group" /> );
 
 			expect(
-				screen.getByRole( 'application', { name: defaultLabel } )
+				screen.getByRole( 'group', { name: defaultLabel } )
 			).toBeVisible();
 		} );
 
-		it.each( [ 'none', 'presentation' ] as const )(
+		it.each( [ 'none', 'presentation', 'region' ] as const )(
 			'should omit the default root label when the role is `%s`',
 			( role ) => {
 				render(
@@ -39,6 +79,45 @@ describe.each( [
 				expect( root ).not.toHaveAttribute( 'aria-label' );
 			}
 		);
+
+		it( 'should let an explicit aria-label replace the generated application label', () => {
+			render(
+				<Component
+					defaultMonth={ may2025 }
+					aria-label="Availability calendar"
+				/>
+			);
+
+			const root = screen.getByRole( 'application', {
+				name: 'Availability calendar',
+			} );
+			expect( root ).toHaveAttribute(
+				'aria-label',
+				'Availability calendar'
+			);
+		} );
+
+		it( 'should let aria-labelledby replace the generated application label', () => {
+			function LabelledCalendar() {
+				const headingId = useId();
+				return (
+					<>
+						<h2 id={ headingId }>Availability calendar</h2>
+						<Component
+							defaultMonth={ may2025 }
+							aria-labelledby={ headingId }
+						/>
+					</>
+				);
+			}
+
+			render( <LabelledCalendar /> );
+
+			const root = screen.getByRole( 'application', {
+				name: 'Availability calendar',
+			} );
+			expect( root ).not.toHaveAttribute( 'aria-label' );
+		} );
 	} );
 
 	describe( 'render prop', () => {

@@ -34,11 +34,15 @@ export default meta;
 
 type Story = StoryObj< typeof Calendar >;
 
+/**
+ * The default `application` role helps screen readers pass navigation keys to
+ * the calendar. Its accessible name follows the displayed month or months.
+ */
 export const Default: Story = {};
 
 /**
  * The dialog owns the dialog semantics, focus containment, and close behavior.
- * The calendar keeps its default `group` role inside it.
+ * The calendar keeps its default `application` role for date navigation.
  */
 export const InDialog: Story = {
 	render: ( { endMonth, ...args } ) => (
@@ -73,14 +77,13 @@ export const WithExternalGrouping: Story = {
 };
 
 /**
- * Use the `application` role only when manual assistive technology testing
- * shows that it is needed for calendar keyboard events to reach the calendar.
- * This story provides a test fixture; Storybook cannot verify screen reader
- * browse and focus modes.
+ * Use the lighter `group` role only when testing confirms that supported
+ * assistive technologies pass calendar navigation keys without `application`.
+ * Storybook cannot verify screen reader browse and focus modes.
  */
-export const WithApplicationRole: Story = {
+export const WithGroupRole: Story = {
 	args: {
-		role: 'application',
+		role: 'group',
 	},
 };
 

@@ -166,14 +166,19 @@ export interface BaseProps
 	/**
 	 * The ARIA role for the calendar's root element.
 	 *
-	 * Most calendars should use the default `group` role. Use `none` or
-	 * `presentation` when a surrounding element provides the grouping semantics.
-	 * Use `application` only when assistive technology testing shows that it is
-	 * needed to support keyboard interaction. Roles that require additional
-	 * behavior, such as `dialog`, should usually be applied to a component that
-	 * wraps the calendar and implements that behavior.
+	 * The default `application` role helps ensure that assistive technologies
+	 * pass calendar navigation keys to the component. Its generated accessible
+	 * name includes the displayed month or months. An explicit `aria-label` or
+	 * `aria-labelledby` replaces that generated name, so include the displayed
+	 * month when providing one.
 	 *
-	 * @default 'group'
+	 * Use `group` when testing confirms that the supported assistive technologies
+	 * pass the navigation keys without `application`. Use `none` or
+	 * `presentation` when a surrounding element provides the root semantics.
+	 * Roles that require additional behavior, such as `dialog`, should usually be
+	 * applied to a component that wraps the calendar and implements that behavior.
+	 *
+	 * @default 'application'
 	 */
 	role?: ComponentProps< 'div' >[ 'role' ];
 

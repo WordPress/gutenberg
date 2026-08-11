@@ -10,12 +10,15 @@ Both are built for accessibility and follow ARIA best practices for calendar wid
 
 ## Root role
 
-By default, `Calendar` and `RangeCalendar` use a named [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) for the root element. The group contains the month navigation and one or more calendar grids.
+By default, `Calendar` and `RangeCalendar` use a named [`application`](https://www.w3.org/TR/wai-aria-1.2/#application) for the root element. This helps screen readers pass arrow and other navigation keys to the calendar instead of using them for browse mode. React DayPicker [documents this compatibility technique](https://daypicker.dev/guides/input-fields#input-with-date-picker-dialog) for screen readers such as NVDA that otherwise keep the arrow keys in browse mode.
 
-Most calendars should keep this default. Use the native `role` prop when the surrounding composition needs different root semantics:
+The generated application name includes the displayed month, for example “Date calendar, September 2025”. It updates after month navigation and includes every displayed month in a multi-month calendar. An explicit `aria-label` or `aria-labelledby` replaces the generated name. When providing either one for an application, include the displayed month or months in the resulting accessible name.
 
+Keep the default unless testing supports a different choice. The native `role` prop remains open to valid roles so consumers can choose semantics for their composition:
+
+-   Use [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) only when testing confirms that supported assistive technologies pass the calendar navigation keys without `application`.
 -   Use `none` or `presentation` when a surrounding element already groups or labels the calendar. The calendar omits its default root label for these roles.
--   Use `application` only when testing with the supported browsers and assistive technologies shows that the screen reader intercepts the calendar's keyboard events. The [`application` role](https://www.w3.org/TR/wai-aria-1.2/#application) changes how some assistive technologies expose and interact with its contents.
+-   For another role, supply any accessible name and behavior that the role requires. The calendar does not infer those requirements.
 -   Apply roles that require additional behavior, such as `dialog`, to a component that wraps the calendar and implements that behavior. Changing the calendar's role does not add focus containment, close behavior, or focus return.
 
 For example, remove the root group when a surrounding region already provides the calendar's context:
