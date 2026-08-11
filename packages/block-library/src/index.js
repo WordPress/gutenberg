@@ -277,11 +277,8 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-<<<<<<< HEAD
 		// Blocks added here are only registered when the "Block experiments"
 		// option is enabled in the Gutenberg > Experiments settings page.
-=======
-		blocks.push( tab );
 		blocks.push( tabList );
 		blocks.push( tabs );
 		blocks.push( tabPanel );
@@ -290,7 +287,6 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 		blocks.push( tableV2 );
 		blocks.push( tableV2Cell );
->>>>>>> 49ed132e041 (Add experimental table-v2 block with inner blocks and useInnerBlockItems hook)
 	}
 
 	blocks.push( classic );
