@@ -14,6 +14,7 @@
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
+-   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
 
 ### Internal
 
