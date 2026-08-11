@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -46,13 +43,11 @@ export default function ResolutionTool( {
 			resetAllFilter={ resetAllFilter }
 		>
 			<SelectControl
-				__nextHasNoMarginBottom
 				label={ __( 'Resolution' ) }
 				value={ displayValue }
 				options={ options }
 				onChange={ onChange }
 				help={ __( 'Select the size of the source image.' ) }
-				size="__unstable-large"
 			/>
 		</ToolsPanelItem>
 	);

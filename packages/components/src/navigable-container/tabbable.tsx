@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NavigableContainer from './container';
 import type { TabbableContainerProps } from './types';
 
@@ -88,5 +77,6 @@ export function UnforwardedTabbableContainer(
  *  ```
  */
 export const TabbableContainer = forwardRef( UnforwardedTabbableContainer );
+TabbableContainer.displayName = 'TabbableContainer';
 
 export default TabbableContainer;

@@ -1,31 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-import {
-	useMemo,
-	createContext,
-	useReducer,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
-
-export const InsertionPointOpenRef = createContext();
 
 function BlockPopoverInbetween( {
 	previousClientId,
@@ -224,7 +206,6 @@ function BlockPopoverInbetween( {
 		return null;
 	}
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
 	// characteristics of click focusing of `button`s in
@@ -260,7 +241,6 @@ function BlockPopoverInbetween( {
 			</div>
 		</Popover>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 export default BlockPopoverInbetween;

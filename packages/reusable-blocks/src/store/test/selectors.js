@@ -1,9 +1,14 @@
-/**
- * Internal dependencies
- */
+import { logged } from '@wordpress/deprecated';
 import { __experimentalIsEditingReusableBlock } from '../selectors';
 
 describe( '__experimentalIsEditingReusableBlock', () => {
+	afterEach( () => {
+		// Reset the deprecation cache so each test observes its own warning.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
+	} );
+
 	it( 'gets the value for clientId', () => {
 		expect(
 			__experimentalIsEditingReusableBlock(
@@ -23,5 +28,7 @@ describe( '__experimentalIsEditingReusableBlock', () => {
 				3
 			)
 		).toBe( undefined );
+
+		expect( console ).toHaveWarned();
 	} );
 } );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import PostTrashCheck from './check';
 

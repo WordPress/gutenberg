@@ -1,11 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createSlotFill } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
 
 const { Fill: ViewMoreMenuGroup, Slot } = createSlotFill(
-	Platform.OS === 'web' ? Symbol( 'ViewMoreMenuGroup' ) : 'ViewMoreMenuGroup'
+	Symbol( 'ViewMoreMenuGroup' )
 );
 
 ViewMoreMenuGroup.Slot = ( { fillProps } ) => <Slot fillProps={ fillProps } />;

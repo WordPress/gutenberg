@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { loadAsset } from '../load-assets';
 
 describe( 'controls', () => {

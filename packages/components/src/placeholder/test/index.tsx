@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import BasePlaceholder from '../';
 import type { WordPressComponentProps } from '../../context';
 import type { PlaceholderProps } from '../types';
@@ -47,7 +36,7 @@ const mockedSpeak = jest.mocked( speak );
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
-		// @ts-ignore
+		// @ts-expect-error The imported hook is not typed as a Jest mock.
 		useResizeObserver.mockReturnValue( [
 			<div key="1" />,
 			{ width: 320 },
@@ -164,7 +153,7 @@ describe( 'Placeholder', () => {
 
 	describe( 'resize aware', () => {
 		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
-			// @ts-ignore
+			// @ts-expect-error The imported hook is not typed as a Jest mock.
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 480 },
@@ -179,7 +168,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
-			// @ts-ignore
+			// @ts-expect-error The imported hook is not typed as a Jest mock.
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },

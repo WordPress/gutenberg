@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { debounce } from '../index';
 
 const identity = ( value ) => value;

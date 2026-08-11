@@ -1,8 +1,8 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ './' ].map( require.resolve ),
+export default {
+	extends: [ './' ].map( ( m ) => fileURLToPath( import.meta.resolve( m ) ) ),
 	plugins: [ '@stylistic/stylelint-plugin' ],
 	rules: {
 		'@stylistic/at-rule-name-case': 'lower',

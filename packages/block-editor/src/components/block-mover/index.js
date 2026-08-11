@@ -1,30 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-
 import { dragHandle } from '@wordpress/icons';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
-function BlockMover( {
-	clientIds,
-	hideDragHandle,
-	isBlockMoverUpButtonDisabled,
-	isBlockMoverDownButtonDisabled,
-} ) {
+function BlockMover( { clientIds, hideDragHandle } ) {
 	const {
 		canMove,
 		rootClientId,
@@ -104,7 +87,6 @@ function BlockMover( {
 					<ToolbarItem>
 						{ ( itemProps ) => (
 							<BlockMoverUpButton
-								disabled={ isBlockMoverUpButtonDisabled }
 								clientIds={ clientIds }
 								{ ...itemProps }
 							/>
@@ -113,7 +95,6 @@ function BlockMover( {
 					<ToolbarItem>
 						{ ( itemProps ) => (
 							<BlockMoverDownButton
-								disabled={ isBlockMoverDownButtonDisabled }
 								clientIds={ clientIds }
 								{ ...itemProps }
 							/>
