@@ -1,43 +1,15 @@
 {
 	"jest": {
 		"files": [
-			"packages/blob/src/test/index.jsdom.test.ts",
-			"packages/block-editor/src/components/block-icon/test/index.jsdom.test.jsx",
-			"packages/block-library/src/utils/test/waveform-player.jsdom.test.jsx",
-			"packages/block-library/src/utils/test/waveform-utils.jsdom.test.js",
-			"packages/components/src/card/test/index.jsdom.test.tsx",
-			"packages/components/src/color-picker/test/index.jsdom.test.tsx",
-			"packages/components/src/custom-gradient-picker/test/index.jsdom.test.tsx",
-			"packages/components/src/divider/test/index.jsdom.test.tsx",
-			"packages/components/src/elevation/test/index.jsdom.test.tsx",
-			"packages/components/src/flex/test/index.jsdom.test.tsx",
-			"packages/components/src/form-file-upload/test/index.jsdom.test.tsx",
-			"packages/components/src/grid/test/grid.jsdom.test.tsx",
-			"packages/components/src/heading/test/index.jsdom.test.tsx",
-			"packages/components/src/icon/test/index.jsdom.test.tsx",
-			"packages/components/src/input-control/test/index.jsdom.test.tsx",
-			"packages/components/src/popover/test/index.jsdom.test.tsx",
-			"packages/components/src/progress-bar/test/index.jsdom.test.tsx",
 			"packages/components/src/resizable-box/resize-tooltip/test/index.jsdom.test.tsx",
 			"packages/components/src/resizable-box/resize-tooltip/test/label.jsdom.test.tsx",
-			"packages/components/src/scrollable/test/index.jsdom.test.tsx",
-			"packages/components/src/select-control/test/select-control.jsdom.test.tsx",
-			"packages/components/src/slot-fill/test/slot.jsdom.test.tsx",
-			"packages/components/src/spacer/test/index.jsdom.test.tsx",
-			"packages/components/src/text/test/index.jsdom.test.tsx",
-			"packages/components/src/utils/test/polymorphic-element.jsdom.test.tsx",
-			"packages/compose/src/hooks/use-media-query/test/index.jsdom.test.jsx",
 			"packages/editor/src/components/collaborators-overlay/test/cursor-dom-utils.jsdom.test.ts",
-			"packages/editor/src/components/collaborators-presence/avatar/test/index.jsdom.test.tsx",
 			"packages/editor/src/store/utils/attach-media-in-post/test/index.jsdom.test.js",
 			"packages/editor/src/store/utils/attach-media-in-post/test/invalidate-attachment-resolutions.jsdom.test.js",
 			"packages/grid/src/dashboard-grid/test/item-limits.jsdom.test.tsx",
 			"packages/grid/src/dashboard-lanes/test/item-limits.jsdom.test.tsx",
 			"packages/icons/src/icon/test/index.jsdom.test.tsx",
-			"packages/media-editor/src/image-editor/react/components/test/cropper.jsdom.test.tsx",
-			"packages/theme/src/test/theme-provider.jsdom.test.tsx",
-			"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx",
-			"packages/ui/src/stack/test/stack.jsdom.test.tsx"
+			"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx"
 		]
 	}
 }

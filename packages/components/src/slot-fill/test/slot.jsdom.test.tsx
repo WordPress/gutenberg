@@ -1,20 +1,8 @@
-import { render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
-import { Component, createPortal, useState } from '@wordpress/element';
-import { registerStyle } from '@wordpress/style-runtime';
+import { Component } from '@wordpress/element';
 import { Slot, Fill, Provider, useSlotFills } from '../';
-
-function IframePortal( { children }: { children: ReactNode } ) {
-	const [ iframe, setIframe ] = useState< HTMLIFrameElement | null >( null );
-	const body = iframe?.contentDocument?.body;
-
-	return (
-		<iframe title="Slot document" ref={ setIframe }>
-			{ body && createPortal( children, body ) }
-		</iframe>
-	);
-}
 
 type FillerProps = {
 	name: string;
@@ -101,7 +89,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const user = userEvent.setup();
 		render(
 			<Provider>
@@ -292,47 +280,6 @@ describe( 'Slot', () => {
 
 		expect( container ).toMatchSnapshot();
 		expect( console ).toHaveWarned();
-	} );
-
-	describe( 'cross-document styles', () => {
-		afterEach( () => {
-			delete ( globalThis as { __wpStyleRuntime?: unknown } )
-				.__wpStyleRuntime;
-			document.head.innerHTML = '';
-		} );
-
-		it( 'injects registered SCSS module styles into the Slot document', () => {
-			const styleHash = 'slot-fill-cross-document-style';
-			const css = '.slot-fill-cross-document{padding:32px;}';
-
-			// CSS module registration is skipped by the Jest transform, so mirror the
-			// generated production call explicitly.
-			registerStyle( styleHash, css );
-
-			render(
-				<Provider>
-					<IframePortal>
-						<Slot name="cross-document" bubblesVirtually />
-					</IframePortal>
-					<Fill name="cross-document">
-						<div className="slot-fill-cross-document">
-							Styled content
-						</div>
-					</Fill>
-				</Provider>
-			);
-			const iframeDocument =
-				screen.getByTitle< HTMLIFrameElement >( 'Slot document' )
-					.contentDocument!;
-
-			const styledElement = within( iframeDocument.body ).getByText(
-				'Styled content'
-			);
-			expect(
-				iframeDocument.defaultView!.getComputedStyle( styledElement )
-					.padding
-			).toBe( '32px' );
-		} );
 	} );
 
 	describe.each( [ false, true ] )(

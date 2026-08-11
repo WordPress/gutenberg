@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { click, render } from '@ariakit/test/react';
 import ColorGradientControl from '../control';
+globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 const noop = () => {};
