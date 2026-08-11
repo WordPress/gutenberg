@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`InputControl Legacy size support treats __unstable-large the same as default 1`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;
+
+exports[`InputControl Legacy size support treats __unstable-large the same as default 2`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;

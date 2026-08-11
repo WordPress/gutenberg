@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -13,7 +10,7 @@ import { useState, useEffect } from '@wordpress/element';
  *
  * @param {string} name The block variation name.
  *
- * @return {JSX.Element} The SVG element.
+ * @return {React.JSX.Element} The SVG element.
  */
 const getGroupPlaceholderIcons = ( name = 'group' ) => {
 	const icons = {
@@ -129,7 +126,7 @@ export function useShouldShowPlaceHolder( {
  * @param {string}   props.name     The block's name.
  * @param {Function} props.onSelect Function to set block's attributes.
  *
- * @return {JSX.Element}                The placeholder.
+ * @return {React.JSX.Element}                The placeholder.
  */
 function GroupPlaceHolder( { name, onSelect } ) {
 	const variations = useSelect(

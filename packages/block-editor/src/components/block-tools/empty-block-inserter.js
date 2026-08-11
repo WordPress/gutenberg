@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import BlockPopoverCover from '../block-popover/cover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
@@ -15,12 +8,8 @@ export default function EmptyBlockInserter( {
 	clientId,
 	__unstableContentRef,
 } ) {
-	const {
-		capturingClientId,
-		isInsertionPointVisible,
-		lastClientId,
-		rootClientId,
-	} = useSelectedBlockToolProps( clientId );
+	const { isInsertionPointVisible, lastClientId, rootClientId } =
+		useSelectedBlockToolProps( clientId );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -29,7 +18,7 @@ export default function EmptyBlockInserter( {
 
 	return (
 		<BlockPopoverCover
-			clientId={ capturingClientId || clientId }
+			clientId={ clientId }
 			bottomClientId={ lastClientId }
 			className={ clsx(
 				'block-editor-block-list__block-side-inserter-popover',

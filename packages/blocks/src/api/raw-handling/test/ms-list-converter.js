@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import msListConverter from '../ms-list-converter';
 import { deepFilterHTML } from '../utils';
 

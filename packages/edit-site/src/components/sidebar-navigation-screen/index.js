@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
@@ -17,10 +10,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
@@ -36,7 +25,6 @@ export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
-	meta,
 	content,
 	footer,
 	description,
@@ -102,7 +90,6 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
 						size={ 20 }
 					>
@@ -121,19 +108,11 @@ export default function SidebarNavigationScreen( {
 						</div>
 					) }
 				</HStack>
-				{ meta && (
-					<>
-						<div className="edit-site-sidebar-navigation-screen__meta">
-							{ meta }
-						</div>
-					</>
-				) }
-
 				<div className="edit-site-sidebar-navigation-screen__content">
 					{ description && (
-						<p className="edit-site-sidebar-navigation-screen__description">
+						<div className="edit-site-sidebar-navigation-screen__description">
 							{ description }
-						</p>
+						</div>
 					) }
 					{ content }
 				</div>

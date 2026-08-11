@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import replaceAction from '../replace-action';
 
 describe( 'replaceAction', () => {

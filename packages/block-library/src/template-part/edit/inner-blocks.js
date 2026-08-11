@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	InnerBlocks,

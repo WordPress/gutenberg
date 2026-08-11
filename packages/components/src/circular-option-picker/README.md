@@ -1,8 +1,6 @@
 # `CircularOptionPicker`
 
-<div class="callout callout-alert">
-This component is not exported, and therefore can only be used internally to the `@wordpress/components` package.
-</div>
+<p class="callout callout-alert">This component is not exported, and therefore can only be used internally to the `@wordpress/components` package.</p>
 
 `CircularOptionPicker` is a component that displays a set of options as circular buttons.
 
@@ -29,7 +27,6 @@ const Example = () => {
 						style={ { backgroundColor: color, color } }
 						isSelected={ index === currentColor }
 						onClick={ () => setCurrentColor( index ) }
-						aria-label={ name }
 					/>
 				);
 			} ) }
@@ -94,6 +91,19 @@ Prevents keyboard interaction from wrapping around. Only used when `asButtons` i
 - Required: No
 - Default: `true`
 
+### `aria-labelledby`: `string`
+
+The ID reference list of one or more elements that label the wrapper element.
+
+- Required: No
+
+### `aria-label`: `string`
+
+The label for the wrapper element. Not used if an 'aria-labelledby' is provided.
+
+- Required: No
+- Default: `Custom color picker`
+
 ## Subcomponents
 
 ### `CircularOptionPicker.ButtonAction`
@@ -150,6 +160,6 @@ Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.
 
 Props for the underlying `Button` component.
 
-Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
+Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`.
 
 - Required: No
