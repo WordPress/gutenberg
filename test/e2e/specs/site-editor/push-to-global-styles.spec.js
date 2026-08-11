@@ -124,9 +124,10 @@ test.describe( 'Push to Global Styles button', () => {
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
 		await page.getByRole( 'button', { name: 'Blocks' } ).click();
-		await settingsPanel
-			.getByRole( 'button', { name: 'Heading', exact: true } )
-			.click();
+		// A customized block's row also summarizes what was changed, so the
+		// accessible name is "Heading Changed: Typography" rather than just
+		// "Heading".
+		await settingsPanel.getByRole( 'button', { name: /^Heading/ } ).click();
 
 		// Headings should now have uppercase.
 		await expect(
