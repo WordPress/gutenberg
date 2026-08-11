@@ -5,6 +5,7 @@ import { Badge, Button, Text } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
+import type { NavigationLinkProps } from '../../navigation/types';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
@@ -193,19 +194,13 @@ export const WithInteractiveNavigation: Story = {
 	render: function Render( args ) {
 		const [ currentHref, setCurrentHref ] = useState( '/overview' );
 		const link = useCallback(
-			( {
-				href,
-				children,
-				...props
-			}: React.AnchorHTMLAttributes< HTMLAnchorElement > ) => (
+			( { href, children, ...props }: NavigationLinkProps ) => (
 				<a
 					{ ...props }
 					href={ href }
 					onClick={ ( event ) => {
 						event.preventDefault();
-						if ( href ) {
-							setCurrentHref( href );
-						}
+						setCurrentHref( href );
 					} }
 				>
 					{ children }

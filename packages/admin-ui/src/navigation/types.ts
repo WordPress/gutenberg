@@ -1,5 +1,11 @@
 import { type AnchorHTMLAttributes, type ComponentType } from 'react';
 
+export type NavigationLinkProps = Omit<
+	AnchorHTMLAttributes< HTMLAnchorElement >,
+	'href'
+> &
+	Required< Pick< AnchorHTMLAttributes< HTMLAnchorElement >, 'href' > >;
+
 export interface NavigationItem {
 	/**
 	 * The label text for the navigation item.
@@ -21,7 +27,7 @@ export interface NavigationComponents {
 	 *
 	 * @default 'a'
 	 */
-	link?: ComponentType< AnchorHTMLAttributes< HTMLAnchorElement > >;
+	link?: ComponentType< NavigationLinkProps >;
 }
 
 export interface NavigationProps {

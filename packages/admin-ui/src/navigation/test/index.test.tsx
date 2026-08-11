@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Navigation } from '..';
+import type { NavigationLinkProps } from '../types';
 
 describe( 'Navigation', () => {
 	describe( 'validation', () => {
@@ -162,7 +163,7 @@ describe( 'Navigation', () => {
 			const CustomLink = ( {
 				children,
 				...props
-			}: React.AnchorHTMLAttributes< HTMLAnchorElement > ) => (
+			}: NavigationLinkProps ) => (
 				<a data-custom="true" { ...props }>
 					{ children }
 				</a>

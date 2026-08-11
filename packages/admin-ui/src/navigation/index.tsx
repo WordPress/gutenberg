@@ -21,7 +21,7 @@ export const Navigation = ( {
 		return null;
 	}
 
-	const LinkComponent = components?.link;
+	const LinkComponent = components?.link ?? 'a';
 
 	if ( process.env.NODE_ENV !== 'production' ) {
 		const invalidItem = items.find(
@@ -67,14 +67,13 @@ export const Navigation = ( {
 							render={
 								<Link
 									variant="unstyled"
-									href={ item.href }
 									aria-current={
 										item.href === currentHref
 											? 'page'
 											: undefined
 									}
 									render={
-										LinkComponent && <LinkComponent />
+										<LinkComponent href={ item.href } />
 									}
 								/>
 							}
