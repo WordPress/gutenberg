@@ -1,6 +1,16 @@
 import type { CropperState, Size } from '../types';
-import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
-import { cropperReducer, enforceContainment, isStateDirty } from '../state';
+import {
+	ABSOLUTE_MIN_ZOOM,
+	DEFAULT_STATE,
+	MAX_ZOOM,
+	MIN_SCALED_PIXELS,
+} from '../constants';
+import {
+	areCropperStatesEqual,
+	cropperReducer,
+	enforceContainment,
+	isStateDirty,
+} from '../state';
 import {
 	createCamera,
 	screenToWorld,
@@ -871,5 +881,133 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 		expect( result.pan.x ).toBeCloseTo( state.pan.x, 5 );
 		expect( result.pan.y ).toBeCloseTo( state.pan.y, 5 );
 		expect( result.zoom ).toBeCloseTo( state.zoom, 5 );
+	} );
+} );
+
+describe( 'cropperReducer — SET_SCALED_SIZE', () => {
+	it( 'scales the image to the requested size', () => {
+		const result = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 800, height: 450 },
+		} );
+
+		expect( result.scaledSize ).toEqual( { width: 800, height: 450 } );
+	} );
+
+	it( 'keeps the source aspect ratio when the requested size does not match it', () => {
+		// 800 is half the width; 900 is the full height. The tighter axis
+		// wins, so both are halved rather than the image being stretched.
+		const result = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 800, height: 900 },
+		} );
+
+		expect( result.scaledSize ).toEqual( { width: 800, height: 450 } );
+	} );
+
+	it( 'refuses to scale above the natural size', () => {
+		const result = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 3200, height: 1800 },
+		} );
+
+		expect( result.scaledSize ).toBeNull();
+	} );
+
+	it( 'records no scale when the requested size is the natural size', () => {
+		const result = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: IMAGE.width, height: IMAGE.height },
+		} );
+
+		expect( result.scaledSize ).toBeNull();
+	} );
+
+	it( 'clears the scale when set to null', () => {
+		const scaled = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 800, height: 450 },
+		} );
+
+		const cleared = cropperReducer( scaled, {
+			type: 'SET_SCALED_SIZE',
+			payload: null,
+		} );
+
+		expect( cleared.scaledSize ).toBeNull();
+	} );
+
+	it( 'keeps the shorter axis above the minimum', () => {
+		const result = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 1, height: 1 },
+		} );
+
+		expect( result.scaledSize?.height ).toBe( MIN_SCALED_PIXELS );
+		expect( result.scaledSize?.width ).toBe( 28 );
+	} );
+
+	it( 'leaves the camera and crop rect untouched', () => {
+		const state = makeState( {
+			zoom: 1.5,
+			rotation: 12,
+			pan: { x: 0.05, y: -0.03 },
+			cropRect: { x: 0.2, y: 0.1, width: 0.5, height: 0.4 },
+		} );
+
+		const result = cropperReducer( state, {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 800, height: 450 },
+		} );
+
+		expect( result.zoom ).toBe( state.zoom );
+		expect( result.rotation ).toBe( state.rotation );
+		expect( result.pan ).toEqual( state.pan );
+		expect( result.cropRect ).toEqual( state.cropRect );
+	} );
+
+	it( 'returns the same reference when the scale does not change', () => {
+		const state = makeState();
+
+		expect(
+			cropperReducer( state, {
+				type: 'SET_SCALED_SIZE',
+				payload: null,
+			} )
+		).toBe( state );
+	} );
+
+	it( 'starts unscaled when a new image is loaded', () => {
+		const scaled = cropperReducer( makeState(), {
+			type: 'SET_SCALED_SIZE',
+			payload: { width: 800, height: 450 },
+		} );
+
+		const result = cropperReducer( scaled, {
+			type: 'SET_IMAGE',
+			payload: {
+				src: 'other.jpg',
+				naturalWidth: 400,
+				naturalHeight: 300,
+			},
+		} );
+
+		expect( result.scaledSize ).toBeNull();
+	} );
+} );
+
+describe( 'scaled size and change detection', () => {
+	const unscaled = makeState();
+	const scaled = cropperReducer( unscaled, {
+		type: 'SET_SCALED_SIZE',
+		payload: { width: 800, height: 450 },
+	} );
+
+	it( 'counts a scaled image as dirty', () => {
+		expect( isStateDirty( scaled, unscaled ) ).toBe( true );
+	} );
+
+	it( 'does not treat a scaled image as equal to an unscaled one', () => {
+		expect( areCropperStatesEqual( scaled, unscaled ) ).toBe( false );
 	} );
 } );

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `scaledSize` to the cropper state and a `setScaledSize` setter, for scaling the whole image down before a crop is taken. `buildModifiers` emits the matching `resize` modifier first.
 
 ## 0.15.0 (2026-07-29)
 

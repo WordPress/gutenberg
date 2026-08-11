@@ -24,6 +24,14 @@ export const MAX_ZOOM = 10;
 export const MIN_CROP_PIXELS = 16;
 
 /**
+ * Smallest dimension, in pixels, the whole image can be scaled down to.
+ * Keeps a typed-in value from collapsing the image to nothing, which would
+ * leave a subsequent crop with no pixels to take. Separate from
+ * `MIN_CROP_PIXELS`, which floors the crop rectangle during a handle drag.
+ */
+export const MIN_SCALED_PIXELS = 16;
+
+/**
  * Minimum on-screen crop rect dimension in CSS pixels. The source-pixel
  * floor (`MIN_CROP_PIXELS`) keeps crops from going sub-pixel, but on a large
  * image fit into a small canvas it can render only a few CSS pixels wide —
@@ -101,6 +109,7 @@ export const DEFAULT_STATE: CropperState = {
 	baseRotation: 0,
 	flip: { ...DEFAULT_FLIP },
 	cropRect: { ...DEFAULT_CROP_RECT },
+	scaledSize: null,
 };
 
 /**

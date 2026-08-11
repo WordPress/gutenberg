@@ -1017,6 +1017,9 @@ describe( 'useCropperReducer', () => {
 				'flip.vertical',
 				'rotation',
 				'zoom',
+				// Defaults to null, so it flattens to the bare key.
+				// `isStateDirty` compares its width and height.
+				'scaledSize',
 			].sort();
 
 			// 'image' is intentionally excluded — it's set once on load

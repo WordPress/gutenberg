@@ -102,6 +102,22 @@ export interface CropperState {
 	flip: Flip;
 	/** The crop rectangle in normalized coordinates. */
 	cropRect: NormalizedRect;
+	/**
+	 * Pixel size the whole source image is scaled to before any crop is
+	 * taken. `null` means no scaling — the image keeps its natural size.
+	 *
+	 * Always on the source's aspect ratio and never larger than the
+	 * natural size; `SET_SCALED_SIZE` enforces both.
+	 *
+	 * This is the size of the *whole image*, not of the saved file. With
+	 * a crop in play the saved file is smaller: scaling a 640x480 image
+	 * to 320x240 and then cropping half of it saves a 160x120 file.
+	 *
+	 * Independent of the camera. `pan`, `zoom` and `cropRect` are all
+	 * normalized fractions, so scaling the source doesn't move them and
+	 * containment has nothing to re-check.
+	 */
+	scaledSize: Size | null;
 }
 
 /**
@@ -136,6 +152,13 @@ export type CropperAction =
 	| { type: 'SET_FLIP'; payload: Flip }
 	/** Sets the crop rectangle. */
 	| { type: 'SET_CROP_RECT'; payload: NormalizedRect }
+	/**
+	 * Sets the pixel size the whole image is scaled to before cropping.
+	 * `null` clears the scale. The payload is a request, not the stored
+	 * value: it is rounded onto the source's aspect ratio, capped at the
+	 * natural size, and floored so neither axis collapses.
+	 */
+	| { type: 'SET_SCALED_SIZE'; payload: Size | null }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */

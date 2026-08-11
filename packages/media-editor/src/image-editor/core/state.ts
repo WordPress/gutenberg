@@ -1,8 +1,14 @@
-import type { CropperAction, CropperState, TransformOperation } from './types';
+import type {
+	CropperAction,
+	CropperState,
+	Size,
+	TransformOperation,
+} from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,
 	DEFAULT_STATE,
 	MAX_ZOOM,
+	MIN_SCALED_PIXELS,
 	MIN_ZOOM,
 } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
@@ -45,8 +51,66 @@ export function areCropperStatesEqual(
 		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
 		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
 		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
-		nearlyEqual( a.cropRect.height, b.cropRect.height )
+		nearlyEqual( a.cropRect.height, b.cropRect.height ) &&
+		a.scaledSize?.width === b.scaledSize?.width &&
+		a.scaledSize?.height === b.scaledSize?.height
 	);
+}
+
+/**
+ * Resolve a requested scaled size against the image it applies to.
+ *
+ * The request is treated as a target box rather than exact dimensions. The
+ * tighter of the two axes decides a single factor, which is applied to both,
+ * so the stored size always sits on the source's aspect ratio — scaling that
+ * changed the ratio would be distortion, not scaling.
+ *
+ * The factor is capped at 1 because enlarging cannot add detail, and floored
+ * so neither axis collapses. A request that resolves back to the natural size
+ * returns `null`, the same value as "never scaled", so history and dirty
+ * checks see no change.
+ *
+ * @param requested Requested size, or `null` to clear the scale.
+ * @param image     The loaded source image.
+ * @return The size to store, or `null` for no scaling.
+ */
+function resolveScaledSize(
+	requested: Size | null,
+	image: CropperState[ 'image' ]
+): Size | null {
+	if ( ! requested || ! image ) {
+		return null;
+	}
+
+	const { naturalWidth, naturalHeight } = image;
+	if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+		return null;
+	}
+
+	const requestedFactor = Math.min(
+		requested.width / naturalWidth,
+		requested.height / naturalHeight
+	);
+
+	// Never below the point where either axis would round away.
+	const minFactor = Math.min(
+		1,
+		Math.max(
+			MIN_SCALED_PIXELS / naturalWidth,
+			MIN_SCALED_PIXELS / naturalHeight
+		)
+	);
+
+	const factor = Math.min( 1, Math.max( minFactor, requestedFactor ) );
+
+	const width = Math.max( 1, Math.round( naturalWidth * factor ) );
+	const height = Math.max( 1, Math.round( naturalHeight * factor ) );
+
+	if ( width === naturalWidth && height === naturalHeight ) {
+		return null;
+	}
+
+	return { width, height };
 }
 
 function clampRequestedZoom( state: CropperState, zoom: number ): number {
@@ -226,6 +290,9 @@ export function cropperReducer(
 				enforceContainment( {
 					...state,
 					image: action.payload,
+					// A scaled size belongs to the image it was measured
+					// against, so a new image starts unscaled.
+					scaledSize: null,
 				} )
 			);
 
@@ -381,6 +448,19 @@ export function cropperReducer(
 				} )
 			);
 
+		case 'SET_SCALED_SIZE': {
+			const scaledSize = resolveScaledSize( action.payload, state.image );
+			if (
+				scaledSize?.width === state.scaledSize?.width &&
+				scaledSize?.height === state.scaledSize?.height
+			) {
+				return state;
+			}
+			// No containment pass: the camera works in normalized
+			// fractions, so the source's pixel size doesn't move it.
+			return { ...state, scaledSize };
+		}
+
 		case 'SETTLE_CROP': {
 			// After a resize drag ends: expand the crop to fill the
 			// available height (maintaining its aspect ratio), center it,
@@ -479,6 +559,8 @@ export function isStateDirty(
 		! nearlyEqual( current.cropRect.x, initial.cropRect.x ) ||
 		! nearlyEqual( current.cropRect.y, initial.cropRect.y ) ||
 		! nearlyEqual( current.cropRect.width, initial.cropRect.width ) ||
-		! nearlyEqual( current.cropRect.height, initial.cropRect.height )
+		! nearlyEqual( current.cropRect.height, initial.cropRect.height ) ||
+		current.scaledSize?.width !== initial.scaledSize?.width ||
+		current.scaledSize?.height !== initial.scaledSize?.height
 	);
 }

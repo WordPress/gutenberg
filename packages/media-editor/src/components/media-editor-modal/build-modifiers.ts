@@ -26,7 +26,8 @@ export type Modifier =
 	| {
 			type: 'crop';
 			args: { left: number; top: number; width: number; height: number };
-	  };
+	  }
+	| { type: 'resize'; args: { width: number; height: number } };
 
 /**
  * Tolerance (percent) used to decide whether a crop rect is effectively
@@ -39,11 +40,12 @@ const CROP_TOLERANCE = 0.1;
 /**
  * Build a Core-compatible modifiers array from the cropper state.
  *
- * Emits `[flip, rotate, crop]` in that order. Identity operations are
- * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
- * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no modifier. An identity state (fresh image, no edits) returns
- * an empty array; callers can use that to skip the `/edit` call.
+ * Emits `[resize, flip, rotate, crop]` in that order. Identity operations
+ * are pruned — an unscaled image, an absent flip, a rotation that
+ * normalizes to 0°, and a crop rect that covers (within tolerance) the
+ * full post-rotate AABB each produce no modifier. An identity state
+ * (fresh image, no edits) returns an empty array; callers can use that to
+ * skip the `/edit` call.
  *
  * Frames and math:
  *
@@ -85,7 +87,20 @@ export function buildModifiers(
 		return modifiers;
 	}
 
-	const { cropRect, pan, zoom, flip } = state;
+	const { cropRect, pan, zoom, flip, scaledSize } = state;
+
+	// Resize goes first so the crop is taken from the scaled image, which
+	// is the order the sidebar's copy promises. The crop args below are
+	// percentages of the post-rotate bounding box, and scaling the source
+	// scales that box by the same factor, so none of the crop math below
+	// has to know a resize happened.
+	if ( scaledSize ) {
+		modifiers.push( {
+			type: 'resize',
+			args: { width: scaledSize.width, height: scaledSize.height },
+		} );
+	}
+
 	const hasFlipH = flip.horizontal;
 	const hasFlipV = flip.vertical;
 

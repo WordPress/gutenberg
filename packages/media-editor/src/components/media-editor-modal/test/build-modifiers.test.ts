@@ -347,3 +347,62 @@ describe( 'buildModifiers ↔ Export-camera parity', () => {
 		expect( server.y ).toBeCloseTo( exported.y, 0 );
 	} );
 } );
+
+describe( 'buildModifiers — scaled images', () => {
+	const CROPPED = {
+		cropRect: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
+	};
+
+	it( 'emits no resize for an unscaled image', () => {
+		const modifiers = buildModifiers( makeState( CROPPED ), IMAGE );
+
+		expect(
+			modifiers.some( ( modifier ) => modifier.type === 'resize' )
+		).toBe( false );
+	} );
+
+	it( 'puts the resize first so the crop is taken from the scaled image', () => {
+		const modifiers = buildModifiers(
+			makeState( {
+				...CROPPED,
+				scaledSize: { width: 800, height: 450 },
+			} ),
+			IMAGE
+		);
+
+		expect( modifiers[ 0 ] ).toEqual( {
+			type: 'resize',
+			args: { width: 800, height: 450 },
+		} );
+		expect( modifiers[ modifiers.length - 1 ].type ).toBe( 'crop' );
+	} );
+
+	it( 'leaves the crop percentages unchanged when the image is scaled', () => {
+		// Crop args are percentages of the post-rotate bounding box, and a
+		// resize scales that box by the same factor, so the crop lands in
+		// the same place whether or not the image was scaled first.
+		const unscaled = buildModifiers( makeState( CROPPED ), IMAGE );
+		const scaled = buildModifiers(
+			makeState( {
+				...CROPPED,
+				scaledSize: { width: 800, height: 450 },
+			} ),
+			IMAGE
+		);
+
+		expect( scaled.filter( ( m ) => m.type === 'crop' ) ).toEqual(
+			unscaled.filter( ( m ) => m.type === 'crop' )
+		);
+	} );
+
+	it( 'emits a resize on its own when the image is only scaled', () => {
+		const modifiers = buildModifiers(
+			makeState( { scaledSize: { width: 800, height: 450 } } ),
+			IMAGE
+		);
+
+		expect( modifiers ).toEqual( [
+			{ type: 'resize', args: { width: 800, height: 450 } },
+		] );
+	} );
+} );

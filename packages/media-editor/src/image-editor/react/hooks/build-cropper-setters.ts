@@ -4,6 +4,7 @@ import type {
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
+	Size,
 	TransformOperation,
 } from '../../core/types';
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
@@ -28,6 +29,13 @@ export interface CropperSetters {
 	setCropRect: ( rect: NormalizedRect ) => void;
 	settleCrop: () => void;
 	applyOperation: ( op: TransformOperation ) => void;
+	/**
+	 * Scale the whole image to a pixel size before any crop is taken.
+	 * Pass `null` to go back to the natural size. The request is
+	 * resolved onto the source's aspect ratio and capped there — see
+	 * `SET_SCALED_SIZE`.
+	 */
+	setScaledSize: ( size: Size | null ) => void;
 }
 
 /**
@@ -97,6 +105,11 @@ export function buildCropperSetters(
 			dispatchCropperAction( {
 				type: 'APPLY_OPERATION',
 				payload: op,
+			} ),
+		setScaledSize: ( size ) =>
+			dispatchCropperAction( {
+				type: 'SET_SCALED_SIZE',
+				payload: size,
 			} ),
 	};
 }
