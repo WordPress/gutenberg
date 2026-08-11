@@ -108,13 +108,13 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
-						<NotesMoreMenuGroup.Slot fillProps={ { onClose } } />
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
 							label={ __( 'Panels' ) }
 							fillProps={ { onClick: onClose } }
 						/>
+						<NotesMoreMenuGroup.Slot fillProps={ { onClose } } />
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
 								onClick={ () =>
