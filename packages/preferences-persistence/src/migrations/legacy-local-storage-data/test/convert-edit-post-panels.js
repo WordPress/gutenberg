@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import convertEditPostPanels from '../convert-edit-post-panels';
 
 describe( 'convertEditPostPanels', () => {

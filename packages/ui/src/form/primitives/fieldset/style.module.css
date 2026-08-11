@@ -1,0 +1,14 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			display: flex;
+			flex-direction: column;
+			gap: var(--wpds-dimension-gap-xs);
+			border: 0;
+			margin: 0;
+			padding: 0;
+		}
+	}
+}

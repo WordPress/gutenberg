@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	FormFileUpload,
@@ -16,19 +9,16 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
+import { getComputedAcceptAttribute } from './utils';
 
 const noop = () => {};
 
@@ -45,9 +35,8 @@ const InsertFromURLPopover = ( {
 			onSubmit={ onSubmit }
 		>
 			<InputControl
-				__next40pxDefaultSize
 				label={ __( 'URL' ) }
-				type="url"
+				type="text" // Use text instead of URL to allow relative paths (e.g., /image/image.jpg)
 				hideLabelFromVision
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
@@ -150,15 +139,29 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const mediaUpload = useSelect( ( select ) => {
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
 	}, [ value?.src ] );
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onlyAllowsImages = () => {
 		if ( ! allowedTypes || allowedTypes.length === 0 ) {
@@ -272,11 +275,11 @@ export function MediaPlaceholder( {
 			} )
 		).catch( ( err ) => onError( err ) );
 
-		if ( multiple ) {
-			onSelect( uploadedMediaList );
-		} else {
-			onSelect( uploadedMediaList[ 0 ] );
+		if ( ! uploadedMediaList?.length ) {
+			return;
 		}
+
+		onSelect( multiple ? uploadedMediaList : uploadedMediaList[ 0 ] );
 	}
 
 	const onUpload = ( event ) => {
@@ -470,7 +473,7 @@ export function MediaPlaceholder( {
 					{ renderDropZone() }
 					<FormFileUpload
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
@@ -518,7 +521,7 @@ export function MediaPlaceholder( {
 							</Button>
 						) }
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 					/>
 					{ uploadMediaLibraryButton }

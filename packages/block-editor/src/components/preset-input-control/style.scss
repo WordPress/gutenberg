@@ -1,0 +1,10 @@
+.preset-input-control__wrapper {
+	> * {
+		flex: 1;
+	}
+
+	> .preset-input-control__icon,
+	> .preset-input-control__custom-toggle {
+		flex: none;
+	}
+}

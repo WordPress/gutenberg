@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
@@ -83,7 +76,6 @@ function BlockManagerCategory( {
 			className="block-editor-block-manager__category"
 		>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="block-editor-block-manager__category-title"

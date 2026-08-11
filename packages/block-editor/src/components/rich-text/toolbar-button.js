@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
 

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { Position } from './utils';
 import { POSITIONS } from './utils';
 import {
@@ -35,7 +24,7 @@ type LabelProps = React.DetailedHTMLProps<
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
 	ref: ForwardedRef< HTMLDivElement >
-): JSX.Element | null {
+) {
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
