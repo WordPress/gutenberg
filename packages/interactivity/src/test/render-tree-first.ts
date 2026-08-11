@@ -702,6 +702,25 @@ const unkeyedItem = ( id: string, label: string ) =>
 const idItem = ( id: string, label: string ) =>
 	`<div id="${ id }" data-wp-context='{ "id": "${ id }" }' data-wp-init="actions.initItem">${ label }</div>`;
 
+// Keyed (or id-keyed) item with a nested child that has its own init: used
+// to verify that splicing INTO an item's subtree does not remount the item
+// (its key must survive the path rebuild) and does not re-run any init.
+const keyedNested = (
+	key: string,
+	id: string,
+	label: string,
+	childId: string,
+	childLabel: string
+) =>
+	`<div data-wp-key="${ key }" data-wp-context='{ "id": "${ id }" }' data-wp-init="actions.initItem">${ label }<span data-wp-context='{ "id": "${ childId }" }' data-wp-init="actions.initItem">${ childLabel }</span></div>`;
+const idNested = (
+	id: string,
+	label: string,
+	childId: string,
+	childLabel: string
+) =>
+	`<div id="${ id }" data-wp-context='{ "id": "${ id }" }' data-wp-init="actions.initItem">${ label }<span data-wp-context='{ "id": "${ childId }" }' data-wp-init="actions.initItem">${ childLabel }</span></div>`;
+
 describe( 'data-wp-key and list identity across modes', () => {
 	// Preact reconciles a position by KEY when keys are present and by INDEX
 	// when they are not. An unkeyed index-shifting splice (prepend/before/
@@ -1212,56 +1231,85 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		} );
 	} );
 
-	it( 'splicing into a data-wp-key SSR item keeps its identity (init does not re-run)', async () => {
-		await setup( item( 'a', 'a', 'a' ) );
+	it( 'splicing into a data-wp-key SSR item keeps its identity and nested content (no re-init)', async () => {
+		await setup(
+			`${ keyedNested( 'a', 'a', 'a', 'a-child', 'ac' ) }${ item( 'b', 'b', 'b' ) }`
+		);
 		await flush();
 		const feed = document.querySelector( '[data-wp-interactive]' )!;
 		const aEl = feed.children[ 0 ];
+		const childEl = aEl.querySelector( 'span' )!;
+		const bEl = feed.children[ 1 ];
 
-		// Insert content INTO the keyed item. The item sits on the rebuild
-		// path; its key must survive the rebuild, or preact remounts it
-		// (init re-runs, element identity lost).
-		renderHTML( aEl as Element, '<span>child</span>' );
+		// Splice INTO the nested child of the keyed item. The rebuild path
+		// runs through the item's Directives wrapper (which carries the
+		// key) and both nested elements. If the wrapper's key is lost,
+		// preact remounts the whole item: element replaced, its nested
+		// child re-inited, its init re-run. The sibling `b` is OFF the
+		// path — carried by reference, so it must be untouched either way.
+		renderHTML(
+			childEl as Element,
+			'<span data-wp-context=\'{ "id": "x" }\' data-wp-init="actions.initItem">x</span>'
+		);
 		await flush();
 
+		expect( feed.children.length ).toBe( 2 );
 		expect( feed.children[ 0 ] ).toBe( aEl );
-		expect( state.initCounts ).toEqual( { a: 1 } );
+		expect( feed.children[ 1 ] ).toBe( bEl );
+		expect( aEl.querySelector( 'span' ) ).toBe( childEl );
+		expect( childEl.lastElementChild?.textContent ).toBe( 'x' );
+		expect( state.initCounts ).toEqual( { a: 1, 'a-child': 1, b: 1, x: 1 } );
 	} );
 
-	it( 'splicing into an id-keyed spliced item keeps its identity (init does not re-run)', async () => {
+	it( 'splicing into an id-keyed spliced item keeps its identity and nested content (no re-init)', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		const feed = document.querySelector( '[data-testid="feed"]' )!;
-		renderHTML( feed, idItem( 'a', 'a' ), { mode: 'prepend' } );
+		renderHTML( feed, idNested( 'a', 'a', 'a-child', 'ac' ), {
+			mode: 'prepend',
+		} );
 		await flush();
 		const aEl = feed.children[ 0 ];
+		const childEl = aEl.querySelector( 'span' )!;
 
 		// Same as above, but the key came from the id fallback at splice
-		// time: the wrapper carries the key, and the rebuild must keep it.
-		renderHTML( aEl as Element, '<span>child</span>' );
+		// time: the Directives wrapper carries the key, and the rebuild
+		// must keep it — otherwise the item remounts and its nested child
+		// re-inits.
+		renderHTML(
+			childEl as Element,
+			'<span data-wp-context=\'{ "id": "x" }\' data-wp-init="actions.initItem">x</span>'
+		);
 		await flush();
 
+		expect( feed.children.length ).toBe( 1 );
 		expect( feed.children[ 0 ] ).toBe( aEl );
-		expect( state.initCounts ).toEqual( { a: 1 } );
+		expect( aEl.querySelector( 'span' ) ).toBe( childEl );
+		expect( childEl.lastElementChild?.textContent ).toBe( 'x' );
+		expect( state.initCounts ).toEqual( { a: 1, 'a-child': 1, x: 1 } );
 	} );
 
-	it( 'inserting below a directive-carrying parent does not re-run its init', async () => {
+	it( 'inserting below a directive-carrying parent does not re-run its init (or its siblings)', async () => {
 		await setup(
 			'<div data-wp-context=\'{ "id": "parent" }\' data-wp-init="actions.initItem">' +
 				'<div data-testid="feed"></div>' +
-				'</div>'
+				'</div>' +
+				'<div data-wp-context=\'{ "id": "sibling" }\' data-wp-init="actions.initItem">sib</div>'
 		);
 		await flush();
-		expect( state.initCounts.parent ).toBe( 1 );
+		expect( state.initCounts ).toEqual( { parent: 1, sibling: 1 } );
+		const island = document.querySelector( '[data-wp-interactive]' )!;
+		const sibEl = island.children[ 1 ];
 
-		// The parent is on the rebuild path and is directive-wrapped
-		// (unkeyed). The rebuilt wrapper must match the old one so the
-		// component instance is reused — its init must not re-run.
+		// The parent's Directives wrapper is rebuilt (unkeyed → matched
+		// positionally → instance reused, init not re-run) and the sibling
+		// is off-path (carried by reference). Both must keep identity.
 		renderHTML(
 			document.querySelector( '[data-testid="feed"]' ),
 			'<span>x</span>'
 		);
 		await flush();
 
-		expect( state.initCounts.parent ).toBe( 1 );
+		expect( state.initCounts ).toEqual( { parent: 1, sibling: 1 } );
+		expect( island.children[ 1 ] ).toBe( sibEl );
 	} );
 } );
