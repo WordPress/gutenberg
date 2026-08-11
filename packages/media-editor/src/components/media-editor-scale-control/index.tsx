@@ -189,21 +189,25 @@ export default function MediaEditorScaleControl() {
 					{ ...sharedFieldProps }
 				/>
 			</Stack>
-			<Button
-				className="media-editor-scale-control__reset"
-				variant="secondary"
-				size="compact"
-				disabled={ state.scaledSize === null }
-				accessibleWhenDisabled
-				onClick={ () => {
-					setDraft( null );
-					setScaledSize( null );
-				} }
-			>
-				{ __( 'Reset to original' ) }
-			</Button>
 			<Text variant="body-sm">
 				{ __( 'Scaling applies to the whole image, before any crop.' ) }
+				{ /* Only offered once there is a scale to undo, so the
+				     sentence reads plainly the rest of the time. */ }
+				{ state.scaledSize !== null && (
+					<>
+						{ ' ' }
+						<Button
+							className="media-editor-scale-control__reset"
+							variant="link"
+							onClick={ () => {
+								setDraft( null );
+								setScaledSize( null );
+							} }
+						>
+							{ __( 'Reset to original size' ) }
+						</Button>
+					</>
+				) }
 			</Text>
 			{ showSavedSize && (
 				<Text variant="body-sm">

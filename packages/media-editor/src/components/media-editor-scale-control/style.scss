@@ -8,9 +8,11 @@
 		min-width: 0;
 	}
 
-	// The column stack stretches its children, which would leave the reset
-	// spanning the whole sidebar.
+	// Sits inline at the end of the help sentence, so it takes the
+	// surrounding text's size rather than the Button default.
 	&__reset {
-		align-self: flex-start;
+		font-size: inherit;
+		line-height: inherit;
+		height: auto;
 	}
 }

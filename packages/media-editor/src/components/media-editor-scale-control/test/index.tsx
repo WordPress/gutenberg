@@ -35,9 +35,11 @@ function setupScaleControl( initialCropperState?: Partial< CropperState > ) {
 		width: screen.getByLabelText( 'Width' ) as HTMLInputElement,
 		height: screen.getByLabelText( 'Height' ) as HTMLInputElement,
 		undo: screen.getByRole( 'button', { name: 'undo' } ),
-		reset: screen.getByRole( 'button', { name: 'Reset to original' } ),
 	};
 }
+
+const queryReset = () =>
+	screen.queryByRole( 'button', { name: 'Reset to original size' } );
 
 describe( 'MediaEditorScaleControl', () => {
 	it( 'renders nothing until an image is loaded', () => {
@@ -192,46 +194,46 @@ describe( 'MediaEditorScaleControl', () => {
 		} );
 	} );
 
-	describe( 'reset to original', () => {
-		// The button stays focusable while unavailable (`accessibleWhenDisabled`)
-		// so it reports its state through `aria-disabled` rather than by
-		// dropping out of the tab order.
-		it( 'is unavailable when the image has not been scaled', () => {
-			const { reset } = setupScaleControl();
+	describe( 'reset to original size', () => {
+		it( 'is not offered until the image is scaled', () => {
+			setupScaleControl();
 
-			expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( queryReset() ).not.toBeInTheDocument();
 		} );
 
-		it( 'becomes available once the image is scaled', () => {
-			const { width, reset } = setupScaleControl();
+		it( 'appears at the end of the help sentence once the image is scaled', () => {
+			const { width } = setupScaleControl();
 
 			fireEvent.change( width, { target: { value: '320' } } );
 			fireEvent.blur( width );
 
-			expect( reset ).not.toHaveAttribute( 'aria-disabled', 'true' );
+			expect( queryReset() ).toBeInTheDocument();
+			expect(
+				screen.getByText( /Scaling applies to the whole image/ )
+			).toContainElement( queryReset() );
 		} );
 
 		it( 'puts the image back to its original size', () => {
-			const { width, height, reset } = setupScaleControl();
+			const { width, height } = setupScaleControl();
 
 			fireEvent.change( width, { target: { value: '320' } } );
 			fireEvent.blur( width );
 
-			fireEvent.click( reset );
+			fireEvent.click( queryReset() as HTMLElement );
 
 			expect( width ).toHaveValue( 640 );
 			expect( height ).toHaveValue( 480 );
-			expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( queryReset() ).not.toBeInTheDocument();
 		} );
 
 		it( 'discards a value that was typed but not committed', () => {
-			const { width, height, reset } = setupScaleControl();
+			const { width, height } = setupScaleControl();
 
 			fireEvent.change( width, { target: { value: '320' } } );
 			fireEvent.blur( width );
 			fireEvent.change( width, { target: { value: '160' } } );
 
-			fireEvent.click( reset );
+			fireEvent.click( queryReset() as HTMLElement );
 
 			expect( width ).toHaveValue( 640 );
 			expect( height ).toHaveValue( 480 );

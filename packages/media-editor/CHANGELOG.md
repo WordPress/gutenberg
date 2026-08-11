@@ -6,7 +6,7 @@
 
 -   Add `scaledSize` to the cropper state and a `setScaledSize` setter, for scaling the whole image down before a crop is taken. `buildModifiers` emits the matching `resize` modifier first.
 -   Add linked width and height fields to the Crop panel for scaling the image, with the resulting saved size shown when a crop is in play.
--   Cap the Crop panel's scale fields at the original dimensions, and add a Reset to original button.
+-   Cap the Crop panel's scale fields at the original dimensions, and offer a Reset to original size link once the image has been scaled.
 
 ### Bug Fixes
 
