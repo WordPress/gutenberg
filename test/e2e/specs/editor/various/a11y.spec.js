@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -22,12 +19,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
 		// On a new post, initial focus is set on the Post title.
 		await expect(
-			page.locator( 'role=textbox[name=/Add title/i]' )
+			editor.canvas.locator( 'role=textbox[name=/Add title/i]' )
 		).toBeFocused();
 		// Navigate to the 'Editor settings' region.
 		await pageUtils.pressKeys( 'ctrl+`' );
@@ -50,11 +44,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'should constrain tabbing within a modal', async ( {
 		page,
 		pageUtils,
-		editor,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
 		// Open keyboard shortcuts modal.
 		await pageUtils.pressKeys( 'access+h' );
 
@@ -109,7 +99,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'access+h' );
 
 		// Click a non-focusable element before the first tabbable within the modal.
-		await page.click( 'role=heading[name="Keyboard shortcuts"i]' );
+		await page
+			.getByRole( 'heading', { name: 'Keyboard shortcuts' } )
+			.click();
 
 		await pageUtils.pressKeys( 'shift+Tab' );
 
@@ -139,14 +131,16 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// this behavior.
 
 		// Open the top bar Options menu.
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
 
 		// Open the Preferences modal.
-		await page.click(
-			'role=menu[name="Options"i] >> role=menuitem[name="Preferences"i]'
-		);
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Preferences' } )
+			.click();
 
 		const preferencesModal = page.locator(
 			'role=dialog[name="Preferences"i]'
@@ -220,10 +214,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// that doesn't exist. The content only shows 'No blocks found' and it's
 		// not scrollable any longer. Check it's not focusable.
 		await clickAndFocusTab( blocksTab );
-		await page.type(
-			'role=searchbox[name="Search for a block"i]',
-			'qwerty'
-		);
+		await page
+			.getByRole( 'searchbox', { name: 'Search for a block' } )
+			.type( 'qwerty' );
 		await clickAndFocusTab( blocksTab );
 		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();

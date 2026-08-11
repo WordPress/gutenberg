@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import type { Pattern } from '../types';
 
@@ -21,6 +14,7 @@ const duplicatePattern: Action< Pattern > = {
 	label: _x( 'Duplicate', 'action label' ),
 	isEligible: ( item ) => item.type !== 'wp_template_part',
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const duplicatedProps = useDuplicatePatternProps( {

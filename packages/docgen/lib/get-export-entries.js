@@ -54,10 +54,10 @@ module.exports = ( token ) => {
 	}
 
 	const name = [];
-	if ( token.declaration === null ) {
+	if ( ! token.declaration ) {
 		token.specifiers.forEach( ( specifier ) =>
 			name.push( {
-				localName: specifier.local.name,
+				localName: specifier.local?.name,
 				exportName: specifier.exported.name,
 				module: token.source?.value ?? null,
 				lineStart: specifier.loc.start.line,

@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
-import Disabled from '../';
 import userEvent from '@testing-library/user-event';
+import Disabled from '../';
+import styles from '../style.module.scss';
 
 describe( 'Disabled', () => {
 	const Form = () => (
@@ -24,9 +18,10 @@ describe( 'Disabled', () => {
 			</Disabled>
 		);
 
-		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
-			'inert'
-		);
+		const wrapper = screen.getByTestId( 'disabled-wrapper' );
+		expect( wrapper ).toHaveAttribute( 'inert' );
+		expect( wrapper ).toHaveClass( 'components-disabled' );
+		expect( wrapper ).toHaveClass( styles.disabled );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {

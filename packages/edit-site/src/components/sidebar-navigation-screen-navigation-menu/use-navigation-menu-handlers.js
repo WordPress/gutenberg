@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { postType } from '.';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -42,7 +35,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			history.navivate( '/navigation' );
+			history.navigate( '/navigation' );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BlockVerticalAlignmentUI from './ui';
 
 const BlockVerticalAlignmentControl = ( props ) => {

@@ -1,15 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { BlockEditorProvider, ExperimentalBlockEditorProvider } from '../';
 import { store as blockEditorStore } from '../../../store';
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { areBlocksDirty } from '../are-blocks-dirty';
 
 describe( 'areBlocksDirty', () => {

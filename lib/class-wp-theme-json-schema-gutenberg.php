@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Schema_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.9.0
  */
 
@@ -49,7 +49,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	public static function migrate( $theme_json, $origin = 'theme' ) {
 		if ( ! isset( $theme_json['version'] ) ) {
 			$theme_json = array(
-				'version' => WP_Theme_JSON::LATEST_SCHEMA,
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			);
 		}
 

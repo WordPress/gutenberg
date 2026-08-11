@@ -54,7 +54,7 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 
 ```js
 if ( true ) {
-	// Wepack has replaced `globalThis.IS_GUTENBERG_PLUGIN` with `true`
+	// Webpack has replaced `globalThis.IS_GUTENBERG_PLUGIN` with `true`
 	pluginOnlyFeature();
 }
 ```
