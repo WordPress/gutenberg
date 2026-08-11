@@ -62,17 +62,17 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant an attribute is. Hosts may promote `'high'` to a prominent
+ * How relevant a declaration is. Hosts may promote `'high'` to a prominent
  * surface; `'low'` (the default) is not. The widget declares importance,
  * not a surface.
  */
-type WidgetAttributeRelevance = 'high' | 'low';
+export type WidgetRelevance = 'high' | 'low';
 
 /**
  * A user-triggerable verb a widget type declares. The declaration is
- * serializable data: an envelope (`id`, `label`) plus exactly one
- * fulfillment, named by the key carrying it. Today the only key is `href`,
- * so the only fulfillment is a link.
+ * serializable data: an envelope (`id`, `label`, optional `icon` and
+ * `relevance`) plus exactly one fulfillment, named by the key carrying it.
+ * Today the only key is `href`, so the only fulfillment is a link.
  *
  * The host owns what follows: which primitive materializes the fulfillment,
  * and where the affordance is placed. For a link that means mounting a real
@@ -89,6 +89,21 @@ export interface WidgetAction {
 	 * Human-readable label naming the action. Translatable.
 	 */
 	label: string;
+
+	/**
+	 * Icon for the action, a rendered element. On the wire an action
+	 * declares a registered icon name instead (`WidgetActionRecord`);
+	 * `useWidgetTypes` resolves it, so hosts only receive renderable
+	 * elements.
+	 */
+	icon?: WidgetIcon;
+
+	/**
+	 * How relevant the action is among the widget's actions. Hosts may
+	 * surface `'high'` prominently; `'low'` (the default) belongs in a
+	 * secondary surface such as a menu.
+	 */
+	relevance?: WidgetRelevance;
 
 	/**
 	 * Link fulfillment: the destination. A URL, an admin path, or a
@@ -109,13 +124,25 @@ export interface WidgetAction {
 }
 
 /**
+ * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:
+ * the same envelope and fulfillment, with `icon` as a registered icon
+ * name rather than a rendered element.
+ */
+export interface WidgetActionRecord extends Omit< WidgetAction, 'icon' > {
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 */
+	icon?: WidgetIconReference;
+}
+
+/**
  * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
  * read. Its `type` may also reference a registered field type by name
  * (see `registerFieldType`); `useWidgetTypes` resolves such references
  * into plain `Field` props.
  */
 type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
-	relevance?: WidgetAttributeRelevance;
+	relevance?: WidgetRelevance;
 };
 
 /**
@@ -297,7 +324,6 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
-		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -327,4 +353,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's icon stands.
 	 */
 	icon?: WidgetIconReference | null;
+
+	/**
+	 * Declarative actions in wire form, icons as registered icon names.
+	 * `null`/absent means the module's actions stand.
+	 */
+	actions?: WidgetActionRecord[] | null;
 }

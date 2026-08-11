@@ -862,13 +862,19 @@ export const saveEntityRecord =
 						method: recordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
+					// Pass the pre-`__unstablePrePersist` edits so the reducer
+					// can clear the persisted edits from state. The values
+					// added by `__unstablePrePersist` (e.g. a fresh CRDT
+					// snapshot in `meta`) never exist in the state edits, so
+					// comparing against them would fail to match and leave the
+					// record dirty after a successful save.
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						record
 					);
 					if ( entityConfig.syncConfig ) {
 						let syncChanges;

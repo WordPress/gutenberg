@@ -1720,11 +1720,6 @@
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 6
-		}
-	},
-	"packages/global-styles-ui/src/shadows-panel.tsx": {
-		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
 	},

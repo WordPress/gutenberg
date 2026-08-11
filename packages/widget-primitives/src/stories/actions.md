@@ -14,7 +14,7 @@ The widget names the intent and, through the key it writes, how the action is fu
 
 ## Envelope and fulfillment
 
-Every action carries an **envelope**, an `id` and a `label`, and exactly one **fulfillment**, which says what triggering it means.
+Every action carries an **envelope** and exactly one **fulfillment**, which says what triggering it means. The envelope is the action's identity: an `id`, a `label`, and optionally an `icon` (a registered icon name) and a `relevance` hint.
 
 The fulfillment is named by the key that carries it, not by a separate discriminator. Today the only key is `href`, so the only fulfillment is a link: triggering the action goes to a target.
 
@@ -60,4 +60,4 @@ Where no link primitive fits, as in a command palette, the host mounts what the 
 
 The widget lists its actions; it never specifies where they go. The host maps them to its surfaces: a dashboard might gather them in a "More" menu, a footer, or a command palette.
 
-This is the contract that the `relevance` attribute already uses: the widget declares intent, and the host owns the surface.
+`relevance` carries the widget's side of that decision: `'high'` marks an action worth a prominent surface, `'low'` (the default) the rest. Attributes already use the same vocabulary: the widget declares intent, and the host owns the surface.

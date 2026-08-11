@@ -4,8 +4,11 @@
 
 ### Enhancements
 
+-   Widgets: carry an action's `icon` and `relevance` from `widget.json`
+    into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`
     into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
 
 ### Bug Fixes
 
