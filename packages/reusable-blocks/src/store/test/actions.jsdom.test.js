@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
@@ -12,10 +21,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { logged } from '@wordpress/deprecated';
 import { store as reusableBlocksStore } from '../index';
 
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn(),
 } ) );
+
+const mockedApiFetch = vi.mocked( apiFetch );
 
 function createRegistryWithStores() {
 	// Create a registry and register stores.
@@ -69,6 +79,8 @@ describe( 'Actions', () => {
 	} );
 
 	afterEach( () => {
+		mockedApiFetch.mockReset();
+
 		// Reset the deprecation cache so each test observes its own warning.
 		for ( const key in logged ) {
 			delete logged[ key ];
@@ -109,7 +121,7 @@ describe( 'Actions', () => {
 
 			const registry = createRegistryWithStores();
 			// Mock the api-fetch.
-			apiFetch.mockImplementation( async ( args ) => {
+			mockedApiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
 					case '/wp/v2/reusable-blocks':
@@ -167,7 +179,7 @@ describe( 'Actions', () => {
 
 			const registry = createRegistryWithStores();
 			// Mock the api-fetch.
-			apiFetch.mockImplementation( async ( args ) => {
+			mockedApiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
 					case '/wp/v2/reusable-blocks/123':
@@ -228,7 +240,7 @@ describe( 'Actions', () => {
 
 			const registry = createRegistryWithStores();
 			// Mock the api-fetch.
-			apiFetch.mockImplementation( async ( args ) => {
+			mockedApiFetch.mockImplementation( async ( args ) => {
 				const { path, data, method } = args;
 				if (
 					path.startsWith( '/wp/v2/reusable-blocks' ) &&

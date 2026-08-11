@@ -1,7 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import URLInputButton from '../button';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'URLInputButton', () => {
 	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {
@@ -67,7 +70,7 @@ describe( 'URLInputButton', () => {
 
 	it( 'should call `onChange` function once per each value change', async () => {
 		const user = userEvent.setup();
-		const onChangeMock = jest.fn();
+		const onChangeMock = vi.fn();
 
 		render( <URLInputButton onChange={ onChangeMock } /> );
 

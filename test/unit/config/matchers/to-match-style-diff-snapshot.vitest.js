@@ -30,12 +30,12 @@ const cleanStyleRule = ( rule ) => {
 
 function toMatchStyleDiffSnapshot( received, expected, testName = '' ) {
 	const styleSheets = getStyleSheets();
-	const receivedStyles = getStyleRulesForElement( received, styleSheets ).map(
-		cleanStyleRule
-	);
-	const expectedStyles = getStyleRulesForElement( expected, styleSheets ).map(
-		cleanStyleRule
-	);
+	const getMeaningfulStyles = ( element ) =>
+		getStyleRulesForElement( element, styleSheets )
+			.map( cleanStyleRule )
+			.filter( ( rule ) => Object.keys( rule ).length > 0 );
+	const receivedStyles = getMeaningfulStyles( received );
+	const expectedStyles = getMeaningfulStyles( expected );
 	const difference = snapshotDiff(
 		receivedStyles,
 		expectedStyles,

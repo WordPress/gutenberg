@@ -1,9 +1,14 @@
+import { describe, expect, test, vi } from 'vitest';
 import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	initializeEditor,
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockVisibleElements();
 
 const defaultSettings = {
 	__experimentalFeatures: {

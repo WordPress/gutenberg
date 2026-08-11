@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { render } from '@testing-library/react';
 import { SlotFillProvider } from '@wordpress/components';
 import PluginPostPublishPanel from '../';

@@ -51,6 +51,9 @@
 	"dependencies": {
 		"comctx": "^1.4.3"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

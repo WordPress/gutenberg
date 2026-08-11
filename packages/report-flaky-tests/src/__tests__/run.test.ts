@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import { run } from '../run';
 
@@ -30,33 +31,58 @@ const mockPullRequestEventContext = {
 		},
 	},
 };
-const mockGetContext = jest.fn(
-	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
-		mockPullRequestEventContext
+const { mockGetContext, mockAPI, mockReaddir, mockReadFile } = vi.hoisted(
+	() => ( {
+		mockGetContext: vi.fn(),
+		mockAPI: {
+			createCommentOnPR: vi.fn(),
+		},
+		mockReaddir: vi.fn< ( path: string ) => Promise< string[] > >(),
+		mockReadFile:
+			vi.fn< ( path: string, encoding: string ) => Promise< string > >(),
+	} )
 );
-jest.mock( '@actions/github', () => ( {
+
+vi.mock( import( '@actions/github' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	get context() {
 		return mockGetContext();
 	},
 } ) );
 
-jest.mock( '@actions/core', () => ( {
-	error: jest.fn(),
-	info: jest.fn(),
-	getInput: jest.fn(),
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	error: vi.fn(),
+	info: vi.fn(),
+	getInput: vi.fn(),
 } ) );
 
-const mockAPI = {
-	createCommentOnPR: jest.fn(),
-};
-jest.mock( '../github-api', () => ( {
-	GitHubAPI: jest.fn( () => mockAPI ),
-} ) );
+vi.mock( import( '../github-api' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-jest.mock( 'fs/promises', () => ( {
-	readdir: jest.fn(),
-	readFile: jest.fn(),
-} ) );
+	return {
+		...original,
+		GitHubAPI: vi.fn(
+			class MockGitHubAPI {
+				constructor() {
+					return mockAPI;
+				}
+			}
+		) as unknown as typeof original.GitHubAPI,
+	};
+} );
+
+vi.mock( import( 'fs/promises' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		readdir: mockReaddir as unknown as typeof original.readdir,
+		readFile: mockReadFile as unknown as typeof original.readFile,
+	};
+} );
+
+const mockedGetInput = vi.mocked( core.getInput );
 
 async function mockFlakyTestsArtifact() {
 	const playwrightFlakyTest = await import(
@@ -66,7 +92,7 @@ async function mockFlakyTestsArtifact() {
 		'../__fixtures__/Should insert new template part on creation.json'
 	).then( ( json ) => json.default );
 
-	( core.getInput as jest.Mock )
+	mockedGetInput
 		// token
 		.mockReturnValueOnce( 'repo-token' )
 		// artifact-path
@@ -78,14 +104,13 @@ async function mockFlakyTestsArtifact() {
 		process.cwd()
 	);
 
-	const mockedFs = require( 'fs/promises' );
-	mockedFs.readdir.mockImplementationOnce( () =>
+	mockReaddir.mockImplementationOnce( () =>
 		Promise.resolve( [
 			`${ playwrightFlakyTest.title }.json`,
 			`${ jestFlakyTest.title }.json`,
 		] )
 	);
-	mockedFs.readFile
+	mockReadFile
 		.mockImplementationOnce( () =>
 			Promise.resolve( JSON.stringify( playwrightFlakyTest ) )
 		)
@@ -95,8 +120,9 @@ async function mockFlakyTestsArtifact() {
 }
 
 describe( 'Report flaky tests', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
+	beforeEach( () => {
+		vi.clearAllMocks();
+		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
 	} );
 
 	it( 'should comment on the pull request', async () => {
@@ -121,19 +147,16 @@ describe( 'Report flaky tests', () => {
 		await run();
 
 		// It bails out before even reading the artifact.
-		expect( require( 'fs/promises' ).readdir ).not.toHaveBeenCalled();
+		expect( mockReaddir ).not.toHaveBeenCalled();
 		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
-
-		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
 	} );
 
 	it( 'should not comment when there are no flaky tests', async () => {
-		( core.getInput as jest.Mock )
+		mockedGetInput
 			.mockReturnValueOnce( 'repo-token' )
 			.mockReturnValueOnce( 'flaky-tests' );
 
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () => Promise.resolve( [] ) );
+		mockReaddir.mockImplementationOnce( () => Promise.resolve( [] ) );
 
 		await run();
 

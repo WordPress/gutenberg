@@ -6,7 +6,7 @@ import {
 	rmSync,
 	writeFileSync,
 } from 'node:fs';
-import { createRequire } from 'node:module';
+import { createRequire, isBuiltin } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -469,83 +469,140 @@ if ( violations.length ) {
 
 const commonTypes = [
 	'gutenberg-env',
+	'react',
 	'react-css-custom-properties',
 	'style-imports',
 ];
+
+function importsNodeBuiltin( file ) {
+	const source = readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
+	return [
+		...source.matchAll( /(?:from\s+|import\s*\(\s*)['"]([^'"]+)['"]/g ),
+	].some( ( match ) => isBuiltin( match[ 1 ] ) );
+}
+
+function getTypecheckConfigPath( testFile ) {
+	let directory = path.dirname( path.join( ROOT_DIR, testFile ) );
+
+	while ( directory.startsWith( ROOT_DIR ) && directory !== ROOT_DIR ) {
+		for ( const configName of [ 'tsconfig.test.json', 'tsconfig.json' ] ) {
+			const configPath = path.join( directory, configName );
+			if ( existsSync( configPath ) ) {
+				return configPath;
+			}
+		}
+		directory = path.dirname( directory );
+	}
+
+	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+}
+
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
-	const typescriptTests = vitestTestsByProject[ projectName ].filter(
+	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
 		( file ) => /\.tsx?$/.test( file )
 	);
-	if ( ! typescriptTests.length ) {
+	if ( ! projectTypescriptTests.length ) {
 		continue;
 	}
 
-	typescriptTestCount += typescriptTests.length;
-	const temporaryDirectory = mkdtempSync(
-		path.join( os.tmpdir(), `gutenberg-vitest-${ projectName }-typecheck-` )
-	);
-	const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
-	const compatibilityTypesPath = path.join(
-		temporaryDirectory,
-		'compatibility.d.ts'
-	);
-	const needsNodeTypes =
-		projectName === 'node' ||
-		typescriptTests.some( ( file ) =>
-			/[('"]node:/.test(
-				readFileSync( path.join( ROOT_DIR, file ), 'utf8' )
+	typescriptTestCount += projectTypescriptTests.length;
+	const testsByConfig = new Map();
+	for ( const testFile of projectTypescriptTests ) {
+		const configPath = getTypecheckConfigPath( testFile );
+		const configTests = testsByConfig.get( configPath ) ?? [];
+		configTests.push( testFile );
+		testsByConfig.set( configPath, configTests );
+	}
+
+	for ( const [ baseConfigPath, typeScriptTests ] of testsByConfig ) {
+		const needsNodeTypes =
+			projectName === 'node' ||
+			typeScriptTests.some( importsNodeBuiltin );
+		const temporaryDirectory = mkdtempSync(
+			path.join(
+				os.tmpdir(),
+				`gutenberg-vitest-${ projectName }-typecheck-`
 			)
 		);
-	const setupTypeFiles =
-		projectName === 'jsdom'
-			? [
-					path.join(
-						ROOT_DIR,
-						'test/unit/config/testing-library.vitest.js'
-					),
-			  ]
-			: [];
-	const typecheckConfig = {
-		extends: path.join( ROOT_DIR, 'tsconfig.base.json' ),
-		compilerOptions: {
-			allowJs: true,
-			checkJs: false,
-			composite: false,
-			declaration: true,
-			declarationMap: false,
-			emitDeclarationOnly: false,
-			noEmit: true,
-			rootDir: ROOT_DIR,
-			typeRoots: [
-				path.join( ROOT_DIR, 'typings' ),
-				path.join( ROOT_DIR, 'node_modules/@types' ),
+		const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
+		const compatibilityTypesPath = path.join(
+			temporaryDirectory,
+			'compatibility.d.ts'
+		);
+		const typecheckConfig = {
+			extends: baseConfigPath,
+			compilerOptions: {
+				allowJs: true,
+				checkJs: false,
+				composite: false,
+				declaration: true,
+				declarationMap: false,
+				emitDeclarationOnly: false,
+				noEmit: true,
+				rootDir: ROOT_DIR,
+				typeRoots: [
+					path.join( ROOT_DIR, 'typings' ),
+					path.join( ROOT_DIR, 'node_modules/@types' ),
+				],
+				types:
+					projectName === 'jsdom'
+						? [
+								...commonTypes,
+								...( needsNodeTypes ? [ 'node' ] : [] ),
+								'gutenberg-vitest-test-env',
+						  ]
+						: [
+								...commonTypes,
+								'node',
+								'gutenberg-vitest-test-env',
+						  ],
+			},
+			// Package configs often include every source, story, and test file.
+			// This validator owns an exact routed-test set, so do not inherit
+			// those broader globs into another Vitest project's typecheck.
+			include: [],
+			exclude: [],
+			files: [
+				compatibilityTypesPath,
+				...( projectName === 'jsdom'
+					? [
+							path.join(
+								ROOT_DIR,
+								'test/unit/config/testing-library.vitest.js'
+							),
+					  ]
+					: [] ),
+				...typeScriptTests.map( ( file ) =>
+					path.join( ROOT_DIR, file )
+				),
 			],
-			types: [ ...commonTypes, ...( needsNodeTypes ? [ 'node' ] : [] ) ],
-		},
-		files: [
-			compatibilityTypesPath,
-			...setupTypeFiles,
-			...typescriptTests.map( ( file ) => path.join( ROOT_DIR, file ) ),
-		],
-	};
+		};
 
-	try {
-		// @wordpress/commands is a JavaScript package without published types.
-		// Keep this exception explicit until that package gains declarations.
-		writeFileSync(
-			compatibilityTypesPath,
-			"declare module '@wordpress/commands';"
-		);
-		writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-		execFileSync(
-			resolvePackageBin( 'typescript' ),
-			[ '--project', configPath, '--pretty', 'false' ],
-			{ cwd: ROOT_DIR, stdio: 'inherit' }
-		);
-	} finally {
-		rmSync( temporaryDirectory, { force: true, recursive: true } );
+		try {
+			// Keep narrow compatibility declarations for JavaScript packages
+			// without published types and migrated tests that still use Node's
+			// `global` alias without injecting all Node globals into browser
+			// packages.
+			writeFileSync(
+				compatibilityTypesPath,
+				[
+					'declare const global: typeof globalThis;',
+					"declare module '@wordpress/commands';",
+					"declare module '@wordpress/interface';",
+					"declare module 'deep-freeze' { export default function deepFreeze<T>(value: T): T; }",
+				].join( '\n' )
+			);
+			writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
+			execFileSync(
+				resolvePackageBin( 'typescript' ),
+				[ '--project', configPath, '--pretty', 'false' ],
+				{ cwd: ROOT_DIR, stdio: 'inherit' }
+			);
+		} finally {
+			rmSync( temporaryDirectory, { force: true, recursive: true } );
+		}
 	}
 }
 

@@ -1,4 +1,5 @@
 import deepFreeze from 'deep-freeze';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
@@ -7,7 +8,7 @@ describe( 'persistence', () => {
 	let registry;
 
 	beforeAll( () => {
-		jest.spyOn( objectStorage, 'setItem' );
+		vi.spyOn( objectStorage, 'setItem' );
 	} );
 
 	beforeEach( () => {
@@ -343,7 +344,7 @@ describe( 'persistence', () => {
 
 	describe( 'withLazySameState', () => {
 		it( 'should call the original reducer if action.nextState differs from state', () => {
-			const reducer = jest
+			const reducer = vi
 				.fn()
 				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
@@ -357,7 +358,7 @@ describe( 'persistence', () => {
 		} );
 
 		it( 'should not call the original reducer if action.nextState equals state', () => {
-			const reducer = jest
+			const reducer = vi
 				.fn()
 				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );

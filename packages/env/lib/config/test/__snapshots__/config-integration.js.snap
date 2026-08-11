@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Config Integration should load local and override configuration files 1`] = `
+exports[`Config Integration > should load local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
   "customConfigPath": null,
@@ -85,7 +85,7 @@ exports[`Config Integration should load local and override configuration files 1
 }
 `;
 
-exports[`Config Integration should load local configuration file 1`] = `
+exports[`Config Integration > should load local configuration file 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
   "customConfigPath": null,
@@ -170,7 +170,7 @@ exports[`Config Integration should load local configuration file 1`] = `
 }
 `;
 
-exports[`Config Integration should use default configuration 1`] = `
+exports[`Config Integration > should use default configuration 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
   "customConfigPath": null,
@@ -255,7 +255,7 @@ exports[`Config Integration should use default configuration 1`] = `
 }
 `;
 
-exports[`Config Integration should use environment variables over local and override configuration files 1`] = `
+exports[`Config Integration > should use environment variables over local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
   "customConfigPath": null,

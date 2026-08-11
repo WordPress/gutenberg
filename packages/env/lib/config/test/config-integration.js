@@ -1,42 +1,60 @@
-'use strict';
-const { readFile } = require( 'fs' ).promises;
-const { existsSync } = require( 'fs' );
-const loadConfig = require( '../load-config' );
-const detectDirectoryType = require( '../detect-directory-type' );
-const md5 = require( '../../md5' );
-
-jest.mock( 'fs', () => ( {
-	promises: {
-		readFile: jest.fn(),
-		stat: jest.fn().mockResolvedValue( true ),
-		mkdir: jest.fn(),
-		writeFile: jest.fn(),
+import { createRequire } from 'node:module';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const dns = require( 'node:dns' );
+const fs = require( 'node:fs' );
+const readFile = vi.spyOn( fs.promises, 'readFile' );
+const stat = vi.spyOn( fs.promises, 'stat' );
+vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
+vi.spyOn( fs.promises, 'writeFile' ).mockResolvedValue();
+const existsSync = vi.spyOn( fs, 'existsSync' );
+const resolveDns = vi.spyOn( dns.promises, 'resolve' );
+const gotPath = require.resolve( 'got' );
+const originalGot = require( gotPath );
+const got = vi.fn( ( url ) => ( {
+	json: () => {
+		if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
+			return Promise.resolve( {
+				'1.0': 'insecure',
+				'99.1.1': 'outdated',
+				'100.0.0': 'latest',
+				'100.0.1': 'fancy',
+			} );
+		}
 	},
-	existsSync: jest.fn().mockReturnValue( false ),
 } ) );
-
-// This mocks a small response with a format matching the stable-check API.
-// It makes getLatestWordPressVersion resolve to "100.0.0".
-jest.mock( 'got', () =>
-	jest.fn( ( url ) => ( {
-		json: () => {
-			if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
-				return Promise.resolve( {
-					'1.0': 'insecure',
-					'99.1.1': 'outdated',
-					'100.0.0': 'latest',
-					'100.0.1': 'fancy',
-				} );
-			}
-		},
-	} ) )
-);
-
-jest.mock( '../detect-directory-type', () => jest.fn() );
+require.cache[ gotPath ].exports = got;
+const detectDirectoryTypePath = require.resolve( '../detect-directory-type' );
+const originalDetectDirectoryType = require( detectDirectoryTypePath );
+const detectDirectoryType = vi.fn();
+require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
+const loadConfig = require( '../load-config' );
+const md5 = require( '../../md5' );
+afterAll( () => {
+	require.cache[ gotPath ].exports = originalGot;
+	require.cache[ detectDirectoryTypePath ].exports =
+		originalDetectDirectoryType;
+	vi.restoreAllMocks();
+	delete require.cache[ require.resolve( '../load-config' ) ];
+	delete require.cache[ require.resolve( '../parse-config' ) ];
+	delete require.cache[ require.resolve( '../../wordpress' ) ];
+} );
 
 describe( 'Config Integration', () => {
 	beforeEach( () => {
+		vi.clearAllMocks();
 		process.env.WP_ENV_HOME = '/cache';
+		stat.mockResolvedValue( true );
+		existsSync.mockReturnValue( false );
+		resolveDns.mockResolvedValue( [ '198.143.164.252' ] );
 		detectDirectoryType.mockResolvedValue( null );
 	} );
 

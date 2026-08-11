@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildRamp } from '../lib';
 import { getColorString } from '../lib/color-utils';

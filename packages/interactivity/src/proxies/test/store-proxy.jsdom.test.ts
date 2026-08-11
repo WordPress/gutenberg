@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { proxifyStore, proxifyState } from '../';
 import { setScope, resetScope, getContext } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';

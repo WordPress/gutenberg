@@ -4,8 +4,7 @@
 	"compilerOptions": {
 		// The action runs straight from these sources on Node's type stripping,
 		// which resolves relative imports by their real `.ts` extension.
-		"allowImportingTsExtensions": true,
-		"types": [ "jest" ]
+		"allowImportingTsExtensions": true
 	},
 	"exclude": [ "src/__tests__", "src/__fixtures__" ]
 }

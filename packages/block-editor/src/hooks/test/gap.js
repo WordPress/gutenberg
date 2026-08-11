@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../gap';
 
 describe( 'gap', () => {

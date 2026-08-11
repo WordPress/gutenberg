@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useMediaEditorState } from '../use-media-editor-state';
 

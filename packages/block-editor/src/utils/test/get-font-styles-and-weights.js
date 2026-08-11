@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getFontStylesAndWeights } from '../get-font-styles-and-weights';
 
 describe( 'getFontStylesAndWeights', () => {

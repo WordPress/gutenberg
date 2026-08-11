@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { logged } from '@wordpress/deprecated';
 import {
 	getComputedFluidTypographyValue,

@@ -22,7 +22,8 @@ describe( 'snapshotDiff', () => {
 
 	it( 'captures matching stylesheet declarations', () => {
 		const style = document.createElement( 'style' );
-		style.textContent = '.received { color: red; } .base { color: blue; }';
+		style.textContent =
+			'.received, .base {} .received { color: red; } .base { color: blue; }';
 		const received = document.createElement( 'div' );
 		const base = document.createElement( 'div' );
 		received.className = 'received';

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Actions __experimentalConvertBlockToStatic should convert a static reusable into a static block 1`] = `
+exports[`Actions > __experimentalConvertBlockToStatic > should convert a static reusable into a static block 1`] = `
 [
   {
     "attributes": {
@@ -36,7 +36,7 @@ exports[`Actions __experimentalConvertBlockToStatic should convert a static reus
 ]
 `;
 
-exports[`Actions __experimentalConvertBlocksToReusable should convert a static block into a reusable block 1`] = `
+exports[`Actions > __experimentalConvertBlocksToReusable > should convert a static block into a reusable block 1`] = `
 [
   {
     "attributes": {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getTypographyClassesAndStyles } from '../use-typography-props';
 
 describe( 'getTypographyClassesAndStyles', () => {

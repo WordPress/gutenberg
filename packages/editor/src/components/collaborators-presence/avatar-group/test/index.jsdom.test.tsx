@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AvatarGroup from '..';
 import Avatar from '../../avatar';
@@ -124,7 +125,7 @@ describe( 'AvatarGroup', () => {
 	} );
 
 	it( 'should render with no children', () => {
-		render( <AvatarGroup data-testid="group" /> );
+		render( <AvatarGroup data-testid="group">{ null }</AvatarGroup> );
 		const group = screen.getByTestId( 'group' );
 		expect( group ).toBeInTheDocument();
 		expect( screen.queryByText( /^\+/ ) ).not.toBeInTheDocument();

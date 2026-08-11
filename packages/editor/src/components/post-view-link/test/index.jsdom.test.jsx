@@ -1,8 +1,14 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import PostViewLink from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 const DEFAULTS = {
 	postType: { labels: { view_item: 'View Post' } },

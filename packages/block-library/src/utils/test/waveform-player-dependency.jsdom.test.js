@@ -1,4 +1,5 @@
-import '@testing-library/jest-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 const DEFAULT_PLAYBACK_RATES = [
 	'0.5x',
@@ -23,14 +24,8 @@ function createDeclarativePlayer( attributes = {} ) {
 	return element;
 }
 
-function loadWaveformPlayer() {
-	let WaveformPlayer;
-
-	jest.isolateModules( () => {
-		WaveformPlayer = require( '@arraypress/waveform-player' ).default;
-	} );
-
-	return WaveformPlayer;
+async function loadWaveformPlayer() {
+	return ( await import( '@arraypress/waveform-player' ) ).default;
 }
 
 function getFragmentedAttributeValue( prefix = '' ) {
@@ -43,7 +38,7 @@ describe( 'Waveform Player dependency', () => {
 	let jsdomStubs;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		originalReadyState = Object.getOwnPropertyDescriptor(
 			document,
 			'readyState'
@@ -54,13 +49,13 @@ describe( 'Waveform Player dependency', () => {
 		} );
 
 		jsdomStubs = [
-			jest
+			vi
 				.spyOn( window.HTMLCanvasElement.prototype, 'getContext' )
 				.mockReturnValue( null ),
-			jest
+			vi
 				.spyOn( window.HTMLMediaElement.prototype, 'pause' )
 				.mockImplementation( () => {} ),
-			jest
+			vi
 				.spyOn( window.HTMLMediaElement.prototype, 'load' )
 				.mockImplementation( () => {} ),
 		];
@@ -69,8 +64,8 @@ describe( 'Waveform Player dependency', () => {
 	afterEach( () => {
 		WaveformPlayer?.destroyAll();
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
-		jest.useRealTimers();
-		jest.resetModules();
+		vi.useRealTimers();
+		vi.resetModules();
 		document.body.innerHTML = '';
 		delete window.WaveformPlayer;
 
@@ -81,14 +76,14 @@ describe( 'Waveform Player dependency', () => {
 		}
 	} );
 
-	it( 'uses the default control icons when declarative icon values are unsupported', () => {
+	it( 'uses the default control icons when declarative icon values are unsupported', async () => {
 		const iconValue = `<span ${ FIXTURE_ATTRIBUTE }></span>`;
 		const element = createDeclarativePlayer( {
 			'data-play-icon': iconValue,
 			'data-pause-icon': iconValue,
 		} );
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 		WaveformPlayer.init();
 
 		expect(
@@ -102,12 +97,12 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'uses the default alignment when a declarative alignment value is unsupported', () => {
+	it( 'uses the default alignment when a declarative alignment value is unsupported', async () => {
 		const element = createDeclarativePlayer( {
 			'data-button-align': getFragmentedAttributeValue( 'center' ),
 		} );
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 		WaveformPlayer.init();
 
 		const track = element.querySelector( '.waveform-track' );
@@ -115,7 +110,7 @@ describe( 'Waveform Player dependency', () => {
 		expect( track ).not.toHaveAttribute( FIXTURE_ATTRIBUTE );
 	} );
 
-	it( 'uses the default playback rates when a declarative rate list is unsupported', () => {
+	it( 'uses the default playback rates when a declarative rate list is unsupported', async () => {
 		const element = createDeclarativePlayer( {
 			'data-show-playback-speed': 'true',
 			'data-playback-rates': JSON.stringify( [
@@ -125,7 +120,7 @@ describe( 'Waveform Player dependency', () => {
 			] ),
 		} );
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 		WaveformPlayer.init();
 
 		const options = [ ...element.querySelectorAll( '.speed-option' ) ];
@@ -139,7 +134,7 @@ describe( 'Waveform Player dependency', () => {
 		).toBe( false );
 	} );
 
-	it( 'supports custom control icons passed to the constructor', () => {
+	it( 'supports custom control icons passed to the constructor', async () => {
 		const element = document.createElement( 'div' );
 		const icon = document.createElementNS(
 			'http://www.w3.org/2000/svg',
@@ -148,7 +143,7 @@ describe( 'Waveform Player dependency', () => {
 		icon.setAttribute( FIXTURE_ATTRIBUTE, 'constructor' );
 		document.body.appendChild( element );
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 		new WaveformPlayer( element, {
 			playIcon: icon.outerHTML,
 		} );
@@ -158,7 +153,7 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'skips programmatic players during explicit declarative scans', () => {
+	it( 'skips programmatic players during explicit declarative scans', async () => {
 		const element = createDeclarativePlayer();
 		const icon = document.createElementNS(
 			'http://www.w3.org/2000/svg',
@@ -166,7 +161,7 @@ describe( 'Waveform Player dependency', () => {
 		);
 		icon.setAttribute( FIXTURE_ATTRIBUTE, 'constructor-scan' );
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 		const player = new WaveformPlayer( element, {
 			playIcon: icon.outerHTML,
 		} );
@@ -182,10 +177,10 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'initializes declarative players only after an explicit request', () => {
+	it( 'initializes declarative players only after an explicit request', async () => {
 		const element = createDeclarativePlayer();
 
-		WaveformPlayer = loadWaveformPlayer();
+		WaveformPlayer = await loadWaveformPlayer();
 
 		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
 		expect( element ).toBeEmptyDOMElement();

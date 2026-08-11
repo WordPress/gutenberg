@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import {
 	registerBlockType,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -5389,8 +5399,8 @@ describe( 'getBlockEditingMode', () => {
 		derivedBlockEditingModes: new Map(),
 	};
 
-	const hasContentRoleAttribute = jest.fn( () => false );
-	const get = jest.fn( () => 'edit' );
+	const hasContentRoleAttribute = vi.fn( () => false );
+	const get = vi.fn( () => 'edit' );
 
 	const mockedSelectors = { get };
 
@@ -5399,7 +5409,7 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => mockedSelectors ),
+		select: vi.fn( () => mockedSelectors ),
 	};
 
 	it( 'should return default by default', () => {

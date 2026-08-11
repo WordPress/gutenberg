@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import KeyboardShortcuts from '..';
 
@@ -22,7 +23,7 @@ describe( 'KeyboardShortcuts', () => {
 	}
 
 	it( 'should capture key events', async () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		render(
 			<KeyboardShortcuts
@@ -38,7 +39,7 @@ describe( 'KeyboardShortcuts', () => {
 	} );
 
 	it( 'should capture key events globally', () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		render(
 			<div>
@@ -58,7 +59,7 @@ describe( 'KeyboardShortcuts', () => {
 	} );
 
 	it( 'should capture key events on specific event', () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		render(
 			<div>
@@ -78,7 +79,7 @@ describe( 'KeyboardShortcuts', () => {
 	} );
 
 	it( 'should capture key events on children', () => {
-		const spy = jest.fn();
+		const spy = vi.fn();
 
 		render(
 			<div>

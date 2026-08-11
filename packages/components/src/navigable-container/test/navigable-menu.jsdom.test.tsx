@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NavigableMenu } from '../menu';
 import type { NavigableMenuProps } from '../types';
+globalThis.wpVitest.mockVisibleElements();
 
 const NavigableMenuTestCase = ( props: NavigableMenuProps ) => (
 	<NavigableMenu { ...props }>
@@ -25,7 +27,7 @@ describe( 'NavigableMenu', () => {
 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
 		const user = userEvent.setup();
 
-		const onNavigateSpy = jest.fn();
+		const onNavigateSpy = vi.fn();
 
 		render( <NavigableMenuTestCase onNavigate={ onNavigateSpy } /> );
 
@@ -64,7 +66,7 @@ describe( 'NavigableMenu', () => {
 	it( 'moves focus on its focusable children by using the left/right arrow keys when the `orientation`prop is set to `horizontal', async () => {
 		const user = userEvent.setup();
 
-		const onNavigateSpy = jest.fn();
+		const onNavigateSpy = vi.fn();
 
 		render(
 			<NavigableMenuTestCase
@@ -108,7 +110,7 @@ describe( 'NavigableMenu', () => {
 	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
 		const user = userEvent.setup();
 
-		const onNavigateSpy = jest.fn();
+		const onNavigateSpy = vi.fn();
 
 		const { rerender } = render(
 			<NavigableMenuTestCase onNavigate={ onNavigateSpy } />
@@ -166,7 +168,7 @@ describe( 'NavigableMenu', () => {
 	it( 'stops keydown event propagation when arrow keys are pressed, regardless of the `orientation` prop', async () => {
 		const user = userEvent.setup();
 
-		const externalWrapperOnKeyDownSpy = jest.fn();
+		const externalWrapperOnKeyDownSpy = vi.fn();
 
 		render(
 			// Disable reason: this is only for test purposes.
@@ -193,7 +195,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'should keep forwarded callback refs stable across rerenders', () => {
-		const refSpy = jest.fn();
+		const refSpy = vi.fn();
 
 		const { rerender } = render(
 			<NavigableMenu ref={ refSpy }>

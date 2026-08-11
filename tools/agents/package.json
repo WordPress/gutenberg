@@ -25,5 +25,8 @@
 	},
 	"scripts": {
 		"setup": "node ./setup-skills.mjs"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	}
 }

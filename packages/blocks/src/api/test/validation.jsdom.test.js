@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import '../../store';
 import {
 	isValidCharacterReference,
 	DecodeEntityParser,
@@ -29,11 +31,6 @@ describe( 'validation', () => {
 		category: 'text',
 		title: 'block title',
 	};
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );

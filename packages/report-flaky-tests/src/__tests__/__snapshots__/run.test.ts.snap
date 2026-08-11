@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Report flaky tests should comment on the pull request 1`] = `
+exports[`Report flaky tests > should comment on the pull request 1`] = `
 "<!-- flaky-tests-report-comment -->
 **Flaky tests detected in headSHA.**
 Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.

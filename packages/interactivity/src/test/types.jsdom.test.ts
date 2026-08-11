@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getServerContext } from '../scopes';
 import {
 	store,
@@ -6,13 +7,18 @@ import {
 	type TypeYield,
 } from '../store';
 
+function checkTypes( description: string, checks: () => void ) {
+	void description;
+	checks();
+}
+
 describe( 'Interactivity API types', () => {
 	it( 'dummy test', () => {
 		expect( true ).toBe( true );
 	} );
 
-	describe( 'store', () => {
-		describe( 'the whole store can be inferred', () => {
+	checkTypes( 'store', () => {
+		checkTypes( 'the whole store can be inferred', () => {
 			// eslint-disable-next-line no-unused-expressions
 			async () => {
 				const myStore = store( 'test', {
@@ -47,7 +53,7 @@ describe( 'Interactivity API types', () => {
 			};
 		} );
 
-		describe( 'the whole store can be manually typed', () => {
+		checkTypes( 'the whole store can be manually typed', () => {
 			// eslint-disable-next-line no-unused-expressions
 			async () => {
 				interface Store {
@@ -95,58 +101,61 @@ describe( 'Interactivity API types', () => {
 			};
 		} );
 
-		describe( 'the server state can be typed and the rest inferred', () => {
-			// eslint-disable-next-line no-unused-expressions
-			async () => {
-				type ServerStore = {
-					state: {
-						serverValue: number;
+		checkTypes(
+			'the server state can be typed and the rest inferred',
+			() => {
+				// eslint-disable-next-line no-unused-expressions
+				async () => {
+					type ServerStore = {
+						state: {
+							serverValue: number;
+						};
 					};
+
+					const clientStore = {
+						state: {
+							clientValue: 1,
+							get derived(): number {
+								return myStore.state.serverValue;
+							},
+						},
+						actions: {
+							sync( n: number ) {
+								return n;
+							},
+							*async( n: number ): AsyncAction< number > {
+								const n1 = ( yield myStore.actions.async2(
+									n
+								) ) as TypeYield<
+									typeof myStore.actions.async2
+								> satisfies number;
+								return myStore.state.derived + n1 + n;
+							},
+							*async2( n: number ) {
+								return n;
+							},
+						},
+					};
+
+					type Store = ServerStore & typeof clientStore;
+
+					const myStore = store< Store >( 'test', clientStore );
+
+					myStore.state.clientValue satisfies number;
+					myStore.state.serverValue satisfies number;
+					myStore.state.derived satisfies number;
+					// @ts-expect-error `nonExistent` is intentionally absent from the store state.
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
+					// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
+					myStore.actions.nonExistent();
 				};
+			}
+		);
 
-				const clientStore = {
-					state: {
-						clientValue: 1,
-						get derived(): number {
-							return myStore.state.serverValue;
-						},
-					},
-					actions: {
-						sync( n: number ) {
-							return n;
-						},
-						*async( n: number ): AsyncAction< number > {
-							const n1 = ( yield myStore.actions.async2(
-								n
-							) ) as TypeYield<
-								typeof myStore.actions.async2
-							> satisfies number;
-							return myStore.state.derived + n1 + n;
-						},
-						*async2( n: number ) {
-							return n;
-						},
-					},
-				};
-
-				type Store = ServerStore & typeof clientStore;
-
-				const myStore = store< Store >( 'test', clientStore );
-
-				myStore.state.clientValue satisfies number;
-				myStore.state.serverValue satisfies number;
-				myStore.state.derived satisfies number;
-				// @ts-expect-error `nonExistent` is intentionally absent from the store state.
-				myStore.state.nonExistent satisfies number;
-				myStore.actions.sync( 1 ) satisfies number;
-				myStore.actions.async( 1 ) satisfies Promise< number >;
-				( await myStore.actions.async( 1 ) ) satisfies number;
-				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
-				myStore.actions.nonExistent();
-			};
-		} );
-
-		describe( 'the state can be casted and the rest inferred', () => {
+		checkTypes( 'the state can be casted and the rest inferred', () => {
 			// eslint-disable-next-line no-unused-expressions
 			async () => {
 				type State = {
@@ -193,58 +202,61 @@ describe( 'Interactivity API types', () => {
 			};
 		} );
 
-		describe( 'the whole store can be manually typed even if doesnt contain state', () => {
-			// eslint-disable-next-line no-unused-expressions
-			async () => {
-				interface Store {
-					actions: {
-						sync: ( n: number ) => number;
-						async: ( n: number ) => Promise< number >;
-						async2: ( n: number ) => AsyncAction< number >;
-					};
-					callbacks: {
-						existent: number;
-					};
-				}
+		checkTypes(
+			'the whole store can be manually typed even if doesnt contain state',
+			() => {
+				// eslint-disable-next-line no-unused-expressions
+				async () => {
+					interface Store {
+						actions: {
+							sync: ( n: number ) => number;
+							async: ( n: number ) => Promise< number >;
+							async2: ( n: number ) => AsyncAction< number >;
+						};
+						callbacks: {
+							existent: number;
+						};
+					}
 
-				const myStore = store< Store >( 'test', {
-					actions: {
-						sync( n ) {
-							return n;
+					const myStore = store< Store >( 'test', {
+						actions: {
+							sync( n ) {
+								return n;
+							},
+							*async( n ): AsyncAction< number > {
+								const n1 = ( yield myStore.actions.async2(
+									n
+								) ) as TypeYield<
+									typeof myStore.actions.async2
+								> satisfies number;
+								return n1 + n;
+							},
+							*async2( n: number ) {
+								return n;
+							},
 						},
-						*async( n ): AsyncAction< number > {
-							const n1 = ( yield myStore.actions.async2(
-								n
-							) ) as TypeYield<
-								typeof myStore.actions.async2
-							> satisfies number;
-							return n1 + n;
+						callbacks: {
+							existent: 1,
+							// @ts-expect-error `nonExistent` is intentionally not part of the declared store.
+							nonExistent: 1,
 						},
-						*async2( n: number ) {
-							return n;
-						},
-					},
-					callbacks: {
-						existent: 1,
-						// @ts-expect-error `nonExistent` is intentionally not part of the declared store.
-						nonExistent: 1,
-					},
-				} );
+					} );
 
-				// @ts-expect-error This store part declares no `state` property.
-				myStore.state.nonExistent satisfies number;
-				myStore.actions.sync( 1 ) satisfies number;
-				myStore.actions.async( 1 ) satisfies Promise< number >;
-				( await myStore.actions.async( 1 ) ) satisfies number;
-				myStore.callbacks.existent satisfies number;
-				// @ts-expect-error `nonExistent` is intentionally absent from the store callbacks.
-				myStore.callbacks.nonExistent satisfies number;
-				// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
-				myStore.actions.nonExistent() satisfies {};
-			};
-		} );
+					// @ts-expect-error This store part declares no `state` property.
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
+					myStore.callbacks.existent satisfies number;
+					// @ts-expect-error `nonExistent` is intentionally absent from the store callbacks.
+					myStore.callbacks.nonExistent satisfies number;
+					// @ts-expect-error `nonExistent` is intentionally absent from the store actions.
+					myStore.actions.nonExistent() satisfies {};
+				};
+			}
+		);
 
-		describe( 'the store can be divided into multiple parts', () => {
+		checkTypes( 'the store can be divided into multiple parts', () => {
 			// eslint-disable-next-line no-unused-expressions
 			async () => {
 				type ServerState = {
@@ -298,130 +310,148 @@ describe( 'Interactivity API types', () => {
 			};
 		} );
 
-		describe( 'a typed store can be returned without adding a new store part', () => {
-			type State = {
-				someValue: number;
-			};
-			type Actions = {
-				incrementValue: ( n: number ) => void;
-			};
+		checkTypes(
+			'a typed store can be returned without adding a new store part',
+			() => {
+				type State = {
+					someValue: number;
+				};
+				type Actions = {
+					incrementValue: ( n: number ) => void;
+				};
 
-			const { state, actions } = store< {
-				state: State;
-				actions: Actions;
-			} >( 'storeWithState', {
-				actions: {
-					incrementValue( n ) {
-						state.someValue += n;
-					},
-				},
-			} );
-
-			state.someValue satisfies number;
-			actions.incrementValue( 1 ) satisfies void;
-
-			const { actions: actions2 } = store< { actions: Actions } >(
-				'storeWithoutState',
-				{
+				const { state, actions } = store< {
+					state: State;
+					actions: Actions;
+				} >( 'storeWithState', {
 					actions: {
 						incrementValue( n ) {
 							state.someValue += n;
 						},
 					},
-				}
-			);
-
-			actions2.incrementValue( 1 ) satisfies void;
-		} );
-
-		describe( 'async actions can pass state to yields and type the yield returns', () => {
-			// eslint-disable-next-line no-unused-expressions
-			async () => {
-				type Store = {
-					state: {
-						someValue: string;
-					};
-					actions: {
-						asyncAction: () => Promise< number >;
-					};
-				};
-
-				const asyncFunction = async (
-					someValue: string
-				): Promise< string > => {
-					return someValue;
-				};
-
-				const { state, actions } = store< Store >( 'test', {
-					actions: {
-						*asyncAction(): AsyncAction< number > {
-							( yield asyncFunction(
-								state.someValue
-							) ) as TypeYield<
-								typeof asyncFunction
-							> satisfies string;
-
-							return 1;
-						},
-					},
 				} );
 
-				( await actions.asyncAction() ) satisfies number;
-			};
-		} );
+				state.someValue satisfies number;
+				actions.incrementValue( 1 ) satisfies void;
+
+				const { actions: actions2 } = store< { actions: Actions } >(
+					'storeWithoutState',
+					{
+						actions: {
+							incrementValue( n ) {
+								state.someValue += n;
+							},
+						},
+					}
+				);
+
+				actions2.incrementValue( 1 ) satisfies void;
+			}
+		);
+
+		checkTypes(
+			'async actions can pass state to yields and type the yield returns',
+			() => {
+				// eslint-disable-next-line no-unused-expressions
+				async () => {
+					type Store = {
+						state: {
+							someValue: string;
+						};
+						actions: {
+							asyncAction: () => Promise< number >;
+						};
+					};
+
+					const asyncFunction = async (
+						someValue: string
+					): Promise< string > => {
+						return someValue;
+					};
+
+					const { state, actions } = store< Store >( 'test', {
+						actions: {
+							*asyncAction(): AsyncAction< number > {
+								( yield asyncFunction(
+									state.someValue
+								) ) as TypeYield<
+									typeof asyncFunction
+								> satisfies string;
+
+								return 1;
+							},
+						},
+					} );
+
+					( await actions.asyncAction() ) satisfies number;
+				};
+			}
+		);
 	} );
 
-	describe( 'getServerState', () => {
-		describe( 'should return a generic object when no type is passed', () => {
-			// eslint-disable-next-line no-unused-expressions
+	checkTypes( 'getServerState', () => {
+		checkTypes(
+			'should return a generic object when no type is passed',
 			() => {
-				const state = getServerState();
-				state.nonExistent satisfies any;
-			};
-		} );
+				// eslint-disable-next-line no-unused-expressions
+				() => {
+					const state = getServerState();
+					state.nonExistent satisfies any;
+				};
+			}
+		);
 
-		describe( 'should accept a type parameter to define the returned object type', () => {
-			// eslint-disable-next-line no-unused-expressions
+		checkTypes(
+			'should accept a type parameter to define the returned object type',
 			() => {
-				interface State {
-					foo: string;
-					bar: {
-						baz: number;
-					};
-				}
-				const state = getServerState< State >();
-				// @ts-expect-error `nonExistent` is intentionally absent from the state type.
-				state.nonExistent = 'error';
-				state.foo satisfies string;
-				state.bar.baz satisfies number;
-			};
-		} );
+				// eslint-disable-next-line no-unused-expressions
+				() => {
+					interface State {
+						foo: string;
+						bar: {
+							baz: number;
+						};
+					}
+					const state = getServerState< State >();
+					// @ts-expect-error `nonExistent` is intentionally absent from the state type.
+					state.nonExistent = 'error';
+					state.foo satisfies string;
+					state.bar.baz satisfies number;
+				};
+			}
+		);
 	} );
 
-	describe( 'getServerContext', () => {
-		describe( 'should return a generic object when no type is passed', () => {
-			// eslint-disable-next-line no-unused-expressions
+	checkTypes( 'getServerContext', () => {
+		checkTypes(
+			'should return a generic object when no type is passed',
 			() => {
-				const context = getServerContext();
-				context.nonExistent satisfies any;
-			};
-		} );
+				// eslint-disable-next-line no-unused-expressions
+				() => {
+					const context = getServerContext();
+					context.nonExistent satisfies any;
+				};
+			}
+		);
 
-		describe( 'should accept a type parameter to define the returned object type', () => {
-			// eslint-disable-next-line no-unused-expressions
+		checkTypes(
+			'should accept a type parameter to define the returned object type',
 			() => {
-				interface Context {
-					foo: string;
-					bar: {
-						baz: number;
-					};
-				}
-				const context = getServerContext< Context >();
-				// @ts-expect-error `nonExistent` is intentionally absent from the context type.
-				context.nonExistent = 'error';
-				context.foo satisfies string;
-				context.bar.baz satisfies number;
-			};
-		} );
+				// eslint-disable-next-line no-unused-expressions
+				() => {
+					interface Context {
+						foo: string;
+						bar: {
+							baz: number;
+						};
+					}
+					const context = getServerContext< Context >();
+					// @ts-expect-error `nonExistent` is intentionally absent from the context type.
+					context.nonExistent = 'error';
+					context.foo satisfies string;
+					context.bar.baz satisfies number;
+				};
+			}
+		);
 	} );
 } );

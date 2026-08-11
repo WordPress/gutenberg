@@ -1,8 +1,11 @@
+import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import _NumberControl from '..';
 import type { NumberControlProps } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const NumberControl = (
 	props: React.ComponentProps< typeof _NumberControl >
@@ -50,7 +53,7 @@ describe( 'NumberControl', () => {
 	describe( 'onChange handling', () => {
 		it( 'should provide onChange callback with number value', async () => {
 			const user = userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 
 			render(
 				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
@@ -65,7 +68,7 @@ describe( 'NumberControl', () => {
 
 		it( 'should call onChange callback when value is clamped on blur', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<NumberControl
@@ -108,7 +111,7 @@ describe( 'NumberControl', () => {
 
 		it( 'should call onChange callback when value is not valid', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<NumberControl
@@ -251,7 +254,7 @@ describe( 'NumberControl', () => {
 		it( 'should fire onKeyDown callback', async () => {
 			const user = userEvent.setup();
 
-			const spy = jest.fn();
+			const spy = vi.fn();
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
@@ -404,7 +407,7 @@ describe( 'NumberControl', () => {
 	describe( 'Key DOWN interactions', () => {
 		it( 'should fire onKeyDown callback', async () => {
 			const user = userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
@@ -587,7 +590,7 @@ describe( 'NumberControl', () => {
 			'should spin %s to %s when props = %o',
 			async ( direction, expectedValue, props ) => {
 				const user = userEvent.setup();
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				render(
 					<NumberControl
 						{ ...props }

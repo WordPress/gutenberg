@@ -1,11 +1,17 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const noop = () => {};
 
@@ -118,7 +124,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<Dataform
 					onChange={ onChange }
@@ -143,7 +149,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should allow decimal input for number fields', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const fieldsWithNumber = [
 				...fields,
 				{
@@ -179,7 +185,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should edit time fields with a time input', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const fieldsWithTime = [
 				...fields,
 				{
@@ -449,7 +455,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should apply changes and close modal when apply button is clicked', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const formWithModalPanel = {
 				...form,
 				layout: {
@@ -494,7 +500,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<Dataform
 					onChange={ onChange }
@@ -861,7 +867,7 @@ describe( 'DataForm component', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: /main card/i } )
 			);
-			jest.mocked( speak ).mockClear();
+			vi.mocked( speak ).mockClear();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Outside' } )
@@ -991,7 +997,7 @@ describe( 'DataForm component', () => {
 			await act( async () => {
 				details!.open = false;
 			} );
-			jest.mocked( speak ).mockClear();
+			vi.mocked( speak ).mockClear();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Outside' } )

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { wordpress } from '@wordpress/icons';
 import { ToolbarGroup } from '..';
@@ -87,7 +88,7 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
-			const clickHandler = jest.fn();
+			const clickHandler = vi.fn();
 			const controls = [
 				{
 					icon: wordpress,

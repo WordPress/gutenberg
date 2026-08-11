@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getChildLayoutStyleRules } from '../layout-child';
 
 describe( 'layout child', () => {

@@ -1,8 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import PostTaxonomies from '../';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'PostTaxonomies', () => {
 	const genresTaxonomy = {
@@ -47,7 +50,7 @@ describe( 'PostTaxonomies', () => {
 	];
 
 	beforeEach( () => {
-		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: {
 				'wp:action-create-categories': [
 					{
@@ -72,7 +75,7 @@ describe( 'PostTaxonomies', () => {
 			},
 		} );
 
-		jest.spyOn( select( coreStore ), 'getEntityRecord' ).mockImplementation(
+		vi.spyOn( select( coreStore ), 'getEntityRecord' ).mockImplementation(
 			( kind, name, slug ) => {
 				switch ( slug ) {
 					case 'category': {
@@ -89,15 +92,12 @@ describe( 'PostTaxonomies', () => {
 	it( 'should render no children if taxonomy data not available', () => {
 		const taxonomies = null;
 
-		jest.spyOn(
-			select( editorStore ),
-			'getCurrentPostType'
-		).mockReturnValue( 'page' );
-		jest.spyOn(
-			select( coreStore ),
-			'getEntityRecords'
-		).mockImplementation( ( kind, name ) =>
-			kind === 'root' && name === 'taxonomy' ? taxonomies : null
+		vi.spyOn( select( editorStore ), 'getCurrentPostType' ).mockReturnValue(
+			'page'
+		);
+		vi.spyOn( select( coreStore ), 'getEntityRecords' ).mockImplementation(
+			( kind, name ) =>
+				kind === 'root' && name === 'taxonomy' ? taxonomies : null
 		);
 
 		const { container } = render( <PostTaxonomies /> );
@@ -106,15 +106,12 @@ describe( 'PostTaxonomies', () => {
 	} );
 
 	it( 'should render taxonomy components for taxonomies assigned to post type', () => {
-		jest.spyOn(
-			select( editorStore ),
-			'getCurrentPostType'
-		).mockReturnValue( 'book' );
-		jest.spyOn(
-			select( coreStore ),
-			'getEntityRecords'
-		).mockImplementation( ( kind, name ) =>
-			kind === 'root' && name === 'taxonomy' ? allTaxonomies : null
+		vi.spyOn( select( editorStore ), 'getCurrentPostType' ).mockReturnValue(
+			'book'
+		);
+		vi.spyOn( select( coreStore ), 'getEntityRecords' ).mockImplementation(
+			( kind, name ) =>
+				kind === 'root' && name === 'taxonomy' ? allTaxonomies : null
 		);
 
 		render( <PostTaxonomies /> );
@@ -132,15 +129,12 @@ describe( 'PostTaxonomies', () => {
 	} );
 
 	it( 'should not render taxonomy components that hide their ui', () => {
-		jest.spyOn(
-			select( editorStore ),
-			'getCurrentPostType'
-		).mockReturnValue( 'book' );
-		jest.spyOn(
-			select( coreStore ),
-			'getEntityRecords'
-		).mockImplementation( ( kind, name ) =>
-			kind === 'root' && name === 'taxonomy' ? hidesUI : null
+		vi.spyOn( select( editorStore ), 'getCurrentPostType' ).mockReturnValue(
+			'book'
+		);
+		vi.spyOn( select( coreStore ), 'getEntityRecords' ).mockImplementation(
+			( kind, name ) =>
+				kind === 'root' && name === 'taxonomy' ? hidesUI : null
 		);
 
 		render( <PostTaxonomies /> );

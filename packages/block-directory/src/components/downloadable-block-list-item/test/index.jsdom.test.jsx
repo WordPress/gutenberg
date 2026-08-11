@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import DownloadableBlockListItem from '../';
 import { plugin } from '../../test/fixtures';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'DownloadableBlockListItem', () => {
 	it( 'should render a block item', () => {
@@ -18,7 +19,7 @@ describe( 'DownloadableBlockListItem', () => {
 		} ) );
 
 		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
+			<DownloadableBlockListItem onClick={ vi.fn() } item={ plugin } />
 		);
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
@@ -33,7 +34,7 @@ describe( 'DownloadableBlockListItem', () => {
 		} ) );
 
 		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
+			<DownloadableBlockListItem onClick={ vi.fn() } item={ plugin } />
 		);
 		const statusLabel = screen.queryByText( 'Installing…' );
 		expect( statusLabel ).toBeInTheDocument();
@@ -46,7 +47,7 @@ describe( 'DownloadableBlockListItem', () => {
 		} ) );
 
 		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
+			<DownloadableBlockListItem onClick={ vi.fn() } item={ plugin } />
 		);
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
@@ -61,7 +62,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstalling: false,
 			isInstallable: true,
 		} ) );
-		const onClick = jest.fn();
+		const onClick = vi.fn();
 		render(
 			<DownloadableBlockListItem onClick={ onClick } item={ plugin } />
 		);

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { getContrast } from '../color-ramps/lib/color-utils';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';

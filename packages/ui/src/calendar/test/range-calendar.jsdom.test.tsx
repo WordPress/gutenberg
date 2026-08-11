@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, within, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -65,10 +66,7 @@ const ControlledRangeCalendar = (
 };
 
 function setupUserEvent() {
-	// The `advanceTimersByTime` is needed since we're using jest
-	// fake timers to simulate a fixed date for tests.
-	const user = userEvent.setup( { advanceTimers: jest.advanceTimersByTime } );
-	return user;
+	return userEvent.setup();
 }
 
 describe( 'RangeCalendar', () => {
@@ -82,10 +80,10 @@ describe( 'RangeCalendar', () => {
 	let prevPrevMonth: Date;
 
 	beforeAll( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers( { toFake: [ 'Date' ] } );
 		// For consistent tests, set the system time to a fixed date:
 		// Thursday, May 15, 2025, 20:00 UTC
-		jest.setSystemTime( 1747339200000 );
+		vi.setSystemTime( 1747339200000 );
 
 		today = startOfDay( new Date() );
 		tomorrow = addDays( today, 1 );
@@ -98,7 +96,7 @@ describe( 'RangeCalendar', () => {
 	} );
 
 	afterAll( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	describe( 'Semantics and basic behavior', () => {
@@ -278,7 +276,7 @@ describe( 'RangeCalendar', () => {
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should start selecting a range when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -303,7 +301,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should complete a range selection when a second date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -348,7 +346,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should handle selecting dates in reverse order (end date first)', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -393,7 +391,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should expand the current range when clicking a third date after the existing range end', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -449,7 +447,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should update the current range when clicking a third date in between the existing range start and end', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -505,7 +503,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should expand the current range when clicking a third date before the existing range start', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render( <Component onValueChange={ onValueChange } /> );
 
@@ -559,7 +557,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not select a disabled date when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render(
 					<Component
@@ -579,7 +577,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should clear the range when defining a one-day range and clicking on the same date again', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				const dayAfterTomorrow = addDays( today, 2 );
 
@@ -641,7 +639,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not clear the range when clicking a selected date if the `required` prop is set to `true`', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				const dayAfterTomorrow = addDays( today, 2 );
 
@@ -691,7 +689,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should complete a range selection even if there are disabled dates in the range', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render(
 					<Component
@@ -737,7 +735,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not complete a range selection if the `excludeDisabled` prop is set to `true` and there is at least one disabled date in the range', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render(
 					<Component
@@ -784,7 +782,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not complete a range selection if the range has a duration of less than the value of the `min` prop', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render(
 					<Component onValueChange={ onValueChange } min={ 3 } />
@@ -843,7 +841,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not complete a range selection if the range has a duration of more than the value of the `max` prop', async () => {
 				const user = setupUserEvent();
-				const onValueChange = jest.fn();
+				const onValueChange = vi.fn();
 
 				render(
 					<Component onValueChange={ onValueChange } max={ 2 } />
@@ -932,7 +930,7 @@ describe( 'RangeCalendar', () => {
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
 				const user = setupUserEvent();
-				const onMonthChange = jest.fn();
+				const onMonthChange = vi.fn();
 
 				render( <Component onMonthChange={ onMonthChange } /> );
 
@@ -986,7 +984,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not navigate to a month that is before the `startMonth` prop', async () => {
 				const user = setupUserEvent();
-				const onMonthChange = jest.fn();
+				const onMonthChange = vi.fn();
 
 				render(
 					<Component
@@ -1039,7 +1037,7 @@ describe( 'RangeCalendar', () => {
 
 			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
 				const user = setupUserEvent();
-				const onMonthChange = jest.fn();
+				const onMonthChange = vi.fn();
 
 				render(
 					<Component
@@ -1470,7 +1468,7 @@ describe( 'RangeCalendar', () => {
 
 		it( 'should support timezones according to the `timeZone` prop', async () => {
 			const user = setupUserEvent();
-			const onValueChange = jest.fn();
+			const onValueChange = vi.fn();
 
 			render(
 				<RangeCalendar

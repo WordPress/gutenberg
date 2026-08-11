@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { rotateImage } from '../';
 
 /**
@@ -7,66 +9,72 @@ import { rotateImage } from '../';
  * returns the same image instance so chained calls (e.g. `flipHor().rot90()`)
  * are captured in order.
  */
-let calls: string[];
-let removed: string[];
+const { MockVipsImage, mockState } = vi.hoisted( () => {
+	const state = {
+		calls: [] as string[],
+		removed: [] as string[],
+	};
 
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	onProgress = () => {};
-	kill = false;
+	class ImageMock {
+		width = 100;
+		height = 100;
+		pageHeight = 100;
+		onProgress = () => {};
+		kill = false;
 
-	flipHor = jest.fn( () => {
-		calls.push( 'flipHor' );
-		return this;
-	} );
-	flipVer = jest.fn( () => {
-		calls.push( 'flipVer' );
-		return this;
-	} );
-	rot90 = jest.fn( () => {
-		calls.push( 'rot90' );
-		return this;
-	} );
-	rot180 = jest.fn( () => {
-		calls.push( 'rot180' );
-		return this;
-	} );
-	rot270 = jest.fn( () => {
-		calls.push( 'rot270' );
-		return this;
-	} );
-	remove = jest.fn( ( field: string ) => {
-		removed.push( field );
-		return true;
-	} );
-	writeToBuffer = jest.fn( () => ( {
-		buffer: new ArrayBuffer( 0 ),
-	} ) );
-}
+		flipHor = vi.fn( () => {
+			state.calls.push( 'flipHor' );
+			return this;
+		} );
+		flipVer = vi.fn( () => {
+			state.calls.push( 'flipVer' );
+			return this;
+		} );
+		rot90 = vi.fn( () => {
+			state.calls.push( 'rot90' );
+			return this;
+		} );
+		rot180 = vi.fn( () => {
+			state.calls.push( 'rot180' );
+			return this;
+		} );
+		rot270 = vi.fn( () => {
+			state.calls.push( 'rot270' );
+			return this;
+		} );
+		remove = vi.fn( ( field: string ) => {
+			state.removed.push( field );
+			return true;
+		} );
+		writeToBuffer = vi.fn( () => ( {
+			buffer: new ArrayBuffer( 0 ),
+		} ) );
+	}
 
-class MockVipsImage {
-	static newFromBuffer = jest.fn( () => new MockImage() );
-}
+	class VipsImageMock {
+		static newFromBuffer = vi.fn( () => new ImageMock() );
+	}
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	return { MockVipsImage: VipsImageMock, mockState: state };
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'rotateImage', () => {
 	beforeEach( () => {
-		calls = [];
-		removed = [];
+		mockState.calls = [];
+		mockState.removed = [];
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	async function rotate( orientation: number ) {
@@ -95,13 +103,13 @@ describe( 'rotateImage', () => {
 		async ( orientation, expected ) => {
 			await rotate( orientation );
 
-			expect( calls ).toEqual( expected );
+			expect( mockState.calls ).toEqual( expected );
 		}
 	);
 
 	it( 'strips the EXIF orientation tag after rotating', async () => {
 		await rotate( 6 );
 
-		expect( removed ).toContain( 'orientation' );
+		expect( mockState.removed ).toContain( 'orientation' );
 	} );
 } );

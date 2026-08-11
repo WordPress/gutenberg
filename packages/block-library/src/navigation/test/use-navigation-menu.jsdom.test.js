@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
@@ -24,11 +25,11 @@ function createRegistryWithStores() {
 	return registry;
 }
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+	useSelect: vi.fn(),
+} ) );
 
 function resolveRecords( registry, menus ) {
 	const dispatch = registry.dispatch( coreStore );

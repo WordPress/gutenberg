@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"checkJs": false,
-		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../blocks" },
@@ -12,5 +12,5 @@
 		{ "path": "../private-apis" },
 		{ "path": "../style-engine" }
 	],
-	"files": [ "global.d.ts" ]
+	"files": []
 }

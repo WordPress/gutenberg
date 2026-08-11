@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Item, ItemGroup } from '..';
@@ -68,7 +69,7 @@ describe( 'ItemGroup', () => {
 	describe( 'Item', () => {
 		it( 'should render as a `button` if the `onClick` handler is specified', async () => {
 			const user = userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render( <Item onClick={ spy }>Code is poetry</Item> );
 
 			const button = screen.getByRole( 'button' );
@@ -81,7 +82,7 @@ describe( 'ItemGroup', () => {
 		} );
 
 		it( 'should give priority to the `as` prop even if the `onClick` handler is specified', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			const { rerender } = render(
 				<Item onClick={ spy }>Code is poetry</Item>
 			);

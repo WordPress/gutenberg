@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createHooks } from '@wordpress/hooks';
 import { createI18n } from '..';
 

@@ -1,7 +1,8 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
@@ -12,11 +13,19 @@ import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
-jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
-	useInlineFit: jest.fn(),
-} ) );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-const mockedUseInlineFit = jest.mocked( useInlineFit );
+globalThis.wpVitest.mockResizeObserver();
+
+vi.mock(
+	import( '../components/widget-attributes/use-inline-fit' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useInlineFit: vi.fn(),
+	} )
+);
+
+const mockedUseInlineFit = vi.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,

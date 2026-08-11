@@ -1,8 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click, sleep } from '@ariakit/test';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
+globalThis.wpVitest.mockMatchMedia();
 
 const props = {
 	children: <button>Tooltip anchor</button>,
@@ -315,8 +317,8 @@ describe( 'Tooltip', () => {
 		}, 10_000 );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
-			const onMouseEnterMock = jest.fn();
-			const onMouseLeaveMock = jest.fn();
+			const onMouseEnterMock = vi.fn();
+			const onMouseLeaveMock = vi.fn();
 			const HOVER_OUTSIDE_ANTICIPATION = 200;
 
 			render(
@@ -417,7 +419,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'event propagation', () => {
 		it( 'should close the parent dialog component when pressing the Escape key while the tooltip is visible', async () => {
-			const onRequestClose = jest.fn();
+			const onRequestClose = vi.fn();
 			render(
 				<Modal onRequestClose={ onRequestClose }>
 					<p>Modal content</p>

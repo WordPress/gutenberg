@@ -1,8 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
 import FontSizePickerSelect from '../font-size-picker-select';
 import type { FontSize } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'FontSizePickerSelect', () => {
 	const fontSizes: FontSize[] = [
@@ -25,14 +28,14 @@ describe( 'FontSizePickerSelect', () => {
 
 	describe( 'valueMode prop', () => {
 		it( 'should find font size by size value when valueMode is literal', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value="16px"
 					valueMode="literal"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -43,14 +46,14 @@ describe( 'FontSizePickerSelect', () => {
 		} );
 
 		it( 'should find font size by slug when valueMode is slug', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value="medium"
 					valueMode="slug"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -61,14 +64,14 @@ describe( 'FontSizePickerSelect', () => {
 		} );
 
 		it( 'should handle undefined value', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value={ undefined }
 					valueMode="literal"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -79,14 +82,14 @@ describe( 'FontSizePickerSelect', () => {
 		} );
 
 		it( 'should handle empty string value', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value=""
 					valueMode="literal"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -100,12 +103,12 @@ describe( 'FontSizePickerSelect', () => {
 	describe( 'onChange callback', () => {
 		it( 'should call onChange with FontSize object as second parameter', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -120,13 +123,13 @@ describe( 'FontSizePickerSelect', () => {
 
 		it( 'should call onChange with undefined as second parameter for default option', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value="16px" // Start with a selected value
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -160,14 +163,14 @@ describe( 'FontSizePickerSelect', () => {
 		];
 
 		it( 'should handle multiple font sizes with same value in literal mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizesWithDuplicates }
 					value="12px"
 					valueMode="literal"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);
@@ -178,14 +181,14 @@ describe( 'FontSizePickerSelect', () => {
 		} );
 
 		it( 'should handle multiple font sizes with same value in slug mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizesWithDuplicates }
 					value="small-1"
 					valueMode="slug"
 					onChange={ onChange }
-					onSelectCustom={ jest.fn() }
+					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }
 				/>
 			);

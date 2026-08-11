@@ -1,7 +1,8 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
@@ -10,6 +11,12 @@ import type {
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockVisibleElements();
 
 function PreviewWidget( {
 	attributes,
@@ -89,7 +96,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'inserts the selected widget type into the layout on Done', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
@@ -130,7 +137,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'inserts multiple widgets via multi-select in a single layout change', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
@@ -162,7 +169,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'preserves existing widgets when appending new ones', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		const existing: DashboardWidget = {
 			uuid: 'existing-1',
 			type: 'wordpress/welcome',

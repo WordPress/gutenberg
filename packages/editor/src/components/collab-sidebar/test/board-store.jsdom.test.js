@@ -1,5 +1,6 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createBoardStore } from '../board-store';
-
+globalThis.wpVitest.mockResizeObserver();
 function mockRect( element, top ) {
 	element.getBoundingClientRect = () => ( { top } );
 }

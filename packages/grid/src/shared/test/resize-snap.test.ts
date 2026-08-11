@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { clampResizeDelta, gridSpanToPixelSize } from '../resize-snap';
 
 describe( 'gridSpanToPixelSize', () => {

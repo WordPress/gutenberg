@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
 import { getMatchingBlockByName, getRetainedBlockAttributes } from '../utils';
 

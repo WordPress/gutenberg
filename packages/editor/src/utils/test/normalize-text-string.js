@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { normalizeTextString } from '../normalize-text-string';
 
 describe( 'normalizeTextString', () => {

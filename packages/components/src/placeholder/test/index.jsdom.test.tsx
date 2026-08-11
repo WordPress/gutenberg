@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
@@ -6,10 +7,13 @@ import BasePlaceholder from '../';
 import type { WordPressComponentProps } from '../../context';
 import type { PlaceholderProps } from '../types';
 
-jest.mock( '@wordpress/compose', () => {
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 	return {
-		...jest.requireActual( '@wordpress/compose' ),
-		useResizeObserver: jest.fn( () => [] ),
+		...original,
+		useResizeObserver: vi.fn(
+			() => []
+		) as unknown as typeof original.useResizeObserver,
 	};
 } );
 
@@ -31,15 +35,18 @@ const Placeholder = (
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
-const mockedSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+const mockedUseResizeObserver = vi.mocked( useResizeObserver );
+const mockedSpeak = vi.mocked( speak );
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
-		// @ts-expect-error The imported hook is not typed as a Jest mock.
-		useResizeObserver.mockReturnValue( [
+		mockedUseResizeObserver.mockReturnValue( [
 			<div key="1" />,
-			{ width: 320 },
+			{ width: 320, height: null },
 		] );
 		mockedSpeak.mockReset();
 	} );
@@ -153,10 +160,9 @@ describe( 'Placeholder', () => {
 
 	describe( 'resize aware', () => {
 		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
-			// @ts-expect-error The imported hook is not typed as a Jest mock.
-			useResizeObserver.mockReturnValue( [
+			mockedUseResizeObserver.mockReturnValue( [
 				<div key="1" />,
-				{ width: 480 },
+				{ width: 480, height: null },
 			] );
 
 			render( <Placeholder /> );
@@ -168,10 +174,9 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
-			// @ts-expect-error The imported hook is not typed as a Jest mock.
-			useResizeObserver.mockReturnValue( [
+			mockedUseResizeObserver.mockReturnValue( [
 				<div key="1" />,
-				{ width: null },
+				{ width: null, height: null },
 			] );
 
 			render( <Placeholder /> );

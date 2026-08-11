@@ -1,8 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 // Since `BoxControlProps` is a the result of type unions, we need to use
 // a distributive version of the standard `Omit` utility.
@@ -166,7 +169,7 @@ describe( 'BoxControl', () => {
 
 		it( 'should persist cleared value when focus changes', async () => {
 			const user = userEvent.setup();
-			const spyChange = jest.fn();
+			const spyChange = vi.fn();
 
 			render(
 				<UncontrolledBoxControl onChange={ ( v ) => spyChange( v ) } />
@@ -414,7 +417,7 @@ describe( 'BoxControl', () => {
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UncontrolledBoxControl onChange={ onChangeSpy } /> );
 
@@ -443,7 +446,7 @@ describe( 'BoxControl', () => {
 
 		it( 'should not pass invalid CSS unit only values to onChange', async () => {
 			const user = userEvent.setup();
-			const setState = jest.fn();
+			const setState = vi.fn();
 
 			render( <UncontrolledBoxControl onChange={ setState } /> );
 

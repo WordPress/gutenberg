@@ -52,6 +52,8 @@
  *   `serverSourcePixel` to undo it, and add values to the grid in
  *   `buildRows`. The probes don't need to change.
  */
+
+import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import { buildModifiers } from '../build-modifiers';
 import type { Modifier } from '../build-modifiers';

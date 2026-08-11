@@ -1,8 +1,7 @@
 import { __ } from '@wordpress/i18n';
-import {
-	BlockPreview,
-	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
-} from '@wordpress/block-editor';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Package builds lack declarations that the Vitest type graph provides.
+// @ts-ignore `@wordpress/block-editor` does not expose type declarations for its entry point.
+import { BlockPreview } from '@wordpress/block-editor';
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
@@ -10,6 +9,9 @@ import { EditorProvider } from '../../../components/provider';
 import { useStyle } from '../../../components/global-styles';
 import { unlock } from '../../../lock-unlock';
 import { store as editorStore } from '../../../store';
+
+const AsyncBlockPreview = ( BlockPreview as any ).Async;
+const ContentBlockPreview = BlockPreview as any;
 
 function PostPreviewContainer( {
 	template,
@@ -44,9 +46,9 @@ function PostPreviewContainer( {
 				</span>
 			) }
 			{ ! isEmpty && (
-				<BlockPreview.Async>
-					<BlockPreview blocks={ blocks } />
-				</BlockPreview.Async>
+				<AsyncBlockPreview>
+					<ContentBlockPreview blocks={ blocks } />
+				</AsyncBlockPreview>
 			) }
 		</div>
 	);

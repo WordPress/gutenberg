@@ -1,6 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Package builds lack declarations that the Vitest type graph provides.
+// @ts-ignore `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { AbsoluteBlockIndexPath } from '../types';
 import { unlock } from '../lock-unlock';

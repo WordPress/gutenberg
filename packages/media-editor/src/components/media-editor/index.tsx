@@ -28,7 +28,8 @@ import {
 	ComplementaryArea,
 	InterfaceSkeleton,
 	PinnedItems,
-	// @ts-expect-error `@wordpress/interface` is not typed yet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Package builds lack declarations that the Vitest type graph provides.
+	// @ts-ignore `@wordpress/interface` is not typed yet.
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { MediaEditorProvider } from '../media-editor-provider';

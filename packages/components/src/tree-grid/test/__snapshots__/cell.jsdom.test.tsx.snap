@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TreeGridCell uses a child render function to render children 1`] = `
+exports[`TreeGridCell > uses a child render function to render children 1`] = `
 <div>
   <div
     role="application"

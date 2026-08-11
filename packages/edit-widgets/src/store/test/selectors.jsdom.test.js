@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import * as _selectors from '../selectors';
 
 const selectors = { ..._selectors };

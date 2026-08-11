@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addFallbackToVar } from '../ds-token-fallbacks.mjs';
 
 describe( 'addFallbackToVar', () => {

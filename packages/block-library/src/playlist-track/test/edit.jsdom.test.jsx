@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
@@ -6,7 +7,7 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -17,7 +18,7 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 	},
 	MediaUpload: ( { render: renderMediaUpload } ) =>
-		renderMediaUpload( { open: jest.fn() } ),
+		renderMediaUpload( { open: vi.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
 	PlainText: ( {
 		onChange,
@@ -27,30 +28,30 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
-	useBlockProps: jest.fn( () => ( {} ) ),
+	useBlockProps: vi.fn( () => ( {} ) ),
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+vi.mock( '@wordpress/data', () => ( {
+	useDispatch: vi.fn(),
+	combineReducers: vi.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
 			newState[ key ] = reducers[ key ]( state[ key ], action );
 		} );
 		return newState;
 	} ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	createSelector: jest.fn( ( fn ) => fn ),
-	register: jest.fn(),
+	createRegistrySelector: vi.fn( ( fn ) => fn ),
+	createReduxStore: vi.fn( () => ( {} ) ),
+	createSelector: vi.fn( ( fn ) => fn ),
+	register: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
 } ) );
 
-jest.mock( '../../utils/hooks', () => ( {
-	useUploadMediaFromBlobURL: jest.fn(),
+vi.mock( '../../utils/hooks', () => ( {
+	useUploadMediaFromBlobURL: vi.fn(),
 } ) );
 
 const defaultAttributes = {
@@ -65,8 +66,8 @@ const defaultAttributes = {
 };
 
 function renderEdit( props = {} ) {
-	const setAttributes = jest.fn();
-	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const setAttributes = vi.fn();
+	const setCurrentTrackClientId = props.setCurrentTrackClientId || vi.fn();
 
 	render(
 		<PlaylistContext.Provider
@@ -99,7 +100,7 @@ describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
+			createErrorNotice: vi.fn(),
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );

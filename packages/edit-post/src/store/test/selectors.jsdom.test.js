@@ -1,9 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 } from '../selectors';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'selectors', () => {
 	describe( 'hasMetaBoxes', () => {

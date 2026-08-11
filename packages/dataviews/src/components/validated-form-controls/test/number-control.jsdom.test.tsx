@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedNumberControl } from '../number-control';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'ValidatedNumberControl', () => {
 	it( 'should preserve the help description', () => {

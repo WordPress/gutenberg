@@ -1,14 +1,19 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageSizeControl from '../index';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
+
 describe( 'ImageSizeControl', () => {
-	const mockOnChange = jest.fn();
-	const mockOnChangeImage = jest.fn();
+	const mockOnChange = vi.fn();
+	const mockOnChangeImage = vi.fn();
 
 	afterEach( () => {
 		// Cleanup on exiting.
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'returns custom dimensions when they exist', () => {

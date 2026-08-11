@@ -46,7 +46,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
-		"@babel/core": "^7.25.7"
+		"@babel/core": "^7.25.7",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

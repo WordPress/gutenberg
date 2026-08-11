@@ -48,6 +48,9 @@
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/i18n": "file:../i18n"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

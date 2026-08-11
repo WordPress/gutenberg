@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
@@ -90,6 +91,8 @@ describe( 'createInterpolateElement', () => {
 			JSON.stringify(
 				createInterpolateElement( partialString, {
 					em: <em />,
+					// @ts-expect-error - The unmatched closing tag is
+					// intentionally included to exercise runtime recovery.
 					strong: <strong />,
 				} )
 			)

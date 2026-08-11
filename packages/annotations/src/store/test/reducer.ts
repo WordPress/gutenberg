@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { annotations } from '../reducer';
 import type { AnnotationAction, AnnotationsState } from '../../types';
 

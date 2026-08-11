@@ -1,10 +1,11 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { startOfDay } from 'date-fns';
 import { ckb, ug } from 'date-fns/locale';
 import { Calendar, RangeCalendar } from '..';
 
-jest.mock( '@wordpress/i18n', () => {
-	const actual = jest.requireActual( '@wordpress/i18n' );
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	const translations: Record< string, string > = {
 		'Go to the Previous Month': 'Translated previous month',
 		'Today, %s, selected': 'Today and selected: %s',
@@ -12,7 +13,8 @@ jest.mock( '@wordpress/i18n', () => {
 
 	return {
 		...actual,
-		__: ( text: string ) => translations[ text ] ?? text,
+		__: ( ( text: string ) =>
+			translations[ text ] ?? text ) as typeof actual.__,
 	};
 } );
 

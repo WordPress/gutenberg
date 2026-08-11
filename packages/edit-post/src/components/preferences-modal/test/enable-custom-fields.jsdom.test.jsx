@@ -1,12 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import {
 	default as EnableCustomFieldsOption,
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 function setupUseSelectMock( areCustomFieldsEnabled ) {
 	useSelect.mockImplementation( () => {
@@ -17,47 +23,59 @@ function setupUseSelectMock( areCustomFieldsEnabled ) {
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
 		setupUseSelectMock( true );
-		const { container } = render( <EnableCustomFieldsOption /> );
+		render( <EnableCustomFieldsOption /> );
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'checkbox' ) ).toBeChecked();
 	} );
 
 	it( 'renders an unchecked checkbox when custom fields are disabled', () => {
 		setupUseSelectMock( false );
-		const { container } = render( <EnableCustomFieldsOption /> );
+		render( <EnableCustomFieldsOption /> );
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'checkbox' ) ).not.toBeChecked();
 	} );
 
 	it( 'renders an unchecked checkbox and a confirmation message when toggled off', async () => {
 		const user = userEvent.setup();
 
 		setupUseSelectMock( true );
-		const { container } = render( <EnableCustomFieldsOption /> );
+		render( <EnableCustomFieldsOption /> );
 
 		await user.click( screen.getByRole( 'checkbox' ) );
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'checkbox' ) ).not.toBeChecked();
+		expect(
+			screen.getByText( /A page reload is required/ )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Hide & Reload Page' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders a checked checkbox and a confirmation message when toggled on', async () => {
 		const user = userEvent.setup();
 
 		setupUseSelectMock( false );
-		const { container } = render( <EnableCustomFieldsOption /> );
+		render( <EnableCustomFieldsOption /> );
 
 		await user.click( screen.getByRole( 'checkbox' ) );
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'checkbox' ) ).toBeChecked();
+		expect(
+			screen.getByText( /A page reload is required/ )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Show & Reload Page' } )
+		).toBeInTheDocument();
 	} );
 } );
 
 describe( 'CustomFieldsConfirmation', () => {
 	it( 'submits the toggle-custom-fields-form', async () => {
 		const user = userEvent.setup();
-		const submit = jest.fn();
-		const setAttribute = jest.fn();
-		const getElementById = jest
+		const submit = vi.fn();
+		const setAttribute = vi.fn();
+		const getElementById = vi
 			.spyOn( document, 'getElementById' )
 			.mockImplementation( () => ( {
 				submit,

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -107,7 +108,7 @@ describe( 'CollapsibleCard', () => {
 		} );
 
 		it( 'calls onOpenChange when toggled', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 			const user = userEvent.setup();
 
 			render(

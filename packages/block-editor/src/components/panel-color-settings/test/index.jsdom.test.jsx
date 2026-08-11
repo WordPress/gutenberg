@@ -1,5 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import PanelColorSettings from '../';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const noop = () => {};
 

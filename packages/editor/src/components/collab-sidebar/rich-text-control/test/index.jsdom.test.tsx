@@ -1,5 +1,15 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { useContext, useEffect, useState } from '@wordpress/element';
 import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
 import {
@@ -262,7 +272,7 @@ describe( 'RichTextControl', () => {
 
 	describe( 'line breaks', () => {
 		it( 'blocks Enter from inserting line breaks when `disableLineBreaks` is set', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Single line"
@@ -287,7 +297,7 @@ describe( 'RichTextControl', () => {
 		] )(
 			'inserts a single line break into the value on %s',
 			async ( _label, modifiers ) => {
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				const { container } = render(
 					<RichTextControl
 						label="Note"
@@ -323,7 +333,7 @@ describe( 'RichTextControl', () => {
 		] )(
 			'leaves Enter presses from an IME %s to the browser',
 			async ( _label, eventInit ) => {
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				const { container } = render(
 					<RichTextControl
 						label="Note"
@@ -352,7 +362,7 @@ describe( 'RichTextControl', () => {
 		);
 
 		it( 'leaves Enter presses with a meta or ctrl modifier to consumers', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Note"
@@ -417,7 +427,7 @@ describe( 'RichTextControl', () => {
 		// format type can be registered once in `beforeAll` (avoiding store
 		// updates during render that would re-fire `useSelect` outside
 		// `act(...)`), while each test can still assert on a fresh mock.
-		let currentOnUse: jest.Mock;
+		let currentOnUse: Mock;
 
 		// Re-implement `RichTextShortcut` locally to keep the assertion on
 		// the registration contract explicit. It registers a callback into
@@ -479,7 +489,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		beforeEach( () => {
-			currentOnUse = jest.fn();
+			currentOnUse = vi.fn();
 		} );
 
 		// Dispatch a `primary+b` keydown — on non-Apple platforms (jsdom's
@@ -648,7 +658,7 @@ describe( 'RichTextControl', () => {
 
 	describe( 'disabled and validation states', () => {
 		it( 'renders a non-editable field with a disabled state when `disabled`', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Summary"
@@ -861,7 +871,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		it( 'runs registered format input rules on insertText input events', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Input rule"
@@ -884,7 +894,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		it( 'ignores non-text input events', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Input rule ignore"

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { unlock } from '../lock-unlock';
 import { privateApis } from '../private-apis';
 import { ThemeProvider } from '../theme-provider';
@@ -5,9 +6,7 @@ import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
 describe( 'privateApis', () => {
 	it( 'warns when accessing useThemeProviderStyles through private APIs', () => {
-		const warn = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
+		const warn = vi.spyOn( console, 'warn' ).mockImplementation( () => {} );
 
 		const unlockedPrivateApis = unlock< {
 			useThemeProviderStyles: typeof useThemeProviderStyles;
@@ -25,9 +24,7 @@ describe( 'privateApis', () => {
 	} );
 
 	it( 'warns when accessing ThemeProvider through private APIs', () => {
-		const warn = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
+		const warn = vi.spyOn( console, 'warn' ).mockImplementation( () => {} );
 
 		const unlockedPrivateApis = unlock< {
 			ThemeProvider: typeof ThemeProvider;

@@ -1,10 +1,12 @@
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { pasteHandler, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import '../../packages/editor/src/hooks';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'Handling of non matched tags in block transforms', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 	it( 'correctly pastes preformatted tag even if preformatted block is removed', () => {

@@ -1,16 +1,31 @@
-jest.mock( '@octokit/rest' );
-jest.mock( '../../lib/milestone' );
-jest.mock( '../../lib/logger', () => ( {
-	log: jest.fn(),
-	warn: jest.fn(),
-	formats: {
-		title: jest.fn( ( message ) => message ),
-		error: jest.fn( ( message ) => message ),
-		warning: jest.fn( ( message ) => message ),
-	},
-} ) );
-
-import {
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import _pullRequests from './fixtures/pull-requests.json';
+import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+const require = createRequire( import.meta.url );
+const octokitModule = require( '@octokit/rest' );
+const originalOctokit = octokitModule.Octokit;
+const Octokit = vi.fn();
+octokitModule.Octokit = Octokit;
+const milestoneModule = require( '../../lib/milestone' );
+const originalGetMilestoneByTitle = milestoneModule.getMilestoneByTitle;
+const originalGetIssuesByMilestone = milestoneModule.getIssuesByMilestone;
+const getMilestoneByTitle = vi.fn();
+const getIssuesByMilestone = vi.fn();
+milestoneModule.getMilestoneByTitle = getMilestoneByTitle;
+milestoneModule.getIssuesByMilestone = getIssuesByMilestone;
+const loggerModule = require( '../../lib/logger' );
+const originalLogger = { ...loggerModule };
+const log = vi.fn();
+const warn = vi.fn();
+loggerModule.log = log;
+loggerModule.warn = warn;
+loggerModule.formats = {
+	title: vi.fn( ( message ) => message ),
+	error: vi.fn( ( message ) => message ),
+	warning: vi.fn( ( message ) => message ),
+};
+const {
 	getNormalizedTitle,
 	reword,
 	addTrailingPeriod,
@@ -32,15 +47,15 @@ import {
 	createChangelog,
 	fetchAllPullRequests,
 	getManualChangelogInstructions,
-} from '../changelog';
-import _pullRequests from './fixtures/pull-requests.json';
-import botPullRequestFixture from './fixtures/bot-pull-requests.json';
-const { Octokit } = require( '@octokit/rest' );
-const {
-	getMilestoneByTitle,
-	getIssuesByMilestone,
-} = require( '../../lib/milestone' );
-const { log, warn } = require( '../../lib/logger' );
+} = require( '../changelog' );
+
+afterAll( () => {
+	octokitModule.Octokit = originalOctokit;
+	milestoneModule.getMilestoneByTitle = originalGetMilestoneByTitle;
+	milestoneModule.getIssuesByMilestone = originalGetIssuesByMilestone;
+	Object.assign( loggerModule, originalLogger );
+	delete require.cache[ require.resolve( '../changelog' ) ];
+} );
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -57,22 +72,24 @@ const pullRequests = _pullRequests.concat( botPullRequestFixture );
  *
  * @return {Object} Octokit stub.
  */
-const createOctokitWithoutReleases = () => ( {
-	repos: {
-		listReleases: {
-			endpoint: {
-				merge: jest.fn().mockReturnValue( {} ),
+function createOctokitWithoutReleases() {
+	return {
+		repos: {
+			listReleases: {
+				endpoint: {
+					merge: vi.fn().mockReturnValue( {} ),
+				},
 			},
 		},
-	},
-	paginate: {
-		iterator: jest.fn().mockReturnValue(
-			( async function* () {
-				yield { data: [] };
-			} )()
-		),
-	},
-} );
+		paginate: {
+			iterator: vi.fn().mockReturnValue(
+				( async function* () {
+					yield { data: [] };
+				} )()
+			),
+		},
+	};
+}
 
 describe( 'createChangelog', () => {
 	const settings = {
@@ -83,8 +100,10 @@ describe( 'createChangelog', () => {
 	};
 
 	beforeEach( () => {
-		jest.clearAllMocks();
-		Octokit.mockImplementation( () => ( {} ) );
+		vi.clearAllMocks();
+		Octokit.mockImplementation( function () {
+			return {};
+		} );
 	} );
 
 	it( 'keeps successful changelog output unchanged', async () => {

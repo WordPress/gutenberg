@@ -1,12 +1,13 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import SnackbarList from '../list';
 
-window.scrollTo = jest.fn();
+window.scrollTo = vi.fn();
 
 describe( 'SnackbarList', () => {
 	afterEach( () => {
-		jest.resetAllMocks();
+		vi.resetAllMocks();
 	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {

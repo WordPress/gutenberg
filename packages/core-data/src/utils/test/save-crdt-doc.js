@@ -1,10 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { getSyncManager } from '../../sync';
 import { saveCRDTDoc } from '../save-crdt-doc';
 
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../../sync', () => ( {
-	getSyncManager: jest.fn(),
+vi.mock( '@wordpress/api-fetch' );
+vi.mock( '../../sync', () => ( {
+	getSyncManager: vi.fn(),
 } ) );
 
 function createDeferred() {
@@ -28,7 +29,7 @@ describe( 'saveCRDTDoc', () => {
 	beforeEach( () => {
 		apiFetch.mockReset();
 		syncManager = {
-			createPersistedCRDTDoc: jest.fn(),
+			createPersistedCRDTDoc: vi.fn(),
 		};
 		getSyncManager.mockReturnValue( syncManager );
 	} );

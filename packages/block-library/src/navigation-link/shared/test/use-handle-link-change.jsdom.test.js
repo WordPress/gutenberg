@@ -1,35 +1,38 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { useDispatch } from '@wordpress/data';
+import { useHandleLinkChange } from '../use-handle-link-change';
+import { updateAttributes } from '../update-attributes';
+import { useEntityBinding } from '../use-entity-binding';
 // Mock the entire @wordpress/block-editor module
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: {},
 } ) );
+
 // Mock the entire @wordpress/core-data module
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
+
 // Mock useDispatch specifically to avoid needing to set up full data store
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	createSelector: vi.fn( ( fn ) => fn ),
+	createRegistrySelector: vi.fn( ( fn ) => fn ),
+	createReduxStore: vi.fn( () => ( {} ) ),
+	combineReducers: vi.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
 			newState[ key ] = reducers[ key ]( state[ key ], action );
 		} );
 		return newState;
 	} ),
-	register: jest.fn(),
+	register: vi.fn(),
 } ) );
-import { useDispatch } from '@wordpress/data';
-import { useHandleLinkChange } from '../use-handle-link-change';
-import { updateAttributes } from '../update-attributes';
-import { useEntityBinding } from '../use-entity-binding';
 
 // Mock internal dependencies
-jest.mock( '../update-attributes' );
-jest.mock( '../use-entity-binding' );
+vi.mock( import( '../update-attributes' ) );
+vi.mock( import( '../use-entity-binding' ) );
 
 describe( 'useHandleLinkChange', () => {
 	let mockSetAttributes;
@@ -41,10 +44,10 @@ describe( 'useHandleLinkChange', () => {
 
 	beforeEach( () => {
 		// Reset mocks
-		mockSetAttributes = jest.fn();
-		mockUpdateBlockAttributes = jest.fn();
-		mockCreateBinding = jest.fn();
-		mockClearBinding = jest.fn();
+		mockSetAttributes = vi.fn();
+		mockUpdateBlockAttributes = vi.fn();
+		mockCreateBinding = vi.fn();
+		mockClearBinding = vi.fn();
 
 		// Mock useDispatch
 		useDispatch.mockReturnValue( {
@@ -70,7 +73,7 @@ describe( 'useHandleLinkChange', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'creating new entity links', () => {

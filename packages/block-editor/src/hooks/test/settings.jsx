@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { applyFilters } from '@wordpress/hooks';
 import '../settings';
 

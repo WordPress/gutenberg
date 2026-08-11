@@ -1,7 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState, useRef } from '@wordpress/element';
 import { ValidatedRangeControl } from '../components';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'ValidatedRangeControl', () => {
 	it( 'should preserve the help description', () => {

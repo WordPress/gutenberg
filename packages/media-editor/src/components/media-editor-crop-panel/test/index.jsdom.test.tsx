@@ -1,8 +1,11 @@
+import { describe, expect, it, vi, type Mock } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
 import { MediaEditorStateProvider } from '../../../state';
 import type { CropperState } from '../../../image-editor';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function setupCropPanel(
 	overrides: Partial< MediaEditorCropPanelProps > = {},
@@ -10,7 +13,7 @@ function setupCropPanel(
 ) {
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
-		onAspectRatioChange: jest.fn(),
+		onAspectRatioChange: vi.fn(),
 		aspectRatioOptions: [
 			{ label: 'Free', value: 0 },
 			{ label: 'Original', value: -1 },
@@ -40,7 +43,7 @@ describe( 'MediaEditorCropPanel', () => {
 
 		expect( controls.onAspectRatioChange ).toHaveBeenCalled();
 		expect(
-			( controls.onAspectRatioChange as jest.Mock ).mock.calls[ 0 ][ 0 ]
+			( controls.onAspectRatioChange as Mock ).mock.calls[ 0 ][ 0 ]
 		).toBe( '0' );
 	} );
 

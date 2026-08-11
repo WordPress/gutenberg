@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
@@ -39,10 +40,10 @@ describe( 'feature-detection', () => {
 		} as unknown as typeof Worker;
 
 		// jsdom does not implement URL.createObjectURL/revokeObjectURL.
-		global.URL.createObjectURL = jest.fn(
+		global.URL.createObjectURL = vi.fn(
 			() => 'blob:http://localhost/test'
 		);
-		global.URL.revokeObjectURL = jest.fn();
+		global.URL.revokeObjectURL = vi.fn();
 
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
@@ -53,7 +54,7 @@ describe( 'feature-detection', () => {
 			delete navigator.connection;
 		}
 		if ( 'hardwareConcurrency' in navigator ) {
-			// @ts-expect-error `hardwareConcurrency` is a read-only property.
+			// @ts-expect-error The test removes a typed browser capability.
 			delete navigator.hardwareConcurrency;
 		}
 	} );
@@ -96,7 +97,7 @@ describe( 'feature-detection', () => {
 				originalHardwareConcurrencyDescriptor
 			);
 		} else if ( 'hardwareConcurrency' in navigator ) {
-			// @ts-expect-error `hardwareConcurrency` is a read-only property.
+			// @ts-expect-error The test removes a typed browser capability.
 			delete navigator.hardwareConcurrency;
 		}
 	} );
@@ -110,7 +111,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -122,7 +123,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
-			// @ts-expect-error `SharedArrayBuffer` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting SharedArrayBuffer to undefined for testing.
 			global.SharedArrayBuffer = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -132,7 +133,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when Worker is unavailable', () => {
-			// @ts-expect-error `Worker` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting Worker to undefined for testing.
 			global.Worker = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -262,7 +263,7 @@ describe( 'feature-detection', () => {
 			expect( result1.supported ).toBe( true );
 
 			// Now set WebAssembly to undefined - cached result should still be returned.
-			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
@@ -277,7 +278,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
@@ -296,49 +297,49 @@ describe( 'feature-detection', () => {
 				global.createImageBitmap =
 					originalCreateImageBitmap as typeof createImageBitmap;
 			} else {
-				// @ts-expect-error The operand of `delete` must be optional.
+				// @ts-expect-error The test removes a typed browser capability.
 				delete global.createImageBitmap;
 			}
 			if ( originalOffscreenCanvas !== undefined ) {
 				global.OffscreenCanvas =
 					originalOffscreenCanvas as typeof OffscreenCanvas;
 			} else {
-				// @ts-expect-error The operand of `delete` must be optional.
+				// @ts-expect-error The test removes a typed browser capability.
 				delete global.OffscreenCanvas;
 			}
 		} );
 
 		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
 			global.createImageBitmap =
-				jest.fn() as unknown as typeof createImageBitmap;
+				vi.fn() as unknown as typeof createImageBitmap;
 			global.OffscreenCanvas =
-				jest.fn() as unknown as typeof OffscreenCanvas;
+				vi.fn() as unknown as typeof OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( true );
 		} );
 
 		it( 'returns false when createImageBitmap is unavailable', () => {
-			// @ts-expect-error The operand of `delete` must be optional.
+			// @ts-expect-error The test removes a typed browser capability.
 			delete global.createImageBitmap;
 			global.OffscreenCanvas =
-				jest.fn() as unknown as typeof OffscreenCanvas;
+				vi.fn() as unknown as typeof OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 
 		it( 'returns false when OffscreenCanvas is unavailable', () => {
 			global.createImageBitmap =
-				jest.fn() as unknown as typeof createImageBitmap;
-			// @ts-expect-error The operand of `delete` must be optional.
+				vi.fn() as unknown as typeof createImageBitmap;
+			// @ts-expect-error The test removes a typed browser capability.
 			delete global.OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 
 		it( 'returns false when both are unavailable', () => {
-			// @ts-expect-error The operand of `delete` must be optional.
+			// @ts-expect-error The test removes a typed browser capability.
 			delete global.createImageBitmap;
-			// @ts-expect-error The operand of `delete` must be optional.
+			// @ts-expect-error The test removes a typed browser capability.
 			delete global.OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
@@ -352,7 +353,7 @@ describe( 'feature-detection', () => {
 
 			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
-			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
+			// @ts-expect-error - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();

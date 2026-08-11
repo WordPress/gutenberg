@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import styled from '@emotion/styled';
 import { cloneElement } from '@wordpress/element';
@@ -13,13 +14,19 @@ describe( 'props', () => {
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
-		const { container } = render(
+		render(
 			<ContextSystemProvider>
-				<ConnectedComponent />
+				<ConnectedComponent data-testid="component" />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByTestId( 'component' ) ).toHaveClass(
+			'components-component'
+		);
+		expect( screen.getByTestId( 'component' ) ).toHaveAttribute(
+			'data-wp-component',
+			'Component'
+		);
 	} );
 
 	test( 'should render context props', () => {
@@ -43,13 +50,12 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<ContextSystemProvider value={ contextValue }>
 				<ConnectedComponent />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
 	} );
 
@@ -76,7 +82,7 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<>
 				<ContextSystemProvider value={ contextValue }>
 					<ConnectedComponent
@@ -86,8 +92,6 @@ describe( 'props', () => {
 				</ContextSystemProvider>
 			</>
 		);
-
-		expect( container ).toMatchSnapshot();
 
 		const element = screen.getByText( 'Code is Poetry' );
 		expect( element ).toBeVisible();

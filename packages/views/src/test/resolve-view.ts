@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import type { View } from '@wordpress/dataviews';
 import { getUserModifications, resolveView } from '../resolve-view';
 

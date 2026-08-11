@@ -1,5 +1,5 @@
-const utils = require( './utils' );
-const getStylelintResult = utils.getStylelintResult;
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid functions css', () => {
 	let result;

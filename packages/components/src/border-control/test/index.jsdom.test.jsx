@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	fireEvent,
 	render,
@@ -9,6 +10,10 @@ import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -28,7 +33,7 @@ function createProps( customProps ) {
 	const props = {
 		colors,
 		label: 'Border',
-		onChange: jest.fn().mockImplementation( ( newValue ) => {
+		onChange: vi.fn().mockImplementation( ( newValue ) => {
 			props.value = newValue;
 		} ),
 		value: defaultBorder,

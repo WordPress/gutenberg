@@ -46,6 +46,9 @@
 	"dependencies": {
 		"@wordpress/hooks": "file:../hooks"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

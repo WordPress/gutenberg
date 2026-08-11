@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	resolveDashboardColumnCount,
 	WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN,

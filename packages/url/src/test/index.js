@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	addQueryArgs,
 	buildQueryString,
@@ -488,22 +489,26 @@ describe( 'isValidQueryString', () => {
 } );
 
 describe( 'getPathAndQueryString', () => {
-	beforeAll( jest.resetModules );
-	afterAll( jest.resetModules );
-	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path', () => ( {
+	beforeAll( () => vi.resetModules() );
+	afterAll( () => {
+		vi.doUnmock( import( '../get-path' ) );
+		vi.doUnmock( import( '../get-query-string' ) );
+		vi.resetModules();
+	} );
+	it( 'combines the results of `getPath` and `getQueryString`', async () => {
+		vi.doMock( import( '../get-path' ), () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string', () => ( {
+		vi.doMock( import( '../get-query-string' ), () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
 		} ) );
-		const {
-			getPathAndQueryString,
-		} = require( '../get-path-and-query-string' );
+		const { getPathAndQueryString } = await import(
+			'../get-path-and-query-string'
+		);
 		expect(
 			getPathAndQueryString( {
 				path: 'path',

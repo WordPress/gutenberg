@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { loadAsset } from '../load-assets';
 
 describe( 'controls', () => {

@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import globPackage from 'glob';
-import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
 import {
 	discoverTestFiles,
@@ -52,9 +51,10 @@ if (
 	] );
 }
 
-// Preserve Jest's repository-root configuration discovery and default timezone.
+// Preserve repository-root configuration discovery and default to UTC while
+// allowing the date-test matrix to supply another timezone.
 process.chdir( ROOT_DIR );
-process.env.TZ = 'UTC';
+process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = glob(
 	path.join( ROOT_DIR, 'packages/*/src/index.{js,jsx,ts,tsx}' )
@@ -81,17 +81,6 @@ export default defineConfig( {
 					},
 				],
 			],
-		} ),
-		commonjs( {
-			filter: ( id ) =>
-				[
-					`${ ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
-					`${ ROOT_DIR }/packages/env/lib/`,
-					`${ ROOT_DIR }/packages/project-management-automation/lib/`,
-					`${ ROOT_DIR }/packages/scripts/utils/`,
-					`${ ROOT_DIR }/tools/release/commands/changelog.js`,
-				].some( ( directory ) => id.startsWith( directory ) ) &&
-				! id.endsWith( '/packages/scripts/utils/license.js' ),
 		} ),
 	],
 	resolve: {
@@ -163,6 +152,10 @@ export default defineConfig( {
 					pool: 'threads',
 					include: vitestTests.node,
 					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'

@@ -1,9 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { LEFT, RIGHT, UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { forwardRef } from '@wordpress/element';
 import TreeGrid from '..';
 import TreeGridRow from '../row';
 import TreeGridCell from '../cell';
+globalThis.wpVitest.mockVisibleElements();
 
 const TestButton = forwardRef(
 	(
@@ -29,7 +31,7 @@ describe( 'TreeGrid', () => {
 
 	describe( 'onExpandRow', () => {
 		it( 'should call onExpandRow when pressing Right Arrow on a collapsed row', () => {
-			const onExpandRow = jest.fn();
+			const onExpandRow = vi.fn();
 
 			render(
 				<TreeGrid onExpandRow={ onExpandRow }>
@@ -81,7 +83,7 @@ describe( 'TreeGrid', () => {
 
 	describe( 'onCollapseRow', () => {
 		it( 'should call onCollapseRow when pressing Left Arrow on an expanded row', () => {
-			const onCollapseRow = jest.fn();
+			const onCollapseRow = vi.fn();
 
 			render(
 				<TreeGrid onCollapseRow={ onCollapseRow }>
@@ -157,7 +159,7 @@ describe( 'TreeGrid', () => {
 		);
 
 		it( 'should call onFocusRow with event, start and end nodes when pressing Down Arrow', () => {
-			const onFocusRow = jest.fn();
+			const onFocusRow = vi.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();
@@ -179,7 +181,7 @@ describe( 'TreeGrid', () => {
 		} );
 
 		it( 'should call onFocusRow with event, start and end nodes when pressing End', () => {
-			const onFocusRow = jest.fn();
+			const onFocusRow = vi.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 1' ).focus();
@@ -201,7 +203,7 @@ describe( 'TreeGrid', () => {
 		} );
 
 		it( 'should call onFocusRow with event, start and end nodes when pressing Up Arrow', () => {
-			const onFocusRow = jest.fn();
+			const onFocusRow = vi.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();
@@ -223,7 +225,7 @@ describe( 'TreeGrid', () => {
 		} );
 
 		it( 'should call onFocusRow with event, start and end nodes when pressing Home', () => {
-			const onFocusRow = jest.fn();
+			const onFocusRow = vi.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 3' ).focus();
@@ -245,7 +247,7 @@ describe( 'TreeGrid', () => {
 		} );
 
 		it( 'should call onFocusRow when shift key is held', () => {
-			const onFocusRow = jest.fn();
+			const onFocusRow = vi.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();

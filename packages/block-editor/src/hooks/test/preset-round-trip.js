@@ -6,6 +6,8 @@
  * preset references, clear the relevant reset surfaces, and treat explicit
  * empty values as non-contributing layers.
  */
+
+import { describe, expect, it } from 'vitest';
 import {
 	getValueFromVariable,
 	getPresetVariableFromValue,
