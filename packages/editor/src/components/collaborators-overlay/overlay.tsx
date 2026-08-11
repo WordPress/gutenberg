@@ -86,16 +86,6 @@ export function Overlay( {
 		};
 	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
 
-	// Share the editor document with parts of the component tree that don't
-	// otherwise have access to it (e.g. the collaborators presence list,
-	// outside the canvas iframe), so they can look up block elements
-	// directly instead of relying on the overlay's own ephemeral avatar
-	// nodes, which re-render independently based on live awareness state.
-	useEffect( () => {
-		cursorRegistry?.setEditorDocument( blockEditorDocument ?? null );
-		return () => cursorRegistry?.setEditorDocument( null );
-	}, [ blockEditorDocument, cursorRegistry ] );
-
 	useEffect( () => {
 		if ( cursors.length === 0 ) {
 			return;
