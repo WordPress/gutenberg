@@ -7,7 +7,7 @@ import {
 	registerFormatType,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-import RichTextControl from '../control';
+import RichTextControl from '../';
 import { unlock } from '../../../../lock-unlock';
 
 /*
