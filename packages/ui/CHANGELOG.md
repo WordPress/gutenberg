@@ -2,13 +2,19 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `IconButton`: Require `shortcut.label` for a human-readable accessible shortcut description. Generate it with `shortcutAriaLabel` from `@wordpress/keycodes`. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
+
 ### Enhancements
 
+-   Add `Calendar` and `RangeCalendar` components. ([#81337](https://github.com/WordPress/gutenberg/pull/81337))
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 
 ### Bug Fixes
 
+-   `Autocomplete`, `Combobox`, `Popover`, `Select`, `Tabs`, and `Tooltip` now derive text direction from WordPress i18n. ([#80399](https://github.com/WordPress/gutenberg/pull/80399))
 -   `Button`, `Link`, `Combobox`, `Select`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 
 ### Internal
