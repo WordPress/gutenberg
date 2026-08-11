@@ -104,7 +104,7 @@ interface BlockStyle {
 
 /**
  * A short summary of what the user changed on a block, e.g.
- * "Changed: Typography, Colors, Plain variation".
+ * "Typography, Colors, Plain variation".
  *
  * A changed style variation is named rather than described: whatever was
  * changed inside it, it contributes one "{Label} variation" entry.
@@ -160,13 +160,9 @@ export function getUserStylesSummary(
 		return '';
 	}
 
-	return sprintf(
-		/* translators: %s: a list of the styles a user changed, e.g. "Typography, Colors". */
-		__( 'Changed: %s' ),
-		entries.join(
-			/* translators: Used between list items, there is a space after the comma. */
-			__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
-		)
+	return entries.join(
+		/* translators: Used between list items, there is a space after the comma. */
+		__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 	);
 }
 

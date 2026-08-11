@@ -137,7 +137,7 @@ describe( 'getUserStylesSummary', () => {
 			},
 		};
 		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe(
-			'Changed: Colors, Typography'
+			'Colors, Typography'
 		);
 	} );
 
@@ -151,9 +151,7 @@ describe( 'getUserStylesSummary', () => {
 				},
 			},
 		};
-		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe(
-			'Changed: Color'
-		);
+		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe( 'Color' );
 	} );
 
 	// A changed variation is named, not described: whatever was changed inside
@@ -174,7 +172,7 @@ describe( 'getUserStylesSummary', () => {
 			getUserStylesSummary( user, 'core/quote', [
 				{ name: 'plain', label: 'Plain' },
 			] )
-		).toBe( 'Changed: Plain variation' );
+		).toBe( 'Plain variation' );
 	} );
 
 	it( 'falls back to the slug when the variation is not registered', () => {
@@ -188,7 +186,7 @@ describe( 'getUserStylesSummary', () => {
 			},
 		};
 		expect( getUserStylesSummary( user, 'core/quote', [] ) ).toBe(
-			'Changed: fancy variation'
+			'fancy variation'
 		);
 	} );
 
@@ -210,7 +208,7 @@ describe( 'getUserStylesSummary', () => {
 			getUserStylesSummary( user, 'core/quote', [
 				{ name: 'plain', label: 'Plain' },
 			] )
-		).toBe( 'Changed: Colors, Typography, Plain variation' );
+		).toBe( 'Colors, Typography, Plain variation' );
 	} );
 
 	it( 'ignores a variation whose values were all cleared', () => {
@@ -228,7 +226,7 @@ describe( 'getUserStylesSummary', () => {
 			getUserStylesSummary( user, 'core/quote', [
 				{ name: 'plain', label: 'Plain' },
 			] )
-		).toBe( 'Changed: Colors' );
+		).toBe( 'Colors' );
 	} );
 
 	it( 'returns an empty string when no category can be named', () => {
