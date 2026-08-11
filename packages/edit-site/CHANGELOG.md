@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81296](https://github.com/WordPress/gutenberg/pull/81296)).
+
 ## 7.0.0 (2026-07-14)
 
 ### Breaking Changes
