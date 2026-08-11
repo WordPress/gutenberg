@@ -160,8 +160,16 @@ export default function MediaEditorScaleControl() {
 	};
 
 	return (
-		<Stack direction="column" gap="xs">
-			<Stack direction="row" gap="sm">
+		<Stack
+			className="media-editor-scale-control"
+			direction="column"
+			gap="xs"
+		>
+			<Stack
+				className="media-editor-scale-control__fields"
+				direction="row"
+				gap="sm"
+			>
 				<NumberControl
 					label={ __( 'Width' ) }
 					value={ shown.width }
@@ -182,7 +190,8 @@ export default function MediaEditorScaleControl() {
 				/>
 			</Stack>
 			<Button
-				variant="tertiary"
+				className="media-editor-scale-control__reset"
+				variant="secondary"
 				size="compact"
 				disabled={ state.scaledSize === null }
 				accessibleWhenDisabled

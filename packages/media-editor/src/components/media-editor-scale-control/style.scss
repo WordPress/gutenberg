@@ -1,0 +1,16 @@
+.media-editor-scale-control {
+	// Width and height carry equal weight, so they get equal room. The
+	// `0` basis makes the split independent of how many digits each value
+	// happens to have, and `min-width: 0` stops the inputs' intrinsic
+	// width from forcing one wider than the other in a narrow sidebar.
+	&__fields > * {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	// The column stack stretches its children, which would leave the reset
+	// spanning the whole sidebar.
+	&__reset {
+		align-self: flex-start;
+	}
+}
