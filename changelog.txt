@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 23.7.2 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Data Layer
+
+- Core Data: Fix post staying dirty after saving edited post meta with RTC enabled. ([81392](https://github.com/WordPress/gutenberg/pull/81392))
+
+
 = 23.7.1 =
 
 **This is a security release. All users are strongly encouraged to update to this version as soon as possible.**
