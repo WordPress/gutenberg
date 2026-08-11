@@ -10,7 +10,13 @@ const UnforwardedValidatedSelectControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof SelectControl > & ValidatedControlProps,
+	}: Omit<
+		React.ComponentProps< typeof SelectControl >,
+		'multiple' | 'onChange' | 'value'
+	> & {
+		value?: string;
+		onChange: ( value: string ) => void;
+	} & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLSelectElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
@@ -30,7 +36,13 @@ const UnforwardedValidatedSelectControl = (
 
 export const ValidatedSelectControl: React.ForwardRefExoticComponent<
 	React.PropsWithoutRef<
-		React.ComponentProps< typeof SelectControl > & ValidatedControlProps
+		Omit<
+			React.ComponentProps< typeof SelectControl >,
+			'multiple' | 'onChange' | 'value'
+		> & {
+			value?: string;
+			onChange: ( value: string ) => void;
+		} & ValidatedControlProps
 	> &
 		React.RefAttributes< HTMLSelectElement >
 > = forwardRef( UnforwardedValidatedSelectControl );
