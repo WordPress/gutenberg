@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
+-   Summarize the styles a user changed on each block in the block list, and add a filter to show only the blocks they have changed ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
 
 ## 1.20.0 (2026-08-12)
 
@@ -15,7 +16,6 @@
 ### Enhancements
 
 -   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
--   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81316](https://github.com/WordPress/gutenberg/issues/81316)).
 
 ## 1.19.0 (2026-07-29)
 

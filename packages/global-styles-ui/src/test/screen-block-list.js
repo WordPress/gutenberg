@@ -1,4 +1,7 @@
-import { hasUserStylesForBlock } from '../screen-block-list';
+import {
+	hasUserStylesForBlock,
+	getUserStylesSummary,
+} from '../screen-block-list';
 
 describe( 'hasUserStylesForBlock', () => {
 	it( 'returns false when there is no user config', () => {
@@ -114,5 +117,127 @@ describe( 'hasUserStylesForBlock', () => {
 			},
 		};
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
+	} );
+} );
+
+describe( 'getUserStylesSummary', () => {
+	it( 'returns an empty string for a block with no entry', () => {
+		expect( getUserStylesSummary( {}, 'core/quote' ) ).toBe( '' );
+	} );
+
+	it( 'names the categories changed under styles', () => {
+		const user = {
+			styles: {
+				blocks: {
+					'core/quote': {
+						typography: { textTransform: 'uppercase' },
+						color: { text: 'red' },
+					},
+				},
+			},
+		};
+		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe(
+			'Changed: Colors, Typography'
+		);
+	} );
+
+	it( 'names categories changed under settings', () => {
+		const user = {
+			settings: {
+				blocks: {
+					'core/quote': {
+						color: { palette: [ { slug: 'a', color: '#fff' } ] },
+					},
+				},
+			},
+		};
+		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe(
+			'Changed: Color'
+		);
+	} );
+
+	// A changed variation is named, not described: whatever was changed inside
+	// it, it contributes one "{Label} variation" entry.
+	it( 'names a changed variation using its registered label', () => {
+		const user = {
+			styles: {
+				blocks: {
+					'core/quote': {
+						variations: {
+							plain: { spacing: { padding: { top: '10px' } } },
+						},
+					},
+				},
+			},
+		};
+		expect(
+			getUserStylesSummary( user, 'core/quote', [
+				{ name: 'plain', label: 'Plain' },
+			] )
+		).toBe( 'Changed: Plain variation' );
+	} );
+
+	it( 'falls back to the slug when the variation is not registered', () => {
+		const user = {
+			styles: {
+				blocks: {
+					'core/quote': {
+						variations: { fancy: { color: { text: 'red' } } },
+					},
+				},
+			},
+		};
+		expect( getUserStylesSummary( user, 'core/quote', [] ) ).toBe(
+			'Changed: fancy variation'
+		);
+	} );
+
+	it( 'lists direct changes before the variation', () => {
+		const user = {
+			styles: {
+				blocks: {
+					'core/quote': {
+						color: { text: 'red' },
+						typography: { fontSize: '2rem' },
+						variations: {
+							plain: { color: { background: 'blue' } },
+						},
+					},
+				},
+			},
+		};
+		expect(
+			getUserStylesSummary( user, 'core/quote', [
+				{ name: 'plain', label: 'Plain' },
+			] )
+		).toBe( 'Changed: Colors, Typography, Plain variation' );
+	} );
+
+	it( 'ignores a variation whose values were all cleared', () => {
+		const user = {
+			styles: {
+				blocks: {
+					'core/quote': {
+						color: { text: 'red' },
+						variations: { plain: { color: { text: undefined } } },
+					},
+				},
+			},
+		};
+		expect(
+			getUserStylesSummary( user, 'core/quote', [
+				{ name: 'plain', label: 'Plain' },
+			] )
+		).toBe( 'Changed: Colors' );
+	} );
+
+	it( 'returns an empty string when no category can be named', () => {
+		// Border is a real user change, but the changelist does not report it.
+		const user = {
+			styles: {
+				blocks: { 'core/quote': { border: { width: '2px' } } },
+			},
+		};
+		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe( '' );
 	} );
 } );

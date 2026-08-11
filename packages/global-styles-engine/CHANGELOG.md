@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `getGlobalStylesChangelist`, which returns the changed styles as translated labels grouped by type ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
+
 ## 1.20.0 (2026-08-12)
 
 ### Bug Fixes
