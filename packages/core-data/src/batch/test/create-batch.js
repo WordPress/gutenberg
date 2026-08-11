@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import createBatch from '../create-batch';
 
 describe( 'createBatch', () => {

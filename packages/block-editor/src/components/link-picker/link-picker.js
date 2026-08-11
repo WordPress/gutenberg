@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
@@ -10,10 +7,6 @@ import {
 import { VisuallyHidden } from '@wordpress/ui';
 import { useState, useId, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import LinkControl from '../link-control';
 import { LinkPreview } from './link-preview';
 

@@ -615,12 +615,13 @@ class WP_Navigation_Block_Renderer {
 			'space-between' => 'items-justified-space-between',
 		);
 
-		$layout_class = '';
+		$layout_class        = '';
+		$nav_justify_content = $attributes['layout']['justifyContent'] ?? null;
 		if (
-			isset( $attributes['layout']['justifyContent'] ) &&
-			isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
+			is_string( $nav_justify_content ) &&
+			isset( $layout_justification[ $nav_justify_content ] )
 		) {
-			$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+			$layout_class .= $layout_justification[ $nav_justify_content ];
 		}
 		if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 			$layout_class .= ' is-vertical';
@@ -682,9 +683,14 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.0.0
 	 *
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
-	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay   Whether a custom overlay is used.
+	 * @param array $colors               The colors array.
 	 * @return array Returns the responsive container classes.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_css_classes: list<string>,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
@@ -709,8 +715,14 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors             The colors array.
 	 * @return string Returns the overlay inline styles.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_inline_styles: string,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
 		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
@@ -1250,7 +1262,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 			)
 		) ) {
 			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
-			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isSubmenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
 		// Add directives to the submenu.

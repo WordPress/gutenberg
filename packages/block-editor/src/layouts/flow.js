@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';

@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`. Adds a `@wordpress/keycodes` dependency ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 0.1.0 (2025-10-23)

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import ContentEditableControl from '../../content-editable-control';

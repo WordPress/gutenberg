@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Scrollable } from '../index';
 
 describe( 'props', () => {

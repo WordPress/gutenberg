@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import LayoutCardComponent from './layout-card';
 import LayoutDetailsComponent from './layout-details';

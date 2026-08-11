@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -35,10 +28,6 @@ import {
 	moreVertical,
 } from '@wordpress/icons';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';

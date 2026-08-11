@@ -1,12 +1,8 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import path from 'path';
+import spawn from 'cross-spawn';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );

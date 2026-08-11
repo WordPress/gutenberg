@@ -172,7 +172,7 @@
 		border-radius: 2px;
 	}
 
-	a:not(.wp-note-mention) {
+	a {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -278,10 +278,15 @@ mark.wp-note {
 	line-height: 1;
 }
 
-// Curated fallback picker (shown only when no Emojibase URL is
-// configured) uses Dropdown's default `.components-popover__content`
-// padding (8px) for breathing room around the listbox; no extra rule
-// needed.
+// Split the Dropdown's default 8px `.components-popover__content` padding
+// between the popover and the scrolling listbox below, so the emoji buttons
+// keep the same breathing room while their focus ring stays inside the
+// scroll container instead of being clipped by it.
+.editor-collab-sidebar-panel__add-reaction-popover .components-popover__content {
+	padding: $grid-unit-05;
+}
+
+
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
 	// The emoji list is filterable server-side, so it can grow well
@@ -289,8 +294,15 @@ mark.wp-note {
 	// buttons) and scroll past 6 rows instead of letting the popover
 	// grow unbounded.
 	flex-wrap: wrap;
-	max-width: 8 * 32px;
-	max-height: 6 * 32px;
+	// `.components-popover__content` is `width: min-content`, which would
+	// otherwise squeeze this wrapping row down to one column per emoji.
+	width: max-content;
+	// Scrolling clips on both axes, so leave room for the focus ring of
+	// the buttons on the edges. The padding is added to the row and column
+	// caps below, which are border-box measurements.
+	padding: $grid-unit-05;
+	max-width: 8 * 32px + 2 * $grid-unit-05;
+	max-height: 6 * 32px + 2 * $grid-unit-05;
 	overflow-y: auto;
 }
 
@@ -301,7 +313,12 @@ mark.wp-note {
 // target of 2.5.5 (Enhanced) — at 44px an 8-column grid would exceed
 // the sidebar-anchored popover's practical width.
 .editor-collab-sidebar-panel__emoji-option {
-	width: var(--wpds-dimension-size-md);
+	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
+	// per row; the compact Button's own padding and minimum size would
+	// otherwise widen the flex item past the 32px width.
+	flex: 0 0 32px;
+	min-width: 0;
+	padding: 0;
 	font-size: 18px;
 	justify-content: center;
 }
@@ -503,8 +520,8 @@ mark.wp-note {
 }
 
 // Mention chips, both in the note input and the rendered note content. A
-// mention is a link to the mentioned user's author page, styled as a chip
-// rather than an underlined link.
+// mention is a non-interactive `span` carrying the mentioned user's ID in a
+// `user-N` class, styled as a chip.
 .wp-note-mention {
 	display: inline;
 	padding: 0 var(--wpds-dimension-padding-xs);
@@ -513,32 +530,10 @@ mark.wp-note {
 	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	white-space: nowrap;
-	text-decoration: none;
 
-	// Focus ring matching `ExternalLink`/`Link`; 0-width at rest avoids a stray forced-colors outline.
-	outline: 0 solid transparent;
-	outline-offset: 1px;
-
-	// Also clears the wp-admin common.css `a:focus` shadow/color/radius, which outrank the base rule.
-	&:focus {
-		outline:
-			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus);
-		box-shadow: none;
-		border-radius: var(--wpds-border-radius-sm);
-		color: var(--wpds-color-foreground-interactive-brand);
-	}
-
-	// Interactive states, since the chip look drops the link underline. After `:focus` so hover wins when both apply.
-	&:hover,
-	&:active {
-		background: var(--wpds-color-background-interactive-brand-weak-active);
-		color: var(--wpds-color-foreground-interactive-brand-active);
-	}
-
-	// Restore the underline when forced-colors drops the background tint.
+	// Keep the chip boundary visible when forced-colors drops the background tint.
 	@media (forced-colors: active) {
-		text-decoration: underline;
+		border: 1px solid;
 	}
 }
 

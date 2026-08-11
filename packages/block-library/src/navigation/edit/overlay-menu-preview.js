@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import OverlayMenuIcon from './overlay-menu-icon';
 
 export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {

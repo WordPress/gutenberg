@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import Header from './header';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
