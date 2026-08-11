@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
@@ -8,7 +5,6 @@ import {
 	removeInvalidHTML,
 	isEmpty,
 } from '../dom';
-
 import { getPhrasingContentSchema } from '../phrasing-content';
 
 describe( 'DOM', () => {

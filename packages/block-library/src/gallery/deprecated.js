@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -56,7 +44,7 @@ export function getHrefAndDestination( image, destination ) {
 	switch ( destination ) {
 		case DEPRECATED_LINK_DESTINATION_MEDIA:
 			return {
-				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				href: image?.source_url || image?.url,
 				linkDestination: LINK_DESTINATION_MEDIA,
 			};
 		case DEPRECATED_LINK_DESTINATION_ATTACHMENT:
@@ -66,7 +54,7 @@ export function getHrefAndDestination( image, destination ) {
 			};
 		case LINK_DESTINATION_MEDIA:
 			return {
-				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				href: image?.source_url || image?.url,
 				linkDestination: LINK_DESTINATION_MEDIA,
 			};
 		case LINK_DESTINATION_ATTACHMENT:

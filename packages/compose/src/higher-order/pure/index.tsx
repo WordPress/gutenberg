@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import type { ComponentType, ComponentClass } from 'react';
-
-/**
- * WordPress dependencies
- */
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
@@ -23,6 +13,11 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
 const pure = createHigherOrderComponent( function < Props extends {} >(
 	WrappedComponent: ComponentType< Props >
 ): ComponentType< Props > {
+	deprecated( 'wp.compose.pure', {
+		since: '7.1',
+		alternative: 'Use `memo` or `PureComponent` instead',
+	} );
+
 	if ( WrappedComponent.prototype instanceof Component ) {
 		return class extends ( WrappedComponent as ComponentClass< Props > ) {
 			shouldComponentUpdate( nextProps: Props, nextState: any ) {

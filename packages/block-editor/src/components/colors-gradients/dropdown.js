@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ColorIndicator,
@@ -17,15 +10,7 @@ import {
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { reset as resetIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from './control';
 
 // When the `ColorGradientSettingsDropdown` controls are being rendered to a
@@ -51,7 +36,10 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 					: true
 			}
 			{ ...props }
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ clsx(
+				'block-editor-color-gradient-item',
+				'block-editor-tools-panel-color-gradient-settings__item'
+			) }
 			panelId={ panelId }
 			// Pass resetAllFilter if supplied due to rendering via SlotFill
 			// into parent ToolsPanel.
@@ -80,9 +68,8 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle =
-	( settings ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( settings ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const {
 			clearable,
 			colorValue,

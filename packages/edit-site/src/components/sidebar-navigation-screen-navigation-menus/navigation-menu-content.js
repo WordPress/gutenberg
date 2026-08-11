@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -10,14 +7,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
+const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -101,7 +96,9 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					showAppender
+					additionalBlockContent={ NavigationLinkUI }
+					isExpanded
 				/>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">

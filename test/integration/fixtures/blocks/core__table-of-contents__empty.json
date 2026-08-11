@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"headings": [],
-			"onlyIncludeCurrentPage": false
+			"onlyIncludeCurrentPage": false,
+			"ordered": true
 		},
 		"innerBlocks": []
 	}

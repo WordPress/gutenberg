@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getNestedValue from '../get-nested-value';
 
 describe( 'getNestedValue', () => {

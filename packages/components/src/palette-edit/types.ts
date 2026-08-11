@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Key, MouseEventHandler } from 'react';
-
-/**
- * Internal dependencies
- */
 import type Popover from '../popover';
 import type { HeadingSize } from '../heading/types';
 
@@ -127,7 +120,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	onChange: ( newElements?: T[] ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	addColorRef: React.RefObject< HTMLButtonElement >;
+	addColorRef: React.RefObject< HTMLButtonElement | null >;
 	editingElement?: EditingElement;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;

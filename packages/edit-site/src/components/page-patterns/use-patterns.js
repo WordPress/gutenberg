@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { filterOutDuplicatesByName } from './utils';
 import {
 	EXCLUDED_PATTERN_SOURCES,
@@ -25,8 +18,11 @@ const EMPTY_PATTERN_LIST = [];
 
 const selectTemplateParts = createSelector(
 	( select, categoryId, search = '' ) => {
-		const { getEntityRecords, isResolving: isResolvingSelector } =
-			select( coreStore );
+		const {
+			getEntityRecords,
+			getCurrentTheme,
+			isResolving: isResolvingSelector,
+		} = select( coreStore );
 
 		const query = { per_page: -1 };
 		const templateParts =
@@ -36,9 +32,7 @@ const selectTemplateParts = createSelector(
 		// In the case where a custom template part area has been removed we need
 		// the current list of areas to cross check against so orphaned template
 		// parts can be treated as uncategorized.
-		const knownAreas =
-			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-				?.default_template_part_areas || [];
+		const knownAreas = getCurrentTheme()?.default_template_part_areas || [];
 
 		const templatePartAreas = knownAreas.map( ( area ) => area.area );
 
@@ -79,8 +73,7 @@ const selectTemplateParts = createSelector(
 			TEMPLATE_PART_POST_TYPE,
 			{ per_page: -1 },
 		] ),
-		select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.default_template_part_areas,
+		select( coreStore ).getCurrentTheme()?.default_template_part_areas,
 	]
 );
 

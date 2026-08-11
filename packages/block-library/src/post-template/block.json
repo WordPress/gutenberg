@@ -14,9 +14,11 @@
 		"templateSlug",
 		"previewPostType",
 		"enhancedPagination",
-		"postType"
+		"postType",
+		"postId"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
@@ -50,8 +52,8 @@
 			},
 			"__experimentalDefaultControls": {
 				"blockGap": true,
-				"padding" : false,
-				"margin" : false
+				"padding": false,
+				"margin": false
 			}
 		},
 		"interactivity": {

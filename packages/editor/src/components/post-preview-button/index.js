@@ -1,19 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
+import { Button, MenuItem, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { external } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
-function writeInterstitialMessage( targetDocument ) {
+function buildInterstitialMarkup() {
 	let markup = renderToString(
 		<div className="editor-post-preview-button__interstitial-message">
 			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
@@ -82,7 +77,7 @@ function writeInterstitialMessage( targetDocument ) {
 			}
 			p {
 				text-align: center;
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+				font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 			}
 		</style>
 	`;
@@ -94,9 +89,170 @@ function writeInterstitialMessage( targetDocument ) {
 	 */
 	markup = applyFilters( 'editor.PostPreview.interstitialMarkup', markup );
 
+	return markup;
+}
+
+function writeInterstitialMessage( targetDocument, markup ) {
 	targetDocument.write( markup );
 	targetDocument.title = __( 'Generating preview…' );
 	targetDocument.close();
+}
+
+/**
+ * Resolves the preview window's `document`, working around
+ * `Document-Isolation-Policy` (DIP) isolation.
+ *
+ * The editor screen is served with `Document-Isolation-Policy:
+ * isolate-and-credentialless` to enable cross-origin isolation. This places the
+ * editor tab and an already-open preview tab in separate agent clusters, so
+ * synchronous access to a reused preview tab's `document` throws a
+ * `SecurityError`. Navigating the reused tab back to `about:blank` returns it to
+ * the opener's agent cluster and restores access. That navigation is
+ * asynchronous and we can't attach a cross-isolation `load` listener, so poll
+ * the `document` access (the operation that throws) until it succeeds, up to a
+ * short timeout.
+ *
+ * @param {Window} previewWindow The preview window/tab.
+ *
+ * @return {?Document} The reachable preview document, or `null` if it never
+ *                     becomes reachable within the timeout.
+ */
+async function getPreviewDocument( previewWindow ) {
+	// A freshly opened tab is already on `about:blank` and accessible, so this
+	// succeeds on the first preview without any reset.
+	try {
+		return previewWindow.document;
+	} catch {
+		// The reused preview tab is isolated from the editor; reset it below.
+	}
+
+	previewWindow.location = 'about:blank';
+
+	const timeoutMs = 1000;
+	const intervalMs = 50;
+	const deadline = Date.now() + timeoutMs;
+	do {
+		await new Promise( ( resolve ) => setTimeout( resolve, intervalMs ) );
+		try {
+			return previewWindow.document;
+		} catch {
+			// Navigation to `about:blank` hasn't completed yet; keep polling.
+		}
+	} while ( Date.now() < deadline );
+
+	return null;
+}
+
+/**
+ * Writes the preview interstitial into the preview window, working around
+ * `Document-Isolation-Policy` (DIP) isolation.
+ *
+ * The interstitial is a progressive enhancement: if the document never becomes
+ * reachable we simply skip it, and the caller still navigates the preview to the
+ * real content.
+ *
+ * @param {Window} previewWindow The preview window/tab.
+ */
+async function writeInterstitialIntoPreviewWindow( previewWindow ) {
+	const previewDocument = await getPreviewDocument( previewWindow );
+	if ( previewDocument ) {
+		writeInterstitialMessage( previewDocument, buildInterstitialMarkup() );
+	}
+}
+
+function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
+	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
+		useSelect( ( select ) => {
+			const editor = select( editorStore );
+			const core = select( coreStore );
+
+			const postType = core.getPostType(
+				editor.getCurrentPostType( 'type' )
+			);
+			const canView = postType?.viewable ?? false;
+			if ( ! canView ) {
+				return { isViewable: canView };
+			}
+
+			return {
+				postId: editor.getCurrentPostId(),
+				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
+				previewLink: editor.getEditedPostPreviewLink(),
+				isSaveable: editor.isEditedPostSaveable(),
+				isViewable: canView,
+			};
+		}, [] );
+
+	const { __unstableSaveForPreview } = useDispatch( editorStore );
+
+	if ( ! isViewable ) {
+		return null;
+	}
+
+	const target = `wp-preview-${ postId }`;
+
+	const handlePreviewClick = async ( event ) => {
+		// Preserve native link semantics with `href` and `target`, but intercept the
+		// click because the final preview URL may depend on an asynchronous save.
+		// Opening the named window synchronously also prevents popup blocking and
+		// ensures subsequent previews reuse the same tab.
+		// https://github.com/WordPress/gutenberg/pull/8330
+		event.preventDefault();
+
+		// Open up a Preview tab if needed. This is where we'll show the preview.
+		const previewWindow = window.open( '', target );
+
+		// Focus the Preview tab. This might not do anything, depending on the browser's
+		// and user's preferences.
+		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
+		previewWindow.focus();
+
+		await writeInterstitialIntoPreviewWindow( previewWindow );
+
+		const link = await __unstableSaveForPreview( { forceIsAutosaveable } );
+
+		previewWindow.location = link;
+
+		onPreview?.();
+	};
+
+	// Link to the `?preview=true` URL if we have it, since this lets us see
+	// changes that were autosaved since the post was last published. Otherwise,
+	// just link to the post's URL.
+	const href = previewLink || currentPostLink;
+
+	return {
+		href,
+		target,
+		disabled: ! isSaveable,
+		onClick: handlePreviewClick,
+	};
+}
+
+/**
+ * Renders the post preview action as a menu item.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {Function} props.onPreview           The callback function for the preview event.
+ *
+ * @return {React.ReactNode} The rendered menu item.
+ */
+export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
+
+	if ( ! previewProps ) {
+		return null;
+	}
+
+	return (
+		<MenuItem icon={ external } { ...previewProps }>
+			{ __( 'Preview in new tab' ) }
+		</MenuItem>
+	);
 }
 
 /**
@@ -121,78 +277,28 @@ export default function PostPreviewButton( {
 	role,
 	onPreview,
 } ) {
-	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
-		useSelect( ( select ) => {
-			const editor = select( editorStore );
-			const core = select( coreStore );
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
 
-			const postType = core.getPostType(
-				editor.getCurrentPostType( 'type' )
-			);
-
-			return {
-				postId: editor.getCurrentPostId(),
-				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
-				previewLink: editor.getEditedPostPreviewLink(),
-				isSaveable: editor.isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
-			};
-		}, [] );
-
-	const { __unstableSaveForPreview } = useDispatch( editorStore );
-
-	if ( ! isViewable ) {
+	if ( ! previewProps ) {
 		return null;
 	}
-
-	const targetId = `wp-preview-${ postId }`;
-
-	const openPreviewWindow = async ( event ) => {
-		// Our Preview button has its 'href' and 'target' set correctly for a11y
-		// purposes. Unfortunately, though, we can't rely on the default 'click'
-		// handler since sometimes it incorrectly opens a new tab instead of reusing
-		// the existing one.
-		// https://github.com/WordPress/gutenberg/pull/8330
-		event.preventDefault();
-
-		// Open up a Preview tab if needed. This is where we'll show the preview.
-		const previewWindow = window.open( '', targetId );
-
-		// Focus the Preview tab. This might not do anything, depending on the browser's
-		// and user's preferences.
-		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
-		previewWindow.focus();
-
-		writeInterstitialMessage( previewWindow.document );
-
-		const link = await __unstableSaveForPreview( { forceIsAutosaveable } );
-
-		previewWindow.location = link;
-
-		onPreview?.();
-	};
-
-	// Link to the `?preview=true` URL if we have it, since this lets us see
-	// changes that were autosaved since the post was last published. Otherwise,
-	// just link to the post's URL.
-	const href = previewLink || currentPostLink;
 
 	return (
 		<Button
 			variant={ ! className ? 'tertiary' : undefined }
 			className={ className || 'editor-post-preview' }
-			href={ href }
-			target={ targetId }
-			accessibleWhenDisabled
-			disabled={ ! isSaveable }
-			onClick={ openPreviewWindow }
 			role={ role }
 			size="compact"
+			accessibleWhenDisabled
+			{ ...previewProps }
 		>
 			{ textContent || (
 				<>
 					{ _x( 'Preview', 'imperative verb' ) }
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{
 							/* translators: accessibility text */
 							__( '(opens in a new tab)' )
