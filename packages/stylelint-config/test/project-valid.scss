@@ -1,0 +1,14 @@
+// BEM-style class segments are allowed by this preset.
+.block-editor__inserter-menu--open {
+	display: flex;
+	flex-direction: row;
+}
+
+// Rules this preset turns off relative to `scss-stylistic`.
+.block-editor-inserter {
+	@if $condition {
+		color: #fff;
+	} @else {
+		color: #000;
+	}
+}

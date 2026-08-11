@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added a `project` preset holding the rules shared by Gutenberg and WordPress Core, so both projects can extend a single source instead of duplicating the set ([#81349](https://github.com/WordPress/gutenberg/issues/81349)).
 
 ## 24.1.0 (2026-07-29)
 

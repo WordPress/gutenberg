@@ -1,0 +1,5 @@
+// Both declarations break the reading-order rules this preset adds.
+.block-editor__inserter-menu {
+	flex-direction: row-reverse;
+	order: 1;
+}
