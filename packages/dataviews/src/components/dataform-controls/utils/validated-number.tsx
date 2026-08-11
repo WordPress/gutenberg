@@ -147,8 +147,16 @@ export default function ValidatedNumber< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid.min ? isValid.min.constraint : undefined }
-			max={ isValid.max ? isValid.max.constraint : undefined }
+			min={
+				typeof isValid.min?.constraint === 'number'
+					? isValid.min.constraint
+					: undefined
+			}
+			max={
+				typeof isValid.max?.constraint === 'number'
+					? isValid.max.constraint
+					: undefined
+			}
 			disabled={ disabled }
 		/>
 	);
