@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef, useCallback, useState } from '@wordpress/element';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 

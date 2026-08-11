@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
 
 const v1 = {

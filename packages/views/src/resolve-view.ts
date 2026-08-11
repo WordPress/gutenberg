@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { dequal } from 'dequal';
-
-/**
- * WordPress dependencies
- */
 import type { View, Filter, SupportedLayouts } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { ViewOverrides } from './types';
 
 type PlainObject = Record< string, unknown >;

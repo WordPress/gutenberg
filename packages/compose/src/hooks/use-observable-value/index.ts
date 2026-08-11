@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ObservableMap } from '../../utils/observable-map';
 
 /**

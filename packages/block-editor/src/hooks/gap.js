@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 
 /**

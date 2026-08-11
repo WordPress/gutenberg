@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { orderBy } from '../sorting';
 
 describe( 'orderBy', () => {

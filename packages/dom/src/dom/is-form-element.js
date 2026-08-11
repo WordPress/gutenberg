@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isInputOrTextArea from './is-input-or-text-area';
 
 /**

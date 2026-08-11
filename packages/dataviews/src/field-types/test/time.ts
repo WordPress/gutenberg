@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { setSettings, getSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import normalizeFields from '../index';
 import parseTime from '../utils/parse-time';
 import type { Field } from '../../types';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
@@ -9,10 +6,6 @@ import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

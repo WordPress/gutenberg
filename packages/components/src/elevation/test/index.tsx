@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Elevation } from '..';
 
 const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>

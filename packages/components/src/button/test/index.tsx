@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import { press } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { createRef, forwardRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';

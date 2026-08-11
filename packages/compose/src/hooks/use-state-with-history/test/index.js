@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { screen, render, fireEvent } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useStateWithHistory from '../';
 
 const TestComponent = () => {

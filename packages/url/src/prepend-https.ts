@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { prependHTTP } from './prepend-http';
 
 /**

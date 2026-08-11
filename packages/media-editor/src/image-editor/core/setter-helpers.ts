@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, CropperAction } from './types';
 import { MAX_ZOOM } from './constants';
 import { getMinZoom, restrictPanZoom } from './containment';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 
 const POSITION_CLASSNAMES = {
