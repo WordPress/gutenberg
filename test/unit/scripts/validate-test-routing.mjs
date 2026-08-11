@@ -4,7 +4,13 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { discoverTestFiles, getVitestTests } from './discover-test-files.mjs';
+import {
+	discoverTestFiles,
+	findOverlappingVitestProjectTests,
+	getVitestTests,
+	getVitestTestsByProject,
+	VITEST_PROJECT_NAMES,
+} from './discover-test-files.mjs';
 
 const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
@@ -65,6 +71,7 @@ function listTests( packageName, args ) {
 			.trim()
 			.split( /\r?\n/ )
 			.filter( Boolean )
+			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
 			.map( normalizeTestPath )
 	);
 }
@@ -112,15 +119,50 @@ const jestTests = listTests( 'jest', [
 	JEST_CONFIG,
 	'--listTests',
 ] );
-const vitestTests = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
-	? listTests( 'vitest', [
-			'list',
-			'--config',
-			VITEST_CONFIG,
-			'--filesOnly',
-	  ] )
-	: new Set();
 const staticInventory = discoverTestFiles( ROOT_DIR );
+const expectedVitestTestsByProject = getVitestTestsByProject(
+	staticInventory,
+	manifest
+);
+const vitestTestsByProject = Object.fromEntries(
+	VITEST_PROJECT_NAMES.map( ( projectName ) => [
+		projectName,
+		existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
+			? listTests( 'vitest', [
+					'list',
+					'--config',
+					VITEST_CONFIG,
+					'--project',
+					projectName,
+					'--filesOnly',
+					'--passWithNoTests',
+			  ] )
+			: new Set(),
+	] )
+);
+const overlappingVitestProjectTests =
+	findOverlappingVitestProjectTests( vitestTestsByProject );
+assert.deepEqual(
+	overlappingVitestProjectTests,
+	[],
+	`Tests are owned by multiple Vitest projects:\n${ overlappingVitestProjectTests.join(
+		'\n'
+	) }`
+);
+
+for ( const projectName of VITEST_PROJECT_NAMES ) {
+	assert.deepEqual(
+		[ ...vitestTestsByProject[ projectName ] ].sort(),
+		expectedVitestTestsByProject[ projectName ],
+		`Vitest ${ projectName } project discovery does not match filename-based ownership.`
+	);
+}
+
+const vitestTests = new Set(
+	Object.values( vitestTestsByProject ).flatMap( ( projectTests ) => [
+		...projectTests,
+	] )
+);
 
 const migratedTestFiles = manifest.vitest.files;
 const migratedDirectories = manifest.vitest.directories;
