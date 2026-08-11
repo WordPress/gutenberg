@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
+-   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
 
 ### Internal
 
@@ -36,6 +37,8 @@
 -   `Modal`: Prevent background page scrolling without relying on WordPress global styles when using the default `bodyOpenClassName` ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
 -   `Menu`: Return focus to the root trigger after closing a legacy `Modal` opened from a menu item, while preserving the menu-to-Modal scroll-lock handoff ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
 -   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
+-   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
+
 
 ### TypeScript
 

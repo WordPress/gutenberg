@@ -1000,4 +1000,94 @@ describe( 'DataForm component', () => {
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'datetime fields', () => {
+		const datetimeFields = [
+			{
+				id: 'date',
+				label: 'Date',
+				type: 'datetime' as const,
+				isValid: { required: true },
+			},
+		];
+
+		const datetimeForm = {
+			fields: [ 'date' ],
+		};
+
+		const dayButton = ( date: Date ) =>
+			screen.getByRole( 'button', {
+				name: new RegExp(
+					new Intl.DateTimeFormat( 'en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+					} ).format( date )
+				),
+			} );
+
+		// Waits out any timeouts scheduled by the control, so that a
+		// duplicate update scheduled for a later tick is not missed.
+		const flushTimeouts = () =>
+			act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 10 ) )
+			);
+
+		it( 'should call onChange once when a date is selected in the calendar', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ { date: '2026-01-10T10:00:00.000Z' } }
+				/>
+			);
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( {
+				date: expect.any( String ),
+			} );
+		} );
+
+		it( 'should call onChange once and show the required error when the date is cleared, without moving focus to the input', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+
+			function ControlledForm() {
+				const [ item, setItem ] = useState< {
+					date: string | undefined;
+				} >( { date: '2026-01-10T10:00:00.000Z' } );
+				return (
+					<Dataform
+						onChange={ ( edits ) => {
+							onChange( edits );
+							setItem( ( prev ) => ( { ...prev, ...edits } ) );
+						} }
+						fields={ datetimeFields }
+						form={ datetimeForm }
+						data={ item }
+					/>
+				);
+			}
+
+			render( <ControlledForm /> );
+
+			// Clicking the selected day deselects it.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( { date: undefined } );
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			expect( screen.getByLabelText( /date time/i ) ).not.toHaveFocus();
+		} );
+	} );
 } );
