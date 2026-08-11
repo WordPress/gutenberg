@@ -17,6 +17,9 @@ describe( 'Vitest repository setup', () => {
 		// eslint-disable-next-line @wordpress/wp-global-usage -- This compatibility test verifies the test-only global.
 		expect( globalThis.SCRIPT_DEBUG ).toBe( true );
 		expect( window.tinyMCEPreInit.baseURL ).toBe( 'about:blank' );
+		expect( window.matchMedia ).toBeUndefined();
+		expect( window.requestIdleCallback ).toBeUndefined();
+		expect( globalThis.ResizeObserver ).toBeUndefined();
 		expect( vi.isMockFunction( convertGifToVideo ) ).toBe( true );
 		expect( vi.isMockFunction( vipsResizeImage ) ).toBe( true );
 		expect( Object.keys( wasmModule ) ).toEqual( [] );
