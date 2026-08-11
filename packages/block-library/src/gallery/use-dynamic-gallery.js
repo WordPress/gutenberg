@@ -9,6 +9,7 @@ import { getUpdatedLinkTargetSettings } from '../image/utils';
 import {
 	getSourceQuery,
 	getDynamicSource,
+	getDynamicSources,
 	ATTACHED_MEDIA,
 	DEFAULT_ORDERBY,
 	DEFAULT_ORDER,
@@ -98,13 +99,42 @@ export default function useDynamicGallery( {
 } ) {
 	const { dynamicContent } = attributes;
 
-	// Whether dynamic mode makes sense in the current editing context. A
-	// `postType` means the block will resolve against some post at render time —
-	// either a concrete post (post/page editor, Query Loop item) or a post-bound
-	// template (`single`, `page`) whose post is filled in by `get_the_ID()` on the
-	// frontend (see `index.php`). Without it (template part, pattern, generic
-	// template) there's no post to attach to, so the source can never resolve.
-	const canUseDynamicSource = !! postType;
+	// The sources that can be offered here, as `[ name, descriptor ]` pairs.
+	//
+	// A source flagged `requiresPost` resolves relative to the post being
+	// rendered, so it needs a `postType` — meaning the block will resolve against
+	// some post at render time, either a concrete post (post/page editor, Query
+	// Loop item) or a post-bound template (`single`, `page`) whose post is filled
+	// in by `get_the_ID()` on the frontend (see `index.php`). Without one
+	// (template part, pattern, generic template) there's nothing to attach to, so
+	// such a source can never resolve. Sources that name their own content —
+	// a media folder — are offered everywhere.
+	const availableSources = useMemo(
+		() =>
+			getDynamicSources().filter(
+				( [ , descriptor ] ) =>
+					( ! descriptor.requiresPost || !! postType ) &&
+					( descriptor.isAvailable?.() ?? true )
+			),
+		[ postType ]
+	);
+
+	// Whether dynamic mode makes sense in the current editing context at all.
+	const canUseDynamicSource = availableSources.length > 0;
+
+	// The sources offered as entry points on the block placeholder. Unlike
+	// `availableSources` this ignores `requiresPost`: with no post type to
+	// preview against, a post-relative source still resolves at render time via
+	// `get_the_ID()` (see `index.php`) — e.g. in a template part or pattern shown
+	// on a singular page. A source gated off by its own `isAvailable` is still
+	// excluded, since it could never resolve at all.
+	const enterableSources = useMemo(
+		() =>
+			getDynamicSources().filter(
+				( [ , descriptor ] ) => descriptor.isAvailable?.() ?? true
+			),
+		[]
+	);
 
 	// The descriptor for the configured source (its `title`/`description`/
 	// `emptyMessage`), resolved once here so consumers read the copy without
@@ -114,6 +144,8 @@ export default function useDynamicGallery( {
 	// Current source ordering, falling back to the shared defaults when unset.
 	const sourceOrderby = dynamicContent?.args?.orderBy ?? DEFAULT_ORDERBY;
 	const sourceOrder = dynamicContent?.args?.order ?? DEFAULT_ORDER;
+	// The folder a `core/media-folder` gallery points at, if any.
+	const sourceFolderId = dynamicContent?.args?.folderId;
 
 	const registry = useRegistry();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
@@ -202,14 +234,14 @@ export default function useDynamicGallery( {
 	// legacy `images`/`ids` attributes aren't touched — they're back-compat shims
 	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
 	// on any gallery reachable here.
-	function enableDynamicMode() {
+	function enableDynamicMode( source = ATTACHED_MEDIA ) {
 		// Batch the attribute change and the inner-block reset into a single
 		// undo level: they're two halves of one mode switch, so one undo should
 		// revert both. Marking the second dispatch non-persistent stops it from
 		// opening a second undo level, which would otherwise leave the gallery
 		// in a half-switched state (dynamic source set, images still present).
 		registry.batch( () => {
-			setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
+			setAttributes( { dynamicContent: { source } } );
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [] );
 		} );
@@ -233,20 +265,17 @@ export default function useDynamicGallery( {
 		} );
 	}
 
-	// Updates the source ordering within `dynamicContent.args`. Passing
-	// `undefined` (or the default order) strips the keys so they aren't
-	// persisted redundantly and the ToolsPanel item reads as unset.
-	function setSourceOrder( nextOrderby, nextOrder ) {
-		const nextArgs = { ...dynamicContent?.args };
-		delete nextArgs.orderBy;
-		delete nextArgs.order;
-		if (
-			nextOrderby !== undefined &&
-			( nextOrderby !== DEFAULT_ORDERBY || nextOrder !== DEFAULT_ORDER )
-		) {
-			nextArgs.orderBy = nextOrderby;
-			nextArgs.order = nextOrder;
-		}
+	// Merges updates into `dynamicContent.args`. A key set to `undefined` is
+	// removed rather than persisted, so an unset argument leaves no trace in the
+	// serialized attribute and the corresponding control reads as unset; `args`
+	// itself is dropped once it is empty.
+	function updateSourceArgs( updates ) {
+		const nextArgs = { ...dynamicContent?.args, ...updates };
+		Object.keys( updates ).forEach( ( key ) => {
+			if ( nextArgs[ key ] === undefined ) {
+				delete nextArgs[ key ];
+			}
+		} );
 		const nextSource = { ...dynamicContent };
 		if ( Object.keys( nextArgs ).length ) {
 			nextSource.args = nextArgs;
@@ -256,21 +285,44 @@ export default function useDynamicGallery( {
 		setAttributes( { dynamicContent: nextSource } );
 	}
 
-	// Resets the source to its bare form: keeps the source kind, drops its args.
+	// Updates the source ordering. Passing `undefined` (or the default order)
+	// strips the keys so they aren't persisted redundantly.
+	function setSourceOrder( nextOrderby, nextOrder ) {
+		const isDefault =
+			nextOrderby === undefined ||
+			( nextOrderby === DEFAULT_ORDERBY && nextOrder === DEFAULT_ORDER );
+		updateSourceArgs(
+			isDefault
+				? { orderBy: undefined, order: undefined }
+				: { orderBy: nextOrderby, order: nextOrder }
+		);
+	}
+
+	// Points a media folder gallery at a folder. A falsy id clears the selection,
+	// returning the block to its "choose a folder" empty state.
+	function setSourceFolderId( folderId ) {
+		updateSourceArgs( { folderId: folderId || undefined } );
+	}
+
+	// Resets the source's optional settings. Only the ordering is optional — the
+	// source kind and the folder it points at are what the gallery *is*, so
+	// clearing them would empty the block rather than reset a setting.
 	function resetSource() {
-		setAttributes( {
-			dynamicContent: { source: dynamicContent.source },
-		} );
+		setSourceOrder( undefined, undefined );
 	}
 
 	return {
 		dynamicContent,
 		canUseDynamicSource,
+		availableSources,
+		enterableSources,
 		sourceDescriptor,
 		hasMoreImagesThanCap,
 		dynamicMediaTotal,
 		sourceOrderby,
 		sourceOrder,
+		sourceFolderId,
+		setSourceFolderId,
 		dynamicMedia,
 		dynamicImageBlocks,
 		isResolvingDynamic,

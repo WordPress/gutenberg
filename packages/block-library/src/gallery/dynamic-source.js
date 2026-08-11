@@ -9,6 +9,24 @@ import { __ } from '@wordpress/i18n';
 export const ATTACHED_MEDIA = 'core/attached-media';
 
 /**
+ * Source discriminator for "images in a media folder". Unlike
+ * `core/attached-media` this source is not relative to the rendered post — its
+ * folder is named outright in `args.folderId` — so it resolves anywhere,
+ * including in templates and patterns.
+ *
+ * Only meaningful while the media folders experiment is on; without it the
+ * `wp_media_folder` taxonomy isn't registered, so the source resolves to nothing
+ * on both sides and the gallery renders empty.
+ */
+export const MEDIA_FOLDER = 'core/media-folder';
+
+/**
+ * The media folders taxonomy's REST base, which names the `/wp/v2/media`
+ * collection parameter used to filter attachments by folder.
+ */
+export const MEDIA_FOLDER_REST_BASE = 'media-folders';
+
+/**
  * Default ordering for a dynamic source. `menu_order` (the manual media-library
  * order) is intentionally not used: it isn't a valid `orderby` value on the
  * media REST endpoint, so the editor preview couldn't reproduce it. Both the
@@ -28,13 +46,32 @@ export const DEFAULT_ORDER = 'desc';
  */
 const DYNAMIC_SOURCES = {
 	[ ATTACHED_MEDIA ]: {
-		// Short label for the entry affordance / future source chooser. Mirrors
-		// the "Attached images" media inserter category name.
+		// Short label for the entry affordance / source chooser. Mirrors the
+		// "Attached images" media inserter category name.
 		title: __( 'Use attached images' ),
 		// Help text shown beneath the Source controls.
 		description: __( 'Images attached to the post.' ),
 		// Empty-state copy for the canvas preview.
 		emptyMessage: __( 'Images attached to the post will appear here.' ),
+		// This source is relative to the post being rendered, so it can only be
+		// offered where there will be one. A source without this flag resolves
+		// anywhere, including template parts and patterns.
+		requiresPost: true,
+	},
+	[ MEDIA_FOLDER ]: {
+		// Mirrors the folder categories in the media inserter, which is where a
+		// folder's images are put together in the first place.
+		title: __( 'Use a folder' ),
+		description: __( 'Images in a media folder.' ),
+		emptyMessage: __( 'Images in the selected folder will appear here.' ),
+		// Copy for the source's own configuration, which the Source panel renders
+		// alongside the shared ordering control.
+		selectFolderLabel: __( 'Folder' ),
+		noFolderMessage: __( 'Select a folder to display its images.' ),
+		// Media folders are experimental: without the experiment the taxonomy
+		// isn't registered, so there is nothing to point a gallery at and the
+		// source isn't offered.
+		isAvailable: () => !! window.__experimentalMediaFolders,
 	},
 };
 
@@ -47,6 +84,16 @@ const DYNAMIC_SOURCES = {
  */
 export function getDynamicSource( source ) {
 	return DYNAMIC_SOURCES[ source ];
+}
+
+/**
+ * Returns every dynamic source as `[ name, descriptor ]` pairs, for building the
+ * "Source" chooser. Order here is the order they are offered in.
+ *
+ * @return {Array<[string, Object]>} The source entries.
+ */
+export function getDynamicSources() {
+	return Object.entries( DYNAMIC_SOURCES );
 }
 
 /**
@@ -80,33 +127,47 @@ export const MAX_IMAGES = 100;
 export function getSourceQuery( dynamicContent, { postId } ) {
 	const { source, args = {} } = dynamicContent ?? {};
 
+	// Query params shared by every source. Unexpected `args` values (only
+	// reachable via hand-edited markup) are coerced back to the defaults —
+	// mirroring the server resolver's allow list — so the editor preview stays in
+	// step with the frontend instead of issuing an invalid REST query.
+	const baseQuery = {
+		per_page: MAX_IMAGES,
+		// The gallery only accepts images, so constrain the source to image
+		// media (matching the server resolver). This keeps the editor preview in
+		// step with the rendered output for sources that also match other media.
+		media_type: 'image',
+		// Map the camelCase `args` to the REST-named media collection params.
+		orderby:
+			args.orderBy === 'date' || args.orderBy === 'title'
+				? args.orderBy
+				: DEFAULT_ORDERBY,
+		order:
+			args.order === 'asc' || args.order === 'desc'
+				? args.order
+				: DEFAULT_ORDER,
+	};
+
 	switch ( source ) {
 		case ATTACHED_MEDIA:
 			if ( ! postId ) {
 				return null;
 			}
+			return { ...baseQuery, parent: postId };
+
+		case MEDIA_FOLDER: {
+			// A folder gallery that hasn't been pointed at a folder yet: return
+			// no query rather than one matching every image, so the block shows
+			// its empty state instead of the whole media library.
+			const folderId = Number( args.folderId );
+			if ( ! Number.isInteger( folderId ) || folderId <= 0 ) {
+				return null;
+			}
 			return {
-				parent: postId,
-				per_page: MAX_IMAGES,
-				// The gallery only accepts images, so constrain the source to
-				// image media (matching the server resolver). This keeps the
-				// editor preview in step with the rendered output for posts
-				// that also have non-image attachments.
-				media_type: 'image',
-				// Map the camelCase `args` to the REST-named media collection
-				// params. Unexpected values (only reachable via hand-edited
-				// markup) are coerced back to the defaults — mirroring the server
-				// resolver's allow list — so the editor preview stays in step with
-				// the frontend instead of issuing an invalid REST query.
-				orderby:
-					args.orderBy === 'date' || args.orderBy === 'title'
-						? args.orderBy
-						: DEFAULT_ORDERBY,
-				order:
-					args.order === 'asc' || args.order === 'desc'
-						? args.order
-						: DEFAULT_ORDER,
+				...baseQuery,
+				[ MEDIA_FOLDER_REST_BASE ]: [ folderId ],
 			};
+		}
 	}
 
 	// Unknown or not-yet-implemented source.

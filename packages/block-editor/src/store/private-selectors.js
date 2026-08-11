@@ -560,6 +560,22 @@ export const getInserterMediaCategories = createSelector(
 );
 
 /**
+ * Returns the media folders capability supplied by the host editor, or
+ * `undefined` when media folders aren't available.
+ *
+ * Creating a folder means writing a taxonomy term, which this WordPress-agnostic
+ * package can't do itself — so the capability is passed in as a setting by the
+ * `editor` package (which owns the folder media categories too).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?{canCreate: boolean, create: Function}} The media folders capability.
+ */
+export function getInserterMediaFolders( state ) {
+	return state.settings.inserterMediaFolders;
+}
+
+/**
  * Returns whether there is at least one allowed pattern for inner blocks children.
  * This is useful for deferring the parsing of all patterns until needed.
  *

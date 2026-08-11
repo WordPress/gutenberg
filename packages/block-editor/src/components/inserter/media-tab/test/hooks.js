@@ -1,5 +1,22 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useDelayedLoading, useMediaResults } from '../hooks';
+import { useSelect } from '@wordpress/data';
+import {
+	useDelayedLoading,
+	useMediaResults,
+	useMediaCategories,
+} from '../hooks';
+
+// `useMediaCategories` reads the categories and the insertion capabilities from
+// the block editor store. Only `useSelect` is exercised here, so the store and
+// its unlock helper are stubbed rather than instantiated — the hook's own logic
+// (which sources get probed, and which survive) is what's under test.
+jest.mock( '@wordpress/data', () => ( {
+	useSelect: jest.fn(),
+} ) );
+jest.mock( '../../../../store', () => ( { store: 'core/block-editor' } ) );
+jest.mock( '../../../../lock-unlock', () => ( {
+	unlock: ( value ) => value,
+} ) );
 
 describe( 'useDelayedLoading', () => {
 	beforeEach( () => {
@@ -256,5 +273,82 @@ describe( 'useMediaResults', () => {
 
 		expect( fetch ).toHaveBeenCalledTimes( 1 );
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
+	} );
+} );
+
+describe( 'useMediaCategories', () => {
+	// Run each `useSelect` callback against a stub store, rather than returning
+	// canned values per call — the hook makes two `useSelect` calls and they must
+	// keep answering correctly across re-renders.
+	const mockSelects = ( categories ) => {
+		const select = () => ( {
+			getInserterMediaCategories: () => categories,
+			canInsertBlockType: () => true,
+		} );
+		useSelect.mockImplementation( ( mapSelect ) => mapSelect( select ) );
+	};
+
+	beforeEach( () => {
+		useSelect.mockReset();
+	} );
+
+	it( 'lists a source with an empty message without probing it', async () => {
+		// A source that supplies an `emptyMessage` is listed whether or not it
+		// has media — so probing it would only throw the result away. Media
+		// folders rely on this: an empty folder still has to be reachable so
+		// images can be added to it, and N folders must not cost N requests.
+		const emptyFolder = {
+			name: 'media-folder-7',
+			mediaType: 'image',
+			emptyMessage: 'No images in this folder.',
+			fetch: jest.fn().mockResolvedValue( { mediaItems: [] } ),
+		};
+		mockSelects( [ emptyFolder ] );
+
+		const { result } = renderHook( () => useMediaCategories( '' ) );
+
+		await waitFor( () =>
+			expect( result.current ).toEqual( [ emptyFolder ] )
+		);
+		expect( emptyFolder.fetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'probes a source without an empty message and drops it when empty', async () => {
+		const populated = {
+			name: 'images',
+			mediaType: 'image',
+			fetch: jest.fn().mockResolvedValue( { mediaItems: [ { id: 1 } ] } ),
+		};
+		const empty = {
+			name: 'videos',
+			mediaType: 'video',
+			fetch: jest.fn().mockResolvedValue( { mediaItems: [] } ),
+		};
+		mockSelects( [ populated, empty ] );
+
+		const { result } = renderHook( () => useMediaCategories( '' ) );
+
+		await waitFor( () =>
+			expect( result.current ).toEqual( [ populated ] )
+		);
+		expect( populated.fetch ).toHaveBeenCalledWith( { per_page: 1 } );
+		expect( empty.fetch ).toHaveBeenCalledWith( { per_page: 1 } );
+	} );
+
+	it( 'does not probe an external source', async () => {
+		const openverse = {
+			name: 'openverse',
+			mediaType: 'image',
+			isExternalResource: true,
+			fetch: jest.fn(),
+		};
+		mockSelects( [ openverse ] );
+
+		const { result } = renderHook( () => useMediaCategories( '' ) );
+
+		await waitFor( () =>
+			expect( result.current ).toEqual( [ openverse ] )
+		);
+		expect( openverse.fetch ).not.toHaveBeenCalled();
 	} );
 } );

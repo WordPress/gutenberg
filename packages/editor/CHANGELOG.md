@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   Inserter: Add a media category per media folder, with pagination, and an injected folder-creation capability for the inserter's "Add folder" button. Behind the `gutenberg-media-folders` experiment.
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
 ### New Features

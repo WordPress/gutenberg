@@ -58,7 +58,6 @@ import useGetMedia from './use-get-media';
 import GalleryGapCustomProperties from './gap-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
-import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -673,24 +672,38 @@ export default function GalleryEdit( props ) {
 					{ ...mediaPlaceholderProps }
 				>
 					{ /*
-					 * Entry into dynamic mode. Gated on the editing mode so it's
-					 * hidden in content-only editing (where this structural change
-					 * isn't allowed), but intentionally not hidden by
-					 * `canUseDynamicSource` the way the inspector is (see
-					 * `dynamic-gallery.js`): even with no
-					 * post type to preview against, the source still resolves at
-					 * render time via `get_the_ID()` (see `index.php`) — e.g. in a
-					 * template part or pattern shown on a singular page.
+					 * Entry into dynamic mode, one button per source. An empty
+					 * gallery renders only this placeholder (no inspector), so
+					 * these are the sole way to reach dynamic mode on a fresh
+					 * block — every source has to be offered here, not just the
+					 * first one.
+					 *
+					 * Gated on the editing mode so they're hidden in content-only
+					 * editing, where this structural change isn't allowed. They
+					 * are intentionally not gated by `canUseDynamicSource` the way
+					 * the inspector is (see `dynamic-gallery.js`): even with no
+					 * post type to preview against, a post-relative source still
+					 * resolves at render time via `get_the_ID()` (see `index.php`)
+					 * — e.g. in a template part or pattern shown on a singular
+					 * page. That's what `enterableSources` accounts for.
 					 */ }
-					{ blockEditingMode === 'default' && (
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ dynamic.enableDynamicMode }
-						>
-							{ getDynamicSource( ATTACHED_MEDIA ).title }
-						</Button>
-					) }
+					{ blockEditingMode === 'default' &&
+						dynamic.enterableSources.map(
+							( [ source, descriptor ] ) => (
+								<Button
+									key={ source }
+									__next40pxDefaultSize
+									variant="secondary"
+									// Called through an arrow so the click event
+									// isn't passed as the source argument.
+									onClick={ () =>
+										dynamic.enableDynamicMode( source )
+									}
+								>
+									{ descriptor.title }
+								</Button>
+							)
+						) }
 				</MediaPlaceholder>
 			</div>
 		);

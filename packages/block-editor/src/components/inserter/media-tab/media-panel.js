@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useEffect,
@@ -19,6 +19,7 @@ import MediaUploadCheck from '../../media-upload/check';
 import { useMediaResults, useDelayedLoading } from './hooks';
 import InserterNoResults from '../no-results';
 import BlockPatternsPaging from '../../block-patterns-paging';
+import { getAttachCopy } from './attach-copy';
 
 const MEDIA_ITEMS_PER_PAGE = 20;
 
@@ -26,25 +27,27 @@ const MEDIA_ITEMS_PER_PAGE = 20;
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
 
 /**
- * Opens the Media Library to attach images to the current post. Only rendered
- * for media categories that expose an `attach` capability (i.e. the "Attached
- * images" source); other sources render the panel exactly as before.
+ * Opens the Media Library to add images to the panel's source. Only rendered for
+ * media categories that expose an `attach` capability (i.e. the "Attached
+ * images" source, or a media folder); other sources render the panel exactly as
+ * before.
  *
  * The picker opens fresh each time with no pre-selected value, so it is purely
- * additive: selecting images attaches them, and it does not imply that
- * deselecting would detach. Detaching is a separate, explicit per-item action.
+ * additive: selecting images adds them, and it does not imply that deselecting
+ * would remove them. Removing is a separate, explicit per-item action.
  *
  * @param {Object}   props
  * @param {Function} props.onSelect Called with the selected media items.
+ * @param {string}   props.label    Button label, also used as the picker's title.
  */
-function AttachImagesButton( { onSelect } ) {
+function AttachImagesButton( { onSelect, label } ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
 				multiple="add"
 				onSelect={ onSelect }
 				allowedTypes={ ATTACH_ALLOWED_TYPES }
-				title={ __( 'Attach images' ) }
+				title={ label }
 				render={ ( { open } ) => (
 					<Button
 						__next40pxDefaultSize
@@ -56,7 +59,7 @@ function AttachImagesButton( { onSelect } ) {
 						} }
 						variant="secondary"
 					>
-						{ __( 'Attach images' ) }
+						{ label }
 					</Button>
 				) }
 			/>
@@ -114,6 +117,10 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;
 	const subscribe = supportsAttachments ? category.subscribe : undefined;
+	// Each source words these affordances for what it actually is ("Attach
+	// images" to a post, "Add images to folder"), so the copy travels with the
+	// category. Merged over the defaults so a source can supply only some of it.
+	const attachCopy = useMemo( () => getAttachCopy( category ), [ category ] );
 
 	// Only show the pager for multi-page sources. Gating on the page count (not
 	// `mediaList.length`) keeps the footer mounted while paging, since the count
@@ -168,7 +175,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					// This source only attaches images (the picker's "Upload
 					// files" tab otherwise accepts any file type), so a selection
 					// with no images attaches nothing.
-					createWarningNotice( __( 'No images were attached.' ), {
+					createWarningNotice( attachCopy.noneAttachedNotice, {
 						type: 'snackbar',
 						id: 'inserter-notice',
 					} );
@@ -177,30 +184,14 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 				refresh();
 				createSuccessNotice(
-					category.postTypeLabel
-						? sprintf(
-								/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
-								_n(
-									'%1$d image attached to %2$s.',
-									'%1$d images attached to %2$s.',
-									attachedCount
-								),
-								attachedCount,
-								category.postTypeLabel
-						  )
-						: sprintf(
-								/* translators: %d: Number of images attached to the post. */
-								_n(
-									'%d image attached to post.',
-									'%d images attached to post.',
-									attachedCount
-								),
-								attachedCount
-						  ),
-					{ type: 'snackbar', id: 'inserter-notice' }
+					attachCopy.attachedNotice( attachedCount ),
+					{
+						type: 'snackbar',
+						id: 'inserter-notice',
+					}
 				);
 			} catch {
-				createErrorNotice( __( 'Could not attach images.' ), {
+				createErrorNotice( attachCopy.attachErrorNotice, {
 					type: 'snackbar',
 					id: 'inserter-notice',
 				} );
@@ -208,7 +199,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		},
 		[
 			attach,
-			category,
+			attachCopy,
 			refresh,
 			createErrorNotice,
 			createSuccessNotice,
@@ -221,24 +212,18 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			try {
 				await detach( media );
 				refresh();
-				createSuccessNotice(
-					category.postTypeLabel
-						? sprintf(
-								/* translators: %s: Name of the post type e.g: "Page". */
-								__( 'Image detached from %s.' ),
-								category.postTypeLabel
-						  )
-						: __( 'Image detached from post.' ),
-					{ type: 'snackbar', id: 'inserter-notice' }
-				);
+				createSuccessNotice( attachCopy.detachedNotice, {
+					type: 'snackbar',
+					id: 'inserter-notice',
+				} );
 			} catch {
-				createErrorNotice( __( 'Could not detach image.' ), {
+				createErrorNotice( attachCopy.detachErrorNotice, {
 					type: 'snackbar',
 					id: 'inserter-notice',
 				} );
 			}
 		},
-		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
+		[ detach, attachCopy, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
 	// Detaching is confirmed first: the dropdown sets the pending item, which
@@ -325,7 +310,10 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					{ attach && (
 						// Lines up with the "Open Media Library" button in the
 						// adjacent column.
-						<AttachImagesButton onSelect={ handleAttach } />
+						<AttachImagesButton
+							onSelect={ handleAttach }
+							label={ attachCopy.attachButton }
+						/>
 					) }
 				</Stack>
 			) }
@@ -334,23 +322,11 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				// `overlayClassName` and stack it above the options dropdown that
 				// opened it (see the z-index entry in `_z-index.scss`).
 				<Modal
-					title={ __( 'Detach image' ) }
+					title={ attachCopy.detachModalTitle }
 					onRequestClose={ () => setMediaPendingDetach( undefined ) }
 					overlayClassName={ `${ baseCssClass }-detach-modal` }
 				>
-					<p>
-						{ category.postTypeLabel
-							? sprintf(
-									/* translators: %s: Name of the post type e.g: "Page". */
-									__(
-										'Detach this image from the current %s? The image will remain in the Media Library.'
-									),
-									category.postTypeLabel
-							  )
-							: __(
-									'Detach this image from the current post? The image will remain in the Media Library.'
-							  ) }
-					</p>
+					<p>{ attachCopy.detachModalBody }</p>
 					<div className={ `${ baseCssClass }-detach-actions` }>
 						<Button
 							__next40pxDefaultSize
@@ -364,7 +340,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 							variant="primary"
 							onClick={ confirmDetach }
 						>
-							{ __( 'Detach' ) }
+							{ attachCopy.detachConfirmButton }
 						</Button>
 					</div>
 				</Modal>

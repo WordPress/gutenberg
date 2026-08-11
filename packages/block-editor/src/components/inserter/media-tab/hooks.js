@@ -179,7 +179,14 @@ export function useMediaCategories( rootClientId ) {
 				await Promise.all(
 					inserterMediaCategories.map( async ( category ) => {
 						// Some sources are external and we don't need to make a request.
-						if ( category.isExternalResource ) {
+						// A source with an `emptyMessage` is always listed (see
+						// below), so probing it would only discard the result —
+						// skip the request entirely. This is what keeps the cost
+						// of listing N media folders at zero.
+						if (
+							category.isExternalResource ||
+							category.emptyMessage
+						) {
 							return [ category.name, true ];
 						}
 						let results = [];
@@ -200,7 +207,8 @@ export function useMediaCategories( rootClientId ) {
 			// whose corresponding block type is not allowed to be inserted, based
 			// on the category's `mediaType`. A category that provides an
 			// `emptyMessage` stays in the list even when empty, so it can show
-			// that message (e.g. Attachments, to expose its "Attach" action).
+			// that message and expose its "Attach"/"Add" action (e.g. Attachments,
+			// or an empty media folder) — those are never probed above.
 			const canInsertMediaType = {
 				image: canInsertImage,
 				video: canInsertVideo,

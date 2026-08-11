@@ -325,4 +325,162 @@ describe( 'getInserterMediaCategories', () => {
 			)
 		).toBe( false );
 	} );
+
+	describe( 'media folders', () => {
+		const getFolderCategory = ( folders, postId, typeLabel ) =>
+			getInserterMediaCategories( postId, typeLabel, folders ).find(
+				( category ) => category.name === 'media-folder-7'
+			);
+
+		it( 'adds a category per folder, independently of the edited post', () => {
+			const folders = [
+				{ id: 7, name: 'Holiday' },
+				{ id: 8, name: 'Product shots' },
+			];
+
+			// Folders are not relative to the edited entity, so they are offered
+			// even where "Attached images" is not (e.g. a template).
+			const categories = getInserterMediaCategories(
+				'wp_template//theme//home',
+				undefined,
+				folders
+			);
+
+			expect( categories.map( ( category ) => category.name ) ).toEqual( [
+				'images',
+				'videos',
+				'audio',
+				'openverse',
+				'media-folder-7',
+				'media-folder-8',
+			] );
+			expect( categories.at( -2 ).labels.name ).toBe( 'Holiday' );
+		} );
+
+		it( 'decodes entities in the folder name', () => {
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Ben &amp; Jerry&#8217;s' },
+			] );
+
+			expect( category.labels.name ).toBe( 'Ben & Jerry’s' );
+			expect( category.attachCopy.detachedNotice ).toBe(
+				'Image removed from Ben & Jerry’s.'
+			);
+		} );
+
+		it( 'filters media by the folder term', async () => {
+			const getEntityRecords = jest.fn().mockResolvedValue( [] );
+			resolveSelect.mockReturnValue( { getEntityRecords } );
+			select.mockReturnValue( {
+				getEntityRecordsTotalItems: jest.fn().mockReturnValue( 0 ),
+				getEntityRecordsTotalPages: jest.fn().mockReturnValue( 0 ),
+			} );
+
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Holiday' },
+			] );
+			await category.fetch( { per_page: 20 } );
+
+			expect( getEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{
+					per_page: 20,
+					media_type: 'image',
+					'media-folders': [ 7 ],
+					orderBy: 'date',
+				}
+			);
+		} );
+
+		it( 'adds a folder without dropping the ones an image is already in', async () => {
+			const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			// Image 10 is already filed under folder 3; image 11 is in none.
+			const getEntityRecord = jest.fn( ( kind, name, id ) =>
+				Promise.resolve(
+					id === 10 ? { id, 'media-folders': [ 3 ] } : { id }
+				)
+			);
+			resolveSelect.mockReturnValue( { getEntityRecord } );
+
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Holiday' },
+			] );
+			const attachedCount = await category.attach( [
+				{ id: 10, type: 'image' },
+				{ id: 11, type: 'image' },
+				// Non-images are gated out, as for attached images.
+				{ id: 12, type: 'application' },
+			] );
+
+			expect( attachedCount ).toBe( 2 );
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 10, 'media-folders': [ 3, 7 ] },
+				{ throwOnError: true }
+			);
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 11, 'media-folders': [ 7 ] },
+				{ throwOnError: true }
+			);
+			expect( saveEntityRecord ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'skips the write for an image already in the folder', async () => {
+			const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			resolveSelect.mockReturnValue( {
+				getEntityRecord: jest
+					.fn()
+					.mockResolvedValue( { id: 10, 'media-folders': [ 7 ] } ),
+			} );
+
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Holiday' },
+			] );
+			const attachedCount = await category.attach( [
+				{ id: 10, type: 'image' },
+			] );
+
+			// Still reported as in the folder, but nothing was re-saved.
+			expect( attachedCount ).toBe( 1 );
+			expect( saveEntityRecord ).not.toHaveBeenCalled();
+		} );
+
+		it( 'removes only this folder on detach', async () => {
+			const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			resolveSelect.mockReturnValue( {
+				getEntityRecord: jest
+					.fn()
+					.mockResolvedValue( { id: 10, 'media-folders': [ 3, 7 ] } ),
+			} );
+
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Holiday' },
+			] );
+			await category.detach( { id: 10 } );
+
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 10, 'media-folders': [ 3 ] },
+				{ throwOnError: true }
+			);
+		} );
+
+		it( 'stays listed while empty so images can be added to it', () => {
+			const category = getFolderCategory( [
+				{ id: 7, name: 'Holiday' },
+			] );
+
+			// `emptyMessage` is what keeps a category in the tab list when it has
+			// no items — and what tells `useMediaCategories` not to probe it.
+			expect( category.emptyMessage ).toBe( 'No images in this folder.' );
+		} );
+	} );
 } );
