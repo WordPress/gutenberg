@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor Inserter', () => {
@@ -13,13 +10,13 @@ test.describe( 'Site Editor Inserter', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.use( {
@@ -301,7 +298,10 @@ class InserterUtils {
 	}
 
 	getBlockLibraryTab( name ) {
-		return this.page.getByRole( 'tab', { name } );
+		// `exact` needed so 'Patterns' cannot also match the 'My patterns'
+		// tab, which renders whenever the site has user patterns (for
+		// example ones left behind by an earlier spec in the same run).
+		return this.page.getByRole( 'tab', { name, exact: true } );
 	}
 
 	async expectActiveTab( name ) {

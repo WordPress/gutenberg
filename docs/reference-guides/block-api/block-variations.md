@@ -35,6 +35,7 @@ A block variation is defined by an object that can contain the following fields:
 -   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
 -   `attributes` (optional, type `Object`) – Values that override block attributes.
 -   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
+-   `innerContent` (optional, type `Array`) – Static HTML fragments interleaved with inner blocks, where `null` entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.
 -   `example` (optional, type `Object`) – Provides structured data for the block preview. Set to `undefined` to disable the preview. See the [Block Registration API](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 -   `scope` (optional, type `WPBlockVariationScope[]`) - Defaults to `block` and `inserter`. The list of scopes where the variation is applicable. Available options include:
     -   `block` - Used by blocks to filter specific block variations. `Columns` and `Query` blocks have such variations, which are passed to the [experimental BlockVariationPicker](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md) component. This component handles displaying the variations and allows users to choose one of them.
@@ -59,6 +60,44 @@ wp.blocks.registerBlockVariation( 'core/embed', {
 	attributes: { providerNameSlug: 'custom' },
 } );
 ```
+
+## Registering block variations in PHP
+
+Block variations can also be registered from PHP using the `get_block_type_variations` filter hook. This approach is particularly useful when you need to dynamically generate variations based on registered post types, taxonomies, or other WordPress data.
+
+Here's an example of how to register a custom variation for the `core/image` block:
+
+```php
+function my_custom_image_variation( $variations, $block_type ) {
+    // Only modify variations for the image block
+    if ( 'core/image' !== $block_type->name ) {
+        return $variations;
+    }
+
+    // Add a custom variation
+    $variations[] = array(
+		'name'        => 'wide-image',
+		'title'       => __( 'Wide image', 'textdomain' ),
+		'description' => __( 'A wide image', 'textdomain' ),
+		'scope'       => array( 'inserter' ),
+		'isDefault'   => false,
+		'attributes'  => array(
+			'align' => 'wide', // Identifies the link type as custom
+		),
+    );
+
+    return $variations;
+}
+add_filter( 'get_block_type_variations', 'my_custom_image_variation', 10, 2 );
+```
+
+The `get_block_type_variations` filter is called when variations are requested for a block type. It receives two parameters:
+- `$variations`: An array of currently registered variations for the block type
+- `$block_type`: The full block type object
+
+Note that variations registered through PHP will be merged with any variations registered through JavaScript using `registerBlockVariation()`.
+
+<div class="callout callout-info">Check the <a href="https://developer.wordpress.org/news/2024/03/how-to-register-block-variations-with-php/">How to register block variations with PHP</a> blog post for more info about this</div>
 
 ## Removing a block variation
 

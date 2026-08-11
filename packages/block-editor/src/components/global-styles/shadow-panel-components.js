@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
@@ -11,15 +8,12 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
-	Tooltip,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
-import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
-
-/**
- * External dependencies
- */
+import { useMemo, useRef } from '@wordpress/element';
+import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
+import { Tooltip } from '@wordpress/ui';
+import { InheritanceResetButton } from './inheritance';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -46,6 +40,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
+						disabled={ ! shadow }
+						accessibleWhenDisabled
 					>
 						{ __( 'Clear' ) }
 					</Button>
@@ -80,35 +76,51 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Tooltip text={ label }>
-			<Composite.Item
-				role="option"
-				aria-label={ label }
-				aria-selected={ isActive }
-				className={ clsx( 'block-editor-global-styles__shadow__item', {
-					'is-active': isActive,
-				} ) }
+		<Tooltip.Root>
+			<Tooltip.Trigger
 				render={
-					<button
+					<Composite.Item
+						role="option"
+						aria-label={ label }
+						aria-selected={ isActive }
 						className={ clsx(
-							'block-editor-global-styles__shadow-indicator',
+							'block-editor-global-styles__shadow__item',
 							{
-								unset: type === 'unset',
+								'is-active': isActive,
 							}
 						) }
-						onClick={ onSelect }
-						style={ { boxShadow: shadow } }
-						aria-label={ label }
-					>
-						{ isActive && <Icon icon={ check } /> }
-					</button>
+						render={
+							<button
+								className={ clsx(
+									'block-editor-global-styles__shadow-indicator',
+									{
+										unset: type === 'unset',
+									}
+								) }
+								onClick={ onSelect }
+								style={ { boxShadow: shadow } }
+								aria-label={ label }
+							>
+								{ isActive && <Icon icon={ check } /> }
+							</button>
+						}
+					/>
 				}
 			/>
-		</Tooltip>
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
-export function ShadowPopover( { shadow, onShadowChange, settings } ) {
+export function ShadowPopover( {
+	shadow,
+	onShadowChange,
+	settings,
+	className,
+	hasLocalValue = !! shadow,
+	hasLocalOverride = false,
+	onReset,
+} ) {
 	const popoverProps = {
 		placement: 'left-start',
 		offset: 36,
@@ -118,8 +130,15 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
-			className="block-editor-global-styles__shadow-dropdown"
-			renderToggle={ renderShadowToggle() }
+			className={ clsx(
+				'block-editor-global-styles__shadow-dropdown',
+				className
+			) }
+			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
+				hasLocalValue,
+				hasLocalOverride,
+				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
+			} ) }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="medium">
 					<ShadowPopoverContainer
@@ -133,25 +152,59 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	);
 }
 
-function renderShadowToggle() {
-	return ( { onToggle, isOpen } ) => {
+function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
+	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+	return function ShadowToggle( { onToggle, isOpen } ) {
+		const shadowButtonRef = useRef( undefined );
+
 		const toggleProps = {
 			onClick: onToggle,
-			className: clsx( { 'is-open': isOpen } ),
+			className: clsx(
+				'block-editor-global-styles__shadow-dropdown-toggle',
+				{ 'is-open': isOpen }
+			),
 			'aria-expanded': isOpen,
+			ref: shadowButtonRef,
+		};
+
+		const handleReset = () => {
+			if ( isOpen ) {
+				onToggle();
+			}
+			onReset();
+			// Return focus to parent button.
+			shadowButtonRef.current?.focus();
 		};
 
 		return (
-			<Button __next40pxDefaultSize { ...toggleProps }>
-				<HStack justify="flex-start">
-					<Icon
-						className="block-editor-global-styles__toggle-icon"
-						icon={ shadowIcon }
-						size={ 24 }
-					/>
-					<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
-				</HStack>
-			</Button>
+			<>
+				<Button __next40pxDefaultSize { ...toggleProps }>
+					<HStack justify="flex-start">
+						<Icon
+							className="block-editor-global-styles__toggle-icon"
+							icon={ shadowIcon }
+							size={ 24 }
+						/>
+						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
+					</HStack>
+				</Button>
+				{ hasLocalValue &&
+					( hasLocalOverride ? (
+						<InheritanceResetButton
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onResetToInherited={ handleReset }
+						/>
+					) : (
+						<Button
+							__next40pxDefaultSize
+							size="small"
+							icon={ reset }
+							label={ __( 'Remove' ) }
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onClick={ handleReset }
+						/>
+					) ) }
+			</>
 		);
 	};
 }

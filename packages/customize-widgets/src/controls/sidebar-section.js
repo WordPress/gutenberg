@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import getInspectorSection from './inspector-section';
 
 const getInspectorSectionId = ( sidebarId ) =>

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
@@ -38,7 +31,7 @@ const PANEL_NAME = 'post-status';
 export default function PostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
 		( select ) => {
-			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 			const {
 				isEditorPanelRemoved,
@@ -53,13 +46,12 @@ export default function PostSummary( { onActionPerformed } ) {
 		},
 		[]
 	);
-
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<VStack spacing={ 4 }>
+						<Stack direction="column" gap="lg">
 							<PostCardPanel
 								postType={ postType }
 								postId={ postId }
@@ -67,13 +59,13 @@ export default function PostSummary( { onActionPerformed } ) {
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
-							<VStack spacing={ 1 }>
+							<Stack direction="column" gap="xs">
 								<PostContentInformation />
 								<PostLastEditedPanel />
-							</VStack>
+							</Stack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 4 }>
-									<VStack spacing={ 1 }>
+								<Stack direction="column" gap="lg">
+									<Stack direction="column" gap="xs">
 										<PostStatusPanel />
 										<PostSchedulePanel />
 										<PostURLPanel />
@@ -88,13 +80,13 @@ export default function PostSummary( { onActionPerformed } ) {
 										<SiteDiscussion />
 										<PostFormatPanel />
 										{ fills }
-									</VStack>
+									</Stack>
 									<PostTrash
 										onActionPerformed={ onActionPerformed }
 									/>
-								</VStack>
+								</Stack>
 							) }
-						</VStack>
+						</Stack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>
