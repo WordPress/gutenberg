@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 // @ts-expect-error -- Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
 import { isValidElementType } from 'react-is';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type { BlockType, BlockCategory, BlockVariation } from '../types';

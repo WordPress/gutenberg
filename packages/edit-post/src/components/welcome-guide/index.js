@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import WelcomeGuideDefault from './default';
 import WelcomeGuideTemplate from './template';
 import { store as editPostStore } from '../../store';

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { useDraggable } from '@dnd-kit/core';
 
 // `useDraggable`'s `listeners` and `attributes` types are not exported

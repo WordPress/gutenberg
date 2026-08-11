@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getSyncErrorMessages } from '../sync-error-messages';
 
 describe( 'getSyncErrorMessages', () => {

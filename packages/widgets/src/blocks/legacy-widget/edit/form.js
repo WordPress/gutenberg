@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-/**
- * Internal dependencies
- */
 import Control from './control';
 
 export default function Form( {

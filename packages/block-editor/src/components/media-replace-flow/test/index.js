@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
-/**
- * Internal dependencies
- */
 import MediaReplaceFlow from '../';
 
 const noop = () => {};

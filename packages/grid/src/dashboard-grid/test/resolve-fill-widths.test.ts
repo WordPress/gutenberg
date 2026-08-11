@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { resolveFillWidths } from '../resolve-fill-widths';
 import type { DashboardGridLayoutItem } from '../types';
 

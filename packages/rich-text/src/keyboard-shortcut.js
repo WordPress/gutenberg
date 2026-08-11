@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import { useEffect, useContext } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { KeyboardShortcutContext } from './contexts';
 
 export function RichTextShortcut( { character, type, onUse } ) {

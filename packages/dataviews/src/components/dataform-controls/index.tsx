@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps, Field, EditConfig } from '../../types';
 import checkbox from './checkbox';
 import combobox from './combobox';

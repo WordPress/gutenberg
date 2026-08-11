@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { dateI18n, format } from '@wordpress/date';
 import {
@@ -11,10 +8,6 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { calendar, people, wordpress } from '@wordpress/icons';
 import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './events-list.module.css';
 
 export interface WPEvent {

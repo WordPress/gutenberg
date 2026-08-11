@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -11,10 +8,6 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getSelectionEditableElement } from '../../utils/dom';

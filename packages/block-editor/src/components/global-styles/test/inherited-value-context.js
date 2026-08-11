@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useResolvedStyle } from '../inherited-value-context';
 import { BlockContextProvider } from '../../block-context';
-
 import { globalStylesDataKey } from '../../../store/private-keys';
 
 // The inheritance treatment sits behind the

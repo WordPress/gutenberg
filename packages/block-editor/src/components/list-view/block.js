@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
@@ -26,10 +19,6 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import ListViewLeaf from './leaf';
 import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {

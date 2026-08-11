@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';

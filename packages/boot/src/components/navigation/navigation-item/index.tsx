@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	FlexBlock,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import RouterLinkItem from '../router-link-item';
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';

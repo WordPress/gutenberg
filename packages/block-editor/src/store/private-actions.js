@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';

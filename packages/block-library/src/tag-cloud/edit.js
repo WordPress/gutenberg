@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	FlexItem,
@@ -24,10 +21,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
