@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   DataForms: Remove the built-in `richtext` control, its `EditConfigRichText` configuration type, and the package's `privateApis` export (whose only member was the control). The control assembled `@wordpress/rich-text` inside this package, which breaks every plugin that installs DataViews from npm: the main build unlocks private APIs against the copy WordPress ships, which fails outright, and the `@wordpress/dataviews/wp` build carried a second copy of `@wordpress/rich-text` that silently reused core's `core/rich-text` store, so core's registered formats rendered against the wrong React contexts and blanked the app ([#81233](https://github.com/WordPress/gutenberg/issues/81233)). The control now lives in `@wordpress/editor`, next to its only consumer, where `@wordpress/rich-text` resolves to the same copy the block editor uses. `@wordpress/rich-text` is no longer a dependency of this package. Building a rich text field needs a custom `Edit` component until `@wordpress/rich-text` offers a public way to assemble one outside `@wordpress/block-editor` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
+
 ### Internal
 
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)

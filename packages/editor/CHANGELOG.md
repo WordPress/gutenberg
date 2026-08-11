@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Notes: Move the rich text control the note form renders in from `@wordpress/dataviews` into this package. DataViews is installed from npm by plugins, and assembling `@wordpress/rich-text` there broke them ([#81233](https://github.com/WordPress/gutenberg/issues/81233)); here `@wordpress/rich-text` is the same `wp.richText` the block editor uses. Same component, no behavior change.
 -   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 -   Vendor a local copy of the `normalizeTextString` utility instead of unlocking it from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 
