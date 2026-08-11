@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -12,6 +9,12 @@ test.use( {
 test.describe( 'Block Toolbar', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so a mid-test failure doesn't leak
+		// the fixed-toolbar setting (or any other pref) to other tests.
+		await requestUtils.resetPreferences();
 	} );
 
 	test.describe( 'Contextual Toolbar', () => {
@@ -61,31 +64,50 @@ test.describe( 'Block Toolbar', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Paragraph' );
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Paragraph' );
+			await expect(
+				page.getByRole( 'button', { name: 'Paragraph', exact: true } )
+			).toBeFocused();
 			// // Navigate to Align Text
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await page.keyboard.press( 'ArrowRight' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 			// // Open the dropdown
 			await page.keyboard.press( 'Enter' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text left' );
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text left' } )
+			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Align text center'
-			);
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text center' } )
+			).toBeFocused();
 			await page.keyboard.press( 'Escape' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 
 			// Navigate to the Bold item. Testing items via the fills within the block toolbar are especially important
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Block: Paragraph'
-			);
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
 
@@ -102,7 +124,9 @@ test.describe( 'Block Toolbar', () => {
 
 			// Go back to the toolbar and apply a formatting option
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 			// Should focus the selected text again
 			expect(
@@ -124,7 +148,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 
@@ -136,8 +160,6 @@ test.describe( 'Block Toolbar', () => {
 		page,
 		pageUtils,
 	} ) => {
-		/* eslint-disable playwright/expect-expect */
-		/* eslint-disable playwright/no-wait-for-timeout */
 		// Set the fixed toolbar
 		await editor.setIsFixedToolbar( true );
 		// Insert a block with a lot of tool buttons
@@ -165,11 +187,7 @@ test.describe( 'Block Toolbar', () => {
 
 		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
-		/* eslint-enable playwright/expect-expect */
-		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
 
 	test( 'Tab order of the block toolbar aligns with visual order', async ( {
@@ -235,8 +253,6 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is on the block
 		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 
@@ -313,16 +329,11 @@ class BlockToolbarUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`). When a
+		// focused editing host owns the selection, the editable element
+		// containing the selection owns the focus.
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async testScrollable( scrollableElement, elementToTest ) {

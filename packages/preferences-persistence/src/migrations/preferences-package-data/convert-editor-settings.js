@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 export default function convertEditorSettings( data ) {
 	let newData = data;
 	const settingsToMoveToCore = [

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
@@ -8,10 +5,6 @@ import { NavigableToolbar } from '@wordpress/block-editor';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import UndoButton from '../undo-redo/undo';
 import RedoButton from '../undo-redo/redo';
 import { store as editWidgetsStore } from '../../../store';

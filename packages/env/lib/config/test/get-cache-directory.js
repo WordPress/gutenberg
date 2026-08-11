@@ -1,14 +1,6 @@
 'use strict';
-/* eslint-disable jest/no-conditional-expect */
-/**
- * External dependencies
- */
 const { stat } = require( 'fs' ).promises;
 const { homedir } = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const getCacheDirectory = require( '../get-cache-directory' );
 
 jest.mock( 'fs', () => ( {
@@ -54,4 +46,3 @@ describe( 'getCacheDirectory', () => {
 		expect( parsed ).toEqual( '/home/test/wp-env' );
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

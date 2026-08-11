@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Component, createRef, forwardRef } from '@wordpress/element';
 import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
@@ -625,6 +614,36 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'second' );
+	} );
+
+	it( 'forwards refs to a function component wrapped with withSelect', () => {
+		const registry = createRegistry();
+		registry.registerStore( 'demo', {
+			reducer: ( state = 'value' ) => state,
+			selectors: {
+				getValue: ( state ) => state,
+			},
+		} );
+
+		const OriginalComponent = forwardRef( ( { value }, ref ) => (
+			<div ref={ ref } role="status">
+				{ value }
+			</div>
+		) );
+
+		const DataBoundComponent = withSelect( ( _select ) => ( {
+			value: _select( 'demo' ).getValue(),
+		} ) )( OriginalComponent );
+
+		const ref = createRef();
+
+		render(
+			<RegistryProvider value={ registry }>
+				<DataBoundComponent ref={ ref } />
+			</RegistryProvider>
+		);
+
+		expect( ref.current ).toBe( screen.getByRole( 'status' ) );
 	} );
 } );
 /* eslint-enable @wordpress/wp-global-usage */

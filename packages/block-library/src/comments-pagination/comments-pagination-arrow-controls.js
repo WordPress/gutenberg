@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -10,8 +7,6 @@ import {
 export function CommentsPaginationArrowControls( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Arrow' ) }
 			value={ value }
 			onChange={ onChange }

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import TextareaAutosize from 'react-autosize-textarea';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import EditableText from '../editable-text';
 
 /**

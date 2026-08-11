@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
@@ -26,6 +19,7 @@ export default function NavigationInnerBlocks( {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasChildren,
 		isSelected,
+		hasSelectedDescendant,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -41,6 +35,7 @@ export default function NavigationInnerBlocks( {
 					false
 				),
 				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
+				hasSelectedDescendant: hasSelectedInnerBlock( clientId, true ),
 
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock.
@@ -96,6 +91,7 @@ export default function NavigationInnerBlocks( {
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasChildren ) ||
+				hasSelectedDescendant ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender

@@ -4,8 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"opacity": "alpha-channel",
-			"backgroundColor": "accent",
-			"tagName": "hr"
+			"tagName": "hr",
+			"backgroundColor": "accent"
 		},
 		"innerBlocks": []
 	}

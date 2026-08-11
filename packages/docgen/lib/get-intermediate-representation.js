@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const getExportEntries = require( './get-export-entries' );
 const getJSDocFromToken = require( './get-jsdoc-from-token' );
 const getDependencyPath = require( './get-dependency-path' );
@@ -14,6 +11,15 @@ const hasClassWithName = ( node, name ) =>
 
 const hasFunctionWithName = ( node, name ) =>
 	node.type === 'FunctionDeclaration' && node.id.name === name;
+
+const hasTSDeclareFunction = ( node, name ) =>
+	node.type === 'TSDeclareFunction' && node.id?.name === name;
+
+const hasImplementationWithName = ( node, name ) =>
+	hasFunctionWithName( node, name ) ||
+	( node.type === 'ExportNamedDeclaration' &&
+		node.declaration &&
+		hasFunctionWithName( node.declaration, name ) );
 
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
@@ -32,6 +38,8 @@ const hasNamedExportWithName = ( node, name ) =>
 	node.type === 'ExportNamedDeclaration' &&
 	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
 		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
+		( node.declaration &&
+			hasTSDeclareFunction( node.declaration, name ) ) ||
 		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
 
 const hasImportWithName = ( node, name ) =>
@@ -91,19 +99,27 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 			return (
 				hasClassWithName( node, entry.localName ) ||
 				hasFunctionWithName( node, entry.localName ) ||
+				hasTSDeclareFunction( node, entry.localName ) ||
 				hasVariableWithName( node, entry.localName ) ||
 				hasNamedExportWithName( node, entry.localName ) ||
 				hasImportWithName( node, entry.localName )
 			);
 		} );
-		if ( candidates.length !== 1 ) {
+		if ( candidates.length === 0 ) {
 			return doc;
 		}
-		const node = candidates[ 0 ];
-		if ( isImportDeclaration( node ) ) {
-			doc = getJSDocFromDependency( node, entry, parseDependency );
-		} else {
-			doc = getJSDocFromToken( node );
+		const implementationNode = candidates.find( ( node ) =>
+			hasImplementationWithName( node, entry.localName )
+		);
+		for ( const node of candidates ) {
+			if ( isImportDeclaration( node ) ) {
+				doc = getJSDocFromDependency( node, entry, parseDependency );
+			} else {
+				doc = getJSDocFromToken( node, implementationNode ?? node );
+			}
+			if ( doc !== undefined ) {
+				return doc;
+			}
 		}
 		return doc;
 	}

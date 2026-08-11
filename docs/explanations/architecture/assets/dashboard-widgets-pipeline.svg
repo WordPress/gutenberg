@@ -1,0 +1,72 @@
+<svg viewBox="0 0 912 656" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="900" height="644" rx="12" fill="#ffffff"/>
+
+  <!-- Station 1: authoring -->
+  <rect x="216" y="30" width="480" height="66" rx="9" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
+  <text x="240" y="57" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1e3a8a">widgets/&lt;name&gt;/</text>
+  <text x="240" y="78" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#2f54a5" opacity="0.85">authoring · one folder per widget · widget.json + widget.ts + render.tsx</text>
+
+  <line x1="456" y1="96" x2="456" y2="134" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="120" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">build time</text>
+
+  <!-- Station 2: build -->
+  <rect x="216" y="136" width="480" height="66" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="240" y="163" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#334155">@wordpress/build</text>
+  <text x="240" y="184" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#475569" opacity="0.9">discovers folders · two ES script modules per widget · emits the PHP manifest</text>
+
+  <line x1="456" y1="202" x2="456" y2="240" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="226" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">init (PHP)</text>
+
+  <!-- Station 3: registry -->
+  <rect x="216" y="242" width="480" height="66" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="240" y="269" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#855317">WP_Widget_Type_Registry</text>
+  <text x="240" y="290" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#855317" opacity="0.85">hydrated from the manifest · the server's runtime source of truth</text>
+
+  <line x1="456" y1="308" x2="456" y2="346" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="332" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">REST</text>
+
+  <!-- Station 4: REST endpoint -->
+  <rect x="216" y="348" width="480" height="66" rx="9" fill="#fff8e6" stroke="#b07020" stroke-width="1.4" stroke-dasharray="6 5"/>
+  <text x="240" y="375" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#855317">/wp/v2/widget-modules</text>
+  <text x="240" y="396" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#855317" opacity="0.85">{ name, render_module, widget_module, presentation }</text>
+
+  <line x1="456" y1="414" x2="456" y2="452" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="438" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">client</text>
+
+  <!-- Station 5: the package -->
+  <rect x="216" y="454" width="480" height="66" rx="9" fill="#d7f0ea" stroke="#2b8d79" stroke-width="1.5"/>
+  <text x="240" y="481" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1d6b5a">@wordpress/widget-primitives</text>
+  <text x="240" y="502" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#1d6b5a" opacity="0.9">useWidgetTypes( records ) → WidgetType[] · WidgetRender mounts one</text>
+
+  <line x1="456" y1="520" x2="456" y2="558" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Station 6: host -->
+  <rect x="216" y="560" width="480" height="66" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="240" y="587" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#475569">Host <tspan font-size="11.5" font-weight="500" fill="#94a3b8">· dashboard, sidebar, plugin panel…</tspan></text>
+  <text x="240" y="608" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#64748b" opacity="0.9">owns layout · chrome · persistence</text>
+
+  <!-- Seam annotations -->
+  <line x1="730" y1="34" x2="730" y2="410" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="730" y1="34" x2="722" y2="34" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="730" y1="410" x2="722" y2="410" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="742" y="218" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#94a3b8">WordPress</text>
+  <text x="742" y="233" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#94a3b8">infrastructure</text>
+
+  <line x1="730" y1="458" x2="730" y2="516" stroke="#7fc4b3" stroke-width="1.2"/>
+  <line x1="730" y1="458" x2="722" y2="458" stroke="#7fc4b3" stroke-width="1.2"/>
+  <line x1="730" y1="516" x2="722" y2="516" stroke="#7fc4b3" stroke-width="1.2"/>
+  <text x="742" y="484" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#2b8d79">the shared</text>
+  <text x="742" y="499" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#2b8d79">contract</text>
+
+  <line x1="730" y1="564" x2="730" y2="622" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="730" y1="564" x2="722" y2="564" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="730" y1="622" x2="722" y2="622" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="742" y="590" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#94a3b8">host</text>
+  <text x="742" y="605" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#94a3b8">territory</text>
+</svg>
