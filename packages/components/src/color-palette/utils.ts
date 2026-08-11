@@ -2,13 +2,13 @@ import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import { __ } from '@wordpress/i18n';
+import { kebabCase } from '@wordpress/kebab-case';
 import type {
 	ColorEditingProps,
 	ColorObject,
 	ColorPaletteProps,
 	PaletteObject,
 } from './types';
-import { kebabCase } from '../utils/strings';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
