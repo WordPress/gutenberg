@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
@@ -29,11 +29,15 @@ import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
-import { getTrackAttributes } from './utils';
+import { getTrackAttributes, getTrackImageAttributes } from './utils';
+import { getPlaylistMediaFromZip, isZipFile } from './zip-utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const ZIP_UPLOAD_MEDIA_TYPES = [ 'audio', 'image' ];
 const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
+const AUDIO_AND_ZIP_ACCEPT =
+	'audio/*,.zip,application/zip,application/x-zip-compressed';
 const DEFAULT_WAVEFORM_STYLE = 'bars';
 const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
@@ -60,6 +64,18 @@ function isAudioFile( file ) {
 
 function getTrackIdentifier( track ) {
 	return track.id ?? track.src ?? track.blob;
+}
+
+function getMediaItems( media ) {
+	if ( ! media ) {
+		return [];
+	}
+
+	if ( Object.prototype.toString.call( media ) === FILE_LIST_OBJECT_NAME ) {
+		return Array.from( media );
+	}
+
+	return Array.isArray( media ) ? media : [ media ];
 }
 
 const PlaylistEdit = ( {
@@ -120,11 +136,14 @@ const PlaylistEdit = ( {
 	);
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
-	const { innerBlockTracks } = useSelect(
+	const { innerBlockTracks, mediaUpload } = useSelect(
 		( select ) => {
 			const { getBlock: _getBlock } = select( blockEditorStore );
+			const { mediaUpload: _mediaUpload } =
+				select( blockEditorStore ).getSettings();
 			return {
 				innerBlockTracks: _getBlock( clientId )?.innerBlocks ?? [],
+				mediaUpload: _mediaUpload,
 			};
 		},
 		[ clientId ]
@@ -166,19 +185,7 @@ const PlaylistEdit = ( {
 
 	const createTrackBlocks = useCallback(
 		( media ) => {
-			if ( ! media ) {
-				return [];
-			}
-
-			let mediaItems = [ media ];
-			if (
-				Object.prototype.toString.call( media ) ===
-				FILE_LIST_OBJECT_NAME
-			) {
-				mediaItems = Array.from( media );
-			} else if ( Array.isArray( media ) ) {
-				mediaItems = media;
-			}
+			const mediaItems = getMediaItems( media );
 			let hasInvalidFile = false;
 
 			const blocks = mediaItems
@@ -214,9 +221,139 @@ const PlaylistEdit = ( {
 		[ onUploadError ]
 	);
 
+	const uploadZipMedia = useCallback(
+		( filesList ) =>
+			new Promise( ( resolve, reject ) => {
+				if ( ! mediaUpload ) {
+					reject(
+						__(
+							'The ZIP file could not be uploaded because media uploads are unavailable.'
+						)
+					);
+					return;
+				}
+
+				const resolveWhenComplete = ( attachments ) => {
+					if ( ! Array.isArray( attachments ) ) {
+						return;
+					}
+
+					if (
+						attachments.length === filesList.length &&
+						attachments.every( ( attachment ) => attachment.id )
+					) {
+						resolve( attachments );
+					}
+				};
+
+				mediaUpload( {
+					allowedTypes: ZIP_UPLOAD_MEDIA_TYPES,
+					filesList,
+					multiple: true,
+					onFileChange: resolveWhenComplete,
+					onSuccess: resolveWhenComplete,
+					onError: ( message ) =>
+						reject(
+							message ||
+								__( 'The ZIP file could not be uploaded.' )
+						),
+				} );
+			} ),
+		[ mediaUpload ]
+	);
+
+	const createTrackBlocksFromZip = useCallback(
+		async ( zipFile ) => {
+			let zipMedia;
+			try {
+				zipMedia = await getPlaylistMediaFromZip( zipFile );
+			} catch ( error ) {
+				const message =
+					typeof error === 'string' ? error : error?.message;
+				onUploadError(
+					message
+						? sprintf(
+								// translators: %s: Error message.
+								__( 'The ZIP file could not be read: %s' ),
+								message
+						  )
+						: __( 'The ZIP file could not be read.' )
+				);
+				return [];
+			}
+
+			if ( zipMedia.tracks.length === 0 ) {
+				onUploadError(
+					__( 'The ZIP file does not contain any audio files.' )
+				);
+				return [];
+			}
+
+			const filesList = [
+				...zipMedia.tracks.map( ( track ) => track.file ),
+				...( zipMedia.imageFile ? [ zipMedia.imageFile ] : [] ),
+			];
+			let attachments;
+			try {
+				attachments = await uploadZipMedia( filesList );
+			} catch ( error ) {
+				const message =
+					typeof error === 'string' ? error : error?.message;
+				onUploadError(
+					message
+						? sprintf(
+								// translators: %s: Error message.
+								__( 'The ZIP file could not be uploaded: %s' ),
+								message
+						  )
+						: __( 'The ZIP file could not be uploaded.' )
+				);
+				return [];
+			}
+
+			const coverImage = zipMedia.imageFile
+				? getTrackImageAttributes(
+						attachments[ zipMedia.tracks.length ]
+				  )
+				: {};
+
+			return zipMedia.tracks.map( ( track, index ) => {
+				const { trackNumber, ...trackDetails } = track.details;
+
+				return createBlock( 'core/playlist-track', {
+					...getTrackAttributes( attachments[ index ] ),
+					...trackDetails,
+					...coverImage,
+				} );
+			} );
+		},
+		[ onUploadError, uploadZipMedia ]
+	);
+
+	const createTrackBlocksFromMedia = useCallback(
+		async ( media ) => {
+			const mediaItems = getMediaItems( media );
+			const blocks = createTrackBlocks(
+				mediaItems.filter( ( mediaItem ) => ! isZipFile( mediaItem ) )
+			);
+			const zipFiles = mediaItems.filter( isZipFile );
+
+			if ( zipFiles.length === 0 ) {
+				return blocks;
+			}
+
+			const zipBlocks = await Promise.all(
+				zipFiles.map( createTrackBlocksFromZip )
+			);
+
+			return [ ...blocks, ...zipBlocks.flat() ];
+		},
+		[ createTrackBlocks, createTrackBlocksFromZip ]
+	);
+
 	const onSelectTracks = useCallback(
-		( media ) => {
-			const newBlocks = createTrackBlocks( media );
+		async ( media ) => {
+			const newBlocks = await createTrackBlocksFromMedia( media );
 			if ( newBlocks.length === 0 ) {
 				return;
 			}
@@ -227,20 +364,22 @@ const PlaylistEdit = ( {
 		},
 		[
 			clientId,
-			createTrackBlocks,
+			createTrackBlocksFromMedia,
 			replaceInnerBlocks,
 			setCurrentTrackClientId,
 		]
 	);
 
 	const onAddTracks = useCallback(
-		( media ) => {
+		async ( media ) => {
 			const existingIds = new Set(
 				validTracks
 					.map( ( block ) => getTrackIdentifier( block.attributes ) )
 					.filter( Boolean )
 			);
-			const newBlocks = createTrackBlocks( media ).filter(
+			const newBlocks = (
+				await createTrackBlocksFromMedia( media )
+			).filter(
 				( block ) =>
 					! existingIds.has( getTrackIdentifier( block.attributes ) )
 			);
@@ -255,7 +394,7 @@ const PlaylistEdit = ( {
 		},
 		[
 			clientId,
-			createTrackBlocks,
+			createTrackBlocksFromMedia,
 			replaceInnerBlocks,
 			selectBlock,
 			setCurrentTrackClientId,
@@ -459,7 +598,7 @@ const PlaylistEdit = ( {
 						),
 					} }
 					onSelect={ onSelectTracks }
-					accept="audio/*"
+					accept={ AUDIO_AND_ZIP_ACCEPT }
 					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -475,7 +614,7 @@ const PlaylistEdit = ( {
 				<MediaReplaceFlow
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
-					accept="audio/*"
+					accept={ AUDIO_AND_ZIP_ACCEPT }
 					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -670,7 +809,7 @@ const PlaylistEdit = ( {
 			<figure { ...blockProps }>
 				<MediaPlaceholder
 					onSelect={ onAddTracks }
-					accept="audio/*"
+					accept={ AUDIO_AND_ZIP_ACCEPT }
 					multiple="add"
 					handleUpload={ false }
 					disableMediaButtons
