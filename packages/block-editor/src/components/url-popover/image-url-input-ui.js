@@ -288,7 +288,7 @@ const ImageURLInputUI = ( {
 		} else if ( ! url || isEditingLink ) {
 			return (
 				<URLPopover.LinkEditor
-					className="block-editor-format-toolbar__link-container-content"
+					className="block-editor-url-popover__link-container-content"
 					value={ linkEditorValue }
 					onChangeInputValue={ setUrlInput }
 					onSubmit={ onSubmitLinkChange() }
@@ -299,7 +299,7 @@ const ImageURLInputUI = ( {
 			return (
 				<>
 					<URLPopover.LinkViewer
-						className="block-editor-format-toolbar__link-container-content"
+						className="block-editor-url-popover__link-container-content"
 						url={ url }
 						onEditLinkClick={ startEditLink }
 						urlLabel={ urlLabel }

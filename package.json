@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.7.1",
+	"version": "23.7.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -94,7 +94,7 @@
 		"jsdom": "26.1.0"
 	},
 	"scripts": {
-		"agents:setup": "node ./tools/agents/setup-skills.mjs",
+		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
@@ -154,7 +154,7 @@
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
-		"test": "npm-run-all lint test:unit",
+		"test": "npm-run-all lint test:unit test:unit:vitest",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
 		"test:e2e": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",
@@ -169,6 +169,7 @@
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
+		"test:unit:vitest": "npm run --workspace @wordpress/unit-tests test:unit:vitest --",
 		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug --",

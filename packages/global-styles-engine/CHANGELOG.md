@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Report changes to site-wide border, shadow, outline, filter and dimensions in the global styles changelist. These are rendered by the styles engine but were not compared, so changing only one of them was reported as no change at all ([#81407](https://github.com/WordPress/gutenberg/pull/81407)).
 -   Render block element styles defined only inside responsive viewport states.
 
 ## 1.19.0 (2026-07-29)
