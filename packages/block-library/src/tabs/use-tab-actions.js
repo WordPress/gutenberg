@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useRegistry } from '@wordpress/data';
