@@ -15,6 +15,14 @@ When changing test ownership:
     entire directory can move as one independently revertible unit.
 -   Vitest tests run in Node by default. Name tests `*.jsdom.test.*` to opt into
     JSDOM or `*.browser.test.*` to opt into Browser Mode.
+-   Use JSDOM for DOM structure, semantics, events, state, and logic that does
+    not depend on rendering. Keep deterministic browser signals local to the
+    test file with the `wpVitest` helpers; shared setup must not emulate browser
+    behavior.
+-   Use Browser Mode for generated or computed styles, cascade, responsive
+    behavior, layout, geometry, rendered visibility, animation, scrolling,
+    observers, and media queries. Browser Mode loads real CSS and uses browser
+    APIs.
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
     `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.

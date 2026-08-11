@@ -35,6 +35,7 @@ const vitestTestsByProject = getVitestTestsByProject(
 	migration
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
+const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
@@ -107,6 +108,62 @@ function isDynamicImport( node ) {
 		node?.type === 'ImportExpression' ||
 		( node?.type === 'CallExpression' && node.callee?.type === 'Import' )
 	);
+}
+
+function getMemberPropertyName( node ) {
+	if ( node?.type !== 'MemberExpression' ) {
+		return null;
+	}
+
+	if ( ! node.computed && node.property?.type === 'Identifier' ) {
+		return node.property.name;
+	}
+
+	if (
+		node.computed &&
+		( node.property?.type === 'Literal' ||
+			node.property?.type === 'StringLiteral' )
+	) {
+		return node.property.value;
+	}
+
+	return null;
+}
+
+function isGlobalGetComputedStyleCall( node, unboundIdentifiers ) {
+	if ( node.callee?.type === 'Identifier' ) {
+		return (
+			node.callee.name === 'getComputedStyle' &&
+			unboundIdentifiers.has( node.callee )
+		);
+	}
+
+	return (
+		getMemberPropertyName( node.callee ) === 'getComputedStyle' &&
+		node.callee.object?.type === 'Identifier' &&
+		[ 'globalThis', 'window' ].includes( node.callee.object.name )
+	);
+}
+
+function getWpVitestMockName( node ) {
+	if ( node.callee?.type !== 'MemberExpression' ) {
+		return null;
+	}
+
+	const namespace = node.callee.object;
+	if (
+		namespace?.type !== 'MemberExpression' ||
+		getMemberPropertyName( namespace ) !== 'wpVitest' ||
+		namespace.object?.type !== 'Identifier' ||
+		namespace.object.name !== 'globalThis'
+	) {
+		return null;
+	}
+
+	const mockName = getMemberPropertyName( node.callee );
+	return typeof mockName === 'string' && mockName.startsWith( 'mock' )
+		? mockName
+		: null;
 }
 
 function hasTestEnvironmentOverride( source ) {
@@ -215,6 +272,31 @@ for ( const file of files ) {
 			) {
 				violations.push(
 					`${ file }:${ node.loc.start.line } TypeScript vi.mock() must use vi.mock(import(...))`
+				);
+			}
+
+			if (
+				jsdomTests.has( file ) &&
+				isGlobalGetComputedStyleCall( node, unboundIdentifiers )
+			) {
+				violations.push(
+					`${ file }:${ node.loc.start.line } computed style assertions require a *.browser.test.* filename`
+				);
+			}
+
+			if (
+				jsdomTests.has( file ) &&
+				getMemberPropertyName( node.callee ) === 'toHaveStyle'
+			) {
+				violations.push(
+					`${ file }:${ node.loc.start.line } toHaveStyle() requires a *.browser.test.* filename`
+				);
+			}
+
+			const wpVitestMockName = getWpVitestMockName( node );
+			if ( wpVitestMockName && ! jsdomTests.has( file ) ) {
+				violations.push(
+					`${ file }:${ node.loc.start.line } wpVitest.${ wpVitestMockName }() requires a *.jsdom.test.* filename`
 				);
 			}
 		},
