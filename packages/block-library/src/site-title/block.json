@@ -15,9 +15,6 @@
 			"type": "array",
 			"default": [ 0, 1, 2, 3, 4, 5, 6 ]
 		},
-		"textAlign": {
-			"type": "string"
-		},
 		"isLink": {
 			"type": "boolean",
 			"default": true,
@@ -33,6 +30,7 @@
 		"viewportWidth": 500
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -55,6 +53,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,

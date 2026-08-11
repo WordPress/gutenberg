@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Query block', () => {
@@ -13,13 +10,6 @@ test.describe( 'Query block', () => {
 		await requestUtils.createPost( { title: 'Post 1', status: 'publish' } );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllPosts(),
-			requestUtils.deactivatePlugin( 'gutenberg-test-query-block' ),
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost( {
 			postType: 'page',
@@ -29,6 +19,13 @@ test.describe( 'Query block', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPages();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllPosts(),
+			requestUtils.deactivatePlugin( 'gutenberg-test-query-block' ),
+		] );
 	} );
 
 	test.describe( 'Query block insertion', () => {

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlStylePicker from '../border-control-style-picker';
 import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
@@ -21,7 +10,6 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
-
 import type { ColorObject } from '../../color-palette/types';
 import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
@@ -157,8 +145,7 @@ const BorderControlDropdown = (
 		onStyleChange,
 		popoverContentClassName,
 		popoverControlsClassName,
-		resetButtonClassName,
-		size,
+		resetButtonWrapperClassName,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -173,7 +160,7 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
-	const showResetButton = color || ( style && style !== 'none' );
+	const enableResetButton = color || ( style && style !== 'none' );
 	const dropdownPosition = __experimentalIsRenderedInSidebar
 		? 'bottom left'
 		: undefined;
@@ -188,7 +175,7 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip
-			__next40pxDefaultSize={ size === '__unstable-large' }
+			__next40pxDefaultSize
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -199,9 +186,7 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
-		onClose,
-	} ) => (
+	const renderContent: DropdownComponentProps[ 'renderContent' ] = () => (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
@@ -224,22 +209,20 @@ const BorderControlDropdown = (
 						/>
 					) }
 				</VStack>
-			</DropdownContentWrapper>
-			{ showResetButton && (
-				<DropdownContentWrapper paddingSize="none">
+				<div className={ resetButtonWrapperClassName }>
 					<Button
-						className={ resetButtonClassName }
 						variant="tertiary"
 						onClick={ () => {
 							onReset();
-							onClose();
 						} }
+						disabled={ ! enableResetButton }
+						accessibleWhenDisabled
 						__next40pxDefaultSize
 					>
 						{ __( 'Reset' ) }
 					</Button>
-				</DropdownContentWrapper>
-			) }
+				</div>
+			</DropdownContentWrapper>
 		</>
 	);
 

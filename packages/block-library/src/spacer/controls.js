@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -17,13 +14,9 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { View } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { MIN_SPACER_SIZE } from './constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
@@ -43,10 +36,6 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
 	} );
 
-	const handleOnChange = ( unprocessedValue ) => {
-		onChange( unprocessedValue.all );
-	};
-
 	// Force the unit to update to `px` when the Spacer is being resized.
 	const [ parsedQuantity, parsedUnit ] =
 		parseQuantityAndUnitFromRawValue( value );
@@ -56,23 +45,23 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 
 	return (
 		<>
-			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+			{ spacingSizes?.length < 2 ? (
 				<UnitControl
 					id={ inputId }
 					isResetValueOnUnitChange
 					min={ MIN_SPACER_SIZE }
-					onChange={ handleOnChange }
+					onChange={ onChange }
 					value={ computedValue }
 					units={ units }
 					label={ label }
-					__next40pxDefaultSize
 				/>
-			) }
-			{ spacingSizes?.length > 0 && (
-				<View className="tools-panel-item-spacing">
+			) : (
+				<div className="tools-panel-item-spacing">
 					<SpacingSizesControl
 						values={ { all: computedValue } }
-						onChange={ handleOnChange }
+						onChange={ ( { all } ) => {
+							onChange( all );
+						} }
 						label={ label }
 						sides={ [ 'all' ] }
 						units={ units }
@@ -80,7 +69,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 						splitOnAxis={ false }
 						showSideInLabel={ false }
 					/>
-				</View>
+				</div>
 			) }
 		</>
 	);
@@ -93,6 +82,8 @@ export default function SpacerControls( {
 	width,
 	isResizing,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<InspectorControls>
 			<ToolsPanel
@@ -103,6 +94,7 @@ export default function SpacerControls( {
 						height: '100px',
 					} );
 				} }
+				dropdownMenuProps={ dropdownMenuProps }
 			>
 				{ orientation === 'horizontal' && (
 					<ToolsPanelItem

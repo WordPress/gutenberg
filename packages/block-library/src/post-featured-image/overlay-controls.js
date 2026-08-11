@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RangeControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -47,6 +44,7 @@ const Overlay = ( {
 							gradient: undefined,
 							customGradient: undefined,
 						} ),
+						clearable: true,
 					},
 				] }
 				panelId={ clientId }
@@ -63,7 +61,6 @@ const Overlay = ( {
 				panelId={ clientId }
 			>
 				<RangeControl
-					__nextHasNoMarginBottom
 					label={ __( 'Overlay opacity' ) }
 					value={ dimRatio }
 					onChange={ ( newDimRatio ) =>
@@ -75,7 +72,6 @@ const Overlay = ( {
 					max={ 100 }
 					step={ 10 }
 					required
-					__next40pxDefaultSize
 				/>
 			</ToolsPanelItem>
 		</>

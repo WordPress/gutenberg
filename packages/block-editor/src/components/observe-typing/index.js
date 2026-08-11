@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
@@ -14,10 +11,6 @@ import {
 	ESCAPE,
 	TAB,
 } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -111,29 +104,29 @@ export function useMouseMoveTypingReset() {
  * Sets and removes the `isTyping` flag based on user actions:
  *
  * - Sets the flag if the user types within the given element.
- * - Removes the flag when the user selects some text, focusses a non-text
+ * - Removes the flag when the user selects some text, focuses a non-text
  *   field, presses ESC or TAB, or moves the mouse in the document.
  */
 export function useTypingObserver() {
-	const { isTyping } = useSelect( ( select ) => {
-		const { isTyping: _isTyping } = select( blockEditorStore );
-		return {
-			isTyping: _isTyping(),
-		};
-	}, [] );
+	const isTyping = useSelect(
+		( select ) => select( blockEditorStore ).isTyping(),
+		[]
+	);
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
 	const ref1 = useMouseMoveTypingReset();
 	const ref2 = useRefEffect(
 		( node ) => {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
-
 			// Listeners to stop typing should only be added when typing.
 			// Listeners to start typing should only be added when not typing.
 			if ( isTyping ) {
 				let timerId;
+
+				// Capture the window reference while the node is still
+				// attached. Reusing the reference we held at mount keeps the
+				// cleanup and the handlers working against the same window
+				// we set things up on.
+				const { defaultView } = node.ownerDocument;
 
 				/**
 				 * Stops typing when focus transitions to a non-text field element.
@@ -174,6 +167,7 @@ export function useTypingObserver() {
 				 * uncollapsed (shift) selection.
 				 */
 				function stopTypingOnSelectionUncollapse() {
+					const selection = defaultView.getSelection();
 					if ( ! selection.isCollapsed ) {
 						stopTyping();
 					}
@@ -182,7 +176,7 @@ export function useTypingObserver() {
 				node.addEventListener( 'focus', stopTypingOnNonTextField );
 				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
 
-				ownerDocument.addEventListener(
+				node.ownerDocument.addEventListener(
 					'selectionchange',
 					stopTypingOnSelectionUncollapse
 				);
@@ -197,7 +191,7 @@ export function useTypingObserver() {
 						'keydown',
 						stopTypingOnEscapeKey
 					);
-					ownerDocument.removeEventListener(
+					node.ownerDocument.removeEventListener(
 						'selectionchange',
 						stopTypingOnSelectionUncollapse
 					);

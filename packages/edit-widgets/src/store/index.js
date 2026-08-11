@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { createReduxStore, register } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import reducer from './reducer';
 import * as resolvers from './resolvers';
 import * as selectors from './selectors';

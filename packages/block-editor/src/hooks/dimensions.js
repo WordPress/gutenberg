@@ -1,28 +1,24 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -69,18 +65,46 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
-	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
-		[ clientId ]
+	const selectedState = useBlockStyleState();
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isEnabled = useHasDimensionsPanel( settings, selectedState );
+	const { style, className } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: attributes.style,
+				className: attributes.className,
+			};
+		},
+		[ clientId, isEnabled ]
 	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
+	const value = isStateSelected
+		? getStyleForState( style, selectedState )
+		: style;
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( {
+					style: cleanEmptyObject( newStyle ),
+				} );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -95,6 +119,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		'__experimentalDefaultControls',
 	] );
 	const defaultControls = {
+		// In the block inspector, minHeight and minWidth should not
+		// be shown by default unless the block explicitly opts in.
+		minHeight: false,
+		minWidth: false,
 		...defaultDimensionsControls,
 		...defaultSpacingControls,
 	};
@@ -108,22 +136,30 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				onVisualize={ setVisualizedProperty }
+				styleState={ selectedState }
+				onVisualize={
+					isStateSelected ? undefined : setVisualizedProperty
+				}
+				inheritedValue={ inheritedValue }
 			/>
-			{ !! settings?.spacing?.padding && (
-				<PaddingVisualizer
-					forceShow={ visualizedProperty === 'padding' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
-			{ !! settings?.spacing?.margin && (
-				<MarginVisualizer
-					forceShow={ visualizedProperty === 'margin' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
+			{ ! isStateSelected &&
+				!! settings?.spacing?.padding &&
+				visualizedProperty === 'padding' && (
+					<PaddingVisualizer
+						forceShow={ visualizedProperty === 'padding' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
+			{ ! isStateSelected &&
+				!! settings?.spacing?.margin &&
+				visualizedProperty === 'margin' && (
+					<MarginVisualizer
+						forceShow={ visualizedProperty === 'margin' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
 		</>
 	);
 }
@@ -137,10 +173,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasDimensionsSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -148,21 +180,35 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! ( support?.aspectRatio || !! support?.minHeight );
+		return !! (
+			support?.aspectRatio ||
+			!! support?.height ||
+			!! support?.minHeight ||
+			!! support?.width ||
+			!! support?.minWidth
+		);
 	}
 
 	return !! support?.[ feature ];
 }
 
+export function isExplicitAspectRatio( aspectRatio ) {
+	if ( ! aspectRatio ) {
+		return false;
+	}
+
+	return `${ aspectRatio }`.trim().toLowerCase() !== 'auto';
+}
+
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'style' ],
+	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
 	hasSupport( name ) {
-		return hasDimensionsSupport( name, 'aspectRatio' );
+		return hasDimensionsSupport( name );
 	},
 };
 
-function useBlockProps( { name, minHeight, style } ) {
+function useBlockProps( { name, height, minHeight, style } ) {
 	if (
 		! hasDimensionsSupport( name, 'aspectRatio' ) ||
 		shouldSkipSerialization( name, DIMENSIONS_SUPPORT_KEY, 'aspectRatio' )
@@ -170,8 +216,11 @@ function useBlockProps( { name, minHeight, style } ) {
 		return {};
 	}
 
+	const hasExplicitAspectRatio = isExplicitAspectRatio(
+		style?.dimensions?.aspectRatio
+	);
 	const className = clsx( {
-		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
+		'has-aspect-ratio': hasExplicitAspectRatio,
 	} );
 
 	// Allow dimensions-based inline style overrides to override any global styles rules that
@@ -179,16 +228,22 @@ function useBlockProps( { name, minHeight, style } ) {
 	const inlineStyleOverrides = {};
 
 	// Apply rules to unset incompatible styles.
-	// Note that a set `aspectRatio` will win out if both an aspect ratio and a minHeight are set.
+	// Note that an explicit `aspectRatio` will win out if both an aspect ratio and height-related properties are set.
 	// This is because the aspect ratio is a newer block support, so (in theory) any aspect ratio
-	// that is set should be intentional and should override any existing minHeight. The Cover block
-	// and dimensions controls have logic that will manually clear the aspect ratio if a minHeight
-	// is set.
-	if ( style?.dimensions?.aspectRatio ) {
-		// To ensure the aspect ratio does not get overridden by `minHeight` unset any existing rule.
+	// that is set should be intentional and should override any existing height properties. The Cover block
+	// and dimensions controls have logic that will manually clear the aspect ratio if height properties
+	// are set.
+	if ( hasExplicitAspectRatio ) {
+		// To ensure the aspect ratio does not get overridden by `minHeight` or `height` unset any existing rule.
 		inlineStyleOverrides.minHeight = 'unset';
-	} else if ( minHeight || style?.dimensions?.minHeight ) {
-		// To ensure the minHeight does not get overridden by `aspectRatio` unset any existing rule.
+		inlineStyleOverrides.height = 'unset';
+	} else if (
+		minHeight ||
+		style?.dimensions?.minHeight ||
+		height ||
+		style?.dimensions?.height
+	) {
+		// To ensure height properties do not get overridden by `aspectRatio` unset any existing rule.
 		inlineStyleOverrides.aspectRatio = 'unset';
 	}
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
 	Composite,
 	CompositeGroup,
@@ -15,7 +8,7 @@ import {
 import { UseCompositeStatePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	title: 'Components (Deprecated)/Composite (Unstable)',
+	title: 'Components/Deprecated/Composite (Unstable)',
 	id: 'components-composite-unstable',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
