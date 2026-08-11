@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Vendor a local copy of the `normalizeTextString` utility instead of unlocking it from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
+### Enhancements
+
+-   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
+
+### New Features
+
+-   Add a `blockStatesEditingEnabled` editor setting, defaulting to `true`, which hides state controls for blocks in the block inspector and Global Styles when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
+
+### Bug Fixes
+
+-   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
+-   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
+
+## 14.52.0 (2026-07-29)
+
 ### Enhancements
 
 -   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#72860](https://github.com/WordPress/gutenberg/issues/72860)).
@@ -10,11 +30,16 @@
 ### New Features
 
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
+-   Add a `responsiveEditingEnabled` editor setting, defaulting to `true`, which hides the "Responsive styles" option in the View menu and the viewport state control in Global Styles when set to `false` ([#80814](https://github.com/WordPress/gutenberg/pull/80814)).
 
 ### Bug Fixes
 
 -   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+
+### Internal
+
+-   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 
 ## 14.51.0 (2026-07-14)
 

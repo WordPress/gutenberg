@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
@@ -12,10 +9,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
@@ -98,7 +91,7 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
+					// @ts-expect-error `property` is a dynamic string key on both objects.
 					newItemObject[ property ] = item[ property ];
 				}
 			} );

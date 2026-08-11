@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import {
 	getBlockTypes,
@@ -13,11 +6,6 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
@@ -227,6 +215,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
@@ -262,6 +251,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
@@ -294,6 +284,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
@@ -332,6 +323,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
@@ -370,6 +362,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
 			const dispatch = jest.fn();
@@ -379,7 +372,7 @@ describe( 'actions', () => {
 				index,
 				'testclientid',
 				true
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -394,6 +387,179 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'insertBlocks', () => {
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should apply block type templates to empty blocks', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						expect.objectContaining( {
+							name: 'core/test-container',
+							innerBlocks: [
+								expect.objectContaining( {
+									name: 'core/test-item',
+									attributes: expect.objectContaining( {
+										content: 'chicken',
+									} ),
+									innerBlocks: [],
+								} ),
+							],
+						} ),
+					],
+				} )
+			);
+		} );
+
+		it( 'selects the first inner leaf block when the block type opts in', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { foo: 42 } ] ],
+				templateInsertUpdatesSelection: true,
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				// The insertion selects the inserted block.
+				getSelectedBlockClientId: () => containerBlock.clientId,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+			dispatch.selectBlock = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				true,
+				0
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			const insertedBlocks = dispatch.mock.calls[ 0 ][ 0 ].blocks;
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith(
+				insertedBlocks[ 0 ].innerBlocks[ 0 ].clientId,
+				0
+			);
+		} );
+
+		it( 'should not apply block type templates to blocks with inner blocks', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container', {}, [
+				createBlock( 'core/test-item', { content: 'ribs' } ),
+			] );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					blocks: [ containerBlock ],
+				} )
+			);
+		} );
+
+		it( 'should leave a nested occurrence of the same block type empty', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item' ], [ 'core/test-container' ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						expect.objectContaining( {
+							name: 'core/test-container',
+							innerBlocks: [
+								expect.objectContaining( {
+									name: 'core/test-item',
+									innerBlocks: [],
+								} ),
+								expect.objectContaining( {
+									name: 'core/test-container',
+									innerBlocks: [],
+								} ),
+							],
+						} ),
+					],
+				} )
+			);
+		} );
+
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
@@ -411,6 +577,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -431,7 +598,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -457,6 +624,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => false,
 			};
 			const dispatch = jest.fn();
@@ -466,7 +634,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -489,6 +657,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -511,7 +680,7 @@ describe( 'actions', () => {
 				false,
 				0,
 				meta
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -575,7 +744,7 @@ describe( 'actions', () => {
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -593,7 +762,7 @@ describe( 'actions', () => {
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -617,7 +786,7 @@ describe( 'actions', () => {
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -635,7 +804,7 @@ describe( 'actions', () => {
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -653,6 +822,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -678,6 +848,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -878,7 +1049,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
@@ -932,7 +1103,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1003,7 +1174,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
@@ -1083,7 +1254,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1159,7 +1330,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
@@ -1219,7 +1390,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();

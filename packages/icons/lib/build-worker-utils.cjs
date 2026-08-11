@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { promisify } = require( 'util' );
 const execFile = promisify( require( 'child_process' ).execFile );
-
-/**
- * Internal dependencies
- */
 const { generateTsxFiles } = require( './generate-library' );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );

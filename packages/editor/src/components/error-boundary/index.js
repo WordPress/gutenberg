@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -11,10 +8,6 @@ import {
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function getContent() {

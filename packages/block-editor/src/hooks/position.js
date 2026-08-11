@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
@@ -13,10 +6,6 @@ import { useSelect } from '@wordpress/data';
 import { useId, useMemo } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
 import { SelectControl } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';

@@ -8,6 +8,12 @@ Existing patches should be described and justified here.
 
 ## Patches
 
+### `patches/@arraypress+waveform-player+1.23.0.patch`
+
+This patch limits declarative configuration to supported option values and
+requires initialization to be requested explicitly. Programmatic configuration
+used by the Playlist block remains unchanged.
+
 ### `patches/react-autosize-textarea+7.1.0.patch`
 
 This package is unmaintained. It's incompatible with some recent versions of React types in ways

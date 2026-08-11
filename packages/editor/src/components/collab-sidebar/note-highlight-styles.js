@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	useStyleOverride,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	findNoteInBlock,
 	getAvatarBorderColor,

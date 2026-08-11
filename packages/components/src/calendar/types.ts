@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Locale } from 'date-fns';
 import type * as React from 'react';
 

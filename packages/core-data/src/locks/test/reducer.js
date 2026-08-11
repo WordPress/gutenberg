@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import locks from '../reducer';
 
 const buildNode = ( children = {} ) => ( {

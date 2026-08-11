@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalTruncate as Truncate,
@@ -9,13 +6,9 @@ import {
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
@@ -61,28 +54,25 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 		}
 		setIsSubmitting( true );
 		const submitted = inputComment;
-		try {
+
+		/*
+		 * The note actions resolve with the saved record on success and
+		 * `undefined` on failure (they surface their own error notice),
+		 * so only discard the draft once the save actually succeeded.
+		 */
+		const result = await onSubmit( submitted );
+		if ( result ) {
 			/*
-			 * The note actions resolve with the saved record on success and
-			 * `undefined` on failure (they surface their own error notice),
-			 * so only discard the draft once the save actually succeeded.
+			 * The field stays editable while the request is in flight, so
+			 * keep anything typed since; clearing unconditionally would
+			 * discard it.
 			 */
-			const result = await onSubmit( submitted );
-			if ( result !== undefined ) {
-				/*
-				 * The field stays editable while the request is in flight, so
-				 * keep anything typed since; clearing unconditionally would
-				 * discard it.
-				 */
-				setInputComment( ( current ) =>
-					current === submitted ? '' : current
-				);
-			}
-		} catch {
-			// Keep the draft so the user can retry.
-		} finally {
-			setIsSubmitting( false );
+			setInputComment( ( current ) =>
+				current === submitted ? '' : current
+			);
 		}
+
+		setIsSubmitting( false );
 	}
 
 	return (
@@ -126,7 +116,12 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				gap="sm"
 				wrap="wrap"
 			>
-				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ onCancel }
+					shortcut="Escape"
+				>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button
@@ -135,6 +130,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					variant="primary"
 					type="submit"
 					disabled={ isDisabled }
+					shortcut={ displayShortcut.primary( 'Enter' ) }
 				>
 					<Truncate>{ labels?.submit ?? __( 'Add note' ) }</Truncate>
 				</Button>

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
@@ -10,10 +7,6 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { hasStickyOrFixedPositionValue } from '../../hooks/position';
