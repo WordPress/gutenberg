@@ -8,13 +8,10 @@ import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
-/*
- * The rich text form field wires `@wordpress/rich-text` into the presentational
- * `ContentEditableControl` shell from `@wordpress/components`. The notes
- * sidebar is its only consumer, so it lives next to it.
- */
 import RichTextControl from './rich-text-control';
 
 /*
@@ -29,8 +26,9 @@ const ALLOWED_NOTE_FORMATS = [
 	'core/link',
 	'core/code',
 ];
-
 const NOTE_COMPLETERS = [ noteMentionCompleter ];
+
+const { useNativeUndo } = unlock( blockEditorPrivateApis );
 
 export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
@@ -38,6 +36,9 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	);
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
+	// Editor undo here would revert an unrelated edit and pull focus away from
+	// the note being typed.
+	const nativeUndoRef = useNativeUndo();
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const trimmedPlainText = sanitizeNoteContent( stripHTML( inputComment ) );
 	const isDisabled =
@@ -74,6 +75,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 
 	return (
 		<Stack
+			ref={ nativeUndoRef }
 			className="editor-collab-sidebar-panel__note-form"
 			direction="column"
 			gap="lg"

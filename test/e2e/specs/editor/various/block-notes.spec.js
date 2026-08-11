@@ -72,6 +72,45 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).toBeFocused();
 	} );
 
+	test( 'undo in the note form undoes the note, not the editor', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		const form = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await form.pressSequentially( 'Note' );
+		await expect( form ).toHaveText( 'Note' );
+
+		// The browser may split typing into several undo steps, so undo more
+		// than once rather than assuming a single step.
+		for ( let i = 0; i < 4; i++ ) {
+			await pageUtils.pressKeys( 'primary+z' );
+		}
+
+		/*
+		 * Undo acts on the field. It cannot clear it entirely: rich text
+		 * replaces the text node the browser typed into when it strips the
+		 * empty-state padding, which drops that first undo step, so the first
+		 * character survives.
+		 */
+		await expect( form ).not.toHaveText( 'Note' );
+		// The block edit is left alone.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+			},
+		] );
+	} );
+
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
