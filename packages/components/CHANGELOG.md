@@ -7,6 +7,7 @@
 -	Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
     -   `Spinner` ([#80511](https://github.com/WordPress/gutenberg/pull/80511))
+-   Remove the private `DateCalendar`, `DateRangeCalendar` and `TZDate` exports. The calendars now ship as the public `Calendar` and `RangeCalendar` components in `@wordpress/ui`; `TZDate` comes from [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz) ([#81337](https://github.com/WordPress/gutenberg/pull/81337)).
 
 ### Deprecations
 

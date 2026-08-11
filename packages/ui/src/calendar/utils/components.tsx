@@ -1,4 +1,11 @@
-import type { CalendarDay } from 'react-day-picker';
+import { useRender } from '@base-ui/react';
+import type { CalendarDay, RootProps, ChevronProps } from 'react-day-picker';
+import { useContext } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { Button } from '../../button';
+import { Icon } from '../../icon';
+import { RootContext } from './root-context';
 import type { Modifiers } from '../types';
 
 /**
@@ -123,5 +130,65 @@ export function Day(
 			{ PreviewDash && <PreviewDash /> }
 			{ children }
 		</td>
+	);
+}
+
+/**
+ * Render the root element of the calendar.
+ *
+ * Wired to `useRender` so that consumers can swap the underlying element
+ * through the `render` prop, like every other `@wordpress/ui` component.
+ * @see https://daypicker.dev/guides/custom-components
+ */
+export function Root( { rootRef, ...props }: RootProps ) {
+	const { render, ref } = useContext( RootContext );
+
+	// `rootRef` is only set by `react-day-picker` when `animate` is enabled.
+	const mergedRef = useMergeRefs( [ rootRef ?? null, ref ?? null ] );
+
+	return useRender( {
+		render,
+		defaultTagName: 'div',
+		ref: mergedRef,
+		props,
+	} );
+}
+
+/**
+ * Render the chevron icon used in the navigation buttons.
+ * @see https://daypicker.dev/guides/custom-components
+ */
+export function Chevron( { orientation, className }: ChevronProps ) {
+	return (
+		<Icon
+			className={ className }
+			icon={ orientation === 'right' ? chevronRight : chevronLeft }
+		/>
+	);
+}
+
+/**
+ * Render a month navigation button.
+ *
+ * `react-day-picker` marks the button as `aria-disabled` (rather than
+ * `disabled`) when there is no month to navigate to, so that it stays
+ * discoverable. `Button`'s `focusableWhenDisabled` produces the same DOM.
+ * @see https://daypicker.dev/guides/custom-components
+ */
+export function NavButton( {
+	className,
+	'aria-disabled': ariaDisabled,
+	...props
+}: React.ButtonHTMLAttributes< HTMLButtonElement > ) {
+	return (
+		<Button
+			{ ...props }
+			className={ className }
+			variant="minimal"
+			tone="neutral"
+			size="compact"
+			disabled={ ariaDisabled === true || ariaDisabled === 'true' }
+			focusableWhenDisabled
+		/>
 	);
 }

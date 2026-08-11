@@ -98,7 +98,6 @@
 		"path-to-regexp": "^6.2.1",
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.6.1",
-		"react-day-picker": "^9.14.0",
 		"remove-accents": "^0.5.0",
 		"uuid": "^14.0.0"
 	},

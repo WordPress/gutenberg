@@ -1,5 +1,6 @@
 import type { Locale } from 'date-fns';
 import type * as React from 'react';
+import type { ComponentProps } from '../utils/types';
 
 /**
  * Represents the modifiers that match a specific day in the calendar.
@@ -131,27 +132,27 @@ type DayOfWeek = {
 };
 
 /**
- * Shared handler type for `onSelect` callback when a selection mode is set.
+ * Shared handler type for `onValueChange` callbacks.
  * @example
- *   const handleSelect: OnSelectHandler<Date> = (
- *     selected,
+ *   const handleValueChange: OnValueChangeHandler<Date | null> = (
+ *     value,
  *     triggerDate,
  *     modifiers,
  *     e
  *   ) => {
- *     console.log( "Selected:", selected );
+ *     console.log( "Value:", value );
  *     console.log( "Triggered by:", triggerDate );
  *   };
- * @template T - The type of the selected item.
- * @callback OnSelectHandler
- * @param {T}                                      selected    - The selected item after the event.
+ * @template T - The value type.
+ * @callback OnValueChangeHandler
+ * @param {T}                                      value       - The new value after the event.
  * @param {Date}                                   triggerDate - The date when the event was triggered. This is
  *                                                             typically the day clicked or interacted with.
  * @param {Modifiers}                              modifiers   - The modifiers associated with the event.
  * @param {React.MouseEvent | React.KeyboardEvent} e           - The event object.
  */
-export type OnSelectHandler< T > = (
-	selected: T,
+export type OnValueChangeHandler< T > = (
+	value: T,
 	triggerDate: Date,
 	modifiers: Modifiers,
 	e: React.MouseEvent | React.KeyboardEvent
@@ -159,8 +160,8 @@ export type OnSelectHandler< T > = (
 
 export interface BaseProps
 	extends Omit<
-		React.HTMLAttributes< HTMLDivElement >,
-		'onSelect' | 'defaultValue'
+		ComponentProps< 'div' >,
+		'onSelect' | 'defaultValue' | 'role'
 	> {
 	/**
 	 * Whether the selection is required.
@@ -207,8 +208,9 @@ export interface BaseProps
 	/**
 	 * Focus the first selected day (if set) or today's date (if not disabled).
 	 *
-	 * Use this prop when you need to focus the calendar after a user action
-	 * (e.g. opening the dialog with the calendar).
+	 * Use this prop when the calendar should receive initial focus as it opens,
+	 * such as in a calendar popover. Do not use it to move focus after updates
+	 * to an open calendar.
 	 */
 	autoFocus?: boolean;
 	/**
@@ -265,12 +267,12 @@ export interface BaseProps
 
 	/**
 	 * The locale object used to localize dates. Pass a locale from
-	 * `@date-fns/locale` to localize the calendar.
+	 * `date-fns/locale` to localize the calendar.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
 	 * used for the translated labels and `locale` prop are consistent.
 	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
-	 * @default The `enUS` locale from `@date-fns/locale`
+	 * @default The `enUS` locale from `date-fns/locale`
 	 */
 	locale?: Locale;
 	/**
@@ -290,43 +292,43 @@ export interface BaseProps
 	 * [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 	 * for the possible values.
 	 *
-	 * When working with time zones, use the `TZDate` object exported by this
-	 * package instead of the native `Date` object.
+	 * When working with time zones, use the `TZDate` object from the
+	 * [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz) package
+	 * instead of the native `Date` object.
 	 * @example
-	 *   import { DateCalendar, TZDate } from "@wordpress/components";
+	 *   import { TZDate } from "@date-fns/tz";
+	 *   import { Calendar } from "@wordpress/ui";
 	 *
 	 *   export function WithTimeZone() {
 	 *     const timeZone = "America/New_York";
-	 *     const [ selected, setSelected ] = useState< Date | undefined >(
+	 *     const [ value, setValue ] = useState< Date | null >(
 	 *       new TZDate( 2024, 12, 10, timeZone ) // Use `TZDate` instead of `Date`
 	 *     );
 	 *     return (
-	 *       <DateCalendar
+	 *       <Calendar
 	 *         timeZone={ timeZone }
-	 *         selected={ selected }
-	 *         onSelect={ setSelected }
+	 *         value={ value }
+	 *         onValueChange={ setValue }
 	 *     />
 	 *   );
 	 * }
 	 */
 	timeZone?: string;
+}
+
+export interface SingleProps {
 	/**
-	 * The role attribute to add to the container element.
-	 * @default 'application'
+	 * The selected date (controlled). Use `null` when there is no selection.
+	 * To render an uncontrolled calendar, use `defaultValue` instead.
 	 */
-	role?: 'application' | 'dialog' | undefined;
+	value?: Date | null;
+	/** Event handler called when the selected date changes. */
+	onValueChange?: OnValueChangeHandler< Date | null >;
+	/** The initially selected date (uncontrolled). */
+	defaultValue?: Date;
 }
 
-interface SingleProps {
-	/** The selected date. */
-	selected?: Date | undefined | null;
-	/** Event handler when a day is selected. */
-	onSelect?: OnSelectHandler< Date | undefined >;
-	/** The default selected date (for uncontrolled usage). */
-	defaultSelected?: Date;
-}
-
-interface RangeProps {
+export interface RangeProps {
 	/**
 	 * When `true`, the range will reset when including a disabled day.
 	 */
@@ -339,13 +341,16 @@ interface RangeProps {
 	 * The maximum number of nights to include in the range.
 	 */
 	max?: number;
-	/** The selected range. */
-	selected?: DateRange | undefined | null;
-	/** Event handler when the selection changes. */
-	onSelect?: OnSelectHandler< DateRange | undefined >;
-	/** The default selected range (for uncontrolled usage). */
-	defaultSelected?: DateRange;
+	/**
+	 * The selected range (controlled). Use `null` when there is no selection.
+	 * To render an uncontrolled calendar, use `defaultValue` instead.
+	 */
+	value?: DateRange | null;
+	/** Event handler called when the selected range changes. */
+	onValueChange?: OnValueChangeHandler< DateRange | null >;
+	/** The initially selected range (uncontrolled). */
+	defaultValue?: DateRange;
 }
 
-export type DateCalendarProps = BaseProps & SingleProps;
-export type DateRangeCalendarProps = BaseProps & RangeProps;
+export type CalendarProps = BaseProps & SingleProps;
+export type RangeCalendarProps = BaseProps & RangeProps;

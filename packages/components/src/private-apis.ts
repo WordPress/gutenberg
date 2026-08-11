@@ -5,7 +5,6 @@ import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
@@ -29,9 +28,6 @@ lock( privateApis, {
 	Tabs,
 	Menu,
 	Badge,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,

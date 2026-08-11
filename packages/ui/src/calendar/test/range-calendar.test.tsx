@@ -15,45 +15,45 @@ import {
 } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useState } from '@wordpress/element';
-import { usePreviewRange, DateRangeCalendar } from '../date-range-calendar';
-import { TZDate } from '../';
+import { TZDate } from 'react-day-picker';
+import { usePreviewRange, RangeCalendar } from '../range-calendar';
 import { getDateButton, getDateCell, monthNameFormatter } from './__utils__';
-import type { DateRange, DateRangeCalendarProps } from '../types';
+import type { DateRange, RangeCalendarProps } from '../types';
 
-const UncontrolledDateRangeCalendar = (
-	props: DateRangeCalendarProps & {
+const UncontrolledRangeCalendar = (
+	props: RangeCalendarProps & {
 		initialSelected?: DateRange | undefined | null;
 		initialMonth?: Date | undefined;
 	}
 ) => {
 	return (
-		<DateRangeCalendar
+		<RangeCalendar
 			{ ...props }
-			defaultSelected={ props.initialSelected ?? undefined }
+			defaultValue={ props.initialSelected ?? undefined }
 			defaultMonth={ props.initialMonth }
 		/>
 	);
 };
 
-const ControlledDateRangeCalendar = (
-	props: DateRangeCalendarProps & {
+const ControlledRangeCalendar = (
+	props: RangeCalendarProps & {
 		initialSelected?: DateRange | undefined | null;
 		initialMonth?: Date | undefined;
 	}
 ) => {
-	const [ selected, setSelected ] = useState< DateRange | undefined | null >(
-		props.initialSelected
+	const [ selected, setSelected ] = useState< DateRange | null >(
+		props.initialSelected ?? null
 	);
 	const [ month, setMonth ] = useState< Date | undefined >(
 		props.initialMonth
 	);
 	return (
-		<DateRangeCalendar
+		<RangeCalendar
 			{ ...props }
-			selected={ selected ?? null }
-			onSelect={ ( ...args ) => {
+			value={ selected }
+			onValueChange={ ( ...args ) => {
 				setSelected( args[ 0 ] );
-				props.onSelect?.( ...args );
+				props.onValueChange?.( ...args );
 			} }
 			month={ month }
 			onMonthChange={ ( newMonth ) => {
@@ -71,7 +71,7 @@ function setupUserEvent() {
 	return user;
 }
 
-describe( 'DateRangeCalendar', () => {
+describe( 'RangeCalendar', () => {
 	let today: Date;
 	let tomorrow: Date;
 	let yesterday: Date;
@@ -103,7 +103,7 @@ describe( 'DateRangeCalendar', () => {
 
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
-			render( <DateRangeCalendar /> );
+			render( <RangeCalendar /> );
 
 			expect(
 				screen.getByRole( 'application', {
@@ -126,7 +126,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
-			render( <DateRangeCalendar numberOfMonths={ 2 } /> );
+			render( <RangeCalendar numberOfMonths={ 2 } /> );
 
 			const grids = screen.getAllByRole( 'grid' );
 			expect( grids ).toHaveLength( 2 );
@@ -140,9 +140,9 @@ describe( 'DateRangeCalendar', () => {
 	} );
 
 	describe( 'Date selection', () => {
-		it( 'should select an initial date range in uncontrolled mode via the `defaultSelected` prop', () => {
+		it( 'should select an initial date range in uncontrolled mode via the `defaultValue` prop', () => {
 			const dateRange = { from: today, to: tomorrow };
-			render( <DateRangeCalendar defaultSelected={ dateRange } /> );
+			render( <RangeCalendar defaultValue={ dateRange } /> );
 
 			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
 			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
@@ -155,15 +155,15 @@ describe( 'DateRangeCalendar', () => {
 			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
 		} );
 
-		it( 'should select an initial date range in controlled mode via the `selected` prop', () => {
+		it( 'should select an initial date range in controlled mode via the `value` prop', () => {
 			const defaultRange = { from: yesterday, to: today };
 			const controlledRange = { from: today, to: tomorrow };
 
-			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
+			// Note: the `defaultValue` prop is ignored when the `value` prop is set.
 			render(
-				<DateRangeCalendar
-					defaultSelected={ defaultRange }
-					selected={ controlledRange }
+				<RangeCalendar
+					defaultValue={ defaultRange }
+					value={ controlledRange }
 				/>
 			);
 
@@ -178,8 +178,8 @@ describe( 'DateRangeCalendar', () => {
 			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
 		} );
 
-		it( 'should have no date selected in uncontrolled mode when the `selected` prop is set to `undefined`', () => {
-			render( <DateRangeCalendar /> );
+		it( 'should have no date selected in uncontrolled mode when no initial value is provided', () => {
+			render( <RangeCalendar /> );
 
 			expect(
 				screen.queryByRole( 'gridcell', { selected: true } )
@@ -189,15 +189,12 @@ describe( 'DateRangeCalendar', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should have no date selected in controlled mode when the `selected` prop is set to `null`', () => {
+		it( 'should have no date selected in controlled mode when the `value` prop is set to `null`', () => {
 			const defaultRange = { from: today, to: tomorrow };
 
-			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
+			// Note: the `defaultValue` prop is ignored when the `value` prop is set.
 			render(
-				<DateRangeCalendar
-					defaultSelected={ defaultRange }
-					selected={ null }
-				/>
+				<RangeCalendar defaultValue={ defaultRange } value={ null } />
 			);
 
 			expect(
@@ -208,12 +205,33 @@ describe( 'DateRangeCalendar', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should select a date in uncontrolled mode via the `defaultSelected` prop even if the date is disabled`', () => {
+		it( 'should stay controlled when a direct state setter clears the value', async () => {
+			const user = setupUserEvent();
+			const initialRange = { from: today, to: today };
+
+			function RangeCalendarWithDirectStateSetter() {
+				const [ value, setValue ] = useState< DateRange | null >(
+					initialRange
+				);
+				return (
+					<RangeCalendar value={ value } onValueChange={ setValue } />
+				);
+			}
+
+			render( <RangeCalendarWithDirectStateSetter /> );
+			await user.click( getDateButton( today ) );
+
+			expect(
+				screen.queryByRole( 'gridcell', { selected: true } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should select a date in uncontrolled mode via the `defaultValue` prop even if the date is disabled`', () => {
 			const defaultRange = { from: today, to: tomorrow };
 
 			render(
-				<DateRangeCalendar
-					defaultSelected={ defaultRange }
+				<RangeCalendar
+					defaultValue={ defaultRange }
 					disabled={ defaultRange }
 				/>
 			);
@@ -231,12 +249,12 @@ describe( 'DateRangeCalendar', () => {
 			expect( tomorrowButton ).toBeDisabled();
 		} );
 
-		it( 'should select a date in controlled mode via the `selected` prop even if the date is disabled`', () => {
+		it( 'should select a date in controlled mode via the `value` prop even if the date is disabled`', () => {
 			const defaultRange = { from: today, to: tomorrow };
 
 			render(
-				<DateRangeCalendar
-					selected={ defaultRange }
+				<RangeCalendar
+					value={ defaultRange }
 					disabled={ defaultRange }
 				/>
 			);
@@ -255,20 +273,20 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
-			[ 'Controlled', ControlledDateRangeCalendar ],
+			[ 'Uncontrolled', UncontrolledRangeCalendar ],
+			[ 'Controlled', ControlledRangeCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should start selecting a range when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -285,9 +303,9 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should complete a range selection when a second date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				const todayButton = getDateButton( today );
 				const tomorrowButton = getDateButton( tomorrow );
@@ -295,8 +313,8 @@ describe( 'DateRangeCalendar', () => {
 				// First click - start range
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -309,8 +327,8 @@ describe( 'DateRangeCalendar', () => {
 				// Second click - complete range
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: tomorrow },
 					tomorrow,
 					expect.objectContaining( { today: false } ),
@@ -330,16 +348,16 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should handle selecting dates in reverse order (end date first)', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				// First click on tomorrow
 				const tomorrowButton = getDateButton( tomorrow );
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					{ from: tomorrow, to: tomorrow },
 					tomorrow,
 					expect.objectContaining( { today: false } ),
@@ -353,8 +371,8 @@ describe( 'DateRangeCalendar', () => {
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
 					{ from: today, to: tomorrow },
 					today,
@@ -375,16 +393,16 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should expand the current range when clicking a third date after the existing range end', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				// First click - start range
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -398,8 +416,8 @@ describe( 'DateRangeCalendar', () => {
 				const tomorrowButton = getDateButton( tomorrow );
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
 					{ from: today, to: tomorrow },
 					tomorrow,
@@ -416,8 +434,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 3 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 3 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					3,
 					{ from: today, to: dayAfterTomorrow },
 					dayAfterTomorrow,
@@ -431,16 +449,16 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should update the current range when clicking a third date in between the existing range start and end', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				// First click - start range
 				const yesterdayButton = getDateButton( yesterday );
 				await user.click( yesterdayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					{ from: yesterday, to: yesterday },
 					yesterday,
 					expect.objectContaining( { today: false } ),
@@ -456,8 +474,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
 					{ from: yesterday, to: dayAfterTomorrow },
 					dayAfterTomorrow,
@@ -472,8 +490,8 @@ describe( 'DateRangeCalendar', () => {
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 3 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 3 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					3,
 					{ from: yesterday, to: today },
 					today,
@@ -487,16 +505,16 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should expand the current range when clicking a third date before the existing range start', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } /> );
+				render( <Component onValueChange={ onValueChange } /> );
 
 				// First click - start range
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -510,8 +528,8 @@ describe( 'DateRangeCalendar', () => {
 				const tomorrowButton = getDateButton( tomorrow );
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
 					{ from: today, to: tomorrow },
 					tomorrow,
@@ -526,8 +544,8 @@ describe( 'DateRangeCalendar', () => {
 				const yesterdayButton = getDateButton( yesterday );
 				await user.click( yesterdayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 3 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 3 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					3,
 					{ from: yesterday, to: tomorrow },
 					yesterday,
@@ -541,16 +559,19 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should not select a disabled date when a date button is clicked', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
-					<Component onSelect={ onSelect } disabled={ tomorrow } />
+					<Component
+						onValueChange={ onValueChange }
+						disabled={ tomorrow }
+					/>
 				);
 
 				const tomorrowButton = getDateButton( tomorrow );
 				await user.click( tomorrowButton );
 
-				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onValueChange ).not.toHaveBeenCalled();
 				expect(
 					screen.queryByRole( 'button', { name: /selected/i } )
 				).not.toBeInTheDocument();
@@ -558,13 +579,13 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should clear the range when defining a one-day range and clicking on the same date again', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				const dayAfterTomorrow = addDays( today, 2 );
 
-				render(
+				const { rerender } = render(
 					<Component
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 						initialSelected={ {
 							from: yesterday,
 							to: dayAfterTomorrow,
@@ -577,8 +598,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					1,
 					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
 					dayAfterTomorrow,
@@ -592,10 +613,10 @@ describe( 'DateRangeCalendar', () => {
 				// Fourth click - remove date range
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
-					undefined,
+					null,
 					dayAfterTomorrow,
 					expect.objectContaining( { today: false } ),
 					expect.objectContaining( {
@@ -603,17 +624,30 @@ describe( 'DateRangeCalendar', () => {
 						target: dayAfterTomorrowButton,
 					} )
 				);
+
+				rerender(
+					<Component
+						onValueChange={ onValueChange }
+						initialSelected={ {
+							from: yesterday,
+							to: dayAfterTomorrow,
+						} }
+					/>
+				);
+				expect(
+					screen.queryByRole( 'gridcell', { selected: true } )
+				).not.toBeInTheDocument();
 			} );
 
 			it( 'should not clear the range when clicking a selected date if the `required` prop is set to `true`', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				const dayAfterTomorrow = addDays( today, 2 );
 
 				render(
 					<Component
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 						initialSelected={ {
 							from: yesterday,
 							to: dayAfterTomorrow,
@@ -627,8 +661,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					1,
 					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
 					dayAfterTomorrow,
@@ -642,8 +676,8 @@ describe( 'DateRangeCalendar', () => {
 				// Fourth click - doesn't remove date range
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenNthCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenNthCalledWith(
 					2,
 					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
 					dayAfterTomorrow,
@@ -657,10 +691,13 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should complete a range selection even if there are disabled dates in the range', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
-					<Component onSelect={ onSelect } disabled={ tomorrow } />
+					<Component
+						onValueChange={ onValueChange }
+						disabled={ tomorrow }
+					/>
 				);
 
 				const todayButton = getDateButton( today );
@@ -668,8 +705,8 @@ describe( 'DateRangeCalendar', () => {
 				// First click - start range
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -686,8 +723,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: dayAfterTomorrow },
 					dayAfterTomorrow,
 					expect.objectContaining( { today: false } ),
@@ -700,11 +737,11 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should not complete a range selection if the `excludeDisabled` prop is set to `true` and there is at least one disabled date in the range', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
 				render(
 					<Component
-						onSelect={ onSelect }
+						onValueChange={ onValueChange }
 						disabled={ tomorrow }
 						excludeDisabled
 					/>
@@ -715,8 +752,8 @@ describe( 'DateRangeCalendar', () => {
 				// First click - start range
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: today },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -733,8 +770,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: dayAfterTomorrow, to: undefined },
 					dayAfterTomorrow,
 					expect.objectContaining( { today: false } ),
@@ -747,17 +784,19 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should not complete a range selection if the range has a duration of less than the value of the `min` prop', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } min={ 3 } /> );
+				render(
+					<Component onValueChange={ onValueChange } min={ 3 } />
+				);
 
 				const todayButton = getDateButton( today );
 
 				// First click - start range
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: undefined },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -774,8 +813,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: dayAfterTomorrow, to: undefined },
 					dayAfterTomorrow,
 					expect.objectContaining( { today: false } ),
@@ -790,8 +829,8 @@ describe( 'DateRangeCalendar', () => {
 				const yesterdayButton = getDateButton( yesterday );
 				await user.click( yesterdayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 3 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 3 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: yesterday, to: dayAfterTomorrow },
 					yesterday,
 					expect.objectContaining( { today: false } ),
@@ -804,16 +843,18 @@ describe( 'DateRangeCalendar', () => {
 
 			it( 'should not complete a range selection if the range has a duration of more than the value of the `max` prop', async () => {
 				const user = setupUserEvent();
-				const onSelect = jest.fn();
+				const onValueChange = jest.fn();
 
-				render( <Component onSelect={ onSelect } max={ 2 } /> );
+				render(
+					<Component onValueChange={ onValueChange } max={ 2 } />
+				);
 
 				// First click - start range
 				const yesterdayButton = getDateButton( yesterday );
 				await user.click( yesterdayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 1 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: yesterday, to: yesterday },
 					yesterday,
 					expect.objectContaining( { today: false } ),
@@ -830,8 +871,8 @@ describe( 'DateRangeCalendar', () => {
 					getDateButton( dayAfterTomorrow );
 				await user.click( dayAfterTomorrowButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 2 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 2 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: dayAfterTomorrow, to: undefined },
 					dayAfterTomorrow,
 					expect.objectContaining( { today: false } ),
@@ -846,8 +887,8 @@ describe( 'DateRangeCalendar', () => {
 				const todayButton = getDateButton( today );
 				await user.click( todayButton );
 
-				expect( onSelect ).toHaveBeenCalledTimes( 3 );
-				expect( onSelect ).toHaveBeenLastCalledWith(
+				expect( onValueChange ).toHaveBeenCalledTimes( 3 );
+				expect( onValueChange ).toHaveBeenLastCalledWith(
 					{ from: today, to: dayAfterTomorrow },
 					today,
 					expect.objectContaining( { today: true } ),
@@ -862,7 +903,7 @@ describe( 'DateRangeCalendar', () => {
 
 	describe( 'Month navigation', () => {
 		it( 'should select an initial month in uncontrolled mode via the `defaultMonth` prop', () => {
-			render( <DateRangeCalendar defaultMonth={ nextMonth } /> );
+			render( <RangeCalendar defaultMonth={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -874,7 +915,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should select an initial month in controlled mode via the `month` prop', () => {
-			render( <DateRangeCalendar month={ nextMonth } /> );
+			render( <RangeCalendar month={ nextMonth } /> );
 
 			expect(
 				screen.getByRole( 'grid', {
@@ -886,8 +927,8 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		describe.each( [
-			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
-			[ 'Controlled', ControlledDateRangeCalendar ],
+			[ 'Uncontrolled', UncontrolledRangeCalendar ],
+			[ 'Controlled', ControlledRangeCalendar ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
 				const user = setupUserEvent();
@@ -990,7 +1031,10 @@ describe( 'DateRangeCalendar', () => {
 				expect( getDateCell( nextNextMonth ) ).toBeVisible();
 				expect( getDateButton( nextNextMonth ) ).toBeVisible();
 
-				expect( prevButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( prevButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 
 			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
@@ -1040,7 +1084,10 @@ describe( 'DateRangeCalendar', () => {
 				expect( getDateCell( prevPrevMonth ) ).toBeVisible();
 				expect( getDateButton( prevPrevMonth ) ).toBeVisible();
 
-				expect( nextButton ).not.toHaveAttribute( 'aria-disabled' );
+				expect( nextButton ).toHaveAttribute(
+					'aria-disabled',
+					'false'
+				);
 			} );
 		} );
 	} );
@@ -1048,10 +1095,10 @@ describe( 'DateRangeCalendar', () => {
 	describe( 'Keyboard focus and navigation', () => {
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					// eslint-disable-next-line jsx-a11y/no-autofocus
 					autoFocus
-					defaultSelected={ { from: today, to: tomorrow } }
+					defaultValue={ { from: today, to: tomorrow } }
 				/>
 			);
 			expect( getDateButton( today ) ).toHaveFocus();
@@ -1059,13 +1106,13 @@ describe( 'DateRangeCalendar', () => {
 
 		it( "should auto-focus today's date if there is not selected date when the `autoFocus` prop is set to `true`", async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
-			render( <DateRangeCalendar autoFocus /> );
+			render( <RangeCalendar autoFocus /> );
 			expect( getDateButton( today ) ).toHaveFocus();
 		} );
 
 		it( 'should focus each arrow as a tab stop, but treat the grid as a 2d composite widget', async () => {
 			const user = setupUserEvent();
-			render( <DateRangeCalendar /> );
+			render( <RangeCalendar /> );
 
 			// Focus previous month button
 			await user.tab();
@@ -1165,7 +1212,7 @@ describe( 'DateRangeCalendar', () => {
 			const user = setupUserEvent();
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ [
 						tomorrow,
 						addWeeks( addDays( tomorrow, 1 ), 1 ),
@@ -1197,9 +1244,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should focus the selected date when tabbing into the calendar', async () => {
 			const user = setupUserEvent();
-			render(
-				<DateRangeCalendar selected={ { from: today, to: tomorrow } } />
-			);
+			render( <RangeCalendar value={ { from: today, to: tomorrow } } /> );
 
 			// Tab to the calendar grid
 			await user.tab();
@@ -1214,7 +1259,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should support disabling all dates via the `disabled` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar disabled /> );
+			render( <RangeCalendar disabled /> );
 
 			within( screen.getByRole( 'grid' ) )
 				.getAllByRole( 'button' )
@@ -1243,7 +1288,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling single dates via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ tomorrow } /> );
+			render( <RangeCalendar disabled={ tomorrow } /> );
 
 			expect( getDateButton( tomorrow ) ).toBeDisabled();
 		} );
@@ -1251,7 +1296,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should support passing a custom function via the `disabled` prop', async () => {
 			const primeNumbers = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ];
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ ( date ) =>
 						primeNumbers.includes( date.getDate() )
 					}
@@ -1268,7 +1313,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates before a certain date via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ { before: today } } /> );
+			render( <RangeCalendar disabled={ { before: today } } /> );
 
 			for ( let date = 1; date < today.getDate(); date++ ) {
 				expect(
@@ -1281,7 +1326,7 @@ describe( 'DateRangeCalendar', () => {
 		} );
 
 		it( 'should support disabling all dates after a certain date via the `disabled` prop', async () => {
-			render( <DateRangeCalendar disabled={ { after: today } } /> );
+			render( <RangeCalendar disabled={ { after: today } } /> );
 
 			for ( let date = today.getDate() + 1; date < 32; date++ ) {
 				expect(
@@ -1295,7 +1340,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling all dates before a certain date and after a certain date via the `disabled` prop', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ {
 						before: yesterday,
 						after: addDays( today, 1 ),
@@ -1327,7 +1372,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling all dates within a certain date range via the `disabled` prop', async () => {
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					disabled={ { from: yesterday, to: addDays( today, 1 ) } }
 				/>
 			);
@@ -1356,9 +1401,7 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support disabling specific days of the week via the `disabled` prop', async () => {
 			const weekendsInMay = [ 3, 4, 10, 11, 17, 18, 24, 25, 31 ];
-			render(
-				<DateRangeCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } />
-			);
+			render( <RangeCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } /> );
 
 			for ( const date of weekendsInMay ) {
 				expect(
@@ -1372,7 +1415,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should disable the previous and next months buttons if the `disableNavigation` is set to `true`', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar disableNavigation /> );
+			render( <RangeCalendar disableNavigation /> );
 
 			expect(
 				screen.getByRole( 'button', { name: /previous month/i } )
@@ -1394,7 +1437,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should localize the calendar based on the `locale` prop', async () => {
 			const user = setupUserEvent();
 
-			render( <DateRangeCalendar locale={ ar } /> );
+			render( <RangeCalendar locale={ ar } /> );
 
 			// Check computed writing direction
 			expect(
@@ -1427,12 +1470,12 @@ describe( 'DateRangeCalendar', () => {
 
 		it( 'should support timezones according to the `timeZone` prop', async () => {
 			const user = setupUserEvent();
-			const onSelect = jest.fn();
+			const onValueChange = jest.fn();
 
 			render(
-				<DateRangeCalendar
+				<RangeCalendar
 					timeZone="Asia/Tokyo"
-					onSelect={ onSelect }
+					onValueChange={ onValueChange }
 				/>
 			);
 
@@ -1451,8 +1494,8 @@ describe( 'DateRangeCalendar', () => {
 				new TZDate( tomorrow, 'Asia/Tokyo' ).getTimezoneOffset() / 60
 			);
 
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
+			expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+			expect( onValueChange ).toHaveBeenCalledWith(
 				{
 					from: tomorrowFromTokyoTimezone,
 					to: tomorrowFromTokyoTimezone,
@@ -1482,8 +1525,8 @@ describe( 'DateRangeCalendar', () => {
 			};
 
 			render(
-				<DateRangeCalendar
-					defaultSelected={ timezoneRange }
+				<RangeCalendar
+					defaultValue={ timezoneRange }
 					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
 					timeZone="Etc/GMT+2"
 				/>
@@ -1505,7 +1548,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should return undefined when there is no hovered date', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: previewToday, to: previewTomorrow },
+					value: { from: previewToday, to: previewTomorrow },
 					hoveredDate: undefined,
 				} )
 			);
@@ -1516,7 +1559,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should return undefined when there is no selected date', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: undefined,
+					value: undefined,
 					hoveredDate: previewToday,
 				} )
 			);
@@ -1527,7 +1570,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should return undefined when there is no selected start date', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: undefined, to: previewTomorrow },
+					value: { from: undefined, to: previewTomorrow },
 					hoveredDate: previewToday,
 				} )
 			);
@@ -1538,7 +1581,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should show preview when hovering before selected range', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: previewToday, to: previewTomorrow },
+					value: { from: previewToday, to: previewTomorrow },
 					hoveredDate: previewYesterday,
 				} )
 			);
@@ -1552,7 +1595,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should show preview when hovering between selected range dates', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: previewYesterday, to: previewTomorrow },
+					value: { from: previewYesterday, to: previewTomorrow },
 					hoveredDate: previewToday,
 				} )
 			);
@@ -1566,7 +1609,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should show preview when hovering after selected range', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: previewYesterday, to: previewToday },
+					value: { from: previewYesterday, to: previewToday },
 					hoveredDate: previewTomorrow,
 				} )
 			);
@@ -1580,7 +1623,7 @@ describe( 'DateRangeCalendar', () => {
 		it( 'should show preview when hovering after selected range with no end date', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
-					selected: { from: previewToday },
+					value: { from: previewToday },
 					hoveredDate: previewTomorrow,
 				} )
 			);
@@ -1595,7 +1638,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should collapse preview to single date when range is less than min', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewTomorrow,
 						min: 3,
 					} )
@@ -1610,7 +1653,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should allow preview when range meets min requirement', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewNextWeek,
 						min: 3,
 					} )
@@ -1627,7 +1670,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should collapse preview to single date when range exceeds max', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewNextWeek,
 						max: 3,
 					} )
@@ -1642,7 +1685,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should allow preview when range meets max requirement', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewTomorrow,
 						max: 3,
 					} )
@@ -1659,7 +1702,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should collapse preview to single date when range contains disabled dates and excludeDisabled is true', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewNextWeek,
 						disabled: [ previewTomorrow ],
 						excludeDisabled: true,
@@ -1675,7 +1718,7 @@ describe( 'DateRangeCalendar', () => {
 			it( 'should allow preview when range contains disabled dates but excludeDisabled is false', () => {
 				const { result } = renderHook( () =>
 					usePreviewRange( {
-						selected: { from: previewToday },
+						value: { from: previewToday },
 						hoveredDate: previewNextWeek,
 						disabled: [ previewTomorrow ],
 						excludeDisabled: false,
