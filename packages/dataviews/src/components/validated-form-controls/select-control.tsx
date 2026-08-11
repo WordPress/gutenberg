@@ -4,19 +4,23 @@ import { SelectControl } from '@wordpress/components';
 import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
 
+type SelectControlProps = React.ComponentProps< typeof SelectControl >;
+
+type ValidatedSelectControlProps = Omit<
+	SelectControlProps,
+	'onChange' | 'value'
+> & {
+	value?: string | string[];
+	onChange: ( value: string | string[] ) => void;
+} & ValidatedControlProps;
+
 const UnforwardedValidatedSelectControl = (
 	{
 		required,
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof SelectControl >,
-		'multiple' | 'onChange' | 'value'
-	> & {
-		value?: string;
-		onChange: ( value: string ) => void;
-	} & ValidatedControlProps,
+	}: ValidatedSelectControlProps,
 	forwardedRef: React.ForwardedRef< HTMLSelectElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
@@ -29,21 +33,20 @@ const UnforwardedValidatedSelectControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<SelectControl ref={ mergedRefs } { ...restProps } />
+			<SelectControl
+				ref={ mergedRefs }
+				{
+					// A runtime boolean cannot statically discriminate
+					// SelectControl's single/multiple props union.
+					...( restProps as unknown as SelectControlProps )
+				}
+			/>
 		</ControlWithError>
 	);
 };
 
 export const ValidatedSelectControl: React.ForwardRefExoticComponent<
-	React.PropsWithoutRef<
-		Omit<
-			React.ComponentProps< typeof SelectControl >,
-			'multiple' | 'onChange' | 'value'
-		> & {
-			value?: string;
-			onChange: ( value: string ) => void;
-		} & ValidatedControlProps
-	> &
+	React.PropsWithoutRef< ValidatedSelectControlProps > &
 		React.RefAttributes< HTMLSelectElement >
 > = forwardRef( UnforwardedValidatedSelectControl );
 ValidatedSelectControl.displayName = 'ValidatedSelectControl';
