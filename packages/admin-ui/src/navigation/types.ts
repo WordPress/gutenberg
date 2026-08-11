@@ -18,18 +18,6 @@ export interface NavigationItem {
 	href: string;
 }
 
-export interface NavigationComponents {
-	/**
-	 * Component rendered in place of the default `<a>` for each item, e.g. a
-	 * client-side router link. It receives standard anchor attributes
-	 * (`href`, `aria-current`, `className`, `children`) and must forward
-	 * them to the element it renders.
-	 *
-	 * @default 'a'
-	 */
-	link?: ComponentType< NavigationLinkProps >;
-}
-
 export interface NavigationProps {
 	/**
 	 * The navigation items to display.
@@ -52,9 +40,11 @@ export interface NavigationProps {
 	ariaLabel?: string;
 
 	/**
-	 * Overrides for the elements the navigation renders.
+	 * Component rendered in place of the default `<a>` for each item.
+	 *
+	 * @default 'a'
 	 */
-	components?: NavigationComponents;
+	linkComponent?: ComponentType< NavigationLinkProps >;
 
 	/**
 	 * Optional class name for the root element.

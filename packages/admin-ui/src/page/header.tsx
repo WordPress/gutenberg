@@ -3,6 +3,7 @@ import { Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
 import type { NavigationProps } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
+import type { PageComponents } from './types';
 import styles from './style.module.css';
 
 export default function Header( {
@@ -14,6 +15,7 @@ export default function Header( {
 	subTitle,
 	actions,
 	navigation,
+	components,
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -24,6 +26,7 @@ export default function Header( {
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
 	navigation?: NavigationProps;
+	components?: PageComponents;
 	showSidebarToggle?: boolean;
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
@@ -94,6 +97,7 @@ export default function Header( {
 			{ hasNavigation && (
 				<Navigation
 					{ ...navigation }
+					linkComponent={ components?.link }
 					className={ styles[ 'header-navigation' ] }
 				/>
 			) }

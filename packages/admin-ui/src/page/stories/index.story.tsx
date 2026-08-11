@@ -186,9 +186,9 @@ export const WithActions: Story = {
 };
 
 /**
- * Demonstrates `navigation.components.link`: a custom link that intercepts
- * navigation and drives `currentHref` from local state, keeping the links
- * usable without a real router.
+ * Demonstrates `components.link`: a custom link that intercepts navigation and
+ * drives `currentHref` from local state, keeping the links usable without a
+ * real router.
  */
 export const WithInteractiveNavigation: Story = {
 	render: function Render( args ) {
@@ -212,6 +212,7 @@ export const WithInteractiveNavigation: Story = {
 		return (
 			<Page
 				{ ...args }
+				components={ { link } }
 				navigation={ {
 					items: [
 						{ label: 'Overview', href: '/overview' },
@@ -220,7 +221,6 @@ export const WithInteractiveNavigation: Story = {
 						{ label: 'Customers', href: '/customers' },
 					],
 					currentHref,
-					components: { link },
 				} }
 			/>
 		);

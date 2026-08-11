@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type { NavigationLinkProps } from '../../navigation/types';
 import Page from '..';
 
 describe( 'Page navigation', () => {
@@ -44,5 +45,28 @@ describe( 'Page navigation', () => {
 		);
 
 		expect( screen.queryByRole( 'navigation' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should render navigation with the provided link component', () => {
+		const CustomLink = ( { children, ...props }: NavigationLinkProps ) => (
+			<a data-custom="true" { ...props }>
+				{ children }
+			</a>
+		);
+
+		render(
+			<Page
+				title="Analytics"
+				showSidebarToggle={ false }
+				components={ { link: CustomLink } }
+				navigation={ { items, currentHref: '/overview' } }
+			>
+				<div>Content</div>
+			</Page>
+		);
+
+		const link = screen.getByRole( 'link', { name: 'Overview' } );
+		expect( link ).toHaveAttribute( 'data-custom', 'true' );
+		expect( link ).toHaveAttribute( 'href', '/overview' );
 	} );
 } );

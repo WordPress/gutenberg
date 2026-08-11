@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import type { NavigationProps } from '../navigation/types';
 import Header from './header';
+import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 import styles from './style.module.css';
@@ -16,6 +17,7 @@ function Page( {
 	className,
 	actions,
 	navigation,
+	components,
 	ariaLabel,
 	hasPadding = false,
 	showSidebarToggle = true,
@@ -45,6 +47,10 @@ function Page( {
 	 * `href` of the current one.
 	 */
 	navigation?: NavigationProps;
+	/**
+	 * Overrides for default elements rendered by the page's sub-components.
+	 */
+	components?: PageComponents;
 	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
@@ -70,6 +76,7 @@ function Page( {
 					subTitle={ subTitle }
 					actions={ actions }
 					navigation={ navigation }
+					components={ components }
 					showSidebarToggle={ showSidebarToggle }
 				/>
 			) }

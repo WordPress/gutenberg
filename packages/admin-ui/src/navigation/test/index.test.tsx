@@ -158,7 +158,7 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
-	describe( 'components', () => {
+	describe( 'linkComponent', () => {
 		it( 'should render items with the provided link component', () => {
 			const CustomLink = ( {
 				children,
@@ -176,7 +176,7 @@ describe( 'Navigation', () => {
 						{ label: 'Products', href: '/products' },
 					] }
 					currentHref="/overview"
-					components={ { link: CustomLink } }
+					linkComponent={ CustomLink }
 				/>
 			);
 
