@@ -89,6 +89,8 @@
 }
 
 .editor-collab-sidebar-panel__note-content {
+	overflow-wrap: break-word;
+
 	p:last-child {
 		margin-bottom: 0;
 	}
@@ -255,7 +257,7 @@ mark.wp-note {
 	background: var(--wpds-color-background-surface-brand);
 	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	white-space: nowrap;
+	overflow-wrap: anywhere;
 
 	// Keep the chip boundary visible when forced-colors drops the background tint.
 	@media (forced-colors: active) {
