@@ -3,6 +3,7 @@ import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
+import MediaEditorScaleControl from '../media-editor-scale-control';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
@@ -62,6 +63,7 @@ export default function MediaEditorCropPanel( {
 					value: preset.value.toString(),
 				} ) ) }
 			/>
+			<MediaEditorScaleControl />
 		</Stack>
 	);
 }
