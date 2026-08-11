@@ -15,16 +15,8 @@
  *     them. Use this for anything that switches the editor into (or out
  *     of) an intent at runtime.
  */
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { EDITOR_STORE_NAME } from './constants';
 import { checkSupport } from '../post-type-support-check';
 
