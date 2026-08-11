@@ -91,15 +91,24 @@
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
 
+	p:first-child {
+		margin-top: 0;
+	}
+
 	p:last-child {
 		margin-bottom: 0;
 	}
 
+	/*
+	 * Clamp long notes to three lines. `max-height` is used in place of
+	 * `line-clamp`, whose exposure to the accessibility tree is still
+	 * settling and varies between screen readers. See
+	 * https://github.com/WordPress/gutenberg/issues/81458.
+	 */
 	&.is-collapsed {
-		-webkit-line-clamp: 3;
-		line-clamp: 3;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
+		/* Fallback for browsers without the `lh` unit. */
+		max-height: 4.5em;
+		max-height: calc(3 * 1lh);
 		overflow: hidden;
 	}
 }

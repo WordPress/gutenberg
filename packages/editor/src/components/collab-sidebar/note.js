@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -62,6 +63,10 @@ export function Note( {
 	const [ prevContent, setPrevContent ] = useState( rawContent );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isOverflowing, setIsOverflowing ] = useState( false );
+	const contentId = useInstanceId(
+		Note,
+		'editor-collab-sidebar-note-content'
+	);
 
 	// Collapse whenever the content changes so it can be re-measured.
 	if ( prevContent !== rawContent ) {
@@ -175,11 +180,18 @@ export function Note( {
 		body = (
 			<div
 				ref={ commentRef }
+				id={ contentId }
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
 					'editor-collab-sidebar-panel__resolution-text':
 						isResolutionNote,
 					'is-collapsed': ! isExpanded,
 				} ) }
+				/*
+				 * Collapsing is visual only, so links clipped by the clamp stay
+				 * in the tab order. Expand when focus reaches one of them so
+				 * focus is never left on content the user cannot see.
+				 */
+				onFocusCapture={ () => setIsExpanded( true ) }
 				dangerouslySetInnerHTML={ { __html: content ?? '' } }
 			/>
 		);
@@ -229,6 +241,8 @@ export function Note( {
 					className="editor-collab-sidebar-panel__show-more-button"
 					variant="unstyled"
 					size="small"
+					aria-expanded={ isExpanded }
+					aria-controls={ contentId }
 					onClick={ () => setIsExpanded( ! isExpanded ) }
 				>
 					{ ! isExpanded ? __( 'Show more' ) : __( 'Show less' ) }
