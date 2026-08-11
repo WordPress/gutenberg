@@ -18,6 +18,36 @@ import {
 } from '../../..';
 import useSelect from '..';
 
+const { originalCancelIdleCallback, originalRequestIdleCallback } = vi.hoisted(
+	() => {
+		const originalCancel = globalThis.window.cancelIdleCallback;
+		const originalRequest = globalThis.window.requestIdleCallback;
+
+		globalThis.window.requestIdleCallback = ( callback ) => {
+			const start = Date.now();
+
+			return setTimeout(
+				() =>
+					callback( {
+						didTimeout: false,
+						timeRemaining: () =>
+							Math.max( 0, 50 - ( Date.now() - start ) ),
+					} ),
+				0
+			);
+		};
+		globalThis.window.cancelIdleCallback = clearTimeout;
+
+		return {
+			originalCancelIdleCallback: originalCancel,
+			originalRequestIdleCallback: originalRequest,
+		};
+	}
+);
+
+const waitForAsyncUpdate = () =>
+	new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 function counterStore( initialCount = 0, step = 1 ) {
 	return {
 		reducer: ( state = initialCount, action ) =>
@@ -47,6 +77,16 @@ describe( 'useSelect', () => {
 
 	afterAll( () => {
 		globalThis.SCRIPT_DEBUG = initialScriptDebug;
+		if ( originalCancelIdleCallback ) {
+			globalThis.window.cancelIdleCallback = originalCancelIdleCallback;
+		} else {
+			Reflect.deleteProperty( globalThis.window, 'cancelIdleCallback' );
+		}
+		if ( originalRequestIdleCallback ) {
+			globalThis.window.requestIdleCallback = originalRequestIdleCallback;
+		} else {
+			Reflect.deleteProperty( globalThis.window, 'requestIdleCallback' );
+		}
 	} );
 
 	it( 'passes the relevant data to the component', () => {
@@ -1083,7 +1123,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'b:1' );
 
 			// Give the async update time to run in case it wasn't cancelled
-			await new Promise( setImmediate );
+			await waitForAsyncUpdate();
 
 			expect( selectA ).toHaveBeenCalledTimes( 1 );
 			expect( selectB ).toHaveBeenCalledTimes( 2 );
@@ -1123,7 +1163,7 @@ describe( 'useSelect', () => {
 			unmount();
 
 			// Give the async update time to run in case it wasn't cancelled
-			await new Promise( setImmediate );
+			await waitForAsyncUpdate();
 
 			// only the initial render, no state updates
 			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
@@ -1164,7 +1204,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '100' );
 
 			// Give the async update time to run in case it wasn't cancelled
-			await new Promise( setImmediate );
+			await waitForAsyncUpdate();
 
 			// initial render + registry change rerender, no state updates
 			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
