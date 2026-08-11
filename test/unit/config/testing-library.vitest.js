@@ -1,4 +1,3 @@
-import { createSerializer as createEmotionSerializer } from '@emotion/jest';
 import '@testing-library/jest-dom/vitest';
 // eslint-disable-next-line testing-library/no-manual-cleanup -- Vitest globals are disabled, so Testing Library cannot register cleanup automatically.
 import { cleanup } from '@testing-library/react';
@@ -6,15 +5,9 @@ import { afterEach, expect } from 'vitest';
 import './matchers/to-match-diff-snapshot.vitest';
 import './matchers/to-match-style-diff-snapshot.vitest';
 import './matchers/to-be-positioned-popover.vitest';
-import { createClassNameReplacer } from './emotion-serializer.vitest';
 
 afterEach( cleanup );
 
-expect.addSnapshotSerializer(
-	createEmotionSerializer( {
-		classNameReplacer: createClassNameReplacer(),
-	} )
-);
 expect.addSnapshotSerializer( {
 	test( value ) {
 		return (
