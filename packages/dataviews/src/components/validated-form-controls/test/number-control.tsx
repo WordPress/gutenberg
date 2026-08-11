@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedNumberControl } from '../components';
+import { ValidatedNumberControl } from '../number-control';
 
 describe( 'ValidatedNumberControl', () => {
 	it( 'should preserve the help description', () => {

@@ -2,16 +2,13 @@ import {
 	Flex,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
-	privateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
-import { unlock } from '../../../lock-unlock';
+import { ValidatedNumberControl } from '../../validated-form-controls';
 import getCustomValidity from './get-custom-validity';
-
-const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
