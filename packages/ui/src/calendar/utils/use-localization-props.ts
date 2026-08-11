@@ -17,6 +17,8 @@ function isLocaleRTL( localeCode: string ) {
 		'syr', // Syriac
 		'dv', // Divehi
 		'ku', // Kurdish (Sorani)
+		'ckb', // Central Kurdish (Sorani)
+		'ug', // Uyghur
 		'yi', // Yiddish
 	].includes( localeObj.language );
 }
@@ -123,6 +125,13 @@ export const useLocalizationProps = ( {
 				) => {
 					const formattedDate = fullDateFormatter.format( date );
 					let label = formattedDate;
+					if ( modifiers?.today && modifiers?.selected ) {
+						return sprintf(
+							// translators: %s is the full date (e.g. "Monday, April 29, 2025")
+							__( 'Today, %s, selected' ),
+							formattedDate
+						);
+					}
 					if ( modifiers?.today ) {
 						label = sprintf(
 							// translators: %s is the full date (e.g. "Monday, April 29, 2025")
