@@ -35,8 +35,12 @@ function setupScaleControl( initialCropperState?: Partial< CropperState > ) {
 		width: screen.getByLabelText( 'Width' ) as HTMLInputElement,
 		height: screen.getByLabelText( 'Height' ) as HTMLInputElement,
 		undo: screen.getByRole( 'button', { name: 'undo' } ),
+		reset: screen.getByRole( 'button', { name: 'Reset to original' } ),
 	};
 }
+
+const OVER_ORIGINAL_WARNING =
+	'640 × 480 is the original size. Anything larger scales back down.';
 
 describe( 'MediaEditorScaleControl', () => {
 	it( 'renders nothing until an image is loaded', () => {
@@ -171,5 +175,121 @@ describe( 'MediaEditorScaleControl', () => {
 		expect(
 			screen.getByText( 'Saved size: 160 × 120 pixels.' )
 		).toBeInTheDocument();
+	} );
+	describe( 'when a value exceeds the original', () => {
+		it( 'warns while the value is still being typed', () => {
+			const { width } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '1280' } } );
+
+			expect(
+				screen.getByText( OVER_ORIGINAL_WARNING )
+			).toBeInTheDocument();
+		} );
+
+		it( 'stays quiet for a value within the original', () => {
+			const { width } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '320' } } );
+
+			expect(
+				screen.queryByText( OVER_ORIGINAL_WARNING )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'warns when the linked field is the one that overflows', () => {
+			const { height } = setupScaleControl();
+
+			// 481 is over the 480 height on its own.
+			fireEvent.change( height, { target: { value: '481' } } );
+
+			expect(
+				screen.getByText( OVER_ORIGINAL_WARNING )
+			).toBeInTheDocument();
+		} );
+
+		it( 'describes both fields with the warning for screen readers', () => {
+			const { width, height } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '1280' } } );
+
+			expect( width ).toHaveAccessibleDescription(
+				OVER_ORIGINAL_WARNING
+			);
+			expect( height ).toHaveAccessibleDescription(
+				OVER_ORIGINAL_WARNING
+			);
+		} );
+
+		it( 'clears the warning once the value is capped', () => {
+			const { width } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '1280' } } );
+			fireEvent.blur( width );
+
+			expect(
+				screen.queryByText( OVER_ORIGINAL_WARNING )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'reset to original', () => {
+		// The button stays focusable while unavailable (`accessibleWhenDisabled`)
+		// so it reports its state through `aria-disabled` rather than by
+		// dropping out of the tab order.
+		it( 'is unavailable when the image has not been scaled', () => {
+			const { reset } = setupScaleControl();
+
+			expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'becomes available once the image is scaled', () => {
+			const { width, reset } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '320' } } );
+			fireEvent.blur( width );
+
+			expect( reset ).not.toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'puts the image back to its original size', () => {
+			const { width, height, reset } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '320' } } );
+			fireEvent.blur( width );
+
+			fireEvent.click( reset );
+
+			expect( width ).toHaveValue( 640 );
+			expect( height ).toHaveValue( 480 );
+			expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'discards a value that was typed but not committed', () => {
+			const { width, height, reset } = setupScaleControl();
+
+			fireEvent.change( width, { target: { value: '320' } } );
+			fireEvent.blur( width );
+			fireEvent.change( width, { target: { value: '160' } } );
+
+			fireEvent.click( reset );
+
+			expect( width ).toHaveValue( 640 );
+			expect( height ).toHaveValue( 480 );
+		} );
+	} );
+
+	describe( 'increment arrows', () => {
+		it( 'offers native spin controls on both fields', () => {
+			const { width, height } = setupScaleControl();
+
+			// The `custom` variant would render Increment/Decrement buttons
+			// that steal focus from the field and commit on every click.
+			expect(
+				screen.queryByRole( 'button', { name: 'Increment' } )
+			).not.toBeInTheDocument();
+			expect( width ).toHaveAttribute( 'type', 'number' );
+			expect( height ).toHaveAttribute( 'type', 'number' );
+		} );
 	} );
 } );
