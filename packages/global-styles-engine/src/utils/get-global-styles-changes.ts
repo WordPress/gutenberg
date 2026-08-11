@@ -131,19 +131,13 @@ function deepCompare(
 }
 
 /*
- * The top-level style properties reported as changes. These are the properties
- * the styles engine renders, minus `blocks` and `elements`, which are compared
- * separately because their changes are named after the block or element rather
+ * The top-level style properties reported as changes.
+ * `blocks` and `elements` changes are named after the block or element rather
  * than the property.
  *
  * Deliberately a separate list rather than a reuse of `STYLE_KEYS` in
  * `core/render.tsx`, because the order here is the order the changes are read
- * in, so it is sorted by what a person is most likely to have changed. The
- * engine's list is ordered for rendering and sorting it for prose would be the
- * wrong trade.
- *
- * Keep the two in step all the same: a property the engine renders but that is
- * missing here is a real change the user is never told about.
+ * in, so it is sorted by what a person is most likely to have changed.
  */
 const COMPARED_STYLE_KEYS = [
 	'background',
