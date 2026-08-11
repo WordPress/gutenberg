@@ -14,13 +14,21 @@ export { useWidgetTypes } from './hooks';
 export { registerFieldType } from './field-types';
 
 /**
+ * Icon resolution
+ */
+export { registerIconResolver } from './icon-resolver';
+
+/**
  * Types
  */
 export type {
 	WidgetName,
 	WidgetIcon,
+	WidgetIconReference,
+	WidgetRelevance,
 	WidgetType,
 	WidgetAction,
+	WidgetActionRecord,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	ResolveWidgetModule,

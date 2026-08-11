@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs' );
 const readline = require( 'readline' );
@@ -10,10 +7,6 @@ const glob = require( 'fast-glob' );
 const { inc: semverInc } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
@@ -695,11 +688,16 @@ async function runNpmPublishPreflight(
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
-	log( '>> Checking npm package access.' );
-	await commandFn( 'npm access list packages @wordpress --json', {
+	/*
+	 * `npm whoami` fails for every credential problem that happens in practice:
+	 * a missing, expired, or revoked auth token, or an unreachable registry.
+	 */
+	log( '>> Checking npm authentication.' );
+	const { stdout: whoamiOutput } = await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'pipe',
 	} );
+	log( `>> Authenticated as "${ whoamiOutput.trim() }".` );
 
 	log( '>> Verifying target package versions and dist-tags.' );
 	const publishedPackageNames = [];

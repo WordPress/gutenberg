@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import SeparatorEdit from '../edit';
 
 jest.mock( '@wordpress/block-editor', () => ( {

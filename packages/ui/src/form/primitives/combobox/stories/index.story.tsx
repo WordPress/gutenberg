@@ -16,6 +16,7 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
 		'Combobox.Popup': Combobox.Popup,
+		'Combobox.InputGroup': Combobox.InputGroup,
 		'Combobox.Input': Combobox.Input,
 		'Combobox.List': Combobox.List,
 		'Combobox.ListBody': Combobox.ListBody,

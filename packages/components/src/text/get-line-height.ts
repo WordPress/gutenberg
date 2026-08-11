@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { Props } from './types';
 import { space } from '../utils/space';
 import { CONFIG } from '../utils';

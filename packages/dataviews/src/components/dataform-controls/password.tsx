@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	Button,
@@ -8,9 +5,6 @@ import {
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { seen, unseen } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 import ValidatedText from './utils/validated-input';
 import type { DataFormControlProps } from '../../types';
 

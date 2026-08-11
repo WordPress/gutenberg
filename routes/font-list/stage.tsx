@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -10,10 +7,6 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { FontLibrary } from '@wordpress/global-styles-ui';
 import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 import './style.scss';
 
