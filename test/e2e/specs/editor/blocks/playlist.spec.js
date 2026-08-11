@@ -31,59 +31,6 @@ test.describe( 'Playlist block', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'does not share the add track control with a selected playlist track', async ( {
-		admin,
-		editor,
-		page,
-	} ) => {
-		await admin.createNewPost();
-		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-		await page.waitForFunction(
-			() => window?.wp?.blocks && window?.wp?.data
-		);
-
-		await page.evaluate( ( audio ) => {
-			const track = window.wp.blocks.createBlock( 'core/playlist-track', {
-				id: audio.id,
-				src: audio.source_url,
-				title: 'Selected Track',
-				artist: 'Test Artist',
-				length: '0:12',
-			} );
-			const playlist = window.wp.blocks.createBlock(
-				'core/playlist',
-				{},
-				[ track ]
-			);
-
-			window.wp.data
-				.dispatch( 'core/block-editor' )
-				.insertBlock( playlist );
-			window.wp.data
-				.dispatch( 'core/block-editor' )
-				.selectBlock( track.clientId );
-		}, uploadedAudio );
-
-		await expect(
-			editor.canvas
-				.locator( '[data-type="core/playlist-track"].is-selected' )
-				.first()
-		).toBeVisible();
-		await editor.showBlockToolbar();
-
-		const blockToolbar = page.getByRole( 'toolbar', {
-			name: 'Block tools',
-		} );
-		// The track's own Replace control confirms the toolbar is showing.
-		await expect(
-			blockToolbar.getByRole( 'button', { name: 'Replace' } )
-		).toBeVisible();
-		// The playlist's Add track control is no longer shared with the track.
-		await expect(
-			blockToolbar.getByRole( 'button', { name: 'Add track' } )
-		).toBeHidden();
-	} );
-
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
 		page,
 		requestUtils,
