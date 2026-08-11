@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { usePluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
 import { store as interfaceStore } from '../../store';
 
 /**
  * Whether the role supports checked state.
  *
  * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
- * @param {import('react').AriaRole} role Role.
+ * @param {React.AriaRole} role Role.
  * @return {boolean} Whether the role supports checked state.
  */
 function roleSupportsCheckedState( role ) {

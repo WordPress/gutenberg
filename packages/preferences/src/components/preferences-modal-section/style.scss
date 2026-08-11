@@ -1,4 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .preferences-modal__section {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+
 	margin: 0 0 2.5rem 0;
 
 	&:last-child {
@@ -12,7 +19,7 @@
 
 .preferences-modal__section-title {
 	font-size: 0.9rem;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin-top: 0;
 }
 

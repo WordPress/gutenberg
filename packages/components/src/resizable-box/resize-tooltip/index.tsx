@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { Ref, ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Label from './label';
 import type { Axis, Position } from './utils';
 import { useResizeLabel, POSITIONS } from './utils';
@@ -46,7 +35,7 @@ function ResizeTooltip(
 		...props
 	}: ResizeTooltipProps,
 	ref: ForwardedRef< HTMLDivElement >
-): JSX.Element | null {
+) {
 	const { label, resizeListener } = useResizeLabel( {
 		axis,
 		fadeTimeout,

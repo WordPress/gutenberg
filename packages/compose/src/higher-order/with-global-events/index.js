@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Component, forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import Listener from './listener';
 
@@ -15,7 +8,6 @@ import Listener from './listener';
  */
 const listener = new Listener();
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
  * Higher-order component creator which, given an object of DOM event types and
  * values corresponding to a callback function name on the component, will
@@ -41,7 +33,6 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 		alternative: 'useEffect',
 	} );
 
-	// @ts-ignore We don't need to fix the type-related issues because this is deprecated.
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor( /** @type {any} */ props ) {
@@ -69,7 +60,6 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 						/** @type {keyof GlobalEventHandlersEventMap} */ (
 							event.type
 						)
-						/* eslint-enable jsdoc/no-undefined-types */
 					];
 				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
 					this.wrappedRef[ handler ]( event );

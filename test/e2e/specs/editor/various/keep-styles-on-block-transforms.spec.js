@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Keep styles on block transforms', () => {
@@ -17,11 +14,25 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
-		await page.click( 'role=button[name="Text"i]' );
-		await page.click( 'role=option[name="Luminous vivid orange"i]' );
 
-		await page.click( 'role=button[name="Heading"i]' );
-		await page.click( 'role=menuitem[name="Paragraph"i]' );
+		// Text color now lives in the Typography panel.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid orange' } )
+			.click();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Heading 2' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -50,9 +61,11 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.keyboard.type( 'Line 3 to be made large' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
-		await page.click( 'role=radio[name="Large"i]' );
-		await page.click( 'role=button[name="Multiple blocks selected"i]' );
-		await page.click( 'role=menuitem[name="Heading"i]' );
+		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Multiple blocks selected' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Heading' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -79,10 +92,10 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
-		await page.click( 'role=radio[name="Large"i]' );
+		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
 		await editor.showBlockToolbar();
-		await page.click( 'role=button[name="Paragraph"i]' );
-		await page.click( 'role=menuitem[name="Group"i]' );
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -14,7 +7,7 @@ import { store as blockEditorStore } from '../../store';
  * selection. Selection will only be cleared if the element is clicked directly,
  * not if a child element is clicked.
  *
- * @return {import('react').RefCallback} Ref callback.
+ * @return {React.RefCallback} Ref callback.
  */
 export function useBlockSelectionClearer() {
 	const { getSettings, hasSelectedBlock, hasMultiSelection } =

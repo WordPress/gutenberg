@@ -1,0 +1,65 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		.trigger-wrapper {
+			&.is-minimal {
+				width: fit-content;
+			}
+		}
+
+		.trigger {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
+			width: 100%;
+			padding-block: 4px;
+
+			/* Optically adjust the caret to a more balanced position. */
+			padding-inline-start: var(--wp-ui-input-layout-padding-inline);
+			padding-inline-end: calc(var(--wp-ui-input-layout-padding-inline) - 4px);
+
+			background-color: transparent;
+			border: none;
+			color: var(--wpds-color-foreground-interactive-neutral);
+			font-family: inherit;
+			font-size: inherit;
+			line-height: 1.4;
+			text-align: start;
+			user-select: none;
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			&.is-minimal {
+				width: auto;
+			}
+
+			&:focus {
+				outline: none; /* handled by InputLayout component */
+			}
+
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			}
+		}
+
+		.trigger-value {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+
+			/* Supports placeholder styling for both Select and Combobox triggers. */
+			.trigger[data-placeholder] & {
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			}
+		}
+
+		.trigger-caret {
+			flex: 0 0 auto;
+		}
+	}
+}

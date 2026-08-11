@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import ColorIndicator from '..';
 
 describe( 'ColorIndicator', () => {

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
