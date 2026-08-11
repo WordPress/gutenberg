@@ -5,6 +5,7 @@ import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
+import useColorEditing from './use-color-editing';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -176,6 +177,7 @@ export default function BackgroundImagePanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
+	const colorEditing = useColorEditing();
 
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
@@ -419,6 +421,7 @@ export default function BackgroundImagePanel( {
 					colorGradientControlSettings={ {
 						colors,
 						disableCustomColors: ! areCustomSolidsEnabled,
+						colorEditing,
 					} }
 					panelId={ panelId }
 				/>

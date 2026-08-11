@@ -55,6 +55,7 @@ import {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	colorEditingSettingsKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -148,6 +149,7 @@ lock( privateApis, {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	colorEditingSettingsKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

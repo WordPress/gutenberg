@@ -20,6 +20,7 @@ import WritingModeControl from '../writing-mode-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
+import useColorEditing from './use-color-editing';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -253,6 +254,8 @@ export default function TypographyPanel( {
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
 		useColorGradientSettings( settings );
+	const colorEditing = useColorEditing();
+
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
@@ -843,6 +846,7 @@ export default function TypographyPanel( {
 					colorGradientControlSettings={ {
 						colors,
 						disableCustomColors: ! areCustomSolidsEnabled,
+						colorEditing,
 					} }
 					panelId={ panelId }
 				/>
