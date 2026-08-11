@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import BlockPatternsList from '../../block-patterns-list';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
@@ -21,6 +14,7 @@ import {
 	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
 	myPatternsCategory,
+	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
@@ -52,6 +46,7 @@ function PatternList( {
 	selectedCategory,
 	patternCategories,
 	rootClientId,
+	onModalClose,
 } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -81,6 +76,12 @@ function PatternList( {
 			if (
 				selectedCategory === myPatternsCategory.name &&
 				pattern.type === INSERTER_PATTERN_TYPES.user
+			) {
+				return true;
+			}
+			if (
+				selectedCategory === starterPatternsCategory.name &&
+				pattern.blockTypes?.includes( 'core/post-content' )
 			) {
 				return true;
 			}
@@ -152,7 +153,10 @@ function PatternList( {
 					<>
 						<BlockPatternsList
 							blockPatterns={ pagingProps.categoryPatterns }
-							onClickPattern={ onClickPattern }
+							onClickPattern={ ( pattern, blocks ) => {
+								onClickPattern( pattern, blocks );
+								onModalClose();
+							} }
 							isDraggable={ false }
 						/>
 						<BlockPatternsPaging { ...pagingProps } />

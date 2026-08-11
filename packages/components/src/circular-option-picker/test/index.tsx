@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import { press } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from '..';
 
 const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
@@ -57,6 +50,7 @@ describe( 'CircularOptionPicker', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
+			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
 		} );
 	} );

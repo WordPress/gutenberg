@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -46,19 +43,30 @@ function BlockKeyboardShortcuts() {
 		) {
 			return;
 		}
+		const newAttributes = {
+			content: attributes.content,
+		};
 
-		const textAlign =
-			blockName === 'core/paragraph' ? 'align' : 'textAlign';
-		const destinationTextAlign =
-			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+		// Read textAlign from source block (could be in old or new format)
+		const sourceTextAlign =
+			attributes.textAlign || attributes.style?.typography?.textAlign;
+
+		// When destination is heading, set the level
+		if ( destinationBlockName === 'core/heading' ) {
+			newAttributes.level = level;
+		}
+
+		if ( sourceTextAlign ) {
+			newAttributes.style = {
+				typography: {
+					textAlign: sourceTextAlign,
+				},
+			};
+		}
 
 		replaceBlocks(
 			currentClientId,
-			createBlock( destinationBlockName, {
-				level,
-				content: attributes.content,
-				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
-			} )
+			createBlock( destinationBlockName, newAttributes )
 		);
 	};
 

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import Guide from '..';
 
@@ -20,7 +9,15 @@ const meta: Meta< typeof Guide > = {
 	argTypes: {
 		contentLabel: { control: 'text' },
 		finishButtonText: { control: 'text' },
+		nextButtonText: { control: 'text' },
+		previousButtonText: { control: 'text' },
 		onFinish: { action: 'onFinish' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -33,7 +30,11 @@ const Template: StoryFn< typeof Guide > = ( { onFinish, ...props } ) => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ openGuide }>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ openGuide }
+			>
 				Open Guide
 			</Button>
 			{ isOpen && (

@@ -2,8 +2,12 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ],
+		"types": [ "gutenberg-env", "style-imports" ],
 		"checkJs": false
 	},
-	"references": [ { "path": "../a11y" }, { "path": "../data" } ]
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../components" },
+		{ "path": "../data" }
+	]
 }

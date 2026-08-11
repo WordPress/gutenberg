@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useRegistry, createRegistry, RegistryProvider } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { storeConfig } from '../../store';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
@@ -26,7 +19,7 @@ function getSubRegistry( subRegistries, registry, useSubRegistry ) {
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) =>
-		( { useSubRegistry = true, ...props } ) => {
+		function WithRegistryProvider( { useSubRegistry = true, ...props } ) {
 			const registry = useRegistry();
 			const [ subRegistries ] = useState( () => new WeakMap() );
 			const subRegistry = getSubRegistry(

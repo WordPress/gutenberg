@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
 
 describe( 'getNamedNodeMapAsObject', () => {

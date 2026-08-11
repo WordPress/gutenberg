@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { parse } from 'hpq';
-
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as sources from '../matchers';
 
 describe( 'matchers', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -8,9 +5,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
@@ -39,7 +33,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display login as form' ) }
 							checked={ displayLoginAsForm }
 							onChange={ () =>
@@ -58,7 +51,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Redirect to current URL' ) }
 							checked={ redirectToCurrent }
 							onChange={ () =>

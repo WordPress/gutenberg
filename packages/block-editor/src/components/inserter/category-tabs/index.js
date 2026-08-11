@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { usePrevious, useReducedMotion } from '@wordpress/compose';
 import {
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -65,9 +58,7 @@ function CategoryTabs( {
 						key={ category.name }
 						tabId={ category.name }
 						aria-current={
-							category.name === selectedCategory?.name
-								? 'true'
-								: undefined
+							category === selectedCategory ? 'true' : undefined
 						}
 					>
 						{ category.label }

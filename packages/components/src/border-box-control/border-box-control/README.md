@@ -47,7 +47,6 @@ const MyBorderBoxControl = () => {
 
 	return (
 		<BorderBoxControl
-			__next40pxDefaultSize
 			colors={ colors }
 			label={ __( 'Borders' ) }
 			onChange={ onChange }
@@ -137,14 +136,6 @@ The space between the popover and the control wrapper.
 
 -   Required: No
 
-### `size`: `string`
-
-Size of the control.
-
--   Required: No
--   Default: `default`
--   Allowed values: `default`, `__unstable-large`
-
 ### `value`: `Object`
 
 An object representing the current border configuration.
@@ -166,10 +157,3 @@ const splitBorders = {
 ```
 
 -   Required: No
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`

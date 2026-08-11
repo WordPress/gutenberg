@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { ENTER } from '@wordpress/keycodes';
 import { create, split, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { RichTextWrapper } from './';
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';

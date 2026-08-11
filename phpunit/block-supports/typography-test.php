@@ -2,7 +2,7 @@
 /**
  * Tests the typography block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	/**
@@ -959,7 +959,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param string $theme_slug      A theme slug corresponding to an available test theme.
 	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
-	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
+	public function test_should_convert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
 		switch_theme( $theme_slug );
 
 		$this->test_block_name = 'test/font-size-fluid-value';
@@ -996,7 +996,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_should_covert_font_sizes_to_fluid_values.
+	 * Data provider for test_should_convert_font_sizes_to_fluid_values.
 	 *
 	 * @return array
 	 */
