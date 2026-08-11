@@ -160,7 +160,7 @@
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 
 	// Inline formats inherit the surrounding text styles but keep
 	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
