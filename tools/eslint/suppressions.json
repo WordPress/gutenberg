@@ -4703,7 +4703,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/context/test/context-system-provider.tsx": {
+	"packages/components/src/context/test/context-system-provider.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -4916,7 +4916,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/hooks/test/use-cx.tsx": {
+	"packages/components/src/utils/hooks/test/use-cx.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 3
 		}
@@ -4931,7 +4931,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/test/polymorphic-element.tsx": {
+	"packages/components/src/utils/test/polymorphic-element.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -8157,7 +8157,7 @@
 			"count": 2
 		}
 	},
-	"packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx": {
+	"packages/ui/src/utils/test/use-deprioritized-initial-focus.jsdom.test.tsx": {
 		"react-hooks/refs": {
 			"count": 2
 		}
