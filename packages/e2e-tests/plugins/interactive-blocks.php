@@ -7,6 +7,43 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+/**
+ * Renders a single activity-feed post card: a keyed article with its own
+ * context (id + likes), a comment list, an init hook, and a like button.
+ * Shared by the `test/activity-feed` block's server markup and the REST
+ * fragments it fetches, so spliced-in cards are identical to SSR'd ones.
+ *
+ * @param array $post The post: id, title, text, comments (id => text).
+ * @return string The card HTML.
+ */
+function gutenberg_e2e_activity_feed_card( $post ) {
+	$post_id   = (int) $post['id'];
+	$title     = $post['title'] ?? 'Untitled';
+	$text      = $post['text'] ?? '';
+	$comments  = $post['comments'] ?? array();
+	$comments_html = '';
+	foreach ( $comments as $comment_id => $comment_text ) {
+		$comments_html .= sprintf(
+			'<p data-wp-key="comment-%1$d" data-testid="comment-%1$d">%2$s</p>',
+			(int) $comment_id,
+			esc_html( $comment_text )
+		);
+	}
+	return sprintf(
+		'<article data-wp-key="post-%1$d" data-testid="post-%1$d" data-wp-context=\'{ "id": %1$d, "likes": 0 }\'>' .
+		'<h3>%2$s</h3>' .
+		'<p data-testid="post-%1$d-text">%3$s</p>' .
+		'<div data-testid="post-%1$d-comments">%4$s</div>' .
+		'<button data-testid="post-%1$d-like" data-wp-on--click="actions.like" data-wp-text="context.likes">0</button>' .
+		'<span data-wp-init="callbacks.initPost"></span>' .
+		'</article>',
+		$post_id,
+		esc_html( $title ),
+		esc_html( $text ),
+		$comments_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	);
+}
+
 add_action(
 	'init',
 	function () {
@@ -177,6 +214,69 @@ add_action(
 						'<div data-testid="nested-container"></div>' .
 						'<p data-testid="nested-count" data-wp-text="state.initCount">0</p>' .
 						'</div>'
+					);
+				},
+			)
+		);
+
+		/*
+		 * A fragment of OLDER posts (ids 101+) for the activity feed's
+		 * "Load more" button: appended via `renderHTML( feedList, html )`.
+		 * Cards are identical to the SSR'd ones, so the appended posts are
+		 * fully interactive (like buttons, init hooks).
+		 */
+		register_rest_route(
+			'test/activity-feed/v1',
+			'/feed',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					$posts = array(
+						array(
+							'id'       => 101,
+							'title'    => 'Older post one',
+							'text'     => 'from the archives',
+							'comments' => array(
+								111 => 'a classic comment',
+							),
+						),
+						array(
+							'id'    => 102,
+							'title' => 'Older post two',
+							'text'  => 'also from the archives',
+						),
+					);
+					$html = '';
+					foreach ( $posts as $post ) {
+						$html .= gutenberg_e2e_activity_feed_card( $post );
+					}
+					return rest_ensure_response( $html );
+				},
+			)
+		);
+
+		/*
+		 * A single NEW post card for the activity feed's composer: prepended
+		 * via `renderHTML( feedList, html, { mode: 'prepend' } )`. The title
+		 * is echoed from the `?title=` query param (the composer input).
+		 */
+		register_rest_route(
+			'test/activity-feed/v1',
+			'/post',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => static function ( $request ) {
+					$title = $request->get_param( 'title' ) ?? 'New post';
+					return rest_ensure_response(
+						gutenberg_e2e_activity_feed_card(
+							array(
+								'id'    => 900,
+								'title' => $title,
+								'text'  => 'just published',
+							)
+						)
 					);
 				},
 			)
