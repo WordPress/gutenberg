@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Notes: Move the rich text control the note form renders from `@wordpress/dataviews` into this package, where `@wordpress/rich-text` is the same copy the block editor uses ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
+
 ### Enhancements
 
 -   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).

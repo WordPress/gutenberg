@@ -39,7 +39,7 @@ import FormatEdit from './format-edit';
 // The presentational shell: `ContentEditableControl` owns the chrome
 // (`BaseControl` + label and the `contentEditable` element) and has no
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
-// required/validity treatment the sibling text controls get. This module is
+// required/validity treatment the other form controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
 const {
 	ValidatedContentEditableControl: RichTextControlShell,
@@ -165,7 +165,7 @@ export type RichTextControlProps = {
 /**
  * Assembles a rich text form field by wiring `@wordpress/rich-text`
  * (`useRichText`, `FormatEdit`, keyboard-shortcut / input-event listeners)
- * into the presentational `RichTextControl` shell from
+ * into the presentational `ContentEditableControl` shell from
  * `@wordpress/components`.
  *
  * This is the counterpart to the in-canvas `RichText` component from
@@ -173,6 +173,16 @@ export type RichTextControlProps = {
  * interface and skips block-editor selection coupling, while still wiring
  * registered format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K)
  * keep working.
+ *
+ * It lives here, in a package WordPress ships as a script, rather than in
+ * `@wordpress/dataviews`: that package is bundled from npm by plugins, so a
+ * second copy of `@wordpress/rich-text` — or an `unlock()` against the copy
+ * WordPress ships — breaks them (see
+ * https://github.com/WordPress/gutenberg/issues/81233). Here
+ * `@wordpress/rich-text` is the same `wp.richText` the block editor uses, so
+ * the format registry, its store, and its React contexts are shared. A
+ * DataForm field can still use it by passing it through a custom `Edit`
+ * component.
  */
 export default function RichTextControl( {
 	label,
@@ -457,10 +467,7 @@ export default function RichTextControl( {
 				<RichTextControlShell
 					label={ label }
 					id={ id }
-					className={ clsx(
-						'dataviews-controls__richtext',
-						className
-					) }
+					className={ clsx( 'editor-rich-text-control', className ) }
 					// The shell draws this while the element is empty, and the
 					// rich-text hook below renders its own placeholder element
 					// once it takes over the contents; either way the attribute

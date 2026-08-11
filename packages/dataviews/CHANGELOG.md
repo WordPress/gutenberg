@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   DataForms: Remove the built-in `richtext` control, its `EditConfigRichText` type, and the package's `privateApis` export, whose only member was that control. Assembling `@wordpress/rich-text` inside a bundled package broke plugins that install DataViews from npm ([#81233](https://github.com/WordPress/gutenberg/issues/81233)), so the control moved to `@wordpress/editor`, next to its only consumer. `@wordpress/rich-text` is no longer a dependency of this package, and a rich text field now needs a custom `Edit` component ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
+
 ### Enhancements
 
 - DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)

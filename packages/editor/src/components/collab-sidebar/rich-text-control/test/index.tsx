@@ -18,7 +18,7 @@ import {
 /**
  * Internal dependencies
  */
-import RichTextControl from '../control';
+import RichTextControl from '../';
 import { unlock } from '../../../../lock-unlock';
 
 /*
