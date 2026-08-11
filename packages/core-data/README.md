@@ -327,8 +327,9 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
--   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.invalidateCache_ `[boolean]`: Whether to invalidate the query caches for the entity once the record is received.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 
 ### undo
 

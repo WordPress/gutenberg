@@ -631,25 +631,28 @@ export const __unstableCreateUndoLevel =
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                         Kind of the received entity.
- * @param {string}   name                         Name of the received entity.
- * @param {Object}   record                       Record to be saved.
- * @param {Object}   options                      Saving options.
- * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]    Internal use only. Function to
- *                                                call instead of `apiFetch()`.
- *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions. Defaults to false.
+ * @param {string}   kind                           Kind of the received entity.
+ * @param {string}   name                           Name of the received entity.
+ * @param {Object}   record                         Record to be saved.
+ * @param {Object}   options                        Saving options.
+ * @param {boolean}  [options.isAutosave=false]     Whether this is an autosave.
+ * @param {boolean}  [options.invalidateCache=true] Whether to invalidate the query caches
+ *                                                  for the entity once the record is received.
+ * @param {boolean}  [options.throwOnError=false]   If false, this action suppresses all
+ *                                                  the exceptions. Defaults to false.
+ * @param {Function} [options.__unstableFetch]      Internal use only. Function to
+ *                                                  call instead of `apiFetch()`.
+ *                                                  Must return a promise.
  */
 export const saveEntityRecord =
 	( kind, name, record, options = {} ) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const {
 			isAutosave = false,
+			invalidateCache = true,
+			throwOnError = false,
 			__unstableFetch = apiFetch,
 			__unstableSkipSyncUpdate = false,
-			throwOnError = false,
 		} = options;
 
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
@@ -838,7 +841,7 @@ export const saveEntityRecord =
 							name,
 							newRecord,
 							undefined,
-							true
+							invalidateCache
 						);
 					} else {
 						dispatch.receiveAutosaves(
@@ -867,7 +870,7 @@ export const saveEntityRecord =
 						name,
 						updatedRecord,
 						undefined,
-						true,
+						invalidateCache,
 						edits
 					);
 					if ( entityConfig.syncConfig ) {
