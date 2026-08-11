@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `pasteHandler`: Split multi-line URL-only pastes into separate blocks so each link can become its own embed. ([#81032](https://github.com/WordPress/gutenberg/issues/81032))
+
 ### Internal
 
 -   Update `hpq` to 1.4.0 for its bundled TypeScript types ([#81199](https://github.com/WordPress/gutenberg/pull/81199)).

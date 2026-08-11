@@ -2,6 +2,7 @@ import { pasteHandler, serialize } from '@wordpress/blocks';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterEmbedBlock } from '../../../../../block-library/src/embed';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -447,5 +448,38 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBeUndefined();
 		expect( result.attributes.height ).toBeUndefined();
+	} );
+} );
+
+describe( 'pasteHandler — core/embed', () => {
+	beforeAll( () => {
+		initAndRegisterEmbedBlock();
+	} );
+
+	it( 'creates separate embed blocks when pasting multiple URL-only lines', () => {
+		const plainText = [
+			'https://github.com/WordPress/gutenberg/issues/81026',
+			'https://github.com/WordPress/gutenberg/issues/81025',
+			'https://github.com/WordPress/gutenberg/issues/81014',
+		].join( '\n' );
+
+		const result = pasteHandler( {
+			plainText,
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result ).toHaveLength( 3 );
+		expect( result.map( ( block ) => block.name ) ).toEqual( [
+			'core/embed',
+			'core/embed',
+			'core/embed',
+		] );
+		expect( result.map( ( block ) => block.attributes.url ) ).toEqual( [
+			'https://github.com/WordPress/gutenberg/issues/81026',
+			'https://github.com/WordPress/gutenberg/issues/81025',
+			'https://github.com/WordPress/gutenberg/issues/81014',
+		] );
 	} );
 } );
