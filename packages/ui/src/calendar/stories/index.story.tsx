@@ -2,7 +2,6 @@ import { fn } from 'storybook/test';
 import { TZDate } from '@daypicker/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from '@wordpress/element';
-import * as Dialog from '../../dialog';
 import { Calendar } from '../index';
 import {
 	toDate,
@@ -34,40 +33,8 @@ export default meta;
 
 type Story = StoryObj< typeof Calendar >;
 
-/**
- * The default `application` role helps screen readers pass navigation keys to
- * the calendar. Its accessible name follows the displayed month or months.
- */
 export const Default: Story = {};
 
-/**
- * The dialog owns the dialog semantics, focus containment, and close behavior.
- * The calendar keeps its default `application` role for date navigation.
- */
-export const InDialog: Story = {
-	render: ( { endMonth, ...args } ) => (
-		<Dialog.Root>
-			<Dialog.Trigger>Choose a date</Dialog.Trigger>
-			<Dialog.Popup size="small">
-				<Dialog.Header>
-					<Dialog.Title>Choose a date</Dialog.Title>
-					<Dialog.CloseIcon />
-				</Dialog.Header>
-				<Dialog.Content>
-					<Calendar { ...args } endMonth={ toDate( endMonth ) } />
-				</Dialog.Content>
-			</Dialog.Popup>
-		</Dialog.Root>
-	),
-	args: {
-		autoFocus: true,
-	},
-};
-
-/**
- * Remove the calendar's grouping semantics when a surrounding element already
- * provides the accessible group or region.
- */
 export const WithExternalGrouping: Story = {
 	render: ( { endMonth, ...args } ) => (
 		<section aria-label="Availability dates">
@@ -76,11 +43,6 @@ export const WithExternalGrouping: Story = {
 	),
 };
 
-/**
- * Use the lighter `group` role only when testing confirms that supported
- * assistive technologies pass calendar navigation keys without `application`.
- * Storybook cannot verify screen reader browse and focus modes.
- */
 export const WithGroupRole: Story = {
 	args: {
 		role: 'group',

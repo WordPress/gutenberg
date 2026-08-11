@@ -166,17 +166,14 @@ export interface BaseProps
 	/**
 	 * The ARIA role for the calendar's root element.
 	 *
-	 * The default `application` role helps ensure that assistive technologies
-	 * pass calendar navigation keys to the component. Its generated accessible
-	 * name includes the displayed month or months. An explicit `aria-label` or
-	 * `aria-labelledby` replaces that generated name, so include the displayed
-	 * month when providing one.
+	 * The default `application` role helps assistive technologies pass calendar
+	 * navigation keys to the component. Its accessible name includes the current
+	 * month.
 	 *
-	 * Use `group` when testing confirms that the supported assistive technologies
-	 * pass the navigation keys without `application`. Use `none` or
-	 * `presentation` when a surrounding element provides the root semantics.
-	 * Roles that require additional behavior, such as `dialog`, should usually be
-	 * applied to a component that wraps the calendar and implements that behavior.
+	 * Use `group` only when testing confirms that keyboard navigation works with
+	 * supported assistive technologies. Use `none` or `presentation` when a
+	 * surrounding element provides the root semantics. Apply roles that require
+	 * additional behavior, such as `dialog`, to a wrapper.
 	 *
 	 * @default 'application'
 	 */

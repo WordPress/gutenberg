@@ -10,41 +10,21 @@ Both are built for accessibility and follow ARIA best practices for calendar wid
 
 ## Root role
 
-By default, `Calendar` and `RangeCalendar` use a named [`application`](https://www.w3.org/TR/wai-aria-1.2/#application) for the root element. This helps screen readers pass arrow and other navigation keys to the calendar instead of using them for browse mode. React DayPicker [documents this compatibility technique](https://daypicker.dev/guides/input-fields#input-with-date-picker-dialog) for screen readers such as NVDA that otherwise keep the arrow keys in browse mode.
+`Calendar` and `RangeCalendar` use [`role="application"`](https://www.w3.org/TR/wai-aria-1.2/#application) by default to help screen readers pass navigation keys to the calendar. The accessible name includes the current month.
 
-The generated application name includes the displayed month, for example “Date calendar, September 2025”. It updates after month navigation and includes every displayed month in a multi-month calendar. An explicit `aria-label` or `aria-labelledby` replaces the generated name. When providing either one for an application, include the displayed month or months in the resulting accessible name.
+Keep the default unless testing supports another role:
 
-Keep the default unless testing supports a different choice. The native `role` prop remains open to valid roles so consumers can choose semantics for their composition:
+-   Use [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) only when supported screen readers allow calendar keyboard navigation without `application`.
+-   Use `none` or `presentation` when a parent provides the calendar's semantics.
+-   Apply roles that require additional behavior, such as `dialog`, to a wrapper.
 
--   Use [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) only when testing confirms that supported assistive technologies pass the calendar navigation keys without `application`.
--   Use `none` or `presentation` when a surrounding element already groups or labels the calendar. The calendar omits its default root label for these roles.
--   For another role, supply any accessible name and behavior that the role requires. The calendar does not infer those requirements.
--   Apply roles that require additional behavior, such as `dialog`, to a component that wraps the calendar and implements that behavior. Changing the calendar's role does not add focus containment, close behavior, or focus return.
-
-For example, remove the root group when a surrounding region already provides the calendar's context:
+When using `application`, include the current month in any custom `aria-label` or `aria-labelledby`. For example, use `none` when a parent labels the calendar:
 
 ```jsx
 <section aria-labelledby="availability-heading">
 	<h2 id="availability-heading">Availability</h2>
 	<Calendar role="none" />
 </section>
-```
-
-When presenting a calendar in a dialog, let the dialog own the dialog semantics:
-
-```jsx
-<Dialog.Root>
-	<Dialog.Trigger>Choose a date</Dialog.Trigger>
-	<Dialog.Popup>
-		<Dialog.Header>
-			<Dialog.Title>Choose a date</Dialog.Title>
-			<Dialog.CloseIcon />
-		</Dialog.Header>
-		<Dialog.Content>
-			<Calendar autoFocus />
-		</Dialog.Content>
-	</Dialog.Popup>
-</Dialog.Root>
 ```
 
 ## Usage

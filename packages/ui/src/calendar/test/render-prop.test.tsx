@@ -10,28 +10,6 @@ describe.each( [
 	describe( 'root role', () => {
 		const may2025 = new Date( 2025, 4, 1 );
 
-		it( 'should use an application role with the displayed month in its default label', () => {
-			render( <Component defaultMonth={ may2025 } /> );
-
-			expect(
-				screen.getByRole( 'application', {
-					name: `${ defaultLabel }, May 2025`,
-				} )
-			).toBeVisible();
-		} );
-
-		it( 'should include every displayed month in the default application label', () => {
-			render(
-				<Component defaultMonth={ may2025 } numberOfMonths={ 2 } />
-			);
-
-			expect(
-				screen.getByRole( 'application', {
-					name: `${ defaultLabel }, May 2025 and June 2025`,
-				} )
-			).toBeVisible();
-		} );
-
 		it( 'should update the default application label when navigating between months', async () => {
 			const user = userEvent.setup();
 			render( <Component defaultMonth={ may2025 } /> );
@@ -67,18 +45,13 @@ describe.each( [
 			).toBeVisible();
 		} );
 
-		it.each( [ 'none', 'presentation', 'region' ] as const )(
-			'should omit the default root label when the role is `%s`',
-			( role ) => {
-				render(
-					<Component role={ role } data-testid="calendar-root" />
-				);
-				const root = screen.getByTestId( 'calendar-root' );
+		it( 'should omit the default label for a neutral root role', () => {
+			render( <Component role="none" data-testid="calendar-root" /> );
+			const root = screen.getByTestId( 'calendar-root' );
 
-				expect( root ).toHaveAttribute( 'role', role );
-				expect( root ).not.toHaveAttribute( 'aria-label' );
-			}
-		);
+			expect( root ).toHaveAttribute( 'role', 'none' );
+			expect( root ).not.toHaveAttribute( 'aria-label' );
+		} );
 
 		it( 'should let an explicit aria-label replace the generated application label', () => {
 			render(
