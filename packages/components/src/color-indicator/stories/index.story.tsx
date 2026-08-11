@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ColorIndicator from '..';
 
 const meta: Meta< typeof ColorIndicator > = {
@@ -24,7 +17,7 @@ const meta: Meta< typeof ColorIndicator > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

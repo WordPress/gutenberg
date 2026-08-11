@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Modal,
@@ -17,19 +14,18 @@ import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
 	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
 		( select ) => {
-			const selectors = unlock( select( coreStore ) );
+			const {
+				isCollaborationSupported: isSupported,
+				getSyncConnectionStatus,
+			} = unlock( select( coreStore ) );
 			return {
-				isCollaborationSupported: selectors.isCollaborationSupported(),
-				syncConnectionStatus: selectors.getSyncConnectionStatus(),
+				isCollaborationSupported: isSupported(),
+				syncConnectionStatus: getSyncConnectionStatus(),
 			};
 		},
 		[]
@@ -74,7 +70,6 @@ function PostLockedModal() {
 		previewLink,
 	} = useSelect( ( select ) => {
 		const {
-			isCollaborationEnabledForCurrentPost,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
@@ -83,7 +78,8 @@ function PostLockedModal() {
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
-		} = select( editorStore );
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
 		const { getPostType } = select( coreStore );
 		return {
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
@@ -182,7 +178,18 @@ function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+		// Re-register with fresh values once the lock state is hydrated from
+		// the server, so a stale `isLocked` doesn't keep `sendPostLock`
+		// refreshing a lock this user doesn't hold.
+	}, [
+		hookName,
+		isLocked,
+		activePostLock,
+		postId,
+		postLockUtils,
+		autosave,
+		updatePostLock,
+	] );
 
 	if ( ! isLocked ) {
 		return null;

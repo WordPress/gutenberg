@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	getArgsFromCLI,
@@ -43,7 +36,6 @@ if ( ! hasLintConfig ) {
 	];
 	const hasLegacyConfig = legacyConfigFiles.some( hasProjectFile );
 	if ( hasLegacyConfig ) {
-		// eslint-disable-next-line no-console
 		console.warn(
 			'Warning: Legacy eslintrc configuration detected. ' +
 				'ESLint v10 no longer supports eslintrc files. ' +

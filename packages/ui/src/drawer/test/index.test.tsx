@@ -810,6 +810,62 @@ describe( 'Drawer', () => {
 			);
 		} );
 
+		// Locks the wrapper structure that Drawer.Content relies on:
+		//
+		// - The forwarded ref / scroll listener / overlay-chrome class
+		//   must land on the visible scroll container (the outer div),
+		//   so it does NOT carry [data-drawer-content].
+		// - Base UI's [data-drawer-content] marker must sit *inside*
+		//   that scroll container so the popup-edge padding gutter
+		//   falls outside the marker and stays mouse-draggable for
+		//   swipe-dismiss (Base UI excludes mouse-drag swipe over
+		//   [data-drawer-content] to preserve text selection).
+		//
+		// Not asserted here: the marker rendering as a real block-level
+		// element rather than `display: contents` (which would neuter
+		// `useOverlayScrollStateAttributes`'s `ResizeObserver`). CSS
+		// modules resolve to empty stubs in this jsdom test environment,
+		// so a `display: contents` regression introduced via CSS would
+		// not be observable from `getComputedStyle`. Catching it
+		// requires reviewing the marker's stylesheet rules at code
+		// review time.
+		it( 'wraps a [data-drawer-content] marker as the only direct child', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( contentRef.current ).not.toHaveAttribute(
+				'data-drawer-content'
+			);
+
+			// Direct DOM access is intentional: this test locks the
+			// concrete element-level wrapping that other invariants
+			// (mouse-drag swipe-dismiss, ResizeObserver-driven scroll
+			// state) silently depend on.
+			// eslint-disable-next-line testing-library/no-node-access
+			const marker = contentRef.current?.firstElementChild;
+			expect( marker ).toBeInstanceOf( HTMLDivElement );
+			expect( marker ).toHaveAttribute( 'data-drawer-content' );
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( contentRef.current?.children ).toHaveLength( 1 );
+		} );
+
 		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
 			const user = userEvent.setup();
 			const popupRef = createRef< HTMLDivElement >();

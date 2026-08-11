@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalText as WCText,
@@ -62,6 +59,7 @@ export default function ActionItem( {
 				onClick={ onClick }
 				isBusy={ isBusy }
 				disabled={ disabled }
+				accessibleWhenDisabled
 			>
 				{ buttonLabel }
 			</Button>

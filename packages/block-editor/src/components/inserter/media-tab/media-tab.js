@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
@@ -54,6 +47,21 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
+	useEffect( () => {
+		if ( ! selectedCategory ) {
+			return;
+		}
+
+		const latestCategory = categories.find(
+			( category ) => category.name === selectedCategory.name
+		);
+
+		if ( latestCategory && latestCategory !== selectedCategory ) {
+			onSelectCategory( latestCategory );
+		} else if ( ! latestCategory ) {
+			onSelectCategory( null );
+		}
+	}, [ categories, onSelectCategory, selectedCategory ] );
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;
@@ -100,7 +108,10 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ categories }>
+				<MobileTabNavigation
+					categories={ categories }
+					screenClassName="block-editor-inserter__media-mobile-screen"
+				>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

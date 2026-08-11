@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useInteraction } from '../use-interaction';
 import type { CropperInteractionActions } from '../../../core/interaction-controller';
 import type { CropperState, Size } from '../../../core/types';
@@ -33,6 +26,7 @@ function createActions(): jest.Mocked< CropperInteractionActions > {
 		setZoom: jest.fn(),
 		setZoomAtPoint: jest.fn(),
 		snapRotate90: jest.fn(),
+		toggleFlip: jest.fn(),
 	};
 }
 

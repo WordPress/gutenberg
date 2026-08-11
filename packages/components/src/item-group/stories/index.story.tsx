@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ItemGroup } from '../item-group/component';
 import { Item } from '../item/component';
 
@@ -24,7 +17,7 @@ const meta: Meta< typeof ItemGroup > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

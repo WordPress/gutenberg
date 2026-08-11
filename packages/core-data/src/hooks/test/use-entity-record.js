@@ -1,19 +1,7 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * External dependencies
- */
 import { act, render, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../../index';
 import useEntityRecord from '../use-entity-record';
 
@@ -49,7 +37,7 @@ describe( 'useEntityRecord', () => {
 			editedRecord: false,
 			hasEdits: false,
 			edits: {},
-			record: undefined,
+			record: null,
 			save: expect.any( Function ),
 			hasResolved: false,
 			hasStarted: false,
@@ -158,6 +146,10 @@ describe( 'useEntityRecord', () => {
 			edits: {},
 			record: null,
 			save: expect.any( Function ),
+			hasResolved: false,
+			hasStarted: false,
+			isResolving: false,
+			status: 'IDLE',
 		} );
 
 		// The same delay.

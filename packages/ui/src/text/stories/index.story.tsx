@@ -6,6 +6,12 @@ const meta: Meta< typeof Text > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Text',
 	component: Text,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -27,7 +33,7 @@ export const AllVariants: Story = {
 		<Stack
 			direction="column"
 			gap="lg"
-			style={ { color: 'var(--wpds-color-fg-content-neutral)' } }
+			style={ { color: 'var(--wpds-color-foreground-content-neutral)' } }
 		>
 			{ (
 				[

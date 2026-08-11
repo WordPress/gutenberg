@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -26,11 +23,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getDefaultView,
 	getActiveViewOverridesForTab,
@@ -39,12 +32,10 @@ import {
 	viewToQuery,
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
-
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */

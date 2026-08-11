@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import {
 	ExternalLink,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 const excerptField: Field< BasePost > = {

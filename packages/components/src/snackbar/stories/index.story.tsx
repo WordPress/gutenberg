@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '../../icon';
 import Snackbar from '..';
 
@@ -39,7 +28,7 @@ const meta: Meta< typeof Snackbar > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

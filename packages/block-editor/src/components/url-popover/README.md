@@ -123,7 +123,7 @@ drawer.
 ## Useful UI pieces
 
 The URLPopover exposes two components that may be used as child components to make the UI creation process easier.
-Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it maybe is possible and perfectly fine to use them standalone if they fit a use-case.
+Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it may be possible and perfectly fine to use them standalone if they fit a use-case.
 
 ### LinkViewer
 

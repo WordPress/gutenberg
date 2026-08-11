@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -13,7 +6,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
@@ -42,15 +35,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-
-/**
- * Internal dependencies
- */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
@@ -123,7 +108,7 @@ function TemplateListItem( {
 				direction={ direction }
 			>
 				<div className="edit-site-add-new-template__template-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 				<VStack
 					className="edit-site-add-new-template__template-name"
@@ -132,7 +117,7 @@ function TemplateListItem( {
 				>
 					<WCText
 						align="center"
-						weight={ 500 }
+						weight="var(--wpds-typography-font-weight-emphasis)"
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }

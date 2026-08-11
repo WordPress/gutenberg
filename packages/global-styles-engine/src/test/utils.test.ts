@@ -2,12 +2,9 @@
  * Tests for utility functions
  * Ported from Gutenberg's utils.js tests
  */
-
-/**
- * Internal dependencies
- */
 import type { GlobalStylesConfig } from '../types';
 import {
+	getBlockStyleVariationFeatureSelector,
 	getBlockStyleVariationSelector,
 	getValueFromVariable,
 	getPresetVariableFromValue,
@@ -303,6 +300,13 @@ describe( 'editor utils', () => {
 					'.wp-block.is-style-custom:is(.outer .inner:first-child)',
 			},
 			{
+				type: ':is with selector list',
+				selector:
+					'.wp-block:is(.outer, .inner:first-child) .content, .wp-block-alternative',
+				expected:
+					'.wp-block.is-style-custom:is(.outer, .inner:first-child) .content, .wp-block-alternative.is-style-custom',
+			},
+			{
 				type: ':not',
 				selector: '.wp-block:not(.outer .inner:first-child)',
 				expected:
@@ -340,6 +344,37 @@ describe( 'editor utils', () => {
 				).toBe( expected );
 			}
 		);
+	} );
+
+	describe( 'getBlockStyleVariationFeatureSelector', () => {
+		it( 'adds the variation class to the feature selector target', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline',
+					'.wp-block-button'
+				)
+			).toBe( '.wp-block-button.is-style-outline' );
+		} );
+
+		it( 'removes an outer variation scope before adding the variation class', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline--3',
+					'.is-style-outline--3 .wp-block-button'
+				)
+			).toBe( '.wp-block-button.is-style-outline--3' );
+		} );
+
+		it( 'preserves selector-list commas inside pseudo-class functions', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline--3',
+					'.is-style-outline--3 .wp-block-button:is(.primary, .secondary), .is-style-outline--3 .wp-block-button .inner'
+				)
+			).toBe(
+				'.wp-block-button.is-style-outline--3:is(.primary, .secondary),.wp-block-button.is-style-outline--3 .inner'
+			);
+		} );
 	} );
 
 	describe( 'scopeFeatureSelectors', () => {

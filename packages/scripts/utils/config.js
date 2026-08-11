@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * Internal dependencies
- */
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -86,6 +79,7 @@ const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.yaml' ) ||
 	hasProjectFile( '.prettierrc.yml' ) ||
 	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( 'prettier.config.mjs' ) ||
 	hasProjectFile( '.prettierrc' ) ||
 	hasPackageProp( 'prettier' );
 

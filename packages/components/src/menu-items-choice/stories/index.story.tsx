@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MenuItemsChoice from '..';
 import MenuGroup from '../../menu-group';
 
@@ -30,7 +19,7 @@ const meta: Meta< typeof MenuItemsChoice > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},

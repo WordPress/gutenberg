@@ -147,6 +147,10 @@ _Related_
 
 -   <https://lodash.com/docs/4#flow>
 
+### privateApis
+
+Private @wordpress/compose APIs.
+
 ### pure
 
 > **Deprecated** Use `memo` or `PureComponent` instead.
@@ -194,23 +198,23 @@ In Dialogs/modals, the tabbing must be constrained to the content of the wrapper
 
 _Usage_
 
-```js
+```ts
 import { useConstrainedTabbing } from '@wordpress/compose';
 
 const ConstrainedTabbingExample = () => {
-	const constrainedTabbingRef = useConstrainedTabbing();
-	return (
-		<div ref={ constrainedTabbingRef }>
-			<Button />
-			<Button />
-		</div>
-	);
-};
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
 ```
 
 _Returns_
 
--   `React.RefCallback<Element>`: Element Ref.
+-   `React.RefCallback< Element >`: Element Ref.
 
 ### useCopyOnClick
 
@@ -252,12 +256,12 @@ _Related_
 _Parameters_
 
 -   _fn_ `TFunc`: The function to debounce.
--   _wait_ `[number]`: The number of milliseconds to delay.
--   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
+-   _wait_ `number`: The number of milliseconds to delay.
+-   _options_ `DebounceOptions`: The options object.
 
 _Returns_
 
--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
+-   `DebouncedFunc< TFunc >`: Debounced function.
 
 ### useDebouncedInput
 
@@ -370,41 +374,41 @@ Adds the unmount behavior of returning focus to the element which had it previou
 
 _Usage_
 
-```js
+```ts
 import { useFocusReturn } from '@wordpress/compose';
 
 const WithFocusReturn = () => {
-	const ref = useFocusReturn();
-	return (
-		<div ref={ ref }>
-			<Button />
-			<Button />
-		</div>
-	);
-};
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
 ```
 
 _Parameters_
 
--   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
+-   _onFocusReturn_ `() => void`: Overrides the default return behavior.
 
 _Returns_
 
--   `React.RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback< HTMLElement >`: Element Ref.
 
 ### useInstanceId
 
-Provides a unique instance ID.
+Specify the useInstanceId _function_ signatures.
+
+More accurately, useInstanceId distinguishes between three different signatures:
+
+1.  When only object is given, the returned value is a number
+2.  When object and prefix is given, the returned value is a string
+3.  When preferredId is given, the returned value is the type of preferredId
 
 _Parameters_
 
 -   _object_ `object`: Object reference to create an id for.
--   _prefix_ `[string]`: Prefix for the unique id.
--   _preferredId_ `[string | number]`: Default ID to use.
-
-_Returns_
-
--   `string | number`: The unique instance id.
 
 ### useIsomorphicLayoutEffect
 
@@ -420,9 +424,13 @@ _Related_
 
 _Parameters_
 
--   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
--   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+-   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
+-   _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
+-   _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
+-   _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
+-   _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
+-   _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
+-   _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
 
 ### useMediaQuery
 
@@ -431,7 +439,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
--   _view_ `[Window]`: Window instance, else default to global window
+-   _view_ `[Window | undefined]`: Window instance, else default to global window
 
 _Returns_
 
@@ -447,19 +455,19 @@ As expected, if you pass a new function on every render, the ref callback will b
 
 If you don't wish a ref callback to be called after every render, wrap it with `useCallback( callback, dependencies )`. When a dependency changes, the old ref callback will be called with `null` and the new ref callback will be called with the same value.
 
-To make ref callbacks easier to use, you can also pass the result of `useRefEffect`, which makes cleanup easier by allowing you to return a cleanup function instead of handling `null`.
+Inner ref callbacks may return a cleanup function (React 19's ref callback cleanup pattern). When a ref callback returns a function, that function is invoked at teardown (node change, dependency change, or unmount) **instead of** the callback being called with `null`. Callbacks that do not return a cleanup continue to receive `null` on teardown as before.
 
 It's also possible to _disable_ a ref (and its behaviour) by simply not passing the ref.
 
 ```jsx
-const ref = useRefEffect( ( node ) => {
+const ref = useCallback( ( node ) => {
   node.addEventListener( ... );
   return () => {
     node.removeEventListener( ... );
   };
 }, [ ...dependencies ] );
 const otherRef = useRef();
-const mergedRefs useMergeRefs( [
+const mergedRefs = useMergeRefs( [
   enabled && ref,
   otherRef,
 ] );
@@ -571,12 +579,12 @@ _Related_
 _Parameters_
 
 -   _fn_ `TFunc`: The function to throttle.
--   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
--   _options_ `[import('../../utils/throttle').ThrottleOptions]`: The options object. See linked documentation for details.
+-   _wait_ `number`: The number of milliseconds to throttle invocations to.
+-   _options_ `ThrottleOptions`: The options object.
 
 _Returns_
 
--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Throttled function.
+-   `DebouncedFunc< TFunc >`: Throttled function.
 
 ### useViewportMatch
 
@@ -584,16 +592,16 @@ Returns true if the viewport matches the given query, or false otherwise.
 
 _Usage_
 
-```js
+```ts
 useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 
 _Parameters_
 
--   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
--   _operator_ `[WPViewportOperator]`: Viewport operator.
--   _view_ `[Window]`: Window instance in which to perform viewport matching.
+-   _breakpoint_ `Breakpoint`: Breakpoint size name.
+-   _operator_ `ViewportOperator`: Viewport operator.
+-   _view_ `Window | undefined`: Window instance in which to perform viewport matching.
 
 _Returns_
 
@@ -601,12 +609,12 @@ _Returns_
 
 ### useWarnOnChange
 
-Hook that performs a shallow comparison between the preview value of an object and the new one, if there's a difference, it prints it to the console. this is useful in performance related work, to check why a component re-renders.
+Hook that performs a shallow comparison between the previous value of an object and the new one, if there's a difference, it prints it to the console. This is useful in performance related work, to check why a component re-renders.
 
 _Usage_
 
-```jsx
-function MyComponent( props ) {
+```tsx
+function MyComponent( props: Record< string, any > ) {
 	useWarnOnChange( props );
 
 	return 'Something';
@@ -615,7 +623,7 @@ function MyComponent( props ) {
 
 _Parameters_
 
--   _object_ `object`: Object which changes to compare.
+-   _object_ `Record< string, any > | any[]`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 ### withGlobalEvents

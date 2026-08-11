@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcuts from '..';
 
 const meta: Meta< typeof KeyboardShortcuts > = {
@@ -17,7 +10,7 @@ const meta: Meta< typeof KeyboardShortcuts > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

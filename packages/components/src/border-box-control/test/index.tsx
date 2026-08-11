@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { BorderBoxControl } from '..';
 
 const colors = [
@@ -53,9 +46,7 @@ const colorPickerRegex = /Border color picker/;
 function TestBorderBoxControl(
 	restProps: ComponentProps< typeof BorderBoxControl >
 ) {
-	return (
-		<BorderBoxControl __next40pxDefaultSize { ...props } { ...restProps } />
-	);
+	return <BorderBoxControl { ...props } { ...restProps } />;
 }
 
 describe( 'BorderBoxControl', () => {

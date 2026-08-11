@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { Tooltip } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
@@ -13,10 +9,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor } from './utils';
 
 export function NoteByline( { avatar, name, date, userId } ) {
@@ -95,14 +87,19 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					{ name ?? currentUserName }
 				</span>
 				{ date && (
-					<Tooltip text={ tooltipText }>
-						<time
-							dateTime={ commentDateTime }
-							className="editor-collab-sidebar-panel__user-time"
-						>
-							{ commentDateText }
-						</time>
-					</Tooltip>
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<time
+									dateTime={ commentDateTime }
+									className="editor-collab-sidebar-panel__user-time"
+								>
+									{ commentDateText }
+								</time>
+							}
+						/>
+						<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 			</Stack>
 		</>

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 import { useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
@@ -6,22 +7,42 @@ import { Icon } from '../../../../icon';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import { Textarea } from '../../textarea';
-import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
+import {
+	COMMANDS,
+	EMOJI_GROUPS,
+	GROUPED_COMMANDS,
+	URLS,
+	USERS,
+	type FixtureGroup,
+	type FixtureItem,
+} from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
-		Popup: Autocomplete.Popup,
-		Input: Autocomplete.Input,
-		InputGroup: Autocomplete.InputGroup,
-		List: Autocomplete.List,
-		ListBody: Autocomplete.ListBody,
-		Collection: Autocomplete.Collection,
-		Item: Autocomplete.Item,
-		Value: Autocomplete.Value,
-		Empty: Autocomplete.Empty,
-		Clear: Autocomplete.Clear,
+		'Autocomplete.Portal': Autocomplete.Portal,
+		'Autocomplete.Positioner': Autocomplete.Positioner,
+		'Autocomplete.Popup': Autocomplete.Popup,
+		'Autocomplete.Input': Autocomplete.Input,
+		'Autocomplete.InputGroup': Autocomplete.InputGroup,
+		'Autocomplete.List': Autocomplete.List,
+		'Autocomplete.ListBody': Autocomplete.ListBody,
+		'Autocomplete.Collection': Autocomplete.Collection,
+		'Autocomplete.Group': Autocomplete.Group,
+		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
+		'Autocomplete.Item': Autocomplete.Item,
+		'Autocomplete.Row': Autocomplete.Row,
+		'Autocomplete.Value': Autocomplete.Value,
+		'Autocomplete.Empty': Autocomplete.Empty,
+		'Autocomplete.Clear': Autocomplete.Clear,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -34,28 +55,30 @@ type Story = StoryObj< typeof Autocomplete.Root >;
 export const Default: Story = {
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
-				<Autocomplete.Popup>
-					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
+		children: [
+			<Autocomplete.Input
+				placeholder="Enter a URL"
+				type="url"
+				key="input"
+			/>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
 	},
 };
 
@@ -208,47 +231,45 @@ export const Inline: Story = {
 export const WithSearchIconAndClearButton: Story = {
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.InputGroup>
-					<Autocomplete.Input
-						placeholder="Search URLs"
-						type="url"
-						render={
-							<Input
-								prefix={
-									<InputLayout.Slot padding="minimal">
-										<Icon icon={ search } />
-									</InputLayout.Slot>
-								}
-								suffix={
-									<InputLayout.Slot padding="minimal">
-										<Autocomplete.Clear />
-									</InputLayout.Slot>
-								}
-							/>
-						}
-					/>
-				</Autocomplete.InputGroup>
-				<Autocomplete.Popup>
-					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
+		children: [
+			<Autocomplete.InputGroup key="inputGroup">
+				<Autocomplete.Input
+					placeholder="Search URLs"
+					type="url"
+					render={
+						<Input
+							prefix={
+								<InputLayout.Slot padding="minimal">
+									<Icon icon={ search } />
+								</InputLayout.Slot>
+							}
+							suffix={
+								<InputLayout.Slot padding="minimal">
+									<Autocomplete.Clear />
+								</InputLayout.Slot>
+							}
+						/>
+					}
+				/>
+			</Autocomplete.InputGroup>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
 	},
 };
 
@@ -365,6 +386,7 @@ export const TextareaInlineAutocomplete: Story = {
 						/>
 					}
 				/>
+
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -406,32 +428,170 @@ export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
-				<Autocomplete.Popup
-					portal={
-						<Autocomplete.Portal
-							style={ { '--wp-ui-autocomplete-z-index': '9999' } }
-						/>
-					}
+		children: [
+			<Autocomplete.Input
+				placeholder="Enter a URL"
+				type="url"
+				key="input"
+			/>,
+			<Autocomplete.Popup
+				portal={
+					<Autocomplete.Portal
+						style={ { '--wp-ui-autocomplete-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Suggestions can be organized into labeled groups with `Autocomplete.Group`
+ * and `Autocomplete.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_COMMANDS,
+		children: [
+			<Autocomplete.Input placeholder="Type a command" key="input" />,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( group: FixtureGroup ) => (
+								<Autocomplete.Group
+									key={ group.label }
+									items={ group.items }
+								>
+									<Autocomplete.GroupLabel>
+										{ group.label }
+									</Autocomplete.GroupLabel>
+									<Autocomplete.Collection>
+										{ ( item: FixtureItem ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.Group>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+const EMOJI_COLUMNS = 8;
+const EMOJI_TILE_SIZE = 'var(--wpds-dimension-size-lg)';
+
+const emojiPickerRowStyle: CSSProperties = {
+	display: 'grid',
+	gridTemplateColumns: `repeat(${ EMOJI_COLUMNS }, ${ EMOJI_TILE_SIZE })`,
+	gap: 'var(--wpds-dimension-gap-xs)',
+	width: 'fit-content',
+};
+
+const emojiPickerCellStyle: CSSProperties = {
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	width: EMOJI_TILE_SIZE,
+	aspectRatio: '1 / 1',
+	marginInline: 0,
+	padding: 'var(--wpds-dimension-padding-xs)',
+	fontSize: 'var(--wpds-typography-font-size-xl)',
+};
+
+function chunkItems< T >( items: T[], size: number ): T[][] {
+	const rows: T[][] = [];
+
+	for ( let index = 0; index < items.length; index += size ) {
+		rows.push( items.slice( index, index + size ) );
+	}
+
+	return rows;
+}
+
+/**
+ * `Autocomplete.Row` groups multiple `Autocomplete.Item` cells into grid rows.
+ * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
+ */
+export const Grid: Story = {
+	args: {
+		items: EMOJI_GROUPS,
+		inline: true,
+		open: true,
+		grid: true,
+	},
+	render: function Template( args ) {
+		return (
+			<Autocomplete.Root { ...args }>
+				<Autocomplete.Input placeholder="Search emojis" />
+				<div
+					style={ {
+						marginTop: 'var(--wpds-dimension-gap-sm)',
+					} }
 				>
+					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
 					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
+						{ ( group: ( typeof EMOJI_GROUPS )[ number ] ) => (
+							<Autocomplete.Group
+								key={ group.value }
+								items={ group.items }
+							>
+								<Autocomplete.GroupLabel>
+									{ group.label }
+								</Autocomplete.GroupLabel>
+								{ chunkItems( group.items, EMOJI_COLUMNS ).map(
+									( row, rowIndex ) => (
+										<Autocomplete.Row
+											key={ rowIndex }
+											style={ emojiPickerRowStyle }
+										>
+											{ row.map( ( emoji ) => (
+												<Autocomplete.Item
+													key={ emoji.value }
+													value={ emoji }
+													aria-label={ emoji.label }
+													style={
+														emojiPickerCellStyle
+													}
+												>
+													<span aria-hidden="true">
+														{ emoji.emoji }
+													</span>
+												</Autocomplete.Item>
+											) ) }
+										</Autocomplete.Row>
+									)
 								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
+							</Autocomplete.Group>
+						) }
 					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
+				</div>
+			</Autocomplete.Root>
+		);
 	},
 };

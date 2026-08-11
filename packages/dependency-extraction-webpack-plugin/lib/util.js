@@ -7,6 +7,8 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/grid',
 	'@wordpress/icons',
 	'@wordpress/interface',
+	'@wordpress/kebab-case',
+	'@wordpress/style-runtime',
 	'@wordpress/ui',
 	'@wordpress/undo-manager',
 	'@wordpress/views',

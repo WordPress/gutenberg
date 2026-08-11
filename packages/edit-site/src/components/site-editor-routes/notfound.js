@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { Notice, __experimentalSpacer as Spacer } from '@wordpress/components';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 
@@ -24,7 +17,7 @@ export const notFoundRoute = {
 	path: '*',
 	areas: {
 		sidebar: <SidebarNavigationScreenMain />,
-		mobile: (
+		mobileSidebar: (
 			<SidebarNavigationScreenMain
 				customDescription={ <NotFoundError /> }
 			/>

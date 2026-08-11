@@ -17,7 +17,7 @@ function gutenberg_register_dashboard_widgets_menu() {
 		'read',
 		'dashboard-wp-admin',
 		'gutenberg_dashboard_wp_admin_render_page',
-		'dashicons-dashboard',
+		'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBhcmlhLWhpZGRlbj0idHJ1ZSIgZm9jdXNhYmxlPSJmYWxzZSI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTIgNEw0IDcuOVYyMGgxNlY3LjlMMTIgNHptNi41IDE0LjVIMTRWMTNoLTR2NS41SDUuNVY4LjhMMTIgNS43bDYuNSAzLjF2OS43eiI+PC9wYXRoPjwvc3ZnPg==',
 		1
 	);
 }

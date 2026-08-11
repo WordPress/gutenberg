@@ -1,9 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
-// @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
 import {
 	store as coreDataStore,
@@ -21,11 +17,10 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { getSyncErrorMessages } from '../../utils/sync-error-messages';
+import {
+	getSyncErrorMessages,
+	PROTOCOL_MISMATCH,
+} from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
@@ -50,17 +45,17 @@ export function SyncConnectionErrorModal() {
 
 	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
 		( selectFn ) => {
-			const currentPostType =
-				selectFn( editorStore ).getCurrentPostType();
+			const { getSyncConnectionStatus, getPostType } = unlock(
+				selectFn( coreDataStore )
+			);
+			const { getCurrentPostType, isCollaborationEnabledForCurrentPost } =
+				unlock( selectFn( editorStore ) );
+			const currentPostType = getCurrentPostType();
 			return {
-				connectionStatus:
-					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-				isCollaborationEnabled:
-					selectFn(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
+				connectionStatus: getSyncConnectionStatus() || null,
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				postType: currentPostType
-					? selectFn( coreDataStore ).getPostType( currentPostType )
+					? getPostType( currentPostType )
 					: null,
 			};
 		},
@@ -125,7 +120,18 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
+	// Protocol mismatch is unrecoverable and has no in-flight connection
+	// attempt to wait on, so delaying the modal serves no purpose.
+	const isProtocolMismatch =
+		connectionStatus?.status === 'disconnected' &&
+		'error' in connectionStatus &&
+		connectionStatus.error?.code === PROTOCOL_MISMATCH;
+
+	if (
+		! isCollaborationEnabled ||
+		( ! hasInitialized && ! isProtocolMismatch ) ||
+		! showModal
+	) {
 		return null;
 	}
 

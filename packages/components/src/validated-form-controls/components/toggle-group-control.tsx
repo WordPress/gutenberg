@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useId, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { ToggleGroupControl } from '../../toggle-group-control';
@@ -16,10 +9,7 @@ const UnforwardedValidatedToggleGroupControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof ToggleGroupControl >,
-		'__next40pxDefaultSize'
-	> &
+	}: React.ComponentProps< typeof ToggleGroupControl > &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
@@ -35,11 +25,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
-				<ToggleGroupControl
-					__next40pxDefaultSize
-					ref={ forwardedRef }
-					{ ...restProps }
-				/>
+				<ToggleGroupControl ref={ forwardedRef } { ...restProps } />
 			</ControlWithError>
 			<input
 				className="components-validated-control__error-delegate"

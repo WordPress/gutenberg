@@ -6,6 +6,12 @@ const meta: Meta< typeof Badge > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Badge',
 	component: Badge,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -81,7 +87,7 @@ export const AllIntents: Story = {
 				display: 'grid',
 				gridTemplateColumns: 'max-content min-content',
 				gap: '1rem',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			{ (

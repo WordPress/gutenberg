@@ -5,12 +5,18 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '../../../icon-button';
 import type { AutocompleteClearProps } from './types';
 
-const DEFAULT_RENDER = ( {
-	'aria-label': ariaLabel = __( 'Clear' ),
-	...props
-}: AutocompleteClearProps ) => (
+const DEFAULT_RENDER = (
+	{
+		'aria-label': ariaLabel = __( 'Clear' ),
+		...props
+	}: AutocompleteClearProps,
+	{ disabled }: _Autocomplete.Clear.State
+) => (
 	<IconButton
 		icon={ closeSmall }
+		focusableWhenDisabled={ false }
+		disabled={ disabled }
+		aria-hidden={ disabled || undefined }
 		size="small"
 		variant="minimal"
 		tone="neutral"

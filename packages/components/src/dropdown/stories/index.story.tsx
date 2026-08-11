@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '..';
 import Button from '../../button';
 import MenuGroup from '../../menu-group';
@@ -19,6 +12,11 @@ const meta: Meta< typeof Dropdown > = {
 	id: 'components-dropdown',
 	component: Dropdown,
 	subcomponents: { DropdownContentWrapper },
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Dropdown { ...args } />,
 	args: {
 		onClose: fn(),
 		onToggle: fn(),
@@ -43,7 +41,7 @@ const meta: Meta< typeof Dropdown > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

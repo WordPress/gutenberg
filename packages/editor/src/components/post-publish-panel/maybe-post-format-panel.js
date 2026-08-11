@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { POST_FORMATS } from '../post-format';
 import { store as editorStore } from '../../store';
 

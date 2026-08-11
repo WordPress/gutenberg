@@ -8,14 +8,10 @@
 	},
 	"references": [ { "path": "../a11y" }, { "path": "../interactivity" } ],
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"build-*/**",
 		"build/**",
 		"**/test/**",
-		"**/react-native-*/**",
 		"src/full-page.ts"
 	]
 }

@@ -1,15 +1,21 @@
 import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
+import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
 
 /**
- * Root element that portals `Autocomplete` popup content. Pass to
- * `Autocomplete.Popup`'s `portal` prop. When `portal` is omitted,
- * `Autocomplete.Popup` uses this component with default props.
+ * Used to apply custom portal behavior to `Autocomplete`'s popup content.
+ * `container` defaults to the `@wordpress/ui` compat overlay slot.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
-	function AutocompletePortal( props, ref ) {
-		return <_Autocomplete.Portal ref={ ref } { ...props } />;
+	function AutocompletePortal( { container, ...restProps }, ref ) {
+		return (
+			<_Autocomplete.Portal
+				container={ container ?? getWpCompatOverlaySlot() }
+				{ ...restProps }
+				ref={ ref }
+			/>
+		);
 	}
 );
 

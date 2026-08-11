@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { FormTokenField } from '../../form-token-field';
@@ -16,11 +9,7 @@ const UnforwardedValidatedFormTokenField = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof FormTokenField >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof FormTokenField > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -36,7 +25,7 @@ const UnforwardedValidatedFormTokenField = (
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
-				<FormTokenField __next40pxDefaultSize { ...restProps } />
+				<FormTokenField { ...restProps } />
 			</ControlWithError>
 			<input
 				className="components-validated-control__error-delegate"

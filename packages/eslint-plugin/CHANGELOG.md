@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
+
+## 25.8.0 (2026-07-29)
+
+## 25.7.0 (2026-07-14)
+
+## 25.6.0 (2026-07-01)
+
+## 25.5.0 (2026-06-24)
+
+## 25.4.1 (2026-06-16)
+
+## 25.4.0 (2026-06-10)
+
+## 25.3.0 (2026-05-27)
+
+## 25.2.0 (2026-05-14)
+
+### New Features
+
+-   Added [`no-non-module-stylesheet-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md) rule to prevent importing non-module stylesheets from JavaScript files ([#77984](https://github.com/WordPress/gutenberg/pull/77984)).
+
+## 25.1.0 (2026-04-29)
+
 ### New Features
 
 -   Added [`use-import-as`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-import-as.md) rule to enforce configured aliases for selected named imports and direct `unlock( privateApis )` destructuring ([#77389](https://github.com/WordPress/gutenberg/pull/77389)).

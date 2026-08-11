@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 
@@ -30,11 +23,7 @@ export default function Header( {
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
 	return (
-		<Stack
-			direction="column"
-			className={ styles.header }
-			render={ <header /> }
-		>
+		<Stack direction="column" className={ styles.header }>
 			<Stack
 				className={ styles[ 'header-content' ] }
 				direction="row"

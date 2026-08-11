@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import objectStorage from '../object';
 
 describe( 'objectStorage', () => {

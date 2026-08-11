@@ -9,8 +9,13 @@ import {
 	upload,
 	wordpress,
 } from '@wordpress/icons';
-import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
+import {
+	displayShortcut,
+	ariaKeyShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { IconButton } from '../index';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof IconButton > = {
 	title: 'Design System/Components/IconButton',
@@ -18,6 +23,13 @@ const meta: Meta< typeof IconButton > = {
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, text overflow behavior, and overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -79,21 +91,23 @@ export const Disabled: Story = {
 export const WithDifferentIcons: Story = {
 	...Default,
 	render: ( args ) => (
-		<div
-			style={ {
-				display: 'flex',
-				gap: '1rem',
-				alignItems: 'center',
-				flexWrap: 'wrap',
-			} }
-		>
-			<IconButton { ...args } icon={ wordpress } label="WordPress" />
-			<IconButton { ...args } icon={ plus } label="Add" />
-			<IconButton { ...args } icon={ pencil } label="Edit" />
-			<IconButton { ...args } icon={ trash } label="Delete" />
-			<IconButton { ...args } icon={ download } label="Download" />
-			<IconButton { ...args } icon={ upload } label="Upload" />
-		</div>
+		<Tooltip.Provider>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '1rem',
+					alignItems: 'center',
+					flexWrap: 'wrap',
+				} }
+			>
+				<IconButton { ...args } icon={ wordpress } label="WordPress" />
+				<IconButton { ...args } icon={ plus } label="Add" />
+				<IconButton { ...args } icon={ pencil } label="Edit" />
+				<IconButton { ...args } icon={ trash } label="Delete" />
+				<IconButton { ...args } icon={ download } label="Download" />
+				<IconButton { ...args } icon={ upload } label="Upload" />
+			</div>
+		</Tooltip.Provider>
 	),
 };
 
@@ -115,8 +129,14 @@ export const Pressed: Story = {
 const EXAMPLE_SHORTCUT_OBJECT = {
 	displayShortcut: displayShortcut.primary( 'c' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
+	label: shortcutAriaLabel.primary( 'c' ),
 };
 
+/**
+ * Use the `displayShortcut`, `ariaKeyShortcut`, and `shortcutAriaLabel` helpers
+ * from `@wordpress/keycodes` to create the visual, ARIA-compatible, and
+ * human-readable representations of the shortcut.
+ */
 export const WithShortcut: Story = {
 	...Default,
 	args: {
@@ -124,5 +144,17 @@ export const WithShortcut: Story = {
 		icon: copy,
 		label: 'Copy',
 		shortcut: EXAMPLE_SHORTCUT_OBJECT,
+	},
+};
+
+/**
+ * Customize where the tooltip appears relative to the button by passing a
+ * `<Tooltip.Positioner />` element with a `side` to the `positioner` prop.
+ */
+export const WithCustomPositioner: Story = {
+	...Default,
+	args: {
+		...Default.args,
+		positioner: <Tooltip.Positioner side="right" />,
 	},
 };

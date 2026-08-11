@@ -1,32 +1,28 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDebounce } from '@wordpress/compose';
+import {
+	useDebounce,
+	__experimentalUseFocusOutside as useFocusOutside,
+} from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { AddNote } from './add-note';
 import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread, getNoteExcerpt } from './utils';
+import {
+	focusNoteThread,
+	getNoteExcerpt,
+	scrollNoteThreadIntoView,
+} from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -47,6 +43,7 @@ export function NoteThread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -59,7 +56,7 @@ export function NoteThread( {
 	const unregisterThread = floating?.unregisterThread;
 
 	// Register block + floating elements with the board.
-	// The board's ResizeObserver and autoUpdate track changes automatically.
+	// The board's ResizeObserver tracks height changes automatically.
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {
@@ -68,77 +65,91 @@ export function NoteThread( {
 		return () => unregisterThread?.( note.id );
 	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
 
-	const onMouseEnter = () => {
-		debouncedToggleBlockHighlight( note.blockClientId, true );
-	};
-
-	const onMouseLeave = () => {
-		debouncedToggleBlockHighlight( note.blockClientId, false );
-	};
-
-	const onFocus = () => {
-		toggleBlockHighlight( note.blockClientId, true );
-	};
-
-	const onBlur = ( event ) => {
-		// Don't deselect notes when the browser window/tab loses focus.
-		if ( ! document.hasFocus() ) {
+	// Scroll the thread into view when it becomes selected, and re-scroll
+	// when its floating position settles after `useFloatingBoard` recomputes.
+	useEffect( () => {
+		if ( ! isSelected || note.id === 'new' ) {
 			return;
 		}
+		scrollNoteThreadIntoView( note.id, sidebarRef.current );
+	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
 
+	/*
+	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
+	 * thread selected while focus stays in UI it owns: the delete dialog, the
+	 * note actions menu and format popovers (e.g. the Cmd+K link UI) portal out
+	 * of the thread's DOM, but their focus events still bubble here through the
+	 * React tree. It also ignores window/tab blur.
+	 */
+	const focusOutside = useFocusOutside( ( event ) => {
+		// When another note is clicked, do nothing because the current note is automatically closed.
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		const isDialogFocused =
-			event.relatedTarget?.closest( '[role="dialog"]' );
-		const isTabbing = isKeyboardTabbingRef.current;
-
-		// When another note is clicked, do nothing because the current note is automatically closed.
-		if ( isNoteFocused && ! isTabbing ) {
-			return;
-		}
-		// When deleting a note, a dialog appears, but the note should not be collapsed.
-		if ( isDialogFocused ) {
-			return;
-		}
-		// When tabbing, do nothing if the focus is within the current note.
-		if (
-			isTabbing &&
-			event.currentTarget.contains( event.relatedTarget )
-		) {
+		if ( isNoteFocused && ! isKeyboardTabbingRef.current ) {
 			return;
 		}
 
-		// Closes a note that has lost focus when any of the following conditions are met:
-		// - An element other than a note is clicked.
-		// - Focus was lost by tabbing.
-		toggleBlockHighlight( note.blockClientId, false );
-		unselectNote();
-	};
+		// Drop the highlight, unless another note (possibly on the same block) now owns it.
+		if ( ! isNoteFocused ) {
+			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
+			debouncedToggleBlockHighlight.cancel();
+			toggleBlockHighlight( note.blockClientId, false );
+		}
 
-	const handleNoteSelect = () => {
+		/*
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
+		 */
+		if ( getSelectedNote() === note.id ) {
+			onDeselectNote();
+		}
+	} );
+
+	function onMouseEnter() {
+		debouncedToggleBlockHighlight( note.blockClientId, true );
+	}
+
+	function onMouseLeave() {
+		debouncedToggleBlockHighlight( note.blockClientId, false );
+	}
+
+	function onFocus( event ) {
+		// Cancel any pending deselect and highlight the related block.
+		focusOutside.onFocus( event );
+		debouncedToggleBlockHighlight.cancel();
+		toggleBlockHighlight( note.blockClientId, true );
+	}
+
+	function onSelectNote() {
+		if ( isSelected ) {
+			return;
+		}
+
 		selectNote( note.id );
+		focusNoteThread( note.id, sidebarRef.current );
 		toggleBlockSpotlight( note.blockClientId, true );
 		if ( !! note.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( note.blockClientId, null );
 		}
-	};
+	}
 
-	const unselectNote = () => {
+	function onDeselectNote() {
 		selectNote( undefined );
 		toggleBlockSpotlight( note.blockClientId, false );
-	};
+	}
 
-	const handleResolve = () => {
+	function handleResolve() {
 		onEditNote( { id: note.id, status: 'approved' } );
-		unselectNote();
+		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
 			focusNoteThread( note.id, sidebarRef.current );
 		}
-	};
+	}
 
 	const allReplies = note?.reply || [];
 	const lastReply =
@@ -181,11 +192,11 @@ export function NoteThread( {
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
-			onClick={ handleNoteSelect }
+			onClick={ onSelectNote }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
+			{ ...focusOutside }
 			onFocus={ onFocus }
-			onBlur={ onBlur }
 			onKeyUp={ ( event ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = false;
@@ -208,7 +219,11 @@ export function NoteThread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					focusNoteThread( note.id, sidebarRef.current, 'textarea' );
+					focusNoteThread(
+						note.id,
+						sidebarRef.current,
+						'[role="textbox"]'
+					);
 				} }
 			>
 				{ __( 'Add new reply' ) }
@@ -247,9 +262,9 @@ export function NoteThread( {
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
-						onClick={ () => {
-							selectNote( note.id );
-							focusNoteThread( note.id, sidebarRef.current );
+						onClick={ ( event ) => {
+							event.stopPropagation();
+							onSelectNote();
 						} }
 					>
 						{ sprintf(
@@ -279,23 +294,22 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								onEditNote( {
+								return onEditNote( {
 									id: note.id,
 									status: 'hold',
 									content: inputComment,
 								} );
-							} else {
-								// For regular replies, add as separate comment.
-								onAddReply( {
-									content: inputComment,
-									parent: note.id,
-								} );
 							}
+							// For regular replies, add as separate comment.
+							return onAddReply( {
+								content: inputComment,
+								parent: note.id,
+							} );
 						} }
 						onCancel={ ( event ) => {
 							// Prevent the parent onClick from being triggered.
 							event.stopPropagation();
-							unselectNote();
+							onDeselectNote();
 							focusNoteThread( note.id, sidebarRef.current );
 						} }
 						labels={ {
@@ -309,6 +323,7 @@ export function NoteThread( {
 								note.id,
 								note.author_name
 							),
+							placeholder: __( 'Reply or @ mention' ),
 						} }
 					/>
 				</NoteCard>

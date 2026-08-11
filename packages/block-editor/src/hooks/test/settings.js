@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import '../settings';
 
 describe( 'with settings', () => {

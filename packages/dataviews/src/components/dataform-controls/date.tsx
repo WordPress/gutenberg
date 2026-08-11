@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import {
 	format,
@@ -11,17 +8,14 @@ import {
 	startOfMonth,
 	startOfYear,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import {
 	useCallback,
 	useEffect,
@@ -33,10 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -210,7 +200,8 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ inputRefs, isValid, validity ] );
 
-	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	// Listen for 'invalid' events (e.g., dispatched by layouts when a card
+	// re-expands or loses focus).
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const handleInvalid = ( event: Event ) => {
@@ -241,6 +232,12 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
 			return;
@@ -259,26 +256,24 @@ function ValidatedDateControl< Item >( {
 	return (
 		<div onBlur={ onBlur }>
 			{ children }
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							customValidity.type === 'invalid'
-								? 'is-invalid'
-								: undefined
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
+			{ customValidity && (
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						customValidity.type === 'invalid'
+							? 'is-invalid'
+							: undefined
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
+			) }
 		</div>
 	);
 }
@@ -435,7 +430,6 @@ function CalendarDateControl< Item >( {
 
 					{ /* Manual date input */ }
 					<InputControl
-						__next40pxDefaultSize
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -541,15 +535,18 @@ function CalendarDateRangeControl< Item >( {
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
-			if ( fromDate && toDate ) {
-				onChangeCallback( [
-					formatDate( fromDate ),
-					formatDate( toDate ),
-				] );
-			} else if ( ! fromDate && ! toDate ) {
+			if ( ! fromDate && ! toDate ) {
 				onChangeCallback( undefined );
+				return;
 			}
-			// Do nothing if only one date is set - wait for both
+			// An incomplete range is committed with an empty-string bound
+			// rather than held back until both dates are set: the inputs are
+			// controlled, so an uncommitted date would be wiped on blur. The
+			// `between` operator does not filter while a bound is unfilled.
+			onChangeCallback( [
+				formatDate( fromDate ),
+				formatDate( toDate ),
+			] );
 		},
 		[ onChangeCallback ]
 	);
@@ -673,7 +670,6 @@ function CalendarDateRangeControl< Item >( {
 						className="dataviews-controls__date-range-inputs"
 					>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -688,7 +684,6 @@ function CalendarDateRangeControl< Item >( {
 							max={ maxConstraint }
 						/>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }

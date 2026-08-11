@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
 
@@ -25,7 +14,7 @@ const meta: Meta< typeof DuotonePicker > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},
