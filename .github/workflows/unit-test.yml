@@ -56,7 +56,7 @@ jobs:
         needs: [detect-relevant-changes]
         permissions:
             contents: read
-        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
 
         steps:
             - name: Checkout repository
@@ -80,7 +80,7 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -133,7 +133,7 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -239,7 +239,7 @@ jobs:
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: true
             matrix:
@@ -383,7 +383,7 @@ jobs:
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
 
         steps:
             - name: Checkout repository
