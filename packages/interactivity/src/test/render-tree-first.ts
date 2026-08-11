@@ -868,7 +868,7 @@ describe( 'data-wp-key and list identity across modes', () => {
 		expect( state.initCounts ).toEqual( { a: 1, b: 1, c: 1, b2: 1 } );
 	} );
 
-	it( 'unkeyed replace reuses the old element and swallows the replacement init (no synthetic on replace)', async () => {
+	it( 'KNOWN LIMITATION: unkeyed replace reuses the old element and swallows the replacement init (no synthetic on replace)', async () => {
 		await setup(
 			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem(
 				'b',
@@ -916,7 +916,7 @@ describe( 'data-wp-key and list identity across modes', () => {
 		expect( state.initCounts ).toEqual( { a: 1, b: 1, z: 1 } );
 	} );
 
-	it( 'unkeyed inner reuses the old element and swallows the new content init (no synthetic on inner)', async () => {
+	it( 'KNOWN LIMITATION: unkeyed inner reuses the old element and swallows the new content init (no synthetic on inner)', async () => {
 		await setup(
 			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem( 'b', 'b' ) }`
 		);
@@ -938,6 +938,11 @@ describe( 'data-wp-key and list identity across modes', () => {
 	} );
 } );
 
+// KNOWN-LIMITATION TESTS in this block are marked with a `KNOWN LIMITATION`
+// prefix. They document behavior that is deliberate but imperfect — the
+// auto-key mechanism cannot fix them (per-parse keys can never match across
+// parses, and a key distinguishes, it does not merge). They pin the gaps so
+// a change in behavior is noticed, not so the behavior is endorsed.
 describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior', () => {
 	it( 'successive unkeyed splices accumulate with all identities preserved', async () => {
 		await setup(
@@ -965,7 +970,7 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		expect( state.initCounts ).toEqual( { a: 1, b: 1, x: 1, y: 1 } );
 	} );
 
-	it( 'inner refresh after a synthetic prepend misattributes id-less items (documented limitation — use data-wp-key/id)', async () => {
+	it( 'KNOWN LIMITATION: inner refresh after a synthetic prepend misattributes id-less items (use data-wp-key/id)', async () => {
 		await setup(
 			`${ unkeyedItem( 'a', 'a' ) }${ unkeyedItem( 'b', 'b' ) }`
 		);
@@ -1006,7 +1011,7 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		expect( state.initCounts ).toEqual( { new: 1, a: 1, b: 2 } );
 	} );
 
-	it( 'same entity delivered twice duplicates when it has no stable key (no dedup)', async () => {
+	it( 'KNOWN LIMITATION: same entity delivered twice duplicates when it has no stable key (no dedup)', async () => {
 		await setup( unkeyedItem( 'a', 'a' ) );
 		const feed = document.querySelector( '[data-wp-interactive]' )!;
 
@@ -1079,7 +1084,7 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		expect( state.initCounts ).toEqual( { a: 2, b: 2, x: 1 } );
 	} );
 
-	it( 'a duplicate delivery with the same id still duplicates (same-key match orphans the old vnode)', async () => {
+	it( 'KNOWN LIMITATION: a duplicate delivery with the same id still duplicates (same-key match orphans the old vnode)', async () => {
 		await setup( `${ idItem( 'a', 'a' ) }${ idItem( 'b', 'b' ) }` );
 		await flush();
 		const feed = document.querySelector( '[data-wp-interactive]' )!;
@@ -1148,7 +1153,7 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		} );
 	} );
 
-	it( 'mixed-tag refresh: data-wp-key and spliced-id items reuse; SSR-id and synthetic items do not', async () => {
+	it( 'KNOWN LIMITATION (partial): mixed-tag refresh — data-wp-key and spliced-id items reuse, SSR-id and synthetic items do not', async () => {
 		await setup(
 			`${ item( 'a', 'a', 'a' ) }` + // data-wp-key → key 'a' in tree
 				`${ idItem( 'b', 'b' ) }` // SSR'd id → NO key in tree (ids are only read at splice time)
