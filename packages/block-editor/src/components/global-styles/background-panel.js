@@ -16,6 +16,10 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	isDefaultBlockStyleState,
+} from '../../hooks/block-style-state';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -164,7 +168,9 @@ export default function BackgroundImagePanel( {
 	headerLabel = __( 'Background' ),
 	contrastWarning,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	styleState = DEFAULT_BLOCK_STYLE_STATE,
 } ) {
+	const isStyleStateSelected = ! isDefaultBlockStyleState( styleState );
 	const {
 		colors,
 		gradients,
@@ -207,12 +213,17 @@ export default function BackgroundImagePanel( {
 			const clearsColorBackground = showBackgroundColorControl;
 			const clearsColorGradient =
 				hasBackgroundGradientControl || showLegacyColorGradientControl;
+			// Persist an explicit unset under a style state so the default-state
+			// background image does not return through the cascade.
+			const background = isStyleStateSelected
+				? { backgroundImage: 'none' }
+				: {};
 			if ( ! clearsColorBackground && ! clearsColorGradient ) {
-				return { ...previousValue, background: {} };
+				return { ...previousValue, background };
 			}
 			return {
 				...previousValue,
-				background: {},
+				background,
 				color: {
 					...previousValue?.color,
 					...( clearsColorBackground && { background: undefined } ),
@@ -222,6 +233,7 @@ export default function BackgroundImagePanel( {
 		},
 		[
 			hasBackgroundGradientControl,
+			isStyleStateSelected,
 			showBackgroundColorControl,
 			showLegacyColorGradientControl,
 		]
@@ -241,7 +253,7 @@ export default function BackgroundImagePanel( {
 			setImmutably(
 				value,
 				[ 'background', 'backgroundImage' ],
-				undefined
+				isStyleStateSelected ? 'none' : undefined
 			)
 		);
 
@@ -373,6 +385,7 @@ export default function BackgroundImagePanel( {
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
+						persistImageUnsetOnReset={ isStyleStateSelected }
 					/>
 				</InheritanceToolsPanelItem>
 			) }

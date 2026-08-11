@@ -4,12 +4,66 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	setBackgroundStyleDefaults,
 	backgroundResetAllFilter,
+	backgroundStateResetAllFilter,
+	backgroundSelectedStateResetAllFilter,
 	BackgroundImagePanel,
 	BACKGROUND_BLOCK_DEFAULT_VALUES,
 } from '../background';
 import { BackgroundToolsPanel } from '../../components/global-styles/background-panel';
 
 describe( 'background', () => {
+	describe( 'backgroundStateResetAllFilter', () => {
+		it( 'persists background-image none for a scoped style-state reset', () => {
+			const result = backgroundStateResetAllFilter( {
+				style: {
+					background: {
+						backgroundImage: { url: 'mobile.png' },
+						backgroundSize: 'cover',
+					},
+					color: {
+						background: 'var:preset|color|base',
+						text: 'var:preset|color|contrast',
+					},
+				},
+			} );
+
+			expect( result.style?.background ).toEqual( {
+				backgroundImage: 'none',
+			} );
+			expect( result.style?.color?.background ).toBeUndefined();
+			expect( result.style?.color?.text ).toBe(
+				'var:preset|color|contrast'
+			);
+		} );
+	} );
+
+	describe( 'backgroundSelectedStateResetAllFilter', () => {
+		it( 'only unsets the selected viewport when given a full style object', () => {
+			const result = backgroundSelectedStateResetAllFilter(
+				{
+					style: {
+						background: {
+							backgroundImage: { url: 'desktop.png' },
+						},
+						'@mobile': {
+							background: {
+								backgroundImage: { url: 'mobile.png' },
+							},
+						},
+					},
+				},
+				{ viewport: '@mobile', pseudo: 'default' }
+			);
+
+			expect( result.style?.background?.backgroundImage ).toEqual( {
+				url: 'desktop.png',
+			} );
+			expect( result.style?.[ '@mobile' ]?.background ).toEqual( {
+				backgroundImage: 'none',
+			} );
+		} );
+	} );
+
 	describe( 'backgroundResetAllFilter', () => {
 		it( 'clears every background-owned value, including a custom legacy color.gradient', () => {
 			const result = backgroundResetAllFilter( {
