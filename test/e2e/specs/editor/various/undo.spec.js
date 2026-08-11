@@ -692,6 +692,42 @@ test.describe( 'undo', () => {
 	} );
 } );
 
+test.describe( 'Media Library modal undo', () => {
+	test( 'does not remove block on undo while media modal is open', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		await expect( modal ).toBeVisible();
+
+		const searchInput = page.locator( '#media-search-input' );
+		await expect( searchInput ).toBeVisible();
+		await searchInput.click();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( modal ).toBeVisible();
+		await expect( modal ).not.toBeEmpty();
+
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toBeHidden();
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/image"]' )
+		).toHaveCount( 1 );
+	} );
+} );
+
 class UndoUtils {
 	constructor( { page } ) {
 		this.page = page;

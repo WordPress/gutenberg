@@ -270,6 +270,19 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
+		this.stopUndoRedoPropagation =
+			this.stopUndoRedoPropagation.bind( this );
+	}
+
+	stopUndoRedoPropagation( event ) {
+		const isUndoRedo =
+			( event.metaKey || event.ctrlKey ) &&
+			event.key &&
+			event.key.toLowerCase() === 'z';
+
+		if ( isUndoRedo ) {
+			event.stopPropagation();
+		}
 	}
 
 	initializeListeners() {
@@ -405,7 +418,19 @@ class MediaUpload extends Component {
 	}
 
 	componentWillUnmount() {
+		this.detachUndoRedoGuard();
 		this.frame?.remove();
+		this.frame?.close();
+	}
+
+	detachUndoRedoGuard() {
+		if ( this.frame?.el ) {
+			this.frame.el.removeEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 	}
 
 	onUpdate( selections ) {
@@ -439,6 +464,14 @@ class MediaUpload extends Component {
 		const { wp } = window;
 		const { value } = this.props;
 		this.updateCollection();
+
+		if ( this.frame?.el ) {
+			this.frame.el.addEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 
 		//Handle active tab in media model on model open.
 		if ( this.props.mode ) {
@@ -476,6 +509,7 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
+		this.detachUndoRedoGuard();
 
 		if ( onClose ) {
 			onClose();
