@@ -38,6 +38,13 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 
 		// Enable option for tests.
 		update_option( 'wp_collaboration_enabled', 1 );
+		delete_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => '',
+			)
+		);
 	}
 
 	/**
