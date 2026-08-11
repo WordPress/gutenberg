@@ -51,8 +51,9 @@ const routerDisabledStyles = new WeakSet< StyleElement >();
  * router.
  *
  * The marked elements are claimed here, eagerly, rather than waiting for the
- * initial page to be prepared. Preparing that page is asynchronous — it
- * awaits hydration — while a navigation can be triggered synchronously, so
+ * initial page to be prepared. Preparing that page awaits hydration of every
+ * interactive region, while a navigation only requires the region that
+ * triggers it to be hydrated, so
  * {@link applyStyles|`applyStyles`} may run first. Elements exclusive to the
  * initial page are never passed to
  * {@link prepareStylePromise|`prepareStylePromise`} by

@@ -360,7 +360,8 @@ document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 // during module evaluation, which is synchronous, so no navigation, prefetch
 // or popstate can interleave before it. Claiming the marked elements here
 // rather than when the initial page is prepared matters because that
-// preparation awaits hydration: a navigation can apply styles before it
+// preparation awaits hydration of every interactive region: a navigation
+// triggered from an already-hydrated region can apply styles before it
 // completes, or hydration may never complete at all. Elements injected by
 // client scripts afterwards are still classified correctly, as the
 // classification is done per element and they lack the attribute.
