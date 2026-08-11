@@ -3,16 +3,13 @@ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement }
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
-import { kebabCase, normalizeTextString } from './utils/strings';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
 	ValidatedInputControl,
 	ValidatedNumberControl,
-	ValidatedSelectControl,
 	ValidatedRadioControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
@@ -29,18 +26,12 @@ lock( privateApis, {
 	ComponentsContext,
 	Tabs,
 	Menu,
-	kebabCase,
 	Badge,
-	normalizeTextString,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
 	ValidatedNumberControl,
-	ValidatedSelectControl,
 	ValidatedRadioControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
