@@ -30,16 +30,16 @@ permissions: {}
 jobs:
     changes:
         timeout-minutes: 5
-        name: Detect performance-relevant changes
+        name: Detect changes relevant to performance testing
         runs-on: 'ubuntu-24.04'
         permissions:
             pull-requests: read
         outputs:
             relevant: ${{ steps.filter.outputs.relevant }}
         steps:
-            - name: Check whether the diff can move a performance metric
+            - name: Check if any changed files may impact performance metrics
               id: filter
-              if: github.event_name == 'pull_request'
+              if: ${{ github.event_name == 'pull_request' }}
               uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
               with:
                   # True as soon as one changed file matches no pattern, so an unrecognised

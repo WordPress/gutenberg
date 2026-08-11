@@ -319,14 +319,14 @@ jobs:
     # away. `needs` must list every job that would otherwise still be running: the gate fails
     # rather than pass a job it never evaluated. `build` settles before the shards do.
     e2e-gate:
-        timeout-minutes: 5
         name: End-to-End Tests Gate
         runs-on: 'ubuntu-24.04'
-        needs: [changes, e2e-playwright, e2e-playwright-rtc-websocket]
-        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        timeout-minutes: 5
         permissions:
             contents: read
             actions: read
+        needs: [changes, e2e-playwright, e2e-playwright-rtc-websocket]
+        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
