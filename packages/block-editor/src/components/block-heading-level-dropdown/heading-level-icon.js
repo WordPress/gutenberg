@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	headingLevel1,
 	headingLevel2,
@@ -10,9 +7,9 @@ import {
 	headingLevel6,
 	paragraph,
 } from '@wordpress/icons';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * HeadingLevelIcon props.
@@ -41,7 +38,7 @@ const LEVEL_TO_PATH = {
  */
 export default function HeadingLevelIcon( { level } ) {
 	if ( LEVEL_TO_PATH[ level ] ) {
-		return <Icon icon={ LEVEL_TO_PATH[ level ] } />;
+		return <WCIcon icon={ LEVEL_TO_PATH[ level ] } />;
 	}
 
 	return null;

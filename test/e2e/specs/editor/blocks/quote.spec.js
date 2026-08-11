@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Quote', () => {
@@ -26,6 +23,72 @@ test.describe( 'Quote', () => {
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
+	} );
+
+	test( 'shows an appender to refill the quote after its last block is removed', async ( {
+		editor,
+		page,
+	} ) => {
+		// Give the floating block toolbar room above the quote, so it does
+		// not clamp down over the appender.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'above' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/quote',
+			attributes: { citation: 'cite' },
+			innerBlocks: [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: { content: '' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Backspace in the sole empty list item removes the list, leaving
+		// the quote without inner blocks.
+		await editor.canvas.locator( '[data-type="core/list-item"]' ).click();
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'above' } },
+			{
+				name: 'core/quote',
+				attributes: { citation: 'cite' },
+				innerBlocks: [],
+			},
+		] );
+
+		// The emptied quote offers the default appender to refill it:
+		// arrowing up from the citation onto the appender inserts a fresh
+		// paragraph inside the quote.
+		await expect(
+			editor.canvas.getByRole( 'button', {
+				name: 'Add default block',
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'refilled' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'above' } },
+			{
+				name: 'core/quote',
+				attributes: { citation: 'cite' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'refilled' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'can be created by using > at the start of a paragraph block', async ( {
@@ -79,6 +142,9 @@ test.describe( 'Quote', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/quote' );
+		await expect(
+			page.getByRole( 'option', { name: 'Quote', exact: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -193,9 +259,10 @@ test.describe( 'Quote', () => {
 		test( 'and renders only one paragraph for the cite, if the quote is void', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
-			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'primary+a' );
 			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
@@ -212,11 +279,11 @@ test.describe( 'Quote', () => {
 
 		test( 'and renders a void paragraph if both the cite and quote are void', async ( {
 			editor,
-			page,
+			pageUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
-			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'primary+a' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
@@ -235,6 +302,30 @@ test.describe( 'Quote', () => {
 <h2 class="wp-block-heading">test</h2>
 <!-- /wp:heading --></blockquote>
 <!-- /wp:quote -->`
+		);
+	} );
+
+	test( 'can be converted to verse with mixed content', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+				{
+					name: 'core/heading',
+					attributes: { content: 'A heading', level: 2 },
+				},
+			],
+		} );
+		await editor.transformBlockTo( 'core/verse' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:verse -->
+<pre class="wp-block-verse">First paragraph<br>A heading</pre>
+<!-- /wp:verse -->`
 		);
 	} );
 
@@ -307,7 +398,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -338,7 +429,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );

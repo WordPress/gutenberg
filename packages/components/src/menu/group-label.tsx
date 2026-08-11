@@ -1,22 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
+import { Context } from './context';
 import { Text } from '../text';
-import type { MenuGroupLabelProps } from './types';
+import { CONFIG } from '../utils';
+import type { GroupLabelProps } from './types';
 import * as Styled from './styles';
 
-export const MenuGroupLabel = forwardRef<
+export const GroupLabel = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuGroupLabelProps, 'div', false >
->( function MenuGroup( props, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< GroupLabelProps, 'div', false >
+>( function Group( props, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -25,7 +19,7 @@ export const MenuGroupLabel = forwardRef<
 	}
 
 	return (
-		<Styled.MenuGroupLabel
+		<Styled.GroupLabel
 			ref={ ref }
 			render={
 				// @ts-expect-error The `children` prop is passed
@@ -33,7 +27,7 @@ export const MenuGroupLabel = forwardRef<
 					upperCase
 					variant="muted"
 					size="11px"
-					weight={ 500 }
+					weight={ CONFIG.fontWeightEmphasis }
 					lineHeight="16px"
 				/>
 			}

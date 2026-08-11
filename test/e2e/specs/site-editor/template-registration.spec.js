@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -16,14 +13,16 @@ test.describe( 'Block template registration', () => {
 			'gutenberg-test-block-template-registration'
 		);
 	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
-	} );
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'templates can be registered and edited', async ( {
@@ -94,7 +93,7 @@ test.describe( 'Block template registration', () => {
 		).toBeHidden();
 	} );
 
-	test( 'registered templates are available in the Swap template screen', async ( {
+	test( 'registered templates are available in the Change template screen', async ( {
 		admin,
 		editor,
 		page,
@@ -106,10 +105,11 @@ test.describe( 'Block template registration', () => {
 			attributes: { content: 'User-created post.' },
 		} );
 
-		// Swap template.
+		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
 		await page.getByText( 'Plugin Template' ).click();
 
 		// Verify the template is applied.
@@ -133,10 +133,11 @@ test.describe( 'Block template registration', () => {
 			attributes: { content: 'User-created post.' },
 		} );
 
-		// Swap template.
+		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
 		await page.getByText( 'Custom', { exact: true } ).click();
 
 		// Verify the theme template is applied.
@@ -275,7 +276,7 @@ test.describe( 'Block template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await page.getByLabel( 'Add New Template' ).click();
+		await page.getByLabel( 'Add template' ).click();
 		await page.getByRole( 'button', { name: 'Author Archives' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Author For a specific item' } )
@@ -321,6 +322,8 @@ test.describe( 'Block template registration', () => {
 		await page
 			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
 			.click();
+		// The Actions button lives in the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
@@ -363,6 +366,9 @@ class BlockTemplateRegistrationUtils {
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );
 		await expect
 			.poll( async () => await searchResults.count() )
-			.toBeLessThan( initialSearchResultsCount );
+			.toBeLessThanOrEqual( initialSearchResultsCount );
+		await expect
+			.poll( async () => this.page.url() )
+			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
 	}
 }

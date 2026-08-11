@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useParsePatternDependencies } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
@@ -78,7 +71,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		if ( ! hasRecursionError && selectedPattern?.blocks ) {
 			try {
 				parsePatternDependencies( selectedPattern );
-			} catch ( error ) {
+			} catch {
 				setHasRecursionError( true );
 				return;
 			}

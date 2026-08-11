@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import { FastAverageColor } from 'fast-average-color';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -92,7 +85,7 @@ export const getMediaColor = memoize( async ( url ) => {
 			crossOrigin: imgCrossOrigin,
 		} );
 		return color.hex;
-	} catch ( error ) {
+	} catch {
 		// If there's an error return the fallback color.
 		return DEFAULT_BACKGROUND_COLOR;
 	}
