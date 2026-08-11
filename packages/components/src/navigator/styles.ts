@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { css, keyframes } from '@emotion/react';
 
 export const navigatorWrapper = css`

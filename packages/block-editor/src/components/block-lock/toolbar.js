@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useReducer, useRef, useEffect } from '@wordpress/element';
 import { lock, unlock } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
 

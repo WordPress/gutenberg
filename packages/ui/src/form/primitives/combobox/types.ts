@@ -1,6 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement } from 'react';
-
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
@@ -52,6 +51,12 @@ export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
 	'size'
 >;
+
+export type ComboboxInputGroupProps = ComponentProps<
+	typeof _Combobox.InputGroup
+> & {
+	children?: React.ReactNode;
+};
 
 export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	children?: React.ReactNode;

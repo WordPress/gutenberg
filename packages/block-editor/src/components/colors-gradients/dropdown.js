@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ColorIndicator,
@@ -17,15 +10,7 @@ import {
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { reset as resetIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from './control';
 
 // When the `ColorGradientSettingsDropdown` controls are being rendered to a

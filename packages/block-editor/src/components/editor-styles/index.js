@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { SVG } from '@wordpress/components';
 import { useCallback, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import transformStyles from '../../utils/transform-styles';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

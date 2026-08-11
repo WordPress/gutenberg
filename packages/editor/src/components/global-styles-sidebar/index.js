@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
@@ -11,10 +8,6 @@ import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import GlobalStylesUI from '../global-styles';
 import { GlobalStylesActionMenu } from '../global-styles/menu';
 import { store as editorStore } from '../../store';

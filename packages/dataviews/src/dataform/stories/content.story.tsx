@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useRef, useEffect } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';

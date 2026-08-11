@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import withSpokenMessages from '../';
 
 describe( 'withSpokenMessages', () => {

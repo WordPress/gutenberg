@@ -8,16 +8,8 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-
-/**
- * External dependencies
- */
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	hasProjectFile,

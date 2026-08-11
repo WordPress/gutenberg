@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath } from './utils/object';
 
 type StyleTree = Record< string, any >;

@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
 import { useStyleOverride } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import {
@@ -27,10 +16,9 @@ import {
 export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
 
-// The boundary divider sits this far inside the reserved space: per the
-// design, full-bleed blocks clipped at the boundary sit flush with the line
-// but must not overlap it.
-const DIVIDER_GAP = 1;
+// The boundary divider occupies the outermost pixel of the reserved space, so
+// full-bleed blocks clipped at the boundary sit flush with the line without
+// overlapping it.
 const DIVIDER_WIDTH = 1;
 
 /**
@@ -157,9 +145,10 @@ export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 	// it picks up the canvas text color. It hangs off the root, not the body:
 	// the body's overflow clip constrains even fixed-position pseudo-elements,
 	// cutting the line short. Fixed positioning keeps it spanning the visible
-	// canvas top to bottom at every scroll position, and the inset leaves a
-	// gap so full-bleed content clipped at the boundary never touches the
-	// line. Injected with `useStyleOverride` so it reaches the iframed canvas
+	// canvas top to bottom at every scroll position, and it takes the
+	// outermost pixel of the reserved space so full-bleed content clipped at
+	// the boundary meets the line without covering it. Injected with
+	// `useStyleOverride` so it reaches the iframed canvas
 	// (and is scoped to `.editor-styles-wrapper` for non-iframed canvases);
 	// logical properties keep it on the correct physical side in RTL. No
 	// space is reserved in the device preview: padding inside the simulated
@@ -172,9 +161,7 @@ export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 				? `:root{padding-inline-end:${ reservedWidth }px}` +
 				  `body{overflow-x:clip}` +
 				  `:root::after{content:"";position:fixed;top:0;bottom:0;` +
-				  `inset-inline-end:${
-						reservedWidth - DIVIDER_GAP - DIVIDER_WIDTH
-				  }px;` +
+				  `inset-inline-end:${ reservedWidth - DIVIDER_WIDTH }px;` +
 				  `width:${ DIVIDER_WIDTH }px;` +
 				  `background:color-mix(in srgb, currentColor 10%, transparent);` +
 				  `pointer-events:none}`

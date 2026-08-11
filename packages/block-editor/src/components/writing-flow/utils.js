@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
@@ -11,10 +8,6 @@ import {
 	getBlockTransforms,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
@@ -171,7 +164,9 @@ export function setContentEditableWrapper(
 	node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 	if ( focus ) {
-		node.focus();
+		// Without preventScroll, focusing the wrapper scrolls the
+		// viewport to the top of the wrapper.
+		node.focus( { preventScroll: true } );
 	}
 
 	return true;

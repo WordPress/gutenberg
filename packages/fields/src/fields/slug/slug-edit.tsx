@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ExternalLink,
@@ -17,10 +14,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 import { getSlug } from './utils';
 
