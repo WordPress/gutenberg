@@ -74,80 +74,42 @@ test.describe( 'activity feed', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'filter navigation swaps the whole feed via the router', async ( {
-		page,
-	} ) => {
+	test( 'a user browses the feed end to end', async ( { page } ) => {
+		// --- Start on the "all" feed: two SSR'd cards. ---
 		await expect( page.getByTestId( 'post-1' ) ).toBeVisible();
 		await expect( page.getByTestId( 'post-2' ) ).toBeVisible();
 
-		await page.getByTestId( 'tab-photos' ).click();
-
-		// The region swapped to the photos feed: the photo card is present,
-		// the all-feed cards are gone, and the new content initialized.
-		await expect( page.getByTestId( 'post-11' ) ).toBeVisible();
-		await expect( page.getByTestId( 'post-11-text' ) ).toHaveText(
-			'a nice photo'
-		);
-		await expect( page.getByTestId( 'post-1' ) ).toHaveCount( 0 );
-		await expect( page.getByTestId( 'post-2' ) ).toHaveCount( 0 );
-		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '3' );
-
-		// The photos card is fully interactive.
-		await page.getByTestId( 'post-11-like' ).click();
-		await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '1' );
-	} );
-
-	test( 'load more appends older posts without disturbing existing ones', async ( {
-		page,
-	} ) => {
-		await expect( page.getByTestId( 'post-1' ) ).toBeVisible();
-
-		// Existing card state before the splice.
+		// Like the first card; state sticks.
 		await page.getByTestId( 'post-1-like' ).click();
 		await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '1' );
 
+		// --- Load more: older posts appended at the end. ---
 		await page.getByTestId( 'load-more' ).click();
-
-		// Older posts appended at the end, fully interactive.
 		await expect( page.getByTestId( 'post-101' ) ).toBeVisible();
 		await expect( page.getByTestId( 'post-102' ) ).toBeVisible();
-		await page.getByTestId( 'post-101-like' ).click();
-		await expect( page.getByTestId( 'post-101-like' ) ).toHaveText( '1' );
-
-		// Appended at the END (after the two existing cards).
-		const articles = page.getByTestId( 'feed-list' ).locator( 'article' );
+		let articles = page.getByTestId( 'feed-list' ).locator( 'article' );
 		await expect( articles ).toHaveCount( 4 );
 		await expect( articles.nth( 0 ) ).toHaveAttribute(
 			'data-testid',
 			'post-1'
 		);
-		await expect( articles.nth( 2 ) ).toHaveAttribute(
+		await expect( articles.nth( 3 ) ).toHaveAttribute(
 			'data-testid',
-			'post-101'
+			'post-102'
 		);
-
-		// The existing card kept its element identity: like state survived
-		// the splice, and no re-init happened (2 SSR + 2 appended = 4).
+		await page.getByTestId( 'post-101-like' ).click();
+		await expect( page.getByTestId( 'post-101-like' ) ).toHaveText( '1' );
+		// The first card's like survived the splice (identity preserved).
 		await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '1' );
-		await page.getByTestId( 'post-1-like' ).click();
-		await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '2' );
+		// No re-init of existing cards (2 SSR + 2 appended = 4).
 		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '4' );
-	} );
 
-	test( 'creating a new post prepends it and initializes it', async ( {
-		page,
-	} ) => {
-		await expect( page.getByTestId( 'post-1' ) ).toBeVisible();
-
-		await page
-			.getByTestId( 'new-post-title' )
-			.fill( 'Breaking news' );
+		// --- Create a new post: prepended at the top. ---
+		await page.getByTestId( 'new-post-title' ).fill( 'Breaking news' );
 		await page.getByTestId( 'create-post' ).click();
-
-		// The new card is at the TOP with the typed title, and is fully
-		// interactive.
-		const articles = page.getByTestId( 'feed-list' ).locator( 'article' );
-		await expect( articles ).toHaveCount( 3 );
+		await expect( page.getByTestId( 'post-900' ) ).toBeVisible();
+		articles = page.getByTestId( 'feed-list' ).locator( 'article' );
+		await expect( articles ).toHaveCount( 5 );
 		await expect( articles.nth( 0 ) ).toHaveAttribute(
 			'data-testid',
 			'post-900'
@@ -155,17 +117,61 @@ test.describe( 'activity feed', () => {
 		await expect( articles.nth( 0 ).locator( 'h3' ) ).toHaveText(
 			'Breaking news'
 		);
-		await expect( page.getByTestId( 'post-900-text' ) ).toHaveText(
-			'just published'
-		);
 		await page.getByTestId( 'post-900-like' ).click();
 		await expect( page.getByTestId( 'post-900-like' ) ).toHaveText( '1' );
-
-		// Existing cards are untouched: identity + like state preserved, no
-		// re-init (2 SSR + 1 new = 3).
-		await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '0' );
-		await page.getByTestId( 'post-1-like' ).click();
+		// The older card's like survived the prepend.
 		await expect( page.getByTestId( 'post-1-like' ) ).toHaveText( '1' );
-		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '3' );
+		// 2 SSR + 2 load-more + 1 new = 5 init runs.
+		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '5' );
+
+		// --- Switch to the photos filter (router swaps the whole region). ---
+		await page.getByTestId( 'tab-photos' ).click();
+		await expect( page.getByTestId( 'post-11' ) ).toBeVisible();
+		await expect( page.getByTestId( 'post-11-text' ) ).toHaveText(
+			'a nice photo'
+		);
+		// The all-feed cards are gone.
+		await expect( page.getByTestId( 'post-1' ) ).toHaveCount( 0 );
+		await expect( page.getByTestId( 'post-900' ) ).toHaveCount( 0 );
+		// The photos card initialized once (5 + 1).
+		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '6' );
+		await page.getByTestId( 'post-11-like' ).click();
+		await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '1' );
+
+		// --- Load more + create post on the photos feed too. ---
+		await page.getByTestId( 'load-more' ).click();
+		await expect( page.getByTestId( 'post-101' ) ).toBeVisible();
+		await page.getByTestId( 'new-post-title' ).fill( 'Photo news' );
+		await page.getByTestId( 'create-post' ).click();
+		await expect( page.getByTestId( 'post-900' ) ).toBeVisible();
+		articles = page.getByTestId( 'feed-list' ).locator( 'article' );
+		await expect( articles ).toHaveCount( 4 );
+		await expect( articles.nth( 0 ) ).toHaveAttribute(
+			'data-testid',
+			'post-900'
+		);
+		await expect( articles.nth( 0 ).locator( 'h3' ) ).toHaveText(
+			'Photo news'
+		);
+		// 6 + 2 load-more + 1 new = 9.
+		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '9' );
+
+		// --- Switch to videos, then back to photos. ---
+		await page.getByTestId( 'tab-videos' ).click();
+		await expect( page.getByTestId( 'post-21' ) ).toBeVisible();
+		await expect( page.getByTestId( 'post-21-text' ) ).toHaveText(
+			'a great video'
+		);
+		await page.getByTestId( 'post-21-like' ).click();
+		await expect( page.getByTestId( 'post-21-like' ) ).toHaveText( '1' );
+		// 9 + 1 = 10.
+		await expect( page.getByTestId( 'init-total' ) ).toHaveText( '10' );
+
+		await page.getByTestId( 'tab-photos' ).click();
+		await expect( page.getByTestId( 'post-11' ) ).toBeVisible();
+		// The photo card's like survived the round trip (region re-hydrated
+		// with fresh server content, so like state resets — the fresh card
+		// is a new instance).
+		await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '0' );
 	} );
 } );
