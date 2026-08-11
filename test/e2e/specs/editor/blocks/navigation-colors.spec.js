@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation colors', () => {
@@ -22,7 +19,7 @@ test.describe( 'Navigation colors', () => {
 		const { id: menuId } = await requestUtils.createNavigationMenu( {
 			title: 'Colored menu',
 			content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
-			attributes: { openSubmenusOnClick: true },
+			attributes: { submenuVisibility: 'click' },
 		} );
 
 		await admin.createNewPost();
@@ -88,19 +85,37 @@ test.describe( 'Navigation colors', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
-		// In the sidebar inspector we add a link color and link hover color to the group block.
+		// In the sidebar inspector we add text and background colors to the group block.
+		// Text and background color controls now live in the Typography and
+		// Background panels respectively, so no separate "Styles" tab is shown.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Text' } ).click();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const textColorToggle = editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await textColorToggle.click();
 		await page
-			.getByRole( 'option', { name: 'Color: White' } )
+			.getByRole( 'option', { name: 'White' } )
 			.click( { force: true } );
+		// Close the text color popover before opening the background one so the
+		// two option pickers don't overlap (each palette contains a "Black"
+		// swatch, which would otherwise be ambiguous).
+		await textColorToggle.click();
 
-		await page
-			.getByRole( 'button', { name: 'Background', exact: true } )
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page
-			.getByRole( 'option', { name: 'Color: Black' } )
+			.getByRole( 'option', { name: 'Black' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -141,22 +156,24 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		// In the sidebar inspector we add a link color and link hover color to the group block.
+		// Link/element colors now live in the Elements panel.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Color options' } ).click();
+		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
 			.click();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Link', exact: true } )
+			.click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
-			.getByRole( 'option', { name: 'Color: Vivid red' } )
+			.getByRole( 'option', { name: 'Vivid red' } )
 			.click( { force: true } );
 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
 		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
 		await page
-			.getByRole( 'option', { name: 'Color: Vivid purple' } )
+			.getByRole( 'option', { name: 'Vivid purple' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -198,7 +215,7 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'option', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Pale pink' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -242,7 +259,7 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Pale cyan blue' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -285,7 +302,7 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'option', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Pale pink' } )
 			.click( { force: true } );
 		// Pale cyan blue for the background color.
 		await page
@@ -294,7 +311,7 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Pale cyan blue' } )
 			.click( { force: true } );
 		// Cyan bluish gray for the submenu and overlay text color.
 		await page
@@ -303,7 +320,7 @@ test.describe( 'Navigation colors', () => {
 		// 171, 184, 195 is the color of the "Cyan bluish gray" color preset.
 		const cyanBluishGray = 'rgb(171, 184, 195)';
 		await page
-			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
+			.getByRole( 'option', { name: 'Cyan bluish gray' } )
 			.click( { force: true } );
 		// Luminous vivid amber for the submenu and overlay background color.
 		await page
@@ -312,7 +329,7 @@ test.describe( 'Navigation colors', () => {
 		// 252, 185, 0 is the color of the "Luminous vivid amber" color preset.
 		const vividAmber = 'rgb(252, 185, 0)';
 		await page
-			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -408,7 +425,10 @@ class ColorControl {
 		// Switch to settings tab.
 		await this.page.getByRole( 'tab', { name: 'Settings' } ).click();
 		// Set it to always be the mobile view, but don't save this setting so we can still check all the frontend colors.
-		await this.page.getByRole( 'radio', { name: 'Always' } ).click();
+		await this.page
+			.getByRole( 'radiogroup', { name: 'Configure overlay visibility' } )
+			.getByRole( 'radio', { name: 'Always' } )
+			.click();
 		await this.editor.canvas
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();

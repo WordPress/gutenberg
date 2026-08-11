@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store as blockEditorStore,
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
@@ -14,7 +11,7 @@ const CONTENT = 'content';
 export default function ResetOverridesControl( props ) {
 	const name = props.attributes.metadata?.name;
 	const registry = useRegistry();
-	const isOverriden = useSelect(
+	const isOverridden = useSelect(
 		( select ) => {
 			if ( ! name ) {
 				return;
@@ -81,7 +78,7 @@ export default function ResetOverridesControl( props ) {
 	return (
 		<BlockToolbarLastItem>
 			<ToolbarGroup>
-				<ToolbarButton onClick={ onClick } disabled={ ! isOverriden }>
+				<ToolbarButton onClick={ onClick } disabled={ ! isOverridden }>
 					{ __( 'Reset' ) }
 				</ToolbarButton>
 			</ToolbarGroup>

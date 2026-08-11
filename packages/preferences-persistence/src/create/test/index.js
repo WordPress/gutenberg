@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import create from '..';
 
 jest.mock( '@wordpress/api-fetch' );
@@ -33,8 +26,8 @@ describe( 'create', () => {
 
 			// The second param of the call to `setItem` has been JSON.stringified.
 			// Parse it to check it contains the data.
-			const setItemDataParm = spy.mock.calls[ 0 ][ 1 ];
-			expect( JSON.parse( setItemDataParm ) ).toEqual(
+			const setItemDataParam = spy.mock.calls[ 0 ][ 1 ];
+			expect( JSON.parse( setItemDataParam ) ).toEqual(
 				expect.objectContaining( data )
 			);
 		} );

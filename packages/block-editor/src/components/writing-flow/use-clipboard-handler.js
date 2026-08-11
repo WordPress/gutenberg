@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	pasteHandler,
 	findTransform,
@@ -11,17 +8,39 @@ import {
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
+	isEntirelySelected,
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { setClipboardBlocks } from './utils';
+import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
+import { getBlockClientId } from '../../utils/dom';
+
+/**
+ * Whether the DOM selection entirely spans the content of the given block,
+ * and the block's editable element is the block element itself, like a
+ * heading or a paragraph, not a field within a larger block, like a caption.
+ *
+ * @param {Document} ownerDocument The block's document.
+ * @param {string}   clientId      The block's client ID.
+ *
+ * @return {boolean} Whether the block is entirely selected.
+ */
+function isBlockEntirelySelected( ownerDocument, clientId ) {
+	const selection = ownerDocument.defaultView.getSelection();
+
+	if ( getBlockClientId( selection.anchorNode ) !== clientId ) {
+		return false;
+	}
+
+	const blockElement = ownerDocument.getElementById( `block-${ clientId }` );
+
+	return (
+		!! blockElement?.isContentEditable && isEntirelySelected( blockElement )
+	);
+}
 
 export default function useClipboardHandler() {
 	const registry = useRegistry();
@@ -61,11 +80,25 @@ export default function useClipboardHandler() {
 				return;
 			}
 
+			// Whether the entire content of a block whose editable element
+			// is the block itself is selected: copying all of a heading's
+			// text should copy the heading block. Fields within a larger
+			// block, like a caption, are not the block element and keep
+			// the native copy.
+			// Whether the entire text of a single selected block is
+			// copied, in which case the block itself is copied.
+			const isWholeSingleBlockCopy =
+				event.type === 'copy' &&
+				! hasMultiSelection() &&
+				isBlockEntirelySelected(
+					event.target.ownerDocument,
+					selectedBlockClientIds[ 0 ]
+				);
+
 			// Let native copy/paste behaviour take over in input fields.
 			// But always handle multiple selected blocks.
 			if ( ! hasMultiSelection() ) {
-				const { target } = event;
-				const { ownerDocument } = target;
+				const { ownerDocument } = event.target;
 				// If copying, only consider actual text selection as selection.
 				// Otherwise, any focus on an input field is considered.
 				const hasSelection =
@@ -75,7 +108,7 @@ export default function useClipboardHandler() {
 						  ! ownerDocument.activeElement.isContentEditable;
 
 				// Let native copy behaviour take over in input fields.
-				if ( hasSelection ) {
+				if ( hasSelection && ! isWholeSingleBlockCopy ) {
 					return;
 				}
 			}
@@ -88,7 +121,9 @@ export default function useClipboardHandler() {
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
 			const shouldHandleWholeBlocks =
-				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
+				__unstableIsSelectionCollapsed() ||
+				__unstableIsFullySelected() ||
+				isWholeSingleBlockCopy;
 			const expandSelectionIsNeeded =
 				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -130,13 +165,17 @@ export default function useClipboardHandler() {
 				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
-					event.target.ownerDocument.activeElement.contentEditable = false;
+					setContentEditableWrapper(
+						event.target.ownerDocument.activeElement,
+						false
+					);
 					__unstableDeleteSelection();
 				}
 			} else if ( event.type === 'paste' ) {
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
+					mediaUpload,
 				} = getSettings();
 				const isInternal =
 					event.clipboardData.getData( 'rich-text' ) === 'true';
@@ -148,6 +187,11 @@ export default function useClipboardHandler() {
 				let blocks = [];
 
 				if ( files.length ) {
+					if ( ! mediaUpload ) {
+						event.preventDefault();
+						return;
+					}
+
 					const fromTransforms = getBlockTransforms( 'from' );
 					blocks = files
 						.reduce( ( accumulator, file ) => {
@@ -180,6 +224,25 @@ export default function useClipboardHandler() {
 				}
 
 				if ( isFullySelected ) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					event.preventDefault();
+					return;
+				}
+
+				// Pasting over an entirely selected block replaces it, the
+				// equivalent of pasting into an empty block.
+				if (
+					! hasMultiSelection() &&
+					isBlockEntirelySelected(
+						event.target.ownerDocument,
+						selectedBlockClientIds[ 0 ]
+					)
+				) {
 					replaceBlocks(
 						selectedBlockClientIds,
 						blocks,

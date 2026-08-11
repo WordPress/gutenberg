@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -106,6 +103,16 @@ function EditorKeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/new-note',
+			category: 'block',
+			description: __( 'Add a new note.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'm',
 			},
 		} );
 

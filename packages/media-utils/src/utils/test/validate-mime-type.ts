@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { validateMimeType } from '../validate-mime-type';
 import { UploadError } from '../upload-error';
 
@@ -53,5 +50,17 @@ describe( 'validateMimeType', () => {
 				file: xmlFile,
 			} )
 		);
+	} );
+
+	it( 'should not error if allowedTypes contains the wildcard "*"', () => {
+		expect( () => {
+			validateMimeType( xmlFile, [ '*' ] );
+		} ).not.toThrow();
+	} );
+
+	it( 'should not error if allowedTypes contains "*" alongside other types', () => {
+		expect( () => {
+			validateMimeType( xmlFile, [ 'image', '*' ] );
+		} ).not.toThrow();
 	} );
 } );

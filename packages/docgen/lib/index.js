@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
 const isSymbolPrivate = require( './is-symbol-private' );
@@ -133,7 +126,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput.
+	// Output.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

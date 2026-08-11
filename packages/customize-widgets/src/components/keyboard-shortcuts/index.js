@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import {
 	useShortcut,
@@ -9,14 +6,24 @@ import {
 import { isAppleOS } from '@wordpress/keycodes';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { unlock } from '../../lock-unlock';
+
+const { usesNativeUndo } = unlock( blockEditorPrivateApis );
 
 function KeyboardShortcuts( { undo, redo, save } ) {
 	useShortcut( 'core/customize-widgets/undo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		undo();
 		event.preventDefault();
 	} );
 
 	useShortcut( 'core/customize-widgets/redo', ( event ) => {
+		if ( usesNativeUndo( event ) ) {
+			return;
+		}
 		redo();
 		event.preventDefault();
 	} );
