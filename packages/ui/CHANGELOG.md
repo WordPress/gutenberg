@@ -32,6 +32,7 @@
 ### Bug Fixes
 
 -   `Calendar`, `RangeCalendar`: Use the WordPress text direction when no supported formatting locale is provided, while preserving explicit locale and `dir` precedence. ([#81982](https://github.com/WordPress/gutenberg/pull/81982))
+-   `Calendar`, `RangeCalendar`: Align day states with neutral WPDS color tokens. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `Calendar`, `RangeCalendar`: Show tooltips for the previous and next month buttons. ([#81983](https://github.com/WordPress/gutenberg/pull/81983))
 -   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
