@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import '@testing-library/jest-dom';
-
-/**
- * Internal dependencies
- */
 import {
 	applyWaveformPlayerStyles,
 	createWaveformContainer,

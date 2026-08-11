@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { decodeEntities } from '..';
 
 describe( 'decodeEntities', () => {

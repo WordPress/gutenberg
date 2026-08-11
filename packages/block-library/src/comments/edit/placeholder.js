@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CommentsForm from '../../post-comments-form/form';
 
 export default function PostCommentsPlaceholder( { postType, postId } ) {

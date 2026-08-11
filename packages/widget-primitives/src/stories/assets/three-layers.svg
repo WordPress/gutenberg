@@ -35,7 +35,7 @@
   <!-- Row 3: Representation -->
   <rect x="44" y="230" width="304" height="74" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
   <text x="64" y="260" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">Representation</text>
-  <text x="64" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">attributes · example · render</text>
+  <text x="64" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">attributes · actions · example · render</text>
   <line x1="352" y1="267" x2="556" y2="267" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="454" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#855317">rendered</text>
   <rect x="560" y="230" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isLatexMathMode from '../latex-to-math';
 
 describe( 'isLatexMathMode', () => {

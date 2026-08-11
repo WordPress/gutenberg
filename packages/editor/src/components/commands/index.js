@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -26,10 +23,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {

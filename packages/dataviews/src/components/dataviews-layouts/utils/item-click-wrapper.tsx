@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ReactElement, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement } from '@wordpress/element';
 
 function getClickableItemProps< Item >( {

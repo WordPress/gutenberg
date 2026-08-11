@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedRules, FieldValidity } from '../../../types';
 
 export default function getCustomValidity< Item >(

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
@@ -17,7 +10,6 @@ import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
-
 import type { BorderBoxControlProps } from '../types';
 import type {
 	LabelProps,

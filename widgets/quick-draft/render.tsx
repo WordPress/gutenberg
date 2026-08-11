@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { autop } from '@wordpress/autop';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,10 +14,6 @@ import { escapeHTML } from '@wordpress/escape-html';
 import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Button, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { DraftsList, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
 import { useWidgetSize } from './hooks';

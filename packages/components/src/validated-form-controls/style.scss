@@ -21,7 +21,7 @@
 	.components-combobox-control__suggestions-container:has(
 	input:invalid[data-validity-visible]
 ):not(:has([aria-expanded="true"])) {
-		--wp-components-color-accent: #{$alert-red};
+		--wp-admin-theme-color: #{$alert-red};
 	}
 }
 
@@ -41,14 +41,14 @@
 
 	// For FormTokenField
 	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
-		--wp-components-color-accent: #{$alert-red};
+		--wp-admin-theme-color: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
 	.components-validated-control__content-editable [role="textbox"] {
-		--wp-components-color-accent: #{$alert-red};
+		--wp-admin-theme-color: #{$alert-red};
 		border-color: $alert-red;
 	}
 }

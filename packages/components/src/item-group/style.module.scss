@@ -1,0 +1,115 @@
+@use "../utils/theme-variables" as *;
+
+// Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
+$surface-border-color: rgba(0, 0, 0, 0.1);
+
+// Matches CONFIG.controlHeight.
+$control-height: 36px;
+$base-font-height: calc(13px * 1.4);
+
+/*
+ * Math:
+ * - Use the desired height as the base value
+ * - Subtract the computed height of (default) text
+ * - Subtract the effects of border
+ * - Divide the calculated number by 2, in order to get an individual top/bottom padding
+ */
+$padding-y: calc((#{$control-height} - #{$base-font-height} - 2px) / 2);
+$padding-y-small: calc((calc(#{$control-height} * 0.8) - #{$base-font-height} - 2px) / 2);
+$padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 2px) / 2);
+
+.item-group {
+	&.is-bordered {
+		border: 1px solid $surface-border-color;
+	}
+
+	&.is-separated {
+		> *:not(marquee) > * {
+			border-block-end: 1px solid $surface-border-color;
+		}
+
+		> *:last-of-type > * {
+			border-block-end-color: transparent;
+		}
+	}
+
+	&.is-rounded {
+		border-radius: var(--wpds-border-radius-sm);
+
+		> *:first-of-type > * {
+			border-start-start-radius: var(--wpds-border-radius-sm);
+			border-start-end-radius: var(--wpds-border-radius-sm);
+		}
+
+		> *:last-of-type > * {
+			border-end-start-radius: var(--wpds-border-radius-sm);
+			border-end-end-radius: var(--wpds-border-radius-sm);
+		}
+	}
+}
+
+.item-wrapper {
+	width: 100%;
+	display: block;
+}
+
+.item {
+	box-sizing: border-box;
+	width: 100%;
+	display: block;
+	margin: 0;
+	color: inherit;
+
+	&.is-unstyled-button,
+	&.is-unstyled-link {
+		font-size: 13px;
+		font-family: inherit;
+		appearance: none;
+		border: 1px solid transparent;
+		cursor: var(--wpds-cursor-control);
+		background: none;
+		text-align: start;
+
+		svg,
+		path {
+			fill: currentColor;
+		}
+
+		&:hover {
+			color: $components-color-accent;
+		}
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+	}
+
+	&.is-unstyled-link {
+		text-decoration: none;
+	}
+
+	&.is-spaced-around {
+		border-radius: var(--wpds-border-radius-sm);
+	}
+
+	&.is-size-small {
+		padding: $padding-y-small 8px;
+	}
+
+	&.is-size-medium {
+		padding: $padding-y 12px;
+	}
+
+	&.is-size-large {
+		// Matches CONFIG.controlPaddingXLarge (`12 * 1.3334`).
+		padding: $padding-y-large 16.0008px;
+	}
+}

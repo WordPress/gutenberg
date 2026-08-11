@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';

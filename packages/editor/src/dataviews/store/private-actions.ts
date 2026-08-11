@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
@@ -63,10 +60,6 @@ import {
 	mediaDimensionsField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
@@ -217,7 +210,7 @@ export const registerPostTypeSchema =
 			canCreate &&
 			duplicatePost;
 
-		// @ts-ignore
+		// @ts-expect-error `globalThis` has no index signature for this build-time global.
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 			// Outside Gutenberg, disable duplication except for wp_template.
 			if ( 'wp_template' !== postTypeConfig.slug ) {
@@ -226,7 +219,6 @@ export const registerPostTypeSchema =
 		}
 
 		// When template activation experiment is disabled, templates cannot be duplicated.
-		// @ts-ignore
 		if (
 			postTypeConfig.slug === 'wp_template' &&
 			! window?.__experimentalTemplateActivate
@@ -239,7 +231,6 @@ export const registerPostTypeSchema =
 			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
-			// @ts-ignore
 			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&

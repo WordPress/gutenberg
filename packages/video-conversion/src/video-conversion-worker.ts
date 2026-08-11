@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
-
-/**
- * Internal dependencies
- */
 import type { ItemId } from './types';
 import type { WorkerAPI } from './worker';
 import { workerCode } from './worker-code';

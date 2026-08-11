@@ -70,6 +70,9 @@
 		.dataviews-view-grid__field-value:has(.fields-field__pattern-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
+			// Override the neutral border the badge's `none` intent applies,
+			// so the outline matches the synced text rather than staying gray.
+			border-color: currentColor;
 		}
 	}
 }

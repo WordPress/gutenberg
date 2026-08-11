@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SandBox, { VIEWPORT_UNIT_VALUE_REGEX, buildSandBoxDocument } from '..';
 
 describe( 'SandBox', () => {
@@ -46,6 +35,48 @@ describe( 'SandBox', () => {
 		);
 		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
 			'allow-same-origin'
+		);
+	} );
+
+	it( 'should not include allow-popups by default', () => {
+		render( <SandBox html="<p>Hello</p>" title="No Popups" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'No Popups' );
+
+		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
+			'allow-popups'
+		);
+	} );
+
+	it( 'should include allow-popups when allowPopups is set', () => {
+		render( <SandBox html="<p>Hello</p>" title="Popups" allowPopups /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popups' );
+
+		expect( iframe ).toHaveAttribute(
+			'sandbox',
+			'allow-scripts allow-presentation allow-popups'
+		);
+	} );
+
+	it( 'should not include allow-forms by default', () => {
+		render( <SandBox html="<p>Hello</p>" title="No Forms" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'No Forms' );
+
+		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
+			'allow-forms'
+		);
+	} );
+
+	it( 'should include allow-forms when allowForms is set', () => {
+		render( <SandBox html="<p>Hello</p>" title="Forms" allowForms /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Forms' );
+
+		expect( iframe ).toHaveAttribute(
+			'sandbox',
+			'allow-scripts allow-presentation allow-forms'
 		);
 	} );
 

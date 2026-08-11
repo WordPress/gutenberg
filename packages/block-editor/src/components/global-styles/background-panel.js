@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
@@ -21,7 +14,7 @@ import {
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const DEFAULT_CONTROLS = {
@@ -170,7 +163,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
 		colors,
@@ -297,11 +290,11 @@ export default function BackgroundImagePanel( {
 	// Legacy `color.gradient` setters.
 	const legacyColorGradient = decodeValue( inheritedValue?.color?.gradient );
 	const userLegacyColorGradient = decodeValue( value?.color?.gradient );
-	const setLegacyColorGradient = ( newGradient ) => {
+	const setLegacyColorGradient = ( newGradient, newSlug ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'gradient' ],
-			encodeGradientValue( newGradient )
+			encodeGradientValue( newGradient, newSlug )
 		);
 		newValue.color.background = undefined;
 		onChange( newValue );
@@ -323,11 +316,11 @@ export default function BackgroundImagePanel( {
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
 	// matching the block inspector behavior in hooks/background.js.
-	const setGradient = ( newGradient ) => {
+	const setGradient = ( newGradient, newSlug ) => {
 		let newValue = setImmutably(
 			value,
 			[ 'background', 'gradient' ],
-			encodeGradientValue( newGradient )
+			encodeGradientValue( newGradient, newSlug )
 		);
 		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
 		onChange( newValue );
@@ -450,6 +443,16 @@ export default function BackgroundImagePanel( {
 							key: 'gradient',
 							label: __( 'Gradient' ),
 							inheritedValue: inheritedGradient,
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.background?.gradient ??
+									inheritedValue?.color?.gradient,
+								'gradient'
+							),
+							userSlug: extractPresetSlug(
+								value?.background?.gradient ??
+									value?.color?.gradient,
+								'gradient'
+							),
 							setValue: setGradient,
 							userValue: currentGradient,
 							isGradient: true,
@@ -487,6 +490,14 @@ export default function BackgroundImagePanel( {
 							key: 'gradient',
 							label: __( 'Gradient' ),
 							inheritedValue: legacyColorGradient,
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.gradient,
+								'gradient'
+							),
+							userSlug: extractPresetSlug(
+								value?.color?.gradient,
+								'gradient'
+							),
 							setValue: setLegacyColorGradient,
 							userValue: userLegacyColorGradient,
 							isGradient: true,

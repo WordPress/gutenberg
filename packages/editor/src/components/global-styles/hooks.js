@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useCallback } from '@wordpress/element';
 import {
 	mergeGlobalStyles,
@@ -10,10 +7,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { getSupportedStyles } from '../private-selectors';
 
 const keyBlocksByName = ( blocks ) =>

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
 import { unlock } from '../lock-unlock';
 
