@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 import { ColorPicker } from '../color-picker';
 import {

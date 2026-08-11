@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { FormEvent, MouseEvent, RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -19,10 +12,6 @@ import {
 } from '@wordpress/element';
 import { pencil, plus, trash } from '@wordpress/icons';
 import { Text, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { CircularOptionPickerContext } from '../circular-option-picker/circular-option-picker-context';
 import { Composite } from '../composite';

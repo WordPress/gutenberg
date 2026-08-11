@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getCanManage } from '../use-color-palette-editor';
 
 describe( 'getCanManage', () => {

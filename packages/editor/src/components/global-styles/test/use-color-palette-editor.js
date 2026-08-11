@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useColorPaletteEditing from '../use-color-palette-editor';
+const { useGlobalStyles } = require( '../hooks' );
 
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
@@ -30,8 +20,6 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '../hooks', () => ( {
 	useGlobalStyles: jest.fn(),
 } ) );
-
-const { useGlobalStyles } = require( '../hooks' );
 
 const mockCreateSuccessNotice = jest.fn();
 const mockCreateErrorNotice = jest.fn();
