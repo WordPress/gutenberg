@@ -1,57 +1,53 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
-	store as blockEditorStore,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
 import {
+	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			placeholder: __( 'Type / to add a hidden block' ),
-		},
-	],
-];
-
 function DetailsEdit( { attributes, setAttributes, clientId } ) {
-	const { showContent, summary } = attributes;
+	const { name, showContent, summary, allowedBlocks, placeholder } =
+		attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		__experimentalCaptureToolbars: true,
+		allowedBlocks,
 	} );
+	const [ isOpen, setIsOpen ] = useState( showContent );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// Check if either the block or the inner blocks are selected.
-	const hasSelection = useSelect(
-		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
-			/* Sets deep to true to also find blocks inside the details content block. */
-			return (
-				hasSelectedInnerBlock( clientId, true ) ||
-				isBlockSelected( clientId )
-			);
-		},
+	// Check if the inner blocks are selected.
+	const hasSelectedInnerBlock = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
 		[ clientId ]
 	);
+
+	const handleSummaryKeyDown = ( event ) => {
+		if ( event.key === 'Enter' && ! event.shiftKey ) {
+			setIsOpen( ( prevIsOpen ) => ! prevIsOpen );
+			event.preventDefault();
+		}
+	};
+
+	// Prevent spacebar from toggling <details> while typing.
+	const handleSummaryKeyUp = ( event ) => {
+		if ( event.key === ' ' ) {
+			event.preventDefault();
+		}
+	};
 
 	return (
 		<>
@@ -76,7 +72,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						} }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open by default' ) }
 							checked={ showContent }
 							onChange={ () =>
@@ -88,16 +83,34 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					label={ __( 'Name attribute' ) }
+					value={ name || '' }
+					onChange={ ( newName ) =>
+						setAttributes( { name: newName } )
+					}
+					help={ __(
+						'Enables multiple Details blocks with the same name attribute to be connected, with only one open at a time.'
+					) }
+				/>
+			</InspectorControls>
 			<details
 				{ ...innerBlocksProps }
-				open={ hasSelection || showContent }
+				open={ isOpen || hasSelectedInnerBlock }
+				onToggle={ ( event ) => setIsOpen( event.target.open ) }
+				name={ name || '' }
 			>
-				<summary onClick={ ( event ) => event.preventDefault() }>
+				<summary
+					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
+					onKeyUp={ handleSummaryKeyUp }
+				>
 					<RichText
 						identifier="summary"
-						aria-label={ __( 'Write summary' ) }
-						placeholder={ __( 'Write summary…' ) }
-						allowedFormats={ [] }
+						aria-label={ __(
+							'Write summary. Press Enter to expand or collapse the details.'
+						) }
+						placeholder={ placeholder || __( 'Write summary…' ) }
 						withoutInteractiveFormatting
 						value={ summary }
 						onChange={ ( newSummary ) =>

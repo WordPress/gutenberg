@@ -1,12 +1,8 @@
-
 .dataviews-bulk-actions-footer__item-count {
-	color: $gray-900;
-	font-weight: 500;
-	font-size: 11px;
-	text-transform: uppercase;
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
 .dataviews-bulk-actions-footer__container {
 	margin-right: auto;
-	min-height: $grid-unit-40;
+	min-height: var(--wpds-dimension-size-md);
 }

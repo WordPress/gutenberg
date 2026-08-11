@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
 import Shortcut from './shortcut';
 
 function DynamicShortcut( { name } ) {

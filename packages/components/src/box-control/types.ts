@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { UnitControlProps } from '../unit-control/types';
 import type { LABELS } from './utils';
 
@@ -39,7 +36,10 @@ type DeprecatedBoxControlProps = {
 	onMouseOut?: UnitControlProps[ 'onMouseOut' ];
 };
 
-export type BoxControlProps = Pick< UnitControlProps, 'units' > &
+export type BoxControlProps = Pick<
+	UnitControlProps,
+	'units' | '__next40pxDefaultSize'
+> &
 	DeprecatedBoxControlProps & {
 		/**
 		 * If this property is true, a button to reset the box control is rendered.
@@ -94,23 +94,32 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
 		 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
 		 */
 		values?: BoxControlValue;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
-		/**
-		 * Available presets to pick from.
-		 */
-		presets?: Preset[];
-		/**
-		 * The key of the preset to apply.
-		 * If you provide a list of presets, you must provide a preset key to use.
-		 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
-		 */
-		presetKey?: string;
-	};
+	} & (
+		| {
+				/**
+				 * Available presets to pick from.
+				 */
+				presets?: never;
+				/**
+				 * The key of the preset to apply.
+				 * If you provide a list of presets, you must provide a preset key to use.
+				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+				 */
+				presetKey?: never;
+		  }
+		| {
+				/**
+				 * Available presets to pick from.
+				 */
+				presets: Preset[];
+				/**
+				 * The key of the preset to apply.
+				 * If you provide a list of presets, you must provide a preset key to use.
+				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+				 */
+				presetKey: string;
+		  }
+	);
 
 export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	onChange?: ( nextValues: BoxControlValue ) => void;
