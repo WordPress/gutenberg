@@ -36,6 +36,11 @@ Node.js and jsdom tests use a deterministic stylesheet mock. Browser Mode
 loads real CSS so tests can inspect computed styles and layout. Browser Mode
 also preserves native browser APIs such as `matchMedia`.
 
+The preset does not add browser behavior to jsdom. Use a local, restored mock
+when a nonvisual test needs a browser signal as controlled input. Use Browser
+Mode when the behavior depends on styles, layout, media queries, observers,
+animation, or scrolling.
+
 The preset does not run Babel. Vite and esbuild handle ordinary JavaScript,
 TypeScript, and modules. `@vitejs/plugin-react-swc` handles React and applies
 `@swc/plugin-emotion` with stable local labels.
