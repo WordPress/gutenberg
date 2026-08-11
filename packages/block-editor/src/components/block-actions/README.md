@@ -1,71 +1,67 @@
-## Block Actions
+# Block Actions
 
-The `BlockActions` component provides an interface for executing various actions on a set of blocks in the WordPress block editor. These actions include duplication, removal, insertion, grouping, ungrouping, and style copying.
+`BlockActions` provides handlers for acting on a set of blocks — duplicating, removing, inserting, grouping, ungrouping, and pasting styles — along with flags describing which of those actions are available. It renders no UI of its own; consumers supply a render prop and build their own controls.
+
+_Note:_ This component is internal to the block editor. It is not exported from `@wordpress/block-editor`, so it can only be imported relatively from within the package.
+
+## Development guidelines
 
 ### Usage
 
 ```jsx
-import BlockActions from './block-actions';
+import BlockActions from '../block-actions';
 
-<BlockActions clientIds={selectedBlockIds}>
-	{({ onDuplicate, onRemove }) => (
+<BlockActions clientIds={ selectedBlockIds }>
+	{ ( { onDuplicate, canDuplicate, onRemove, canRemove } ) => (
 		<>
-			<button onClick={onDuplicate}>Duplicate</button>
-			<button onClick={onRemove}>Remove</button>
+			{ canDuplicate && (
+				<button onClick={ onDuplicate }>Duplicate</button>
+			) }
+			{ canRemove && <button onClick={ onRemove }>Remove</button> }
 		</>
-	)}
+	) }
 </BlockActions>;
 ```
 
 ### Props
 
-| Prop                            | Type       | Description                                                          |
-| ------------------------------- | ---------- | -------------------------------------------------------------------- |
-| `clientIds`                     | `string[]` | Array of block client IDs to perform actions on.                     |
-| `children`                      | `function` | A render prop function that receives available actions as an object. |
-| `__experimentalUpdateSelection` | `function` | (Experimental) Function to update block selection after an action.   |
+#### `clientIds`
 
-### Provided Actions
+-   **Type:** `String[]`
 
-The `children` function receives an object with the following properties, which can be used to trigger block actions:
+The client IDs of the blocks to act on.
 
-| Action           | Type                  | Description                                            |
-| ---------------- | --------------------- | ------------------------------------------------------ |
-| `onDuplicate`    | `() => void`          | Duplicates the selected blocks.                        |
-| `onRemove`       | `() => void`          | Removes the selected blocks.                           |
-| `onInsertBefore` | `() => void`          | Inserts a new block before the selected blocks.        |
-| `onInsertAfter`  | `() => void`          | Inserts a new block after the selected blocks.         |
-| `onGroup`        | `() => void`          | Groups the selected blocks into a container block.     |
-| `onUngroup`      | `() => void`          | Ungroups a grouped block, extracting its inner blocks. |
-| `onCopy`         | `() => void`          | Copies the selected block(s) for later pasting.        |
-| `onPasteStyles`  | `() => Promise<void>` | Pastes styles from copied blocks.                      |
+#### `children`
 
-### Features
+-   **Type:** `Function`
 
-- **Duplication**: Allows duplicating blocks that support multiple instances.
-- **Removal**: Provides an option to remove selected blocks.
-- **Insertion**: Supports inserting new blocks before or after the selected ones.
-- **Grouping & Ungrouping**: Enables conversion of selected blocks into a group and extraction of inner blocks from a group.
-- **Copy & Paste Styles**: Copies styles from a block and applies them to another.
+A render prop called with a single object argument. Its properties are:
 
-### Dependencies
+Availability flags:
 
-The component uses the following WordPress dependencies:
+-   `canRemove` (`Boolean`): Whether the blocks can be removed.
+-   `canDuplicate` (`Boolean`): Whether every block supports multiple instances and can be inserted into the current parent.
+-   `canInsertBlock` (`Boolean`): Whether a new block can be inserted next to the blocks.
+-   `canCopyStyles` (`Boolean`): Whether every block supports color or typography, and so has styles to copy.
 
-- `@wordpress/data` for interacting with the editor's state.
-- `@wordpress/blocks` for block support checks and transformations.
-- `@wordpress/block-editor` for modifying blocks within the editor.
+Action handlers:
 
-### Related Components
+-   `onDuplicate` (`Function`): Duplicates the blocks. Returns the result of the `duplicateBlocks` dispatch.
+-   `onRemove` (`Function`): Removes the blocks. Returns the result of the `removeBlocks` dispatch.
+-   `onInsertBefore` (`Function`): Inserts a default block before the first block.
+-   `onInsertAfter` (`Function`): Inserts a default block after the last block.
+-   `onGroup` (`Function`): Replaces the blocks with a single grouping block containing them.
+-   `onUngroup` (`Function`): Replaces the block with its inner blocks.
+-   `onCopy` (`Function`): Flashes a single selected block to signal it was copied. Writing to the clipboard is the consumer's responsibility.
+-   `onPasteStyles` (`Function`): Applies the copied styles to the blocks. Returns a `Promise`.
 
-- `usePasteStyles` – Used to handle copying and pasting block styles.
-- `block-editor/store` – The primary store for managing block actions.
+#### `__experimentalUpdateSelection`
 
-### Notes
+-   **Type:** `Boolean`
+-   **Default:** `true`
 
-This component does not render UI directly. Instead, it provides action handlers through a render prop pattern, allowing flexibility in implementation.
+Whether the block selection should be updated after duplicating or removing. Passed straight through to the `duplicateBlocks` and `removeBlocks` actions.
 
----
+## Related components
 
-For more details, refer to the [WordPress Gutenberg repository](https://github.com/WordPress/gutenberg).
-
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
