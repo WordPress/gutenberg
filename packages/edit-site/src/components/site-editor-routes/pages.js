@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { loadView } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';

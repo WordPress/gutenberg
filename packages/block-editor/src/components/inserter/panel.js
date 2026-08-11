@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 
 function InserterPanel( { title, icon, children } ) {

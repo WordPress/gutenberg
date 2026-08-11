@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import HtmlRenderer from '../../../utils/html-renderer';
 
 const BATCH_SIZE = 20;

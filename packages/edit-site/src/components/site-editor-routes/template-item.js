@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
 
 export const CREATE_NAVIGATION_MENU_SUCCESS = 'success';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 

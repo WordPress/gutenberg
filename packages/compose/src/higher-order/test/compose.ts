@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import compose from '../compose';
 
 describe( 'compose', () => {

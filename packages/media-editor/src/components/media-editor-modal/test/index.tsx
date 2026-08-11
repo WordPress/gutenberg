@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { MediaEditorModal } from '../index';
 
 let mockSaveResult = {

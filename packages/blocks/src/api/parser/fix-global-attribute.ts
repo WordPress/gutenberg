@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { hasBlockSupport } from '../registration';
 import { parseWithAttributeSchema } from './get-block-attributes';
 import type { BlockAttribute, BlockType } from '../../types';

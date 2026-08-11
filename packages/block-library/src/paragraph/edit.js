@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarButton,
@@ -19,17 +12,18 @@ import {
 	useBlockProps,
 	useSettings,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
+import { useContext } from '@wordpress/element';
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
 import { unlock } from '../lock-unlock';
+
+const { PrivateBlockContext } = unlock( blockEditorPrivateApis );
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -131,6 +125,7 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	const { ariaLabel } = useContext( PrivateBlockContext );
 
 	return (
 		<>
@@ -164,11 +159,12 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onRemove }
 				aria-label={
-					RichText.isEmpty( content )
+					ariaLabel ??
+					( RichText.isEmpty( content )
 						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
-						: __( 'Block: Paragraph' )
+						: __( 'Block: Paragraph' ) )
 				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }

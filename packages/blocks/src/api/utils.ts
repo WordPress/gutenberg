@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import type {

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, act, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import UploadProgressSnackbar, { UPLOAD_SPINNER } from '../';
 import { addFiles, advance, reset } from '../tracker';
 

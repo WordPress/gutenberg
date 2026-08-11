@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -19,10 +16,6 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
