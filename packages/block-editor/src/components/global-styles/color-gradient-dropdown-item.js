@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
@@ -20,16 +13,13 @@ import {
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -170,6 +160,7 @@ function ColorGradientTab( {
 			colorValue={ isGradient ? undefined : displayed }
 			colorSlug={ isGradient ? undefined : displayedSlug }
 			gradientValue={ isGradient ? displayed : undefined }
+			gradientSlug={ isGradient ? displayedSlug : undefined }
 			onColorChange={ isGradient ? undefined : onChange }
 			onGradientChange={ isGradient ? onChange : undefined }
 			/*
@@ -212,7 +203,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );

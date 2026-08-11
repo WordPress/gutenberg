@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { MenuItem, Route } from './types';
 
 export function registerMenuItem( id: string, menuItem: MenuItem ) {

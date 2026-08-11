@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { resizeImage } from '../';
 import type { ImageSizeCrop } from '../types';
 

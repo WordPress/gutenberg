@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
@@ -15,10 +8,6 @@ import {
 	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
@@ -47,6 +36,7 @@ function ColorGradientControlInner( {
 	colorValue,
 	colorSlug,
 	gradientValue,
+	gradientSlug,
 	clearable,
 	showTitle = true,
 	enableAlpha,
@@ -110,13 +100,15 @@ function ColorGradientControlInner( {
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
 				value={ gradientValue }
+				selectedSlug={ gradientSlug }
 				onChange={
 					canChooseAColor
-						? ( newGradient ) => {
-								onGradientChange( newGradient );
+						? ( newGradient, _index, newSlug ) => {
+								onGradientChange( newGradient, newSlug );
 								onColorChange();
 						  }
-						: onGradientChange
+						: ( newGradient, _index, newSlug ) =>
+								onGradientChange( newGradient, newSlug )
 				}
 				{ ...{ gradients, disableCustomGradients } }
 				__experimentalIsRenderedInSidebar={

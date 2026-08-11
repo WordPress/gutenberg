@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
 // Mock useDispatch and useSelect

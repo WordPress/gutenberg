@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import AspectRatioTool from './aspect-ratio-tool';
 import ScaleTool from './scale-tool';
 import WidthHeightTool from './width-height-tool';

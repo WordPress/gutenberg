@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useLayoutEffect,
@@ -11,12 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { getContrastWarning } from '../components/contrast-checker';
-
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';

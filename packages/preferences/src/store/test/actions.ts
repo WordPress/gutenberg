@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { setPersistenceLayer } from '../actions';
 
 describe( 'setPersistenceLayer', () => {

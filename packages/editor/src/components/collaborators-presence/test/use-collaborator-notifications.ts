@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
 
 // --- Mocks ---

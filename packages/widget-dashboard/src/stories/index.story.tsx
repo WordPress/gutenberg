@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
@@ -21,10 +14,6 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
@@ -265,7 +254,7 @@ const GOAL_ACTIONS: WidgetAction[] = [
 	{
 		id: 'export-progress',
 		label: 'Export progress',
-		href: 'data:text/csv;charset=utf-8,metric,target,current,percent%0Arevenue,5000,3600,72',
+		href: new URL( './goal-progress.csv', import.meta.url ).href,
 		download: 'goal-progress.csv',
 	},
 ];

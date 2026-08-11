@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'List View', () => {
@@ -640,6 +637,17 @@ test.describe( 'List View', () => {
 				name: 'Copy Styles',
 			} )
 			.click();
+
+		// Wait for the copy confirmation. It only shows up once the styles
+		// have actually been written to the clipboard: the click on "Copy
+		// Styles" resolves before the asynchronous clipboard write settles,
+		// so pasting right away can read the clipboard before the styles
+		// are in it.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( 'Styles copied to clipboard.' )
+		).toBeVisible();
 
 		// Open List View.
 		await listViewUtils.openListView();

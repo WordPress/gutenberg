@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import firstTimeContributorAccountLink from '../';
 import hasWordPressProfile from '../../../has-wordpress-profile';
 

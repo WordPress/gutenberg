@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	TextControl,
 	SelectControl,
@@ -14,13 +11,9 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
@@ -367,7 +360,10 @@ export default function QueryInspectorControls( props ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Offset' ) }
+						label={ _x(
+							'Offset',
+							'Number of posts to skip in a query'
+						) }
 						hasValue={ () => offset > 0 }
 						onDeselect={ () => setQuery( { offset: 0 } ) }
 					>

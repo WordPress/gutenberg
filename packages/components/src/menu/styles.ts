@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';

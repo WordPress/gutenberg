@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import {
 	cloneFile,
 	convertBlobToFile,
@@ -21,6 +10,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
@@ -898,8 +888,7 @@ export function prepareItem( id: QueueItemId ) {
 					id,
 					new UploadError( {
 						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						message: getHeicUnsupportedMessage(),
 						file,
 					} )
 				);
@@ -1928,9 +1917,31 @@ export function finalizeItem( id: QueueItemId ) {
 					updates.attachment = updatedAttachment;
 				}
 			} catch ( error ) {
-				// Log but don't fail the upload if finalization fails.
+				// Log the underlying failure so it is visible in every
+				// environment; `apiFetch` may reject with a plain object
+				// rather than an Error, and the user-facing notice below is
+				// deliberately generic.
 				// eslint-disable-next-line no-console
 				console.warn( 'Media finalization failed:', error );
+
+				// Finalize is the server's commit point: it writes the
+				// attachment metadata (responsive sub-sizes and the final
+				// `-scaled` file reference). If it fails, none of that was
+				// saved, so the upload is NOT complete. Reporting success
+				// would let the editor keep — and autosave — a block whose
+				// attachment is missing its registered sizes (so the front
+				// end cannot build a srcset) and whose file references are
+				// inconsistent. Fail the item instead so the error surfaces
+				// to the user rather than showing "upload complete".
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.MEDIA_FINALIZE_ERROR,
+						message: __( 'Could not finalize the upload.' ),
+						file: item.file,
+					} )
+				);
+				return;
 			}
 		}
 

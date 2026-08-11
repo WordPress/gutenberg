@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -19,10 +12,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '../dropdown';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
