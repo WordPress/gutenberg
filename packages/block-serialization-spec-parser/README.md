@@ -4,7 +4,7 @@ This library contains the grammar file (`grammar.pegjs`) for WordPress posts whi
 
 PEG parser generators are available in many languages, though different libraries may require some translation of this grammar into their syntax. For more information see:
 
--   [PEG.js](https://pegjs.org)
+-   [PEG.js](https://github.com/pegjs/pegjs)
 -   [Parsing expression grammar](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
 
 ## Installation

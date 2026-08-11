@@ -2,5 +2,5 @@
 // core-js dependencies are updated.
 // It should always test a feature that is supported, but requires
 // a polyfill to work across all supported browsers.
-const foo = new URLSearchParams();
-window.fooSize = foo.size;
+const { promise } = Promise.withResolvers();
+window.promise = promise;

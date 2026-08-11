@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { Fragment, useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResponsiveBlockControl from '../index';
 
 const inputId = 'input-12345678';
@@ -39,12 +28,7 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
-			<SelectControl
-				__next40pxDefaultSize
-				label={ labelComponent }
-				options={ sizeOptions }
-				__nextHasNoMarginBottom
-			/>
+			<SelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.

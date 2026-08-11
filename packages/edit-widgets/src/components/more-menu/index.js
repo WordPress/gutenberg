@@ -1,12 +1,4 @@
-/**
- * WordPress dependencies
- */
-import {
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-	DropdownMenu,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
@@ -14,10 +6,7 @@ import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import { VisuallyHidden } from '@wordpress/ui';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 
@@ -91,10 +80,10 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

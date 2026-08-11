@@ -1,28 +1,28 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import PostAuthorCheck from './check';
 import PostAuthorForm from './index';
 import PostPanelRow from '../post-panel-row';
-import { useAuthorsQuery } from './hook';
+import { BASE_QUERY } from './constants';
+import { store as editorStore } from '../../store';
 
 function PostAuthorToggle( { isOpen, onClick } ) {
-	const { postAuthor } = useAuthorsQuery();
+	const { postAuthor } = useSelect( ( select ) => {
+		const id = select( editorStore ).getEditedPostAttribute( 'author' );
+		return {
+			postAuthor: select( coreStore ).getUser( id, BASE_QUERY ),
+		};
+	}, [] );
 	const authorName =
 		decodeEntities( postAuthor?.name ) || __( '(No author)' );
 	return (
 		<Button
 			size="compact"
-			className="editor-post-author__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={

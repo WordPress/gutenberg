@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	createBlocksFromInnerBlocksTemplate,
@@ -8,27 +5,37 @@ import {
 } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import {
-	useBlockProps,
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useResizeObserver } from '@wordpress/compose';
 import { useScopedBlockVariations } from '../utils';
 import { useBlockPatterns } from './pattern-selection';
+import QueryToolbar from './query-toolbar';
 
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
 	name,
 	openPatternSelectionModal,
+	isSelected,
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
-	const blockProps = useBlockProps();
+	const [ containerWidth, setContainerWidth ] = useState( 0 );
+
+	// Use ResizeObserver to monitor container width.
+	const resizeObserverRef = useResizeObserver( ( [ entry ] ) => {
+		setContainerWidth( entry.contentRect.width );
+	} );
+
+	const SMALL_CONTAINER_BREAKPOINT = 160;
+
+	const isSmallContainer =
+		containerWidth > 0 && containerWidth < SMALL_CONTAINER_BREAKPOINT;
+
 	const { blockType, activeBlockVariation } = useSelect(
 		( select ) => {
 			const { getActiveBlockVariation, getBlockType } =
@@ -49,6 +56,10 @@ export default function QueryPlaceholder( {
 		activeBlockVariation?.icon ||
 		blockType?.icon?.src;
 	const label = activeBlockVariation?.title || blockType?.title;
+	const blockProps = useBlockProps( {
+		ref: resizeObserverRef,
+	} );
+
 	if ( isStartingBlank ) {
 		return (
 			<QueryVariationPicker
@@ -61,14 +72,24 @@ export default function QueryPlaceholder( {
 	}
 	return (
 		<div { ...blockProps }>
+			{ isSelected && (
+				<QueryToolbar
+					clientId={ clientId }
+					attributes={ attributes }
+					hasInnerBlocks={ false }
+				/>
+			) }
 			<Placeholder
-				icon={ icon }
-				label={ label }
-				instructions={ __(
-					'Choose a pattern for the query loop or start blank.'
-				) }
+				className="block-editor-media-placeholder"
+				icon={ ! isSmallContainer && icon }
+				label={ ! isSmallContainer && label }
+				instructions={
+					! isSmallContainer &&
+					__( 'Choose a pattern for the query loop or start blank.' )
+				}
+				withIllustration={ isSmallContainer }
 			>
-				{ !! hasPatterns && (
+				{ !! hasPatterns && ! isSmallContainer && (
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -78,15 +99,17 @@ export default function QueryPlaceholder( {
 					</Button>
 				) }
 
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ () => {
-						setIsStartingBlank( true );
-					} }
-				>
-					{ __( 'Start blank' ) }
-				</Button>
+				{ ! isSmallContainer && (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => {
+							setIsStartingBlank( true );
+						} }
+					>
+						{ __( 'Start blank' ) }
+					</Button>
+				) }
 			</Placeholder>
 		</div>
 	);

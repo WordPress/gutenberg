@@ -28,10 +28,10 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 ## The performance benchmark job
 
-A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `./bin/plugin/cli.js perf [branches]`, example:
+A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `npm exec release-cli -- perf [branches]`, example:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 To get the most accurate results, it's is important to use the exact same version of the tests and environment (theme...) when running the tests, the only thing that need to be different between the branches is the Gutenberg plugin version (or branch used to build the plugin).
@@ -39,10 +39,10 @@ To get the most accurate results, it's is important to use the exact same versio
 To achieve that the command first prepares the following folder structure:
 
     │
-    ├── tests/packages/e2e-tests/specs/performance/*
+    ├── test/performance/specs/*
     |   The actual performance tests to run
     │
-    ├── tests/test/emptytheme
+    ├── test/emptytheme
     |   The theme used for the tests environment. (site editor)
     │
     │── envs/branch1/.wp-env.json
@@ -84,9 +84,11 @@ The new reference commit hash that is chosen needs to meet the following require
  - Be compatible with the new WP version used in the "Tested up to" flag.
  - Is already tracked on "codevitals.run" for all existing metrics.
 
-When releasing a plugin update with changes to the minimum WordPress version requirements, the end-to-end test GitHub Action workflow in Core SVN will need to be updated for any branch losing support. Otherwise the first run of that workflow on that branch following the release will fail.
+### Update `wordpress-develop`
 
-The version of the plugin used in the workflow can be pinned by adding the `gutenberg-version` input to the test matrix. [Core-59221](https://core.trac.wordpress.org/changeset/59221) is an example of this change for the 6.4 branch.
+When releasing a plugin update that changes the minimum required version of WordPress, the end-to-end test GitHub Actions workflow in Core SVN will need to be updated for any branch losing support. Otherwise, the first run of that workflow on that branch following the release will fail.
+
+A plugin version can be pinned in the workflow by adding the `gutenberg-version` input to the test matrix. [Core-59221](https://core.trac.wordpress.org/changeset/59221) is an example of this change for the 6.4 branch.
 
 **Note:** Always use the final release including bug fixes (ie. `x.y.2` or `x.y.3`). If the final release is not yet known, create a [Trac ticket](https://core.trac.wordpress.org/ticket/62488) so it's not forgotten.
 
