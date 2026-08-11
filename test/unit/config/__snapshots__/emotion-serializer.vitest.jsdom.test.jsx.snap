@@ -1,9 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Emotion snapshot serializer > preserves stable labels for empty styled components 1`] = `
-<div
-  class="css-19utepg-EmptyBox emotion-0"
->
-  Content
-</div>
-`;

@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
+import react from '@vitejs/plugin-react-swc';
 import globPackage from 'glob';
 import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
@@ -76,6 +77,17 @@ export default defineConfig( {
 		},
 	},
 	plugins: [
+		react( {
+			plugins: [
+				[
+					'@swc/plugin-emotion',
+					{
+						autoLabel: 'always',
+						labelFormat: '[local]',
+					},
+				],
+			],
+		} ),
 		commonjs( {
 			filter: ( id ) =>
 				[
