@@ -7,7 +7,15 @@ package changelogs, PR testing instructions, or release notes are affected.
 
 - Add proportionate coverage for changed behavior, likely errors, and
   materially different empty, null, enabled, disabled, and boundary inputs.
+- Prefer focused tests for the changed behavior. Avoid padding with adjacent
+  coverage that does not trace directly to the task.
 - Make a bug regression test fail on the base revision and pass with the fix.
+- Do not make a failing test pass by weakening it: no loosened assertions,
+  added waits or timeouts, skipped cases, or deleted coverage without calling
+  it out explicitly.
+- Do not make a failing test pass by changing production code unless the
+  production code is the source of the bug. The goal is to verify the intended
+  behavior, not just make the test runner green.
 - Assert observable user behavior rather than incidental implementation. Guard
   explicitly against false positives and false negatives.
 - Prefer `user-event` and accessible `getByRole` queries for UI tests. Scope

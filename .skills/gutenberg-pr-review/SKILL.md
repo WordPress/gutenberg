@@ -38,47 +38,22 @@ git log <base>..<branch> --oneline
 
 ## Load focused guidance
 
-Read the directly relevant files; combine them for cross-cutting changes.
+Read the shared [Gutenberg building guidance](../../docs/contributors/code/building-guidance.md), then read the directly relevant focused files. Combine them for cross-cutting changes.
 
+- Cross-cutting lifecycle, boundary, and verification checks:
+  [cross-cutting-method.md](../../docs/contributors/code/cross-cutting-method.md)
 - UI components, interaction, keyboard, focus, styles, responsive behavior,
-  localization: [references/ui-accessibility.md](references/ui-accessibility.md)
+  localization: [ui-accessibility.md](../../docs/contributors/code/ui-accessibility.md)
 - React hooks, `@wordpress/data`, async work, entities, preferences,
-  performance: [references/react-data-lifecycle.md](references/react-data-lifecycle.md)
+  performance: [react-data-lifecycle.md](../../docs/contributors/code/react-data-lifecycle.md)
 - Package layering, exports, public APIs, blocks, saved markup, compatibility:
-  [references/packages-apis-compatibility.md](references/packages-apis-compatibility.md)
+  [packages-apis-compatibility.md](../../docs/contributors/code/packages-apis-compatibility.md)
 - PHP, REST routes and schemas, permissions, sanitization, escaping:
-  [references/php-rest-schema.md](references/php-rest-schema.md)
+  [php-rest-schema.md](../../docs/contributors/code/php-rest-schema.md)
 - Workspaces, dependencies, builds, CI, generated artifacts, releases:
-  [references/tooling-ci-release.md](references/tooling-ci-release.md)
+  [tooling-ci-release.md](../../docs/contributors/code/tooling-ci-release.md)
 - Tests, changelogs, documentation, fixtures, snapshots, delivery evidence:
-  [references/testing-docs-delivery.md](references/testing-docs-delivery.md)
-
-## Review method
-
-Follow changed values and state across their complete lifecycle:
-
-```text
-input → validation → state/store → serialization or request
-      → async completion/error → rendered output → cleanup/recovery
-```
-
-At each affected boundary, check:
-
-- whether absent, empty, `false`, `null`, and `undefined` retain their intended
-  meanings;
-- whether authorization and validation occur before side effects;
-- whether loading, empty, success, failure, cancellation, and retry states are
-  distinguishable;
-- whether old public consumers or stored content remain valid;
-- whether keyboard, pointer, screen-reader, RTL, narrow-viewport, and reduced
-  motion behavior remains equivalent where relevant;
-- whether tests exercise observable behavior and would fail without the fix;
-- whether metadata, types, docs, changelogs, generated output, and published
-  artifacts agree with runtime behavior.
-
-Search for existing helpers, analogous implementations, public consumers, and
-fixtures before suggesting a new abstraction or claiming a break. Check both
-editor and frontend behavior for block/style changes.
+  [testing-docs-delivery.md](../../docs/contributors/code/testing-docs-delivery.md)
 
 ## Finding threshold
 
