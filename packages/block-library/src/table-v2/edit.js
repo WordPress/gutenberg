@@ -17,7 +17,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
@@ -280,20 +280,25 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 					</form>
 				</Placeholder>
 			) : (
-				<table { ...innerBlocksProps }>
-					{ sections.map( ( section ) => (
-						<TSection name={ section.name } key={ section.name }>
-							{ section.rows.map( ( row, rowIndex ) => (
-								<tr key={ rowIndex }>
-									{ row.map(
-										( cell ) =>
-											itemsByClientId[ cell.clientId ]
-									) }
-								</tr>
-							) ) }
-						</TSection>
-					) ) }
-				</table>
+				<AsyncModeProvider value={ false }>
+					<table { ...innerBlocksProps }>
+						{ sections.map( ( section ) => (
+							<TSection
+								name={ section.name }
+								key={ section.name }
+							>
+								{ section.rows.map( ( row, rowIndex ) => (
+									<tr key={ rowIndex }>
+										{ row.map(
+											( cell ) =>
+												itemsByClientId[ cell.clientId ]
+										) }
+									</tr>
+								) ) }
+							</TSection>
+						) ) }
+					</table>
+				</AsyncModeProvider>
 			) }
 		</figure>
 	);
