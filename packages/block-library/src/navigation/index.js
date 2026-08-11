@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -52,6 +48,23 @@ export const settings = {
 	},
 	edit,
 	save,
+	__experimentalLabel: ( { ref } ) => {
+		if ( ! ref ) {
+			return;
+		}
+
+		const navigation = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_navigation',
+			ref
+		);
+
+		if ( ! navigation?.title ) {
+			return;
+		}
+
+		return decodeEntities( navigation.title );
+	},
 	deprecated,
 };
 

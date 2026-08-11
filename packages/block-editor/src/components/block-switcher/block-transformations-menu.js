@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup, MenuItem } from '@wordpress/components';
 import {
@@ -8,10 +5,6 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';
@@ -27,20 +20,20 @@ import BlockVariationTransformations from './block-variation-transformations';
  * @return {Record<string, Object[]>} The grouped block transformations.
  */
 function useGroupedTransforms( possibleBlockTransformations ) {
-	const priorityContentTranformationBlocks = {
+	const priorityContentTransformationBlocks = {
 		'core/paragraph': 1,
 		'core/heading': 2,
 		'core/list': 3,
 		'core/quote': 4,
 	};
 	const transformations = useMemo( () => {
-		const priorityTextTranformsNames = Object.keys(
-			priorityContentTranformationBlocks
+		const priorityTextTransformsNames = Object.keys(
+			priorityContentTransformationBlocks
 		);
 		const groupedPossibleTransforms = possibleBlockTransformations.reduce(
 			( accumulator, item ) => {
 				const { name } = item;
-				if ( priorityTextTranformsNames.includes( name ) ) {
+				if ( priorityTextTransformsNames.includes( name ) ) {
 					accumulator.priorityTextTransformations.push( item );
 				} else {
 					accumulator.restTransformations.push( item );
@@ -71,8 +64,8 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 	// Order the priority text transformations.
 	transformations.priorityTextTransformations.sort(
 		( { name: currentName }, { name: nextName } ) => {
-			return priorityContentTranformationBlocks[ currentName ] <
-				priorityContentTranformationBlocks[ nextName ]
+			return priorityContentTransformationBlocks[ currentName ] <
+				priorityContentTransformationBlocks[ nextName ]
 				? -1
 				: 1;
 		}
@@ -88,8 +81,7 @@ const BlockTransformationsMenu = ( {
 	onSelectVariation,
 	blocks,
 } ) => {
-	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
-		useState();
+	const [ hoveredTransformItem, setHoveredTransformItem ] = useState();
 
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
@@ -101,17 +93,18 @@ const BlockTransformationsMenu = ( {
 		<RestTransformationItems
 			restTransformations={ restTransformations }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
+			setHoveredTransformItem={ setHoveredTransformItem }
 		/>
 	);
 	return (
 		<>
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
-				{ hoveredTransformItemName && (
+				{ hoveredTransformItem && (
 					<PreviewBlockPopover
 						blocks={ switchToBlockType(
 							blocks,
-							hoveredTransformItemName
+							hoveredTransformItem.name,
+							hoveredTransformItem.variationName
 						) }
 					/>
 				) }
@@ -125,13 +118,11 @@ const BlockTransformationsMenu = ( {
 					/>
 				) }
 				{ priorityTextTransformations.map( ( item ) => (
-					<BlockTranformationItem
-						key={ item.name }
+					<BlockTransformationItem
+						key={ item.id || item.name }
 						item={ item }
 						onSelect={ onSelect }
-						setHoveredTransformItemName={
-							setHoveredTransformItemName
-						}
+						setHoveredTransformItem={ setHoveredTransformItem }
 					/>
 				) ) }
 				{ ! hasBothContentTransformations && restTransformItems }
@@ -148,22 +139,22 @@ const BlockTransformationsMenu = ( {
 function RestTransformationItems( {
 	restTransformations,
 	onSelect,
-	setHoveredTransformItemName,
+	setHoveredTransformItem,
 } ) {
 	return restTransformations.map( ( item ) => (
-		<BlockTranformationItem
-			key={ item.name }
+		<BlockTransformationItem
+			key={ item.id || item.name }
 			item={ item }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
+			setHoveredTransformItem={ setHoveredTransformItem }
 		/>
 	) );
 }
 
-function BlockTranformationItem( {
+function BlockTransformationItem( {
 	item,
 	onSelect,
-	setHoveredTransformItemName,
+	setHoveredTransformItem,
 } ) {
 	const { name, icon, title, isDisabled } = item;
 	return (
@@ -171,11 +162,13 @@ function BlockTranformationItem( {
 			className={ getBlockMenuDefaultClassName( name ) }
 			onClick={ ( event ) => {
 				event.preventDefault();
-				onSelect( name );
+				onSelect( name, item.variationName );
 			} }
 			disabled={ isDisabled }
-			onMouseLeave={ () => setHoveredTransformItemName( null ) }
-			onMouseEnter={ () => setHoveredTransformItemName( name ) }
+			onMouseLeave={ () => setHoveredTransformItem( null ) }
+			onMouseEnter={ () => setHoveredTransformItem( item ) }
+			onFocus={ () => setHoveredTransformItem( item ) }
+			onBlur={ () => setHoveredTransformItem( null ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

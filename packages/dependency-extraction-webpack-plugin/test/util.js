@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	camelCaseDash,
 	defaultRequestToExternal,
@@ -47,6 +44,20 @@ describe( 'defaultRequestToExternal', () => {
 			defaultRequestToExternal( '@wordpress/some-future-package' )
 		).toEqual( [ 'wp', 'someFuturePackage' ] );
 	} );
+
+	test( 'Handles react request', () => {
+		expect( defaultRequestToExternal( 'react' ) ).toBe( 'React' );
+	} );
+
+	test( 'Handles react-dom request', () => {
+		expect( defaultRequestToExternal( 'react-dom' ) ).toBe( 'ReactDOM' );
+	} );
+
+	test( 'Handles react-dom/client request', () => {
+		expect( defaultRequestToExternal( 'react-dom/client' ) ).toBe(
+			'ReactDOM'
+		);
+	} );
 } );
 
 describe( 'defaultRequestToHandle', () => {
@@ -62,5 +73,19 @@ describe( 'defaultRequestToHandle', () => {
 		expect(
 			defaultRequestToHandle( '@wordpress/some-future-package' )
 		).toBe( 'wp-some-future-package' );
+	} );
+
+	test( 'Handles react request', () => {
+		expect( defaultRequestToHandle( 'react' ) ).toBeUndefined();
+	} );
+
+	test( 'Handles react-dom request', () => {
+		expect( defaultRequestToHandle( 'react-dom' ) ).toBeUndefined();
+	} );
+
+	test( 'Handles react-dom/client request', () => {
+		expect( defaultRequestToHandle( 'react-dom/client' ) ).toBe(
+			'react-dom'
+		);
 	} );
 } );

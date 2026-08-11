@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import {
@@ -34,8 +31,6 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
