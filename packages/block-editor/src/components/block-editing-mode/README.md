@@ -1,20 +1,28 @@
 # Block Editing Mode
 
-The `block-editing-mode` component allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+`useBlockEditingMode` is a hook that reads, and optionally sets, the editing mode of a block. The mode restricts the user interface that is displayed for editing that block.
 
-## Usage
+The mode can be set to one of the following values:
 
-### Importing
+-   `'disabled'`: Prevents editing the block entirely, i.e., it cannot be selected.
+-   `'contentOnly'`: Hides all non-content UI, such as auxiliary controls in the toolbar, block movers, and block settings.
+-   `'default'`: Allows editing the block as normal.
 
-```js
-import { useBlockEditingMode } from '@wordpress/block-editor';
-```
+Modes don't cascade to inner blocks, with one exception: a block set to `'disabled'` also disables its inner blocks, unless an inner block has its own mode explicitly set.
 
-### Example
+If called outside of a block context, the mode is set on the editor root, which follows the same rule, so `'disabled'` applies to every block, while `'contentOnly'` does not.
+
+A mode can also be derived rather than set by the block itself. Under a `templateLock: 'contentOnly'` ancestor, a block without an explicitly set mode is derived as `'contentOnly'` if it is a content block (it has an attribute with `role: 'content'`, or `supports.contentRole`), and as `'disabled'` otherwise. An explicitly set mode wins over these derived modes. See the [block locking guide](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/block-locking/) for more on locking.
+
+## Development guidelines
+
+### Usage
 
 Called without an argument, the hook returns the current mode for the block. This is the most common use, and lets a block hide controls when editing is restricted:
 
-```js
+```jsx
+import { useBlockEditingMode } from '@wordpress/block-editor';
+
 function MyBlock( { attributes, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 	return (
@@ -30,41 +38,32 @@ function MyBlock( { attributes, setAttributes } ) {
 }
 ```
 
-Passing a mode sets it for the block and its inner blocks:
+Passing a mode sets it for the block:
 
-```js
+```jsx
+import { useBlockEditingMode } from '@wordpress/block-editor';
+
 function MyBlock( { attributes, setAttributes } ) {
 	useBlockEditingMode( 'disabled' );
 	return <div { ...useBlockProps() }></div>;
 }
 ```
 
-### Modes
+### Parameters
 
-The `mode` parameter can be set to one of the following values:
+#### `mode`
 
--   `'disabled'`: Prevents editing the block entirely, i.e., it cannot be selected.
--   `'contentOnly'`: Hides all non-content UI, such as auxiliary controls in the toolbar, block movers, and block settings.
--   `'default'`: Allows editing the block as normal.
+-   **Type:** `String`
+-   **Default:** `undefined`
 
-The mode is inherited by all of the block's inner blocks unless they have their own mode explicitly set.
+The editing mode to set for the block. One of `'disabled'`, `'contentOnly'`, or `'default'`. If `undefined`, the current editing mode remains unchanged.
 
-If called outside of a block context, the mode is applied to all blocks.
+### Return
 
-### Template locks
+-   **Type:** `String`
 
-A template lock can also set a mode, and it takes precedence over the mode a block sets for itself. If the template lock is `'contentOnly'`, the block's mode is overridden to `'contentOnly'` when the block has a content role attribute, and to `'disabled'` otherwise.
+The current editing mode for the block.
 
-This means a block that calls `useBlockEditingMode( 'default' )` can still be rendered as `'contentOnly'` or `'disabled'`. If a mode doesn't appear to take effect, check whether a template lock applies to the block. See the [block locking guide](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/block-locking/) for more on locking.
+## Related components
 
-## API
-
-### `useBlockEditingMode( mode )`
-
-#### Parameters
-
--   `mode` (optional) - The editing mode to apply. If `undefined`, the current editing mode remains unchanged.
-
-#### Returns
-
--   The current `BlockEditingMode` for the block.
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
