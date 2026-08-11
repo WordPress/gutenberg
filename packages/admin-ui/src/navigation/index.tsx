@@ -14,12 +14,14 @@ export const Navigation = ( {
 	items,
 	currentHref,
 	ariaLabel = __( 'Sections' ),
-	linkComponent: LinkComponent = 'a',
+	linkComponent,
 	className,
 }: NavigationProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
+
+	const LinkComponent = linkComponent ?? 'a';
 
 	if ( process.env.NODE_ENV !== 'production' ) {
 		const invalidItem = items.find(
