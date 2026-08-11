@@ -4,6 +4,9 @@
 
 ### New Features
 
+-   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
+    `--wp-widget-dashboard-tile-header-gap`; the header gap follows the tile
+    padding unless set apart ([#81352](https://github.com/WordPress/gutenberg/pull/81352)).
 -   The actions "More" menu renders each action's resolved icon as the menu
     item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 
