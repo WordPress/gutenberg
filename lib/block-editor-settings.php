@@ -15,11 +15,12 @@
  *
  * Note: The settings that are WP version specific should be handled inside the `compat` directory.
  *
- * @param array $settings Existing block editor settings.
+ * @param array                   $settings       Existing block editor settings.
+ * @param WP_Block_Editor_Context $editor_context The current block editor context.
  *
  * @return array New block editor settings.
  */
-function gutenberg_get_block_editor_settings( $settings ) {
+function gutenberg_get_block_editor_settings( $settings, $editor_context = null ) {
 	$global_styles = array();
 	$presets       = array(
 		array(
@@ -121,6 +122,18 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	$settings['canEditCSS'] = current_user_can( 'edit_css' );
 
+	if ( isset( $editor_context->post ) && $editor_context->post instanceof WP_Post ) {
+		$post_type = $editor_context->post->post_type;
+
+		if ( is_object_in_taxonomy( $post_type, 'category' ) ) {
+			$post_type_object = get_post_type_object( $post_type );
+
+			if ( $post_type_object && current_user_can( $post_type_object->cap->create_posts ) ) {
+				$settings['defaultCategory'] = (int) get_option( 'default_category' );
+			}
+		}
+	}
+
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
+add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0, 2 );

@@ -2,6 +2,7 @@ import {
 	sortBySelected,
 	getFilterMatcher,
 	findTerm,
+	getSelectedTermIds,
 } from '../hierarchical-term-selector';
 
 describe( 'sortBySelected', () => {
@@ -158,5 +159,51 @@ describe( 'getFilterMatcher', () => {
 		};
 		const matcher = getFilterMatcher( 'parent' );
 		expect( matcher( input ) ).toEqual( output );
+	} );
+} );
+
+describe( 'getSelectedTermIds', () => {
+	test( 'returns default category for new posts with no selected categories', () => {
+		expect(
+			getSelectedTermIds( {
+				terms: [],
+				slug: 'category',
+				isNewPost: true,
+				defaultCategory: 1,
+			} )
+		).toEqual( [ 1 ] );
+	} );
+
+	test( 'does not apply default category for existing posts', () => {
+		expect(
+			getSelectedTermIds( {
+				terms: [],
+				slug: 'category',
+				isNewPost: false,
+				defaultCategory: 1,
+			} )
+		).toEqual( [] );
+	} );
+
+	test( 'does not override existing selected categories', () => {
+		expect(
+			getSelectedTermIds( {
+				terms: [ 3 ],
+				slug: 'category',
+				isNewPost: true,
+				defaultCategory: 1,
+			} )
+		).toEqual( [ 3 ] );
+	} );
+
+	test( 'does not apply default category to non-category taxonomies', () => {
+		expect(
+			getSelectedTermIds( {
+				terms: [],
+				slug: 'post_tag',
+				isNewPost: true,
+				defaultCategory: 1,
+			} )
+		).toEqual( [] );
 	} );
 } );
