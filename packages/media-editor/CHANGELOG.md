@@ -7,6 +7,11 @@
 -   Add `scaledSize` to the cropper state and a `setScaledSize` setter, for scaling the whole image down before a crop is taken. `buildModifiers` emits the matching `resize` modifier first.
 -   Add linked width and height fields to the Crop panel for scaling the image, with the resulting saved size shown when a crop is in play.
 
+### Bug Fixes
+
+-   The undo shortcut now leaves the browser's own undo alone in any field you can type into, rather than only in fields outside a crop control region.
+-   The crop handle tooltip now reports dimensions against the scaled image, matching the saved size shown in the Crop panel.
+
 ## 0.15.0 (2026-07-29)
 
 ## 0.14.0 (2026-07-14)

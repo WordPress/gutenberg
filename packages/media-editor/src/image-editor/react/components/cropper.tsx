@@ -776,10 +776,16 @@ function CropperInner(
 		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
-		const region = getSourceRegion( state, {
-			width: state.image.naturalWidth,
-			height: state.image.naturalHeight,
-		} );
+		// Measured against the scaled size when one is set, so the tooltip
+		// reports the size the file will be saved at rather than the size
+		// of an intermediate the user never receives.
+		const region = getSourceRegion(
+			state,
+			state.scaledSize ?? {
+				width: state.image.naturalWidth,
+				height: state.image.naturalHeight,
+			}
+		);
 		return { width: region.width, height: region.height };
 	}, [ showDimensions, activeHandle, state ] );
 

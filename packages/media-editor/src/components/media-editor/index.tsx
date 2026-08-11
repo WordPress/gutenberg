@@ -42,7 +42,7 @@ import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
-import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
+import { isTextEntryField } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 import {
 	MEDIA_EDITOR_NOTICES_CONTEXT,
@@ -533,12 +533,7 @@ function MediaEditorContent( {
 			( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
 		if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
 			const target = event.target as HTMLElement;
-			const isMetadataField =
-				( target.tagName === 'INPUT' ||
-					target.tagName === 'TEXTAREA' ||
-					target.isContentEditable ) &&
-				! target.closest( `[${ CROP_CONTROL_ATTR }]` );
-			if ( ! isMetadataField ) {
+			if ( ! isTextEntryField( target ) ) {
 				event.preventDefault();
 				if ( isCropInteractionActive ) {
 					return;

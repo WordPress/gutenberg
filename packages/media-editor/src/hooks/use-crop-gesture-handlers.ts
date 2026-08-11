@@ -2,12 +2,53 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useMediaEditor } from '../state';
 
 /**
- * Data attribute applied to crop control wrappers. The modal's keyboard
- * shortcut handler uses this to distinguish crop controls (where custom
- * undo/redo should fire) from metadata text fields (where the browser's
- * native undo should be preserved).
+ * Data attribute applied to crop control wrappers, marking the region a
+ * pointer or keyboard gesture belongs to so repeated input inside it
+ * coalesces into one history entry.
  */
 export const CROP_CONTROL_ATTR = 'data-crop-control';
+
+/**
+ * Input types the browser keeps its own undo stack for.
+ *
+ * A range slider is an `<input>` too, but there is no typed text to
+ * restore, so Ctrl/Cmd+Z on one should undo the image edit it drives.
+ */
+const TEXT_ENTRY_INPUT_TYPES = new Set( [
+	'email',
+	'number',
+	'password',
+	'search',
+	'tel',
+	'text',
+	'url',
+] );
+
+/**
+ * Whether Ctrl/Cmd+Z on this element means "undo my typing".
+ *
+ * The editor's undo shortcut moves through the image edit history, which
+ * is right everywhere except a field someone is typing into — there, the
+ * browser's own undo has to win, or a keystroke correction silently
+ * reverts a crop instead.
+ *
+ * Being inside a crop control region makes no difference: the Crop
+ * panel's scale fields are text entry and sit inside one, while the fine
+ * rotation slider is not text entry and also sits inside one. The
+ * element decides, not where it lives.
+ *
+ * @param target The element the key event fired on.
+ * @return Whether the browser's undo should handle the shortcut.
+ */
+export function isTextEntryField( target: HTMLElement ): boolean {
+	if ( target.isContentEditable || target.tagName === 'TEXTAREA' ) {
+		return true;
+	}
+	return (
+		target.tagName === 'INPUT' &&
+		TEXT_ENTRY_INPUT_TYPES.has( ( target as HTMLInputElement ).type )
+	);
+}
 
 /** Idle window used to group repeated keyboard input into one gesture. */
 const KEYBOARD_GESTURE_IDLE_MS = 300;

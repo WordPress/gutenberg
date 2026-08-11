@@ -15,7 +15,9 @@ const GRID_INTERACTIVE_CLASS =
 	'wp-media-editor-image-editor__canvas--grid-interactive';
 const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
 
-function createController(): CropperController {
+function createController(
+	stateOverrides: Partial< CropperController[ 'state' ] > = {}
+): CropperController {
 	return {
 		state: {
 			...DEFAULT_STATE,
@@ -24,7 +26,9 @@ function createController(): CropperController {
 				naturalWidth: 600,
 				naturalHeight: 400,
 			},
+			...stateOverrides,
 		},
+		setScaledSize: jest.fn(),
 		setImage: jest.fn(),
 		setPan: jest.fn(),
 		setZoom: jest.fn(),
@@ -1143,5 +1147,65 @@ describe( 'Cropper', () => {
 		render( <Cropper src="tall.jpg" controller={ controller } /> );
 
 		expect( imageRendering() ).not.toBe( 'pixelated' );
+	} );
+	describe( 'dimensions tooltip', () => {
+		/**
+		 * Render, grab a resize handle to make the tooltip appear, and read
+		 * the pixel dimensions out of it.
+		 *
+		 * @param controller Controller whose state drives the tooltip.
+		 */
+		async function readTooltipDimensions(
+			controller: CropperController
+		): Promise< { width: number; height: number; unmount: () => void } > {
+			const { unmount } = render(
+				<Cropper
+					src="test.jpg"
+					controller={ controller }
+					freeformCrop
+				/>
+			);
+
+			const handle = await screen.findByRole( 'button', {
+				name: 'Resize from top-left corner',
+			} );
+			fireEvent.pointerDown( handle, {
+				button: 0,
+				clientX: 0,
+				clientY: 0,
+				pointerId: 1,
+			} );
+
+			const tooltip = screen.getByTestId( 'cropper-dimensions-tooltip' );
+			const [ width, height ] = ( tooltip.textContent ?? '' )
+				.match( /\d+/g )!
+				.map( Number );
+
+			fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+			return { width, height, unmount };
+		}
+
+		it( 'reports the crop against the scaled image, not the original', async () => {
+			const cropRect = { x: 0.25, y: 0.25, width: 0.5, height: 0.5 };
+
+			const unscaled = await readTooltipDimensions(
+				createController( { cropRect } )
+			);
+			unscaled.unmount();
+
+			// Half the source in each direction, so the same crop should
+			// report half the pixels.
+			const scaled = await readTooltipDimensions(
+				createController( {
+					cropRect,
+					scaledSize: { width: 300, height: 200 },
+				} )
+			);
+			scaled.unmount();
+
+			expect( scaled.width ).toBeCloseTo( unscaled.width / 2, 0 );
+			expect( scaled.height ).toBeCloseTo( unscaled.height / 2, 0 );
+		} );
 	} );
 } );
