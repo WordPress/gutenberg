@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `usePopoverScroll`: Prevent the default action on the wheel events it forwards into the canvas. Block popovers render outside the canvas iframe, in a document with no room to scroll, so the browser would start a mousewheel transaction against a target it could never scroll and drop subsequent wheel events until the pointer moved. Scrolling with the pointer over the in-between block inserter froze for several seconds as a result ([#81415](https://github.com/WordPress/gutenberg/pull/81415)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
