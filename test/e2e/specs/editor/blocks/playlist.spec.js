@@ -31,7 +31,7 @@ test.describe( 'Playlist block', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'shows the add track control when a playlist track is selected', async ( {
+	test( 'does not share the add track control with a selected playlist track', async ( {
 		admin,
 		editor,
 		page,
@@ -71,11 +71,17 @@ test.describe( 'Playlist block', () => {
 		).toBeVisible();
 		await editor.showBlockToolbar();
 
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		// The track's own Replace control confirms the toolbar is showing.
 		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Add track' } )
+			blockToolbar.getByRole( 'button', { name: 'Replace' } )
 		).toBeVisible();
+		// The playlist's Add track control is no longer shared with the track.
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'Add track' } )
+		).toBeHidden();
 	} );
 
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
