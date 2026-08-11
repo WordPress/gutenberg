@@ -1,3 +1,10 @@
+@use "sass:math";
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-icon {
 	display: flex;
 	align-items: center;
@@ -9,7 +16,7 @@
 		svg {
 			fill: currentColor;
 
-			// Optimizate for high contrast modes.
+			// Optimize for high contrast modes.
 			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 			@media (forced-colors: active) {
 				fill: CanvasText;

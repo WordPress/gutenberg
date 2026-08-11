@@ -1,0 +1,16 @@
+{
+	"name": "@wordpress/welcome-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/compose": "file:../../packages/compose",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/primitives": "file:../../packages/primitives",
+		"clsx": "^2.1.1"
+	}
+}

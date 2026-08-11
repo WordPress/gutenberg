@@ -1,5 +1,12 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-text-editor {
+	@include reset;
 	position: relative;
+	isolation: isolate;
 	width: 100%;
 	background-color: $white;
 	flex-grow: 1;
@@ -46,7 +53,7 @@
 // Exit code editor toolbar.
 .editor-text-editor__toolbar {
 	position: sticky;
-	z-index: z-index(".editor-text-editor__toolbar");
+	z-index: 1;
 	top: 0;
 	left: 0;
 	right: 0;

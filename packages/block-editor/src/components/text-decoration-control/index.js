@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import {
@@ -49,8 +42,6 @@ export default function TextDecorationControl( {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label={ __( 'Decoration' ) }
 			className={ clsx(
 				'block-editor-text-decoration-control',

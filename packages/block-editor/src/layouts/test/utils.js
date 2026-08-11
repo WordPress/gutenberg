@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { appendSelectors, getBlockGapCSS } from '../utils';
 
 const layoutDefinitions = {

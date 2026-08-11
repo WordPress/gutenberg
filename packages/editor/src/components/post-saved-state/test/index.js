@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostSavedState from '../';
 
 const mockSavePost = jest.fn();
@@ -69,6 +58,24 @@ describe( 'PostSavedState', () => {
 		render( <PostSavedState /> );
 
 		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
+	} );
+
+	it( 'returns a disabled button while a non-post entity is being saved', () => {
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			isSavingNonPostEntityChanges: true,
+			postStatus: 'draft',
+		} ) );
+
+		render( <PostSavedState /> );
+
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {

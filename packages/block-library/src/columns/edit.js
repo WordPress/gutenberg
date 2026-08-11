@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Notice,
@@ -15,7 +8,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-
 import {
 	InspectorControls,
 	useInnerBlocksProps,
@@ -31,10 +23,6 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
@@ -153,7 +141,6 @@ function ColumnInspectorControls( {
 		<ToolsPanel
 			label={ __( 'Settings' ) }
 			resetAll={ () => {
-				updateColumns( count, minCount );
 				setAttributes( {
 					isStackedOnMobile: true,
 				} );
@@ -161,36 +148,24 @@ function ColumnInspectorControls( {
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ canInsertColumnBlock && (
-				<ToolsPanelItem
-					label={ __( 'Columns' ) }
-					isShownByDefault
-					hasValue={ () => count }
-					onDeselect={ () => updateColumns( count, minCount ) }
-				>
-					<VStack spacing={ 4 }>
-						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Columns' ) }
-							value={ count }
-							onChange={ ( value ) =>
-								updateColumns(
-									count,
-									Math.max( minCount, value )
-								)
-							}
-							min={ Math.max( 1, minCount ) }
-							max={ Math.max( 6, count ) }
-						/>
-						{ count > 6 && (
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'This column count exceeds the recommended amount and may cause visual breakage.'
-								) }
-							</Notice>
-						) }
-					</VStack>
-				</ToolsPanelItem>
+				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
+					<RangeControl
+						label={ __( 'Columns' ) }
+						value={ count }
+						onChange={ ( value ) =>
+							updateColumns( count, Math.max( minCount, value ) )
+						}
+						min={ Math.max( 1, minCount ) }
+						max={ Math.max( 6, count ) }
+					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+				</VStack>
 			) }
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
@@ -203,7 +178,6 @@ function ColumnInspectorControls( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -242,7 +216,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	/**
 	 * Update all child Column blocks with a new vertical alignment setting
 	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
+	 * to override anything set on a individual column basis.
 	 *
 	 * @param {string} newVerticalAlignment The vertical alignment setting.
 	 */
@@ -280,17 +254,12 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 }
 
 function Placeholder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
+	const { blockType, variations } = useSelect(
 		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
 				variations: getBlockVariations( name, 'block' ),
 			};
 		},
@@ -306,7 +275,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				label={ blockType?.title }
 				variations={ variations }
 				instructions={ __( 'Divide into columns. Select a layout:' ) }
-				onSelect={ ( nextVariation = defaultVariation ) => {
+				onSelect={ ( nextVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );
 					}
@@ -320,7 +289,6 @@ function Placeholder( { clientId, name, setAttributes } ) {
 						);
 					}
 				} }
-				allowSkip
 			/>
 		</div>
 	);

@@ -1,4 +1,5 @@
-export interface APIFetchOptions extends RequestInit {
+export interface APIFetchOptions< Parse extends boolean = boolean >
+	extends RequestInit {
 	// Override headers, we only accept it as an object due to the `nonce` middleware
 	headers?: Record< string, string >;
 	path?: string;
@@ -6,13 +7,17 @@ export interface APIFetchOptions extends RequestInit {
 	/**
 	 * @default true
 	 */
-	parse?: boolean;
+	parse?: Parse;
 	data?: any;
 	namespace?: string;
 	endpoint?: string;
 }
 
-export type APIFetchMiddleware = (
-	options: APIFetchOptions,
-	next: ( nextOptions: APIFetchOptions ) => Promise< any >
+export type FetchHandler< Parse extends boolean = boolean > = (
+	nextOptions: APIFetchOptions< Parse >
+) => Promise< any >;
+
+export type APIFetchMiddleware< Parse extends boolean = boolean > = (
+	options: APIFetchOptions< Parse >,
+	next: FetchHandler< Parse >
 ) => Promise< any >;

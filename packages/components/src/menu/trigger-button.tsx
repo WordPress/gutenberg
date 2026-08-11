@@ -1,25 +1,14 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import type { MenuTriggerButtonProps } from './types';
-import { MenuContext } from './context';
+import type { TriggerButtonProps } from './types';
+import { Context } from './context';
 
-export const MenuTriggerButton = forwardRef<
+export const TriggerButton = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuTriggerButtonProps, 'button', false >
->( function MenuTriggerButton( { children, disabled = false, ...props }, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< TriggerButtonProps, 'button', false >
+>( function TriggerButton( { children, disabled = false, ...props }, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(

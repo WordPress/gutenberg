@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { DependencyList, RefCallback } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useRef } from '@wordpress/element';
 
 /**
@@ -31,7 +24,7 @@ export default function useRefEffect< TElement = Node >(
 	callback: ( node: TElement ) => ( () => void ) | void,
 	dependencies: DependencyList
 ): RefCallback< TElement | null > {
-	const cleanupRef = useRef< ( () => void ) | void >();
+	const cleanupRef = useRef< ( () => void ) | void >( undefined );
 	return useCallback( ( node: TElement | null ) => {
 		if ( node ) {
 			cleanupRef.current = callback( node );

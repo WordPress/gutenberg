@@ -1,11 +1,9 @@
-/**
- * Internal dependencies
- */
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
- * can be found.
+ * can be found. Use instead of `Range.getBoundingClientRect()`, which is often
+ * broken, especially for collapsed ranges.
  *
  * @param {Range} range The range.
  *

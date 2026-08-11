@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
