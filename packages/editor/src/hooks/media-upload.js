@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
@@ -8,10 +5,6 @@ import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { MediaUploadModal: MediaUploadModalComponent } = unlock(

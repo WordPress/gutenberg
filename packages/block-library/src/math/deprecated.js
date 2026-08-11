@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 
 // v1: Add a wrapper div around the math element.

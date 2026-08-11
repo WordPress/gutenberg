@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, click, hover, sleep } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import {
 	ToggleGroupControl,

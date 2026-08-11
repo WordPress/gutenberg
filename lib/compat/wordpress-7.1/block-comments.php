@@ -94,148 +94,89 @@ function gutenberg_strip_inline_note_markers( $block_content ) {
 add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
 
 /**
- * Allows note mention markup in the content of `note` comments for users
- * without `unfiltered_html`.
+ * Allows the note mention chip markup through comment kses.
  *
- * The notes `@` mention completer stores a mention as a link to the mentioned
- * user's author page carrying the user's ID in a class:
- * `<a class="wp-note-mention user-N" href="…">@Name</a>`. The default comment
- * kses allowlist includes `a` but only its `href` and `title` attributes, so
- * for users without `unfiltered_html` the mention classes would be stripped
- * on save.
+ * The notes `@` mention completer stores a mention as a chip carrying the
+ * mentioned user's ID in a class token:
+ * `<span class="wp-note-mention user-N">@Name</span>`. The default comment
+ * kses allowlist (the minimal `$allowedtags` used in the
+ * `pre_comment_content` context) does not allow `span` at all, so for users
+ * without `unfiltered_html` the mention would be stripped on save.
  *
- * This callback is deliberately not attached globally: `class` attributes are
- * CSS and JavaScript selector hooks, so allowing them in every comment would
- * extend what regular (including anonymous) commenters can publish. Instead
- * gutenberg_notes_arm_mention_kses() attaches it only while
- * a `note` comment is being filtered and detaches it right after, so the
- * sanitization of other comment types is unchanged. Notes can only be written
- * by logged-in users who can edit the post, and are never rendered on the
- * front end.
+ * This allowance is deliberately narrow and always on: `span` is a
+ * semantics-free element and gutenberg_notes_sanitize_mention_classes()
+ * reduces its `class` to the two mention tokens right after kses runs, so
+ * regular (including anonymous) commenters gain nothing beyond the inert
+ * mention markup itself. Keeping it unconditional avoids per-comment-type
+ * arming and disarming of kses state across the direct and REST write paths.
  *
- * @param array|string $allowed The allowed tags structure for the context.
- * @param string       $context The kses context.
- * @return array|string Modified allowed tags structure.
+ * @param array<string, array<string, bool>> $allowed The allowed tags structure for the context.
+ * @param string                             $context The kses context.
+ * @return array<string, array<string, bool>> Modified allowed tags structure.
  */
-function gutenberg_notes_allow_mention_attributes( $allowed, $context ) {
-	if ( 'pre_comment_content' !== $context || ! is_array( $allowed ) ) {
+function gutenberg_notes_allow_mention_span( $allowed, $context ): array {
+	if ( ! is_array( $allowed ) ) {
+		$allowed = array();
+	}
+	if ( 'pre_comment_content' !== $context ) {
 		return $allowed;
 	}
 
-	if ( ! isset( $allowed['a'] ) || ! is_array( $allowed['a'] ) ) {
-		$allowed['a'] = array();
+	if ( ! isset( $allowed['span'] ) || ! is_array( $allowed['span'] ) ) {
+		$allowed['span'] = array();
 	}
 
-	$allowed['a']['class'] = true;
+	$allowed['span']['class'] = true;
 
 	return $allowed;
 }
 
 /**
- * Arms the mention markup allowance for a single note kses pass.
+ * Reduces `span` classes in comment content to the note mention tokens.
  *
- * @see gutenberg_notes_allow_mention_attributes()
+ * gutenberg_notes_allow_mention_span() lets `class` through kses on `span`
+ * so the mention chip survives, but `class` is an open-ended styling and
+ * scripting hook, so this companion pass - running right after
+ * `wp_filter_kses` at priority 10 - strips every class token except the two
+ * the mention markup uses: `wp-note-mention` and `user-N`. `span` is the only
+ * comment tag allowed to carry `class` at all, so walking `span` tags covers
+ * the entire allowance.
+ *
+ * The pass only applies while the restrictive comment allowlist is active:
+ * users with `unfiltered_html` are filtered through `wp_filter_post_kses`
+ * (or not at all), where arbitrary classes are already permitted, and
+ * narrowing their markup here would restrict what core allows them to post.
+ *
+ * @param string $content Slashed comment content, already filtered by kses.
+ * @return string Slashed comment content with span classes reduced.
  */
-function gutenberg_notes_arm_mention_kses() {
-	add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes', 10, 2 );
-
-	/*
-	 * Disarm once this one comment's content has been filtered, so the
-	 * allowance cannot apply to any later comment. PHP_INT_MAX runs after
-	 * every other 'pre_comment_content' callback (wp_filter_kses at 10,
-	 * wp_rel_ugc at 15, anything a plugin adds): when a callback empties its
-	 * own priority bucket mid-run, WP_Hook skips the bucket that follows, so
-	 * a self-removing disarm must be the final bucket or it would silently
-	 * swallow the next callback.
-	 */
-	add_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', PHP_INT_MAX );
-
-	/*
-	 * Backstop: if the write aborts between arming and content filtering (for
-	 * example a failed capability or flood check in a batched REST request),
-	 * disarm at the end of the REST request so the allowance cannot leak into
-	 * a later write.
-	 */
-	add_filter( 'rest_request_after_callbacks', 'gutenberg_notes_disarm_mention_kses' );
-}
-
-/**
- * Disarms the mention markup allowance after a note kses pass.
- *
- * Attached by gutenberg_notes_arm_mention_kses(); self-removes from both of
- * its hooks so the extended allowlist never outlives the single note write
- * that armed it.
- *
- * @param mixed $value The filtered value, passed through untouched.
- * @return mixed The unchanged value.
- */
-function gutenberg_notes_disarm_mention_kses( $value = null ) {
-	remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' );
-	remove_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', PHP_INT_MAX );
-	remove_filter( 'rest_request_after_callbacks', 'gutenberg_notes_disarm_mention_kses' );
-
-	return $value;
-}
-
-/**
- * Arms the mention markup allowance when a `note` comment is inserted.
- *
- * Covers every wp_new_comment() caller; runs before wp_filter_comment()
- * sanitizes the content.
- *
- * @param array $commentdata Comment data.
- * @return array Unchanged comment data.
- */
-function gutenberg_notes_scope_mention_kses( $commentdata ) {
-	if ( isset( $commentdata['comment_type'] ) && 'note' === $commentdata['comment_type'] ) {
-		gutenberg_notes_arm_mention_kses();
+function gutenberg_notes_sanitize_mention_classes( $content ): string {
+	if ( ! is_string( $content ) ) {
+		$content = '';
+	}
+	if ( false === has_filter( 'pre_comment_content', 'wp_filter_kses' ) ) {
+		return $content;
 	}
 
-	return $commentdata;
-}
+	$processor = new WP_HTML_Tag_Processor( wp_unslash( $content ) );
 
-/**
- * Arms the mention markup allowance for REST note writes.
- *
- * Runs in WP_REST_Comments_Controller::prepare_item_for_database() for both
- * creates and updates, before the comment is sanitized. Neither carries the
- * comment type in the prepared data, so it is resolved from the comment being
- * updated or, on creation, from the request's `type` param.
- *
- * @param array           $prepared_comment Prepared comment data.
- * @param WP_REST_Request $request          The REST request.
- * @return array Unchanged prepared comment data.
- */
-function gutenberg_notes_scope_mention_kses_rest( $prepared_comment, $request ) {
-	$comment_type = isset( $prepared_comment['comment_type'] ) ? $prepared_comment['comment_type'] : '';
-
-	if ( '' === $comment_type && ! empty( $request['id'] ) ) {
-		$comment_type = get_comment_type( (int) $request['id'] );
+	while ( $processor->next_tag( 'SPAN' ) ) {
+		foreach ( $processor->class_list() as $token ) {
+			if ( 'wp-note-mention' !== $token && ! preg_match( '/^user-[1-9][0-9]*$/', $token ) ) {
+				// Removing the last class also removes the attribute itself.
+				$processor->remove_class( $token );
+			}
+		}
 	}
 
-	/*
-	 * On creation the controller only copies the `type` param into the
-	 * prepared data after this filter has run, and it inserts through
-	 * wp_filter_comment() directly - never through wp_new_comment() and its
-	 * 'preprocess_comment' filter - so this is the only chance to arm and the
-	 * type must be resolved from the request.
-	 */
-	if ( '' === $comment_type && isset( $request['type'] ) ) {
-		$comment_type = $request['type'];
-	}
-
-	if ( 'note' === $comment_type ) {
-		gutenberg_notes_arm_mention_kses();
-	}
-
-	return $prepared_comment;
+	return wp_slash( $processor->get_updated_html() );
 }
 
 /*
- * When WordPress itself scopes the mention allowance inside
- * wp_filter_comment() (WordPress 7.1+), defer to it.
+ * When WordPress itself carries the mention allowance (WordPress 7.1+),
+ * defer to it.
  */
-if ( ! function_exists( '_wp_kses_allow_note_mention_attributes' ) ) {
-	add_filter( 'preprocess_comment', 'gutenberg_notes_scope_mention_kses' );
-	add_filter( 'rest_preprocess_comment', 'gutenberg_notes_scope_mention_kses_rest', 10, 2 );
+if ( ! function_exists( '_wp_kses_allow_note_mention_span' ) ) {
+	add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_span', 10, 2 );
+	add_filter( 'pre_comment_content', 'gutenberg_notes_sanitize_mention_classes', 11 );
 }

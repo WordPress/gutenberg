@@ -174,6 +174,9 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether the caller owns the upload lifecycle UX (progress tracking,
+	// save locking) and uses the handler only as its server transport.
+	isTransportOnly?: boolean;
 }
 
 /**

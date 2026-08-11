@@ -15,6 +15,7 @@
 	"references": [ { "path": "./tsconfig.json" } ],
 	"files": [ "global.d.ts" ],
 	"include": [
+		"*-plugins/test/**/*",
 		"src/**/stories/**/*",
 		"src/**/test/**/*",
 		"src/**/*.story.*"

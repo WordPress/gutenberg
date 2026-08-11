@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	PanelBody,
 	Button,
@@ -15,10 +12,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { mediaSideloadFromUrlKey } = unlock( blockEditorPrivateApis );

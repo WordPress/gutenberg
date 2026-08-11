@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Template } from '../types';
 
 /**

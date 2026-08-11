@@ -132,6 +132,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				);
 				return false;
 			}
+
+			$icon_properties['content'] = $sanitized_icon_content;
 		}
 
 		$qualified_name = $collection . '/' . $unqualified_name;

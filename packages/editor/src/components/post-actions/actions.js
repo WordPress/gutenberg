@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useSetAsHomepageAction } from './set-as-homepage';

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import flex from '../flex';
 
 const FlexLayoutInspectorControls = flex.inspectorControls;

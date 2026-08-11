@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import BaseControl, { useBaseControlProps } from '../../base-control';
@@ -32,7 +21,6 @@ function UnconnectedToggleGroupControl(
 		__nextHasNoMarginBottom: _,
 		size: _size,
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,

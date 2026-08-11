@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Placeholder,
 	QueryControls,
@@ -42,10 +35,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	MIN_EXCERPT_LENGTH,
 	MAX_EXCERPT_LENGTH,

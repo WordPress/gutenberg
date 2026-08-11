@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { render, screen, within, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -17,13 +14,7 @@ import {
 	addHours,
 } from 'date-fns';
 import { ar } from 'date-fns/locale';
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import { usePreviewRange, DateRangeCalendar } from '../date-range-calendar';
 import { TZDate } from '../';
 import { getDateButton, getDateCell, monthNameFormatter } from './__utils__';

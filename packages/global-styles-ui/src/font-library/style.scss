@@ -85,11 +85,16 @@ $footer-height: 90px;
 	text-transform: uppercase;
 
 	@include mixins.break-small() {
-		.font-library__page-selection-trigger {
+		.components-select-control__input {
 			font-size: 11px !important;
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
+}
+
+.font-library__search {
+	// Fixed width to ensure the control doesn't resize with the reset button.
+	width: 240px;
 }
 
 .font-library__fonts-title {
