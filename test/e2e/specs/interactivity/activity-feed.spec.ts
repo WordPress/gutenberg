@@ -127,6 +127,21 @@ const browseFeed = async ( page: Page ) => {
 	// The photo card's like reset: the region re-hydrated fresh server
 	// content, so the keyed card mounted as a new instance.
 	await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '0' );
+
+	// Like the freshly mounted card.
+	await page.getByTestId( 'post-11-like' ).click();
+	await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '1' );
+
+	// --- Re-visit the same page: the same keys exist on both sides. ---
+	// A keyed item is reused when the new page carries the same key: the
+	// element keeps its identity and its state (the like survives), and
+	// init does not re-run. The videos→photos swap re-inited the card (11)
+	// because post-11's key matched nothing in the videos tree; this
+	// same-key swap must NOT re-init (stays 11).
+	await page.getByTestId( 'tab-photos' ).click();
+	await expect( page.getByTestId( 'post-11' ) ).toBeVisible();
+	await expect( page.getByTestId( 'post-11-like' ) ).toHaveText( '1' );
+	await expect( page.getByTestId( 'init-total' ) ).toHaveText( '11' );
 };
 
 test.describe( 'activity feed', () => {
