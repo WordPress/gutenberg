@@ -13,6 +13,12 @@
     `WidgetType.icon` always reaches hosts renderable
     ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 
+### Enhancements
+
+-   Name the two forms of an action icon: `WidgetActionRecord` carries the
+    registered icon name on the wire, and `WidgetAction.icon` narrows to the
+    rendered element hosts receive ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
+
 ### Documentation
 
 -   Simplify the actions doc: the accepted `href` forms in one statement and
