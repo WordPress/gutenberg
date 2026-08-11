@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -40,10 +37,6 @@ import type {
 	FontFamily,
 	CollectionFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';

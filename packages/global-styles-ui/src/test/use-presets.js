@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
 jest.mock( '../hooks', () => ( {
 	useSetting: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
 import { usePresets } from '../presets/use-presets';
-
 const mockUseSetting = require( '../hooks' ).useSetting;
 
 describe( 'usePresets', () => {

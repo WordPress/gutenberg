@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
 } from '../crdt-user-selections';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-
 jest.mock( '@wordpress/data', () => ( {
 	select: jest.fn(),
 	// Needed because @wordpress/rich-text initialises its store at import time.
@@ -22,7 +14,6 @@ jest.mock( '@wordpress/data', () => ( {
 	register: jest.fn(),
 	createSelector: ( selector: Function ) => selector,
 } ) );
-
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: 'core/block-editor',
 } ) );

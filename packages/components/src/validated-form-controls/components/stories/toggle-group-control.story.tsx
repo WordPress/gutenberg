@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { formDecorator } from './story-utils';
 import { ValidatedToggleGroupControl } from '../toggle-group-control';
 import { ToggleGroupControlOption } from '../../../toggle-group-control';

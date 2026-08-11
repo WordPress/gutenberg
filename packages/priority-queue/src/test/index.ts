@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createQueue } from '../';
 import _requestIdleCallback from '../request-idle-callback';
 

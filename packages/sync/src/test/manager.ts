@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
 import * as buffer from 'lib0/buffer';
@@ -13,10 +10,6 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,

@@ -1,13 +1,5 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * Internal dependencies
- */
 import {
 	editEntityRecord,
 	clearEntityRecordEdits,

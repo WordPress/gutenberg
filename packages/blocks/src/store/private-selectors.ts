@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';

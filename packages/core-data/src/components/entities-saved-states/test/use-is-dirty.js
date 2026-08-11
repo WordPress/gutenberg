@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useIsDirty } from '../hooks/use-is-dirty';
 
 jest.mock( '@wordpress/data', () => {

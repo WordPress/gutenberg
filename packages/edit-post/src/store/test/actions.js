@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
@@ -10,10 +7,6 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { store as editPostStore } from '..';
 import { unlock } from '../../lock-unlock';
 

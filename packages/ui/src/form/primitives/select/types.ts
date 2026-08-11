@@ -1,6 +1,5 @@
 import type { Select as _Select } from '@base-ui/react/select';
 import type { ReactElement } from 'react';
-
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 

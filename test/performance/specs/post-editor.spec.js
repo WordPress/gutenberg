@@ -1,13 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 

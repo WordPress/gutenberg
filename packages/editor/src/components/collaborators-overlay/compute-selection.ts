@@ -3,7 +3,6 @@ import type {
 	CoreDataPrivateApis,
 	ResolvedSelection,
 } from '@wordpress/core-data';
-
 import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,

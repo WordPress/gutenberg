@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
 import {
 	preloadScriptModules,

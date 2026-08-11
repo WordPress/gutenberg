@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useId, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { ToggleGroupControl } from '../../toggle-group-control';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store, STORE_NAME } from '../store';
 import { unlock } from '../lock-unlock';
 

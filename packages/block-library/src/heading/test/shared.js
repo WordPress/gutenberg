@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getLevelFromHeadingNodeName } from '../shared';
 
 describe( 'getLevelFromHeadingNodeName()', () => {

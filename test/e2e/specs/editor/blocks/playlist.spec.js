@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const audioPath = path.join(

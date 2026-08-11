@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type ComboboxControlOption = {
