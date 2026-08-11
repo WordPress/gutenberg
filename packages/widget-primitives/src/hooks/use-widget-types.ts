@@ -7,6 +7,8 @@ import {
 import { resolveFields } from '../field-types';
 import { resolveIcon } from '../icon-resolver';
 import type {
+	WidgetAction,
+	WidgetActionRecord,
 	WidgetIcon,
 	WidgetModuleRecord,
 	WidgetName,
@@ -20,6 +22,21 @@ import type {
 const pendingIcon: WidgetIcon = createElement( 'svg', {
 	viewBox: '0 0 24 24',
 } );
+
+/**
+ * Emitted actions carry only renderable icons: a wire reference resolves
+ * after the gate and patches in; anything else non-renderable drops.
+ *
+ * @param actions Declared actions, from the record or the module.
+ */
+function withRenderableIcons(
+	actions: ( WidgetAction | WidgetActionRecord )[]
+): WidgetAction[] {
+	return actions.map( ( { icon, ...action } ) => ( {
+		...action,
+		...( isValidElement( icon ) ? { icon: icon as WidgetIcon } : {} ),
+	} ) );
+}
 
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
@@ -89,6 +106,8 @@ export function useWidgetTypes(
 					const icon =
 						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
 
+					const actions = record.actions ?? metadata.actions;
+
 					return {
 						...metadata,
 						...( metadata.attributes
@@ -121,8 +140,8 @@ export function useWidgetTypes(
 						...( record.keywords
 							? { keywords: record.keywords }
 							: {} ),
-						...( record.actions
-							? { actions: record.actions }
+						...( actions
+							? { actions: withRenderableIcons( actions ) }
 							: {} ),
 					} as WidgetType;
 				} catch {
@@ -173,37 +192,32 @@ export function useWidgetTypes(
 			}
 
 			/*
-			 * Each action icon reference resolves off the gate and patches
-			 * into the emitted type; an unresolvable reference clears, so
-			 * hosts only render elements.
+			 * Each record action's icon reference resolves off the gate
+			 * and patches into the emitted action; an unresolvable
+			 * reference leaves the action without an icon.
 			 */
-			for ( const widgetType of results ) {
-				for ( const action of widgetType?.actions ?? [] ) {
+			for ( const record of records ) {
+				for ( const action of record.actions ?? [] ) {
 					if ( typeof action.icon !== 'string' ) {
 						continue;
 					}
 
-					const reference = action.icon;
-					void resolveIcon( reference ).then( ( resolved ) => {
-						if ( cancelled ) {
+					void resolveIcon( action.icon ).then( ( resolved ) => {
+						if ( cancelled || ! resolved ) {
 							return;
 						}
 
 						setWidgetTypes( ( prev ) =>
 							prev.map( ( type ) => {
-								if ( type.name !== widgetType?.name ) {
+								if ( type.name !== record.name ) {
 									return type;
 								}
 
 								return {
 									...type,
 									actions: type.actions?.map( ( entry ) =>
-										entry.id === action.id &&
-										entry.icon === reference
-											? {
-													...entry,
-													icon: resolved ?? undefined,
-											  }
+										entry.id === action.id
+											? { ...entry, icon: resolved }
 											: entry
 									),
 								};

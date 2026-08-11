@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Set Sass's `charset` option to `false` so production builds no longer emit a UTF-8 BOM in the middle of the extracted CSS ([#81383](https://github.com/WordPress/gutenberg/pull/81383)).
 
 ## 34.0.0 (2026-07-29)
 

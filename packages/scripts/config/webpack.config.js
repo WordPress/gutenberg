@@ -202,6 +202,9 @@ const baseConfig = {
 						loader: require.resolve( 'sass-loader' ),
 						options: {
 							sourceMap: ! isProduction,
+							sassOptions: {
+								charset: false,
+							},
 						},
 					},
 				],
