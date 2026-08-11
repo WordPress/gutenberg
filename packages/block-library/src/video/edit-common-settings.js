@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
 	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useMemo, useCallback, Platform } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },
@@ -22,17 +19,23 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 	const autoPlayHelpText = __(
 		'Autoplay may cause usability issues for some users.'
 	);
-	const getAutoplayHelp = Platform.select( {
-		web: useCallback( ( checked ) => {
-			return checked ? autoPlayHelpText : null;
-		}, [] ),
-		native: autoPlayHelpText,
-	} );
+
+	const getAutoplayHelp = useCallback( ( checked ) => {
+		return checked ? autoPlayHelpText : null;
+	}, [] );
 
 	const toggleFactory = useMemo( () => {
 		const toggleAttribute = ( attribute ) => {
 			return ( newValue ) => {
-				setAttributes( { [ attribute ]: newValue } );
+				setAttributes( {
+					[ attribute ]: newValue,
+					// Set muted and playsInLine when autoplay changes
+					// playsInline is set to true when autoplay is true to support iOS devices
+					...( attribute === 'autoplay' && {
+						muted: newValue,
+						playsInline: newValue,
+					} ),
+				} );
 			};
 		};
 
@@ -56,11 +59,10 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				isShownByDefault
 				hasValue={ () => !! autoplay }
 				onDeselect={ () => {
-					setAttributes( { autoplay: false } );
+					setAttributes( { autoplay: false, muted: false } );
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Autoplay' ) }
 					onChange={ toggleFactory.autoplay }
 					checked={ !! autoplay }
@@ -76,7 +78,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Loop' ) }
 					onChange={ toggleFactory.loop }
 					checked={ !! loop }
@@ -91,10 +92,13 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Muted' ) }
 					onChange={ toggleFactory.muted }
 					checked={ !! muted }
+					disabled={ autoplay }
+					help={
+						autoplay ? __( 'Muted because of Autoplay.' ) : null
+					}
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
@@ -106,7 +110,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Playback controls' ) }
 					onChange={ toggleFactory.controls }
 					checked={ !! controls }
@@ -121,14 +124,18 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
 					label={ __( 'Play inline' ) }
 					onChange={ toggleFactory.playsInline }
 					checked={ !! playsInline }
-					help={ __(
-						'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
-					) }
+					disabled={ autoplay }
+					help={
+						autoplay
+							? __( 'Play inline enabled because of Autoplay.' )
+							: __(
+									'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
+							  )
+					}
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
@@ -140,8 +147,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<SelectControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Preload' ) }
 					value={ preload }
 					onChange={ onChangePreload }

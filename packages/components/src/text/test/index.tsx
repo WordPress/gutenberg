@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';
@@ -31,13 +24,11 @@ describe( 'Text', () => {
 
 	test( 'should render truncate', () => {
 		render(
-			<Text role="heading" truncate>
+			<Text role="heading" truncate limit={ 1 } ellipsizeMode="tail">
 				Lorem ipsum.
 			</Text>
 		);
-		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			textOverflow: 'ellipsis',
-		} );
+		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'L…' );
 	} );
 
 	test( 'should render size', () => {
@@ -69,7 +60,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: COLORS.gray[ 700 ],
+			color: COLORS.theme.gray[ 700 ],
 		} );
 	} );
 
@@ -105,6 +96,23 @@ describe( 'Text', () => {
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			color: 'rgb(255, 165, 0)',
+		} );
+	} );
+
+	test( 'should render variant color regardless of Emotion insertion order', () => {
+		render(
+			<>
+				<Text role="note" variant="muted">
+					Primer.
+				</Text>
+				<Text role="heading" color="orange" variant="muted">
+					Lorem ipsum.
+				</Text>
+			</>
+		);
+
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			color: COLORS.theme.gray[ 700 ],
 		} );
 	} );
 

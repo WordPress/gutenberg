@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -37,7 +34,6 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
-				__nextHasNoMarginBottom
 				onChange={ setSearchValue }
 				value={ searchValue }
 				label={ __( 'Search' ) }

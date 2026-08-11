@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { RawHTML } from '@wordpress/element';
-
-export default function save( { attributes } ) {
-	return <RawHTML>{ attributes.content }</RawHTML>;
+// The block's markup is serialized from its `innerContent` (static HTML
+// fragments interleaved with inner blocks), not from a save implementation.
+export default function save() {
+	return null;
 }

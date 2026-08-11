@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Flex,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
@@ -39,7 +32,6 @@ function PageAttributesOrder() {
 		<Flex>
 			<FlexBlock>
 				<NumberControl
-					__next40pxDefaultSize
 					label={ __( 'Order' ) }
 					help={ __( 'Set the page order.' ) }
 					value={ value }

@@ -1,23 +1,37 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { createSlotFill } from '@wordpress/components';
 import BlockList from '../block-list';
 import BlockTools from '../block-tools';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
-import { useMouseMoveTypingReset } from '../observe-typing';
+import { useMouseMoveTypingReset, useTypingObserver } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+export const BlockCanvasCover = createSlotFill( Symbol( 'BlockCanvasCover' ) );
+
+function BlockCanvasCoverWrapper( { children } ) {
+	return (
+		<div
+			className="block-canvas-cover"
+			style={ {
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: '100%',
+				height: '100%',
+				pointerEvents: 'none',
+			} }
+		>
+			{ children }
+		</div>
+	);
+}
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
@@ -39,7 +53,14 @@ export function ExperimentalBlockCanvas( {
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();
-	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
+	// Attached to the same node as the writing flow ref: the iframe body,
+	// or the WritingFlow element when the canvas is not iframed.
+	const contentRef = useMergeRefs( [
+		contentRefProp,
+		clearerRef,
+		localRef,
+		useTypingObserver(),
+	] );
 	const zoomLevel = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
 		[]
@@ -56,9 +77,17 @@ export function ExperimentalBlockCanvas( {
 		return (
 			<BlockTools
 				__unstableContentRef={ localRef }
-				className="block-editor-block-canvas"
-				style={ { height } }
+				style={ { height, display: 'flex' } }
 			>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<BlockCanvasCoverWrapper key={ index }>
+								{ cover }
+							</BlockCanvasCoverWrapper>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 				<EditorStyles
 					styles={ styles }
 					scope=":where(.editor-styles-wrapper)"
@@ -68,6 +97,11 @@ export function ExperimentalBlockCanvas( {
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
+					style={ {
+						height: '100%',
+						width: '100%',
+						overflow: 'auto',
+					} }
 				>
 					{ children }
 				</WritingFlow>
@@ -78,7 +112,6 @@ export function ExperimentalBlockCanvas( {
 	return (
 		<BlockTools
 			__unstableContentRef={ localRef }
-			className="block-editor-block-canvas"
 			style={ { height, display: 'flex' } }
 		>
 			<Iframe
@@ -91,6 +124,15 @@ export function ExperimentalBlockCanvas( {
 				} }
 				name="editor-canvas"
 			>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<BlockCanvasCoverWrapper key={ index }>
+								{ cover }
+							</BlockCanvasCoverWrapper>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 				<EditorStyles styles={ styles } />
 				{ children }
 			</Iframe>

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostPendingStatusCheck from './check';
 import { store as editorStore } from '../../store';
 
@@ -30,7 +23,6 @@ export function PostPendingStatus() {
 	return (
 		<PostPendingStatusCheck>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label={ __( 'Pending review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
