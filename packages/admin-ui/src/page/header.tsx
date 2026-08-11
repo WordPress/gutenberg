@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
-import type { NavigationProps } from '../navigation/types';
+import type { NavigationConfig } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import type { PageComponents } from './types';
 import styles from './style.module.css';
@@ -25,7 +25,7 @@ export default function Header( {
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
-	navigation?: NavigationProps;
+	navigation?: NavigationConfig;
 	components?: PageComponents;
 	showSidebarToggle?: boolean;
 } ) {

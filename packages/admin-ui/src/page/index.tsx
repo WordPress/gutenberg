@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { NavigationProps } from '../navigation/types';
+import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
 import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
@@ -46,7 +46,7 @@ function Page( {
 	 * Section navigation shown in the page header: the list of links and the
 	 * `href` of the current one.
 	 */
-	navigation?: NavigationProps;
+	navigation?: NavigationConfig;
 	/**
 	 * Overrides for default elements rendered by the page's sub-components.
 	 */

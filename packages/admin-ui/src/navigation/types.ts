@@ -18,7 +18,7 @@ export interface NavigationItem {
 	href: string;
 }
 
-export interface NavigationProps {
+export interface NavigationConfig {
 	/**
 	 * The navigation items to display.
 	 */
@@ -38,7 +38,9 @@ export interface NavigationProps {
 	 * @default 'Sections'
 	 */
 	ariaLabel?: string;
+}
 
+export interface NavigationProps extends NavigationConfig {
 	/**
 	 * Component rendered in place of the default `<a>` for each item.
 	 *
