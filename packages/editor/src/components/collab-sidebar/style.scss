@@ -257,7 +257,6 @@ mark.wp-note {
 	background: var(--wpds-color-background-surface-brand);
 	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	overflow-wrap: anywhere;
 
 	// Keep the chip boundary visible when forced-colors drops the background tint.
 	@media (forced-colors: active) {
