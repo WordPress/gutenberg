@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { applyBlockDeprecatedVersions } from '../apply-block-deprecated-versions';
 import {
 	registerBlockType,
@@ -17,6 +10,7 @@ import {
 
 describe( 'applyBlockDeprecatedVersions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',

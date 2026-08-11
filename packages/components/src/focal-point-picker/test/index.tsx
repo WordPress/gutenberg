@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
@@ -14,7 +7,7 @@ type Log = { name: string; args: unknown[] };
 type EventLogger = ( name: string, args: unknown[] ) => void;
 
 const Picker = ( props: React.ComponentProps< typeof _Picker > ) => {
-	return <_Picker { ...props } __nextHasNoMarginBottom />;
+	return <_Picker { ...props } />;
 };
 
 const props: FocalPointPickerProps = {

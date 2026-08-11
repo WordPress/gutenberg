@@ -14,15 +14,53 @@ npm install @wordpress/eslint-plugin --save-dev
 
 ## Usage
 
-To opt-in to the default configuration, extend your own project's `.eslintrc` file:
+**Minimum ESLint version:** `^9.0.0 || ^10.0.0`
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/recommended" ]
-}
+> **Upgrading from an older version?** See the [ESLint v10 migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/docs/how-to-guides/eslint-v10-migration.md) for a comprehensive walkthrough of the breaking changes, migration steps, and troubleshooting.
+
+### Flat config (ESLint v9+, recommended)
+
+Create an `eslint.config.mjs` file in your project root:
+
+```js
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [ ...wordpress.configs.recommended ];
 ```
 
-Refer to the [ESLint documentation on Shareable Configs](https://eslint.org/docs/latest/extend/shareable-configs) for more information.
+You can add your own overrides after the spread:
+
+```js
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [
+	...wordpress.configs.recommended,
+	{
+		rules: {
+			// your custom rule overrides
+		},
+	},
+];
+```
+
+Refer to the [ESLint flat config documentation](https://eslint.org/docs/latest/use/configure/configuration-files) for more information.
+
+### Legacy eslintrc (ESLint v9 only, deprecated)
+
+If you are still using ESLint v9 with the legacy `.eslintrc.*` format, a compatibility wrapper is available:
+
+```js
+// .eslintrc.js
+const wordpress = require( '@wordpress/eslint-plugin/eslintrc' );
+
+module.exports = wordpress.configs.recommended;
+```
+
+All config presets are available through the wrapper (e.g., `wordpress.configs.esnext`, `wordpress.configs[ 'recommended-with-formatting' ]`).
+
+> **Note:** The eslintrc wrapper is deprecated and will be removed in the next major version. ESLint v10 does not support `.eslintrc.*` files at all. Please migrate to flat config.
+
+### About the recommended preset
 
 The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
@@ -55,15 +93,16 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `test-unit`– rules for unit tests written in Jest.
 -   `test-playwright` – rules for end-to-end tests written in Playwright.
 
-For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
+For example, if your project does not use React, you could use only the ESNext rules:
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/esnext" ]
-}
+```js
+// eslint.config.mjs
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [ ...wordpress.configs.esnext ];
 ```
 
-These rules can be used additively, so you could extend both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
+These rules can be used additively, so you could spread both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
 
@@ -72,7 +111,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 | Rule                                                                                                                                                                 | Description                                                                                     | Recommended |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------- |
 | [data-no-store-string-literals](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores.                                    |             |
-| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting.                                                      | ✓           |
+| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting.                                                      |             |
 | [i18n-ellipsis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)                                                 | Disallow using three dots in translatable strings.                                              | ✓           |
 | [i18n-hyphenated-range](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md)                                 | Disallow hyphenated numerical ranges in translatable strings.                                   |             |
 | [i18n-no-collapsible-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)               | Disallow collapsible whitespace in translatable strings.                                        | ✓           |
@@ -82,23 +121,62 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [i18n-text-domain](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains.                                                             | ✓           |
 | [i18n-translator-comments](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments.                                                             | ✓           |
 | [no-base-control-with-label-without-id](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property. | ✓           |
+| [no-dom-globals-in-constructor](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-constructor.md)                 | Disallow use of DOM globals in class constructors.                                              |             |
+| [no-dom-globals-in-module-scope](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-module-scope.md)               | Disallow use of DOM globals in module scope.                                                    |             |
+| [no-dom-globals-in-react-cc-render](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-cc-render.md)         | Disallow use of DOM globals in React class component render methods.                            |             |
+| [no-dom-globals-in-react-fc](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md)                       | Disallow use of DOM globals in the render cycle of a React function component.                  |             |
+| [no-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md)                                                   | Disallow any usage of `--wpds-*` CSS custom properties.                                         |             |
+| `no-global-active-element`                                                                                                                              | Disallow accessing the active element via `document.activeElement`.                             | ✓           |
+| `no-global-get-selection`                                                                                                                               | Disallow accessing the selection via `window.getSelection`.                                     | ✓           |
+| [no-setting-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md)                                   | Disallow setting any CSS custom property beginning with `--wpds-`.                              | ✓           |
+| [no-unknown-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md)                                   | Prevent use of non-existing `--wpds-*` variables.                                               | ✓           |
+| [components-no-missing-40px-size-prop](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md)   | Disallow missing `__next40pxDefaultSize` prop on `@wordpress/components` components.            | ✓           |
+| [components-no-unsafe-button-disabled](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md)   | Disallow using `disabled` on Button without `accessibleWhenDisabled`.                           | ✓           |
+| [no-unsafe-render-order](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md)                               | Prevent unsafe `render` composition orders that silently remove semantics.                      | ✓           |
+| [no-i18n-in-save](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-i18n-in-save.md)                                             | Disallow translation functions in block save methods.                                           |             |
+| [no-non-module-stylesheet-imports](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md)           | Disallow importing non-module stylesheets from JavaScript files.                                |             |
+| [no-unmerged-classname](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unmerged-classname.md)                                 | Disallow unmerged `className` in components that spread rest props.                             |             |
 | [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls.                                             | ✓           |
-| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packagesl                                 | ✓           |
+| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packages                                  | ✓           |
+| [use-recommended-components](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md)                       | Encourage the use of recommended UI components in a WordPress environment.                      |             |
 | [no-unused-vars-before-return](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return.                                   | ✓           |
 | [no-wp-process-env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-wp-process-env.md)                                         | Disallow legacy usage of WordPress variables via `process.env` like `process.env.SCRIPT_DEBUG`. | ✓           |
 | [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component.                                                      |             |
+| [use-import-as](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/use-import-as.md)                                                 | Enforce configured `as` names for specific named imports and unlocked private APIs.             |             |
 | [valid-sprintf](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage.                                                                    | ✓           |
 | [wp-global-usage](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/wp-global-usage.md)                                             | Enforce correct usage of WordPress globals like `globalThis.SCRIPT_DEBUG`.                      |             |
 
-### Legacy
+### Migrating from eslintrc to flat config
 
-If you are using WordPress' `.jshintrc` JSHint configuration and you would like to take the first step to migrate to an ESLint equivalent it is also possible to define your own project's `.eslintrc` file as:
+If you are upgrading from a previous version that used `.eslintrc.*` files:
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/jshint" ]
-}
-```
+1. Replace your `.eslintrc.*` file with an `eslint.config.mjs` file.
+2. Change `extends` arrays to import + spread:
+
+    ```js
+    // Old (.eslintrc.js)
+    module.exports = {
+    	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+    };
+
+    // New (eslint.config.mjs)
+    import wordpress from '@wordpress/eslint-plugin';
+    export default [ ...wordpress.configs.recommended ];
+    ```
+
+3. Convert `overrides` to separate config objects with `files` patterns.
+4. Replace `env` with `languageOptions.globals` using the [`globals`](https://www.npmjs.com/package/globals) package.
+5. Delete your `.eslintignore` file and move patterns into an `ignores` config object.
+6. Update rule prefixes in inline comments: `eslint-comments/*` has been renamed to `@eslint-community/eslint-comments/*`. For example:
+
+    ```diff
+    - /* eslint-disable eslint-comments/no-unlimited-disable */
+    + /* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable */
+    ```
+
+7. Remove any `/* eslint-env */` comments — they are no longer supported in ESLint v10. Use `languageOptions.globals` in your config instead.
+
+For a comprehensive walkthrough with examples and troubleshooting, see the [Gutenberg ESLint v10 migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/docs/how-to-guides/eslint-v10-migration.md). See also the [ESLint migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for general flat config details.
 
 ## Contributing to this package
 

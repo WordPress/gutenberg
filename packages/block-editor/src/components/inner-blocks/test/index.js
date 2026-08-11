@@ -1,8 +1,4 @@
 /* eslint-disable testing-library/render-result-naming-convention */
-
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getBlockTypes,
@@ -12,10 +8,6 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { renderToString } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import InnerBlocks from '../';
 
 describe( 'InnerBlocks', () => {
@@ -27,6 +19,7 @@ describe( 'InnerBlocks', () => {
 
 	it( 'should return element as string, with inner blocks', () => {
 		registerBlockType( 'core/fruit', {
+			apiVersion: 3,
 			category: 'text',
 
 			title: 'fruit',
@@ -62,6 +55,7 @@ describe( 'InnerBlocks', () => {
 
 	it( 'should force serialize for invalid block with inner blocks', () => {
 		const blockType = {
+			apiVersion: 3,
 			attributes: {
 				throw: {
 					type: 'boolean',

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { RegistryProvider, createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useUpdatePostLinkListener } from '../listener-hooks';
 import { STORE_NAME } from '../../../store/constants';
 
@@ -33,6 +22,14 @@ describe( 'listener hook tests', () => {
 			...storeConfig,
 			selectors: {
 				getCurrentPost: jest.fn(),
+				getCurrentPostType: jest.fn(),
+				getEditedPostAttribute: jest.fn(),
+			},
+		},
+		core: {
+			...storeConfig,
+			selectors: {
+				getPostType: jest.fn(),
 			},
 		},
 		'core/viewport': {
@@ -69,6 +66,13 @@ describe( 'listener hook tests', () => {
 		mockStores[ store ].selectors[ functionName ].mockReturnValue( value );
 	};
 
+	const setupPostTypeScenario = ( postType, isViewable = true ) => {
+		setMockReturnValue( 'core/editor', 'getEditedPostAttribute', postType );
+		setMockReturnValue( 'core', 'getPostType', {
+			viewable: isViewable,
+		} );
+	};
+
 	afterEach( () => {
 		Object.values( mockStores ).forEach( ( storeMocks ) => {
 			Object.values( storeMocks.selectors ).forEach( ( mock ) => {
@@ -95,28 +99,36 @@ describe( 'listener hook tests', () => {
 		};
 
 		const setAttribute = jest.fn();
+		const mockElement = {
+			setAttribute,
+			style: { display: '' },
+		};
 		const mockSelector = jest.fn();
 		beforeEach( () => {
+			// Reset the mock element style
+			mockElement.style.display = '';
 			// eslint-disable-next-line testing-library/no-node-access
-			document.querySelector = mockSelector.mockReturnValue( {
-				setAttribute,
-			} );
+			document.querySelector =
+				mockSelector.mockReturnValue( mockElement );
 		} );
 		afterEach( () => {
 			setAttribute.mockClear();
 			mockSelector.mockClear();
+			mockElement.style.display = '';
 		} );
 		it( 'updates nothing if there is no view link available', () => {
 			mockSelector.mockImplementation( () => null );
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
+			setupPostTypeScenario( 'post', true );
 			render( <TestedOutput /> );
 
 			expect( setAttribute ).not.toHaveBeenCalled();
 		} );
 		it( 'updates nothing if there is no permalink', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', { link: '' } );
+			setupPostTypeScenario( 'post', true );
 			render( <TestedOutput /> );
 
 			expect( setAttribute ).not.toHaveBeenCalled();
@@ -125,6 +137,7 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
+			setupPostTypeScenario( 'post', true );
 			const { rerender } = render( <TestedOutput /> );
 
 			rerender( <TestedOutput /> );
@@ -139,6 +152,7 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
+			setupPostTypeScenario( 'post', true );
 			render( <TestedOutput /> );
 			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
 			act( () => {
@@ -150,6 +164,7 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
+			setupPostTypeScenario( 'post', true );
 			render( <TestedOutput /> );
 			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
 			expect( setAttribute ).toHaveBeenCalledWith( 'href', 'foo' );
@@ -162,6 +177,16 @@ describe( 'listener hook tests', () => {
 			} );
 			expect( setAttribute ).toHaveBeenCalledTimes( 2 );
 			expect( setAttribute ).toHaveBeenCalledWith( 'href', 'bar' );
+		} );
+		it( 'hides the "View Post" link when editing non-viewable post types', () => {
+			setMockReturnValue( 'core/editor', 'getCurrentPost', {
+				link: 'foo',
+			} );
+			setupPostTypeScenario( 'wp_block', false );
+			render( <TestedOutput /> );
+
+			expect( setAttribute ).not.toHaveBeenCalled();
+			expect( mockElement ).toHaveProperty( 'style.display', 'none' );
 		} );
 	} );
 } );

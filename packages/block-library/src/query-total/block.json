@@ -15,6 +15,7 @@
 	},
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"spacing": {
@@ -23,9 +24,9 @@
 		},
 		"color": {
 			"gradients": true,
-			"text": true,
 			"__experimentalDefaultControls": {
-				"background": true
+				"background": true,
+				"text": true
 			}
 		},
 		"typography": {
@@ -52,6 +53,9 @@
 				"width": true,
 				"style": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-query-total"

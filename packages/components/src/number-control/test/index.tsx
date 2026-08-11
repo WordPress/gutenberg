@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import _NumberControl from '..';
 import type { NumberControlProps } from '../types';
 
 const NumberControl = (
 	props: React.ComponentProps< typeof _NumberControl >
-) => <_NumberControl __next40pxDefaultSize { ...props } />;
+) => <_NumberControl { ...props } />;
 
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
@@ -40,8 +29,21 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should render custom className', () => {
-			render( <NumberControl className="hello" /> );
-			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
+			const { container: withoutClassName } = render( <NumberControl /> );
+
+			const { container: withClassName } = render(
+				<NumberControl className="hello" />
+			);
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				withoutClassName.querySelector( '.components-number-control' )
+			).not.toHaveClass( 'hello' );
+
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				withClassName.querySelector( '.components-number-control' )
+			).toHaveClass( 'hello' );
 		} );
 	} );
 

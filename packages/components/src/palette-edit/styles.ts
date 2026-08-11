@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { Heading } from '../heading';
 import { space } from '../utils/space';
@@ -52,7 +45,7 @@ export const NameContainer = styled.div`
 export const PaletteHeading = styled( Heading )`
 	text-transform: uppercase;
 	line-height: ${ space( 6 ) };
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightEmphasis };
 	&&& {
 		font-size: 11px;
 		margin-bottom: 0;

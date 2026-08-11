@@ -1,20 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
+import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -119,115 +119,6 @@ export const hideBlockTypes =
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
-	};
-
-/**
- * Save entity records marked as dirty.
- *
- * @param {Object}   options                      Options for the action.
- * @param {Function} [options.onSave]             Callback when saving happens.
- * @param {object[]} [options.dirtyEntityRecords] Array of dirty entities.
- * @param {object[]} [options.entitiesToSkip]     Array of entities to skip saving.
- * @param {Function} [options.close]              Callback when the actions is called. It should be consolidated with `onSave`.
- */
-export const saveDirtyEntities =
-	( { onSave, dirtyEntityRecords = [], entitiesToSkip = [], close } = {} ) =>
-	( { registry } ) => {
-		const PUBLISH_ON_SAVE_ENTITIES = [
-			{ kind: 'postType', name: 'wp_navigation' },
-		];
-		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry
-			.select( coreStore )
-			.getEntityRecord( 'root', '__unstableBase' )?.home;
-		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! entitiesToSkip.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-		close?.( entitiesToSave );
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					registry
-						.dispatch( coreStore )
-						.editEntityRecord( kind, name, key, {
-							status: 'publish',
-						} );
-				}
-
-				pendingSavedRecords.push(
-					registry
-						.dispatch( coreStore )
-						.saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				registry
-					.dispatch( coreStore )
-					.__experimentalSaveSpecifiedEntityEdits(
-						'root',
-						'site',
-						undefined,
-						siteItemsToSave
-					)
-			);
-		}
-		registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkLastChangeAsPersistent();
-		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					registry
-						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					registry
-						.dispatch( noticesStore )
-						.createSuccessNotice( __( 'Site updated.' ), {
-							type: 'snackbar',
-							id: saveNoticeId,
-							actions: [
-								{
-									label: __( 'View site' ),
-									url: homeUrl,
-								},
-							],
-						} );
-				}
-			} )
-			.catch( ( error ) =>
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
-					)
-			);
 	};
 
 /**
@@ -405,7 +296,7 @@ export const removeTemplates =
 				}
 				successMessage = isResetting
 					? sprintf(
-							/* translators: The template/part's name. */
+							/* translators: %s: The template/part's name. */
 							__( '"%s" reset.' ),
 							decodeEntities( title )
 					  )
@@ -492,3 +383,381 @@ export const removeTemplates =
 				.createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
+
+/**
+ * Set the default rendering mode preference for the current post type.
+ *
+ * @param {string} mode The rendering mode to set as default.
+ */
+export const setDefaultRenderingMode =
+	( mode ) =>
+	( { select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const theme = registry
+			.select( coreStore )
+			.getCurrentTheme()?.stylesheet;
+		const renderingModes =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'renderingModes' )?.[ theme ] ?? {};
+
+		if ( renderingModes[ postType ] === mode ) {
+			return;
+		}
+
+		const newModes = {
+			[ theme ]: {
+				...renderingModes,
+				[ postType ]: mode,
+			},
+		};
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'renderingModes', newModes );
+	};
+
+/**
+ * Set the current global styles navigation path.
+ *
+ * @param {string} path The navigation path.
+ * @return {Object} Action object.
+ */
+export function setStylesPath( path ) {
+	return {
+		type: 'SET_STYLES_PATH',
+		path,
+	};
+}
+
+/**
+ * Set whether the stylebook is visible.
+ *
+ * @param {boolean} show Whether to show the stylebook.
+ * @return {Object} Action object.
+ */
+export function setShowStylebook( show ) {
+	return {
+		type: 'SET_SHOW_STYLEBOOK',
+		show,
+	};
+}
+
+/**
+ * Reset the global styles navigation to initial state.
+ *
+ * @return {Object} Action object.
+ */
+export function resetStylesNavigation() {
+	return {
+		type: 'RESET_STYLES_NAVIGATION',
+	};
+}
+
+/**
+ * Set the width of the canvas.
+ *
+ * @param {number} width The width of the canvas in pixels.
+ */
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		const blockEditorSelect = unlock( registry.select( blockEditorStore ) );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if ( blockEditorSelect.isResponsiveEditing() ) {
+			const viewportSettings =
+				blockEditorSelect.getSettings().__experimentalFeatures
+					?.viewport;
+			const deviceType = getDeviceTypeByCanvasWidth(
+				width,
+				viewportSettings
+			);
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
+	};
+}
+
+/**
+ * Set the current revision ID for revisions preview mode.
+ * Pass a revision ID to enter revisions mode, or null to exit.
+ *
+ * @param {number|null} revisionId The revision ID, or null to exit revisions mode.
+ * @return {Object} Action object.
+ */
+export function setCurrentRevisionId( revisionId ) {
+	return {
+		type: 'SET_CURRENT_REVISION_ID',
+		revisionId,
+	};
+}
+
+/**
+ * Set the current revisions page number and select the newest
+ * revision on that page once it loads.
+ *
+ * @param {number} page The page number.
+ */
+export const setRevisionPage =
+	( page ) =>
+	async ( { dispatch, select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page )
+			);
+
+		registry.batch( () => {
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+			if ( revisions?.length ) {
+				dispatch.setCurrentRevisionId( revisions[ 0 ][ revisionKey ] );
+			}
+		} );
+	};
+
+function createRevisionsLoadFailedNotice( registry ) {
+	registry
+		.dispatch( noticesStore )
+		.createNotice( 'warning', __( 'Revisions could not be loaded.' ), {
+			type: 'snackbar',
+			id: 'editor-revisions-load-failed',
+		} );
+}
+
+/**
+ * Open a revision from a shared URL and select the page that contains it.
+ *
+ * @param {number} revisionId The revision ID to open.
+ */
+export const openRevision =
+	( revisionId ) =>
+	async ( { dispatch, select, registry } ) => {
+		// Set the revision before loading its page so the canvas and slider
+		// can show loading states.
+		dispatch.setCurrentRevisionId( revisionId );
+
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		// Fetch all IDs in the slider's order so the revision's index points
+		// to the right page.
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions( 'postType', postType, postId, {
+				per_page: -1,
+				context: 'edit',
+				orderby: 'date',
+				order: 'desc',
+				_fields: revisionKey,
+			} );
+
+		// Ignore stale results if the user navigated during the request.
+		if ( select.getCurrentRevisionId() !== revisionId ) {
+			return;
+		}
+
+		// core-data swallows request errors, so a missing result means the
+		// request failed. Keep the selection so a reload can try again.
+		if ( ! revisions ) {
+			createRevisionsLoadFailedNotice( registry );
+			return;
+		}
+
+		const index = revisions.findIndex(
+			( revision ) => revision[ revisionKey ] === revisionId
+		);
+		if ( index === -1 ) {
+			// Autosaves can be missing from the collection when revisions are
+			// disabled. Fetch the record directly so a request failure is not
+			// mistaken for a 404.
+			let revision;
+			try {
+				revision = await apiFetch( {
+					path: addQueryArgs(
+						entityConfig.getRevisionsUrl( postId, revisionId ),
+						{ context: 'edit' }
+					),
+				} );
+			} catch ( error ) {
+				if ( select.getCurrentRevisionId() !== revisionId ) {
+					return;
+				}
+				if ( error?.data?.status !== 404 ) {
+					createRevisionsLoadFailedNotice( registry );
+					return;
+				}
+
+				dispatch.setCurrentRevisionId( null );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'warning', __( 'Invalid revision ID.' ), {
+						type: 'snackbar',
+						id: 'editor-revision-invalid',
+					} );
+				return;
+			}
+
+			if ( select.getCurrentRevisionId() !== revisionId ) {
+				return;
+			}
+			if ( ! revision ) {
+				createRevisionsLoadFailedNotice( registry );
+				return;
+			}
+			await registry
+				.dispatch( coreStore )
+				.receiveRevisions( 'postType', postType, postId, revision, {
+					context: 'edit',
+				} );
+			return;
+		}
+
+		const page = Math.floor( index / select.getRevisionsPerPage() ) + 1;
+		if ( page !== select.getRevisionPage() ) {
+			// `setRevisionPage()` would replace the deep-linked revision with
+			// the newest revision on the page.
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+		}
+	};
+
+/**
+ * Set whether the revision diff highlighting is shown.
+ *
+ * @param {boolean} showDiff Whether to show diff highlighting.
+ * @return {Object} Action object.
+ */
+export function setShowRevisionDiff( showDiff ) {
+	return {
+		type: 'SET_SHOW_REVISION_DIFF',
+		showDiff,
+	};
+}
+
+/**
+ * Restore a revision by replacing the current content with the revision's content
+ * and auto-saving.
+ *
+ * @param {number} revisionId The revision ID to restore.
+ */
+export const restoreRevision =
+	( revisionId ) =>
+	async ( { select, dispatch, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		// Use resolveSelect to ensure the revision is fetched if not yet
+		// in the store. The _fields parameter matches the query used by
+		// getRevisions so the result is served from cache without an
+		// extra API call.
+		const revision = await registry
+			.resolveSelect( coreStore )
+			.getRevision( 'postType', postType, postId, revisionId, {
+				context: 'edit',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
+			} );
+
+		if ( ! revision ) {
+			return;
+		}
+
+		// Build the edits object with all restorable fields from the revision.
+		const edits = {
+			blocks: undefined,
+			content: revision.content.raw,
+		};
+		if ( revision.title?.raw !== undefined ) {
+			edits.title = revision.title.raw;
+		}
+		if ( revision.excerpt?.raw !== undefined ) {
+			edits.excerpt = revision.excerpt.raw;
+		}
+		if ( revision.meta !== undefined ) {
+			edits.meta = revision.meta;
+		}
+
+		// Apply edits and save.
+		dispatch.editPost( edits );
+
+		// Exit revisions mode.
+		dispatch.setCurrentRevisionId( null );
+
+		// Save the post to persist the restored revision.
+		await dispatch.savePost();
+		if ( select.didPostSaveRequestFail() ) {
+			return;
+		}
+
+		// The saved post is now newer than any autosave, so the
+		// autosave notice is stale.
+		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
+
+		// Show success notice.
+		registry.dispatch( noticesStore ).createSuccessNotice(
+			sprintf(
+				/* translators: %s: Date and time of the revision. */
+				__( 'Restored to revision from %s.' ),
+				dateI18n( getDateSettings().formats.datetime, revision.date )
+			),
+			{
+				type: 'snackbar',
+				id: 'editor-revision-restored',
+			}
+		);
+	};
+
+/**
+ * Select a note by its ID, or clear the selection.
+ *
+ * @param {undefined|number|'new'} noteId          The note ID to select, 'new' to open the new note form, or undefined to clear.
+ * @param {Object}                 [options]       Optional options for the selection.
+ * @param {boolean}                [options.focus] Whether to focus the selected note. Default false.
+ * @return {Object} Action object.
+ */
+export function selectNote( noteId, options = { focus: false } ) {
+	return {
+		type: 'SELECT_NOTE',
+		noteId,
+		options,
+	};
+}

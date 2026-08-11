@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SVG, Rect } from '@wordpress/primitives';
 import { Icon, menu } from '@wordpress/icons';
 
