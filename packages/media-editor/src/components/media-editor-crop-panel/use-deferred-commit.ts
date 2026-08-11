@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	getInputBounds,
 	getInputCommitValue,

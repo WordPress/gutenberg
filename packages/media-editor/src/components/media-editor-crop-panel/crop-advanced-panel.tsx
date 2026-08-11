@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import CropInput from './crop-input';
 import { useAdvancedCropControls } from './use-advanced-crop-controls';

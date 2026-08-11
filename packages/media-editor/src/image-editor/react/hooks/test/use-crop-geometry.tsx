@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_STATE } from '../../../core/constants';
 import type { CropperState, Size } from '../../../core/types';
 import {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { MAX_ROTATION_OFFSET } from './constants';
 import type { Flip } from './types';
 

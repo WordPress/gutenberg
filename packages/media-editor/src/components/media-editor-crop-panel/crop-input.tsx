@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { CropInputRange } from './crop-input-utils';
 import { useDeferredCommit } from './use-deferred-commit';
 

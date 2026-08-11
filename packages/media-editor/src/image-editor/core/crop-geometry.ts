@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedRect, Size } from './types';
 import { getRotatedBBox } from './camera';
 import { getSourceRegion, type SourceRegion } from './source-region';
