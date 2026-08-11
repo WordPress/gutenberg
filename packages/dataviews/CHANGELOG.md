@@ -33,7 +33,7 @@
 
 ### Bug Fix
 
--   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value. [#](https://github.com/WordPress/gutenberg/pull/)
+-   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
 -   DataForms: Skip validation for fields hidden through the `isVisible` API, so a hidden field with validation rules (e.g. `required`) no longer makes the form invalid. Toggling a field's visibility now clears or restores its validity accordingly. [#81377](https://github.com/WordPress/gutenberg/pull/81377)
 -   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
 -   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)
