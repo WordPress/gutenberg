@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function PostAuthorBiographyEdit( props ) {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Spinner from '../';
 import { space } from '../../utils/space';
 

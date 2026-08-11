@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
-
-/**
- * Internal dependencies
- */
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import {
 	useColorsPerOrigin,
@@ -21,6 +14,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
+import { isGlobalStylesInheritanceEnabled } from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -148,7 +142,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
 		colors,
@@ -324,6 +318,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.link?.color?.text,
 						'color'
 					),
+					userSlug: extractPresetSlug(
+						value?.elements?.link?.color?.text,
+						'color'
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 					isPlaceholder:
@@ -336,6 +334,10 @@ export default function ColorPanel( {
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.[ ':hover' ]?.color
 							?.text,
+						'color'
+					),
+					userSlug: extractPresetSlug(
+						value?.elements?.link?.[ ':hover' ]?.color?.text,
 						'color'
 					),
 					setValue: setHoverLinkColor,
@@ -414,11 +416,11 @@ export default function ColorPanel( {
 			newValue.elements[ name ].color.gradient = undefined;
 			onChange( newValue );
 		};
-		const setElementGradient = ( newGradient ) => {
+		const setElementGradient = ( newGradient, newSlug ) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'gradient' ],
-				encodeGradientValue( newGradient )
+				encodeGradientValue( newGradient, newSlug )
 			);
 			newValue.elements[ name ].color.background = undefined;
 			onChange( newValue );
@@ -476,6 +478,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.[ name ]?.color?.text,
 						'color'
 					),
+					userSlug: extractPresetSlug(
+						value?.elements?.[ name ]?.color?.text,
+						'color'
+					),
 					setValue: setElementTextColor,
 					userValue: elementTextUserColor,
 					isPlaceholder: isElementTextPlaceholder,
@@ -490,6 +496,10 @@ export default function ColorPanel( {
 								?.background,
 							'color'
 						),
+						userSlug: extractPresetSlug(
+							value?.elements?.[ name ]?.color?.background,
+							'color'
+						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
 						isPlaceholder: isElementBackgroundPlaceholder,
@@ -499,6 +509,14 @@ export default function ColorPanel( {
 						key: 'gradient',
 						label: __( 'Gradient' ),
 						inheritedValue: elementGradient,
+						inheritedSlug: extractPresetSlug(
+							inheritedValue?.elements?.[ name ]?.color?.gradient,
+							'gradient'
+						),
+						userSlug: extractPresetSlug(
+							value?.elements?.[ name ]?.color?.gradient,
+							'gradient'
+						),
 						setValue: setElementGradient,
 						userValue: elementGradientUserColor,
 						isGradient: true,

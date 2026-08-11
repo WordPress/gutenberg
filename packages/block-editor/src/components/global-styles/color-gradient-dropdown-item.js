@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
@@ -20,16 +13,13 @@ import {
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -132,6 +122,7 @@ function ColorGradientTab( {
 	isGradient,
 	inheritedValue,
 	inheritedSlug,
+	userSlug,
 	userValue,
 	setValue,
 	isPlaceholder,
@@ -142,6 +133,10 @@ function ColorGradientTab( {
 	// back to the inherited value so the at-rest preselection is visible
 	// inside the picker.
 	const displayed = userValue ?? inheritedValue;
+	// Slug of the displayed value: the block's own when it has one, otherwise
+	// the inherited one. Slug matching keeps two same-hex presets apart; a
+	// slug-less (custom) value falls back to hex matching.
+	const displayedSlug = userValue !== undefined ? userSlug : inheritedSlug;
 	// Display-without-commit interceptor. `ColorPalette` and `GradientPicker`
 	// fire `onChange( undefined )` when the user clicks the currently-selected
 	// option. At rest (placeholder mode), that click is the user's "accept
@@ -151,7 +146,7 @@ function ColorGradientTab( {
 	// set, the same click correctly clears local back to at rest.
 	const onChange = ( newValue, newSlug ) => {
 		if ( isPlaceholder && newValue === undefined ) {
-			setValue( inheritedValue );
+			setValue( inheritedValue, inheritedSlug );
 			return;
 		}
 		setValue( newValue, newSlug );
@@ -163,12 +158,9 @@ function ColorGradientTab( {
 			enableAlpha
 			__experimentalIsRenderedInSidebar
 			colorValue={ isGradient ? undefined : displayed }
-			colorSlug={
-				isGradient || userValue !== undefined
-					? undefined
-					: inheritedSlug
-			}
+			colorSlug={ isGradient ? undefined : displayedSlug }
 			gradientValue={ isGradient ? displayed : undefined }
+			gradientSlug={ isGradient ? displayedSlug : undefined }
 			onColorChange={ isGradient ? undefined : onChange }
 			onGradientChange={ isGradient ? onChange : undefined }
 			/*
@@ -211,7 +203,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );

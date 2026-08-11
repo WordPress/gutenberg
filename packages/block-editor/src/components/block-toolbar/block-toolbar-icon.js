@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { copy, symbol } from '@wordpress/icons';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
 import BlockStylesDropdown from './block-styles-dropdown';

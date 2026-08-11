@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { Ability, AbilityCategory } from '../types';
 import {
 	REGISTER_ABILITY,

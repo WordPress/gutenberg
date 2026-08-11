@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { HslaColor } from 'react-colorful';
-
-/**
- * Internal dependencies
- */
 import { InputWithSlider } from './input-with-slider';
 import type { HslInputProps } from './types';
 

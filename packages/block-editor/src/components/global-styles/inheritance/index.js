@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -13,6 +6,24 @@ import {
 } from '@wordpress/components';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Whether the inspector surfaces inherited Global Styles values.
+ *
+ * Behind the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment,
+ * so the treatment is off unless someone opts in on the Experiments screen.
+ * With it off, the panels show locally-set values alone.
+ *
+ * Evaluated per call rather than once at module scope, so tests can toggle
+ * the experiment and so a later move to a store-backed setting only has to
+ * change this one place. Always returns a boolean: callers pass the result
+ * down as a prop, and `undefined` would trigger a receiving component's own
+ * default parameter.
+ *
+ * @return {boolean} Whether the inherited-value treatment is enabled.
+ */
+export const isGlobalStylesInheritanceEnabled = () =>
+	!! window.__experimentalGlobalStylesInheritanceUI;
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { isValidVideoEmbedUrl } from '../embed-video-utils';
 
 export default function EmbedVideoUrlInput( {

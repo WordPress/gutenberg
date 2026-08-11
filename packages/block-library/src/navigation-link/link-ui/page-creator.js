@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	TextControl,
@@ -15,10 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DialogWrapper from './dialog-wrapper';
 
 /**

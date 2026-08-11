@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Color } from '@wordpress/global-styles-engine';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useSetting, useColorRandomizer } from './hooks';
 import ColorVariations from './variations/variations-color';
 

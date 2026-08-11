@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	trash,
@@ -17,10 +14,6 @@ import {
 } from '@wordpress/icons';
 import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import { LAYOUT_ACTIVITY } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';

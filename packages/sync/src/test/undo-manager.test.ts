@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import { LOCAL_EDITOR_ORIGIN } from '../config';
 import { createUndoManager } from '../undo-manager';
 

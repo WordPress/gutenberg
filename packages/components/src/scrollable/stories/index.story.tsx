@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Scrollable } from '..';
 

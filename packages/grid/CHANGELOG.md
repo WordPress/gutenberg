@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
+### Internal
+
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
 ## 0.3.0 (2026-07-14)
 
 ### Enhancements

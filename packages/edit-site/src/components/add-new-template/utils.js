@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -8,10 +5,6 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { blockMeta, post, archive } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};

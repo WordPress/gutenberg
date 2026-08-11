@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getScrollContainer } from '@wordpress/dom';
 import { useLayoutEffect } from '@wordpress/element';
 

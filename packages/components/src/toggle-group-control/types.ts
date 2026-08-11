@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 import type { TooltipProps } from '../tooltip/types';
 
@@ -116,6 +109,10 @@ export type ToggleGroupControlProps = Pick<
 	 * `ToggleGroupControlOptionIcon` components.
 	 */
 	children: ReactNode;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 	/**
 	 * The size variant of the control.
 	 *
