@@ -84,14 +84,6 @@ module.exports = {
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
 	testEnvironment: require.resolve( 'jest-environment-jsdom' ),
-	setupFiles: [
-		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-env.js',
-	],
-	setupFilesAfterEnv: [
-		'<rootDir>/test/unit/config/testing-library.js',
-		'<rootDir>/test/unit/mocks/match-media.js',
-	],
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
@@ -111,10 +103,6 @@ module.exports = {
 	transformIgnorePatterns: [
 		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
-	],
-	snapshotSerializers: [
-		require.resolve( '@emotion/jest/serializer' ),
-		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,
