@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useAdvancedCropControls } from '../use-advanced-crop-controls';
 
 const mockSetCropRect = jest.fn();

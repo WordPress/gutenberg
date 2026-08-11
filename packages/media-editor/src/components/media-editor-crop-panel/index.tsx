@@ -1,10 +1,6 @@
 import { SelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { resolveAspectRatio, useMediaEditor } from '../../state';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';

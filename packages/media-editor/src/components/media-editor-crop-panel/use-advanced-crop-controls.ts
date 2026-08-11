@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import {
 	applyCropEdit,

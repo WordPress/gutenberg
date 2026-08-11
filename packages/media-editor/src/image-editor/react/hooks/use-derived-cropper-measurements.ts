@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { CropperState, Size } from '../../core/types';
 import type { NormalizedCropBounds } from '../../core/crop-geometry';
 import { getImageFit } from '../../core/camera';

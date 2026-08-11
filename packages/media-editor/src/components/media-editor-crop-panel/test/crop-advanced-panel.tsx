@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import CropAdvancedPanel from '../crop-advanced-panel';
 
 const mockSetCropRect = jest.fn();

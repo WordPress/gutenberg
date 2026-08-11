@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { DEFAULT_STATE } from '../constants';
 import {
 	applyCropEdit,
