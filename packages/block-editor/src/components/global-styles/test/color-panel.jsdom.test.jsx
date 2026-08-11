@@ -10,6 +10,7 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 // The inheritance treatment sits behind the

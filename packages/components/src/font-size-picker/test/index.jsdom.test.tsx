@@ -5,6 +5,7 @@ import { render } from '@ariakit/test/react';
 import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
+globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 const ControlledFontSizePicker = ( {

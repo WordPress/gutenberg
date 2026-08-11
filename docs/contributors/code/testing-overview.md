@@ -39,7 +39,7 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for tests that require a DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. During the Jest-to-Vitest migration, the filename selects the Vitest project after the migration manifest assigns the test to Vitest.
+Use `*.jsdom.test.*` for DOM structure, semantics, events, state, and other behavior that does not depend on browser rendering. Use `*.browser.test.*` for generated styles, computed styles, cascade, responsive behavior, layout, geometry, rendered visibility, animation, scrolling, `ResizeObserver`, and media queries. Browser Mode loads real CSS and uses browser APIs. Keep deterministic browser API mocks local to nonvisual tests and restore them afterwards. Leave Node-compatible test names without an environment suffix. During the Jest-to-Vitest migration, the filename selects the Vitest project after the migration manifest assigns the test to Vitest.
 
 ```
 +-- test
@@ -297,7 +297,7 @@ Integration testing is defined as a type of testing where different parts are te
 
 The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
 
-[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.jsdom.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.browser.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
 
 To set up a jest file for integration tests:
 
@@ -460,13 +460,14 @@ test( 'should render a darker background when isShady is true', () => {
 } );
 ```
 
-Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the difference between the _styles_ associated to two different states of a component, like in this example:
+Test rendered style behavior in Browser Mode with a narrow computed-style or behavior assertion. This verifies the browser result instead of a serialized representation of generated styles:
 
 ```jsx
 test( 'should render margin', () => {
-	const { container: spacer } = render( <Spacer /> );
-	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin ).toMatchStyleDiffSnapshot( spacer );
+	render( <Spacer data-testid="spacer" margin={ 5 } /> );
+	expect( getComputedStyle( screen.getByTestId( 'spacer' ) ).marginTop ).toBe(
+		'20px'
+	);
 } );
 ```
 

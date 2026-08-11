@@ -54,6 +54,14 @@ function buildSelector( sequential ) {
  * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
+	const visibility =
+		element.ownerDocument.defaultView?.getComputedStyle(
+			element
+		).visibility;
+	if ( visibility === 'hidden' || visibility === 'collapse' ) {
+		return false;
+	}
+
 	return (
 		element.offsetWidth > 0 ||
 		element.offsetHeight > 0 ||

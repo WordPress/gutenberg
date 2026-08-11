@@ -258,11 +258,15 @@ describe.each( [
 		);
 
 		// assert against filtered array
-		styledItems.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).toHaveStyle(
-				customStyles
-			)
-		);
+		styledItems.forEach( ( { name } ) => {
+			const style = getComputedStyle(
+				screen.getByRole( 'option', { name } )
+			);
+			expect( style.backgroundColor ).toBe(
+				customStyles.backgroundColor
+			);
+			expect( style.rotate ).toBe( customStyles.rotate );
+		} );
 
 		// return an array of items _without_ styles added
 		const unstyledItems = props.options.filter(
@@ -270,11 +274,15 @@ describe.each( [
 		);
 
 		// assert against filtered array
-		unstyledItems.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveStyle(
-				customStyles
-			)
-		);
+		unstyledItems.forEach( ( { name } ) => {
+			const style = getComputedStyle(
+				screen.getByRole( 'option', { name } )
+			);
+			expect( style.backgroundColor ).not.toBe(
+				customStyles.backgroundColor
+			);
+			expect( style.rotate ).not.toBe( customStyles.rotate );
+		} );
 	} );
 
 	it( 'does not show selected hint by default', async () => {
@@ -729,8 +737,25 @@ describe( 'Legacy size support', () => {
 
 		const comboboxes = screen.getAllByRole( 'combobox' );
 		const [ defaultCombobox, legacyCombobox ] = comboboxes;
+		const properties = [
+			'height',
+			'minHeight',
+			'paddingTop',
+			'paddingRight',
+			'paddingBottom',
+			'paddingLeft',
+			'fontSize',
+			'lineHeight',
+			'borderRadius',
+		] as const;
+		const defaultStyles = getComputedStyle( defaultCombobox );
+		const legacyStyles = getComputedStyle( legacyCombobox );
 
-		expect( legacyCombobox ).toMatchStyleDiffSnapshot( defaultCombobox );
+		for ( const property of properties ) {
+			expect( legacyStyles[ property ] ).toBe(
+				defaultStyles[ property ]
+			);
+		}
 	} );
 } );
 

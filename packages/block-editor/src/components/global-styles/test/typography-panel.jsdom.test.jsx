@@ -3,6 +3,7 @@ import { act, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { click, render as renderAriakit } from '@ariakit/test/react';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
+globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 // The inheritance treatment sits behind the

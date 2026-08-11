@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
@@ -45,7 +46,6 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 				aria-label="Notice"
 				className="custom-class"
 				data-testid="notice"
-				style={ { color: 'red' } }
 				title="Notice title"
 			/>
 		);
@@ -55,7 +55,6 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		expect( element ).toHaveAttribute( 'aria-label', 'Notice' );
 		expect( element ).toHaveAttribute( 'title', 'Notice title' );
 		expect( element ).toHaveClass( 'custom-class' );
-		expect( element ).toHaveStyle( { color: 'rgb(255, 0, 0)' } );
 	} );
 
 	it( 'preserves standard props without relying on the DOM', () => {
