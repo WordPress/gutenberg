@@ -242,6 +242,35 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should forward delete an empty heading without transforming the next block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'My paragraph' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'My paragraph' },
+			},
+		] );
+
+		await page.keyboard.press( 'Delete' );
+		// The caret lands at the start of the surviving paragraph.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '‸My paragraph' },
+			},
+		] );
+	} );
+
 	test( 'should remove empty paragraph block on backspace', async ( {
 		editor,
 		page,
