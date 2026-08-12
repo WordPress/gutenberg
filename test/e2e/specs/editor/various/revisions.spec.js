@@ -959,6 +959,13 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// The post must be published: when the post author autosaves their
+		// own draft, WordPress updates the draft in place instead of storing
+		// an autosave revision, so no autosave would exist to open. It must
+		// also be backdated because the editor deletes an autosave that is
+		// not strictly newer than the post on load, and the post and the
+		// autosave can otherwise be created within the same second.
+		// See https://github.com/WordPress/gutenberg/issues/81157.
 		const post = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/posts',
@@ -966,7 +973,8 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 				title: 'Autosave URL Test',
 				content:
 					'<!-- wp:paragraph --><p>Saved content</p><!-- /wp:paragraph -->',
-				status: 'draft',
+				status: 'publish',
+				date: '2024-01-01T00:00:00',
 			},
 		} );
 		const autosave = await requestUtils.rest( {
