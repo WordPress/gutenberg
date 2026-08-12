@@ -894,6 +894,56 @@ export function isWithinEditedContentOnlySection( state, clientId ) {
 }
 
 /**
+ * Retrieves the client ID of the closest-to-the-root ancestor block that
+ * captures the controls (toolbar and inspector) of the block with the
+ * provided client ID, via the `captureControls` block support.
+ *
+ * Returns undefined while the capturing block's inner blocks are temporarily
+ * expanded to show their own controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the controls-capturing ancestor block.
+ */
+export function getControlsCapturingParent( state, clientId ) {
+	if ( ! clientId ) {
+		return undefined;
+	}
+
+	let current = clientId;
+	let result;
+	// If capturing blocks are nested, the topmost one captures the controls.
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		const blockName = getBlockName( state, current );
+		if (
+			blockName &&
+			hasBlockSupport( blockName, 'captureControls', false )
+		) {
+			result = current;
+		}
+	}
+
+	if ( ! result || state.expandedControlsBlock === result ) {
+		return undefined;
+	}
+
+	return result;
+}
+
+/**
+ * Retrieves the client ID of the controls-capturing block whose inner blocks
+ * are temporarily expanded to show their own controls.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The client ID of the expanded controls-capturing block.
+ */
+export function getExpandedControlsBlock( state ) {
+	return state.expandedControlsBlock;
+}
+
+/**
  * Returns the style attributes of multiple blocks.
  *
  * @param {Object}   state     Global application state.

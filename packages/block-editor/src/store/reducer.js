@@ -2066,6 +2066,47 @@ export function editedContentOnlySection( state, action ) {
 }
 
 /**
+ * Reducer returning the clientId of the controls-capturing block whose inner
+ * blocks temporarily show their own controls instead of the capturing
+ * block's.
+ *
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
+ *
+ * @return {string|undefined} Updated state.
+ */
+export function expandedControlsBlock( state, action ) {
+	if ( action.type === 'EXPAND_BLOCK_CONTROLS' ) {
+		return action.clientId;
+	}
+
+	if ( ! state ) {
+		return state;
+	}
+
+	switch ( action.type ) {
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			// Clear if the expanded block is directly among the removed or
+			// replaced blocks. A removed ancestor is not caught here since
+			// action.clientIds only contains the top-level IDs; that edge
+			// case is handled by the CollapseExpandedControlsOnOutsideSelect
+			// component in block-list/index.js.
+			if ( action.clientIds.includes( state ) ) {
+				return undefined;
+			}
+			break;
+		case 'RESET_BLOCKS':
+			if ( ! getFlattenedClientIds( action.blocks )[ state ] ) {
+				return undefined;
+			}
+			break;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning a map of style IDs to style overrides.
  *
  * @param {Map}    state  Current state.
@@ -2442,6 +2483,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,
+	expandedControlsBlock,
 	blockVisibility,
 	viewportModalClientIds,
 	styleOverrides,
