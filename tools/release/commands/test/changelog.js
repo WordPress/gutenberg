@@ -352,23 +352,22 @@ describe( 'getIssueFeature', () => {
 		expect( result ).toBe( 'Uncategorized' );
 	} );
 
-	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
-		const result = getIssueFeature( {
-			labels: [
-				{
-					name: 'Some Label',
-				},
-				{
-					name: '[Package] Example Package', // 1. has explicit mapping.
-				},
-				{
-					name: '[Package] Another One',
-				},
-			],
-		} );
+	it.each( [
+		[ '[Package] Element', 'Element' ],
+		[ '[Package] Widget Dashboard', 'Widget Dashboard' ],
+		[ '[Package] Boot', 'Boot' ],
+		[ '[Tool] WP Scripts', 'WP Scripts' ],
+		[ '[Package] Interface', 'Interface' ],
+	] )(
+		'uses an otherwise-unmapped %s label as a fallback category',
+		( label, expected ) => {
+			const result = getIssueFeature( {
+				labels: [ { name: 'Some Label' }, { name: label } ],
+			} );
 
-		expect( result ).toEqual( 'Uncategorized' );
-	} );
+			expect( result ).toEqual( expected );
+		}
+	);
 
 	it( 'gives precedence to manual feature mapping', () => {
 		const result = getIssueFeature( {
@@ -469,18 +468,20 @@ describe( 'getTypesByLabels', () => {
 } );
 
 describe( 'mapLabelsToFeatures', () => {
-	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+	it( 'returns all normalized feature candidates case-insensitively', () => {
 		const result = mapLabelsToFeatures( [
 			'[Package] Commands',
 			'[Package] Block Library',
 			'[Feature] Link Editing',
 			'[Feature] block Multi Selection',
+			'[Type] Flaky Test',
 		] );
 
 		expect( result ).toEqual( [
 			'Commands',
 			'Block Library',
 			'Block Editor',
+			'Testing',
 		] );
 	} );
 } );
