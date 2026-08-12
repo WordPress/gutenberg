@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedFormTokenField } from '../components';
+import { ValidatedFormTokenField } from '../form-token-field';
 
 describe( 'ValidatedFormTokenField', () => {
 	it( 'should preserve the built-in howto description', () => {
