@@ -1020,6 +1020,7 @@
 			"test/unit/config/setup.vitest.jsdom.test.jsx",
 			"test/unit/scripts/test/discover-test-files.test.js",
 			"test/unit/scripts/test/resolver.js",
+			"test/unit/scripts/test/vite-block-metadata.vitest.test.js",
 			"test/unit/scripts/test/vitest-policy-rules.test.js",
 			"tools/agents/test/setup-skills.test.js",
 			"tools/release/commands/test/changelog.js",
