@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import {
 	useHasColorPanel,

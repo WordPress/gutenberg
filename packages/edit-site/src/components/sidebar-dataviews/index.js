@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/icons';
 import { useViewConfig } from '@wordpress/views';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 

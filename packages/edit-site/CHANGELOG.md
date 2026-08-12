@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 7.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+
+## 7.1.0 (2026-07-29)
+
 ## 7.0.0 (2026-07-14)
 
 ### Breaking Changes

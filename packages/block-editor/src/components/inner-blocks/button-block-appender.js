@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import BaseButtonBlockAppender from '../button-block-appender';
 import { useBlockEditContext } from '../block-edit/context';
 

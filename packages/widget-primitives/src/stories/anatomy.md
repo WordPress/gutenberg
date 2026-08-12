@@ -60,9 +60,11 @@ Either way the host never interprets the values. It mounts the form from the dec
 
 ![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings surface. The meaning stays the widget's.](./assets/representation.svg)
 
-Alongside its data, a widget can declare `actions`: the verbs a user triggers, such as opening a report or downloading a file. Each action names an `id`, a `label`, and a link target (`href`, with optional `download` / `openInNewTab`).
+Alongside its data, a widget can declare `actions`: the verbs a user triggers, such as opening a report or downloading a file. Each action names an `id`, a `label`, and exactly one fulfillment, the key that says what triggering it means. Today the only key is `href`, a link target (with optional `download` / `openInNewTab`).
 
-The pattern matches attributes: the widget declares the intent, and the host decides the surface. It never says "put this in a toolbar"; it names the action, and the host materializes the affordance and places it. Today the only target is a link, so navigation and download are the browser's, and the host renders the anchor without interpreting what the action means.
+The pattern matches attributes: the widget declares the intent, and the host decides the surface. It never says "put this in a toolbar"; it names the action, and the host materializes the affordance and places it.
+
+The host never interprets what an action _means_, only how to offer it: which primitive to mount, and where. For a link that means mounting a real link primitive wherever the surface allows one, and deciding how to reach the target, which the widget cannot know (see **Actions**).
 
 ## Why the split matters
 

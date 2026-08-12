@@ -97,7 +97,7 @@
 
 	.dataviews-view-grid__media {
 		width: 100%;
-		aspect-ratio: 1/1;
+		aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
 		background-color: var(--wpds-color-background-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-md);
 		overflow: hidden;

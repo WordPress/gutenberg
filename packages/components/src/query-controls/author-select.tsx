@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from './terms';
 import TreeSelect from '../tree-select';
 import type { AuthorSelectProps } from './types';

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -16,10 +9,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {

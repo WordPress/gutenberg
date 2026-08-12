@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createElement, Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import serialize, {
 	getCommentAttributes,
 	getSaveContent,
