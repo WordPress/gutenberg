@@ -2096,6 +2096,272 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeFocused();
 		} );
 	} );
+
+	/*
+	 * Composing a note used to leave the user without their place: the notes
+	 * surface took the single complementary-area slot and nothing put the
+	 * displaced sidebar back when the composer was cancelled. See #75450.
+	 *
+	 * Above the `medium` breakpoint the floating notes are part of the canvas
+	 * and displace nothing, so the remaining flow to cover is the small
+	 * viewport, where "All notes" is the only notes surface.
+	 */
+	test.describe( 'Sidebar restoration around the add-note flow', () => {
+		const SMALL_VIEWPORT = { width: 600, height: 800 };
+
+		/*
+		 * Which sidebar is open is a persisted user preference, so these
+		 * tests both need a known starting point and must not leave one open
+		 * for the rest of the suite. Resetting before the post is created is
+		 * what makes it take effect in the editor these tests load.
+		 */
+		test.beforeEach( async ( { requestUtils, admin } ) => {
+			await requestUtils.resetPreferences();
+			await admin.createNewPost();
+		} );
+
+		/*
+		 * Preferences are persisted on a debounce, so a reset can land before
+		 * the previous editor has written its last state. Leaving every test
+		 * with the sidebar closed makes anything that does leak harmless.
+		 */
+		test.afterEach( async ( { page } ) => {
+			const closeButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: /^Close / } );
+			if ( await closeButton.isVisible() ) {
+				await closeButton.click();
+				await expect( closeButton ).toBeHidden();
+			}
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.resetPreferences();
+		} );
+
+		/**
+		 * Opens the settings sidebar on the given tab. The viewport is set
+		 * first so the sidebar isn't closed by the editor's own
+		 * large-to-small viewport handling.
+		 *
+		 * @param {Object}                                                utils
+		 * @param {import('@playwright/test').Page}                       utils.page
+		 * @param {import('@wordpress/e2e-test-utils-playwright').Editor} utils.editor
+		 * @param {string}                                                tabName
+		 */
+		async function openSettingsTab( { page, editor }, tabName ) {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settings.getByRole( 'tab', { name: tabName } ).click();
+			await expect(
+				settings.getByRole( 'tab', { name: tabName } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			return settings;
+		}
+
+		// The headline repro from #75450, at the default viewport: the floating
+		// notes never take the sidebar slot, so nothing is displaced.
+		test( 'keeps the settings sidebar open through the add-note flow', async ( {
+			page,
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+			const settings = await openSettingsTab( { page, editor }, 'Block' );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await expect(
+				settings.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				settings.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		test( 'restores the block inspector after cancelling a new note', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			await page.setViewportSize( SMALL_VIEWPORT );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+			const settings = await openSettingsTab( { page, editor }, 'Block' );
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await expect(
+				settings.getByRole( 'button', { name: 'Close Notes' } )
+			).toBeVisible();
+
+			await settings.getByRole( 'button', { name: 'Cancel' } ).click();
+
+			await expect(
+				settings.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
+		} );
+
+		test( 'restores the document tab after dismissing a new note with Escape', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			await page.setViewportSize( SMALL_VIEWPORT );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+			const settings = await openSettingsTab( { page, editor }, 'Post' );
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				settings.getByRole( 'tab', { name: 'Post' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		// The previous attempt at this fix (#75455) opened the document
+		// sidebar here, which is worse than leaving the user where they were.
+		test( 'does not open any sidebar after cancelling when none was open', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			await page.setViewportSize( SMALL_VIEWPORT );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect( settings ).toBeHidden();
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect(
+				settings.getByRole( 'button', { name: 'Close Notes' } )
+			).toBeVisible();
+
+			await settings.getByRole( 'button', { name: 'Cancel' } ).click();
+
+			await expect( settings ).toBeHidden();
+		} );
+
+		test( 'restores the inspector even when the post has other notes', async ( {
+			page,
+			editor,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Already noted' },
+				comment: 'An existing note',
+			} );
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Note me too' },
+			} );
+
+			await page.setViewportSize( SMALL_VIEWPORT );
+			const settings = await openSettingsTab( { page, editor }, 'Block' );
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await settings.getByRole( 'button', { name: 'Cancel' } ).click();
+
+			await expect(
+				settings.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		test( 'keeps the notes sidebar open after submitting a note', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			await page.setViewportSize( SMALL_VIEWPORT );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+			const settings = await openSettingsTab( { page, editor }, 'Block' );
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.pressSequentially( 'Submitted note' );
+			await settings
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The new note lives in the sidebar the user is looking at, so
+			// yanking it away to re-show the inspector would hide their work.
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Submitted note',
+				} )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'button', { name: 'Close Notes' } )
+			).toBeVisible();
+		} );
+
+		test( 'does not restore when the user switches sidebars while composing', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			await page.setViewportSize( SMALL_VIEWPORT );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note me' },
+			} );
+			const settings = await openSettingsTab( { page, editor }, 'Block' );
+
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+
+			// Switching away dismisses the composer through focus-out.
+			await editor.openDocumentSettingsSidebar();
+			await expect(
+				settings.getByRole( 'tab', { name: 'Post' } )
+			).toBeVisible();
+
+			await expect(
+				settings.getByRole( 'button', { name: 'Close Notes' } )
+			).toBeHidden();
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
