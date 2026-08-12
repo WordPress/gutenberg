@@ -99,8 +99,11 @@ export function normalizeRootItems(
 		return items;
 	}
 
-	const creatableItems = items.filter( isCreatableItem );
-	const regularItems = items.filter( ( item ) => ! isCreatableItem( item ) );
+	const flatItems = items as Item[];
+	const creatableItems = flatItems.filter( isCreatableItem );
+	const regularItems = flatItems.filter(
+		( item ) => ! isCreatableItem( item )
+	);
 
 	return [ ...regularItems, ...creatableItems ];
 }
