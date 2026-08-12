@@ -38,7 +38,7 @@
 
 
 .editor-post-url__link-slug {
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 // TODO: This might indicate a need to update the InputControl itself, as

@@ -1,31 +1,21 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner, Composite } from '@wordpress/components';
 import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 import type {
 	NormalizedField,
 	ViewPickerActivity as ViewPickerActivityType,
 	ViewPickerActivityProps,
 } from '../../../types';
-import type { SetSelection } from '../../../types/private';
 
 function isDefined< T >( item: T | undefined ): item is T {
 	return !! item;
@@ -33,9 +23,8 @@ function isDefined< T >( item: T | undefined ): item is T {
 
 interface PickerActivityItemProps< Item > {
 	view: ViewPickerActivityType;
-	multiselect?: boolean;
 	selection: string[];
-	onChangeSelection: SetSelection;
+	selectionProps: SelectionProps;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	titleField?: NormalizedField< Item >;
@@ -48,9 +37,8 @@ interface PickerActivityItemProps< Item > {
 
 function PickerActivityItem< Item >( {
 	view,
-	multiselect,
 	selection,
-	onChangeSelection,
+	selectionProps,
 	getItemId,
 	item,
 	titleField,
@@ -127,18 +115,7 @@ function PickerActivityItem< Item >( {
 				density === 'comfortable' && 'is-comfortable',
 				isSelected && 'is-selected'
 			) }
-			onClick={ () => {
-				if ( isSelected ) {
-					onChangeSelection(
-						selection.filter( ( itemId ) => id !== itemId )
-					);
-				} else {
-					const newSelection = multiselect
-						? [ ...selection, id ]
-						: [ id ];
-					onChangeSelection( newSelection );
-				}
-			} }
+			{ ...selectionProps }
 			render={ <div /> }
 		>
 			<Stack direction="row" gap="lg" justify="start" align="flex-start">
@@ -273,13 +250,25 @@ export default function ViewPickerActivity< Item >( {
 	const hasData = !! data?.length;
 	const isGrouped = !! ( groupField && dataByGroup );
 
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
+	} );
+
 	const renderItem = ( item: Item ) => (
 		<PickerActivityItem
 			key={ getItemId( item ) }
 			view={ view }
-			multiselect={ isMultiselect }
 			selection={ selection }
-			onChangeSelection={ onChangeSelection }
+			selectionProps={ getSelectionProps( getItemId( item ) ) }
 			getItemId={ getItemId }
 			item={ item }
 			titleField={ titleField }

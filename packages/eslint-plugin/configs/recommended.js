@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
-
-/**
- * Internal dependencies
- */
 const { isPackageInstalled } = require( '../utils' );
 const recommendedWithFormattingConfig = require( './recommended-with-formatting' );
 
@@ -45,9 +38,10 @@ if ( isPackageInstalled( 'typescript' ) ) {
 		{
 			settings: {
 				'import/resolver': {
-					typescript: {
-						extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
-					},
+					[ require.resolve( 'eslint-import-resolver-typescript' ) ]:
+						{
+							extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+						},
 				},
 			},
 			ignores: [ '**/*.d.ts' ],

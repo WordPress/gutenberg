@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	afterEach,
 	beforeEach,
@@ -68,7 +65,6 @@ interface PollingManager {
 		awareness: unknown;
 		log: () => void;
 		onStatusChange: () => void;
-		onSync: () => void;
 	} ) => void;
 	unregisterRoom: (
 		room: string,
@@ -194,7 +190,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			// Simulate a doc update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
@@ -220,7 +215,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			const onDocUpdate = getOnDocUpdate( doc );
@@ -257,7 +251,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			// Flush the initial poll so 'connected' status is emitted first.
@@ -308,7 +301,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -348,7 +340,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -381,7 +372,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -420,7 +410,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 1000 );
@@ -460,7 +449,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			// First poll passes.
@@ -523,7 +511,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -566,7 +553,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -612,7 +598,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -621,7 +606,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// First poll: detects collaborators on primary room, resumes all queues.
@@ -684,7 +668,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -693,7 +676,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// First poll: no collaborators.
@@ -736,7 +718,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -745,7 +726,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// First poll: no collaborators, queues stay paused.
@@ -862,7 +842,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
-				onSync: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -871,7 +850,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -911,7 +889,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -940,7 +917,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -964,7 +940,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -986,7 +961,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1009,7 +983,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1056,7 +1029,6 @@ describe( 'polling-manager', () => {
 					awareness: createMockAwareness(),
 					log: jest.fn(),
 					onStatusChange: jest.fn(),
-					onSync: jest.fn(),
 				} );
 			}
 
@@ -1119,7 +1091,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1186,7 +1157,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// Flush the initial poll (queue is paused, so no updates sent).
@@ -1244,7 +1214,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1293,7 +1262,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// registerRoom → poll() → start() → postSyncUpdate (pending).
@@ -1316,7 +1284,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			// Flush so the first poll completes and schedules a timeout.
@@ -1362,7 +1329,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
-				onSync: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'other-room',
@@ -1370,7 +1336,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1446,7 +1411,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-a',
@@ -1454,7 +1418,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-b',
@@ -1462,7 +1425,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1529,7 +1491,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 			for ( let i = 1; i <= 10; i++ ) {
 				pollingManager.registerRoom( {
@@ -1538,7 +1499,6 @@ describe( 'polling-manager', () => {
 					awareness: createMockAwareness(),
 					log: jest.fn(),
 					onStatusChange: jest.fn(),
-					onSync: jest.fn(),
 				} );
 			}
 
@@ -1609,7 +1569,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange,
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1645,7 +1604,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1672,7 +1630,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1702,7 +1659,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1737,7 +1693,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1763,7 +1718,6 @@ describe( 'polling-manager', () => {
 				awareness: createMockAwareness(),
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
 			} );
 		}
 

@@ -9,7 +9,7 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array $context Block context from parent Navigation block.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
@@ -258,8 +258,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
-	$parent_page_id = $attributes['parentPageID'];
-	$is_nested      = ! empty( $block->context['core/isInsideSubmenu'] );
+	$parent_page_id_attr = $attributes['parentPageID'] ?? null;
+	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
+	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
 	$all_pages = get_pages(
 		array(

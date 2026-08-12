@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
@@ -300,6 +293,19 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test { height: 20rem !important; aspect-ratio: unset !important; }'
 		);
 	} );
+
+	it( 'adds important text alignment declarations for state styles', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					typography: {
+						textAlign: 'center',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { text-align: center !important; }' );
+	} );
 } );
 
 describe( 'getBlockStateStylesCSS', () => {
@@ -411,6 +417,22 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped text alignment styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						typography: { textAlign: 'right' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { text-align: right !important; }}',
 		] );
 	} );
 

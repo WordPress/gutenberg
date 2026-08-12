@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { type LinearGradientNode } from 'gradient-parser';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
@@ -166,7 +155,7 @@ export function CustomGradientPicker( {
 			color: getStopCssColor( colorStop ),
 			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
 			// TypeScript doesn't know that `colorStop.length` is not undefined here.
-			// @ts-expect-error
+			// @ts-expect-error `colorStop.length` is possibly `undefined`.
 			position: parseInt( colorStop.length.value ),
 		};
 	} );

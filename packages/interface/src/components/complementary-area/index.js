@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Panel,
@@ -17,7 +10,13 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	cloneElement,
+	isValidElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -26,10 +25,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { usePluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
 import ComplementaryAreaHeader from '../complementary-area-header';
 import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
@@ -42,12 +37,37 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-const SIDEBAR_WIDTH = 280;
 const variants = {
-	open: { width: SIDEBAR_WIDTH },
-	closed: { width: 0 },
-	mobileOpen: { width: '100vw' },
+	// `auto` leaves the width to the area's own stylesheet, so it stays in one
+	// place. framer-motion measures the element to animate, then restores
+	// `auto`.
+	open: { width: 'auto' },
+	// Resolved with the `custom` value passed to `AnimatePresence`, which is
+	// the only way an already removed element can be given a fresh transition.
+	closed: ( transition ) => ( { width: 0, transition } ),
 };
+
+/**
+ * Renders the complementary area container, replacing the default `div` with
+ * the element given via the `render` prop.
+ *
+ * `className` and `style` are composed rather than overwritten, since the
+ * container is also the scroll container for the sidebar.
+ *
+ * @param {Object} [render] Replacement element.
+ * @param {Object} props    Props for the container.
+ */
+function renderContainer( render, props ) {
+	if ( isValidElement( render ) ) {
+		return cloneElement( render, {
+			...props,
+			className: clsx( render.props.className, props.className ),
+			style: { ...render.props.style, ...props.style },
+		} );
+	}
+
+	return <div { ...props } />;
+}
 
 function ComplementaryAreaFill( {
 	activeArea,
@@ -56,27 +76,20 @@ function ComplementaryAreaFill( {
 	children,
 	className,
 	id,
+	render,
 } ) {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	// This is used to delay the exit animation to the next tick.
-	// The reason this is done is to allow us to apply the right transition properties
-	// When we switch from an open sidebar to another open sidebar.
-	// we don't want to animate in this case.
+	// Swapping one open area straight for another should not animate.
 	const previousActiveArea = usePrevious( activeArea );
-	const previousIsActive = usePrevious( isActive );
-	const [ , setState ] = useState( {} );
-	useEffect( () => {
-		setState( {} );
-	}, [ isActive ] );
+	const isSwitchingAreas =
+		!! previousActiveArea &&
+		!! activeArea &&
+		activeArea !== previousActiveArea;
 	const transition = {
 		type: 'tween',
 		duration:
-			disableMotion ||
-			isMobileViewport ||
-			( !! previousActiveArea &&
-				!! activeArea &&
-				activeArea !== previousActiveArea )
+			disableMotion || isMobileViewport || isSwitchingAreas
 				? 0
 				: ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
@@ -84,27 +97,21 @@ function ComplementaryAreaFill( {
 
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<AnimatePresence initial={ false }>
-				{ ( previousIsActive || isActive ) && (
+			<AnimatePresence initial={ false } custom={ transition }>
+				{ isActive && (
 					<motion.div
 						variants={ variants }
 						initial="closed"
-						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
+						animate="open"
 						exit="closed"
 						transition={ transition }
 						className="interface-complementary-area__fill"
 					>
-						<div
-							id={ id }
-							className={ className }
-							style={ {
-								width: isMobileViewport
-									? '100vw'
-									: SIDEBAR_WIDTH,
-							} }
-						>
-							{ children }
-						</div>
+						{ renderContainer( render, {
+							id,
+							className,
+							children,
+						} ) }
 					</motion.div>
 				) }
 			</AnimatePresence>
@@ -177,6 +184,7 @@ function ComplementaryArea( {
 	icon: iconProp,
 	isPinnable = true,
 	panelClassName,
+	render,
 	scope,
 	name,
 	title,
@@ -302,6 +310,7 @@ function ComplementaryArea( {
 				className={ clsx( 'interface-complementary-area', className ) }
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
+				render={ render }
 			>
 				<ComplementaryAreaHeader
 					className={ headerClassName }
@@ -336,7 +345,6 @@ function ComplementaryArea( {
 										)
 									}
 									isPressed={ isPinned }
-									aria-expanded={ isPinned }
 									size="compact"
 								/>
 							) }

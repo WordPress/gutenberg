@@ -88,7 +88,7 @@
 	position: relative;
 	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
 	width: 100%;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-align: left;
 	color: $gray-900;
 

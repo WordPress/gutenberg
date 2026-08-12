@@ -36,6 +36,12 @@ How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) 
 
 The hook reaches for no store or endpoint. The host fetches the records however it wants and passes them in.
 
+### Field types
+
+`registerFieldType( definition )` names a reusable field type that widget attributes can reference via `type` (for example `type: 'location'`), so an attribute ships a custom control without importing one. The consuming application owns the vocabulary; `useWidgetTypes` resolves the references into plain DataViews `Field` props while it assembles each `WidgetType`, and unregistered names degrade exactly as unknown types do in DataViews.
+
+See **Field Types** for the full pipeline.
+
 ### Rendering
 
 `<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract.

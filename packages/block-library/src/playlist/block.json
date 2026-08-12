@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/playlist",
 	"title": "Playlist",
 	"category": "media",
@@ -26,6 +25,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"showPlayButtonArtwork": {
+			"type": "boolean",
+			"default": false
+		},
 		"showArtists": {
 			"type": "boolean",
 			"default": true
@@ -43,6 +46,18 @@
 			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
 			"default": "bars"
 		},
+		"waveformColor": {
+			"type": "string"
+		},
+		"waveformGradient": {
+			"type": "string"
+		},
+		"waveformBackgroundColor": {
+			"type": "string"
+		},
+		"waveformBackgroundGradient": {
+			"type": "string"
+		},
 		"caption": {
 			"type": "string"
 		}
@@ -54,6 +69,7 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"__experimentalExposeControlsToChildren": true,
 		"color": {
 			"gradients": true,
 			"link": true,

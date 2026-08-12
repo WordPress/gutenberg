@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { wordpress } from '@wordpress/icons';
 import type { WidgetAttributeField } from '@wordpress/widget-primitives';
 
 type HelloWorldWidgetAttributes = {
@@ -13,7 +9,6 @@ type HelloWorldWidgetAttributes = {
  */
 export default {
 	name: 'core/hello-world',
-	icon: wordpress,
 	attributes: [
 		{
 			id: 'message',

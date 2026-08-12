@@ -13,12 +13,14 @@ on:
                 description: 'rc or stable?'
                 required: true
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels previous non-release workflow runs that have not completed.
+# Workflow-dispatched release runs must not cancel an in-flight run after it may have
+# pushed version bump commits.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-    cancel-in-progress: true
+    # The concurrency group contains a shared release group for dispatches,
+    # the branch name for pull requests, or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && 'release' || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
+    cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -53,11 +55,31 @@ jobs:
                     echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> "$GITHUB_OUTPUT"
                   fi
 
+    preflight-release-token:
+        name: Preflight release token
+        runs-on: 'ubuntu-24.04'
+        environment: 'GitHub Releases'
+        permissions: {}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+
+        steps:
+            # Request the same elevated permissions as create-release so invalid
+            # credentials or unavailable requested permissions fail before version
+            # bump commits are pushed.
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
+
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
-        needs: compute-stable-branches
+        needs: [compute-stable-branches, preflight-release-token]
         if: |
             github.event_name == 'workflow_dispatch' && (
               (
@@ -88,7 +110,7 @@ jobs:
                   permission-contents: write
 
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   token: ${{ steps.app-token.outputs.token }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -197,8 +219,14 @@ jobs:
         if: |
             always() && (
               github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch' ||
-              github.repository == 'WordPress/gutenberg'
+              (
+                github.event_name == 'workflow_dispatch' &&
+                needs.bump-version.result == 'success'
+              ) ||
+              (
+                github.event_name != 'workflow_dispatch' &&
+                github.repository == 'WordPress/gutenberg'
+              )
             )
         strategy:
             matrix:
@@ -206,7 +234,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -217,6 +245,11 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
@@ -242,8 +275,14 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
-                  sed -ie '1,6d' release-notes.txt
+                  RELEASE_NOTES_TMP="$(mktemp)"
+                  trap 'rm -f "$RELEASE_NOTES_TMP"' EXIT
+                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > "$RELEASE_NOTES_TMP"
+                  sed '1,6d' "$RELEASE_NOTES_TMP" > release-notes.txt
+                  if [[ ! -s release-notes.txt ]]; then
+                    echo "Release notes are empty for milestone \"$MILESTONE\"." >&2
+                    exit 1
+                  fi
                   if [[ "${VERSION}" != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
                     CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
@@ -300,7 +339,7 @@ jobs:
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+              uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -309,7 +348,7 @@ jobs:
             # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
             # for example) to container registries such as GitHub Container Registry.
             - name: Setup ORAS
-              uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3 # v2.0.0
+              uses: oras-project/setup-oras@1d808f7d7f6995cc68b7bf507bfe5c5446e1dc9d # v2.0.1
 
             # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
@@ -371,7 +410,7 @@ jobs:
                   permission-contents: write
 
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -422,6 +461,7 @@ jobs:
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
+        if: ${{ needs.bump-version.outputs.new_version }}
 
         steps:
             - name: Generate application token
@@ -499,7 +539,7 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   path: main
                   ref: trunk
@@ -507,7 +547,7 @@ jobs:
                   persist-credentials: false
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -528,6 +568,11 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
