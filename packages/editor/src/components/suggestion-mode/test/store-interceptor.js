@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,10 +10,6 @@ import {
 	getBlockTypes,
 	setDefaultBlockName,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import SuggestionStoreInterceptor, {
 	diffAttributes,
 	shallowAttributeEquals,

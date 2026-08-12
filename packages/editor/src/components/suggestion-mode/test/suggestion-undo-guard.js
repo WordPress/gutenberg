@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { findNewestWithdrawableSuggestion } from '../suggestion-undo-guard';
 
 describe( 'findNewestWithdrawableSuggestion', () => {
