@@ -193,7 +193,7 @@ global.File = FilePolyfill;
 /**
  * Mock `userEvent.setup()` to fix the `HTMLElement.prototype` properties
  * that `@testing-library/user-event` makes non-writable, which breaks
- * `@ariakit/test` and other code that tries to override `focus` and `blur`.
+ * Code that tries to override `focus` and `blur`.
  * @see https://github.com/testing-library/user-event/pull/1265
  *
  * Kept at the module top-level so babel-jest hoists it above imports. The

@@ -13,8 +13,8 @@ export async function withFakeTimers( fn ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// fake timers may mutate these globals, which breaks the Animated API. We
 	// preserve the original implementations to restore them later.
-	const requestAnimationFrameCopy = global.requestAnimationFrame;
-	const cancelAnimationFrameCopy = global.cancelAnimationFrame;
+	const requestAnimationFrameCopy = globalThis.requestAnimationFrame;
+	const cancelAnimationFrameCopy = globalThis.cancelAnimationFrame;
 
 	if ( ! usingFakeTimers ) {
 		vi.useFakeTimers();
@@ -25,8 +25,8 @@ export async function withFakeTimers( fn ) {
 	if ( ! usingFakeTimers ) {
 		vi.useRealTimers();
 
-		global.requestAnimationFrame = requestAnimationFrameCopy;
-		global.cancelAnimationFrame = cancelAnimationFrameCopy;
+		globalThis.requestAnimationFrame = requestAnimationFrameCopy;
+		globalThis.cancelAnimationFrame = cancelAnimationFrameCopy;
 	}
 	return result;
 }

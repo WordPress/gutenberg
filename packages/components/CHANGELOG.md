@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run Components interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 39.0.0 (2026-08-12)
 
 ### Breaking Changes

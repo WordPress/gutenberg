@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [
-			"jest",
+			"gutenberg-vitest-test-env",
 			"node",
 			"style-imports",
 			"react-css-custom-properties"
