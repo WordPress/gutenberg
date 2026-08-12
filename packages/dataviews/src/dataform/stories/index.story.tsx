@@ -1,3 +1,4 @@
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import DataForm from '../index';
 import LayoutCardComponent from './layout-card';
 import LayoutDetailsComponent from './layout-details';
@@ -7,6 +8,7 @@ import LayoutRowComponent from './layout-row';
 import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
+import ValidationPanelComponent from './validation-panel';
 import VisibilityComponent from './visibility';
 
 const meta = {
@@ -168,6 +170,44 @@ export const Validation = {
 		custom: 'sync',
 		pattern: false,
 		minMax: false,
+	},
+};
+
+/**
+ * In the `panel` layout, a field's error indicator overlays the edit button's
+ * stretched hit area, so it relays its clicks to the button. The interaction
+ * test covers what jsdom cannot: the real stacking and focus behavior.
+ */
+export const ValidationPanelErrorIndicator = {
+	render: ValidationPanelComponent,
+	play: async ( { canvasElement }: { canvasElement: HTMLElement } ) => {
+		const canvas = within( canvasElement );
+		// The flyout renders in a portal outside the story canvas.
+		const body = within( canvasElement.ownerDocument.body );
+
+		// Make the field invalid: clear the required value, then dismiss the
+		// flyout. The row only reveals the error after its flyout has been
+		// open once.
+		await userEvent.click(
+			canvas.getByRole( 'button', { name: 'Edit Title' } )
+		);
+		await userEvent.clear( await body.findByRole( 'textbox' ) );
+		await userEvent.keyboard( '{Escape}' );
+
+		const editButton = await canvas.findByRole( 'button', {
+			name: 'Edit Title (has errors)',
+		} );
+
+		// The error indicator wraps the label, stacking above the edit
+		// button's stretched hit area, so it delegates clicks to it.
+		await userEvent.click( canvas.getByText( 'Title' ) );
+		await expect( await body.findByRole( 'textbox' ) ).toBeVisible();
+		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		// Dismissing the flyout returns focus to the edit button, as if it
+		// had been clicked directly.
+		await userEvent.keyboard( '{Escape}' );
+		await waitFor( () => expect( editButton ).toHaveFocus() );
 	},
 };
 
