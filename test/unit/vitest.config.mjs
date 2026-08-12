@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
@@ -14,6 +15,8 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
+const nodeRequire = createRequire( import.meta.url );
+const flakinessReporter = nodeRequire.resolve( '@flakiness/vitest' );
 const testMigration = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -186,7 +189,7 @@ export default defineConfig( {
 						'default',
 						'github-actions',
 						[
-							'@flakiness/vitest',
+							flakinessReporter,
 							{
 								duplicates: 'rename',
 								flakinessProject: 'WordPress/gutenberg',
