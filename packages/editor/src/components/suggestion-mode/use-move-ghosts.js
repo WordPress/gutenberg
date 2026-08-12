@@ -14,15 +14,8 @@
  * overlay context: move suggestions live on the real block and must keep
  * rendering once the overlay is retired. See #73411.
  */
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { createContext, useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { buildMoveGhostIndex } from './move-ghost-index';
 
 // Referenced by name so the hook runs in tests and standalone contexts where

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichTextData,
 	create,
@@ -9,10 +6,6 @@ import {
 	store as richTextStore,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_A11Y_FORMAT_NAME,

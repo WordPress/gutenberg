@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { RichTextData, applyFormat, create } from '@wordpress/rich-text';
 
 /**

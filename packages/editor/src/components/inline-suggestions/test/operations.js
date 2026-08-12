@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichTextData,
 	registerFormatType,
@@ -8,10 +5,6 @@ import {
 	unregisterFormatType,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	acceptInlineDeletion,
 	rejectInlineDeletion,

@@ -51,18 +51,10 @@
  * re-open a withdrawn attribute or structural suggestion; an inline marker
  * restored by redo gets its note back via `SuggestionNoteGC`.
  */
-
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { useSuggestionOverlay } from './overlay-context';
 import { operationsFromOverlay } from './provider';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';

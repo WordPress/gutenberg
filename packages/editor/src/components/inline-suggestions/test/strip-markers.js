@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichTextData,
 	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
