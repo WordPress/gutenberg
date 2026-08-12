@@ -1,16 +1,14 @@
 # Inspector Controls Tabs
 
-The `InspectorControlsTabs` component splits the block inspector sidebar into tabs, so a block's settings, styles and list view fills are grouped instead of being stacked in a single scrolling column.
+The `InspectorControlsTabs` component splits the block inspector sidebar into tabs, so a block's content, list view, settings and styles are grouped instead of being stacked in a single scrolling column.
 
 _Note:_ This component is internal to the `@wordpress/block-editor` package. It is not exported from the package and is not part of the public API. It is rendered by [`BlockInspector`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md), which decides whether tabs are shown at all.
 
 ## Development guidelines
 
-The tabs are not authored by the block. Each tab renders [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) slots, so a block populates a tab simply by rendering `InspectorControls` with the matching `group`: the Settings tab renders the default, `position` and `bindings` groups plus the Advanced panel, the Styles tab renders the `color`, `background`, `filter`, `typography`, `dimensions`, `border` and `styles` groups, and the List View tab renders the `list` group.
+The tabs are not authored by the block. Each tab renders [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) slots, so a block populates a tab simply by rendering `InspectorControls` with the matching `group`. There are four tabs, rendered in this order when available: Content (the `content` group), List View (the `list` group), Settings (the default and `bindings` groups, plus the Advanced panel) and Styles (the `typography`, `color`, `background`, `filter`, `layout`, `dimensions`, `border`, `elements`, `position` and `styles` groups).
 
-Which tabs exist is determined by the `useInspectorControlsTabs` hook, which only returns a tab when at least one fill has been rendered into its groups. The hook also honors the `blockInspectorTabs` block editor setting, which can disable tabs globally or per block name. `BlockInspector` renders this component only when the hook returns more than one tab; with a single tab the sections are rendered flat instead.
-
-Two behaviors are worth knowing when consuming the tabs. The List View tab is restricted by an allowlist that currently contains only `core/navigation`, so other blocks never receive it even if they render `list` group fills. And because the tab panel mounts before slot fills arrive, blocks that are known to have a List View tab select it by default via `defaultTabId` rather than falling back to Settings.
+Which tabs exist is determined by the `useInspectorControlsTabs` hook, which returns a tab when fills have been rendered into its groups. `BlockInspector` renders this component only when the hook returns more than one tab; with a single tab the sections are rendered flat instead. The hook also honors the `blockInspectorTabs` block editor setting, which can disable tabs globally or per block name.
 
 Tab labels are rendered as icons with a tooltip. When the `showIconLabels` preference from `@wordpress/preferences` is enabled, the tab title is rendered as text instead.
 
@@ -20,8 +18,19 @@ Tab labels are rendered as icons with a tooltip. When the `showIconLabels` prefe
 import InspectorControlsTabs from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 
-function MyBlockInspector( { blockName, clientId, hasBlockStyles } ) {
-	const availableTabs = useInspectorControlsTabs( blockName );
+function MyBlockInspector( {
+	blockName,
+	clientId,
+	hasBlockStyles,
+	isSectionBlock,
+	contentClientIds,
+} ) {
+	const availableTabs = useInspectorControlsTabs(
+		blockName,
+		contentClientIds,
+		isSectionBlock,
+		hasBlockStyles
+	);
 
 	if ( availableTabs.length <= 1 ) {
 		return null;
@@ -33,6 +42,8 @@ function MyBlockInspector( { blockName, clientId, hasBlockStyles } ) {
 			clientId={ clientId }
 			hasBlockStyles={ hasBlockStyles }
 			tabs={ availableTabs }
+			isSectionBlock={ isSectionBlock }
+			contentClientIds={ contentClientIds }
 		/>
 	);
 }
@@ -44,7 +55,7 @@ function MyBlockInspector( { blockName, clientId, hasBlockStyles } ) {
 
 -   **Type:** `String`
 
-The name of the block being inspected, for example `core/navigation`. It is used to decide whether the List View tab is available and to resolve the border panel label. When omitted, the Advanced panel is not rendered in the Settings tab.
+The name of the block being inspected, for example `core/group`. It is used to resolve the border panel label, and `core/template-part` is excluded from the curated section styles described under `isSectionBlock`. When omitted, the Advanced panel is not rendered in the Settings tab.
 
 #### `clientId`
 
@@ -56,13 +67,25 @@ The client ID of the block being inspected. It is used as the key of the tabs pa
 
 -   **Type:** `Boolean`
 
-Whether the block has registered block styles. When `true`, the Styles tab renders a "Styles" panel with the block style previews above the block support slots.
+Whether the block has registered block styles. When `true`, the Styles tab renders the block style previews above the block support panels.
 
 #### `tabs`
 
 -   **Type:** `Array`
 
-The tabs to render in the tab list, in display order. Each entry is an object with `name`, `title` and `icon`. Pass the value returned by `useInspectorControlsTabs`; only tabs matching the `settings`, `styles` and `list` names have a corresponding panel.
+The tabs to render in the tab list, in display order. Each entry is an object with `name`, `title` and `icon`. Pass the value returned by `useInspectorControlsTabs`; only tabs matching the `content`, `list`, `settings` and `styles` names have a corresponding panel.
+
+#### `isSectionBlock`
+
+-   **Type:** `Boolean`
+
+Whether the block being inspected is a section. When `true`, the Styles tab replaces the full set of block support panels with a curated subset — typography, background and elements — restricted to the supports a section should expose. Template parts are excluded and keep the full panel set.
+
+#### `contentClientIds`
+
+-   **Type:** `Array`
+
+The client IDs of the content blocks within a section. The Content tab lists them as quick navigation links to select a nested block, and the Styles tab uses them to decide which element color controls to show by default.
 
 ## Related components
 
