@@ -12,10 +12,6 @@ Wrap the UI that offers the actions, and use the flags passed to the render prop
 
 ```jsx
 import { MenuGroup, MenuItem } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockActions from '../block-actions';
 
 function MyBlockMenu( { clientIds } ) {
