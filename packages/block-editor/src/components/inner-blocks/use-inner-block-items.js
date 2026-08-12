@@ -98,6 +98,6 @@ useInnerBlockItems.save = function () {
 	const innerBlocks = getInnerBlocks();
 	return innerBlocks.map( ( block ) => ( {
 		clientId: block.clientId,
-		html: serializeBlock( block, { isInnerBlocks: true } ),
+		html: serializeBlock( block ),
 	} ) );
 };
