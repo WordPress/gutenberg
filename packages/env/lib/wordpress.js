@@ -3,7 +3,10 @@ const dns = require( 'dns' ).promises;
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const SimpleGit = require( 'simple-git' );
 const { getCache, setCache } = require( './cache' );
+
+const WORDPRESS_MIRROR_URL = 'https://github.com/WordPress/WordPress.git';
 
 /**
  * @typedef {import('./config').WPSource} WPSource
@@ -58,6 +61,30 @@ async function canAccessWPORG() {
 }
 
 /**
+ * Checks whether a given version tag has been mirrored to the WordPress/WordPress
+ * git repository yet. The stable-check API on WordPress.org is updated the moment
+ * a release ships, but the git mirror syncs separately and can lag behind by a
+ * few hours, during which the tag this function checks for does not exist yet.
+ *
+ * @param {string} version The WordPress version to look for, like "6.0.1".
+ * @return {boolean} True if the tag exists on the mirror, false otherwise.
+ */
+async function isVersionAvailableOnMirror( version ) {
+	try {
+		const output = await SimpleGit().listRemote( [
+			'--tags',
+			WORDPRESS_MIRROR_URL,
+			version,
+		] );
+		return output.trim().length > 0;
+	} catch {
+		// If the check itself fails (e.g. no network), don't treat that as
+		// confirmation the tag is missing -- fall through to the normal path.
+		return true;
+	}
+}
+
+/**
  * Returns the latest stable version of WordPress by requesting the stable-check
  * endpoint on WordPress.org.
  *
@@ -96,6 +123,20 @@ async function getLatestWordPressVersion( options ) {
 
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
+			// The stable-check API can report a version before the
+			// WordPress/WordPress git mirror has synced its tag. Fetching
+			// that tag would fail outright, so fall back to the last known
+			// good version until the mirror catches up.
+			if ( ! ( await isVersionAvailableOnMirror( version ) ) ) {
+				const lastKnownGoodVersion = await getCache(
+					'latestWordPressVersion',
+					cacheOptions
+				);
+				if ( lastKnownGoodVersion ) {
+					return lastKnownGoodVersion;
+				}
+			}
+
 			CACHED_WP_VERSION = version;
 			await setCache( 'latestWordPressVersion', version, cacheOptions );
 			return version;
