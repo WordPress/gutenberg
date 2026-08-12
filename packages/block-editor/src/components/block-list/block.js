@@ -346,7 +346,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 				if (
 					blockOrder.length === 1 &&
-					isUnmodifiedBlock( getBlock( firstClientId ) )
+					isUnmodifiedBlock( getBlock( firstClientId ), 'content' )
 				) {
 					removeBlock( _clientId );
 				} else if ( isTextualWrapper ) {
