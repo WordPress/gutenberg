@@ -1,61 +1,38 @@
 # Block Edit Visually Button
 
-`BlockEditVisuallyButton` is a component that provides a toolbar button to switch from HTML editing mode to visual editing mode in the WordPress Block Editor (Gutenberg).
+`BlockEditVisuallyButton` renders the toolbar button that takes a block out of the HTML editor and back to the visual editor. It is the toolbar counterpart of the "Edit as HTML" / "Edit visually" item that [`BlockSettingsMenu`](../block-settings-menu/README.md) renders, and it exists so that a block being edited as HTML always offers a visible way back without opening the settings menu.
 
-## Description
+_Note:_ This component is internal to the block editor and is not exported from `@wordpress/block-editor`. It is rendered by [`BlockToolbar`](../block-toolbar/README.md); it is documented here for contributors working on the block toolbar rather than as public API.
 
-This component renders a toolbar button that allows users to switch from HTML editing mode back to the visual editor. The button only appears when a single block is selected and is currently in HTML editing mode.
+## Development guidelines
 
-## Installation
+The button renders only when a single block is selected and that block's mode is `html`, so it is safe to render unconditionally alongside the rest of the toolbar: with a multi-block selection, or with a block in visual mode, it returns `null`. Clicking it dispatches `toggleBlockMode` for the selected block, which flips the mode back to `visual`.
 
-This component is available as part of the `@wordpress/block-editor` package and can be imported as:
+Note that the two entry points are not gated the same way. The settings menu item is only rendered for a valid block that supports `html` editing while the `codeEditingEnabled` setting is on, whereas this button checks the block's mode alone. Whatever put the block into HTML mode, the toolbar button is there to bring it back.
 
-```js
-import { BlockEditVisuallyButton } from '@wordpress/block-editor';
-```
-
-## Properties
-
-### Required Props
-
-- `clientIds` (array): An array of block client IDs. The button will only be shown when exactly one block is selected (array length === 1).
-
-## Usage
+### Usage
 
 ```jsx
-function MyBlockToolbar({ clientIds }) {
-  return (
-    <BlockControls>
-      <BlockEditVisuallyButton clientIds={clientIds} />
-    </BlockControls>
-  );
+import { ToolbarGroup } from '@wordpress/components';
+
+function MyBlockToolbar( { clientIds } ) {
+	return (
+		<div className="my-block-toolbar">
+			<ToolbarGroup>{ /* Block controls. */ }</ToolbarGroup>
+			<BlockEditVisuallyButton clientIds={ clientIds } />
+		</div>
+	);
 }
 ```
 
-## Behavior
+### Props
 
-- The button is only rendered when:
-  - Exactly one block is selected
-  - The selected block is currently in HTML editing mode
-- Clicking the button toggles the block's editing mode from HTML to visual
-- The button is automatically hidden when in visual editing mode
+#### `clientIds`
 
-## Dependencies
+-   **Type:** `Array`
 
-This component uses:
+The client IDs of the currently selected blocks. The button renders only when the array contains exactly one client ID, since editing visually applies to a single block.
 
-- `@wordpress/components`: For `ToolbarButton` and `ToolbarGroup`
-- `@wordpress/i18n`: For internationalization
-- `@wordpress/data`: For state management
-- Block editor store
+## Related components
 
-## Related Components
-
-- `BlockModeToggle`: Complementary component that handles switching from visual to HTML mode
-- `BlockControls`: Parent component where this button is typically rendered
-
-## Notes
-
-- Uses the block editor data store to check and toggle block modes
-- Internationalization ready with default text "Edit visually"
-- Part of the block toolbar UI components suite
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
