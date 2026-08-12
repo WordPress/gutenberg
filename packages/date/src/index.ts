@@ -426,9 +426,12 @@ export function format(
 		char = dateFormat[ i ];
 		// Is this an escape?
 		if ( '\\' === char ) {
-			// Add next character, then move on.
+			// Add next character, then move on. A backslash that ends the
+			// format has nothing to escape, so it is dropped, as in PHP.
 			i++;
-			newFormat.push( '[' + dateFormat[ i ] + ']' );
+			if ( i < dateFormat.length ) {
+				newFormat.push( '[' + dateFormat[ i ] + ']' );
+			}
 			continue;
 		}
 		if ( char in formatMap ) {
