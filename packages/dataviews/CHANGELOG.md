@@ -14,6 +14,7 @@
 -   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedNumberControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81433](https://github.com/WordPress/gutenberg/pull/81433)
 -   DataForm: Internalize `ValidatedRadioControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81434](https://github.com/WordPress/gutenberg/pull/81434)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
 
 ### New Features
 

@@ -1,5 +1,4 @@
 export * from './custom-select-control';
-export * from './form-token-field';
 export * from './input-control';
 export * from './range-control';
 export * from './content-editable-control';
