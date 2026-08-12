@@ -10,6 +10,7 @@
 	},
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
+		"test/unit/config/setup.vitest.jsdom.test.jsx": "Verifies that the jsdom setup leaves browser layout APIs unimplemented; it asserts their absence rather than emulating browser behavior.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
 		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",
 		"packages/grid/src/dashboard-grid/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover deterministic drag and resize control semantics.",
