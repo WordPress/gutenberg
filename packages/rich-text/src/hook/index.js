@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';

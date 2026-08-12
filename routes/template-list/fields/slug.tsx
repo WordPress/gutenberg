@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as corePrivateApis } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';

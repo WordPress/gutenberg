@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
@@ -267,6 +260,18 @@ export const Input = styled.input< InputProps >`
 
 		&:-ms-input-placeholder {
 			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
 		}
 
 		&[type='email'],

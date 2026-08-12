@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuGroup, Button, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
 

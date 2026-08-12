@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
 import { addYears, getYear, set, startOfToday, subYears } from 'date-fns';
-
-/**
- * Internal dependencies
- */
 import { Month, useLilius } from '../use-lilius';
 
 const getDate = ( {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import ContrastChecker from '../';
 
 const meta = {

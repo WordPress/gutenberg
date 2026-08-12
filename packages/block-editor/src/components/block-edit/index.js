@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import Edit from './edit';
 import {
 	BlockEditContextProvider,

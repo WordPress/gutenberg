@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import BlockPatternsList from '../../block-patterns-list';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';

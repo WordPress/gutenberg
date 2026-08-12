@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -12,10 +9,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import InstallButton from './install-button';
 import { store as blockDirectoryStore } from '../../store';
 

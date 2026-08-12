@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import Textarea from 'react-autosize-textarea';
-
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { adjustPosition, getDiff } from './utils';
 

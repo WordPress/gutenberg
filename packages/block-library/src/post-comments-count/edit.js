@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';

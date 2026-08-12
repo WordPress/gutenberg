@@ -407,7 +407,8 @@
 }
 
 .dataviews-search {
-	width: fit-content;
+	// Fixed width to ensure the control doesn't resize with the reset button.
+	flex-basis: 210px;
 }
 
 .dataviews-filters__user-input-widget {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ENTER } from '@wordpress/keycodes';
 import {
 	insert,
@@ -8,10 +5,6 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );

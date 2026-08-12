@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, forwardRef } from '@wordpress/element';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
-
-/**
- * Internal dependencies
- */
 import StyleBook from '../style-book';
 import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
 import { useGlobalStyles } from '../global-styles/hooks';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useSelect,
 	useDispatch,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
