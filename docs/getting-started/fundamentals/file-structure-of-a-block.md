@@ -23,7 +23,7 @@ The `package.json` file is used to configure a Node.js project, which is technic
 
 In a standard project, the `src` (source) folder contains the raw, uncompiled code, including JavaScript, CSS, and other assets necessary for developing the block. This is where you write and edit your block's source code, utilizing modern JavaScript features and JSX for React components.
 
-The [build process](docs/block-editor/getting-started/fundamentals/javascript-in-the-block-editor/#javascript-build-process.md) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder. 
+The [build process](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md#javascript-with-a-build-process) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder.
 
 ### `block.json`
 

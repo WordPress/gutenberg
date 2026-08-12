@@ -11,7 +11,6 @@ import {
 	FlexItem,
 	SearchControl,
 	Spinner,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -22,10 +21,10 @@ import {
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { buildTermsTree } from '../../utils/terms';
+import { normalizeTextString } from '../../utils/normalize-text-string';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { normalizeTextString } = unlock( componentsPrivateApis );
 const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 
 /**
