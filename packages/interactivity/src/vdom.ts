@@ -153,6 +153,14 @@ export function toVdom( root: Node ): ComponentChild {
 				}
 			} else if ( attributeName === 'ref' ) {
 				continue;
+			} else if (
+				attributeName[ 0 ] === 'o' &&
+				attributeName[ 1 ] === 'n'
+			) {
+				// Preact treats any prop starting with "on" as an event listener
+				// and would try to attach the attribute string as a handler. The
+				// browser already runs these inline handlers, so leave them alone.
+				continue;
 			}
 			// For boolean attributes with empty string values, use `true`.
 			// This prevents Preact from coercing "" to false. Camelcase
