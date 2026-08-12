@@ -25,6 +25,7 @@
 
 ### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
 -   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
@@ -70,7 +71,6 @@
 
 ### Internal
 
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Remove `ValidatedCheckboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81435](https://github.com/WordPress/gutenberg/pull/81435)).
 -   Remove `ValidatedNumberControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81433](https://github.com/WordPress/gutenberg/pull/81433)).
 -   Remove `ValidatedRadioControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81434](https://github.com/WordPress/gutenberg/pull/81434)).

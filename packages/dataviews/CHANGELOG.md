@@ -15,7 +15,9 @@
 
 ### Internal
 
--   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 -   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
 -   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
@@ -31,7 +33,6 @@
 
 ### Internal
 
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
 -   DataForm: Internalize `ValidatedSelectControl` and its `ControlWithError` foundation instead of unlocking them from the `@wordpress/components` private APIs. The foundation is a temporary copy slated to be replaced by the upcoming `@wordpress/ui` implementation. [#81391](https://github.com/WordPress/gutenberg/pull/81391)
 -   DataForm: Internalize `ValidatedCheckboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81435](https://github.com/WordPress/gutenberg/pull/81435)
