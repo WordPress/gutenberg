@@ -3,6 +3,7 @@ import {
 	setImmutably,
 	getAttributesDiff,
 	applyAttributesDiff,
+	getPerBlockAttributeUpdates,
 } from '../object';
 
 describe( 'setImmutably', () => {
@@ -260,6 +261,166 @@ describe( 'applyAttributesDiff', () => {
 		const diff = { style: { color: { background: undefined } } };
 		expect( applyAttributesDiff( original, diff ) ).toEqual( {
 			style: { color: { text: 'red' } },
+		} );
+	} );
+} );
+
+describe( 'getPerBlockAttributeUpdates', () => {
+	const toBlocks = ( attributesList ) =>
+		attributesList.map( ( attributes, index ) => ( {
+			clientId: `client-${ index }`,
+			attributes,
+		} ) );
+
+	it( 'returns undefined for an empty payload', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ content: 'a' },
+				{},
+				toBlocks( [ { content: 'a' } ] )
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'returns undefined when the payload matches the primary block attributes', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ content: 'a', fontSize: 'large' },
+				{ fontSize: 'large' },
+				toBlocks( [
+					{ content: 'a', fontSize: 'large' },
+					{ content: 'b' },
+				] )
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'applies a changed scalar attribute to every block', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ content: 'a', align: 'left' },
+				{ align: 'center' },
+				toBlocks( [
+					{ content: 'a', align: 'left' },
+					{ content: 'b' },
+				] )
+			)
+		).toEqual( {
+			'client-0': { align: 'center' },
+			'client-1': { align: 'center' },
+		} );
+	} );
+
+	it( 'propagates an explicit undefined clear to every block', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ fontSize: 'large' },
+				{ fontSize: undefined },
+				toBlocks( [ { fontSize: 'large' }, { fontSize: 'small' }, {} ] )
+			)
+		).toStrictEqual( {
+			'client-0': { fontSize: undefined },
+			'client-1': { fontSize: undefined },
+			'client-2': { fontSize: undefined },
+		} );
+	} );
+
+	it( 'leaves attributes absent from the payload untouched', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ content: 'a', textColor: 'white' },
+				{ textColor: 'black' },
+				toBlocks( [
+					{ content: 'a', textColor: 'white' },
+					{ content: 'b' },
+				] )
+			)
+		).toEqual( {
+			'client-0': { textColor: 'black' },
+			'client-1': { textColor: 'black' },
+		} );
+	} );
+
+	it( 'merges a nested style change into each block style, preserving distinct branches', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ style: { color: { background: 'red' } } },
+				{ style: { color: { background: 'red', text: 'white' } } },
+				toBlocks( [
+					{ style: { color: { background: 'red' } } },
+					{ style: { color: { background: 'green' } } },
+				] )
+			)
+		).toEqual( {
+			'client-0': {
+				style: { color: { background: 'red', text: 'white' } },
+			},
+			'client-1': {
+				style: { color: { background: 'green', text: 'white' } },
+			},
+		} );
+	} );
+
+	it( 'propagates nested deletions within an object attribute', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{
+					style: {
+						typography: { fontSize: '20px', lineHeight: '1.5' },
+					},
+				},
+				{ style: { typography: { lineHeight: '1.5' } } },
+				toBlocks( [
+					{
+						style: {
+							typography: { fontSize: '20px', lineHeight: '1.5' },
+						},
+					},
+					{
+						style: {
+							typography: { fontSize: '16px' },
+							color: { text: 'red' },
+						},
+					},
+				] )
+			)
+		).toEqual( {
+			'client-0': { style: { typography: { lineHeight: '1.5' } } },
+			'client-1': { style: { color: { text: 'red' } } },
+		} );
+	} );
+
+	it( 'merges a new object attribute into each block instead of replacing it', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{},
+				{ style: { typography: { fontSize: '20px' } } },
+				toBlocks( [ {}, { style: { color: { text: 'red' } } } ] )
+			)
+		).toEqual( {
+			'client-0': { style: { typography: { fontSize: '20px' } } },
+			'client-1': {
+				style: {
+					color: { text: 'red' },
+					typography: { fontSize: '20px' },
+				},
+			},
+		} );
+	} );
+
+	it( 'clears only the primary block branches when an object attribute is emptied', () => {
+		expect(
+			getPerBlockAttributeUpdates(
+				{ style: { typography: { fontSize: '20px' } } },
+				{ style: undefined },
+				toBlocks( [
+					{ style: { typography: { fontSize: '20px' } } },
+					{ style: { color: { text: 'red' } } },
+				] )
+			)
+		).toStrictEqual( {
+			'client-0': { style: undefined },
+			'client-1': { style: { color: { text: 'red' } } },
 		} );
 	} );
 } );

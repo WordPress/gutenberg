@@ -27,7 +27,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
-import { getAttributesDiff, applyAttributesDiff } from '../../utils/object';
+import { getPerBlockAttributeUpdates } from '../../utils/object';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -268,21 +268,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					: nextAttributes;
 
 			if ( multiSelectedBlockClientIds.length > 0 ) {
-				const diff = getAttributesDiff( attributes, newAttributes );
-				if ( diff !== undefined ) {
-					const blocks = getBlocksByClientId(
-						multiSelectedBlockClientIds
-					);
-					const updates = {};
-					multiSelectedBlockClientIds.forEach( ( id, index ) => {
-						const block = blocks[ index ];
-						if ( block ) {
-							updates[ id ] = applyAttributesDiff(
-								block.attributes,
-								diff
-							);
-						}
-					} );
+				const updates = getPerBlockAttributeUpdates(
+					attributes,
+					newAttributes,
+					getBlocksByClientId( multiSelectedBlockClientIds )
+				);
+				if ( updates ) {
 					updateBlockAttributes(
 						multiSelectedBlockClientIds,
 						updates,
