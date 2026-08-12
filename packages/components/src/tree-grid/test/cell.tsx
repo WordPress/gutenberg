@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TreeGrid from '..';
 import TreeGridCell from '../cell';
 
@@ -34,6 +23,7 @@ describe( 'TreeGridCell', () => {
 				</TreeGridCell>
 			)
 		).toThrow();
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'uses a child render function to render children', () => {

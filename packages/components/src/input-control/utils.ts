@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { InputChangeCallback } from './types';
 
 /**
@@ -60,8 +49,7 @@ export function useDragCursor(
 		if ( isDragging ) {
 			document.documentElement.style.cursor = dragCursor;
 		} else {
-			// @ts-expect-error
-			document.documentElement.style.cursor = null;
+			document.documentElement.style.removeProperty( 'cursor' );
 		}
 	}, [ isDragging, dragCursor ] );
 

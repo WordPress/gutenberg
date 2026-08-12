@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,
@@ -21,10 +18,6 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
@@ -63,9 +56,11 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const onSplitAtEnd = () => {
-		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
-	};
+	const onSplitAtEnd = insertBlocksAfter
+		? () => {
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+		  }
+		: undefined;
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -203,7 +198,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
 											label={ __( 'Link relation' ) }
 											help={ createInterpolateElement(
 												__(

@@ -14,13 +14,13 @@
  * Appends the bundled widget instances to the default layout unless an
  * earlier callback in the filter chain already added them.
  *
- * Only contributes to the bundled `gutenberg_dashboard` surface; other
+ * Only contributes to the bundled `gutenberg_dashboard`; other
  * dashboards are left untouched.
  *
  * @param array  $dashboard_layout Default layout produced by previous
  *                                 callbacks on `gutenberg_dashboard_default_layout`.
- * @param string $dashboard_name   Identifier of the dashboard surface
- *                                 receiving the default.
+ * @param string $dashboard_name   Identifier of the dashboard receiving
+ *                                 the default.
  * @return array The layout extended with the bundled widget instance.
  */
 function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_name = '' ) {

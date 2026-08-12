@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { MediaEditorModal } from '../index';
 
 let mockSaveResult = {
@@ -24,6 +13,7 @@ let mockSaveResult = {
 	},
 };
 const mockOnUpdate = jest.fn();
+const mockOnClose = jest.fn();
 const mockCloseMediaEditorModal = jest.fn();
 const mockCreateSuccessNotice = jest.fn();
 
@@ -81,6 +71,7 @@ describe( 'MediaEditorModal', () => {
 				isOpen: () => true,
 				getId: () => 10,
 				getOnUpdate: () => mockOnUpdate,
+				getOnClose: () => mockOnClose,
 			} ) )
 		);
 		( useDispatch as jest.Mock ).mockImplementation( ( store ) =>
@@ -102,6 +93,7 @@ describe( 'MediaEditorModal', () => {
 			url: 'edited.jpg',
 		} );
 		expect( mockCloseMediaEditorModal ).toHaveBeenCalled();
+		expect( mockOnClose ).toHaveBeenCalled();
 		expect( mockCreateSuccessNotice ).toHaveBeenCalledWith(
 			'Image edited.',
 			expect.objectContaining( {

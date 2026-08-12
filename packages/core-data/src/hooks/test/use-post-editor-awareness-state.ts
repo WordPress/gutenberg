@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import {
 	useActiveCollaborators,
 	useResolvedSelection,
@@ -26,6 +19,14 @@ import type { SelectionCursor } from '../../types';
 // Mock the sync module
 jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
+} ) );
+
+const mockPostContentBlocks = [
+	{ clientId: 'block-1', name: 'core/paragraph', innerBlocks: [] },
+];
+
+jest.mock( '../../awareness/block-lookup', () => ( {
+	usePostContentBlocks: jest.fn( () => mockPostContentBlocks ),
 } ) );
 
 const mockAvatarUrls = {
@@ -299,7 +300,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			} );
 		} );
 
-		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection and blocks', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
 				cursorPosition: {
@@ -321,7 +322,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			expect(
 				mockAwareness.convertSelectionStateToAbsolute
-			).toHaveBeenCalledWith( mockSelection );
+			).toHaveBeenCalledWith( mockSelection, mockPostContentBlocks );
 			expect( position ).toEqual( {
 				richTextOffset: 10,
 				localClientId: 'block-1',

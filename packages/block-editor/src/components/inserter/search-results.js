@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
 import __unstableInserterMenuExtension from '../inserter-menu-extension';
@@ -181,9 +174,7 @@ function InserterSearchResults( {
 
 	const patternsUI = !! filteredBlockPatterns.length && (
 		<InserterPanel
-			title={
-				<VisuallyHidden>{ __( 'Block patterns' ) }</VisuallyHidden>
-			}
+			title={ <VisuallyHidden>{ __( 'Patterns' ) }</VisuallyHidden> }
 		>
 			<div className="block-editor-inserter__quick-inserter-patterns">
 				<BlockPatternsList

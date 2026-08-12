@@ -1,15 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { ENTER } from '@wordpress/keycodes';
-import { insert, remove } from '@wordpress/rich-text';
+import {
+	insert,
+	remove,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
+const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
@@ -31,8 +29,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( event.target !== element ) {
+		// the target is the element, or whether the element owns the
+		// selection through a focused editing host.
+		if ( event.target !== element && ! ownsSelection( element ) ) {
 			return;
 		}
 
@@ -88,9 +87,16 @@ export default ( props ) => ( element ) => {
 		'keydown',
 		onKeyDown
 	);
-	element.addEventListener( 'keydown', onKeyDownDeprecated );
+	// Capture phase so this runs before ancestor (writing flow) bubble
+	// handlers, matching the timing of the previous raw element listener.
+	const unsubscribeKeyDownDeprecated = subscribeOwnedListener(
+		element,
+		'keydown',
+		onKeyDownDeprecated,
+		true
+	);
 	return () => {
 		unsubscribeKeyDown();
-		element.removeEventListener( 'keydown', onKeyDownDeprecated );
+		unsubscribeKeyDownDeprecated();
 	};
 };

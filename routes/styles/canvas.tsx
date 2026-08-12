@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate, useSearch } from '@wordpress/route';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEditorAssets } from '@wordpress/lazy-editor';
 import { Spinner } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { StyleBookPreview } = unlock( editorPrivateApis );
 

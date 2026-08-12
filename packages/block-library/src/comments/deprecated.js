@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 // v1: Deprecate the initial version of the block which was called "Comments

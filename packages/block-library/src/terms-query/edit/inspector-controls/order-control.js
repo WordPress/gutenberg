@@ -1,13 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
 
 export default function OrderControl( { orderBy, order, onChange, ...props } ) {
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			options={ [
 				{
 					label: __( 'Name: A → Z' ),

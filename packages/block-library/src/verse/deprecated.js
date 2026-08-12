@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
 

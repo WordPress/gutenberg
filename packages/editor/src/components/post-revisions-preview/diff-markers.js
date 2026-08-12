@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
@@ -15,12 +12,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );

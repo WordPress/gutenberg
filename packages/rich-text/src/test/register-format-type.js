@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { getFormatType } from '../get-format-type';

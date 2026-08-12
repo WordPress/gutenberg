@@ -1,6 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
-
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;
@@ -9,10 +8,7 @@ export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
 
 export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 
-export type ProviderProps = Pick<
-	_Tooltip.Provider.Props,
-	'delay' | 'children'
->;
+export type ProviderProps = _Tooltip.Provider.Props;
 
 export interface TriggerProps extends ComponentProps< 'button' > {
 	/**

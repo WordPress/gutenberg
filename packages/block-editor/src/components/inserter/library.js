@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { PrivateInserterMenu } from './menu';
 import { store as blockEditorStore } from '../../store';
 

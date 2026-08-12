@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -55,7 +44,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );

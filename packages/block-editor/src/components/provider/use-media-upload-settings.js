@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -21,6 +18,8 @@ function useMediaUploadSettings( settings = {} ) {
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
+			imageStripMeta: settings.imageStripMeta,
+			imageMaxBitDepth: settings.imageMaxBitDepth,
 		} ),
 		[ settings ]
 	);

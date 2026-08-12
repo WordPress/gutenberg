@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import AlignmentUI from './ui';
 
 const AlignmentControl = ( props ) => {
