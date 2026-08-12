@@ -513,16 +513,23 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await editor.canvas
-			.getByRole( 'document', { name: 'Add default block' } )
-			.click();
-		await page.keyboard.type( 'First paragraph' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '## Heading' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Second paragraph' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Third paragraph' );
+		// The block before the hovered boundary must be one where typing
+		// can't create a block after it, so that the in-between inserter
+		// shows in the gap.
+		await editor.setContent( `<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->` );
+		// Put the caret in the trailing paragraph so the test can catch an
+		// insertion that wrongly follows the caret instead of the inserter.
+		await editor.canvas.locator( 'p:text("First paragraph")' ).click();
 
 		const boundingBox = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
@@ -551,10 +558,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect
 			.poll( editor.getBlocks )
 			.toMatchObject( [
-				{ name: 'core/paragraph' },
+				{ name: 'core/image' },
 				{ name: 'core/image' },
 				{ name: 'core/heading' },
-				{ name: 'core/paragraph' },
 				{ name: 'core/paragraph' },
 			] );
 	} );

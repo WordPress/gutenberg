@@ -1,3 +1,4 @@
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -19,6 +20,7 @@ export function useInBetweenInserter() {
 	const {
 		getBlockListSettings,
 		getBlockIndex,
+		getBlockOrder,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getSettings,
@@ -109,29 +111,54 @@ export function useInBetweenInserter() {
 					);
 				} );
 
-				if ( ! element ) {
-					hideInsertionPoint();
-					return;
-				}
+				const order = getBlockOrder( rootClientId );
+				let clientId;
+				let index;
 
-				// The block may be in an alignment wrapper, so check the first direct
-				// child if the element has no ID.
-				if ( ! element.id ) {
-					element = element.firstElementChild;
+				const isPastLastBlock =
+					! element ||
+					element.classList.contains( 'block-list-appender' );
 
+				if ( isPastLastBlock ) {
+					// No block follows the pointer, so the boundary is at the
+					// end of the list.
+					if ( ! order.length ) {
+						hideInsertionPoint();
+						return;
+					}
+					index = order.length;
+					element = event.target.ownerDocument.getElementById(
+						'block-' + order[ index - 1 ]
+					);
 					if ( ! element ) {
 						hideInsertionPoint();
 						return;
 					}
+				} else {
+					// The block may be in an alignment wrapper, so check the
+					// first direct child if the element has no ID.
+					if ( ! element.id ) {
+						element = element.firstElementChild;
+
+						if ( ! element ) {
+							hideInsertionPoint();
+							return;
+						}
+					}
+
+					clientId = element.id.slice( 'block-'.length );
+					if ( ! clientId ) {
+						return;
+					}
+					index = getBlockIndex( clientId );
 				}
 
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const clientId = element.id.slice( 'block-'.length );
+				const boundaryClientId = clientId ?? order[ order.length - 1 ];
 				if (
-					! clientId ||
-					__unstableIsWithinBlockOverlay( clientId ) ||
-					!! getParentSectionBlock( clientId )
+					__unstableIsWithinBlockOverlay( boundaryClientId ) ||
+					!! getParentSectionBlock( boundaryClientId )
 				) {
 					return;
 				}
@@ -143,6 +170,7 @@ export function useInBetweenInserter() {
 				// 3. when the __experimentalCaptureToolbars is not enabled
 				// 4. when the Top Toolbar is not disabled
 				if (
+					clientId &&
 					getSelectedBlockClientIds().includes( clientId ) &&
 					orientation === 'vertical' &&
 					! captureToolbars &&
@@ -164,11 +192,23 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const index = getBlockIndex( clientId );
-
-				// Don't show the in-between inserter before the first block in
-				// the list (preserves the original behaviour).
-				if ( index === 0 ) {
+				// When the block above can split, typing can already create a
+				// block here: pressing Enter at its end starts a new block at
+				// this spot with the caret in it, so the inserter would only
+				// get in the way of writing. Splitting at the start of a
+				// block leaves the caret behind, which is why only the block
+				// above counts. In horizontal rows the inserter doesn't get
+				// in the way of writing, so it stays.
+				const previousClientId = order[ index - 1 ];
+				if (
+					orientation === 'vertical' &&
+					previousClientId &&
+					hasBlockSupport(
+						getBlockName( previousClientId ),
+						'splitting',
+						false
+					)
+				) {
 					hideInsertionPoint();
 					return;
 				}

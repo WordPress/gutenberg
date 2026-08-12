@@ -175,12 +175,12 @@ test.describe( 'Widgets screen', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second Paragraph' );
 
-		const secondParagraphBlock = firstWidgetArea
+		const firstParagraphBlockLocator = firstWidgetArea
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: 'Second Paragraph' } );
+			.filter( { hasText: 'First Paragraph' } );
 
-		const secondParagraphBlockBoundingBox =
-			await secondParagraphBlock.boundingBox();
+		const firstParagraphBlockBoundingBox =
+			await firstParagraphBlockLocator.boundingBox();
 
 		// Click outside the block to move the focus back to the widget area.
 		await firstWidgetArea.click( {
@@ -190,11 +190,13 @@ test.describe( 'Widgets screen', () => {
 			},
 		} );
 
-		// Hover above the last block to trigger the inline inserter between blocks.
+		// Hover above the first block to trigger the inline inserter. The
+		// boundary between the two paragraphs no longer shows it, because
+		// typing can already create a block there.
 		await page.mouse.move(
-			secondParagraphBlockBoundingBox.x +
-				secondParagraphBlockBoundingBox.width / 2,
-			secondParagraphBlockBoundingBox.y - 10
+			firstParagraphBlockBoundingBox.x +
+				firstParagraphBlockBoundingBox.width / 2,
+			firstParagraphBlockBoundingBox.y - 10
 		);
 
 		// There will be 2 matches here.
@@ -230,12 +232,12 @@ test.describe( 'Widgets screen', () => {
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
 			'sidebar-1': [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'First Paragraph' },
-				},
-				{
 					name: 'core/heading',
 					attributes: { content: 'My Heading' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First Paragraph' },
 				},
 				{
 					name: 'core/paragraph',
