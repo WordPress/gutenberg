@@ -6,6 +6,7 @@ import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 const MINIMUM_TEXT_CONTRAST = 4.5;
 const MINIMUM_STATE_DELTA_E_OK = 0.04;
+const TARGET_STATE_CONTRAST = 1.5;
 const CUSTOM_PRIMARY = '#0057b8';
 const CUSTOM_BACKGROUND = '#f6f3ef';
 
@@ -205,7 +206,7 @@ describe( 'semantic color contrast', () => {
 	);
 
 	it.each( BACKGROUND_COLOR_CASES )(
-		'gives normal neutral interactive foregrounds a perceptible active-state difference with $name',
+		'targets perceptible contrast between normal neutral interactive foreground states with $name',
 		( { background } ) => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( {
@@ -227,6 +228,12 @@ describe( 'semantic color contrast', () => {
 				styles,
 				'--wpds-color-foreground-interactive-neutral-active'
 			);
+			const stateContrast = getContrast( resting, active );
+			const meetsTargetOrReachedEndpoint =
+				stateContrast >= TARGET_STATE_CONTRAST ||
+				[ '#000', '#fff' ].includes( active );
+
+			expect( meetsTargetOrReachedEndpoint ).toBe( true );
 
 			expect(
 				deltaEOK( parse( resting ), parse( active ) )

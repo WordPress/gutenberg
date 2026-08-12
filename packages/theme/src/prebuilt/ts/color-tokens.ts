@@ -88,13 +88,13 @@ export default {
 	],
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
 	'bg-surface3': [ 'background-surface-neutral-strong' ],
-	'bg-fgSurface5': [
-		'foreground-content-neutral',
-		'foreground-interactive-neutral-active',
-	],
 	'bg-fgSurface4': [
 		'foreground-interactive-neutral',
 		'foreground-interactive-neutral-weak-active',
+	],
+	'bg-fgSurface5': [
+		'foreground-content-neutral',
+		'foreground-interactive-neutral-active',
 	],
 	'bg-fgSurface3': [
 		'foreground-content-neutral-weak',

@@ -110,7 +110,7 @@
 	/* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state. */
 	--wpds-color-background-thumb-neutral-weak-disabled: #dbdbdb;
 	/* Foreground color for content like text with normal emphasis. */
-	--wpds-color-foreground-content-neutral: #1e1e1e;
+	--wpds-color-foreground-content-neutral: #1b1b1b;
 	/* Foreground color for content like text with weak emphasis. */
 	--wpds-color-foreground-content-neutral-weak: #707070;
 	/* Foreground color for content like text with success tone and normal emphasis. */
@@ -118,25 +118,25 @@
 	/* Foreground color for content like text with success tone and weak emphasis. */
 	--wpds-color-foreground-content-success-weak: #008030;
 	/* Foreground color for content like text with info tone and normal emphasis. */
-	--wpds-color-foreground-content-info: #001b4f;
+	--wpds-color-foreground-content-info: #00184b;
 	/* Foreground color for content like text with info tone and weak emphasis. */
 	--wpds-color-foreground-content-info-weak: #006bd7;
 	/* Foreground color for content like text with warning tone and normal emphasis. */
-	--wpds-color-foreground-content-warning: #2e1900;
+	--wpds-color-foreground-content-warning: #291600;
 	/* Foreground color for content like text with warning tone and weak emphasis. */
 	--wpds-color-foreground-content-warning-weak: #926300;
 	/* Foreground color for content like text with caution tone and normal emphasis. */
-	--wpds-color-foreground-content-caution: #281d00;
+	--wpds-color-foreground-content-caution: #241a00;
 	/* Foreground color for content like text with caution tone and weak emphasis. */
 	--wpds-color-foreground-content-caution-weak: #826a00;
 	/* Foreground color for content like text with error tone and normal emphasis. */
-	--wpds-color-foreground-content-error: #470000;
+	--wpds-color-foreground-content-error: #3d0000;
 	/* Foreground color for content like text with error tone and weak emphasis. */
 	--wpds-color-foreground-content-error-weak: #cc1818;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis. */
 	--wpds-color-foreground-interactive-neutral: #3a3a3a;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-neutral-active: #1e1e1e;
+	--wpds-color-foreground-interactive-neutral-active: #1b1b1b;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with neutral tone and strong emphasis. */
@@ -154,7 +154,7 @@
 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
 	--wpds-color-foreground-interactive-brand: #3858e9;
 	/* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-brand-active: #0b0070;
+	--wpds-color-foreground-interactive-brand-active: #05004c;
 	/* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with brand tone and strong emphasis. */
@@ -166,7 +166,7 @@
 	/* Foreground color for interactive elements with error tone and normal emphasis. */
 	--wpds-color-foreground-interactive-error: #cc1818;
 	/* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-error-active: #470000;
+	--wpds-color-foreground-interactive-error-active: #3d0000;
 	/* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-error-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and strong emphasis. */
