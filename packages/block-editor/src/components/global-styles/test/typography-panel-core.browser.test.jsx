@@ -1,9 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import { click, render as renderAriakit } from '@ariakit/test/react';
 import TypographyPanel from '../typography-panel';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
 // experiment off, which is what WordPress Core gets. Deleted rather than set to
@@ -96,7 +94,7 @@ describe( 'TypographyPanel — experiment off', () => {
 	} );
 
 	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
-		await renderAriakit(
+		render(
 			<TypographyPanel
 				value={ { color: { text: 'var:preset|color|blue' } } }
 				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
@@ -120,7 +118,7 @@ describe( 'TypographyPanel — experiment off', () => {
 describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
 		const onChange = vi.fn();
-		await renderAriakit(
+		render(
 			<TypographyPanel
 				value={ value }
 				inheritedValue={ inheritedValue }
@@ -129,13 +127,13 @@ describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 				onChange={ onChange }
 			/>
 		);
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', { name: /Color/, expanded: false } )
 		);
 		// `findAllByRole` waits for the Popover/portal content to appear.
 		const swatches = await screen.findAllByRole( 'option' );
 		// swatch[0] = 'Blue', swatch[1] = 'Red'
-		await click( swatches[ 1 ] );
+		await userEvent.click( swatches[ 1 ] );
 		return onChange.mock.calls[ 0 ][ 0 ];
 	}
 

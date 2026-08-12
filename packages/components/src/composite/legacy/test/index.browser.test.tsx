@@ -1,49 +1,18 @@
-import {
-	afterAll,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	test,
-	vi,
-	type MockInstance,
-} from 'vitest';
+import { describe, expect, it, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import {
 	queryByAttribute,
 	render,
 	screen,
 	renderHook,
+	waitFor,
 } from '@testing-library/react';
-import { press, waitFor } from '@ariakit/test';
 import {
 	Composite,
 	CompositeGroup,
 	CompositeItem,
 	useCompositeState,
 } from '..';
-
-// This is necessary because of how Ariakit calculates page up and
-// page down. Without this, nothing has a height, and so paging up
-// and down doesn't behave as expected in tests.
-
-let clientHeightSpy: MockInstance<
-	() => typeof HTMLElement.prototype.clientHeight
->;
-
-beforeAll( () => {
-	clientHeightSpy = vi
-		.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
-		.mockImplementation( function getClientHeight( this: HTMLElement ) {
-			if ( this.tagName === 'BODY' ) {
-				return window.outerHeight;
-			}
-			return 50;
-		} );
-} );
-
-afterAll( () => {
-	clientHeightSpy?.mockRestore();
-} );
 
 type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 type CompositeState = ReturnType< typeof useCompositeState >;
@@ -237,13 +206,13 @@ describe.each( [
 		);
 		await renderAndValidate( <Test /> );
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
-		await press.Tab();
+		await userEvent.tab();
 		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
-		await press.Tab();
+		await userEvent.tab();
 		expect( screen.getByText( 'After' ) ).toHaveFocus();
-		await press.ShiftTab();
+		await userEvent.tab( { shift: true } );
 		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
 	} );
 
@@ -269,9 +238,9 @@ describe.each( [
 
 		expect( item2 ).toBeDisabled();
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( item1 ).toHaveFocus();
-		await press.ArrowDown();
+		await userEvent.keyboard( '{ArrowDown}' );
 		expect( item2 ).not.toHaveFocus();
 		expect( item3 ).toHaveFocus();
 	} );
@@ -298,9 +267,9 @@ describe.each( [
 		expect( item2 ).toBeEnabled();
 		expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( item1 ).toHaveFocus();
-		await press.ArrowDown();
+		await userEvent.keyboard( '{ArrowDown}' );
 		expect( item2 ).toHaveFocus();
 		expect( item3 ).not.toHaveFocus();
 	} );
@@ -321,20 +290,17 @@ describe.each( [
 		expect( item3.id ).toMatch( 'test-id-3' );
 	} );
 
-	test( 'Supports `currentId`', async () => {
-		const Test = () => (
-			<OneDimensionalTest
-				{ ...useProps( {
-					baseId: 'test-id',
-					currentId: 'test-id-2',
-				} ) }
-			/>
+	test( 'Supports `currentId`', () => {
+		const { result } = renderHook( () =>
+			useProps( {
+				baseId: 'test-id',
+				currentId: 'test-id-2',
+			} )
 		);
-		await renderAndValidate( <Test /> );
-		const { item2 } = getOneDimensionalItems();
+		const state =
+			'state' in result.current ? result.current.state : result.current;
 
-		await press.Tab();
-		await waitFor( () => expect( item2 ).toHaveFocus() );
+		expect( state.store.getState().activeId ).toBe( 'test-id-2' );
 	} );
 } );
 
@@ -376,35 +342,35 @@ describe.each( [
 		test( 'All directions work with no orientation', async () => {
 			const { item1, item2, item3 } = await renderOneDimensionalTest();
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( item1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item2 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item2 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item1 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item2 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item3 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item2 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item1 ).toHaveFocus();
-			await press.End();
+			await userEvent.keyboard( '{End}' );
 			expect( item3 ).toHaveFocus();
-			await press.Home();
+			await userEvent.keyboard( '{Home}' );
 			expect( item1 ).toHaveFocus();
-			await press.PageDown();
+			await userEvent.keyboard( '{PageDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.PageUp();
+			await userEvent.keyboard( '{PageUp}' );
 			expect( item1 ).toHaveFocus();
 		} );
 
@@ -413,27 +379,27 @@ describe.each( [
 				orientation: 'horizontal',
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( item1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item2 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item3 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item3 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item2 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item1 ).toHaveFocus();
-			await press.End();
+			await userEvent.keyboard( '{End}' );
 			expect( item3 ).toHaveFocus();
-			await press.Home();
+			await userEvent.keyboard( '{Home}' );
 			expect( item1 ).toHaveFocus();
-			await press.PageDown();
+			await userEvent.keyboard( '{PageDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.PageUp();
+			await userEvent.keyboard( '{PageUp}' );
 			expect( item1 ).toHaveFocus();
 		} );
 
@@ -442,27 +408,27 @@ describe.each( [
 				orientation: 'vertical',
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( item1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item2 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item3 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item3 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item2 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item1 ).toHaveFocus();
-			await press.End();
+			await userEvent.keyboard( '{End}' );
 			expect( item3 ).toHaveFocus();
-			await press.Home();
+			await userEvent.keyboard( '{Home}' );
 			expect( item1 ).toHaveFocus();
-			await press.PageDown();
+			await userEvent.keyboard( '{PageDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.PageUp();
+			await userEvent.keyboard( '{PageUp}' );
 			expect( item1 ).toHaveFocus();
 		} );
 
@@ -471,19 +437,19 @@ describe.each( [
 				loop: true,
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( item1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item2 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item3 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( item1 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( item3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( item1 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( item3 ).toHaveFocus();
 		} );
 	} );
@@ -493,35 +459,35 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
 				await renderTwoDimensionalTest();
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( itemA1 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemB1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemB2 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( itemA2 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemA1 ).toHaveFocus();
-			await press( last );
+			await userEvent.keyboard( `{${ last }}` );
 			expect( itemA3 ).toHaveFocus();
-			await press.PageDown();
+			await userEvent.keyboard( '{PageDown}' );
 			expect( itemC3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemC3 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemC3 ).toHaveFocus();
-			await press( first );
+			await userEvent.keyboard( `{${ first }}` );
 			expect( itemC1 ).toHaveFocus();
-			await press.PageUp();
+			await userEvent.keyboard( '{PageUp}' );
 			expect( itemA1 ).toHaveFocus();
-			await press.End( null, { ctrlKey: true } );
+			await userEvent.keyboard( '{Control>}{End}{/Control}' );
 			expect( itemC3 ).toHaveFocus();
-			await press.Home( null, { ctrlKey: true } );
+			await userEvent.keyboard( '{Control>}{Home}{/Control}' );
 			expect( itemA1 ).toHaveFocus();
 		} );
 
@@ -529,23 +495,23 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 				await renderTwoDimensionalTest( { loop: true } );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA2 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemB1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemC1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemA1 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemA3 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( itemC3 ).toHaveFocus();
 		} );
 
@@ -553,29 +519,30 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 				await renderTwoDimensionalTest( { wrap: true } );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA2 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemB1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemC1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemA2 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemA1 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( itemA1 ).toHaveFocus();
-			await press.End( itemA1, { ctrlKey: true } );
+			itemA1.focus();
+			await userEvent.keyboard( '{Control>}{End}{/Control}' );
 			expect( itemC3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemC3 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemC3 ).toHaveFocus();
 		} );
 
@@ -585,15 +552,15 @@ describe.each( [
 				wrap: true,
 			} );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press( previous );
+			await userEvent.keyboard( `{${ previous }}` );
 			expect( itemC3 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			expect( itemC3 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemA1 ).toHaveFocus();
 		} );
 
@@ -601,20 +568,20 @@ describe.each( [
 			const { itemA1, itemB1, itemB2, itemC1 } =
 				await renderShiftTest( true );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemB1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemB2 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			// A2 doesn't exist
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemB1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemB2 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			// C2 is disabled
 			expect( itemC1 ).toHaveFocus();
 		} );
@@ -622,16 +589,16 @@ describe.each( [
 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
 			const { itemA1, itemB1, itemB2 } = await renderShiftTest( false );
 
-			await press.Tab();
+			await userEvent.tab();
 			expect( itemA1 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			expect( itemB1 ).toHaveFocus();
-			await press( next );
+			await userEvent.keyboard( `{${ next }}` );
 			expect( itemB2 ).toHaveFocus();
-			await press.ArrowUp();
+			await userEvent.keyboard( '{ArrowUp}' );
 			// A2 doesn't exist
 			expect( itemB2 ).toHaveFocus();
-			await press.ArrowDown();
+			await userEvent.keyboard( '{ArrowDown}' );
 			// C2 is disabled
 			expect( itemB2 ).toHaveFocus();
 		} );

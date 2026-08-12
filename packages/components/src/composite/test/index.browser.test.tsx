@@ -1,15 +1,11 @@
+import { describe, expect, it, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import {
-	afterAll,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	test,
-	vi,
-	type MockInstance,
-} from 'vitest';
-import { queryByAttribute, render, screen } from '@testing-library/react';
-import { click, press, waitFor } from '@ariakit/test';
+	queryByAttribute,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import { Composite } from '..';
@@ -28,28 +24,6 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
 }
 
 describe( 'Composite', () => {
-	let clientHeightSpy: MockInstance<
-		() => typeof HTMLElement.prototype.clientHeight
-	>;
-
-	beforeAll( () => {
-		// This is necessary because of how Ariakit calculates page up and
-		// page down. Without this, nothing has a height, and so paging up
-		// and down doesn't behave as expected in tests.
-		clientHeightSpy = vi
-			.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
-			.mockImplementation( function getClientHeight( this: HTMLElement ) {
-				if ( this.tagName === 'BODY' ) {
-					return window.outerHeight;
-				}
-				return 50;
-			} );
-	} );
-
-	afterAll( () => {
-		clientHeightSpy?.mockRestore();
-	} );
-
 	test( 'Renders as a single tab stop', async () => {
 		await renderAndValidate(
 			<>
@@ -63,17 +37,17 @@ describe( 'Composite', () => {
 			</>
 		);
 
-		await press.Tab();
+		await userEvent.tab();
 		expect(
 			screen.getByRole( 'button', { name: 'Before' } )
 		).toHaveFocus();
-		await press.Tab();
+		await userEvent.tab();
 		expect(
 			screen.getByRole( 'button', { name: 'Item 1' } )
 		).toHaveFocus();
-		await press.Tab();
+		await userEvent.tab();
 		expect( screen.getByRole( 'button', { name: 'After' } ) ).toHaveFocus();
-		await press.ShiftTab();
+		await userEvent.tab( { shift: true } );
 		expect(
 			screen.getByRole( 'button', { name: 'Item 1' } )
 		).toHaveFocus();
@@ -94,9 +68,9 @@ describe( 'Composite', () => {
 
 		expect( item2 ).toBeDisabled();
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( item1 ).toHaveFocus();
-		await press.ArrowDown();
+		await userEvent.keyboard( '{ArrowDown}' );
 		expect( item2 ).not.toHaveFocus();
 		expect( item3 ).toHaveFocus();
 	} );
@@ -119,9 +93,9 @@ describe( 'Composite', () => {
 		expect( item2 ).toBeEnabled();
 		expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( item1 ).toHaveFocus();
-		await press.ArrowDown();
+		await userEvent.keyboard( '{ArrowDown}' );
 		expect( item2 ).toHaveFocus();
 		expect( item3 ).not.toHaveFocus();
 	} );
@@ -129,17 +103,23 @@ describe( 'Composite', () => {
 	test( 'Supports `activeId`', async () => {
 		/* eslint-disable no-restricted-syntax */
 		await renderAndValidate(
-			<Composite activeId="item-2">
-				<Composite.Item id="item-1">Item 1</Composite.Item>
-				<Composite.Item id="item-2">Item 2</Composite.Item>
-				<Composite.Item id="item-3">Item 3</Composite.Item>
-			</Composite>
+			<>
+				<button>Before</button>
+				<Composite activeId="item-2">
+					<Composite.Item id="item-1">Item 1</Composite.Item>
+					<Composite.Item id="item-2">Item 2</Composite.Item>
+					<Composite.Item id="item-3">Item 3</Composite.Item>
+				</Composite>
+			</>
 		);
 		/* eslint-enable no-restricted-syntax */
 
 		const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 
-		await press.Tab();
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Before' } )
+		);
+		await userEvent.tab();
 		await waitFor( () => expect( item2 ).toHaveFocus() );
 	} );
 
@@ -175,45 +155,45 @@ describe( 'Composite', () => {
 			name: 'Toggle third item',
 		} );
 
-		await press.Tab();
-		await press.Tab();
+		await userEvent.tab();
+		await userEvent.tab();
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 1' } )
 		).toHaveFocus();
 
-		await press.ArrowRight();
-		await press.ArrowRight();
+		await userEvent.keyboard( '{ArrowRight}' );
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 3' } )
 		).toHaveFocus();
 
-		await click( toggleButton );
+		await userEvent.click( toggleButton );
 
 		expect(
 			screen.queryByRole( 'button', { name: 'Item 3' } )
 		).not.toBeInTheDocument();
 
-		await press.ShiftTab();
+		await userEvent.tab( { shift: true } );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 2' } )
 		).toHaveFocus();
 
-		await click( toggleButton );
+		await userEvent.click( toggleButton );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 3' } )
 		).toBeVisible();
 
-		await press.ShiftTab();
+		await userEvent.tab( { shift: true } );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 2' } )
 		).toHaveFocus();
 
-		await press.ArrowRight();
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Item 3' } )
@@ -243,35 +223,35 @@ describe( 'Composite', () => {
 				const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 				const item3 = screen.getByRole( 'button', { name: 'Item 3' } );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( item1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item2 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item2 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item1 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item2 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item3 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item2 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item1 ).toHaveFocus();
-				await press.End();
+				await userEvent.keyboard( '{End}' );
 				expect( item3 ).toHaveFocus();
-				await press.Home();
+				await userEvent.keyboard( '{Home}' );
 				expect( item1 ).toHaveFocus();
-				await press.PageDown();
+				await userEvent.keyboard( '{PageDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.PageUp();
+				await userEvent.keyboard( '{PageUp}' );
 				expect( item1 ).toHaveFocus();
 			} );
 
@@ -288,27 +268,27 @@ describe( 'Composite', () => {
 				const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 				const item3 = screen.getByRole( 'button', { name: 'Item 3' } );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( item1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item2 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item3 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item3 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item2 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item1 ).toHaveFocus();
-				await press.End();
+				await userEvent.keyboard( '{End}' );
 				expect( item3 ).toHaveFocus();
-				await press.Home();
+				await userEvent.keyboard( '{Home}' );
 				expect( item1 ).toHaveFocus();
-				await press.PageDown();
+				await userEvent.keyboard( '{PageDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.PageUp();
+				await userEvent.keyboard( '{PageUp}' );
 				expect( item1 ).toHaveFocus();
 			} );
 
@@ -325,27 +305,27 @@ describe( 'Composite', () => {
 				const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 				const item3 = screen.getByRole( 'button', { name: 'Item 3' } );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( item1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item2 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item3 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item3 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item2 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item1 ).toHaveFocus();
-				await press.End();
+				await userEvent.keyboard( '{End}' );
 				expect( item3 ).toHaveFocus();
-				await press.Home();
+				await userEvent.keyboard( '{Home}' );
 				expect( item1 ).toHaveFocus();
-				await press.PageDown();
+				await userEvent.keyboard( '{PageDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.PageUp();
+				await userEvent.keyboard( '{PageUp}' );
 				expect( item1 ).toHaveFocus();
 			} );
 
@@ -362,19 +342,19 @@ describe( 'Composite', () => {
 				const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 				const item3 = screen.getByRole( 'button', { name: 'Item 3' } );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( item1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item2 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item3 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( item1 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( item3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( item1 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( item3 ).toHaveFocus();
 			} );
 		} );
@@ -423,35 +403,35 @@ describe( 'Composite', () => {
 					name: 'Item C3',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( itemA1 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemB1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemB2 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( itemA2 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
-				await press( lastArrowKey );
+				await userEvent.keyboard( `{${ lastArrowKey }}` );
 				expect( itemA3 ).toHaveFocus();
-				await press.PageDown();
+				await userEvent.keyboard( '{PageDown}' );
 				expect( itemC3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemC3 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemC3 ).toHaveFocus();
-				await press( firstArrowKey );
+				await userEvent.keyboard( `{${ firstArrowKey }}` );
 				expect( itemC1 ).toHaveFocus();
-				await press.PageUp();
+				await userEvent.keyboard( '{PageUp}' );
 				expect( itemA1 ).toHaveFocus();
-				await press.End( null, { ctrlKey: true } );
+				await userEvent.keyboard( '{Control>}{End}{/Control}' );
 				expect( itemC3 ).toHaveFocus();
-				await press.Home( null, { ctrlKey: true } );
+				await userEvent.keyboard( '{Control>}{Home}{/Control}' );
 				expect( itemA1 ).toHaveFocus();
 			} );
 
@@ -495,23 +475,23 @@ describe( 'Composite', () => {
 					name: 'Item C3',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA2 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemB1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemC1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemA1 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemA3 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( itemC3 ).toHaveFocus();
 			} );
 
@@ -554,29 +534,30 @@ describe( 'Composite', () => {
 				const itemC3 = screen.getByRole( 'button', {
 					name: 'Item C3',
 				} );
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA2 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemB1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemC1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemA2 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( itemA1 ).toHaveFocus();
-				await press.End( itemA1, { ctrlKey: true } );
+				itemA1.focus();
+				await userEvent.keyboard( '{Control>}{End}{/Control}' );
 				expect( itemC3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemC3 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemC3 ).toHaveFocus();
 			} );
 
@@ -608,15 +589,15 @@ describe( 'Composite', () => {
 					name: 'Item C3',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press( previousArrowKey );
+				await userEvent.keyboard( `{${ previousArrowKey }}` );
 				expect( itemC3 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				expect( itemC3 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemA1 ).toHaveFocus();
 			} );
 
@@ -650,20 +631,20 @@ describe( 'Composite', () => {
 					name: 'Item C1',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemB1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemB2 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				// A2 doesn't exist
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemB1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemB2 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				// C2 is disabled
 				expect( itemC1 ).toHaveFocus();
 			} );
@@ -695,16 +676,16 @@ describe( 'Composite', () => {
 					name: 'Item B2',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( itemA1 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				expect( itemB1 ).toHaveFocus();
-				await press( nextArrowKey );
+				await userEvent.keyboard( `{${ nextArrowKey }}` );
 				expect( itemB2 ).toHaveFocus();
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 				// A2 doesn't exist
 				expect( itemB2 ).toHaveFocus();
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 				// C2 is disabled
 				expect( itemB2 ).toHaveFocus();
 			} );

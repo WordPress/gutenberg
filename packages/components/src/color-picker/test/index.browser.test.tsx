@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { click } from '@ariakit/test';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
 
@@ -312,7 +311,7 @@ describe( 'ColorPicker', () => {
 			const setColorButton = screen.getByRole( 'button', {
 				name: /set color/i,
 			} );
-			await click( setColorButton );
+			await userEvent.click( setColorButton );
 
 			expect( hueSlider ).toHaveValue( '208' );
 			expect( hueNumberInput ).toHaveValue( 208 );

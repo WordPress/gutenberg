@@ -1,11 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { render } from '@ariakit/test/react';
+import { userEvent } from 'vitest/browser';
+import { render, screen } from '@testing-library/react';
 import FontSizePickerSelect from '../font-size-picker-select';
 import type { FontSize } from '../types';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'FontSizePickerSelect', () => {
 	const fontSizes: FontSize[] = [
@@ -102,7 +99,7 @@ describe( 'FontSizePickerSelect', () => {
 
 	describe( 'onChange callback', () => {
 		it( 'should call onChange with FontSize object as second parameter', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
@@ -122,7 +119,7 @@ describe( 'FontSizePickerSelect', () => {
 		} );
 
 		it( 'should call onChange with undefined as second parameter for default option', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect

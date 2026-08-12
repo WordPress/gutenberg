@@ -1,10 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 type Log = { name: string; args: unknown[] };
 type EventLogger = ( name: string, args: unknown[] ) => void;
@@ -25,7 +23,7 @@ const props: FocalPointPickerProps = {
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
 		it( 'clicking the draggable area should focus it', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			const mockOnChange = vi.fn();
 
@@ -70,7 +68,7 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'drag gestures', () => {
-		it( 'should call onDragStart, onDrag, onDragEnd and onChange in that order', () => {
+		it( 'should call onDragStart, onDrag, onDragEnd and onChange in that order', async () => {
 			const logs: Log[] = [];
 			const eventLogger: EventLogger = ( name, args ) =>
 				logs.push( { name, args } );
@@ -84,11 +82,10 @@ describe( 'FocalPointPicker', () => {
 
 			const dragArea = screen.getByRole( 'button' );
 
-			// `user-event` is not capable of testing drag interactions properly.
-			// we could consider using playwright instead.
-			fireEvent.mouseDown( dragArea );
-			fireEvent.mouseMove( dragArea );
-			fireEvent.mouseUp( dragArea );
+			await userEvent.dragAndDrop( dragArea, dragArea, {
+				sourcePosition: { x: 10, y: 10 },
+				targetPosition: { x: 20, y: 20 },
+			} );
 
 			expect(
 				events.reduce( ( last, eventName, index ) => {
@@ -100,7 +97,7 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'resolvePoint handling', () => {
 		it( 'should allow value altering', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			const spyChange = vi.fn();
 			const spy = vi.fn();
@@ -143,7 +140,7 @@ describe( 'FocalPointPicker', () => {
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			const spyChange = vi.fn();
 			render(

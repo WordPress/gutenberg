@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { RectangleStencil } from '../rectangle-stencil';
 import type {
@@ -57,33 +57,6 @@ function renderStencil(
 }
 
 describe( 'RectangleStencil', () => {
-	// jsdom does not implement PointerEvent or pointer capture — stub both so
-	// handle drag tests work. Same pattern as core/test/interaction-controller.ts.
-	beforeAll( () => {
-		if ( ! HTMLElement.prototype.setPointerCapture ) {
-			HTMLElement.prototype.setPointerCapture = vi.fn();
-		}
-		if ( ! HTMLElement.prototype.releasePointerCapture ) {
-			HTMLElement.prototype.releasePointerCapture = vi.fn();
-		}
-		// Without a PointerEvent constructor, fireEvent.pointerDown falls back to
-		// the base Event class which has no `button` property. The stencil's
-		// handler guards on `event.button !== 0` and returns early, so no native
-		// listeners are ever registered. Providing a minimal stub (extending
-		// MouseEvent so `button` comes from MouseEventInit) fixes this.
-		if ( typeof ( globalThis as any ).PointerEvent === 'undefined' ) {
-			( globalThis as any ).PointerEvent = class PointerEvent extends (
-				MouseEvent
-			) {
-				pointerId: number;
-				constructor( type: string, init: PointerEventInit = {} ) {
-					super( type, init );
-					this.pointerId = init.pointerId ?? 0;
-				}
-			};
-		}
-	} );
-
 	describe( 'tab order', () => {
 		it( 'renders handles clockwise from top-left in freeform mode', () => {
 			renderStencil();
@@ -430,17 +403,21 @@ describe( 'RectangleStencil', () => {
 				</div>
 			);
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
+			const createTouch = ( identifier: number, clientX: number ) =>
+				new Touch( {
+					identifier,
+					target: firstHandle,
+					clientX,
+					clientY: 100,
+				} );
 
 			fireEvent.touchStart( firstHandle, {
-				touches: [ { clientX: 100, clientY: 100 } ],
+				touches: [ createTouch( 1, 100 ) ],
 			} );
 			expect( onTouchStart ).not.toHaveBeenCalled();
 
 			fireEvent.touchStart( firstHandle, {
-				touches: [
-					{ clientX: 100, clientY: 100 },
-					{ clientX: 160, clientY: 100 },
-				],
+				touches: [ createTouch( 1, 100 ), createTouch( 2, 160 ) ],
 			} );
 			expect( onTouchStart ).toHaveBeenCalledTimes( 1 );
 		} );

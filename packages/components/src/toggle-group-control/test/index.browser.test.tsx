@@ -1,6 +1,6 @@
 import { describe, expect, it, test, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, click, hover, sleep } from '@ariakit/test';
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 import Button from '../../button';
@@ -13,12 +13,13 @@ import { TOOLTIP_DELAY } from '../../tooltip';
 import type { ToggleGroupControlProps } from '../types';
 import controlStyles from '../toggle-group-control/style.module.scss';
 import optionStyles from '../toggle-group-control-option-base/style.module.scss';
-globalThis.wpVitest.mockResizeObserver();
 
 const hoverOutside = async () => {
-	await hover( document.body );
-	await hover( document.body, { clientX: 10, clientY: 10 } );
+	await userEvent.hover( document.body );
 };
+
+const sleep = ( milliseconds: number ) =>
+	new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
 
 const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
 	Array.from( element.classList ).filter( ( className ) =>
@@ -172,7 +173,7 @@ describe.each( [
 			</Component>
 		);
 
-		await click( screen.getByRole( 'radio', { name: 'R' } ) );
+		await userEvent.click( screen.getByRole( 'radio', { name: 'R' } ) );
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
@@ -185,7 +186,7 @@ describe.each( [
 		const radio = screen.getByRole( 'radio', { name: 'R' } );
 		expect( radio ).not.toBeChecked();
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( radio ).toHaveFocus();
 		expect( radio ).not.toBeChecked();
 	} );
@@ -200,13 +201,15 @@ describe.each( [
 
 			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
 
-			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Reset' } )
+			);
 
 			expect(
 				screen.getByRole( 'radio', { name: 'J' } )
 			).not.toBeChecked();
 
-			await press.ShiftTab();
+			await userEvent.tab( { shift: true } );
 			expect(
 				screen.getByRole( 'radio', { name: 'R' } )
 			).not.toBeChecked();
@@ -227,7 +230,7 @@ describe.each( [
 			'Click for Delicious Gnocchi'
 		);
 
-		await hover( firstRadio );
+		await userEvent.hover( firstRadio );
 
 		const tooltip = await screen.findByRole( 'tooltip', {
 			name: 'Click for Delicious Gnocchi',
@@ -257,7 +260,7 @@ describe.each( [
 			'Click for Sumptuous Caponata'
 		);
 
-		await hover( secondRadio );
+		await userEvent.hover( secondRadio );
 
 		// Tooltip shouldn't show
 		expect(
@@ -284,12 +287,14 @@ describe.each( [
 			const rigasOption = screen.getByRole( 'radio', { name: 'R' } );
 			const jackOption = screen.getByRole( 'radio', { name: 'J' } );
 
-			await click( rigasOption );
+			await userEvent.click( rigasOption );
 
 			expect( jackOption ).not.toBeChecked();
 			expect( rigasOption ).toBeChecked();
 
-			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Reset' } )
+			);
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).not.toBeChecked();
@@ -312,7 +317,9 @@ describe.each( [
 			expect( rigasOption ).toBeChecked();
 			expect( jackOption ).not.toBeChecked();
 
-			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Reset' } )
+			);
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).not.toBeChecked();
@@ -338,7 +345,7 @@ describe.each( [
 						</Component>
 					);
 
-					await click(
+					await userEvent.click(
 						screen.getByRole( 'button', { name: 'Jack' } )
 					);
 					expect(
@@ -348,7 +355,7 @@ describe.each( [
 						screen.getByRole( 'radio', { name: 'R' } )
 					).not.toBeChecked();
 
-					await click(
+					await userEvent.click(
 						screen.getByRole( 'button', { name: 'Rigas' } )
 					);
 					expect(
@@ -435,7 +442,7 @@ describe.each( [
 					name: 'R',
 					checked: true,
 				} );
-				await click( rigas );
+				await userEvent.click( rigas );
 				expect( mockOnChange ).toHaveBeenCalledTimes( 0 );
 			} );
 
@@ -453,10 +460,10 @@ describe.each( [
 					name: 'R',
 				} );
 
-				await press.Tab();
+				await userEvent.tab();
 				expect( rigas ).toHaveFocus();
 
-				await press.Tab();
+				await userEvent.tab();
 
 				// When in controlled mode, there is an additional "Reset" button.
 				const expectedFocusTarget =
@@ -482,7 +489,7 @@ describe.each( [
 					</Component>
 				);
 
-				await press.Tab();
+				await userEvent.tab();
 
 				expect(
 					screen.getByRole( 'radio', { name: 'Pizza' } )
@@ -492,7 +499,7 @@ describe.each( [
 				).toBeDisabled();
 
 				// Arrow navigation skips the disabled option
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 				expect(
 					screen.getByRole( 'radio', { name: 'Pasta' } )
 				).toBeChecked();
@@ -500,7 +507,7 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
 
 				// Arrow navigation skips the disabled option
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 				expect(
 					screen.getByRole( 'radio', { name: 'Pizza' } )
 				).toBeChecked();
@@ -508,7 +515,8 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
 
 				// Clicks don't cause the option to be selected
-				await click( screen.getByRole( 'radio', { name: 'Rice' } ) );
+				// eslint-disable-next-line testing-library/no-node-access
+				screen.getByRole( 'radio', { name: 'Rice' } ).click();
 				expect(
 					screen.getByRole( 'radio', { name: 'Pizza' } )
 				).toBeChecked();
@@ -531,7 +539,7 @@ describe.each( [
 					</Component>
 				);
 
-				await click(
+				await userEvent.click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: true,
@@ -540,7 +548,7 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
 
-				await click(
+				await userEvent.click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: false,
@@ -557,7 +565,7 @@ describe.each( [
 					</Component>
 				);
 
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'R',
@@ -565,7 +573,7 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'J',
@@ -574,7 +582,7 @@ describe.each( [
 				).toHaveFocus();
 
 				// Focus should not move with arrow keys
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 				expect(
 					screen.getByRole( 'button', {
 						name: 'J',
@@ -597,7 +605,7 @@ describe.each( [
 					</Component>
 				);
 
-				await press.Tab();
+				await userEvent.tab();
 
 				expect(
 					screen.getByRole( 'button', {
@@ -613,8 +621,8 @@ describe.each( [
 				).toBeDisabled();
 
 				// Tab key navigation skips the disabled option
-				await press.Tab();
-				await press.Space();
+				await userEvent.tab();
+				await userEvent.keyboard( ' ' );
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Pasta',
@@ -625,7 +633,7 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
 
 				// Tab key navigation skips the disabled option
-				await press.ShiftTab();
+				await userEvent.tab( { shift: true } );
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Pizza',
@@ -634,11 +642,8 @@ describe.each( [
 				).toHaveFocus();
 
 				// Clicks don't cause the option to be selected.
-				await click(
-					screen.getByRole( 'button', {
-						name: 'Rice',
-					} )
-				);
+				// eslint-disable-next-line testing-library/no-node-access
+				screen.getByRole( 'button', { name: 'Rice' } ).click();
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
