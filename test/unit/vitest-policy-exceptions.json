@@ -1,9 +1,16 @@
 {
-	"browserFireEvent": {},
+	"browserFireEvent": {
+		"packages/components/src/color-picker/test/index.browser.test.tsx": "Uses exact pointer and mouse coordinates to verify visual picker geometry and a complete pointer lifecycle that native userEvent cannot express deterministically.",
+		"packages/components/src/custom-gradient-picker/test/index.browser.test.tsx": "Uses exact mouse coordinates to verify gradient marker positioning while observable clicks and keyboard input use native userEvent.",
+		"packages/components/src/focal-point-picker/test/index.browser.test.tsx": "Uses exact mouse coordinates and an explicit blur sequence to verify drag lifecycle state that native userEvent cannot express deterministically.",
+		"packages/dataviews/src/dataviews/test/infinite-scroll.browser.test.tsx": "Sets controlled scroll metrics before dispatching scroll to verify the infinite-loading threshold deterministically.",
+		"packages/media-editor/src/image-editor/react/components/stencils/test/rectangle-stencil.browser.test.tsx": "Uses exact pointer and touch payloads for capture lifecycle coverage, plus direct key events only where fake timers verify resize debounce timing.",
+		"packages/media-editor/src/image-editor/react/components/test/cropper.browser.test.tsx": "Uses exact pointer, wheel, and transition payloads for crop geometry and lifecycle coverage, plus a direct key event only where fake timers isolate resize timing.",
+		"packages/ui/src/utils/test/use-overlay-scroll-state-attributes.browser.test.tsx": "Sets controlled scroll dimensions before dispatching scroll to verify overlay state transitions deterministically."
+	},
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
-		"packages/components/src/snackbar/test/list.jsdom.test.tsx": "Stubs scrollTo only to satisfy focus side effects; the regression assertion covers deterministic focus transfer, not scrolling.",
 		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",
 		"packages/compose/src/hooks/use-resize-observer/test/index.jsdom.test.ts": "Replaces ResizeObserver with a deterministic mock to verify disconnect-on-unmount lifecycle behavior without relying on browser layout.",
 		"packages/grid/src/dashboard-grid/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover deterministic drag and resize control semantics.",
