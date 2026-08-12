@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -11,10 +8,6 @@ import {
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';

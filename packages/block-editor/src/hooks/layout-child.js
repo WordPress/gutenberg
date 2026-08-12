@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { useStyleOverride } from './utils';

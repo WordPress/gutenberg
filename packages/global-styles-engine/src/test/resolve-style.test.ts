@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { resolveStyle, privateHelpers } from '../resolve-style';
 
 const {

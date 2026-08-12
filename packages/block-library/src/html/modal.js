@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -20,10 +17,6 @@ import {
 } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import Preview from './preview';
 import { parseContent, serializeContent } from './utils';

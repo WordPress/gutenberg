@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-fit';
 

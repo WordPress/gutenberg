@@ -5,12 +5,20 @@
 
 	@layer utilities {
 		.outset-ring--focus:focus,
-		.outset-ring--focus-except-active:focus:not(:active),
 		.outset-ring--focus-visible:focus-visible,
 		.outset-ring--focus-within:focus-within,
-		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
 		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
 		:focus-visible .outset-ring--focus-parent-visible {
+			@include mixins.focus-ring();
+		}
+
+		.outset-ring--focus-except-active:focus,
+		.outset-ring--focus-within-except-active:focus-within {
+			outline: none;
+		}
+
+		.outset-ring--focus-except-active:focus:not(:active),
+		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)) {
 			@include mixins.focus-ring();
 		}
 	}

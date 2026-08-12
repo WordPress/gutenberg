@@ -1,10 +1,6 @@
 /**
  * Tests for schema validation utilities.
  */
-
-/**
- * Internal dependencies
- */
 import { validateValueFromSchema } from '../validation';
 
 describe( 'validateValueFromSchema', () => {

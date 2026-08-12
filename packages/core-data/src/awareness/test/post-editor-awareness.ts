@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
 import type {

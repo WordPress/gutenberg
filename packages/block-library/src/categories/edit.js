@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Placeholder,
 	SelectControl,
@@ -27,10 +20,6 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function CategoriesEdit( {

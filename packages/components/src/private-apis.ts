@@ -1,30 +1,14 @@
-/**
- * External dependencies
- */
 import { useDrag } from '@use-gesture/react';
-
-/**
- * Internal dependencies
- */
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
-import { kebabCase, normalizeTextString } from './utils/strings';
-import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
-	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
 	ValidatedInputControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
@@ -39,22 +23,11 @@ lock( privateApis, {
 	ComponentsContext,
 	Tabs,
 	Menu,
-	kebabCase,
-	withIgnoreIMEEvents,
 	Badge,
-	normalizeTextString,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
-	ValidatedCheckboxControl,
 	ValidatedComboboxControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,

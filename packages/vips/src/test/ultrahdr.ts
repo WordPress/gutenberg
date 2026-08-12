@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getUltraHdrInfo, resizeImage } from '../';
 
 const mockThumbnailImage = jest.fn();

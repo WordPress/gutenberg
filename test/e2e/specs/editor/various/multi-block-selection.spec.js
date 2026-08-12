@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -85,7 +82,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+Enter' );
@@ -112,7 +109,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
@@ -135,7 +132,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+ArrowUp' );
@@ -241,28 +238,25 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1 ] );
 	} );
 
-	test( 'should keep the editing host semantics across a cross-block selection', async ( {
+	test( 'should present the editing host semantics during a cross-block selection', async ( {
 		page,
 		editor,
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		// The wrapper hosts editing for the selected block: it must present
-		// as a named multiline textbox for as long as it is the editing
-		// host, including while a selection crosses blocks.
+		// Without a cross-block selection, the block is edited on its own
+		// element and the canvas wrapper is not an editing host.
 		const host = editor.canvas.locator( 'body' );
-		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
-		await expect( host ).toHaveAttribute( 'role', 'textbox' );
-		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
-		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
+		await expect( host ).not.toHaveAttribute( 'contenteditable', 'true' );
 
-		// Extend the selection across blocks: the host semantics remain.
+		// Extend the selection across blocks: the wrapper becomes the
+		// editing host and must present as a named multiline textbox.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
@@ -281,18 +275,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			'Multiple selected blocks'
 		);
 
-		// Collapse into a block: the block still hosts, so the semantics
-		// remain and the generic host name returns.
-		await page.keyboard.press( 'ArrowLeft' );
-		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
-		await expect( host ).toHaveAttribute( 'role', 'textbox' );
-		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
-
-		// Move to the post title: the editability and the textbox semantics
+		// Collapse into a block: the editability and the textbox semantics
 		// are removed together.
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.click();
+		await page.keyboard.press( 'ArrowLeft' );
 		await expect( host ).toHaveAttribute( 'contenteditable', 'false' );
 		await expect( host ).not.toHaveAttribute( 'role' );
 		await expect( host ).not.toHaveAttribute( 'aria-multiline' );
@@ -305,7 +290,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -603,7 +588,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -670,7 +655,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '123' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -787,7 +772,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();
@@ -879,7 +864,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 
@@ -1281,7 +1266,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
@@ -1310,7 +1295,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );

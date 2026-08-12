@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'List (@firefox)', () => {
@@ -44,7 +41,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* A list item' );
 
@@ -71,7 +68,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a list with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
@@ -91,7 +88,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1) A list item' );
 
@@ -110,7 +107,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. ' );
 		await pageUtils.pressKeys( 'primary+z' );
@@ -127,7 +124,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Backspace' );
@@ -144,7 +141,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await expect(
@@ -164,7 +161,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await editor.showBlockToolbar();
@@ -182,7 +179,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.evaluate( () => delete window.requestIdleCallback );
 		await page.keyboard.type( '* ' );
@@ -203,7 +200,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Escape' );
@@ -220,7 +217,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Backspace' );
@@ -252,7 +249,7 @@ test.describe( 'List (@firefox)', () => {
 	test( 'can be created by typing "/list"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/list' );
 		await expect(
@@ -275,7 +272,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/list' );
@@ -294,7 +291,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
@@ -325,7 +322,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
@@ -351,7 +348,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
@@ -626,7 +623,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. one' );
 		await page.keyboard.press( 'Enter' );
@@ -992,7 +989,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '* 1' ); // Should be at level 0.
@@ -1107,7 +1104,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1140,7 +1137,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '* 1' );
@@ -1165,7 +1162,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Tests the shortcut with a non breaking space.
@@ -1183,7 +1180,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Tests the shortcut with a non breaking space.
@@ -1249,7 +1246,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1276,7 +1273,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1308,7 +1305,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. a' );
 		await page.keyboard.press( 'Enter' );
@@ -1367,7 +1364,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Enter' );
@@ -1412,7 +1409,7 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'can be exited to selected paragraph', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Enter' );
@@ -1618,7 +1615,7 @@ test.describe( 'List (@firefox)', () => {
 		for ( const key of [ 'Backspace', 'Delete' ] ) {
 			test( key, async ( { editor, page, pageUtils } ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				await page.keyboard.type( '* ab' );
 				await page.keyboard.press( 'Enter' );
@@ -1697,7 +1694,7 @@ test.describe( 'List (@firefox)', () => {
 		for ( const key of [ 'Backspace', 'Delete' ] ) {
 			test( key, async ( { editor, page, pageUtils } ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				await page.keyboard.type( '* ab' );
 				await page.keyboard.press( 'Enter' );
@@ -1770,7 +1767,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -1863,7 +1860,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -1943,7 +1940,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -2007,7 +2004,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -2109,7 +2106,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* one' );
 		await page.keyboard.press( 'Enter' );
@@ -2177,7 +2174,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* one' );
 		await page.keyboard.press( 'Enter' );
